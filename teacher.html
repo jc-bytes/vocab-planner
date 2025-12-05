@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Vocabulary App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <a href="index.html" class="back-link">← Home</a>
+                <h1>Teacher Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <div id="teacher-auth-controls" style="display:flex; align-items:center; gap:0.75rem;">
+                    <div id="teacher-user-info" style="display:none; align-items:center; gap:0.5rem;">
+                        <img id="teacher-user-avatar" src="" alt="Avatar"
+                            style="width:32px; height:32px; border-radius:50%;">
+                        <span id="teacher-user-name" style="font-size:0.9rem; color:var(--text-muted);"></span>
+                    </div>
+                    <span id="teacher-cloud-status" style="font-size:0.8rem; color:var(--text-muted);">☁️ Offline</span>
+                    <button id="teacher-sign-out-btn" class="btn text-btn" style="display:none;">Sign Out</button>
+                    <button id="teacher-login-btn" class="btn secondary-btn">Sign in with Google</button>
+                </div>
+                <button id="export-btn" class="btn primary-btn hidden">Export JSON</button>
+            </div>
+        </header>
+
+        <main class="teacher-main">
+            <!-- View: Login -->
+            <section id="teacher-login-view" class="view active">
+                <div class="card" style="text-align:center; padding:3rem; max-width:640px; margin:0 auto;">
+                    <h2 style="margin-bottom:0.5rem;">Teacher Sign In</h2>
+                    <p style="color:var(--text-muted); margin-bottom:2rem;">Sign in with your email to access teacher tools.</p>
+                    
+                    <!-- Email Link Sign-In Form -->
+                    <div id="email-signin-form" style="margin-bottom:1.5rem;">
+                        <div class="form-group" style="margin-bottom:1rem; text-align:left;">
+                            <label for="teacher-email-input" style="display:block; margin-bottom:0.5rem; font-weight:500;">Email Address</label>
+                            <input type="email" id="teacher-email-input" 
+                                placeholder="your.email@school.edu" 
+                                style="width:100%; padding:0.75rem 1rem; font-size:1rem; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg, rgba(15,23,42,0.6)); color:var(--text-color);">
+                        </div>
+                        <button id="send-email-link-btn" class="btn primary-btn"
+                            style="font-size:1.1rem; padding:0.75rem 2rem; width:100%;">
+                            📧 Send Sign-In Link
+                        </button>
+                    </div>
+                    
+                    <!-- Email Sent Confirmation (hidden by default) -->
+                    <div id="email-sent-confirmation" style="display:none; padding:1.5rem; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); border-radius:8px; margin-bottom:1.5rem;">
+                        <div style="font-size:2rem; margin-bottom:0.5rem;">✉️</div>
+                        <h3 style="margin:0 0 0.5rem 0; color:#10b981;">Check Your Email!</h3>
+                        <p style="margin:0 0 1rem 0; color:var(--text-muted);">
+                            We sent a sign-in link to <strong id="sent-email-display"></strong>
+                        </p>
+                        <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">
+                            Click the link in your email to sign in. The link expires in 1 hour.
+                        </p>
+                        <button id="resend-email-btn" class="btn text-btn" style="margin-top:1rem;">
+                            Didn't receive it? Send again
+                        </button>
+                    </div>
+                    
+                    <!-- Email Confirmation Prompt (for cross-device sign-in) -->
+                    <div id="email-confirm-prompt" style="display:none; margin-bottom:1.5rem;">
+                        <p style="color:var(--text-muted); margin-bottom:1rem;">
+                            Please confirm your email to complete sign-in:
+                        </p>
+                        <div class="form-group" style="margin-bottom:1rem; text-align:left;">
+                            <input type="email" id="confirm-email-input" 
+                                placeholder="Confirm your email" 
+                                style="width:100%; padding:0.75rem 1rem; font-size:1rem; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg, rgba(15,23,42,0.6)); color:var(--text-color);">
+                        </div>
+                        <button id="confirm-email-btn" class="btn primary-btn"
+                            style="font-size:1rem; padding:0.75rem 1.5rem;">
+                            Confirm & Sign In
+                        </button>
+                    </div>
+                    
+                    <!-- Divider -->
+                    <div style="display:flex; align-items:center; gap:1rem; margin:1.5rem 0;">
+                        <hr style="flex:1; border:0; border-top:1px solid var(--border-color);">
+                        <span style="color:var(--text-muted); font-size:0.85rem;">or</span>
+                        <hr style="flex:1; border:0; border-top:1px solid var(--border-color);">
+                    </div>
+                    
+                    <!-- Google Sign-In (alternative) -->
+                    <button id="teacher-login-view-btn" class="btn secondary-btn"
+                        style="font-size:1rem; padding:0.75rem 2rem;">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                            alt="Google" style="width:18px; height:18px; margin-right:0.5rem; vertical-align:middle;">
+                        Sign in with Google
+                    </button>
+                    
+                    <div id="teacher-login-error" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Teacher Dashboard -->
+            <section id="teacher-dashboard-view" class="view hidden">
+                <div class="dashboard-actions card" style="margin-bottom: 2rem; text-align: center; padding: 3rem;">
+                    <h2>Manage Vocabularies</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Create new sets, import existing ones, or
+                        edit from the library.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button id="create-new-btn" class="btn primary-btn"
+                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">+ Create New</button>
+                        <label for="import-file" class="btn secondary-btn"
+                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">📂 Import JSON</label>
+                        <input type="file" id="import-file" accept=".json" hidden>
+                        <button id="view-progress-btn" class="btn secondary-btn"
+                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">📊 Student Progress</button>
+                    </div>
+                </div>
+
+                <!-- Gamification Settings -->
+                <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="margin: 0; color: #fbbf24;">🎮 Gamification Settings</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Configure coin rewards and game costs for all students.</p>
+                        </div>
+                        <button id="save-gamification-btn" class="btn primary-btn" style="padding: 0.5rem 1rem;">
+                            💾 Save Settings
+                        </button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                        <div class="form-group" style="margin: 0;">
+                            <label for="global-exchange-rate" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Game Cost (Coins/Min)</label>
+                            <input type="number" id="global-exchange-rate" min="1" value="10" style="width: 100%; padding: 0.5rem;">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Cost to play games per minute</small>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label for="global-completion-bonus" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Completion Bonus (Coins)</label>
+                            <input type="number" id="global-completion-bonus" min="0" value="50" style="width: 100%; padding: 0.5rem;">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Bonus for completing all activities</small>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label for="global-progress-reward" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Progress Reward (Coins/10%)</label>
+                            <input type="number" id="global-progress-reward" min="0" value="1" style="width: 100%; padding: 0.5rem;">
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Coins earned per 10% progress</small>
+                        </div>
+                    </div>
+                    <div id="gamification-save-status" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);"></div>
+                </div>
+
+                <section class="library-section">
+                    <h2 style="margin-bottom: 1rem;">📚 Library</h2>
+                    <div id="library-list" class="vocab-grid">
+                        <div class="loading-spinner">Loading library...</div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- View: Student Progress -->
+            <section id="teacher-progress-view" class="view hidden">
+                <div class="section-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button id="back-to-dashboard-from-progress" class="btn text-btn">← Back to Dashboard</button>
+                        <h2 style="margin: 0;">Student Progress</h2>
+                    </div>
+                    <button id="open-data-management-btn" class="btn secondary-btn" style="padding: 0.75rem 1.5rem;">
+                        <span style="margin-right: 0.5rem;">⚙️</span>
+                        Data Management
+                    </button>
+                </div>
+
+                <div class="card"
+                    style="margin-bottom: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Total Students</div>
+                        <div class="mini-stat-value" id="stat-total-students">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Active (7d)</div>
+                        <div class="mini-stat-value" id="stat-active">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Average Coins</div>
+                        <div class="mini-stat-value" id="stat-avg-coins">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Top Performer</div>
+                        <div class="mini-stat-value" id="stat-top-student">--</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                            <label for="filter-grade" style="font-size: 0.8rem;">Grade</label>
+                            <select id="filter-grade" style="width: 100%; padding: 0.5rem;">
+                                <option value="">All Grades</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                            <label for="filter-group" style="font-size: 0.8rem;">Group</label>
+                            <select id="filter-group" style="width: 100%; padding: 0.5rem;">
+                                <option value="">All Groups</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
+                            <label for="filter-search" style="font-size: 0.8rem;">Search Name</label>
+                            <input type="text" id="filter-search" placeholder="Search student..."
+                                style="width: 100%; padding: 0.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="overflow-x: auto; max-height: 60vh; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead style="position: sticky; top: 0; background: var(--card-bg, rgba(15, 23, 42, 0.55)); z-index: 10;">
+                                <tr style="border-bottom: 2px solid var(--border-color);">
+                                    <th style="padding: 1rem; width: 50px;">
+                                        <input type="checkbox" id="select-all-students" title="Select All">
+                                    </th>
+                                    <th style="padding: 1rem;">Name</th>
+                                    <th style="padding: 1rem;">Email</th>
+                                    <th style="padding: 1rem;">Grade</th>
+                                    <th style="padding: 1rem;">Group</th>
+                                    <th style="padding: 1rem;">Coins</th>
+                                    <th style="padding: 1rem;">Last Active</th>
+                                    <th style="padding: 1rem;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-progress-list">
+                                <!-- Rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="progress-loading" class="loading-spinner hidden">Loading data...</div>
+                </div>
+
+                <!-- Bulk Action Toolbar -->
+                <div id="bulk-action-toolbar" class="bulk-action-toolbar hidden">
+                    <div class="bulk-toolbar-content">
+                        <span id="bulk-selected-count" class="bulk-count">0 students selected</span>
+                        <div class="bulk-actions">
+                            <input type="number" id="bulk-coin-input" value="10" min="1" placeholder="Coins"
+                                style="width: 90px; padding: 0.5rem;">
+                            <button id="bulk-add-coins-btn" class="btn primary-btn">Add Coins to Selected</button>
+                            <button id="bulk-clear-selection-btn" class="btn text-btn">Clear Selection</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Modal: Student Details -->
+            <div id="student-detail-modal" class="modal hidden">
+                <div class="modal-content" style="max-width: 800px; width: 90%;">
+                    <div class="modal-header">
+                        <h2 id="detail-student-name">Student Name</h2>
+                        <button id="close-detail-modal" class="btn text-btn" style="font-size: 1.5rem;">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="detail-summary-grid">
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Grade</div>
+                                <div class="mini-stat-value" id="detail-student-grade">-</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Group</div>
+                                <div class="mini-stat-value" id="detail-student-group">-</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Coins</div>
+                                <div class="mini-stat-value" id="detail-student-coins">0</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Last Active</div>
+                                <div class="mini-stat-value" id="detail-last-active">-</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Avg Score</div>
+                                <div class="mini-stat-value" id="detail-avg-score">-</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Activities Completed</div>
+                                <div class="mini-stat-value" id="detail-total-activities">-</div>
+                            </div>
+                            <div class="mini-stat">
+                                <div class="mini-stat-label">Role</div>
+                                <select id="detail-student-role"
+                                    style="width: 100%; padding: 0.2rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+                                    <option value="student">Student</option>
+                                    <option value="teacher">Teacher</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-bottom:1.25rem;">
+                            <h4 style="margin-bottom:0.5rem;">Adjust Coins</h4>
+                            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                                <input type="number" id="coin-adjust-input" value="10" min="1" style="width:90px;">
+                                <button id="coin-adjust-btn" class="btn primary-btn" style="padding:0.5rem 1rem;">Add
+                                    Coins</button>
+                                <div id="coin-adjust-status" style="font-size:0.85rem; color:var(--text-muted);"></div>
+                            </div>
+                            <div style="display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
+                                <button class="btn secondary-btn quick-coin-btn" data-amount="5">+5</button>
+                                <button class="btn secondary-btn quick-coin-btn" data-amount="10">+10</button>
+                                <button class="btn secondary-btn quick-coin-btn" data-amount="25">+25</button>
+                            </div>
+                        </div>
+                        <h3>Activity Progress</h3>
+                        <div id="detail-activity-list" style="display: grid; gap: 1rem; margin-top: 1rem;">
+                            <!-- Activity details populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Editor -->
+            <section id="teacher-editor-view" class="view hidden">
+                <div class="section-header" style="margin-bottom: 1rem;">
+                    <button id="back-to-dashboard" class="btn text-btn">← Back to Dashboard</button>
+                    <div style="flex:1"></div>
+                    <button id="generate-quiz-btn" class="btn secondary-btn">📝 Generate Summative Quiz</button>
+                </div>
+
+                <section class="vocab-meta-section card">
+                    <h2>Vocabulary Set Details</h2>
+                    <div class="form-group">
+                        <label for="vocab-id">ID (e.g., grade6_unit3)</label>
+                        <input type="text" id="vocab-id" placeholder="Unique ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="vocab-name">Name</label>
+                        <input type="text" id="vocab-name" placeholder="e.g., Technology Unit 3">
+                    </div>
+                    <div class="form-group">
+                        <label for="vocab-desc">Description</label>
+                        <textarea id="vocab-desc" placeholder="Brief description of this set"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="vocab-grade">Grade Levels (comma separated)</label>
+                        <input type="text" id="vocab-grade" placeholder="e.g., 6, 7">
+                    </div>
+                </section>
+
+                <section class="activity-settings-section card">
+                    <h2>Activity Settings</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">Configure how many
+                        words each activity should use.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="setting-flashcards">Flashcards</label>
+                            <input type="number" id="setting-flashcards" min="1" placeholder="All words"
+                                style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-matching">Matching</label>
+                            <input type="number" id="setting-matching" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-quiz">Quiz</label>
+                            <input type="number" id="setting-quiz" min="1" value="10" style="width: 100px;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="setting-synonym-antonym">Synonym & Antonym</label>
+                            <input type="number" id="setting-synonym-antonym" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-word-search">Word Search</label>
+                            <input type="number" id="setting-word-search" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-illustration">Image Hunt</label>
+                            <input type="number" id="setting-illustration" min="1" value="10" style="width: 100px;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="setting-crossword">Crossword</label>
+                            <input type="number" id="setting-crossword" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-hangman">Hangman</label>
+                            <input type="number" id="setting-hangman" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-scramble">Word Scramble</label>
+                            <input type="number" id="setting-scramble" min="1" value="10" style="width: 100px;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="setting-speed-match">Speed Match</label>
+                            <input type="number" id="setting-speed-match" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-fill-in-blank">Fill in Blank</label>
+                            <input type="number" id="setting-fill-in-blank" min="1" value="10" style="width: 100px;">
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #fbbf24;">Gamification Settings</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Configure coin rewards
+                        and costs.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="setting-completion-bonus">Completion Bonus (Coins)</label>
+                            <input type="number" id="setting-completion-bonus" min="0" value="50" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-exchange-rate">Exchange Rate (Coins/Min)</label>
+                            <input type="number" id="setting-exchange-rate" min="1" value="10" style="width: 100px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="setting-progress-reward">Progress Reward (Coins/10%)</label>
+                            <input type="number" id="setting-progress-reward" min="0" value="1" style="width: 100px;">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="words-section">
+                    <div class="section-header">
+                        <h2>Words List</h2>
+                        <button id="add-word-btn" class="btn accent-btn">+ Add Word</button>
+                    </div>
+                    <div id="words-container" class="words-grid">
+                        <!-- Word cards will be injected here -->
+                    </div>
+                </section>
+            </section>
+
+            <!-- View: Quiz Maker -->
+            <section id="quiz-maker-view" class="view hidden">
+                <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
+                    <!-- Sidebar -->
+                    <aside class="quiz-sidebar card"
+                        style="width: 300px; display: flex; flex-direction: column; overflow-y: auto;">
+                        <h3 style="margin-bottom: 1rem;">Quiz Tools</h3>
+
+                        <div class="tool-section">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Add
+                                Questions</h4>
+                            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                                <div
+                                    style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem;">
+                                    <span style="flex:1;">Type</span>
+                                    <span style="width:70px; text-align:center;">Pts/Q</span>
+                                    <span style="width:70px; text-align:center;">Count</span>
+                                    <span style="width:90px; text-align:center;">Order</span>
+                                </div>
+                                <div id="quiz-type-list" style="display:flex; flex-direction:column; gap:0.5rem;">
+                                    <!-- Rows keep their data-type for JS ordering -->
+                                    <div class="quiz-row" data-type="mc"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="mc"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="mc"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Multiple Choice</label>
+                                        <input type="number" id="mc-points" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="mc-count" min="0" value="5"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="tf"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="tf"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="tf"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">True / False</label>
+                                        <input type="number" id="tf-points" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="tf-count" min="0" value="5"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="matching"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="matching"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="matching"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Matching</label>
+                                        <input type="number" id="match-points" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="match-count" min="0" value="5"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="short"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="short"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="short"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Short Answer</label>
+                                        <input type="number" id="short-points" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="short-count" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="synonym"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="synonym"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="synonym"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Synonym / Antonym</label>
+                                        <input type="number" id="synonym-points" min="0" value="1"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="synonym-count" min="0" value="5"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="wordsearch"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="wordsearch"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="wordsearch"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Word Search</label>
+                                        <input type="number" id="wordsearch-points" min="0" value="10"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="wordsearch-count" min="0" value="0"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                    <div class="quiz-row" data-type="crossword"
+                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
+                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
+                                            <button type="button" class="btn text-btn order-up" data-type="crossword"
+                                                title="Move up">↑</button>
+                                            <button type="button" class="btn text-btn order-down" data-type="crossword"
+                                                title="Move down">↓</button>
+                                        </div>
+                                        <label style="font-size: 0.8rem; font-weight:600;">Crossword</label>
+                                        <input type="number" id="crossword-points" min="0" value="10"
+                                            style="padding:0.3rem; text-align:center;">
+                                        <input type="number" id="crossword-count" min="0" value="0"
+                                            style="padding:0.3rem; text-align:center;">
+                                    </div>
+                                </div>
+                                <button id="generate-questions-btn" class="btn primary-btn"
+                                    style="margin-top: 0.5rem;">Generate Quiz</button>
+                                <p
+                                    style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
+                                    Tip: Reorder sections with arrows. Word Search and Crossword still start on a new
+                                    page.
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--border-color);">
+
+                        <div class="tool-section">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Settings
+                            </h4>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Quiz Title</label>
+                                <input type="text" id="quiz-title-input" style="width: 100%;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Instructions</label>
+                                <textarea id="quiz-instructions-input" rows="3" style="width: 100%;"></textarea>
+                            </div>
+
+                            <h4
+                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; margin-top: 1rem;">
+                                Header & Rubric</h4>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">School Name</label>
+                                <input type="text" id="quiz-school-input" value="ACADEMIA INTERNACIONAL DE DAVID"
+                                    style="width: 100%;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Rubric</label>
+                                <button id="edit-rubric-btn" class="btn secondary-btn"
+                                    style="width:100%; font-size:0.8rem;">Edit Rubric Table</button>
+                            </div>
+
+                            <h4
+                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; margin-top: 1rem;">
+                                Page Style</h4>
+                            <div class="form-group">
+                                <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+                                    <input type="checkbox" id="quiz-border-toggle" checked> Show Border
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Font</label>
+                                <select id="quiz-font-select" style="width:100%;">
+                                    <option value="'Inter', sans-serif">Sans Serif (Modern)</option>
+                                    <option value="'Times New Roman', serif">Serif (Classic)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: auto; padding-top: 1rem;">
+                            <button id="quiz-maker-print-btn" class="btn primary-btn"
+                                style="width: 100%; margin-bottom: 0.5rem;">🖨️ Print / PDF</button>
+                            <button id="quiz-maker-image-btn" class="btn secondary-btn"
+                                style="width: 100%; margin-bottom: 0.5rem;">🖼️ Export as Image</button>
+                            <button id="quiz-maker-pdf-btn" class="btn secondary-btn"
+                                style="width: 100%; margin-bottom: 0.5rem;">📄 Export as PDF</button>
+                            <button id="quiz-maker-close-btn" class="btn text-btn" style="width: 100%;">Close
+                                Editor</button>
+                        </div>
+                    </aside>
+
+                    <!-- Main Canvas -->
+                    <main class="quiz-canvas card"
+                        style="flex: 1; overflow-y: auto; background: #f3f4f6; padding: 2rem;">
+                        <div id="quiz-questions-list" class="quiz-list" style="max-width: 800px; margin: 0 auto;">
+                            <!-- Questions injected here -->
+                            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                <p>Quiz is empty.</p>
+                                <p>Use the sidebar to add questions.</p>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </section>
+
+            <!-- View: Data Management -->
+            <section id="teacher-data-management-view" class="view hidden" style="max-width: 80%; margin: 0 auto;">
+                <div class="section-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button id="back-to-progress-from-data" class="btn text-btn">← Back to Student Progress</button>
+                        <h2 style="margin: 0;">⚙️ Data Management</h2>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.125)); margin-bottom: 2rem;">
+                    <button class="data-tab-btn active" data-tab="dashboard" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid var(--primary-color, #6366f1); color: var(--text-main, #f8fafc); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        📊 Dashboard
+                    </button>
+                    <button class="data-tab-btn" data-tab="export" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        📤 Export
+                    </button>
+                    <button class="data-tab-btn" data-tab="view" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        📂 View Data
+                    </button>
+                    <button class="data-tab-btn" data-tab="reset" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        🗑️ Reset
+                    </button>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div id="data-dashboard-section" class="data-tab-content active">
+                    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">📊 Analytics Dashboard</h3>
+                            <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                                Visual insights into student progress, activity completion, and engagement metrics.
+                            </p>
+                        </div>
+                        <div class="card" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <label for="dashboard-grade-filter" style="font-weight: 500; white-space: nowrap; color: var(--text-main);">Filter by Grade:</label>
+                            <select id="dashboard-grade-filter" style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg, rgba(15,23,42,0.6)); color: var(--text-color); min-width: 150px;">
+                                <option value="">All Grades</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-total-students">--</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Total Students</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);" id="dashboard-active-students">--</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Active (7 days)</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🪙</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-avg-coins">--</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Coins</div>
+                        </div>
+                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-vocab-count">--</div>
+                            <div style="color: var(--text-muted); font-size: 0.9rem;">Vocabularies</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- Activity Completion Chart -->
+                        <div class="card" style="padding: 1.5rem;">
+                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Activity Completion</h4>
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="activity-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Progress by Grade Chart -->
+                        <div class="card" style="padding: 1.5rem;">
+                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Progress by Grade</h4>
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="grade-progress-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Coin Distribution Chart -->
+                        <div class="card" style="padding: 1.5rem;">
+                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Coin Distribution</h4>
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="coin-distribution-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Activity Usage Chart -->
+                        <div class="card" style="padding: 1.5rem;">
+                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Most Used Activities</h4>
+                            <div style="position: relative; height: 300px;">
+                                <canvas id="activity-usage-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Table -->
+                    <div class="card" style="padding: 1.5rem;">
+                        <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Recent Activity</h4>
+                        <div id="recent-activity-table" style="max-height: 400px; overflow-y: auto;">
+                            <div class="loading-spinner">Loading activity data...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Tab -->
+                <div id="data-export-section" class="data-tab-content" style="display: none;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">📊 Data Export & Visualization</h3>
+                        <p style="color: var(--text-muted, #6b7280); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                            Before resetting data, you must export it. Select the data types and students you want to export, then preview and download.
+                        </p>
+                    </div>
+
+                    <!-- Data Type Selection -->
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label style="font-weight: 600; margin-bottom: 1rem; display: block; font-size: 1rem; color: var(--text-main, #f8fafc);">Select data to export:</label>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 1.25rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
+                                <input type="checkbox" id="export-progress" checked style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">Student Progress</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Vocabulary progress (scores, activity data), coins, images, student profile</div>
+                                </div>
+                            </label>
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
+                                <input type="checkbox" id="export-scores" checked style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">Leaderboard Scores</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Game high scores</div>
+                                </div>
+                            </label>
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
+                                <input type="checkbox" id="export-roles" style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">User Roles</div>
+                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Advanced option</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Student Selection -->
+                    <div class="form-group" style="margin-bottom: 2rem;">
+                        <label style="font-weight: 600; margin-bottom: 1rem; display: block; font-size: 1rem; color: var(--text-main, #f8fafc);">Select students:</label>
+                        <div style="padding: 1.25rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
+                                    <input type="radio" name="student-selection" value="all" id="select-all" checked style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                    <span style="font-weight: 500; color: var(--text-main, #f8fafc);">All students</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent; flex-wrap: wrap;">
+                                    <input type="radio" name="student-selection" value="grade" id="select-grade" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                    <span style="font-weight: 500; min-width: 100px; color: var(--text-main, #f8fafc);">By grade:</span>
+                                    <select id="export-grade-select" class="form-control" style="flex: 1; max-width: 250px; padding: 0.5rem; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 6px; color: var(--text-main, #f8fafc);" disabled>
+                                        <option value="">Select grade...</option>
+                                    </select>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
+                                    <input type="radio" name="student-selection" value="specific" id="select-specific" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
+                                    <span style="font-weight: 500; color: var(--text-main, #f8fafc);">Specific students (use filters above)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
+                        <button id="preview-data-btn" class="btn secondary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                            <span style="margin-right: 0.5rem;">👁️</span>
+                            Preview Data
+                        </button>
+                        <button id="export-json-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                            <span style="margin-right: 0.5rem;">📥</span>
+                            Export JSON
+                        </button>
+                        <button id="export-csv-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                            <span style="margin-right: 0.5rem;">📊</span>
+                            Export CSV
+                        </button>
+                    </div>
+
+                    <!-- Export Loading Indicator -->
+                    <div id="export-loading" style="display: none; padding: 1.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="export-spinner" style="width: 24px; height: 24px; border: 3px solid rgba(99, 102, 241, 0.3); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Exporting Data...</div>
+                                <div id="export-loading-text" style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5);">Preparing your data for download</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 6px; overflow: hidden;">
+                            <div id="export-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); transition: width 0.3s ease; animation: progress-pulse 1.5s ease-in-out infinite;"></div>
+                        </div>
+                    </div>
+                    <style>
+                        @keyframes spin {
+                            to { transform: rotate(360deg); }
+                        }
+                        @keyframes progress-pulse {
+                            0%, 100% { opacity: 1; }
+                            50% { opacity: 0.7; }
+                        }
+                    </style>
+
+                    <!-- Export Status -->
+                    <div id="export-status" style="display: none; padding: 1rem 1.25rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
+                            <span style="font-size: 1.2rem;">✅</span>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-main, #f8fafc);">Export Completed</div>
+                                <div id="export-status-text" style="font-size: 0.9rem; color: #34d399;">Ready to proceed with reset</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div id="data-preview-section" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Data Preview</h4>
+                        <div id="preview-summary" style="margin-bottom: 1.5rem;"></div>
+                        <div id="preview-tables" style="max-height: 500px; overflow-y: auto; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                    </div>
+                </div>
+
+                <!-- View Data Tab -->
+                <div id="data-viewer-section" class="data-tab-content" style="display: none;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">📂 View Exported Data</h3>
+                        <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                            Load a previously exported JSON file to view all progress data, vocabulary scores, and student information.
+                        </p>
+                    </div>
+
+                    <!-- File Loader -->
+                    <div id="file-loader" style="border: 2px dashed var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 2.5rem; text-align: center; background: rgba(15, 23, 42, 0.3); transition: all 0.2s;">
+                        <input type="file" id="load-json-file" accept=".json" style="display: none;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                        <button id="choose-file-btn" class="btn primary-btn" style="padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 0.75rem;">
+                            Choose JSON File
+                        </button>
+                        <p style="margin: 0; color: var(--text-muted, #cbd5f5); font-size: 0.9rem;">or drag and drop file here</p>
+                    </div>
+
+                    <!-- File Info -->
+                    <div id="file-info" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
+                            <span style="font-size: 1.2rem;">✅</span>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">
+                                    <span id="file-name"></span>
+                                </div>
+                                <div id="file-size" style="font-size: 0.9rem; color: #34d399;"></div>
+                            </div>
+                            <button id="clear-file-btn" class="btn text-btn" style="padding: 0.5rem 1rem;">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="file-error" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #f87171;">
+                            <span style="font-size: 1.2rem;">❌</span>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Error Loading File</div>
+                                <div id="error-message" style="font-size: 0.9rem; color: #fca5a5;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Summary (shown after successful load) -->
+                    <div id="viewer-summary" style="display: none; margin-top: 2rem;">
+                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Data Summary</h4>
+                        <div id="viewer-summary-stats" style="margin-bottom: 1.5rem;"></div>
+                    </div>
+
+                    <!-- Data Tables (shown after successful load) -->
+                    <div id="viewer-tables" style="display: none; margin-top: 2rem;">
+                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Student Data</h4>
+                        <div id="viewer-tables-content" style="max-height: 600px; overflow-y: auto; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                    </div>
+                </div>
+
+                <!-- Reset Tab -->
+                <div id="data-reset-section" class="data-tab-content" style="display: none; opacity: 0.5; pointer-events: none;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--danger-color, #f87171);">🗑️ Data Reset</h3>
+                        <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                            ⚠️ <strong>WARNING:</strong> This action cannot be undone! You must export data before resetting.
+                        </p>
+                    </div>
+                    <div id="reset-export-status" style="padding: 1rem 1.25rem; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #fbbf24;">
+                            <span style="font-size: 1.2rem;">⚠️</span>
+                            <span style="font-weight: 500; color: var(--text-main, #f8fafc);">Export required before reset</span>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
+                        <h4 style="margin: 0 0 1rem 0; color: var(--danger-color, #f87171);">What will be deleted:</h4>
+                        <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-main, #f8fafc);">
+                            <li>All student progress data (vocabulary scores, activity completion)</li>
+                            <li>All leaderboard scores</li>
+                            <li>User roles (optional)</li>
+                        </ul>
+                    </div>
+                    <button id="reset-data-btn" class="btn danger-btn" style="margin-top: 1.5rem; padding: 0.75rem 2rem; font-size: 1rem;" disabled>
+                        🗑️ Reset All Data
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Word Editor Modal -->
+    <div id="word-modal" class="modal hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Word</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Word</label>
+                        <input type="text" id="word-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Part of Speech</label>
+                        <select id="pos-input">
+                            <option value="noun">Noun</option>
+                            <option value="verb">Verb</option>
+                            <option value="adjective">Adjective</option>
+                            <option value="adverb">Adverb</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Definition</label>
+                    <textarea id="def-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Example Sentence</label>
+                    <textarea id="example-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Image Path (Repo Path)</label>
+                    <div class="image-path-input">
+                        <input type="text" id="image-input" placeholder="images/unitX/word.png">
+                        <div id="image-preview" class="image-preview-box">No Image</div>
+                    </div>
+                    <small>Images must be uploaded to the repo manually.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary-btn close-modal">Cancel</button>
+                <button id="save-word-btn" class="btn primary-btn">Save Word</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Preview Modal -->
+    <div id="quiz-modal" class="modal hidden">
+        <div class="modal-content card" style="max-width: 900px; width: 95%; max-height: 90vh; overflow: auto;">
+            <div class="modal-header">
+                <div>
+                    <h3 style="margin-bottom:0.25rem;">Summative Quiz Preview</h3>
+                    <small style="color:var(--text-muted);">Layout follows provided template.</small>
+                </div>
+                <button id="close-quiz-modal" class="btn text-btn" style="font-size: 1.5rem;">×</button>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+                <button id="refresh-quiz-btn" class="btn secondary-btn">🔄 Regenerate</button>
+                <button id="print-quiz-btn" class="btn primary-btn">🖨️ Print / Save PDF</button>
+            </div>
+            <div id="quiz-preview" class="quiz-preview"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/main.js" type="module"></script>
+    <script src="js/libs/html2canvas.min.js"></script>
+    <script src="js/teacher.js" type="module"></script>
+</body>
+
+</html>
