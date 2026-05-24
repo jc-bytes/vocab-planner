@@ -1,0 +1,28 @@
+{
+  "id": "grade8_it_vector_graphics_design",
+  "name": "Grade 8 IT: Vector Graphics and Design",
+  "description": "Vector graphics, bitmap images, fill, stroke, z-order, alignment, grouping, paths, nodes, SVG markup, and campaign logo improvement.",
+  "grades": ["8"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "vector", "definition": "A graphic made from paths and shapes that can scale clearly.", "example": "A logo is often a vector graphic.", "difficulty": 2, "synonyms": ["scalable graphic"], "antonyms": ["bitmap"]},
+    {"word": "bitmap", "definition": "An image made from pixels.", "example": "A photo is usually a bitmap image.", "difficulty": 2, "synonyms": ["raster"], "antonyms": ["vector"]},
+    {"word": "fill", "definition": "The inside color of a vector shape.", "example": "The circle had a green fill.", "difficulty": 1, "synonyms": ["inside color"], "antonyms": ["stroke"]},
+    {"word": "stroke", "definition": "The outline of a vector shape or path.", "example": "The icon used a dark stroke.", "difficulty": 1, "synonyms": ["outline"], "antonyms": ["fill"]},
+    {"word": "layer", "definition": "A level in a design that controls object order.", "example": "The background layer stayed behind the logo.", "difficulty": 2, "synonyms": ["level"], "antonyms": []},
+    {"word": "z-order", "definition": "The front-to-back order of objects in a design.", "example": "Changing z-order moved the leaf in front.", "difficulty": 3, "synonyms": ["stacking order"], "antonyms": []},
+    {"word": "align", "definition": "To line up objects neatly.", "example": "The icons were aligned along the same edge.", "difficulty": 1, "synonyms": ["line up"], "antonyms": ["misalign"]},
+    {"word": "distribute", "definition": "To space objects evenly.", "example": "The shapes were distributed across the badge.", "difficulty": 2, "synonyms": ["space evenly"], "antonyms": ["cluster"]},
+    {"word": "group", "definition": "To combine objects so they move together.", "example": "The logo parts were grouped.", "difficulty": 1, "synonyms": ["combine"], "antonyms": ["ungroup"]},
+    {"word": "path", "definition": "A line or curve used to create a vector object.", "example": "The leaf was made from a curved path.", "difficulty": 2, "synonyms": ["curve"], "antonyms": []},
+    {"word": "node", "definition": "A point on a path that can be edited.", "example": "Moving the node changed the curve.", "difficulty": 2, "synonyms": ["point"], "antonyms": []},
+    {"word": "pen tool", "definition": "A vector tool used to draw straight or curved paths.", "example": "The pen tool made the water drop shape.", "difficulty": 2, "synonyms": ["path tool"], "antonyms": []},
+    {"word": "SVG", "definition": "A markup format for vector graphics.", "example": "The SVG code changed the icon color.", "difficulty": 3, "synonyms": ["vector markup"], "antonyms": []},
+    {"word": "markup", "definition": "Text code that describes structure or appearance.", "example": "Markup described what the vector image looked like.", "difficulty": 2, "synonyms": ["code"], "antonyms": []},
+    {"word": "scalable", "definition": "Able to change size while staying clear.", "example": "A scalable logo works on a poster and website.", "difficulty": 2, "synonyms": ["resizable"], "antonyms": ["fixed"]},
+    {"word": "campaign", "definition": "A planned message that tries to inform or persuade.", "example": "The campaign icon promoted clean energy.", "difficulty": 1, "synonyms": ["message plan"], "antonyms": []},
+    {"word": "feedback", "definition": "Helpful comments about strengths and improvements.", "example": "Peer feedback improved the logo.", "difficulty": 1, "synonyms": ["suggestions"], "antonyms": []},
+    {"word": "export", "definition": "To save a file in a format for sharing or submitting.", "example": "The student exported the badge as an image.", "difficulty": 1, "synonyms": ["save out"], "antonyms": ["import"]}
+  ]
+}

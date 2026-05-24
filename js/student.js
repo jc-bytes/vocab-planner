@@ -1,7 +1,7 @@
 import { $, $$, createElement, fetchJSON, notifications } from './main.js';
 import { ReportGenerator } from './reportGenerator.js';
 import {
-    firebaseAuthService,
+    supabaseService,
     getDocs,
     collection,
     doc,
@@ -13,13 +13,16 @@ import {
     where,
     orderBy,
     limit
-} from './firebaseService.js';
+} from './supabaseService.js';
 import { imageDB } from './db.js';
 // Import modular components
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
 import { StudentActivities } from './student/studentActivities.js';
 import { StudentGames } from './student/studentGames.js';
+
+const DEV_AUTH_DISABLED = false;
+const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
 
 class StudentManager {
     constructor() {
@@ -79,6 +82,9 @@ class StudentManager {
         this.htmlGames = ['ball-roll-3d', 'appel', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021'];
         this.currentGameIndex = 0;
         this.authInitialized = false;
+        this.authDisabled = DEV_AUTH_DISABLED;
+        this.joinGrade = this.getJoinGradeFromUrl();
+        this.mustChangePassword = false;
         this.cloudVocabs = [];
         this.cloudSaveTimeout = null;
         this.unitImages = {};
@@ -95,43 +101,43 @@ class StudentManager {
     async init() {
         // Attach listeners first so buttons work immediately
         this.initListeners();
+        this.prefillRegistrationFromJoinLink();
 
         // Default view/state
         this.switchView('loading-view');
 
-        // Check if we expect to be logged in
-        const wasLoggedIn = localStorage.getItem('was_logged_in') === 'true';
-        const hasLocalProfile = this.studentProfile && (this.studentProfile.firstName || this.studentProfile.name);
+        if (this.authDisabled) {
+            this.currentUser = null;
+            this.currentRole = 'student';
+            this.auth.setAuthStatus('Local development');
+            this.auth.updateGuestStatus(true);
 
-        if (wasLoggedIn && hasLocalProfile) {
-            this.auth.setAuthStatus('Resuming session...');
+            await this.activities.loadManifest();
+            this.progress.loadLocalProgress();
             this.auth.updateHeader();
             this.activities.renderDashboard();
             this.switchView('main-menu-view');
-            // We still let initFirebaseAuth run to verify token and sync
-        } else if (wasLoggedIn) {
-            this.auth.setAuthStatus('Resuming session...');
-        } else {
-            this.auth.setAuthStatus('Guest Mode');
-            this.auth.updateGuestStatus(true);
-            this.switchView('main-menu-view');
+            return;
         }
 
         // Load manifest and local data
         await this.activities.loadManifest();
-        
-        // Try to load cloud vocabularies (may fail offline)
-        try {
-            await this.activities.loadCloudVocabularies();
-        } catch (error) {
-            console.error('Failed to load cloud vocabularies (may be offline):', error);
-            // Continue with local/manifest vocabularies
-        }
-        
         this.progress.loadLocalProgress();
-        this.auth.updateHeader();
 
-        await this.auth.initFirebaseAuth();
+        await this.auth.initBackendAuth();
+    }
+
+    getJoinGradeFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const grade = params.get('grade') || params.get('join');
+        return /^[6-9]$/.test(String(grade || '')) ? String(grade) : '';
+    }
+
+    prefillRegistrationFromJoinLink() {
+        if (!this.joinGrade) return;
+        const gradeSelect = $('#register-grade');
+        if (gradeSelect) gradeSelect.value = this.joinGrade;
+        this.showAuthPanel('register');
     }
 
     // DEPRECATED: Use this.progress.migrateCoinData() instead
@@ -179,9 +185,9 @@ class StudentManager {
         return this.activities.showActivityMenu();
     }
 
-    // DEPRECATED: Use this.auth.initFirebaseAuth() instead
-    async initFirebaseAuth() {
-        return this.auth.initFirebaseAuth();
+    // DEPRECATED: Use this.auth.initBackendAuth() instead
+    async initBackendAuth() {
+        return this.auth.initBackendAuth();
     }
 
     // DEPRECATED: Use this.activities.loadCloudVocabularies() instead
@@ -198,7 +204,7 @@ class StudentManager {
     async _loadCloudProgress_OLD() {
         if (!this.currentUser) return;
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.currentUser.uid);
             const snapshot = await getDoc(docRef);
 
@@ -344,14 +350,14 @@ class StudentManager {
         return this.auth.fetchAndSetRole(user);
     }
 
-    // DEPRECATED: Use this.auth.handleFirebaseSignIn() instead
-    async handleFirebaseSignIn(user) {
-        return this.auth.handleFirebaseSignIn(user);
+    // DEPRECATED: Use this.auth.handleBackendSignIn() instead
+    async handleBackendSignIn(user) {
+        return this.auth.handleBackendSignIn(user);
     }
 
-    // DEPRECATED: Use this.auth.handleFirebaseSignOut() instead
-    handleFirebaseSignOut() {
-        return this.auth.handleFirebaseSignOut();
+    // DEPRECATED: Use this.auth.handleBackendSignOut() instead
+    handleBackendSignOut() {
+        return this.auth.handleBackendSignOut();
     }
 
     switchView(viewId) {
@@ -454,88 +460,20 @@ class StudentManager {
             $('#activity-container').innerHTML = '';
         });
 
-        // Google Sign-In (Firebase)
-        const loginBtn = $('#google-login-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Login button clicked!');
-                const originalText = loginBtn.innerHTML;
-                loginBtn.innerHTML = '⏳ Signing in...';
-                loginBtn.disabled = true;
-                this.auth.showLoginError('');
-
-                try {
-                    console.log('Calling signInWithGoogle...');
-                    const result = await firebaseAuthService.signInWithGoogle();
-                    console.log('signInWithGoogle returned:', result);
-                    
-                    // If using redirect, the page will navigate away, so don't reset button
-                    if (result) {
-                        // Popup succeeded, reset button after delay
-                    setTimeout(() => {
-                        loginBtn.innerHTML = originalText;
-                        loginBtn.disabled = false;
-                    }, 1200);
-                    } else {
-                        console.log('Redirect mode - page should navigate away');
-                        // For redirect, show a message
-                        loginBtn.innerHTML = '⏳ Redirecting to Google...';
-                    }
-                } catch (e) {
-                    console.error('Sign in error:', e);
-                    console.error('Error details:', {
-                        code: e.code,
-                        message: e.message,
-                        stack: e.stack
-                    });
-                    
-                    let errorMessage = 'Sign-in failed. Please try again.';
-                    
-                    if (e.message === 'ELECTRON_NO_POPUP' || e.message === 'POPUP_BLOCKED_MANUAL_AUTH' || 
-                        e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-blocked') {
-                        // Electron/Cursor doesn't support popups - show helpful message
-                        this.showElectronAuthMessage(loginBtn);
-                        loginBtn.innerHTML = originalText;
-                        loginBtn.disabled = false;
-                        return;
-                    } else if (e.code === 'auth/network-request-failed') {
-                        errorMessage = 'Network error. Please check your connection.';
-                    } else if (e.message) {
-                        errorMessage = `Sign-in failed: ${e.message}`;
-                    }
-                    
-                    this.showLoginError(errorMessage);
-                    loginBtn.innerHTML = originalText;
-                    loginBtn.disabled = false;
-                }
-            });
-        } else {
-            console.error('ERROR: Login button not found!');
-            this.showLoginError('Sign-in button unavailable. Please refresh.');
-        }
-
-        // Skip Login (Guest Mode)
-        this.addListener('#skip-login-link', 'click', (e) => {
-            e.preventDefault();
-            this.switchView('vocab-selection-view');
-            this.auth.checkProfile(); // Proceed to profile check -> dashboard
-        });
-
-        // Guest Sign In Button
+        this.addListener('#student-login-form', 'submit', (e) => this.handleStudentLogin(e));
+        this.addListener('#student-register-form', 'submit', (e) => this.handleStudentRegister(e));
+        this.addListener('#show-login-btn', 'click', () => this.showAuthPanel('login'));
+        this.addListener('#show-register-btn', 'click', () => this.showAuthPanel('register'));
         this.addListener('#guest-signin-btn', 'click', () => {
             this.switchView('login-view');
+            this.showAuthPanel('login');
         });
 
-        this.addListener('#google-sign-out-btn', 'click', async () => {
-            try {
-                await firebaseAuthService.signOut();
-            } catch (error) {
-                console.error('Sign out error:', error);
-            }
+        this.addListener('#sign-out-btn', 'click', async () => {
+            await supabaseService.signOut();
         });
+
+        this.addListener('#change-password-form', 'submit', (e) => this.handleForcedPasswordChange(e));
 
         // Activity Selection
         $$('.activity-card').forEach(card => {
@@ -566,12 +504,11 @@ class StudentManager {
         });
 
         // Profile Save
-        this.addListener('#save-profile-btn', 'click', () => {
+        this.addListener('#save-profile-btn', 'click', async () => {
             const firstName = $('#student-firstname').value.trim();
             const lastName = $('#student-lastname').value.trim();
             let grade = $('#student-grade').value.trim();
             let group = $('#student-group').value.trim();
-            const isLoginViewVisible = $('#login-view') && !$('#login-view').classList.contains('hidden');
 
             if (!firstName) {
                 notifications.warning('Please enter your first name.');
@@ -598,20 +535,169 @@ class StudentManager {
                 lastName,
                 name: `${firstName} ${lastName}`.trim(), // For backward compatibility
                 grade,
-                group
+                group,
+                email: this.currentUser?.email || this.studentProfile.email || ''
             };
-            this.progress.saveLocalProgress(); // Save to local storage
+
+            try {
+                if (this.currentUser && !this.authDisabled) {
+                    await supabaseService.updateStudentProfile(this.studentProfile);
+                }
+                this.progress.saveLocalProgress(); // Save to local storage
+            } catch (error) {
+                console.error('Failed to update Supabase profile:', error);
+                notifications.error('Could not save your profile. Please try again.');
+                return;
+            }
 
             $('#profile-modal').classList.add('hidden');
             this.auth.updateHeader();
             this.activities.renderDashboard();
-            if (isLoginViewVisible) {
-                this.activities.renderDashboard();
-                if (isLoginViewVisible) {
-                    this.switchView('main-menu-view');
-                }
-            }
         });
+    }
+
+    showAuthPanel(panel) {
+        const loginPanel = $('#student-login-panel');
+        const registerPanel = $('#student-register-panel');
+        const loginBtn = $('#show-login-btn');
+        const registerBtn = $('#show-register-btn');
+
+        if (loginPanel) loginPanel.style.display = panel === 'login' ? 'block' : 'none';
+        if (registerPanel) registerPanel.style.display = panel === 'register' ? 'block' : 'none';
+        if (loginBtn) loginBtn.classList.toggle('primary-btn', panel === 'login');
+        if (registerBtn) registerBtn.classList.toggle('primary-btn', panel === 'register');
+    }
+
+    validateRegistrationForm() {
+        const firstName = $('#register-first-name')?.value.trim() || '';
+        const lastName = $('#register-last-name')?.value.trim() || '';
+        const email = $('#register-email')?.value.trim().toLowerCase() || '';
+        const grade = $('#register-grade')?.value || '';
+        const section = ($('#register-section')?.value || '').trim().toUpperCase();
+        const password = $('#register-password')?.value || '';
+        const confirmPassword = $('#register-confirm-password')?.value || '';
+
+        if (!firstName || !lastName || !email || !grade || !section || !password) {
+            throw new Error('Complete every registration field.');
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            throw new Error('Enter a valid school email address.');
+        }
+
+        if (!email.endsWith(STUDENT_EMAIL_DOMAIN)) {
+            throw new Error(`Use your ${STUDENT_EMAIL_DOMAIN} school email address.`);
+        }
+
+        if (!/^[6-9]$/.test(grade)) {
+            throw new Error('Choose grade 6, 7, 8, or 9.');
+        }
+
+        if (!/^[A-Z]$/.test(section)) {
+            throw new Error('Section letter must be one uppercase letter.');
+        }
+
+        if (password.length < 6) {
+            throw new Error('Password must be at least 6 characters.');
+        }
+
+        if (password !== confirmPassword) {
+            throw new Error('Passwords do not match.');
+        }
+
+        return {
+            firstName,
+            lastName,
+            email,
+            grade,
+            group: section
+        };
+    }
+
+    async handleStudentLogin(event) {
+        event.preventDefault();
+        const email = $('#login-email')?.value.trim().toLowerCase() || '';
+        const password = $('#login-password')?.value || '';
+
+        if (!email || !password) {
+            this.showLoginError('Enter your email and password.');
+            return;
+        }
+
+        this.showLoginError('');
+        this.switchView('loading-view');
+
+        try {
+            const result = await supabaseService.signInWithPassword(email, password);
+            await this.auth.handleBackendSignIn(result.user);
+        } catch (error) {
+            console.error('Student login failed:', error);
+            this.switchView('login-view');
+            this.showAuthPanel('login');
+            this.showLoginError(error.message || 'Could not sign in.');
+        }
+    }
+
+    async handleStudentRegister(event) {
+        event.preventDefault();
+
+        let profile;
+        try {
+            profile = this.validateRegistrationForm();
+        } catch (error) {
+            this.showLoginError(error.message);
+            return;
+        }
+
+        this.showLoginError('');
+        this.switchView('loading-view');
+
+        try {
+            const result = await supabaseService.signUpStudent(profile, $('#register-password').value);
+            await this.auth.handleBackendSignIn(result.user);
+            notifications.success('Registration complete. Welcome!');
+        } catch (error) {
+            console.error('Student registration failed:', error);
+            this.switchView('login-view');
+            this.showAuthPanel('register');
+            this.showLoginError(error.message || 'Could not register.');
+        }
+    }
+
+    showForcedPasswordChange() {
+        const modal = $('#force-password-modal');
+        const status = $('#change-password-status');
+        if (status) status.textContent = '';
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    async handleForcedPasswordChange(event) {
+        event.preventDefault();
+        const password = $('#change-password-new')?.value || '';
+        const confirmPassword = $('#change-password-confirm')?.value || '';
+        const status = $('#change-password-status');
+
+        if (password.length < 6) {
+            if (status) status.textContent = 'Use at least 6 characters.';
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            if (status) status.textContent = 'Passwords do not match.';
+            return;
+        }
+
+        try {
+            if (status) status.textContent = 'Updating password...';
+            await supabaseService.updatePasswordAndClearFlag(password);
+            this.mustChangePassword = false;
+            $('#force-password-modal')?.classList.add('hidden');
+            await this.auth.finishSignedInSession();
+            notifications.success('Password updated.');
+        } catch (error) {
+            console.error('Password change failed:', error);
+            if (status) status.textContent = error.message || 'Could not update password.';
+        }
     }
 
     // DEPRECATED: Use this.activities.handleAutoSave() instead
@@ -634,7 +720,7 @@ class StudentManager {
         if (guestEl) {
             guestEl.style.display = isGuest ? 'flex' : 'none';
         }
-        const userInfo = $('#google-user-info');
+        const userInfo = $('#user-info');
         if (userInfo && isGuest) {
             userInfo.style.display = 'none';
         } else if (userInfo && !isGuest) {
@@ -705,7 +791,7 @@ class StudentManager {
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
             <h3 style="margin: 0 0 0.75rem 0; color: var(--text-main, #f8fafc);">Sign In via Browser</h3>
             <p style="margin: 0 0 1rem 0; color: var(--text-muted, #94a3b8); font-size: 0.9rem; line-height: 1.5;">
-                Google Sign-In doesn't work in the Cursor browser. Please use one of these options:
+                External sign-in doesn't work in the Cursor browser. Please use one of these options:
             </p>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <a href="${deployedUrl}" target="_blank" 

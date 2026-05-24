@@ -5,7 +5,7 @@
 
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
-import { firebaseAuthService, doc, getDoc, setDoc, serverTimestamp } from '../firebaseService.js';
+import { supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../supabaseService.js';
 import { imageDB } from '../db.js';
 
 export class StudentProgress {
@@ -90,9 +90,10 @@ export class StudentProgress {
     }
 
     async loadCloudProgress() {
+        if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
             const snapshot = await getDoc(docRef);
 
@@ -182,9 +183,10 @@ export class StudentProgress {
     }
 
     async saveProgressToCloud() {
+        if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
 
             // Get current cloud data first to prevent overwriting newer data
@@ -328,6 +330,11 @@ export class StudentProgress {
     }
 
     async acceptGiftCoins() {
+        if (this.sm.authDisabled) {
+            this.sm.hideNotificationBadge();
+            return;
+        }
+
         if (this.sm.coinData.giftCoins <= 0) {
             this.sm.hideNotificationBadge();
             return;
@@ -353,7 +360,7 @@ export class StudentProgress {
         
         // Save to cloud immediately with giftCoins = 0
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
             
             const snapshot = await getDoc(docRef);
@@ -395,7 +402,7 @@ export class StudentProgress {
         const coinEl = $('#coin-balance');
         if (coinEl) {
             coinEl.textContent = `🪙 ${this.sm.coinData.balance} `;
-            coinEl.style.display = this.sm.currentUser ? 'flex' : 'none';
+            coinEl.style.display = (this.sm.currentUser || this.sm.authDisabled) ? 'flex' : 'none';
         }
         
         // Update notification badge
@@ -406,4 +413,3 @@ export class StudentProgress {
         }
     }
 }
-

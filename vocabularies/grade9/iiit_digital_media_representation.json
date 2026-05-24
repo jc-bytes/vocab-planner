@@ -1,0 +1,28 @@
+{
+  "id": "grade9_iiit_digital_media_representation",
+  "name": "Grade 9 IIIT: Digital Media Representation",
+  "description": "STEM launch vocabulary, pixels, resolution, color depth, RGB intensity, image size, samples, sampling rate, sample size, microphones, speakers, compression, quality, and file-size tradeoffs.",
+  "grades": ["9"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "STEM", "definition": "Problem solving that connects science, technology, engineering, and mathematics.", "example": "The STEM project connected media, design, and testing.", "difficulty": 1, "synonyms": ["technical learning"], "antonyms": []},
+    {"word": "representation", "definition": "A way to store, show, or communicate information.", "example": "Digital images use binary representation.", "difficulty": 2, "synonyms": ["encoding"], "antonyms": []},
+    {"word": "pixel", "definition": "One small picture element in a digital image.", "example": "The mosaic was built pixel by pixel.", "difficulty": 1, "synonyms": ["picture element"], "antonyms": []},
+    {"word": "resolution", "definition": "The number of pixels in an image or display.", "example": "Higher resolution can increase file size.", "difficulty": 2, "synonyms": ["pixel count"], "antonyms": []},
+    {"word": "color depth", "definition": "The number of bits used to represent each pixel's color.", "example": "Higher color depth can show more colors.", "difficulty": 3, "synonyms": ["bits per pixel"], "antonyms": []},
+    {"word": "RGB", "definition": "A color model that mixes red, green, and blue.", "example": "RGB values created purple.", "difficulty": 2, "synonyms": ["red green blue"], "antonyms": []},
+    {"word": "intensity", "definition": "The strength or amount of a color or signal.", "example": "Higher red intensity made the color warmer.", "difficulty": 2, "synonyms": ["strength"], "antonyms": ["weakness"]},
+    {"word": "file size", "definition": "The amount of storage a file uses.", "example": "Higher quality often increased file size.", "difficulty": 1, "synonyms": ["storage size"], "antonyms": []},
+    {"word": "sample", "definition": "One recorded measurement of sound or data.", "example": "Digital sound is stored as many samples.", "difficulty": 2, "synonyms": ["measurement"], "antonyms": []},
+    {"word": "sampling rate", "definition": "How many sound samples are recorded per second.", "example": "Higher sampling rate improved sound quality.", "difficulty": 3, "synonyms": ["sample frequency"], "antonyms": []},
+    {"word": "sample size", "definition": "The number of bits used for each sound sample.", "example": "Sample size affects quality and file size.", "difficulty": 3, "synonyms": ["bit depth"], "antonyms": []},
+    {"word": "microphone", "definition": "A device that captures sound input.", "example": "The microphone recorded the audio sample.", "difficulty": 1, "synonyms": ["sound input"], "antonyms": ["speaker"]},
+    {"word": "speaker", "definition": "A device that produces sound output.", "example": "The speaker played the edited sound.", "difficulty": 1, "synonyms": ["sound output"], "antonyms": ["microphone"]},
+    {"word": "compression", "definition": "Reducing file size by storing data more efficiently.", "example": "Compression made the audio file smaller.", "difficulty": 2, "synonyms": ["size reduction"], "antonyms": ["expansion"]},
+    {"word": "quality", "definition": "How clear or accurate media appears or sounds.", "example": "Lower sample size reduced quality.", "difficulty": 1, "synonyms": ["clarity"], "antonyms": ["poor quality"]},
+    {"word": "tradeoff", "definition": "A choice where gaining one benefit may lose another.", "example": "There was a tradeoff between file size and quality.", "difficulty": 2, "synonyms": ["compromise"], "antonyms": []},
+    {"word": "Audacity", "definition": "A sound editing tool used to inspect or change audio.", "example": "Students used Audacity to compare sample rates.", "difficulty": 1, "synonyms": ["audio editor"], "antonyms": []},
+    {"word": "evidence table", "definition": "A table used to record observations and results.", "example": "The evidence table compared sound settings.", "difficulty": 2, "synonyms": ["results table"], "antonyms": []}
+  ]
+}

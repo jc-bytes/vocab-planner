@@ -1,0 +1,198 @@
+{
+  "id": "grade6_t1_online_communication_collaboration",
+  "name": "Grade 6 T1: Online Communication and Collaboration",
+  "description": "Responsible communication, public and private messages, audiences, permissions, and shared digital work.",
+  "grades": ["6"],
+  "trimester": "1",
+  "activitySettings": {
+    "matching": 12,
+    "flashcards": 22,
+    "quiz": 12,
+    "illustration": 8,
+    "synonymAntonym": 10,
+    "wordSearch": 12,
+    "crossword": 12,
+    "hangman": 8,
+    "scramble": 10,
+    "speedMatch": 12,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "communicate",
+      "definition": "To share information, ideas, or feelings with other people.",
+      "example": "Students communicate online through messages, comments, and video calls.",
+      "difficulty": 1,
+      "synonyms": ["share", "message"],
+      "antonyms": ["ignore"]
+    },
+    {
+      "word": "collaborate",
+      "definition": "To work together with others to complete a task or project.",
+      "example": "The group collaborated on a shared slide deck.",
+      "difficulty": 1,
+      "synonyms": ["work together", "cooperate"],
+      "antonyms": ["work alone"]
+    },
+    {
+      "word": "public",
+      "definition": "Visible or available to many people.",
+      "example": "A public post may be seen by people outside your class.",
+      "difficulty": 1,
+      "synonyms": ["open", "shared"],
+      "antonyms": ["private"]
+    },
+    {
+      "word": "private",
+      "definition": "Limited to only certain people or kept protected from others.",
+      "example": "A private message should only be seen by the intended person.",
+      "difficulty": 1,
+      "synonyms": ["personal", "restricted"],
+      "antonyms": ["public"]
+    },
+    {
+      "word": "audience",
+      "definition": "The people who can see, hear, or receive a message.",
+      "example": "Before posting, think about the audience.",
+      "difficulty": 1,
+      "synonyms": ["viewers", "readers"],
+      "antonyms": []
+    },
+    {
+      "word": "permission",
+      "definition": "Approval to do something, such as sharing a photo or using someone's work.",
+      "example": "You need permission before posting a classmate's picture.",
+      "difficulty": 1,
+      "synonyms": ["approval", "consent"],
+      "antonyms": ["refusal"]
+    },
+    {
+      "word": "respectful",
+      "definition": "Kind, polite, and considerate toward others.",
+      "example": "A respectful comment helps the group improve without being rude.",
+      "difficulty": 1,
+      "synonyms": ["polite", "kind"],
+      "antonyms": ["rude"]
+    },
+    {
+      "word": "comment",
+      "definition": "A written response or note added to online work or a discussion.",
+      "example": "The teacher left a comment on the shared document.",
+      "difficulty": 1,
+      "synonyms": ["note", "response"],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent from one person to another.",
+      "example": "The team sent a message to agree on who would edit the slide.",
+      "difficulty": 1,
+      "synonyms": ["note", "communication"],
+      "antonyms": []
+    },
+    {
+      "word": "chat",
+      "definition": "A quick online conversation using typed messages.",
+      "example": "The group used chat to ask a project question.",
+      "difficulty": 1,
+      "synonyms": ["conversation", "message thread"],
+      "antonyms": []
+    },
+    {
+      "word": "share",
+      "definition": "To let others access, view, or use information or a file.",
+      "example": "The student shared the file with the teacher.",
+      "difficulty": 1,
+      "synonyms": ["send", "give access"],
+      "antonyms": ["hide"]
+    },
+    {
+      "word": "shared file",
+      "definition": "A digital file that more than one person can access or edit.",
+      "example": "The shared file let each team member add one idea.",
+      "difficulty": 1,
+      "synonyms": ["collaborative file", "team document"],
+      "antonyms": ["private file"]
+    },
+    {
+      "word": "contribution",
+      "definition": "Something useful that a person adds to a group task.",
+      "example": "Adding a clear title was a helpful contribution.",
+      "difficulty": 2,
+      "synonyms": ["addition", "input"],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful information about what works well and what could improve.",
+      "example": "The partner gave feedback about making the link easier to find.",
+      "difficulty": 1,
+      "synonyms": ["suggestion", "response"],
+      "antonyms": []
+    },
+    {
+      "word": "privacy",
+      "definition": "Protection of personal information and control over who can see it.",
+      "example": "Privacy matters when deciding what to share online.",
+      "difficulty": 2,
+      "synonyms": ["protection", "confidentiality"],
+      "antonyms": ["exposure"]
+    },
+    {
+      "word": "personal information",
+      "definition": "Details that identify someone, such as a full name, address, phone number, or password.",
+      "example": "Students should not post personal information in a public place.",
+      "difficulty": 2,
+      "synonyms": ["private details"],
+      "antonyms": ["public information"]
+    },
+    {
+      "word": "platform",
+      "definition": "An online tool or service used to communicate, create, or share.",
+      "example": "Google Classroom is a platform for class work.",
+      "difficulty": 2,
+      "synonyms": ["online tool", "service"],
+      "antonyms": []
+    },
+    {
+      "word": "tool",
+      "definition": "A program, app, or feature used to complete a task.",
+      "example": "A shared document is a tool for collaboration.",
+      "difficulty": 1,
+      "synonyms": ["app", "resource"],
+      "antonyms": []
+    },
+    {
+      "word": "purpose",
+      "definition": "The reason for doing something or sending a message.",
+      "example": "The purpose of the message was to ask for help.",
+      "difficulty": 1,
+      "synonyms": ["reason", "goal"],
+      "antonyms": []
+    },
+    {
+      "word": "responsible",
+      "definition": "Making careful, safe, and respectful choices.",
+      "example": "Responsible online communication protects people and their work.",
+      "difficulty": 1,
+      "synonyms": ["careful", "safe"],
+      "antonyms": ["careless"]
+    },
+    {
+      "word": "scenario",
+      "definition": "A short situation used to practice making a decision.",
+      "example": "The quiz gave a scenario about sharing a classmate's photo.",
+      "difficulty": 2,
+      "synonyms": ["situation", "case"],
+      "antonyms": []
+    },
+    {
+      "word": "confidential",
+      "definition": "Meant to be kept private or shared only with trusted people.",
+      "example": "A password is confidential information.",
+      "difficulty": 2,
+      "synonyms": ["private", "secret"],
+      "antonyms": ["public"]
+    }
+  ]
+}

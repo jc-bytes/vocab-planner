@@ -6,7 +6,7 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import {
-    firebaseAuthService,
+    supabaseService,
     getDocs,
     collection,
     doc,
@@ -17,7 +17,7 @@ import {
     where,
     orderBy,
     limit
-} from '../firebaseService.js';
+} from '../supabaseService.js';
 
 export class StudentGames {
     constructor(studentManager) {
@@ -38,9 +38,28 @@ export class StudentGames {
     async loadGlobalSettings() {
         // Return cached settings if available
         if (this.globalSettings) return this.globalSettings;
+
+        if (this.sm.authDisabled) {
+            try {
+                const localSettings = JSON.parse(localStorage.getItem('dev_gamification_settings') || '{}');
+                this.globalSettings = {
+                    exchangeRate: localSettings.exchangeRate || 10,
+                    completionBonus: localSettings.completionBonus || 50,
+                    progressReward: localSettings.progressReward || 1
+                };
+            } catch (error) {
+                console.error('Error loading local gamification settings:', error);
+                this.globalSettings = {
+                    exchangeRate: 10,
+                    completionBonus: 50,
+                    progressReward: 1
+                };
+            }
+            return this.globalSettings;
+        }
         
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const settingsRef = doc(db, 'appSettings', 'gamification');
             const settingsSnap = await getDoc(settingsRef);
             
@@ -113,6 +132,10 @@ export class StudentGames {
     }
 
     async saveHighScore(gameId, score, metadata = null) {
+        if (this.sm.authDisabled) {
+            return;
+        }
+
         // Games with leaderboards enabled
         const gamesWithLeaderboard = ['level-devil', 'radius-raid', 'packabunchas', 'spacepi'];
         
@@ -135,7 +158,7 @@ export class StudentGames {
         }
 
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const scoresRef = collection(db, 'scores');
 
             // Use a deterministic document ID: userId-gameId
@@ -247,6 +270,11 @@ export class StudentGames {
         if (!container) return; // Modal might not be in DOM yet
         if (!container) return;
 
+        if (this.sm.authDisabled) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Leaderboards are disabled in local development.</p>';
+            return;
+        }
+
         // Only show if we have a grade to filter by
         if (!this.sm.studentProfile.grade) {
             container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Update your profile grade to see the leaderboard!</p>';
@@ -256,11 +284,11 @@ export class StudentGames {
         container.innerHTML = '<div class="loading-spinner">Loading scores...</div>';
 
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const scoresRef = collection(db, 'scores');
 
             // Query: Same grade, same game, order by score (desc for higher=better, asc for lower=better)
-            // Note: This requires a composite index in Firestore. 
+            // Note: This requires a composite index in Supabase.
             // If it fails, check console for index creation link.
             // SpacePi uses "lower is better" scoring
             const isLowerBetter = gameId === 'spacepi';
@@ -1125,4 +1153,3 @@ export class StudentGames {
         $('#game-timer').textContent = `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
     }
 }
-

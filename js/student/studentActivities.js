@@ -5,7 +5,7 @@
 
 import { $, $$, createElement, fetchJSON } from '../main.js';
 import { notifications } from '../notifications.js';
-import { firebaseAuthService, getDocs, collection } from '../firebaseService.js';
+import { supabaseService, getDocs, collection } from '../supabaseService.js';
 import { MatchingActivity } from '../activities/matching.js';
 import { FlashcardsActivity } from '../activities/flashcards.js';
 import { QuizActivity } from '../activities/quiz.js';
@@ -151,9 +151,14 @@ export class StudentActivities {
     }
 
     async loadCloudVocabularies() {
+        if (this.sm.authDisabled) {
+            this.sm.cloudVocabs = [];
+            return;
+        }
+
         try {
-            await firebaseAuthService.init();
-            const db = firebaseAuthService.getFirestore();
+            await supabaseService.init();
+            const db = supabaseService.getDatabase();
             const snapshot = await getDocs(collection(db, 'vocabularies'));
             this.sm.cloudVocabs = snapshot.docs.map(docSnap => ({
                 id: docSnap.id,
@@ -178,6 +183,7 @@ export class StudentActivities {
     renderDashboard() {
         const container = $('#vocab-list');
         container.innerHTML = '';
+        container.className = 'vocab-groups';
 
         let vocabs = [];
 
@@ -237,24 +243,72 @@ export class StudentActivities {
             return;
         }
 
-        vocabs.forEach(vocab => {
-            const card = createElement('div', 'card option-card');
-            const sourceLabel = vocab.__source === 'cloud'
-                ? '☁️ Cloud'
-                : vocab.__source === 'local'
-                    ? '💾 Local'
-                    : '📁 Repo';
+        this.renderVocabularyGroups(container, vocabs);
+    }
 
-            card.innerHTML = `
-                <div class="icon">${vocab.__source === 'cloud' ? '☁️' : '📚'}</div>
-                <h3>${vocab.name}</h3>
-                <p>${vocab.description || ''}</p>
-                ${vocab.grades ? `<small>Grade: ${vocab.grades.join(', ')}</small>` : ''}
-                <small style="color:var(--text-muted); display:block; margin-top:0.5rem;">${sourceLabel}</small>
+    getTrimesterKey(trimester) {
+        const normalized = String(trimester || '').trim().toUpperCase();
+        if (normalized === '1' || normalized === 'IT' || normalized === 'T1') return 'IT';
+        if (normalized === '2' || normalized === 'IIT' || normalized === 'T2') return 'IIT';
+        if (normalized === '3' || normalized === 'IIIT' || normalized === 'T3') return 'IIIT';
+        return 'other';
+    }
+
+    getTrimesterLabel(trimester) {
+        const key = this.getTrimesterKey(trimester);
+        if (key === 'IT') return 'IT';
+        if (key === 'IIT') return 'IIT';
+        if (key === 'IIIT') return 'IIIT';
+        return 'Other Units';
+    }
+
+    renderVocabularyGroups(container, vocabs) {
+        const grouped = vocabs.reduce((groups, vocab) => {
+            const key = this.getTrimesterKey(vocab.trimester);
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(vocab);
+            return groups;
+        }, {});
+
+        ['IT', 'IIT', 'IIIT', 'other'].forEach(trimester => {
+            const trimesterVocabs = grouped[trimester];
+            if (!trimesterVocabs || trimesterVocabs.length === 0) return;
+
+            const group = createElement('section', 'vocab-trimester-group');
+            const heading = createElement('div', 'vocab-trimester-heading');
+            heading.innerHTML = `
+                <h3>${this.getTrimesterLabel(trimester)}</h3>
+                <span>${trimesterVocabs.length} ${trimesterVocabs.length === 1 ? 'unit' : 'units'}</span>
             `;
-            card.addEventListener('click', () => this.loadVocabulary(vocab));
-            container.appendChild(card);
+
+            const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
+            trimesterVocabs
+                .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
+                .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
+
+            group.appendChild(heading);
+            group.appendChild(grid);
+            container.appendChild(group);
         });
+    }
+
+    createVocabularyCard(vocab) {
+        const card = createElement('div', 'card option-card');
+        const sourceLabel = vocab.__source === 'cloud'
+            ? 'Cloud'
+            : vocab.__source === 'local'
+                ? 'Local'
+                : 'Repo';
+
+        card.innerHTML = `
+            <div class="icon">${vocab.__source === 'cloud' ? '☁️' : '📚'}</div>
+            <h3>${vocab.name}</h3>
+            <p>${vocab.description || ''}</p>
+            ${vocab.grades ? `<small>Grade: ${vocab.grades.join(', ')}</small>` : ''}
+            <small style="color:var(--text-muted); display:block; margin-top:0.5rem;">${sourceLabel}</small>
+        `;
+        card.addEventListener('click', () => this.loadVocabulary(vocab));
+        return card;
     }
 
     async loadVocabulary(vocabMeta) {
@@ -638,4 +692,3 @@ export class StudentActivities {
         }
     }
 }
-

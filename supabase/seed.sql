@@ -1,0 +1,2 @@
+-- Add teacher emails after linking or starting Supabase, for example:
+-- insert into public.teacher_allowlist (email) values ('teacher@example.com');

@@ -52,7 +52,7 @@ export class CrosswordActivity {
             placedWords: this.placedWords
         };
 
-        // Save via callback (to StudentManager -> Firebase)
+        // Save via callback (to StudentManager -> backend)
         if (this.onSaveState) {
             this.onSaveState(state);
         }

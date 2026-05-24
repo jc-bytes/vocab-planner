@@ -1,0 +1,28 @@
+{
+  "id": "grade8_it_web_portfolio_search",
+  "name": "Grade 8 IT: Web Portfolio and Search",
+  "description": "HTML, CSS, images, alt text, links, search keywords, operators, credits, Google Sites portfolios, navigation, videos, and calls to action.",
+  "grades": ["8"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "HTML", "definition": "Markup used to structure web page content.", "example": "HTML created headings, paragraphs, lists, and links.", "difficulty": 1, "synonyms": ["web markup"], "antonyms": []},
+    {"word": "tag", "definition": "A markup instruction surrounded by angle brackets.", "example": "The h1 tag created a heading.", "difficulty": 1, "synonyms": ["markup element"], "antonyms": []},
+    {"word": "heading", "definition": "Text that names a page or section.", "example": "The heading introduced the campaign topic.", "difficulty": 1, "synonyms": ["title"], "antonyms": []},
+    {"word": "paragraph", "definition": "A block of text about one idea.", "example": "The paragraph explained the campaign purpose.", "difficulty": 1, "synonyms": ["text block"], "antonyms": []},
+    {"word": "link", "definition": "Clickable text or media that opens another page or place.", "example": "The link opened the research source.", "difficulty": 1, "synonyms": ["hyperlink"], "antonyms": []},
+    {"word": "CSS", "definition": "A language used to style web pages.", "example": "CSS changed colors and fonts.", "difficulty": 1, "synonyms": ["style rules"], "antonyms": []},
+    {"word": "selector", "definition": "The part of a CSS rule that chooses what to style.", "example": "The selector targeted all headings.", "difficulty": 2, "synonyms": ["style target"], "antonyms": []},
+    {"word": "property", "definition": "A CSS feature being changed, such as color or font size.", "example": "The color property made text blue.", "difficulty": 2, "synonyms": ["style feature"], "antonyms": []},
+    {"word": "alt text", "definition": "A text description of an image.", "example": "Alt text helped explain the campaign image.", "difficulty": 2, "synonyms": ["image description"], "antonyms": []},
+    {"word": "keyword", "definition": "An important search word or phrase.", "example": "Specific keywords improved research results.", "difficulty": 1, "synonyms": ["search term"], "antonyms": []},
+    {"word": "operator", "definition": "A search or logic word that changes results.", "example": "AND and NOT helped refine the search.", "difficulty": 2, "synonyms": ["command"], "antonyms": []},
+    {"word": "portfolio", "definition": "A collection of project evidence and reflections.", "example": "The Google Sites portfolio showed graphics and research.", "difficulty": 1, "synonyms": ["collection"], "antonyms": []},
+    {"word": "navigation", "definition": "The way users move through a website.", "example": "Clear navigation connected all site pages.", "difficulty": 2, "synonyms": ["site movement"], "antonyms": []},
+    {"word": "credit", "definition": "A note that names a creator or source.", "example": "The portfolio included source credits.", "difficulty": 1, "synonyms": ["attribution"], "antonyms": ["plagiarism"]},
+    {"word": "caption", "definition": "Text that explains an image or video.", "example": "The caption described the vector graphic.", "difficulty": 1, "synonyms": ["label"], "antonyms": []},
+    {"word": "storyboard", "definition": "A plan that shows scenes or shots for a video.", "example": "The environmental video used a five-shot storyboard.", "difficulty": 2, "synonyms": ["scene plan"], "antonyms": []},
+    {"word": "call to action", "definition": "A message that asks the audience to do something.", "example": "The homepage had a call to action about saving water.", "difficulty": 2, "synonyms": ["action prompt"], "antonyms": []},
+    {"word": "reflection", "definition": "A written or spoken review of learning and design choices.", "example": "The reflection explained one challenge solved.", "difficulty": 1, "synonyms": ["review"], "antonyms": []}
+  ]
+}

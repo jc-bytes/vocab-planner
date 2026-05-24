@@ -1,7 +1,7 @@
 import { $, $$, createElement, fetchJSON, notifications } from './main.js';
 import { QuizMaker } from './quizMaker.js';
 import {
-    firebaseAuthService,
+    supabaseService,
     doc,
     setDoc,
     deleteDoc,
@@ -12,7 +12,16 @@ import {
     query,
     where,
     addDoc
-} from './firebaseService.js';
+} from './supabaseService.js';
+
+const DEV_AUTH_DISABLED = false;
+const DEV_TEACHER_USER = {
+    uid: 'dev-teacher',
+    displayName: 'Development Teacher',
+    email: 'teacher@local.dev',
+    photoURL: ''
+};
+const DEV_GAMIFICATION_SETTINGS_KEY = 'dev_gamification_settings';
 
 class TeacherManager {
     constructor() {
@@ -28,13 +37,14 @@ class TeacherManager {
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.editingWordIndex = -1;
-        this.isAuthenticated = false;
-        this.currentUser = null;
+        this.authDisabled = DEV_AUTH_DISABLED;
+        this.isAuthenticated = this.authDisabled;
+        this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
         this.cloudSaveTimeout = null;
         this.VOCAB_COLLECTION = 'vocabularies';
         this.activeStudentId = null;
         this.currentQuiz = null;
-        this.currentRole = 'student';
+        this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
         this.dataViewerInitialized = false;
 
@@ -43,60 +53,33 @@ class TeacherManager {
 
     async init() {
         this.initListeners();
-        this.initListeners();
 
-        // Optimistic UI check
-        if (localStorage.getItem('was_logged_in') === 'true') {
-            this.updateAuthUI({ displayName: 'Resuming...', email: '...' }); // Placeholder UI
-            this.showDashboard();
-            this.loadLibrary();
-        } else {
-            this.showLoginView();
+        if (this.authDisabled) {
+            this.startDevelopmentSession();
+            return;
         }
+
+        this.showLoginView();
 
         await this.initAuth();
     }
 
+    startDevelopmentSession() {
+        this.isAuthenticated = true;
+        this.currentUser = DEV_TEACHER_USER;
+        this.currentRole = 'teacher';
+        this.updateAuthUI(DEV_TEACHER_USER);
+        this.showDashboard();
+        this.loadLibrary();
+    }
+
     async initAuth() {
         try {
-            await firebaseAuthService.init();
-            
-            // Check for email link sign-in first (highest priority)
-            // This handles when user clicks the magic link in their email
-            if (firebaseAuthService.isEmailSignInLink()) {
-                console.log('Email sign-in link detected, completing sign-in...');
-                try {
-                    const result = await firebaseAuthService.completeEmailSignIn();
-                    console.log('Email link sign-in successful:', result.user.email);
-                    await this.handleAuthWithRole(result.user);
-                    return; // Don't continue with other auth checks
-                } catch (error) {
-                    if (error.message === 'EMAIL_REQUIRED') {
-                        // User opened link on different device, show email confirmation prompt
-                        this.showEmailConfirmPrompt();
-                        return;
-                    }
-                    console.error('Email link sign-in failed:', error);
-                    this.showAuthError('Email sign-in failed. Please try again.');
-                }
-            }
-            
-            // Check for redirect result (when using signInWithRedirect)
-            // This must be called before onAuthStateChanged
-            const redirectResult = await firebaseAuthService.handleRedirectResult();
-            let redirectProcessed = false;
-            if (redirectResult?.user) {
-                console.log('Processing redirect sign-in result for teacher...');
-                await this.handleAuthWithRole(redirectResult.user);
-                redirectProcessed = true;
-            }
-            
-            firebaseAuthService.onAuthStateChanged((user) => {
+            await supabaseService.init();
+
+            supabaseService.onAuthStateChanged((user) => {
                 if (user) {
-                    // Only handle if we didn't already process redirect result
-                    if (!redirectProcessed || !redirectResult?.user || redirectResult.user.uid !== user.uid) {
-                        this.handleAuthWithRole(user);
-                    }
+                    this.handleAuthWithRole(user);
                 } else {
                     this.isAuthenticated = false;
                     this.currentUser = null;
@@ -106,7 +89,7 @@ class TeacherManager {
             });
         } catch (error) {
             console.error('Failed to initialize teacher auth:', error);
-            this.showAuthError('Authentication unavailable. Please refresh to try again.');
+            this.showAuthError(error.message || 'Authentication unavailable. Please refresh to try again.');
             this.showLoginView();
         }
     }
@@ -125,7 +108,7 @@ class TeacherManager {
     // Handle email link sign-in with confirmed email (cross-device)
     async completeEmailSignInWithEmail(email) {
         try {
-            const result = await firebaseAuthService.completeEmailSignIn(email);
+            const result = await supabaseService.completeEmailSignIn(email);
             console.log('Email link sign-in completed:', result.user.email);
             await this.handleAuthWithRole(result.user);
         } catch (error) {
@@ -145,8 +128,9 @@ class TeacherManager {
             const role = await this.fetchUserRole(user);
             this.currentRole = role;
             if (role !== 'teacher') {
-                alert('Access restricted to teachers.');
-                await firebaseAuthService.signOut();
+                await supabaseService.signOut();
+                this.showAuthError('Access restricted to allowlisted teacher emails.');
+                this.showLoginView();
                 return;
             }
             this.isAuthenticated = true;
@@ -163,37 +147,13 @@ class TeacherManager {
     }
 
     async fetchUserRole(user) {
-        let role = 'student';
         try {
-            const db = firebaseAuthService.getFirestore();
-            const roleRef = doc(db, 'userRoles', user.uid);
-            const snap = await getDoc(roleRef);
-            if (snap.exists()) {
-                role = snap.data().role || 'student';
-            } else {
-                // Try to create as teacher (if allowlisted), otherwise fallback to student
-                let created = false;
-                try {
-                    await setDoc(roleRef, { role: 'teacher', email: user.email || '' }, { merge: true });
-                    role = 'teacher';
-                    created = true;
-                } catch (err) {
-                    // ignore
-                }
-                if (!created) {
-                    try {
-                        await setDoc(roleRef, { role: 'student', email: user.email || '' }, { merge: true });
-                        role = 'student';
-                    } catch (err) {
-                        console.error('Failed to create role doc', err);
-                    }
-                }
-            }
+            const profile = await supabaseService.getProfile(user.uid);
+            return profile?.role || 'student';
         } catch (err) {
             console.error('Failed to fetch role', err);
-            role = 'student';
+            return 'student';
         }
-        return role;
     }
 
     switchView(viewId) {
@@ -219,8 +179,30 @@ class TeacherManager {
     }
     
     async loadGamificationSettings() {
+        if (this.authDisabled) {
+            try {
+                const settings = JSON.parse(localStorage.getItem(DEV_GAMIFICATION_SETTINGS_KEY) || '{}');
+                const exchangeRateInput = $('#global-exchange-rate');
+                const completionBonusInput = $('#global-completion-bonus');
+                const progressRewardInput = $('#global-progress-reward');
+
+                if (exchangeRateInput && settings.exchangeRate !== undefined) {
+                    exchangeRateInput.value = settings.exchangeRate;
+                }
+                if (completionBonusInput && settings.completionBonus !== undefined) {
+                    completionBonusInput.value = settings.completionBonus;
+                }
+                if (progressRewardInput && settings.progressReward !== undefined) {
+                    progressRewardInput.value = settings.progressReward;
+                }
+            } catch (error) {
+                console.error('Error loading local gamification settings:', error);
+            }
+            return;
+        }
+
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const settingsRef = doc(db, 'appSettings', 'gamification');
             const settingsSnap = await getDoc(settingsRef);
             
@@ -259,8 +241,31 @@ class TeacherManager {
                 saveBtn.innerHTML = '⏳ Saving...';
             }
             if (statusEl) statusEl.textContent = 'Saving settings...';
+
+            if (this.authDisabled) {
+                localStorage.setItem(DEV_GAMIFICATION_SETTINGS_KEY, JSON.stringify({
+                    exchangeRate,
+                    completionBonus,
+                    progressReward,
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: DEV_TEACHER_USER.email
+                }));
+
+                if (statusEl) {
+                    statusEl.style.color = 'var(--success-color)';
+                    statusEl.textContent = '✅ Settings saved locally.';
+                    setTimeout(() => {
+                        statusEl.textContent = '';
+                        statusEl.style.color = 'var(--text-muted)';
+                    }, 3000);
+                }
+
+                this.setCloudStatus('Saved locally', 'success');
+                notifications.success('Gamification settings saved locally.');
+                return;
+            }
             
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const settingsRef = doc(db, 'appSettings', 'gamification');
             await setDoc(settingsRef, {
                 exchangeRate,
@@ -302,6 +307,10 @@ class TeacherManager {
     }
 
     showLoginView() {
+        if (this.authDisabled) {
+            this.showDashboard();
+            return;
+        }
         this.switchView('teacher-login-view');
         $('#export-btn').classList.add('hidden');
     }
@@ -314,6 +323,16 @@ class TeacherManager {
         const avatar = $('#teacher-user-avatar');
         const loginViewBtn = $('#teacher-login-view-btn');
 
+        if (this.authDisabled) {
+            if (headerLoginBtn) headerLoginBtn.style.display = 'none';
+            if (signOutBtn) signOutBtn.style.display = 'none';
+            if (userInfo) userInfo.style.display = 'none';
+            if (loginViewBtn) loginViewBtn.style.display = 'none';
+            this.showAuthError('');
+            this.setCloudStatus('Local development', 'muted');
+            return;
+        }
+
         if (user) {
             if (headerLoginBtn) headerLoginBtn.style.display = 'none';
             if (signOutBtn) signOutBtn.style.display = 'inline-flex';
@@ -324,7 +343,7 @@ class TeacherManager {
             }
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
-                loginViewBtn.innerHTML = '🔐 Sign in with Google';
+                loginViewBtn.innerHTML = '🔐 Sign in';
             }
             this.showAuthError('');
             this.setCloudStatus('☁️ Ready', 'info');
@@ -334,7 +353,7 @@ class TeacherManager {
             if (userInfo) userInfo.style.display = 'none';
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
-                loginViewBtn.innerHTML = '🔐 Sign in with Google';
+                loginViewBtn.innerHTML = '🔐 Sign in';
             }
             this.setCloudStatus('☁️ Offline', 'muted');
         }
@@ -349,6 +368,59 @@ class TeacherManager {
         } else {
             errorEl.textContent = '';
             errorEl.style.display = 'none';
+        }
+    }
+
+    async handleTeacherLogin(event) {
+        event.preventDefault();
+        const email = $('#teacher-email')?.value.trim().toLowerCase() || '';
+        const password = $('#teacher-password')?.value || '';
+
+        if (!email || !password) {
+            this.showAuthError('Enter your email and password.');
+            return;
+        }
+
+        this.showAuthError('');
+        try {
+            const result = await supabaseService.signInWithPassword(email, password);
+            await this.handleAuthWithRole(result.user);
+        } catch (error) {
+            console.error('Teacher login failed:', error);
+            this.showAuthError(error.message || 'Could not sign in.');
+            this.showLoginView();
+        }
+    }
+
+    async handleTeacherSignup(event) {
+        event.preventDefault();
+        const email = $('#teacher-signup-email')?.value.trim().toLowerCase() || '';
+        const password = $('#teacher-signup-password')?.value || '';
+        const confirmPassword = $('#teacher-signup-confirm')?.value || '';
+
+        if (!email || !password) {
+            this.showAuthError('Enter your teacher email and password.');
+            return;
+        }
+
+        if (password.length < 6) {
+            this.showAuthError('Password must be at least 6 characters.');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            this.showAuthError('Passwords do not match.');
+            return;
+        }
+
+        this.showAuthError('');
+        try {
+            const result = await supabaseService.signUpTeacher(email, password);
+            await this.handleAuthWithRole(result.user);
+        } catch (error) {
+            console.error('Teacher signup failed:', error);
+            this.showAuthError(error.message || 'Could not create teacher account.');
+            this.showLoginView();
         }
     }
 
@@ -385,7 +457,7 @@ class TeacherManager {
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
             <h3 style="margin: 0 0 0.75rem 0; color: var(--text-main, #f8fafc);">Sign In via Browser</h3>
             <p style="margin: 0 0 1rem 0; color: var(--text-muted, #94a3b8); font-size: 0.9rem; line-height: 1.5;">
-                Google Sign-In doesn't work in the Cursor browser. Please use one of these options:
+                External sign-in doesn't work in the Cursor browser. Please use one of these options:
             </p>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <a href="${deployedUrl}" target="_blank" 
@@ -473,7 +545,7 @@ class TeacherManager {
                 this.showAuthError('');
                 
                 try {
-                    await firebaseAuthService.sendEmailSignInLink(email);
+                    await supabaseService.sendEmailSignInLink(email);
                     
                     // Show success message
                     const form = $('#email-signin-form');
@@ -572,6 +644,9 @@ class TeacherManager {
     }
 
     ensureAuthenticated(showAlert = true) {
+        if (this.authDisabled) {
+            return true;
+        }
         if (!this.isAuthenticated) {
             if (showAlert) {
                 alert('Please sign in to use the teacher tools.');
@@ -586,7 +661,7 @@ class TeacherManager {
         const list = $('#library-list');
         if (!list) return;
 
-        if (!this.isAuthenticated) {
+        if (!this.authDisabled && !this.isAuthenticated) {
             list.innerHTML = '<p>Please sign in to view the library.</p>';
             return;
         }
@@ -627,10 +702,11 @@ class TeacherManager {
     }
 
     async fetchCloudVocabs() {
+        if (this.authDisabled) return [];
         if (!this.ensureAuthenticated(false)) return [];
 
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const snapshot = await getDocs(collection(db, this.VOCAB_COLLECTION));
             this.setCloudStatus('☁️ Ready', 'info');
             return snapshot.docs.map(docSnap => {
@@ -742,7 +818,7 @@ class TeacherManager {
     async deleteCloudVocab(id) {
         if (!this.ensureAuthenticated()) return;
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const ref = doc(db, this.VOCAB_COLLECTION, id);
             await deleteDoc(ref);
         } catch (err) {
@@ -779,6 +855,12 @@ class TeacherManager {
     triggerAutoSave() {
         if (!this.vocabSet.id) return;
 
+        if (this.authDisabled) {
+            this.saveToLocal(this.vocabSet);
+            this.setCloudStatus('Saved locally', 'success');
+            return;
+        }
+
         if (this.vocabSet.source === 'cloud') {
             this.queueCloudSave();
         } else {
@@ -788,6 +870,10 @@ class TeacherManager {
     }
 
     queueCloudSave() {
+        if (this.authDisabled) {
+            this.setCloudStatus('Saved locally', 'success');
+            return;
+        }
         if (!this.isAuthenticated || !this.vocabSet.id) return;
         clearTimeout(this.cloudSaveTimeout);
         this.setCloudStatus('☁️ Saving...', 'info');
@@ -797,11 +883,12 @@ class TeacherManager {
     }
 
     async saveToCloud() {
+        if (this.authDisabled) return;
         if (!this.ensureAuthenticated(false)) return;
         if (!this.vocabSet.id) return;
 
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const docRef = doc(db, this.VOCAB_COLLECTION, this.vocabSet.id);
             const { __source, ...rest } = this.vocabSet;
             const payload = {
@@ -813,9 +900,9 @@ class TeacherManager {
             this.setCloudStatus('✅ Saved to cloud', 'success');
             setTimeout(() => this.setCloudStatus('☁️ Ready', 'info'), 1500);
         } catch (error) {
-            console.error('Failed to save vocabulary to Firebase:', error);
+            console.error('Failed to save vocabulary to backend:', error);
             this.setCloudStatus('⚠️ Save failed', 'error');
-            notifications.error('Cloud save failed. Check Firebase rules to ensure authenticated users can write to the vocabularies collection.');
+            notifications.error('Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');
         }
     }
 
@@ -857,85 +944,22 @@ class TeacherManager {
     }
 
     initListeners() {
-        // ========== EMAIL LINK SIGN-IN LISTENERS ==========
-        this.initEmailLinkListeners();
-        
-        // ========== GOOGLE SIGN-IN LISTENERS ==========
-        const loginButtons = ['#teacher-login-btn', '#teacher-login-view-btn'];
-        loginButtons.forEach(selector => {
-            const btn = $(selector);
-            if (!btn) {
-                console.warn(`Login button not found: ${selector}`);
-                return;
-            }
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Teacher login button clicked!', selector);
-                const originalText = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = '⏳ Signing in...';
-                this.showAuthError('');
-                
-                try {
-                    console.log('Calling signInWithGoogle for teacher...');
-                    const result = await firebaseAuthService.signInWithGoogle();
-                    console.log('signInWithGoogle returned:', result);
-                    
-                    // If using redirect, the page will navigate away, so don't reset button
-                    if (result) {
-                        // Popup succeeded, reset button after delay
-                        setTimeout(() => {
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        }, 1200);
-                    } else {
-                        console.log('Redirect mode - page should navigate away');
-                        btn.innerHTML = '⏳ Redirecting to Google...';
-                    }
-                } catch (error) {
-                    console.error('Teacher sign-in failed:', error);
-                    console.error('Error details:', {
-                        code: error.code,
-                        message: error.message,
-                        stack: error.stack
-                    });
-                    
-                    // Check if this is an Electron/popup issue
-                    if (error.message === 'ELECTRON_NO_POPUP' || error.message === 'POPUP_BLOCKED_MANUAL_AUTH' || 
-                        error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-blocked') {
-                        this.showElectronAuthMessage(btn);
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                        return;
-                    }
-                    
-                    let errorMessage = 'Sign-in failed. Please try again.';
-                    if (error.code === 'auth/network-request-failed') {
-                        errorMessage = 'Network error. Please check your connection.';
-                    } else if (error.message) {
-                        errorMessage = `Sign-in failed: ${error.message}`;
-                    }
-                    this.showAuthError(errorMessage);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }
-            });
-        });
+        if (!this.authDisabled) {
+            $('#teacher-login-form')?.addEventListener('submit', (event) => this.handleTeacherLogin(event));
+            $('#teacher-signup-form')?.addEventListener('submit', (event) => this.handleTeacherSignup(event));
+            $('#teacher-login-btn')?.addEventListener('click', () => this.showLoginView());
 
-        const signOutBtn = $('#teacher-sign-out-btn');
-        if (signOutBtn) {
-            signOutBtn.addEventListener('click', async () => {
-                try {
-                    await firebaseAuthService.signOut();
-                } catch (error) {
-                    console.error('Sign out error:', error);
-                } finally {
+            const signOutBtn = $('#teacher-sign-out-btn');
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', async () => {
+                    await supabaseService.signOut();
                     localStorage.removeItem('was_logged_in');
-                    window.location.reload(); // Reload to clear state cleanly
-                }
-            });
+                    this.isAuthenticated = false;
+                    this.currentUser = null;
+                    this.updateAuthUI(null);
+                    this.showLoginView();
+                });
+            }
         }
 
         // Dashboard Actions
@@ -1008,10 +1032,7 @@ class TeacherManager {
             this.clearSelection();
         });
 
-        // Role Change Listener
-        $('#detail-student-role')?.addEventListener('change', (e) => {
-            this.updateStudentRole(e.target.value);
-        });
+        $('#reset-student-password-btn')?.addEventListener('click', () => this.handlePasswordReset());
 
 
         // Meta fields
@@ -1629,13 +1650,14 @@ class TeacherManager {
     }
 
     async fetchAllStudentProgress() {
+        if (this.authDisabled) {
+            this.allStudentData = [];
+            this.filteredStudentData = [];
+            return;
+        }
+
         try {
-            const db = firebaseAuthService.getFirestore();
-            const snapshot = await getDocs(collection(db, 'studentProgress'));
-            this.allStudentData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            this.allStudentData = await supabaseService.getStudentsWithProgress();
             this.filteredStudentData = [...this.allStudentData];
         } catch (error) {
             console.error('Error fetching student progress:', error);
@@ -1792,22 +1814,16 @@ class TeacherManager {
             : '-';
         $('#detail-last-active').textContent = lastActiveDate;
 
-        // Fetch and set current role
-        const roleSelect = $('#detail-student-role');
-        roleSelect.value = 'student'; // Default
-        roleSelect.disabled = true; // Disable until loaded
-
-        try {
-            const db = firebaseAuthService.getFirestore();
-            const roleRef = doc(db, 'userRoles', student.id);
-            const snap = await getDoc(roleRef);
-            if (snap.exists()) {
-                roleSelect.value = snap.data().role || 'student';
-            }
-        } catch (e) {
-            console.error('Error fetching role:', e);
-        } finally {
-            roleSelect.disabled = false;
+        const passwordFlag = $('#detail-password-flag');
+        if (passwordFlag) {
+            passwordFlag.textContent = student.mustChangePassword ? 'Required' : 'No';
+        }
+        const resetStatus = $('#reset-password-status');
+        const tempOutput = $('#temporary-password-output');
+        if (resetStatus) resetStatus.textContent = '';
+        if (tempOutput) {
+            tempOutput.textContent = '';
+            tempOutput.style.display = 'none';
         }
 
         const list = $('#detail-activity-list');
@@ -1858,29 +1874,50 @@ class TeacherManager {
     }
 
     async updateStudentRole(role) {
+        console.warn('Role changes are disabled. Teacher access is controlled by teacher_allowlist.', role);
+        notifications.warning('Teacher access is controlled by teacher_allowlist.');
+    }
+
+    async handlePasswordReset() {
         if (!this.activeStudentId) return;
-        if (!confirm(`Are you sure you want to change this user's role to "${role}"?`)) {
-            // Revert selection if cancelled
-            const roleSelect = $('#detail-student-role');
-            roleSelect.value = role === 'teacher' ? 'student' : 'teacher';
-            return;
-        }
+        const student = this.allStudentData.find(s => s.id === this.activeStudentId);
+        const name = student?.studentProfile?.name || student?.email || 'this student';
+        const confirmed = confirm(`Reset the password for ${name}?`);
+        if (!confirmed) return;
+
+        const status = $('#reset-password-status');
+        const tempOutput = $('#temporary-password-output');
+        const button = $('#reset-student-password-btn');
 
         try {
-            const db = firebaseAuthService.getFirestore();
-            const roleRef = doc(db, 'userRoles', this.activeStudentId);
-            // Get email from already loaded student data if available
-            const student = this.allStudentData.find(s => s.id === this.activeStudentId);
-            const email = student?.email || student?.studentProfile?.email || '';
-            await setDoc(roleRef, { role: role, email: email }, { merge: true });
-            notifications.success(`Role updated to ${role}. The user must sign out and sign back in to access teacher features.`);
-            // Refresh the student details to show updated role
-            if (student) {
-                await this.showStudentDetails(student);
+            if (button) button.disabled = true;
+            if (status) {
+                status.style.color = 'var(--text-muted)';
+                status.textContent = 'Resetting password...';
             }
-        } catch (e) {
-            console.error('Error updating role:', e);
-            notifications.error('Failed to update role. Make sure Firestore rules are deployed.');
+            if (tempOutput) tempOutput.style.display = 'none';
+
+            const result = await supabaseService.resetStudentPassword(this.activeStudentId);
+            if (status) {
+                status.style.color = 'var(--success-color)';
+                status.textContent = 'Temporary password created.';
+            }
+            if (tempOutput) {
+                tempOutput.textContent = result.temporaryPassword || '';
+                tempOutput.style.display = 'block';
+            }
+
+            if (student) student.mustChangePassword = true;
+            const passwordFlag = $('#detail-password-flag');
+            if (passwordFlag) passwordFlag.textContent = 'Required';
+        } catch (error) {
+            console.error('Password reset failed:', error);
+            if (status) {
+                status.style.color = 'var(--danger-color)';
+                status.textContent = error.message || 'Could not reset password.';
+            }
+        } finally {
+            if (button) button.disabled = false;
         }
     }
     updateCoinStatus(message, state = 'muted') {
@@ -1918,7 +1955,7 @@ class TeacherManager {
         const student = this.allStudentData.find(s => s.id === studentId);
         if (!student) throw new Error('Student not found');
 
-        const db = firebaseAuthService.getFirestore();
+        const db = supabaseService.getDatabase();
         const ref = doc(db, 'studentProgress', studentId);
         
         // Get current coin data
@@ -2048,8 +2085,8 @@ class TeacherManager {
         if (!confirmed) return;
 
         try {
-            const db = firebaseAuthService.getFirestore();
-            const { writeBatch } = await import('./firebaseService.js');
+            const db = supabaseService.getDatabase();
+            const { writeBatch } = await import('./supabaseService.js');
             const batch = writeBatch(db);
 
             // First, fetch all student data
@@ -2482,7 +2519,7 @@ Object.assign(TeacherManager.prototype, {
     },
 
     async fetchPreviewData(studentIds, dataTypes) {
-        const db = firebaseAuthService.getFirestore();
+        const db = supabaseService.getDatabase();
         const preview = {
             studentProgress: [],
             scores: [],
@@ -2797,7 +2834,7 @@ Object.assign(TeacherManager.prototype, {
     },
 
     async exportStudentProgress(studentIds) {
-        const db = firebaseAuthService.getFirestore();
+        const db = supabaseService.getDatabase();
         const progressData = [];
         
         for (const studentId of studentIds) {
@@ -2819,7 +2856,7 @@ Object.assign(TeacherManager.prototype, {
     },
 
     async exportScores(studentIds) {
-        const db = firebaseAuthService.getFirestore();
+        const db = supabaseService.getDatabase();
         const scoresRef = collection(db, 'scores');
         const allScores = [];
         
@@ -2842,7 +2879,7 @@ Object.assign(TeacherManager.prototype, {
     },
 
     async exportUserRoles(studentIds) {
-        const db = firebaseAuthService.getFirestore();
+        const db = supabaseService.getDatabase();
         const rolesData = [];
         
         for (const studentId of studentIds) {
@@ -2973,9 +3010,9 @@ Object.assign(TeacherManager.prototype, {
         // Enable reset section
         this.enableResetSection();
         
-        // Log to Firestore (optional audit)
+        // Log to Supabase (optional audit)
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             await addDoc(collection(db, 'exportLogs'), {
                 ...exportRecord,
                 timestamp: serverTimestamp()
@@ -3165,7 +3202,7 @@ Object.assign(TeacherManager.prototype, {
         
         // Load vocabulary count
         try {
-            const db = firebaseAuthService.getFirestore();
+            const db = supabaseService.getDatabase();
             const vocabSnapshot = await getDocs(collection(db, 'vocabularies'));
             $('#dashboard-vocab-count').textContent = vocabSnapshot.size;
         } catch (err) {
@@ -3515,7 +3552,7 @@ Object.assign(TeacherManager.prototype, {
                         const timestamp = activityData.completedAt || activityData.lastAttempt || activityData.timestamp || student.updatedAt;
                         let date = null;
                         if (timestamp) {
-                            // Handle Firestore timestamp or regular timestamp
+                            // Handle Supabase timestamp or regular timestamp
                             if (timestamp.toDate) {
                                 date = timestamp.toDate();
                             } else if (timestamp.toMillis) {

@@ -1,0 +1,28 @@
+{
+  "id": "grade9_it_robotics_prototype_project",
+  "name": "Grade 9 IT: Robotics Prototype Project",
+  "description": "Robotics project planning, component lists, subsystems, state charts, test steps, prototypes, reliability, optimization, project logs, evidence, and demonstrations.",
+  "grades": ["9"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "robotics", "definition": "The field of designing, building, and programming robots or automated systems.", "example": "The robotics project used inputs and outputs.", "difficulty": 1, "synonyms": ["robot engineering"], "antonyms": []},
+    {"word": "goal", "definition": "The result a project is trying to achieve.", "example": "The goal was an obstacle alert system.", "difficulty": 1, "synonyms": ["target"], "antonyms": []},
+    {"word": "component", "definition": "One part used in a system or circuit.", "example": "The component list included LEDs and sensors.", "difficulty": 1, "synonyms": ["part"], "antonyms": []},
+    {"word": "subsystem", "definition": "A smaller system inside a larger system.", "example": "The light output was one subsystem.", "difficulty": 3, "synonyms": ["component system"], "antonyms": ["whole system"]},
+    {"word": "state chart", "definition": "A chart that shows system states and what causes changes.", "example": "The state chart described ready, warning, and error.", "difficulty": 3, "synonyms": ["state diagram"], "antonyms": []},
+    {"word": "prototype", "definition": "A test version of a design.", "example": "The group built a prototype before the final demonstration.", "difficulty": 2, "synonyms": ["test model"], "antonyms": ["final"]},
+    {"word": "feature", "definition": "One useful part or behavior of a project.", "example": "The first feature was the warning light.", "difficulty": 1, "synonyms": ["function"], "antonyms": []},
+    {"word": "project log", "definition": "A record of plans, tests, results, and changes.", "example": "The project log included pass/fail results.", "difficulty": 1, "synonyms": ["record"], "antonyms": []},
+    {"word": "test attempt", "definition": "One planned try to check project behavior.", "example": "The team recorded five test attempts.", "difficulty": 1, "synonyms": ["trial"], "antonyms": []},
+    {"word": "pass", "definition": "A test result showing the system met the requirement.", "example": "The alert passed when it turned red at the right time.", "difficulty": 1, "synonyms": ["succeed"], "antonyms": ["fail"]},
+    {"word": "fail", "definition": "A test result showing the system did not meet the requirement.", "example": "The output failed when the sensor was covered.", "difficulty": 1, "synonyms": ["not work"], "antonyms": ["pass"]},
+    {"word": "reliability", "definition": "How dependably a system works over repeated tests.", "example": "Reliability improved after the wiring was cleaned.", "difficulty": 2, "synonyms": ["dependability"], "antonyms": ["unreliability"]},
+    {"word": "optimization", "definition": "Improving a system so it works better or more efficiently.", "example": "Optimization made the response faster.", "difficulty": 3, "synonyms": ["improvement"], "antonyms": ["worsening"]},
+    {"word": "code comment", "definition": "A note in code that explains what a section does.", "example": "The code comment explained the threshold rule.", "difficulty": 2, "synonyms": ["code note"], "antonyms": []},
+    {"word": "evidence", "definition": "Information that proves or supports a result.", "example": "Test evidence showed the prototype worked.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]},
+    {"word": "demonstration", "definition": "Showing and explaining how a project works.", "example": "The demonstration explained inputs, outputs, and logic.", "difficulty": 1, "synonyms": ["demo"], "antonyms": []},
+    {"word": "reflection", "definition": "A review of design success, challenge, and improvement.", "example": "The reflection described one design success.", "difficulty": 1, "synonyms": ["review"], "antonyms": []},
+    {"word": "archive", "definition": "To organize and store project files for later.", "example": "Students archived project files after the trimester.", "difficulty": 1, "synonyms": ["store"], "antonyms": ["delete"]}
+  ]
+}

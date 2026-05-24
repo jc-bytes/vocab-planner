@@ -1,0 +1,28 @@
+{
+  "id": "grade7_iit_scratch_foundations",
+  "name": "Grade 7 IIT: Scratch Programming Foundations",
+  "description": "Scratch sequences, sprites, events, variables, selection, comparisons, logic operators, loops, debugging, and pair programming.",
+  "grades": ["7"],
+  "trimester": "IIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "Scratch", "definition": "A block-based programming tool used to make games and animations.", "example": "The class built a quiz in Scratch.", "difficulty": 1, "synonyms": ["coding tool"], "antonyms": []},
+    {"word": "sprite", "definition": "A character or object in a Scratch project.", "example": "The sprite moved when the key was pressed.", "difficulty": 1, "synonyms": ["character"], "antonyms": ["stage"]},
+    {"word": "script", "definition": "A group of connected blocks that run together.", "example": "The script made the sprite speak and move.", "difficulty": 1, "synonyms": ["program"], "antonyms": []},
+    {"word": "event", "definition": "An action that starts code.", "example": "A green flag event started the sequence.", "difficulty": 2, "synonyms": ["trigger"], "antonyms": []},
+    {"word": "sequence", "definition": "Instructions performed in order.", "example": "The sequence changed costume before playing sound.", "difficulty": 1, "synonyms": ["order"], "antonyms": ["randomness"]},
+    {"word": "variable", "definition": "A named place that stores a value that can change.", "example": "The score variable changed during the game.", "difficulty": 2, "synonyms": ["storage"], "antonyms": ["constant"]},
+    {"word": "value", "definition": "The information stored in a variable.", "example": "The value of score was 10.", "difficulty": 1, "synonyms": ["amount"], "antonyms": []},
+    {"word": "selection", "definition": "Code that chooses what happens based on a condition.", "example": "Selection gave different responses for right and wrong answers.", "difficulty": 2, "synonyms": ["choice"], "antonyms": []},
+    {"word": "condition", "definition": "A rule that can be true or false.", "example": "The condition checked whether the answer was correct.", "difficulty": 2, "synonyms": ["test"], "antonyms": []},
+    {"word": "operator", "definition": "A symbol or word used to compare or combine values.", "example": "The greater-than operator compared scores.", "difficulty": 2, "synonyms": ["symbol"], "antonyms": []},
+    {"word": "comparison", "definition": "Checking how two values relate.", "example": "The comparison tested if score was greater than 5.", "difficulty": 2, "synonyms": ["check"], "antonyms": []},
+    {"word": "logic", "definition": "Rules used to make decisions in programs.", "example": "AND, OR, and NOT are logic operators.", "difficulty": 2, "synonyms": ["reasoning"], "antonyms": []},
+    {"word": "loop", "definition": "Code that repeats instructions.", "example": "The repeat loop replaced copied blocks.", "difficulty": 2, "synonyms": ["repeat"], "antonyms": ["single run"]},
+    {"word": "iteration", "definition": "Repeating a group of instructions.", "example": "Iteration made the animation shorter to code.", "difficulty": 3, "synonyms": ["repetition"], "antonyms": []},
+    {"word": "debug", "definition": "To find and fix a coding problem.", "example": "The student debugged the condition block.", "difficulty": 2, "synonyms": ["fix"], "antonyms": ["break"]},
+    {"word": "trace", "definition": "To follow code step by step to understand what happens.", "example": "Tracing helped find the wrong variable value.", "difficulty": 2, "synonyms": ["follow"], "antonyms": []},
+    {"word": "driver", "definition": "The pair-programming role that controls the keyboard or mouse.", "example": "The driver built the blocks while the navigator checked logic.", "difficulty": 1, "synonyms": ["coder"], "antonyms": []},
+    {"word": "navigator", "definition": "The pair-programming role that checks, guides, and suggests.", "example": "The navigator spotted a missing loop.", "difficulty": 1, "synonyms": ["guide"], "antonyms": []}
+  ]
+}

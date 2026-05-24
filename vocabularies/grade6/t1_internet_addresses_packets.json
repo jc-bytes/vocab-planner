@@ -1,0 +1,182 @@
+{
+  "id": "grade6_t1_internet_addresses_packets",
+  "name": "Grade 6 T1: Internet Addresses and Packets",
+  "description": "Internet addresses, domain names, DNS, IP addresses, packets, headers, payloads, and data transfer.",
+  "grades": ["6"],
+  "trimester": "1",
+  "activitySettings": {
+    "matching": 12,
+    "flashcards": 20,
+    "quiz": 12,
+    "illustration": 8,
+    "synonymAntonym": 10,
+    "wordSearch": 12,
+    "crossword": 12,
+    "hangman": 8,
+    "scramble": 10,
+    "speedMatch": 12,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "address",
+      "definition": "A label that helps computers find a device, website, or place online.",
+      "example": "A website address tells the browser where to go.",
+      "difficulty": 1,
+      "synonyms": ["location", "destination"],
+      "antonyms": []
+    },
+    {
+      "word": "domain",
+      "definition": "The readable name of a website, such as example.com.",
+      "example": "The domain helps people remember a website more easily than numbers.",
+      "difficulty": 1,
+      "synonyms": ["website name", "site name"],
+      "antonyms": []
+    },
+    {
+      "word": "DNS",
+      "definition": "The system that matches a domain name to the IP address a computer needs.",
+      "example": "DNS works like a phone book for websites.",
+      "difficulty": 2,
+      "synonyms": ["domain name system"],
+      "antonyms": []
+    },
+    {
+      "word": "IP address",
+      "definition": "A number-based address that identifies a device or server on a network.",
+      "example": "The computer used an IP address to find the website server.",
+      "difficulty": 2,
+      "synonyms": ["internet address", "network address"],
+      "antonyms": []
+    },
+    {
+      "word": "website",
+      "definition": "A collection of web pages that people can visit through the internet.",
+      "example": "The class opened a website to look for information.",
+      "difficulty": 1,
+      "synonyms": ["site", "web page collection"],
+      "antonyms": []
+    },
+    {
+      "word": "browser",
+      "definition": "An app used to open websites and web pages.",
+      "example": "A browser can show text, images, links, and videos.",
+      "difficulty": 1,
+      "synonyms": ["web browser"],
+      "antonyms": []
+    },
+    {
+      "word": "server",
+      "definition": "A computer that stores or sends information to other computers.",
+      "example": "The website server sent the page to the student's computer.",
+      "difficulty": 2,
+      "synonyms": ["host", "service computer"],
+      "antonyms": ["client"]
+    },
+    {
+      "word": "client",
+      "definition": "A device or app that asks a server for information.",
+      "example": "The browser acted as a client when it requested the web page.",
+      "difficulty": 2,
+      "synonyms": ["requesting device"],
+      "antonyms": ["server"]
+    },
+    {
+      "word": "packet",
+      "definition": "A small piece of data sent across a network.",
+      "example": "A long message can be divided into many packets.",
+      "difficulty": 2,
+      "synonyms": ["data piece", "data chunk"],
+      "antonyms": ["whole file"]
+    },
+    {
+      "word": "header",
+      "definition": "The part of a packet that carries delivery information, such as where the packet should go.",
+      "example": "The header helps the network send the packet to the right place.",
+      "difficulty": 2,
+      "synonyms": ["label", "packet label"],
+      "antonyms": []
+    },
+    {
+      "word": "payload",
+      "definition": "The part of a packet that carries the actual message or data.",
+      "example": "The payload held one piece of the sentence.",
+      "difficulty": 2,
+      "synonyms": ["message data", "content"],
+      "antonyms": ["header"]
+    },
+    {
+      "word": "protocol",
+      "definition": "An agreed rule or method that computers follow to communicate.",
+      "example": "Protocols help devices send data in a way others can understand.",
+      "difficulty": 3,
+      "synonyms": ["rule", "method"],
+      "antonyms": []
+    },
+    {
+      "word": "network",
+      "definition": "A group of connected devices that can share information.",
+      "example": "The school network connects computers to the internet.",
+      "difficulty": 1,
+      "synonyms": ["connected system"],
+      "antonyms": ["single device"]
+    },
+    {
+      "word": "router",
+      "definition": "A device that sends data between networks and helps packets find a path.",
+      "example": "The router moved the packet toward the website server.",
+      "difficulty": 2,
+      "synonyms": ["network device"],
+      "antonyms": []
+    },
+    {
+      "word": "transfer",
+      "definition": "To move data from one place or device to another.",
+      "example": "The photo transfer took a few seconds.",
+      "difficulty": 1,
+      "synonyms": ["send", "move"],
+      "antonyms": ["keep"]
+    },
+    {
+      "word": "transmission",
+      "definition": "The process of sending data across a connection.",
+      "example": "Packet transmission lets data travel across the internet.",
+      "difficulty": 2,
+      "synonyms": ["sending", "delivery"],
+      "antonyms": ["receiving"]
+    },
+    {
+      "word": "route",
+      "definition": "The path data takes from one device to another.",
+      "example": "A packet may take a different route from another packet.",
+      "difficulty": 2,
+      "synonyms": ["path", "way"],
+      "antonyms": []
+    },
+    {
+      "word": "internet",
+      "definition": "A worldwide system of connected networks that lets people share information.",
+      "example": "The internet allows students to visit websites and collaborate online.",
+      "difficulty": 1,
+      "synonyms": ["global network", "web"],
+      "antonyms": ["offline"]
+    },
+    {
+      "word": "data",
+      "definition": "Facts, numbers, text, images, or other information a computer can store or send.",
+      "example": "The computer sent data in packets.",
+      "difficulty": 1,
+      "synonyms": ["information", "facts"],
+      "antonyms": []
+    },
+    {
+      "word": "delivery",
+      "definition": "The act of getting data to the correct destination.",
+      "example": "The header helps with packet delivery.",
+      "difficulty": 2,
+      "synonyms": ["arrival", "sending"],
+      "antonyms": ["loss"]
+    }
+  ]
+}

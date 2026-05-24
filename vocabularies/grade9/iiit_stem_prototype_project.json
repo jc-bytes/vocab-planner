@@ -1,0 +1,30 @@
+{
+  "id": "grade9_iiit_stem_prototype_project",
+  "name": "Grade 9 IIIT: STEM Prototype Project",
+  "description": "STEM project problems, users, constraints, proposals, tools, sketches, Tinkercad concepts, materials, test criteria, project logs, prototypes, proof of concept, improvements, limitations, evidence, and presentations.",
+  "grades": ["9"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "problem", "definition": "A need or challenge a project tries to solve.", "example": "The STEM project problem was connected to school safety.", "difficulty": 1, "synonyms": ["challenge"], "antonyms": ["solution"]},
+    {"word": "user", "definition": "A person who will use or benefit from a design.", "example": "The users were students in the classroom.", "difficulty": 1, "synonyms": ["audience"], "antonyms": []},
+    {"word": "constraint", "definition": "A limit or requirement that affects a design.", "example": "Class time was one constraint.", "difficulty": 2, "synonyms": ["limit"], "antonyms": ["freedom"]},
+    {"word": "proposal", "definition": "A plan that explains a project problem, goal, tools, tests, and evidence.", "example": "The proposal listed the materials and test criteria.", "difficulty": 2, "synonyms": ["project plan"], "antonyms": []},
+    {"word": "goal", "definition": "The result a project is trying to achieve.", "example": "The goal was to create a useful prototype.", "difficulty": 1, "synonyms": ["target"], "antonyms": []},
+    {"word": "tool", "definition": "A material, platform, or app used to build a project.", "example": "Tinkercad was one approved tool.", "difficulty": 1, "synonyms": ["resource"], "antonyms": []},
+    {"word": "Tinkercad", "definition": "A 3D design tool used to build digital models.", "example": "The concept model was made in Tinkercad.", "difficulty": 1, "synonyms": ["3D tool"], "antonyms": []},
+    {"word": "sketch", "definition": "A quick drawing that plans a design.", "example": "The proposal included a sketch.", "difficulty": 1, "synonyms": ["drawing"], "antonyms": []},
+    {"word": "concept", "definition": "An early idea for how a solution could work.", "example": "The concept showed the main parts.", "difficulty": 1, "synonyms": ["idea"], "antonyms": []},
+    {"word": "materials", "definition": "The physical or digital resources needed for a project.", "example": "The materials list included cardboard and sensors.", "difficulty": 1, "synonyms": ["supplies"], "antonyms": []},
+    {"word": "test criteria", "definition": "Standards used to decide if a prototype works.", "example": "The project used three test criteria.", "difficulty": 2, "synonyms": ["success standards"], "antonyms": []},
+    {"word": "prototype", "definition": "A test version of a product or solution.", "example": "The prototype was improved after testing.", "difficulty": 2, "synonyms": ["draft model"], "antonyms": ["final"]},
+    {"word": "proof of concept", "definition": "A small test that shows an idea can work.", "example": "The proof of concept showed the sensor could detect motion.", "difficulty": 3, "synonyms": ["idea test"], "antonyms": []},
+    {"word": "logbook", "definition": "A record of planning, building, testing, and reflection.", "example": "The logbook included photos and results.", "difficulty": 1, "synonyms": ["journal"], "antonyms": []},
+    {"word": "feedback", "definition": "Helpful comments about strengths and changes.", "example": "Feedback helped refine the prototype.", "difficulty": 1, "synonyms": ["suggestions"], "antonyms": []},
+    {"word": "improvement", "definition": "A change that makes a project better.", "example": "The improvement made the model stronger.", "difficulty": 1, "synonyms": ["upgrade"], "antonyms": ["worsening"]},
+    {"word": "limitation", "definition": "A weakness or boundary that affects a project.", "example": "The prototype limitation was battery life.", "difficulty": 2, "synonyms": ["constraint"], "antonyms": ["strength"]},
+    {"word": "evidence", "definition": "Information that supports a result or claim.", "example": "Photos and test results were evidence.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]},
+    {"word": "rubric", "definition": "A guide that explains how work will be evaluated.", "example": "The rubric included testing and reflection.", "difficulty": 2, "synonyms": ["criteria"], "antonyms": []},
+    {"word": "presentation", "definition": "A clear demonstration and explanation of work.", "example": "The presentation explained problem, design, tests, and improvement.", "difficulty": 1, "synonyms": ["demo"], "antonyms": []}
+  ]
+}

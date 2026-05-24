@@ -23,9 +23,9 @@
                             style="width:32px; height:32px; border-radius:50%;">
                         <span id="teacher-user-name" style="font-size:0.9rem; color:var(--text-muted);"></span>
                     </div>
-                    <span id="teacher-cloud-status" style="font-size:0.8rem; color:var(--text-muted);">☁️ Offline</span>
+                    <span id="teacher-cloud-status" style="font-size:0.8rem; color:var(--text-muted);">Signed out</span>
                     <button id="teacher-sign-out-btn" class="btn text-btn" style="display:none;">Sign Out</button>
-                    <button id="teacher-login-btn" class="btn secondary-btn">Sign in with Google</button>
+                    <button id="teacher-login-btn" class="btn secondary-btn" style="display:none;">Sign in</button>
                 </div>
                 <button id="export-btn" class="btn primary-btn hidden">Export JSON</button>
             </div>
@@ -34,70 +34,39 @@
         <main class="teacher-main">
             <!-- View: Login -->
             <section id="teacher-login-view" class="view active">
-                <div class="card" style="text-align:center; padding:3rem; max-width:640px; margin:0 auto;">
-                    <h2 style="margin-bottom:0.5rem;">Teacher Sign In</h2>
-                    <p style="color:var(--text-muted); margin-bottom:2rem;">Sign in with your email to access teacher tools.</p>
-                    
-                    <!-- Email Link Sign-In Form -->
-                    <div id="email-signin-form" style="margin-bottom:1.5rem;">
-                        <div class="form-group" style="margin-bottom:1rem; text-align:left;">
-                            <label for="teacher-email-input" style="display:block; margin-bottom:0.5rem; font-weight:500;">Email Address</label>
-                            <input type="email" id="teacher-email-input" 
-                                placeholder="your.email@school.edu" 
-                                style="width:100%; padding:0.75rem 1rem; font-size:1rem; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg, rgba(15,23,42,0.6)); color:var(--text-color);">
-                        </div>
-                        <button id="send-email-link-btn" class="btn primary-btn"
-                            style="font-size:1.1rem; padding:0.75rem 2rem; width:100%;">
-                            📧 Send Sign-In Link
-                        </button>
+                <div class="card" style="padding:2rem; max-width:720px; margin:0 auto;">
+                    <h2 style="margin-bottom:1.5rem; text-align:center;">Teacher Access</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem;">
+                        <form id="teacher-login-form">
+                            <h3 style="margin-bottom:1rem;">Log In</h3>
+                            <div class="form-group">
+                                <label for="teacher-email">Email</label>
+                                <input type="email" id="teacher-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-password">Password</label>
+                                <input type="password" id="teacher-password" autocomplete="current-password" minlength="6" required>
+                            </div>
+                            <button type="submit" class="btn primary-btn" style="width:100%;">Log In</button>
+                        </form>
+
+                        <form id="teacher-signup-form">
+                            <h3 style="margin-bottom:1rem;">Sign Up</h3>
+                            <div class="form-group">
+                                <label for="teacher-signup-email">Email</label>
+                                <input type="email" id="teacher-signup-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-signup-password">Password</label>
+                                <input type="password" id="teacher-signup-password" autocomplete="new-password" minlength="6" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="teacher-signup-confirm">Confirm Password</label>
+                                <input type="password" id="teacher-signup-confirm" autocomplete="new-password" minlength="6" required>
+                            </div>
+                            <button type="submit" class="btn secondary-btn" style="width:100%;">Create Teacher Account</button>
+                        </form>
                     </div>
-                    
-                    <!-- Email Sent Confirmation (hidden by default) -->
-                    <div id="email-sent-confirmation" style="display:none; padding:1.5rem; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); border-radius:8px; margin-bottom:1.5rem;">
-                        <div style="font-size:2rem; margin-bottom:0.5rem;">✉️</div>
-                        <h3 style="margin:0 0 0.5rem 0; color:#10b981;">Check Your Email!</h3>
-                        <p style="margin:0 0 1rem 0; color:var(--text-muted);">
-                            We sent a sign-in link to <strong id="sent-email-display"></strong>
-                        </p>
-                        <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">
-                            Click the link in your email to sign in. The link expires in 1 hour.
-                        </p>
-                        <button id="resend-email-btn" class="btn text-btn" style="margin-top:1rem;">
-                            Didn't receive it? Send again
-                        </button>
-                    </div>
-                    
-                    <!-- Email Confirmation Prompt (for cross-device sign-in) -->
-                    <div id="email-confirm-prompt" style="display:none; margin-bottom:1.5rem;">
-                        <p style="color:var(--text-muted); margin-bottom:1rem;">
-                            Please confirm your email to complete sign-in:
-                        </p>
-                        <div class="form-group" style="margin-bottom:1rem; text-align:left;">
-                            <input type="email" id="confirm-email-input" 
-                                placeholder="Confirm your email" 
-                                style="width:100%; padding:0.75rem 1rem; font-size:1rem; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg, rgba(15,23,42,0.6)); color:var(--text-color);">
-                        </div>
-                        <button id="confirm-email-btn" class="btn primary-btn"
-                            style="font-size:1rem; padding:0.75rem 1.5rem;">
-                            Confirm & Sign In
-                        </button>
-                    </div>
-                    
-                    <!-- Divider -->
-                    <div style="display:flex; align-items:center; gap:1rem; margin:1.5rem 0;">
-                        <hr style="flex:1; border:0; border-top:1px solid var(--border-color);">
-                        <span style="color:var(--text-muted); font-size:0.85rem;">or</span>
-                        <hr style="flex:1; border:0; border-top:1px solid var(--border-color);">
-                    </div>
-                    
-                    <!-- Google Sign-In (alternative) -->
-                    <button id="teacher-login-view-btn" class="btn secondary-btn"
-                        style="font-size:1rem; padding:0.75rem 2rem;">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
-                            alt="Google" style="width:18px; height:18px; margin-right:0.5rem; vertical-align:middle;">
-                        Sign in with Google
-                    </button>
-                    
                     <div id="teacher-login-error" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
                     </div>
                 </div>
@@ -287,12 +256,8 @@
                                 <div class="mini-stat-value" id="detail-total-activities">-</div>
                             </div>
                             <div class="mini-stat">
-                                <div class="mini-stat-label">Role</div>
-                                <select id="detail-student-role"
-                                    style="width: 100%; padding: 0.2rem; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
-                                    <option value="student">Student</option>
-                                    <option value="teacher">Teacher</option>
-                                </select>
+                                <div class="mini-stat-label">Must Change Password</div>
+                                <div class="mini-stat-value" id="detail-password-flag">No</div>
                             </div>
                         </div>
                         <div class="card" style="margin-bottom:1.25rem;">
@@ -308,6 +273,14 @@
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="10">+10</button>
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="25">+25</button>
                             </div>
+                        </div>
+                        <div class="card" style="margin-bottom:1.25rem;">
+                            <h4 style="margin-bottom:0.5rem;">Password Reset</h4>
+                            <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+                                <button id="reset-student-password-btn" class="btn secondary-btn" style="padding:0.5rem 1rem;">Reset Password</button>
+                                <div id="reset-password-status" style="font-size:0.85rem; color:var(--text-muted);"></div>
+                            </div>
+                            <div id="temporary-password-output" style="display:none; margin-top:0.75rem; padding:0.75rem; border:1px solid var(--border-color); border-radius:8px; font-family:monospace; font-size:1rem; color:var(--text-color); background:rgba(15, 23, 42, 0.35);"></div>
                         </div>
                         <h3>Activity Progress</h3>
                         <div id="detail-activity-list" style="display: grid; gap: 1rem; margin-top: 1rem;">

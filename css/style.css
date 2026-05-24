@@ -10,12 +10,15 @@
     --text-muted: #cbd5f5;
     --border-color: rgba(255, 255, 255, 0.125);
     --danger-color: #f87171;
+    --success-color: #34d399;
 
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 1.5rem;
     --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --touch-target: 44px;
 
     /* Radius */
     --radius-sm: 0.375rem;
@@ -44,6 +47,7 @@ body {
     color: var(--text-main);
     line-height: 1.5;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .glass-panel {
@@ -105,7 +109,7 @@ body {
 
 /* Header */
 .landing-header h1 {
-    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-size: 3.25rem;
     color: #fff;
     margin-bottom: var(--spacing-sm);
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
@@ -153,8 +157,8 @@ body {
     align-items: center;
     text-decoration: none;
     color: var(--text-main);
-    width: 300px;
-    margin: var(--spacing-md);
+    width: min(100%, 320px);
+    min-height: 220px;
     cursor: pointer;
 }
 
@@ -275,6 +279,8 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    gap: var(--spacing-md);
+    width: 100%;
 }
 
 /* Buttons */
@@ -283,12 +289,16 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0.6rem 1.25rem;
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
     border-radius: 999px;
     font-weight: 600;
     cursor: pointer;
     border: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    line-height: 1.2;
+    touch-action: manipulation;
 }
 
 .primary-btn {
@@ -322,7 +332,7 @@ body {
 .text-btn {
     background: none;
     color: var(--text-muted);
-    padding: 0;
+    padding: 0.35rem 0.5rem;
 }
 
 .text-btn:hover {
@@ -356,10 +366,11 @@ textarea,
 select {
     width: 100%;
     padding: 0.6rem 0.85rem;
+    min-height: var(--touch-target);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-md);
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 1rem;
     background: rgba(15, 23, 42, 0.45);
     color: var(--text-main);
 }
@@ -377,6 +388,16 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
 }
 
+.btn:focus-visible,
+.card[tabindex]:focus-visible,
+.option-card:focus-visible,
+.activity-card:focus-visible,
+.menu-card:focus-visible,
+.close-modal:focus-visible {
+    outline: 3px solid rgba(14, 165, 233, 0.8);
+    outline-offset: 3px;
+}
+
 /* Grid Layouts */
 .words-grid,
 .vocab-grid,
@@ -385,6 +406,42 @@ select:focus {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: var(--spacing-md);
     margin-top: var(--spacing-md);
+}
+
+.vocab-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.vocab-trimester-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.vocab-trimester-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    padding-bottom: var(--spacing-xs);
+}
+
+.vocab-trimester-heading h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.vocab-trimester-heading span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.trimester-vocab-grid {
+    margin-top: 0;
 }
 
 /* Teacher Dashboard Specifics */
@@ -426,6 +483,7 @@ select:focus {
     align-items: center;
     justify-content: center;
     z-index: 100;
+    padding: var(--spacing-md);
 }
 
 .modal.hidden {
@@ -433,9 +491,9 @@ select:focus {
 }
 
 .modal-content {
-    width: 100%;
+    width: min(92vw, 600px);
     max-width: 600px;
-    max-height: 90vh;
+    max-height: min(88vh, 900px);
     overflow-y: auto;
     background: rgba(15, 23, 42, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -446,6 +504,7 @@ select:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
 }
 
@@ -455,6 +514,8 @@ select:focus {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
+    min-width: var(--touch-target);
+    min-height: var(--touch-target);
 }
 
 .modal-footer {
@@ -1876,4 +1937,530 @@ input[type="checkbox"] {
 
 .question-card.view-mode .q-option {
     color: #374151;
+}
+
+/* Tablet and small Chromebook responsive pass */
+.header-actions,
+#user-info,
+#guest-status,
+#teacher-auth-controls,
+#teacher-user-info {
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.section-header,
+.activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-md);
+}
+
+.section-header h2,
+.activity-header h2,
+#current-unit-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.menu-card,
+.activity-card,
+.word-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.menu-card,
+.activity-card {
+    min-height: 180px;
+}
+
+.activity-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding-bottom: 2.25rem;
+}
+
+.activity-card .icon,
+.menu-card .icon {
+    font-size: 2.75rem;
+    line-height: 1;
+}
+
+.activity-card h3,
+.menu-card h3 {
+    line-height: 1.2;
+}
+
+.activity-card p,
+.menu-card p,
+.option-card p,
+.word-card p {
+    overflow-wrap: anywhere;
+}
+
+.modal-body {
+    max-height: calc(88vh - 9rem);
+    overflow-y: auto;
+    padding-right: 0.15rem;
+}
+
+.modal-footer {
+    flex-wrap: wrap;
+}
+
+.completion-overlay {
+    padding: var(--spacing-md);
+}
+
+.completion-overlay .completion-screen {
+    width: min(92vw, 520px);
+    max-height: 86vh;
+    overflow-y: auto;
+}
+
+/* Word search */
+.word-search-wrapper {
+    width: 100% !important;
+    max-width: 960px !important;
+    align-items: flex-start !important;
+}
+
+.word-list-container {
+    flex: 0 0 210px !important;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.word-search-grid-container {
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.word-search-grid {
+    width: min(100%, 620px);
+    margin: 0 auto;
+    touch-action: none;
+}
+
+.word-search-cell {
+    min-width: 0;
+}
+
+/* Crossword */
+.crossword-wrapper {
+    width: 100%;
+}
+
+.cw-grid {
+    max-width: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cw-grid-cell {
+    width: var(--cw-cell-size, var(--touch-target));
+    height: var(--cw-cell-size, var(--touch-target));
+}
+
+.cw-clues {
+    flex: 1 1 260px;
+    max-width: min(100%, 420px);
+}
+
+/* Arcade and canvas games */
+.arcade-container,
+#game-stage {
+    width: 100%;
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-md);
+}
+
+#game-canvas {
+    display: block;
+    width: min(100%, 800px);
+    max-height: min(70vh, 600px);
+    margin: 0 auto;
+    object-fit: contain;
+}
+
+/* Teacher minimum tablet safety */
+.teacher-main,
+#teacher-data-management-view {
+    max-width: 100% !important;
+}
+
+#teacher-progress-view table {
+    min-width: 760px;
+}
+
+#teacher-progress-view .card,
+#teacher-dashboard-view .card,
+#teacher-editor-view .card,
+#teacher-data-management-view .card {
+    min-width: 0;
+}
+
+#teacher-progress-view .card>div[style*="overflow-x"],
+#preview-tables,
+#viewer-tables-content {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#student-detail-modal .modal-content {
+    width: min(92vw, 800px) !important;
+    max-height: 88vh !important;
+}
+
+#quiz-modal .modal-content {
+    width: min(95vw, 900px) !important;
+    max-height: 90vh !important;
+}
+
+@media (hover: none) {
+    .option-card:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .matching-card:hover,
+    .question-card.view-mode:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    :root {
+        --cw-cell-size: 44px;
+    }
+
+    .app-container {
+        padding: var(--spacing-md);
+    }
+
+    .app-container>main {
+        padding: var(--spacing-md);
+    }
+
+    .app-header {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .header-actions {
+        justify-content: flex-end;
+    }
+
+    .landing-container {
+        justify-content: flex-start;
+        min-height: 100svh;
+        padding: var(--spacing-xl) var(--spacing-md) var(--spacing-lg);
+    }
+
+    .landing-header h1 {
+        font-size: 3rem;
+    }
+
+    .words-grid,
+    .vocab-grid,
+    .activities-grid,
+    .trimester-vocab-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: var(--spacing-md) !important;
+    }
+
+    .menu-card {
+        padding: var(--spacing-lg) var(--spacing-md) !important;
+    }
+
+    #game-selection>div:first-child {
+        gap: var(--spacing-sm) !important;
+        margin-bottom: var(--spacing-md) !important;
+    }
+
+    .quiz-maker-container {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 0;
+    }
+
+    .quiz-sidebar {
+        width: 100% !important;
+        max-height: none !important;
+    }
+
+    .quiz-canvas {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 850px) {
+    .app-header {
+        align-items: flex-start;
+    }
+
+    .header-actions,
+    #user-info,
+    #guest-status,
+    #teacher-auth-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    #user-info {
+        gap: 0.65rem !important;
+    }
+
+    .vocab-trimester-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .activity-card {
+        min-height: 170px;
+    }
+
+    .crossword-wrapper {
+        gap: var(--spacing-md);
+        justify-content: flex-start;
+    }
+
+    .cw-clues {
+        flex-basis: 100%;
+        max-height: 320px;
+    }
+
+    .word-search-wrapper {
+        gap: var(--spacing-md) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    :root {
+        --cw-cell-size: 44px;
+    }
+
+    .landing-container,
+    .app-container {
+        padding: var(--spacing-sm);
+    }
+
+    .landing-header h1 {
+        font-size: 2.5rem;
+    }
+
+    .landing-options {
+        align-items: stretch;
+    }
+
+    .option-card {
+        width: 100%;
+        min-height: 0;
+    }
+
+    .app-container>main {
+        padding: var(--spacing-sm);
+        border-radius: var(--radius-md);
+    }
+
+    .header-left h1 {
+        font-size: 1.25rem;
+    }
+
+    .section-header,
+    .activity-header,
+    .modal-header {
+        align-items: flex-start;
+    }
+
+    .section-header h2,
+    #current-unit-title {
+        flex-basis: 100%;
+    }
+
+    .words-grid,
+    .vocab-grid,
+    .activities-grid,
+    .trimester-vocab-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--spacing-sm);
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .activity-card,
+    .word-card,
+    .mini-stat {
+        padding: var(--spacing-sm);
+    }
+
+    .activity-card {
+        min-height: 150px;
+        padding-bottom: 2rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .login-container {
+        min-height: auto !important;
+    }
+
+    #student-register-panel form>div[style*="grid-template-columns"],
+    #teacher-login-view form+form,
+    #teacher-login-view .card>div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .modal {
+        align-items: flex-start;
+        padding: var(--spacing-sm);
+    }
+
+    .modal-content {
+        width: 100% !important;
+        max-height: calc(100svh - 2rem) !important;
+    }
+
+    .modal-body {
+        max-height: calc(100svh - 11rem);
+    }
+
+    .modal-footer {
+        justify-content: stretch;
+    }
+
+    .modal-footer .btn {
+        flex: 1 1 180px;
+    }
+
+    .word-search-wrapper {
+        flex-direction: column !important;
+    }
+
+    .word-list-container {
+        flex: 1 1 auto !important;
+        width: 100%;
+    }
+
+    .word-search-grid {
+        width: min(100%, 520px);
+    }
+
+    .word-search-cell {
+        font-size: 0.8rem !important;
+    }
+
+    .cw-cell {
+        font-size: 1rem;
+    }
+
+    .cw-number {
+        font-size: 0.5rem;
+    }
+
+    .card-scene {
+        width: min(100%, 300px);
+        height: 360px;
+    }
+
+    .matching-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: var(--spacing-sm);
+    }
+
+    .matching-card {
+        min-height: 96px;
+        padding: var(--spacing-sm);
+        font-size: 1rem;
+    }
+
+    .fib-wrapper,
+    .speed-match-intro {
+        padding: var(--spacing-sm);
+    }
+
+    .fib-sentence,
+    .fib-input {
+        font-size: 1.15rem;
+    }
+
+    .keyboard-row {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #game-selection>div:first-child {
+        flex-wrap: wrap;
+    }
+
+    #current-game-card {
+        order: -1;
+        flex-basis: 100% !important;
+    }
+
+    .bulk-toolbar-content,
+    .bulk-actions {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .bulk-actions .btn {
+        flex: 1 1 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --cw-cell-size: 36px;
+    }
+
+    .landing-header h1 {
+        font-size: 2rem;
+    }
+
+    .words-grid,
+    .vocab-grid,
+    .activities-grid,
+    .trimester-vocab-grid,
+    .matching-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cw-grid {
+        width: max-content;
+    }
+
+    .word-search-grid {
+        width: 100%;
+    }
+
+    .scramble-slot,
+    .scramble-tile {
+        width: 40px;
+        height: 40px;
+    }
 }

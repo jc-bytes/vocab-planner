@@ -1,0 +1,214 @@
+{
+  "id": "grade6_t3_3d_modeling_project_sharing",
+  "name": "Grade 6 T3: 3D Modeling and Project Sharing",
+  "description": "3D modeling tools, shapes, movement, resizing, rotating, duplicating, grouping, prototypes, presentations, and feedback.",
+  "grades": ["6"],
+  "trimester": "3",
+  "activitySettings": {
+    "matching": 12,
+    "flashcards": 24,
+    "quiz": 12,
+    "illustration": 8,
+    "synonymAntonym": 10,
+    "wordSearch": 12,
+    "crossword": 12,
+    "hangman": 8,
+    "scramble": 10,
+    "speedMatch": 12,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "3D",
+      "definition": "Having three dimensions: length, width, and height.",
+      "example": "A 3D model can be viewed from different sides.",
+      "difficulty": 1,
+      "synonyms": ["three-dimensional"],
+      "antonyms": ["2D"]
+    },
+    {
+      "word": "model",
+      "definition": "A digital or physical version of an object or idea.",
+      "example": "The student built a 3D model of a desk organizer.",
+      "difficulty": 1,
+      "synonyms": ["representation", "version"],
+      "antonyms": []
+    },
+    {
+      "word": "shape",
+      "definition": "A basic form used to build a model.",
+      "example": "The model used cubes, cylinders, and spheres.",
+      "difficulty": 1,
+      "synonyms": ["form", "object"],
+      "antonyms": []
+    },
+    {
+      "word": "cube",
+      "definition": "A 3D shape with six equal square faces.",
+      "example": "The student used a cube for the base of the model.",
+      "difficulty": 1,
+      "synonyms": ["box shape"],
+      "antonyms": []
+    },
+    {
+      "word": "cylinder",
+      "definition": "A 3D shape with two circular ends and one curved side.",
+      "example": "A cylinder made the pencil holder part.",
+      "difficulty": 1,
+      "synonyms": ["tube shape"],
+      "antonyms": []
+    },
+    {
+      "word": "sphere",
+      "definition": "A round 3D shape like a ball.",
+      "example": "The sphere was used as a decorative part.",
+      "difficulty": 1,
+      "synonyms": ["ball shape"],
+      "antonyms": []
+    },
+    {
+      "word": "move",
+      "definition": "To change where an object is placed.",
+      "example": "The student moved the shape to the center of the workplane.",
+      "difficulty": 1,
+      "synonyms": ["shift", "place"],
+      "antonyms": ["keep still"]
+    },
+    {
+      "word": "resize",
+      "definition": "To make an object larger or smaller.",
+      "example": "The cylinder was resized to become taller.",
+      "difficulty": 1,
+      "synonyms": ["scale", "change size"],
+      "antonyms": ["keep same size"]
+    },
+    {
+      "word": "rotate",
+      "definition": "To turn an object around an axis.",
+      "example": "The student rotated the shape to make it face the correct direction.",
+      "difficulty": 1,
+      "synonyms": ["turn", "spin"],
+      "antonyms": []
+    },
+    {
+      "word": "duplicate",
+      "definition": "To make a copy of an object.",
+      "example": "The student duplicated a shape to create two matching sides.",
+      "difficulty": 1,
+      "synonyms": ["copy", "clone"],
+      "antonyms": ["delete"]
+    },
+    {
+      "word": "group",
+      "definition": "To combine objects so they work as one object.",
+      "example": "The shapes were grouped after they were aligned.",
+      "difficulty": 2,
+      "synonyms": ["combine", "join"],
+      "antonyms": ["ungroup"]
+    },
+    {
+      "word": "align",
+      "definition": "To place objects neatly in relation to each other.",
+      "example": "The student aligned the shapes before grouping them.",
+      "difficulty": 2,
+      "synonyms": ["line up", "arrange"],
+      "antonyms": ["misalign"]
+    },
+    {
+      "word": "workplane",
+      "definition": "The flat digital surface where 3D objects are placed and edited.",
+      "example": "The model sat on the workplane.",
+      "difficulty": 2,
+      "synonyms": ["building surface", "workspace"],
+      "antonyms": []
+    },
+    {
+      "word": "design",
+      "definition": "A plan for how something should look or work.",
+      "example": "The design included a sketch and labeled shapes.",
+      "difficulty": 1,
+      "synonyms": ["plan", "idea"],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "A quick drawing that plans an idea.",
+      "example": "The sketch showed where each shape would go.",
+      "difficulty": 1,
+      "synonyms": ["drawing", "draft"],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "An early version of a design used for testing and improvement.",
+      "example": "The 3D model was a prototype of a useful desk item.",
+      "difficulty": 2,
+      "synonyms": ["test version", "draft model"],
+      "antonyms": ["final version"]
+    },
+    {
+      "word": "purpose",
+      "definition": "The reason something is made or used.",
+      "example": "The model purpose was to hold pencils.",
+      "difficulty": 1,
+      "synonyms": ["reason", "goal"],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "The planned improvement made the model stronger.",
+      "difficulty": 1,
+      "synonyms": ["upgrade", "better change"],
+      "antonyms": ["worsening"]
+    },
+    {
+      "word": "screenshot",
+      "definition": "A picture of what is shown on a screen.",
+      "example": "The student submitted a screenshot of the 3D model.",
+      "difficulty": 1,
+      "synonyms": ["screen capture", "screen image"],
+      "antonyms": []
+    },
+    {
+      "word": "present",
+      "definition": "To show and explain work to an audience.",
+      "example": "Each student presented a chart, spreadsheet, or 3D model.",
+      "difficulty": 1,
+      "synonyms": ["show", "demonstrate"],
+      "antonyms": ["hide"]
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about what works and what can improve.",
+      "example": "A partner gave feedback about making the model easier to understand.",
+      "difficulty": 1,
+      "synonyms": ["suggestions", "comments"],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "A short explanation of what was made, improved, or learned.",
+      "example": "The reflection described one change made after testing.",
+      "difficulty": 1,
+      "synonyms": ["review", "thinking note"],
+      "antonyms": []
+    },
+    {
+      "word": "artifact",
+      "definition": "A finished piece of work made during a project.",
+      "example": "The chart was one project artifact the student could present.",
+      "difficulty": 2,
+      "synonyms": ["project item", "product"],
+      "antonyms": []
+    },
+    {
+      "word": "rubric",
+      "definition": "A guide that explains how work will be checked or graded.",
+      "example": "The rubric listed the required parts of the model.",
+      "difficulty": 2,
+      "synonyms": ["grading guide", "criteria"],
+      "antonyms": []
+    }
+  ]
+}

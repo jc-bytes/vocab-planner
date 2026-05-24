@@ -22,21 +22,21 @@
             </div>
             <div class="header-actions">
                 <!-- Authenticated/User Status -->
-                <div id="google-user-info" style="display:none; align-items: center; gap: 1rem;">
+                <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
                     <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">🪙 0</div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <img id="google-user-avatar" src="" alt="Avatar"
+                        <img id="user-avatar" src="" alt="Avatar"
                             style="width: 32px; height: 32px; border-radius: 50%;">
-                        <span id="google-user-name" style="font-size: 0.875rem; color: var(--text-muted);"></span>
+                        <span id="user-name" style="font-size: 0.875rem; color: var(--text-muted);"></span>
                     </div>
                     <span id="auth-status" style="font-size: 0.75rem; color: var(--success-color);"
                         title="Progress sync status">☁️ Syncing...</span>
-                    <button id="google-sign-out-btn" class="btn text-btn" style="font-size: 0.875rem;">Sign
+                    <button id="sign-out-btn" class="btn text-btn" style="font-size: 0.875rem;">Sign
                         Out</button>
                 </div>
                 <div id="guest-status" style="display:none; align-items: center; gap: 1rem;">
-                    <span style="font-size:0.85rem; color:var(--text-muted);">🔒 Guest mode</span>
-                    <button id="guest-signin-btn" class="btn text-btn" style="font-size: 0.875rem;">Sign In</button>
+                    <span style="font-size:0.85rem; color:var(--text-muted);">Signed out</span>
+                    <button id="guest-signin-btn" class="btn text-btn" style="font-size: 0.875rem; display:none;">Sign In</button>
                 </div>
             </div>
         </header>
@@ -47,31 +47,82 @@
                 <div
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh;">
                     <div class="loading-spinner" style="width: 50px; height: 50px; border-width: 4px;"></div>
-                    <p style="margin-top: 1rem; color: var(--text-muted);">Checking authentication...</p>
+                    <p style="margin-top: 1rem; color: var(--text-muted);">Loading session...</p>
                 </div>
             </section>
 
             <!-- Login View -->
             <section id="login-view" class="view hidden">
                 <div class="login-container"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center;">
+                    style="display: flex; flex-direction: column; align-items: stretch; justify-content: center; min-height: 60vh; max-width: 520px; margin: 0 auto;">
                     <div class="icon" style="font-size: 4rem; margin-bottom: 1rem;">🎓</div>
-                    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Student Login</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Sign in with your school Google
-                        account or continue as a guest.</p>
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Student Access</h2>
 
-                    <button id="google-login-btn" class="btn primary-btn"
-                        style="font-size: 1.2rem; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem;">
-                        <span style="font-size: 1.5rem;">🔐</span> Sign in with Google
-                    </button>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                        <button id="show-login-btn" class="btn primary-btn" style="flex: 1;">Log In</button>
+                        <button id="show-register-btn" class="btn secondary-btn" style="flex: 1;">Register</button>
+                    </div>
+
+                    <div id="student-login-panel" class="card" style="padding: 1.5rem;">
+                        <form id="student-login-form">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" autocomplete="current-password" minlength="6" required>
+                            </div>
+                            <button type="submit" class="btn primary-btn" style="width: 100%;">Log In</button>
+                        </form>
+                    </div>
+
+                    <div id="student-register-panel" class="card" style="padding: 1.5rem; display: none;">
+                        <form id="student-register-form">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="register-first-name">First Name</label>
+                                    <input type="text" id="register-first-name" autocomplete="given-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-last-name">Last Name</label>
+                                    <input type="text" id="register-last-name" autocomplete="family-name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">School Email (@aid.edu.pa)</label>
+                                <input type="email" id="register-email" autocomplete="email" required>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="register-grade">Grade</label>
+                                    <select id="register-grade" required>
+                                        <option value="">Select</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-section">Section</label>
+                                    <input type="text" id="register-section" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">Password</label>
+                                <input type="password" id="register-password" autocomplete="new-password" minlength="6" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-confirm-password">Confirm Password</label>
+                                <input type="password" id="register-confirm-password" autocomplete="new-password" minlength="6" required>
+                            </div>
+                            <button type="submit" class="btn primary-btn" style="width: 100%;">Create Account</button>
+                        </form>
+                    </div>
 
                     <div id="login-error" style="color: var(--danger-color); margin-top: 1rem; display: none;">
                     </div>
-
-                    <p style="margin-top: 2rem; font-size: 0.875rem; color: var(--text-muted);">
-                        Don't have a Google account?
-                        <a href="#" id="skip-login-link" style="color: var(--primary-color);">Continue as Guest</a>
-                    </p>
                 </div>
             </section>
 
@@ -259,16 +310,47 @@
                 </div>
                 <div class="form-group">
                     <label for="student-grade">Grade</label>
-                    <input type="text" id="student-grade" placeholder="e.g., 6th Grade">
+                    <select id="student-grade">
+                        <option value="">Select Grade</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="student-group">Group/Class</label>
-                    <input type="text" id="student-group" placeholder="e.g., Class A">
+                    <label for="student-group">Section Letter</label>
+                    <input type="text" id="student-group" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" placeholder="A">
                 </div>
             </div>
             <div class="modal-footer">
                 <button id="save-profile-btn" class="btn primary-btn">Start Learning</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Forced Password Change Modal -->
+    <div id="force-password-modal" class="modal hidden">
+        <div class="modal-content card" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+            </div>
+            <form id="change-password-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="change-password-new">New Password</label>
+                        <input type="password" id="change-password-new" autocomplete="new-password" minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-password-confirm">Confirm New Password</label>
+                        <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="6" required>
+                    </div>
+                    <div id="change-password-status" style="color: var(--danger-color); font-size: 0.9rem;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn primary-btn">Update Password</button>
+                </div>
+            </form>
         </div>
     </div>
 

@@ -1,0 +1,28 @@
+{
+  "id": "grade7_iit_scratch_dance_game",
+  "name": "Grade 7 IIT: Scratch Dance Game Project",
+  "description": "Dance game planning, sprites, costumes, sounds, input timing, subroutines, score, timer, feedback, testing, and project presentation.",
+  "grades": ["7"],
+  "trimester": "IIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "game", "definition": "An interactive activity with goals, rules, and feedback.", "example": "The Scratch dance game used key presses.", "difficulty": 1, "synonyms": ["challenge"], "antonyms": []},
+    {"word": "costume", "definition": "A visual look or pose for a sprite.", "example": "The dancer changed costume for each move.", "difficulty": 1, "synonyms": ["appearance"], "antonyms": []},
+    {"word": "sound", "definition": "Audio used in a project or game.", "example": "A sound played after a correct move.", "difficulty": 1, "synonyms": ["audio"], "antonyms": ["silence"]},
+    {"word": "input", "definition": "Information or action the program receives.", "example": "A key press was the player input.", "difficulty": 2, "synonyms": ["signal"], "antonyms": ["output"]},
+    {"word": "timing", "definition": "When or how long actions happen.", "example": "Good timing made the dance challenge fair.", "difficulty": 1, "synonyms": ["schedule"], "antonyms": []},
+    {"word": "score", "definition": "A number that tracks points.", "example": "The score increased after a correct key press.", "difficulty": 1, "synonyms": ["points"], "antonyms": []},
+    {"word": "timer", "definition": "A tool or variable that tracks time.", "example": "The timer limited each round.", "difficulty": 1, "synonyms": ["clock"], "antonyms": []},
+    {"word": "feedback", "definition": "A response that tells the player what happened.", "example": "The game gave success or failure feedback.", "difficulty": 1, "synonyms": ["response"], "antonyms": []},
+    {"word": "subroutine", "definition": "A reusable group of instructions.", "example": "Each dance move used a subroutine.", "difficulty": 3, "synonyms": ["custom block"], "antonyms": []},
+    {"word": "prototype", "definition": "A test version of a feature or project.", "example": "The prototype tested one dance move.", "difficulty": 2, "synonyms": ["draft"], "antonyms": ["final"]},
+    {"word": "rubric", "definition": "A guide that explains how a project will be evaluated.", "example": "The rubric included code organization and presentation.", "difficulty": 2, "synonyms": ["criteria"], "antonyms": []},
+    {"word": "functionality", "definition": "How well a project works.", "example": "Functionality improved after the input bug was fixed.", "difficulty": 2, "synonyms": ["working ability"], "antonyms": []},
+    {"word": "organization", "definition": "How clearly code, files, or ideas are arranged.", "example": "Good organization made the project easier to explain.", "difficulty": 1, "synonyms": ["order"], "antonyms": ["disorder"]},
+    {"word": "testing", "definition": "Trying a project to check what works and what fails.", "example": "Testing found a bug in the scoring logic.", "difficulty": 1, "synonyms": ["checking"], "antonyms": ["guessing"]},
+    {"word": "bug", "definition": "A mistake that causes a program to behave incorrectly.", "example": "The bug made the score change twice.", "difficulty": 1, "synonyms": ["error"], "antonyms": ["fix"]},
+    {"word": "demo", "definition": "A short demonstration of how a project works.", "example": "The final demo showed the dance game controls.", "difficulty": 1, "synonyms": ["demonstration"], "antonyms": []},
+    {"word": "application", "definition": "A real-world use or connection for an idea.", "example": "The student explained a real-world application for dance-game timing.", "difficulty": 2, "synonyms": ["use"], "antonyms": []},
+    {"word": "reflection", "definition": "A written or spoken review of learning, challenges, and growth.", "example": "The reflection described programming growth.", "difficulty": 1, "synonyms": ["review"], "antonyms": []}
+  ]
+}

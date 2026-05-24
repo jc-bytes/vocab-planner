@@ -1,0 +1,28 @@
+{
+  "id": "grade9_it_inputs_outputs_state_logic",
+  "name": "Grade 9 IT: Inputs, Outputs, and State Logic",
+  "description": "Button input, toggle control, serial monitor data, potentiometers, sensor thresholds, RGB outputs, addressable LED animation, states, and state logic charts.",
+  "grades": ["9"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "button", "definition": "A component that sends input when pressed.", "example": "The button turned the LED on and off.", "difficulty": 1, "synonyms": ["switch"], "antonyms": []},
+    {"word": "state", "definition": "The current mode or condition of a system.", "example": "The LED state changed after each press.", "difficulty": 2, "synonyms": ["status"], "antonyms": []},
+    {"word": "toggle", "definition": "To switch between states.", "example": "Each button press toggled the output.", "difficulty": 2, "synonyms": ["switch"], "antonyms": []},
+    {"word": "stable", "definition": "Working consistently without unwanted changes.", "example": "The output stayed stable after five presses.", "difficulty": 2, "synonyms": ["steady"], "antonyms": ["unstable"]},
+    {"word": "serial monitor", "definition": "A tool that displays data sent from a board to a computer.", "example": "The Serial Monitor showed sensor values.", "difficulty": 2, "synonyms": ["data viewer"], "antonyms": []},
+    {"word": "baud", "definition": "The speed setting for serial communication.", "example": "The baud rate matched the sketch.", "difficulty": 3, "synonyms": ["data speed"], "antonyms": []},
+    {"word": "message", "definition": "Text or data sent from one part of a system to another.", "example": "The serial message showed the reading.", "difficulty": 1, "synonyms": ["data"], "antonyms": []},
+    {"word": "potentiometer", "definition": "A knob-like component that sends a changing analog value.", "example": "The potentiometer controlled brightness.", "difficulty": 3, "synonyms": ["knob sensor"], "antonyms": []},
+    {"word": "reading", "definition": "A value measured by a sensor or input.", "example": "The low reading meant the knob was turned left.", "difficulty": 1, "synonyms": ["measurement"], "antonyms": []},
+    {"word": "threshold", "definition": "A limit value used to choose a response.", "example": "The threshold separated bright and dark readings.", "difficulty": 2, "synonyms": ["limit"], "antonyms": []},
+    {"word": "expected", "definition": "What you think should happen before testing.", "example": "The expected output was red for warning.", "difficulty": 1, "synonyms": ["predicted"], "antonyms": ["unexpected"]},
+    {"word": "RGB LED", "definition": "A light that mixes red, green, and blue channels.", "example": "The RGB LED showed ready, active, warning, and error.", "difficulty": 2, "synonyms": ["color LED"], "antonyms": []},
+    {"word": "channel", "definition": "One controllable part of a multi-part output.", "example": "The red channel value was 255.", "difficulty": 2, "synonyms": ["component"], "antonyms": []},
+    {"word": "addressable LED", "definition": "An LED that can be controlled individually in a strip or group.", "example": "The addressable LEDs made a moving pattern.", "difficulty": 3, "synonyms": ["programmable LED"], "antonyms": []},
+    {"word": "pixel", "definition": "One controllable light or image element.", "example": "Each LED acted like a pixel.", "difficulty": 2, "synonyms": ["picture element"], "antonyms": []},
+    {"word": "animation", "definition": "A sequence of visual changes that creates motion.", "example": "The LED animation moved across the strip.", "difficulty": 1, "synonyms": ["motion effect"], "antonyms": ["still image"]},
+    {"word": "logic chart", "definition": "A table that connects states, inputs, and outputs.", "example": "The logic chart explained the robot states.", "difficulty": 2, "synonyms": ["state table"], "antonyms": []},
+    {"word": "alert", "definition": "A signal that warns or gets attention.", "example": "Red was the clearest alert color.", "difficulty": 1, "synonyms": ["warning"], "antonyms": []}
+  ]
+}

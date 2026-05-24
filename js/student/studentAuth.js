@@ -1,49 +1,58 @@
 /**
  * Student Authentication Module
- * Handles Firebase authentication, user profile, and auth state
+ * Handles backend authentication, user profile, and auth state
  */
 
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
-import { firebaseAuthService, doc, getDoc } from '../firebaseService.js';
+import { supabaseService } from '../supabaseService.js';
 
 export class StudentAuth {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
     }
 
-    async initFirebaseAuth() {
+    async initBackendAuth() {
+        if (this.sm.authDisabled) {
+            this.sm.currentUser = null;
+            this.sm.currentRole = 'student';
+            this.setAuthStatus('Local development');
+            this.updateGuestStatus(true);
+            this.sm.switchView('main-menu-view');
+            return;
+        }
+
         try {
-            await firebaseAuthService.init();
+            await supabaseService.init();
             
             // Check for redirect result (when using signInWithRedirect)
             // This must be called before onAuthStateChanged
-            const redirectResult = await firebaseAuthService.handleRedirectResult();
+            const redirectResult = await supabaseService.handleRedirectResult();
             let redirectProcessed = false;
             if (redirectResult?.user) {
                 console.log('Processing redirect sign-in result...');
-                await this.handleFirebaseSignIn(redirectResult.user);
+                await this.handleBackendSignIn(redirectResult.user);
                 redirectProcessed = true;
             }
             
-            firebaseAuthService.onAuthStateChanged(async (user) => {
+            supabaseService.onAuthStateChanged(async (user) => {
                 if (user) {
                     // Only handle if we didn't already process redirect result
                     if (!redirectProcessed || !redirectResult?.user || redirectResult.user.uid !== user.uid) {
-                        await this.handleFirebaseSignIn(user);
+                        await this.handleBackendSignIn(user);
                     }
                 } else {
-                    this.handleFirebaseSignOut();
+                    this.handleBackendSignOut();
                 }
             });
         } catch (error) {
-            console.error('Firebase auth init failed:', error);
-            this.sm.showLoginError('Authentication service unavailable. Continue as guest.');
-            this.sm.setManualSaveVisibility(true);
+            console.error('backend auth init failed:', error);
+            this.sm.showLoginError(error.message || 'Authentication service unavailable.');
+            this.sm.switchView('login-view');
         }
     }
 
-    async handleFirebaseSignIn(user) {
+    async handleBackendSignIn(user) {
         this.sm.currentUser = user;
         localStorage.setItem('was_logged_in', 'true');
         
@@ -52,30 +61,41 @@ export class StudentAuth {
         this.sm.updateGuestStatus(false);
 
         const name = user.displayName || user.email || 'Signed in';
-        const avatar = $('#google-user-avatar');
+        const avatar = $('#user-avatar');
         if (avatar) {
             avatar.src = user.photoURL || '';
         }
-        const nameEl = $('#google-user-name');
+        const nameEl = $('#user-name');
         if (nameEl) {
             nameEl.textContent = name;
         }
 
-        // Try to fetch role and progress (may fail offline)
+        // Try to fetch role and profile.
         try {
             await this.fetchAndSetRole(user);
         } catch (error) {
-            console.error('Failed to fetch role (may be offline):', error);
-            // Use cached role if available
+            console.error('Failed to fetch role:', error);
             const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
-            if (cachedRole) {
-                this.sm.currentRole = cachedRole;
-            } else {
-                this.sm.currentRole = 'student'; // Default
-            }
-            this.sm.setAuthStatus('🔐 Signed in (Offline)');
+            this.sm.currentRole = cachedRole || 'student';
+            this.sm.setAuthStatus('Signed in');
         }
 
+        if (this.sm.currentRole !== 'student') {
+            this.sm.showLoginError('This page is for student accounts. Please use the teacher dashboard.');
+            await supabaseService.signOut();
+            return;
+        }
+
+        if (this.sm.mustChangePassword) {
+            this.sm.switchView('loading-view');
+            this.sm.showForcedPasswordChange();
+            return;
+        }
+
+        await this.finishSignedInSession();
+    }
+
+    async finishSignedInSession() {
         // Try to load cloud progress (may fail offline)
         try {
             await this.sm.progress.loadCloudProgress();
@@ -101,7 +121,7 @@ export class StudentAuth {
         }
     }
 
-    handleFirebaseSignOut() {
+    handleBackendSignOut() {
         this.sm.currentUser = null;
         localStorage.removeItem('was_logged_in');
         if (this.sm.cloudSaveTimeout) {
@@ -109,22 +129,28 @@ export class StudentAuth {
             this.sm.cloudSaveTimeout = null;
         }
         this.sm.updateGuestStatus(true);
-        this.sm.setAuthStatus('Guest mode (local only)');
-        this.sm.switchView('main-menu-view');
+        this.sm.setAuthStatus('Signed out');
+        this.sm.switchView('login-view');
     }
 
     async fetchAndSetRole(user) {
         try {
-            const db = firebaseAuthService.getFirestore();
-            const roleDoc = await getDoc(doc(db, 'userRoles', user.uid));
-            if (roleDoc.exists()) {
-                this.sm.currentRole = roleDoc.data().role || 'student';
-                // Cache role for offline use
-                localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
-            } else {
-                this.sm.currentRole = 'student';
-                localStorage.setItem(`userRole_${user.uid}`, 'student');
+            const profile = await supabaseService.getProfile(user.uid);
+            this.sm.currentRole = profile?.role || 'student';
+            this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
+
+            if (profile && this.sm.currentRole === 'student') {
+                this.sm.studentProfile = {
+                    firstName: profile.firstName || '',
+                    lastName: profile.lastName || '',
+                    name: profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim(),
+                    grade: profile.grade || '',
+                    group: profile.group || '',
+                    email: profile.email || user.email || ''
+                };
             }
+
+            localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
         } catch (error) {
             console.error('Error fetching role:', error);
             // Try to use cached role if available
@@ -134,7 +160,6 @@ export class StudentAuth {
             } else {
                 this.sm.currentRole = 'student';
             }
-            // Re-throw to let caller know we're offline
             throw error;
         }
         return this.sm.currentRole;
@@ -197,9 +222,18 @@ export class StudentAuth {
 
     updateGuestStatus(isGuest) {
         const guestStatus = $('#guest-status');
-        const googleUserInfo = $('#google-user-info');
+        const userInfo = $('#user-info');
         if (guestStatus) guestStatus.style.display = isGuest ? 'flex' : 'none';
-        if (googleUserInfo) googleUserInfo.style.display = isGuest ? 'none' : 'flex';
+        if (userInfo) userInfo.style.display = isGuest ? 'none' : 'flex';
+
+        if (this.sm.authDisabled) {
+            const signInBtn = $('#guest-signin-btn');
+            if (signInBtn) signInBtn.style.display = 'none';
+            if (guestStatus) {
+                const statusText = guestStatus.querySelector('span');
+                if (statusText) statusText.textContent = 'Local development';
+            }
+        }
     }
 
     showLoginError(message) {
@@ -213,4 +247,3 @@ export class StudentAuth {
         }
     }
 }
-

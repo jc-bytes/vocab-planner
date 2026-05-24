@@ -1,0 +1,30 @@
+{
+  "id": "grade8_iiit_python_programming",
+  "name": "Grade 8 IIIT: Python Programming",
+  "description": "Python algorithms, syntax, print, strings, variables, assignment, input, arithmetic, operators, selection, random numbers, branches, loops, counters, flags, and debugging.",
+  "grades": ["8"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "Python", "definition": "A text-based programming language.", "example": "Students wrote Python programs with input and output.", "difficulty": 1, "synonyms": ["programming language"], "antonyms": []},
+    {"word": "algorithm", "definition": "A clear set of steps for solving a problem.", "example": "The algorithm described the program before coding.", "difficulty": 2, "synonyms": ["procedure"], "antonyms": []},
+    {"word": "syntax", "definition": "The exact rules for writing code correctly.", "example": "A missing colon caused a syntax error.", "difficulty": 2, "synonyms": ["code grammar"], "antonyms": []},
+    {"word": "print", "definition": "A Python command that displays output.", "example": "The program used print to show a message.", "difficulty": 1, "synonyms": ["display"], "antonyms": []},
+    {"word": "string", "definition": "Text data in a program.", "example": "The user's name was stored as a string.", "difficulty": 1, "synonyms": ["text"], "antonyms": ["number"]},
+    {"word": "variable", "definition": "A named place that stores a value.", "example": "The variable stored the player's age.", "difficulty": 2, "synonyms": ["storage"], "antonyms": ["constant"]},
+    {"word": "assignment", "definition": "Giving a value to a variable.", "example": "score = 0 is an assignment statement.", "difficulty": 2, "synonyms": ["set value"], "antonyms": []},
+    {"word": "input", "definition": "Information received from the user or system.", "example": "The input function asked for a number.", "difficulty": 1, "synonyms": ["signal in"], "antonyms": ["output"]},
+    {"word": "integer", "definition": "A whole number.", "example": "The score was an integer.", "difficulty": 1, "synonyms": ["whole number"], "antonyms": ["float"]},
+    {"word": "float", "definition": "A number that can include a decimal point.", "example": "The measurement was stored as a float.", "difficulty": 2, "synonyms": ["decimal"], "antonyms": ["integer"]},
+    {"word": "operator", "definition": "A symbol that performs math or comparison.", "example": "The greater-than operator compared two values.", "difficulty": 2, "synonyms": ["symbol"], "antonyms": []},
+    {"word": "expression", "definition": "Code that produces a value.", "example": "The expression calculated the total.", "difficulty": 2, "synonyms": ["calculation"], "antonyms": []},
+    {"word": "selection", "definition": "Code that chooses a path based on a condition.", "example": "Selection used if and else.", "difficulty": 2, "synonyms": ["choice"], "antonyms": []},
+    {"word": "branch", "definition": "One possible path in a program decision.", "example": "The elif branch ran for medium scores.", "difficulty": 2, "synonyms": ["path"], "antonyms": []},
+    {"word": "random", "definition": "Chosen by chance or without a predictable pattern.", "example": "The program generated a random number.", "difficulty": 1, "synonyms": ["chance"], "antonyms": ["planned"]},
+    {"word": "loop", "definition": "Code that repeats instructions.", "example": "The while loop repeated until the answer was correct.", "difficulty": 2, "synonyms": ["repeat"], "antonyms": ["single run"]},
+    {"word": "counter", "definition": "A variable used to count repetitions or events.", "example": "The counter increased during each loop.", "difficulty": 2, "synonyms": ["tracker"], "antonyms": []},
+    {"word": "flag", "definition": "A Boolean variable used to track a state.", "example": "The flag showed whether the game was running.", "difficulty": 3, "synonyms": ["state marker"], "antonyms": []},
+    {"word": "indentation", "definition": "Spaces at the start of code lines that show code structure in Python.", "example": "Wrong indentation caused a bug.", "difficulty": 2, "synonyms": ["spacing"], "antonyms": []},
+    {"word": "debug", "definition": "To find and fix code errors.", "example": "The student debugged a missing update in the loop.", "difficulty": 2, "synonyms": ["fix"], "antonyms": ["break"]}
+  ]
+}

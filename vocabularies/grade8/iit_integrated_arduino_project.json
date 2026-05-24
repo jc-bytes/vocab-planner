@@ -1,0 +1,28 @@
+{
+  "id": "grade8_iit_integrated_arduino_project",
+  "name": "Grade 8 IIT: Integrated Arduino Project",
+  "description": "Ultrasonic sensing, project design plans, input-process-output diagrams, circuit diagrams, test cases, prototypes, debugging, documentation, demonstrations, and reflections.",
+  "grades": ["8"],
+  "trimester": "IIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "ultrasonic", "definition": "Using sound waves above human hearing to measure distance.", "example": "The ultrasonic sensor measured how close the object was.", "difficulty": 3, "synonyms": ["distance sensing"], "antonyms": []},
+    {"word": "echo", "definition": "A reflected sound signal used by an ultrasonic sensor.", "example": "The echo helped calculate distance.", "difficulty": 3, "synonyms": ["reflection"], "antonyms": []},
+    {"word": "trigger", "definition": "A signal or condition that starts an action.", "example": "The trigger started the distance measurement.", "difficulty": 2, "synonyms": ["activate"], "antonyms": ["stop"]},
+    {"word": "centimeter", "definition": "A small unit of length used for measuring distance.", "example": "The sensor reading was 15 centimeters.", "difficulty": 1, "synonyms": ["cm"], "antonyms": []},
+    {"word": "purpose", "definition": "The reason a project exists.", "example": "The project purpose was to warn when a hand was close.", "difficulty": 1, "synonyms": ["goal"], "antonyms": []},
+    {"word": "prototype", "definition": "A test version of a project.", "example": "The prototype used one sensor and one output.", "difficulty": 2, "synonyms": ["test model"], "antonyms": ["final"]},
+    {"word": "input", "definition": "Information a system receives.", "example": "Distance was the project input.", "difficulty": 1, "synonyms": ["signal in"], "antonyms": ["output"]},
+    {"word": "process", "definition": "The logic or decision step in a system.", "example": "The process compared the reading to a threshold.", "difficulty": 2, "synonyms": ["logic"], "antonyms": []},
+    {"word": "output", "definition": "The action or result a system produces.", "example": "The buzzer and light were outputs.", "difficulty": 1, "synonyms": ["result"], "antonyms": ["input"]},
+    {"word": "diagram", "definition": "A labeled drawing that explains parts or connections.", "example": "The circuit diagram showed the sensor and LED.", "difficulty": 1, "synonyms": ["drawing"], "antonyms": []},
+    {"word": "test case", "definition": "A planned condition used to check if a system works.", "example": "The team tested near, medium, and far cases.", "difficulty": 2, "synonyms": ["test condition"], "antonyms": []},
+    {"word": "debug", "definition": "To find and fix a problem.", "example": "The students debugged a wrong pin number.", "difficulty": 2, "synonyms": ["fix"], "antonyms": ["break"]},
+    {"word": "wiring", "definition": "The way circuit parts are connected with wires.", "example": "The wiring problem stopped the sensor.", "difficulty": 1, "synonyms": ["connections"], "antonyms": []},
+    {"word": "code logic", "definition": "The decision structure and steps inside a program.", "example": "The code logic used a threshold condition.", "difficulty": 2, "synonyms": ["program reasoning"], "antonyms": []},
+    {"word": "documentation", "definition": "Records of plans, code, diagrams, tests, and results.", "example": "The documentation included photos and code notes.", "difficulty": 2, "synonyms": ["records"], "antonyms": []},
+    {"word": "evidence", "definition": "Information that shows what happened or supports a claim.", "example": "Testing evidence showed the prototype improved.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]},
+    {"word": "demonstration", "definition": "Showing and explaining how something works.", "example": "The demonstration identified the input and output.", "difficulty": 1, "synonyms": ["demo"], "antonyms": []},
+    {"word": "reflection", "definition": "A review of learning, challenges, and improvements.", "example": "The reflection named the strongest build skill.", "difficulty": 1, "synonyms": ["review"], "antonyms": []}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "grade7_it_maze_navigation_project",
+  "name": "Grade 7 IT: Maze Navigation Project",
+  "description": "Maze vocabulary, route planning, algorithms, prototypes, testing evidence, debugging, teamwork, and final robot presentations.",
+  "grades": ["7"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "maze", "definition": "A path challenge with turns, routes, and obstacles.", "example": "The mBot had to navigate the maze.", "difficulty": 1, "synonyms": ["labyrinth"], "antonyms": ["open path"]},
+    {"word": "route", "definition": "The planned path from start to finish.", "example": "The route included two turns and two obstacles.", "difficulty": 1, "synonyms": ["path"], "antonyms": []},
+    {"word": "checkpoint", "definition": "A planned point used to check progress on a route.", "example": "The robot stopped at the checkpoint.", "difficulty": 1, "synonyms": ["marker"], "antonyms": []},
+    {"word": "obstacle", "definition": "Something in the way that must be avoided or handled.", "example": "The maze obstacle required a turn.", "difficulty": 1, "synonyms": ["barrier"], "antonyms": ["clear path"]},
+    {"word": "prototype", "definition": "An early test version of a project.", "example": "The group built a maze prototype before the final exam project.", "difficulty": 2, "synonyms": ["test version"], "antonyms": ["final version"]},
+    {"word": "algorithm", "definition": "A clear set of steps used to solve a problem.", "example": "The maze algorithm listed movements and sensor checks.", "difficulty": 2, "synonyms": ["procedure"], "antonyms": []},
+    {"word": "debug", "definition": "To find and fix a problem in code or robot behavior.", "example": "The team debugged the turn time.", "difficulty": 2, "synonyms": ["fix"], "antonyms": ["break"]},
+    {"word": "trial", "definition": "One test attempt.", "example": "The best trial reached the finish line.", "difficulty": 1, "synonyms": ["attempt"], "antonyms": []},
+    {"word": "evidence", "definition": "Information that shows what happened or supports a claim.", "example": "The test table was evidence of improvement.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]},
+    {"word": "rubric", "definition": "A guide that explains how work will be evaluated.", "example": "The rubric checked programming, problem solving, and performance.", "difficulty": 2, "synonyms": ["criteria"], "antonyms": []},
+    {"word": "teamwork", "definition": "Working responsibly with others to complete a goal.", "example": "Teamwork helped the group test faster.", "difficulty": 1, "synonyms": ["collaboration"], "antonyms": ["solo work"]},
+    {"word": "responsibility", "definition": "Careful, reliable behavior during work.", "example": "Responsibility included safe material use and cleanup.", "difficulty": 1, "synonyms": ["accountability"], "antonyms": ["carelessness"]},
+    {"word": "documentation", "definition": "Written or visual records of plans, code, tests, and results.", "example": "The project documentation included screenshots and notes.", "difficulty": 2, "synonyms": ["records"], "antonyms": []},
+    {"word": "presentation", "definition": "A clear explanation and demonstration of work.", "example": "The final presentation explained the robot solution.", "difficulty": 1, "synonyms": ["demonstration"], "antonyms": []},
+    {"word": "reflection", "definition": "Thinking and writing about what was learned or improved.", "example": "The reflection named one challenge and solution.", "difficulty": 1, "synonyms": ["review"], "antonyms": []},
+    {"word": "improvement", "definition": "A change that makes work better.", "example": "The code improvement made the route more reliable.", "difficulty": 1, "synonyms": ["upgrade"], "antonyms": ["worsening"]},
+    {"word": "performance", "definition": "How well a robot or project works during testing.", "example": "Robot performance improved after calibration.", "difficulty": 2, "synonyms": ["function"], "antonyms": []},
+    {"word": "navigator", "definition": "A team role that helps plan, guide, or check the route.", "example": "The navigator compared the map with the robot path.", "difficulty": 1, "synonyms": ["guide"], "antonyms": []}
+  ]
+}

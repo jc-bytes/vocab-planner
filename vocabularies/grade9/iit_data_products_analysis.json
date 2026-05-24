@@ -1,0 +1,28 @@
+{
+  "id": "grade9_iit_data_products_analysis",
+  "name": "Grade 9 IIT: Data Products and Analysis",
+  "description": "Charts, patterns, outliers, correlation, observations, inferences, conclusions, limitations, recommendations, dashboards, reports, Tinkercad mock-ups, and evidence-based presentations.",
+  "grades": ["9"],
+  "trimester": "IIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "chart", "definition": "A visual display of data.", "example": "The chart showed the strongest pattern.", "difficulty": 1, "synonyms": ["graph"], "antonyms": ["table"]},
+    {"word": "bar chart", "definition": "A chart that uses bars to compare categories.", "example": "The bar chart compared survey choices.", "difficulty": 1, "synonyms": ["bar graph"], "antonyms": []},
+    {"word": "line chart", "definition": "A chart that shows change over order or time.", "example": "The line chart showed a trend.", "difficulty": 2, "synonyms": ["line graph"], "antonyms": []},
+    {"word": "scatter plot", "definition": "A chart that uses points to compare two numerical variables.", "example": "The scatter plot suggested a correlation.", "difficulty": 3, "synonyms": ["point graph"], "antonyms": []},
+    {"word": "pattern", "definition": "A noticeable relationship or trend in data.", "example": "The pattern showed more responses in one category.", "difficulty": 1, "synonyms": ["trend"], "antonyms": ["randomness"]},
+    {"word": "outlier", "definition": "A value very different from the rest.", "example": "One value was an outlier.", "difficulty": 2, "synonyms": ["unusual value"], "antonyms": ["typical value"]},
+    {"word": "correlation", "definition": "A relationship where two things appear to change together.", "example": "The data suggested a possible correlation.", "difficulty": 3, "synonyms": ["relationship"], "antonyms": []},
+    {"word": "observation", "definition": "Something noticed directly from data.", "example": "The tallest bar was an observation.", "difficulty": 1, "synonyms": ["noticed fact"], "antonyms": []},
+    {"word": "inference", "definition": "An idea made from observations and evidence.", "example": "The inference explained why one category was high.", "difficulty": 2, "synonyms": ["reasoned idea"], "antonyms": ["observation"]},
+    {"word": "conclusion", "definition": "A final statement about what the data shows.", "example": "The conclusion matched the evidence.", "difficulty": 2, "synonyms": ["finding"], "antonyms": []},
+    {"word": "limitation", "definition": "A weakness or boundary that affects results.", "example": "Small sample size was a limitation.", "difficulty": 2, "synonyms": ["constraint"], "antonyms": ["strength"]},
+    {"word": "recommendation", "definition": "A suggested action based on evidence.", "example": "The report included one recommendation.", "difficulty": 2, "synonyms": ["suggestion"], "antonyms": []},
+    {"word": "dashboard", "definition": "A visual summary of important data and findings.", "example": "The dashboard showed a chart and key conclusion.", "difficulty": 2, "synonyms": ["data display"], "antonyms": []},
+    {"word": "infographic", "definition": "A visual product that explains information with text and graphics.", "example": "The infographic made the data easier to understand.", "difficulty": 2, "synonyms": ["information graphic"], "antonyms": []},
+    {"word": "report", "definition": "A document or product that presents a question, evidence, and conclusion.", "example": "The one-page report included a limitation.", "difficulty": 1, "synonyms": ["summary"], "antonyms": []},
+    {"word": "Tinkercad", "definition": "A 3D design tool used to build digital models.", "example": "A Tinkercad model supported the data story.", "difficulty": 1, "synonyms": ["3D tool"], "antonyms": []},
+    {"word": "mock-up", "definition": "A simple model showing how a product could look.", "example": "The mock-up showed the data display idea.", "difficulty": 2, "synonyms": ["draft model"], "antonyms": ["final product"]},
+    {"word": "evidence", "definition": "Information that supports a claim.", "example": "Evidence statements used values from the chart.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]}
+  ]
+}

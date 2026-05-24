@@ -1,0 +1,28 @@
+{
+  "id": "grade7_iiit_spreadsheets_charts",
+  "name": "Grade 7 IIIT: Spreadsheets and Charts",
+  "description": "Spreadsheet components, formatting, formulas, functions, chart creation, sorting, filtering, COUNTIF, conditional formatting, and data interpretation.",
+  "grades": ["7"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "spreadsheet", "definition": "A digital table used to organize and analyze data.", "example": "The class used a spreadsheet for survey results.", "difficulty": 1, "synonyms": ["worksheet"], "antonyms": []},
+    {"word": "sheet", "definition": "One page or tab inside a spreadsheet file.", "example": "The workbook had one sheet for class data.", "difficulty": 1, "synonyms": ["tab"], "antonyms": []},
+    {"word": "row", "definition": "A horizontal line of cells.", "example": "Each row stored one response.", "difficulty": 1, "synonyms": ["horizontal line"], "antonyms": ["column"]},
+    {"word": "column", "definition": "A vertical line of cells.", "example": "One column stored scores.", "difficulty": 1, "synonyms": ["vertical line"], "antonyms": ["row"]},
+    {"word": "cell", "definition": "One box in a spreadsheet.", "example": "The active cell had a blue border.", "difficulty": 1, "synonyms": ["box"], "antonyms": []},
+    {"word": "reference", "definition": "The address of a cell, such as A1.", "example": "The formula used cell reference B2.", "difficulty": 2, "synonyms": ["address"], "antonyms": []},
+    {"word": "formula", "definition": "A spreadsheet instruction that calculates a result.", "example": "The formula added the numbers.", "difficulty": 2, "synonyms": ["calculation"], "antonyms": []},
+    {"word": "function", "definition": "A built-in spreadsheet command.", "example": "SUM and AVERAGE are functions.", "difficulty": 2, "synonyms": ["command"], "antonyms": []},
+    {"word": "average", "definition": "The typical value found by adding values and dividing by how many there are.", "example": "The average score was calculated with a function.", "difficulty": 1, "synonyms": ["mean"], "antonyms": []},
+    {"word": "minimum", "definition": "The smallest value in a set.", "example": "MIN found the minimum number.", "difficulty": 1, "synonyms": ["smallest"], "antonyms": ["maximum"]},
+    {"word": "maximum", "definition": "The largest value in a set.", "example": "MAX found the maximum number.", "difficulty": 1, "synonyms": ["largest"], "antonyms": ["minimum"]},
+    {"word": "chart", "definition": "A visual display of data.", "example": "The chart showed which option was most popular.", "difficulty": 1, "synonyms": ["graph"], "antonyms": ["table"]},
+    {"word": "interpretation", "definition": "An explanation of what data or a chart shows.", "example": "The interpretation sentence explained the highest category.", "difficulty": 2, "synonyms": ["explanation"], "antonyms": []},
+    {"word": "sort", "definition": "To arrange data in a chosen order.", "example": "The students sorted scores from highest to lowest.", "difficulty": 1, "synonyms": ["arrange"], "antonyms": ["shuffle"]},
+    {"word": "filter", "definition": "To show only data that matches a rule.", "example": "The filter showed only one category.", "difficulty": 2, "synonyms": ["screen"], "antonyms": ["show all"]},
+    {"word": "COUNTIF", "definition": "A function that counts items matching a condition.", "example": "COUNTIF counted repeated choices.", "difficulty": 3, "synonyms": ["conditional count"], "antonyms": []},
+    {"word": "formatting", "definition": "Changing how data looks in a spreadsheet.", "example": "Conditional formatting highlighted values above 90.", "difficulty": 2, "synonyms": ["styling"], "antonyms": []},
+    {"word": "pattern", "definition": "A noticeable relationship or repeated result in data.", "example": "The filtered data showed a pattern.", "difficulty": 1, "synonyms": ["trend"], "antonyms": ["randomness"]}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "grade7_iiit_sources_blogs_media",
+  "name": "Grade 7 IIIT: Credible Sources and Blog Media",
+  "description": "Source credibility, plagiarism, citation, Creative Commons, blog features, captions, headings, layout, calls to action, and cause-based media posts.",
+  "grades": ["7"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "source", "definition": "The place where information or media comes from.", "example": "The source included a link and author.", "difficulty": 1, "synonyms": ["origin"], "antonyms": []},
+    {"word": "credible", "definition": "Trustworthy and supported by useful evidence.", "example": "A credible source listed an author and date.", "difficulty": 2, "synonyms": ["reliable"], "antonyms": ["unreliable"]},
+    {"word": "author", "definition": "The person or group that created information or media.", "example": "The student checked the author of the article.", "difficulty": 1, "synonyms": ["creator"], "antonyms": []},
+    {"word": "evidence", "definition": "Information that supports an idea or claim.", "example": "The article used evidence from research.", "difficulty": 1, "synonyms": ["proof"], "antonyms": ["guess"]},
+    {"word": "purpose", "definition": "The reason a source or message was created.", "example": "The source purpose was to persuade readers.", "difficulty": 1, "synonyms": ["goal"], "antonyms": []},
+    {"word": "plagiarism", "definition": "Using someone else's work or ideas without proper credit.", "example": "Citation helps avoid plagiarism.", "difficulty": 2, "synonyms": ["copying"], "antonyms": ["attribution"]},
+    {"word": "citation", "definition": "Information that identifies a source.", "example": "The citation included title, author, and link.", "difficulty": 2, "synonyms": ["reference"], "antonyms": []},
+    {"word": "credit", "definition": "A note that names the creator or source of media.", "example": "The photo had a credit below it.", "difficulty": 1, "synonyms": ["attribution"], "antonyms": ["plagiarism"]},
+    {"word": "license", "definition": "Rules explaining how someone may use creative work.", "example": "The image license allowed reuse with credit.", "difficulty": 2, "synonyms": ["use rules"], "antonyms": []},
+    {"word": "blog", "definition": "An online post or page used to share ideas or updates.", "example": "The blog post supported a cause.", "difficulty": 1, "synonyms": ["web post"], "antonyms": []},
+    {"word": "heading", "definition": "Text that names a section or topic.", "example": "The heading introduced the main idea.", "difficulty": 1, "synonyms": ["title"], "antonyms": []},
+    {"word": "caption", "definition": "Text that explains an image or media item.", "example": "The caption described the photo.", "difficulty": 1, "synonyms": ["label"], "antonyms": []},
+    {"word": "paragraph", "definition": "A group of sentences about one idea.", "example": "The paragraph explained the cause.", "difficulty": 1, "synonyms": ["text block"], "antonyms": []},
+    {"word": "layout", "definition": "The arrangement of text, images, and other elements.", "example": "The layout made the blog easier to read.", "difficulty": 1, "synonyms": ["arrangement"], "antonyms": ["clutter"]},
+    {"word": "call to action", "definition": "A message that asks the audience to do something.", "example": "The call to action asked readers to recycle batteries.", "difficulty": 2, "synonyms": ["action prompt"], "antonyms": []},
+    {"word": "cause", "definition": "An issue or goal that people support.", "example": "The blog promoted an environmental cause.", "difficulty": 1, "synonyms": ["issue"], "antonyms": []},
+    {"word": "draft", "definition": "An early version of writing or design.", "example": "The draft was revised after feedback.", "difficulty": 1, "synonyms": ["version"], "antonyms": ["final"]},
+    {"word": "referencing", "definition": "The practice of recording and showing sources.", "example": "Referencing helped the reader verify information.", "difficulty": 2, "synonyms": ["citing"], "antonyms": []}
+  ]
+}

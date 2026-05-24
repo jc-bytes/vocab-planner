@@ -1,0 +1,30 @@
+{
+  "id": "grade8_iiit_representation_microbit_game",
+  "name": "Grade 8 IIIT: Representation and micro:bit Game",
+  "description": "Symbols, bits, binary, bytes, decimal conversion, Scratch Link, Bluetooth, micro:bit accelerometer, axes, sensor-controlled games, testing, and presentation.",
+  "grades": ["8"],
+  "trimester": "IIIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "representation", "definition": "A way of storing, showing, or communicating information.", "example": "Binary is one representation of numbers.", "difficulty": 2, "synonyms": ["encoding"], "antonyms": []},
+    {"word": "symbol", "definition": "A mark or character that represents information.", "example": "A letter is a symbol in a message.", "difficulty": 1, "synonyms": ["sign"], "antonyms": []},
+    {"word": "bit", "definition": "A binary digit, either 0 or 1.", "example": "A bit is the smallest binary value.", "difficulty": 2, "synonyms": ["binary digit"], "antonyms": []},
+    {"word": "binary", "definition": "A number system that uses only 0 and 1.", "example": "The class converted decimal numbers to binary.", "difficulty": 2, "synonyms": ["base two"], "antonyms": ["decimal"]},
+    {"word": "byte", "definition": "A group of eight bits.", "example": "File sizes can be measured in bytes.", "difficulty": 2, "synonyms": ["eight bits"], "antonyms": []},
+    {"word": "decimal", "definition": "The base ten number system used in everyday counting.", "example": "The number 9 is decimal.", "difficulty": 1, "synonyms": ["base ten"], "antonyms": ["binary"]},
+    {"word": "conversion", "definition": "Changing information from one form to another.", "example": "Binary conversion changed 5 into 101.", "difficulty": 2, "synonyms": ["change"], "antonyms": []},
+    {"word": "code", "definition": "A system of symbols or instructions.", "example": "Binary code represents data with bits.", "difficulty": 1, "synonyms": ["instructions"], "antonyms": []},
+    {"word": "Scratch Link", "definition": "A tool that helps Scratch connect to devices such as micro:bit.", "example": "Scratch Link connected the microbit to the game.", "difficulty": 2, "synonyms": ["connection tool"], "antonyms": []},
+    {"word": "Bluetooth", "definition": "A wireless method used to connect nearby devices.", "example": "Bluetooth connected Scratch and the microbit.", "difficulty": 2, "synonyms": ["wireless"], "antonyms": ["wired"]},
+    {"word": "microbit", "definition": "A small programmable computer with buttons and sensors.", "example": "The microbit controlled a Scratch game.", "difficulty": 1, "synonyms": ["microcontroller"], "antonyms": []},
+    {"word": "accelerometer", "definition": "A sensor that detects movement, tilt, or shake.", "example": "The accelerometer moved the sprite when tilted.", "difficulty": 3, "synonyms": ["motion sensor"], "antonyms": []},
+    {"word": "axis", "definition": "A direction used to measure position or movement.", "example": "The x-axis changed when the microbit tilted left.", "difficulty": 2, "synonyms": ["direction"], "antonyms": []},
+    {"word": "sprite", "definition": "A character or object in a Scratch project.", "example": "The sprite moved with tilt controls.", "difficulty": 1, "synonyms": ["character"], "antonyms": []},
+    {"word": "sensor-controlled", "definition": "Controlled by data from a sensor.", "example": "The game was sensor-controlled using tilt input.", "difficulty": 2, "synonyms": ["input-controlled"], "antonyms": ["keyboard-only"]},
+    {"word": "game loop", "definition": "Repeated code that keeps a game running.", "example": "The game loop checked movement and scoring.", "difficulty": 3, "synonyms": ["main loop"], "antonyms": []},
+    {"word": "win condition", "definition": "The rule that decides when a player succeeds.", "example": "The win condition was reaching the goal sprite.", "difficulty": 2, "synonyms": ["success rule"], "antonyms": []},
+    {"word": "testing", "definition": "Trying a project to check whether it works.", "example": "Peer testing found one control issue.", "difficulty": 1, "synonyms": ["checking"], "antonyms": ["guessing"]},
+    {"word": "screenshot", "definition": "An image of what is shown on a screen.", "example": "The student submitted a screenshot of the game.", "difficulty": 1, "synonyms": ["screen capture"], "antonyms": []},
+    {"word": "presentation", "definition": "A clear demonstration and explanation of work.", "example": "The presentation explained how the microbit connected.", "difficulty": 1, "synonyms": ["demo"], "antonyms": []}
+  ]
+}

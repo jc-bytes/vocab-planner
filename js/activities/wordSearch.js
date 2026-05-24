@@ -13,6 +13,8 @@ export class WordSearchActivity {
         this.foundWords = new Set();
         this.isSelecting = false;
         this.selectedCells = [];
+        this.activePointerId = null;
+        this.handleDocumentPointerEnd = (event) => this.handlePointerEnd(event);
 
         // Try to restore state first
         this.restoreState();
@@ -253,6 +255,8 @@ export class WordSearchActivity {
         grid.style.padding = '2px';
         grid.style.borderRadius = '0.5rem';
         grid.style.userSelect = 'none';
+        grid.style.touchAction = 'none';
+        grid.addEventListener('pointermove', (e) => this.handlePointerMove(e));
 
         for (let r = 0; r < this.gridSize; r++) {
             for (let c = 0; c < this.gridSize; c++) {
@@ -273,20 +277,51 @@ export class WordSearchActivity {
                 cell.style.cursor = 'pointer';
                 cell.style.transition = 'all 0.15s';
 
-                // Mouse events
-                cell.addEventListener('mousedown', (e) => this.handleMouseDown(e, r, c));
-                cell.addEventListener('mouseenter', () => this.handleMouseEnter(r, c));
-                cell.addEventListener('mouseup', () => this.handleMouseUp());
+                cell.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));
+                cell.addEventListener('pointerenter', (e) => this.handlePointerEnter(e, r, c));
 
                 grid.appendChild(cell);
             }
         }
 
-        // Global mouse up (in case mouse leaves grid)
-        document.addEventListener('mouseup', () => this.handleMouseUp());
+        // Global pointer end in case the pointer leaves the grid.
+        document.addEventListener('pointerup', this.handleDocumentPointerEnd);
+        document.addEventListener('pointercancel', this.handleDocumentPointerEnd);
 
         gridContainer.appendChild(grid);
         return gridContainer;
+    }
+
+    handlePointerDown(e, row, col) {
+        if (e.button !== undefined && e.button !== 0) return;
+        this.activePointerId = e.pointerId;
+        this.handleMouseDown(e, row, col);
+    }
+
+    handlePointerEnter(e, row, col) {
+        if (!this.isSelecting || e.pointerId !== this.activePointerId) return;
+        this.handleMouseEnter(row, col);
+    }
+
+    handlePointerMove(e) {
+        if (!this.isSelecting || e.pointerId !== this.activePointerId) return;
+
+        const target = document.elementFromPoint(e.clientX, e.clientY);
+        const cell = target && target.closest ? target.closest('.word-search-cell') : null;
+        if (!cell || !this.container.contains(cell)) return;
+
+        const row = Number(cell.dataset.row);
+        const col = Number(cell.dataset.col);
+        if (Number.isInteger(row) && Number.isInteger(col)) {
+            e.preventDefault();
+            this.handleMouseEnter(row, col);
+        }
+    }
+
+    handlePointerEnd(e) {
+        if (this.activePointerId !== null && e.pointerId !== this.activePointerId) return;
+        this.activePointerId = null;
+        this.handleMouseUp();
     }
 
     handleMouseDown(e, row, col) {
@@ -325,7 +360,7 @@ export class WordSearchActivity {
 
     updateCellSelection() {
         // Clear previous selection highlighting
-        const allCells = document.querySelectorAll('.word-search-cell');
+        const allCells = this.container.querySelectorAll('.word-search-cell');
         allCells.forEach(cell => {
             if (!cell.classList.contains('found')) {
                 cell.style.background = '#0f172a';
@@ -335,7 +370,7 @@ export class WordSearchActivity {
 
         // Highlight currently selected cells
         this.selectedCells.forEach(({ row, col }) => {
-            const cell = document.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
+            const cell = this.container.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
             if (cell && !cell.classList.contains('found')) {
                 cell.style.background = '#dbeafe';
                 cell.style.color = '#0f172a';
@@ -385,7 +420,7 @@ export class WordSearchActivity {
 
     markWordAsFound(wordPos) {
         wordPos.positions.forEach(({ row, col }) => {
-            const cell = document.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
+            const cell = this.container.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
             if (cell) {
                 cell.classList.add('found');
                 cell.style.background = '#d1fae5';

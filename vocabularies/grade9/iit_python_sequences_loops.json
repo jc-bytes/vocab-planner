@@ -1,0 +1,28 @@
+{
+  "id": "grade9_iit_python_sequences_loops",
+  "name": "Grade 9 IIT: Python Sequences and Loops",
+  "description": "Python lists, indexes, append, remove, sort, while loops, for loops, strings, characters, substrings, patterns, conditions, and debugging.",
+  "grades": ["9"],
+  "trimester": "IIT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "Python", "definition": "A text-based programming language.", "example": "Python was used to process lists and strings.", "difficulty": 1, "synonyms": ["programming language"], "antonyms": []},
+    {"word": "sequence", "definition": "Data stored in an order.", "example": "Lists and strings are sequences.", "difficulty": 2, "synonyms": ["ordered data"], "antonyms": []},
+    {"word": "list", "definition": "A Python collection that stores related items in order.", "example": "The list stored six favorite media items.", "difficulty": 2, "synonyms": ["collection"], "antonyms": []},
+    {"word": "index", "definition": "A position number used to access an item.", "example": "Index 0 accessed the first list item.", "difficulty": 2, "synonyms": ["position"], "antonyms": []},
+    {"word": "append", "definition": "To add an item to the end of a list.", "example": "The program appended a new temperature.", "difficulty": 2, "synonyms": ["add"], "antonyms": ["remove"]},
+    {"word": "remove", "definition": "To delete an item from a list.", "example": "The program removed one old value.", "difficulty": 1, "synonyms": ["delete"], "antonyms": ["append"]},
+    {"word": "sort", "definition": "To arrange items in order.", "example": "The list was sorted alphabetically.", "difficulty": 1, "synonyms": ["arrange"], "antonyms": ["shuffle"]},
+    {"word": "method", "definition": "A command connected to an object such as a list.", "example": "The sort method changed the list order.", "difficulty": 2, "synonyms": ["object command"], "antonyms": []},
+    {"word": "while loop", "definition": "A loop that repeats while a condition is true.", "example": "The while loop stopped after a condition changed.", "difficulty": 2, "synonyms": ["condition loop"], "antonyms": []},
+    {"word": "for loop", "definition": "A loop that repeats for each item in a sequence.", "example": "The for loop checked each list value.", "difficulty": 2, "synonyms": ["item loop"], "antonyms": []},
+    {"word": "condition", "definition": "A rule that can be true or false.", "example": "The condition stopped the while loop.", "difficulty": 2, "synonyms": ["test"], "antonyms": []},
+    {"word": "counter", "definition": "A variable used to count repetitions or matches.", "example": "The counter tracked values above 10.", "difficulty": 2, "synonyms": ["tracker"], "antonyms": []},
+    {"word": "string", "definition": "Text data in a program.", "example": "The program searched inside a string.", "difficulty": 1, "synonyms": ["text"], "antonyms": ["number"]},
+    {"word": "character", "definition": "One symbol, letter, digit, or space in a string.", "example": "The word data has four characters.", "difficulty": 1, "synonyms": ["symbol"], "antonyms": []},
+    {"word": "length", "definition": "The number of items or characters in a sequence.", "example": "The length of the list was six.", "difficulty": 1, "synonyms": ["size"], "antonyms": []},
+    {"word": "substring", "definition": "A smaller part of a string.", "example": "The code checked whether a substring was present.", "difficulty": 2, "synonyms": ["text part"], "antonyms": ["whole string"]},
+    {"word": "trace", "definition": "To follow code step by step.", "example": "Tracing showed where the loop stopped.", "difficulty": 2, "synonyms": ["follow"], "antonyms": []},
+    {"word": "debugging", "definition": "Finding and fixing errors in a program.", "example": "The debugging check corrected four loop issues.", "difficulty": 2, "synonyms": ["troubleshooting"], "antonyms": ["breaking"]}
+  ]
+}

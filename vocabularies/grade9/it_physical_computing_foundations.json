@@ -1,0 +1,28 @@
+{
+  "id": "grade9_it_physical_computing_foundations",
+  "name": "Grade 9 IT: Physical Computing Foundations",
+  "description": "Input-process-output systems, lab safety, digital and analog signals, Arduino/Freenove basics, LED blink, setup, loop, delay, circuits, and debugging routines.",
+  "grades": ["9"],
+  "trimester": "IT",
+  "activitySettings": {"matching": 12, "flashcards": 18, "quiz": 12, "illustration": 8, "synonymAntonym": 10, "wordSearch": 12, "crossword": 12, "hangman": 8, "scramble": 10, "speedMatch": 12, "fillInBlank": 10},
+  "words": [
+    {"word": "physical computing", "definition": "Using code and electronic parts to interact with the physical world.", "example": "The LED project was a physical computing system.", "difficulty": 2, "synonyms": ["interactive electronics"], "antonyms": []},
+    {"word": "system", "definition": "A group of parts that work together.", "example": "The device was a system with input, process, and output.", "difficulty": 1, "synonyms": ["connected parts"], "antonyms": []},
+    {"word": "input", "definition": "Information or action received by a system.", "example": "A button press was the input.", "difficulty": 1, "synonyms": ["signal in"], "antonyms": ["output"]},
+    {"word": "process", "definition": "The logic or decision step in a system.", "example": "The process checked the sensor value.", "difficulty": 2, "synonyms": ["logic"], "antonyms": []},
+    {"word": "output", "definition": "The action or result produced by a system.", "example": "The LED blink was the output.", "difficulty": 1, "synonyms": ["result"], "antonyms": ["input"]},
+    {"word": "device", "definition": "A piece of technology that performs a function.", "example": "A smart lamp is a device that reacts to input.", "difficulty": 1, "synonyms": ["machine"], "antonyms": []},
+    {"word": "workflow", "definition": "The planned steps for working safely and efficiently.", "example": "The lab workflow included setup, testing, and cleanup.", "difficulty": 2, "synonyms": ["process"], "antonyms": []},
+    {"word": "digital", "definition": "Using clear states such as on or off.", "example": "A button can send a digital signal.", "difficulty": 2, "synonyms": ["on off"], "antonyms": ["analog"]},
+    {"word": "analog", "definition": "Using a range of values.", "example": "A volume knob is analog.", "difficulty": 2, "synonyms": ["variable"], "antonyms": ["digital"]},
+    {"word": "Arduino", "definition": "A microcontroller platform used for electronic projects.", "example": "The Arduino ran the blink program.", "difficulty": 1, "synonyms": ["microcontroller"], "antonyms": []},
+    {"word": "Freenove", "definition": "An electronics kit used with Arduino-style projects.", "example": "The Freenove kit included wires and LEDs.", "difficulty": 1, "synonyms": ["electronics kit"], "antonyms": []},
+    {"word": "circuit", "definition": "A complete path that allows electricity to flow.", "example": "The circuit needed power, LED, resistor, and ground.", "difficulty": 1, "synonyms": ["electrical path"], "antonyms": ["open circuit"]},
+    {"word": "sketch", "definition": "An Arduino program.", "example": "The sketch controlled the LED.", "difficulty": 1, "synonyms": ["program"], "antonyms": []},
+    {"word": "setup", "definition": "The part of an Arduino sketch that runs once at the start.", "example": "Setup set the output pin.", "difficulty": 2, "synonyms": ["start code"], "antonyms": []},
+    {"word": "loop", "definition": "The part of an Arduino sketch that repeats.", "example": "The loop turned the LED on and off.", "difficulty": 2, "synonyms": ["repeat"], "antonyms": ["single run"]},
+    {"word": "delay", "definition": "A timed pause in a program.", "example": "A longer delay made the blink slower.", "difficulty": 1, "synonyms": ["pause"], "antonyms": []},
+    {"word": "upload", "definition": "To send code from the computer to the board.", "example": "The student uploaded the sketch.", "difficulty": 1, "synonyms": ["send"], "antonyms": ["download"]},
+    {"word": "debug", "definition": "To find and fix a problem in code, wiring, or behavior.", "example": "The team debugged a missing resistor.", "difficulty": 2, "synonyms": ["troubleshoot"], "antonyms": ["break"]}
+  ]
+}

@@ -27,12 +27,12 @@ export const store = {
     
     saveProgress() {
         // TODO: Implement save logic
-        // Progress saving is handled by Firebase/Drive services
+        // Progress saving is handled by backend/Drive services
     },
     
     loadProgress(json) {
         // TODO: Implement load logic
-        // Progress loading is handled by Firebase/Drive services
+        // Progress loading is handled by backend/Drive services
     }
 };
 
