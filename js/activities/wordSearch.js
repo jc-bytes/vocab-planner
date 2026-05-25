@@ -1,13 +1,17 @@
 import { createElement, $ } from '../main.js';
 
 export class WordSearchActivity {
-    constructor(container, words, onProgress, vocabID) {
+    constructor(container, words, onProgress, vocabID, onSaveState = null, initialState = null, options = {}) {
         this.container = container;
-        // Words are pre-filtered by student.js based on settings
-        this.words = words;
-        this.onProgress = onProgress;
-        this.vocabID = vocabID || 'default'; // Use ID for stable persistence
         this.gridSize = 15;
+        // Words are pre-filtered by student.js based on settings. Keep only terms that can
+        // become playable word-search entries in this grid.
+        this.words = this.prepareWords(words);
+        this.onProgress = onProgress;
+        this.onSaveState = onSaveState;
+        this.initialState = initialState;
+        this.options = options;
+        this.vocabID = vocabID || 'default'; // Use ID for stable persistence
         this.grid = [];
         this.wordPositions = [];
         this.foundWords = new Set();
@@ -22,12 +26,36 @@ export class WordSearchActivity {
         // If no state was restored, generate new grid
         if (this.grid.length === 0) {
             this.generateGrid();
+        } else {
+            this.saveState();
         }
 
         this.render();
     }
 
+    prepareWords(words) {
+        return words
+            .map(wordObj => ({
+                ...wordObj,
+                puzzleWord: this.normalizeWord(wordObj.word)
+            }))
+            .filter(wordObj => wordObj.puzzleWord.length >= 2 && wordObj.puzzleWord.length <= this.gridSize);
+    }
+
+    normalizeWord(word) {
+        return String(word || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    getOriginalLabel(wordObj) {
+        return String(wordObj.word || '')
+            .trim()
+            .replace(/\s+/g, ' ')
+            .replace(/\b[A-Za-z]/g, char => char.toUpperCase());
+    }
+
     restoreState() {
+        if (this.applySavedState(this.initialState)) return;
+
         // Use vocabID in key for stability
         const key = `word_search_state_${this.vocabID}`;
         const saved = localStorage.getItem(key);
@@ -35,16 +63,29 @@ export class WordSearchActivity {
         if (saved) {
             try {
                 const state = JSON.parse(saved);
-                // Only restore if word count matches (basic validation)
-                if (state.wordsLength === this.words.length) {
-                    this.grid = state.grid;
-                    this.wordPositions = state.wordPositions;
-                    this.foundWords = new Set(state.foundWords);
-                }
+                this.applySavedState(state);
             } catch (e) {
                 console.error('Error restoring word search state:', e);
             }
         }
+    }
+
+    applySavedState(state) {
+        if (!state || typeof state !== 'object') return false;
+        if (state.wordsLength !== this.words.length) return false;
+        if (!this.hasMatchingWordKeys(state.wordKeys)) return false;
+        if (!Array.isArray(state.grid) || !Array.isArray(state.wordPositions)) return false;
+
+        this.grid = state.grid;
+        this.wordPositions = state.wordPositions;
+        this.foundWords = new Set(Array.isArray(state.foundWords) ? state.foundWords : []);
+        return true;
+    }
+
+    hasMatchingWordKeys(wordKeys) {
+        if (!Array.isArray(wordKeys) || wordKeys.length === 0) return true;
+        if (wordKeys.length !== this.words.length) return false;
+        return wordKeys.every((wordKey, index) => wordKey === this.words[index]?.word);
     }
 
     saveState() {
@@ -53,9 +94,13 @@ export class WordSearchActivity {
             grid: this.grid,
             wordPositions: this.wordPositions,
             foundWords: Array.from(this.foundWords),
+            wordKeys: this.words.map(word => word.word),
             wordsLength: this.words.length
         };
         localStorage.setItem(key, JSON.stringify(state));
+        if (typeof this.onSaveState === 'function') {
+            this.onSaveState(state);
+        }
     }
 
     generateGrid() {
@@ -80,13 +125,15 @@ export class WordSearchActivity {
             [-1, 1]   // Diagonal up-right
         ];
 
-        // Try to place each word
-        for (const wordObj of this.words) {
-            // Remove spaces for multi-word terms (e.g., "sound sensor" -> "soundsensor")
-            const word = wordObj.word.toUpperCase().replace(/\s+/g, '');
+        const placedWords = [];
+
+        // Try to place each word, longest first so large words get the easiest space.
+        const wordsToPlace = [...this.words].sort((a, b) => b.puzzleWord.length - a.puzzleWord.length);
+        for (const wordObj of wordsToPlace) {
+            const word = wordObj.puzzleWord;
             let placed = false;
             let attempts = 0;
-            const maxAttempts = 100;
+            const maxAttempts = 300;
 
             while (!placed && attempts < maxAttempts) {
                 attempts++;
@@ -97,9 +144,12 @@ export class WordSearchActivity {
                 if (this.canPlaceWord(word, row, col, dir)) {
                     this.placeWord(word, row, col, dir);
                     placed = true;
+                    placedWords.push(wordObj);
                 }
             }
         }
+
+        this.words = placedWords;
 
         // Fill ALL empty cells with random letters
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -157,13 +207,17 @@ export class WordSearchActivity {
     }
 
     render() {
+        this.destroy();
         this.container.innerHTML = '';
 
+        const header = this.renderHeader();
+        this.container.appendChild(header);
+
         const wrapper = createElement('div', 'word-search-wrapper');
-        wrapper.style.maxWidth = '900px';
+        wrapper.style.maxWidth = '1040px';
         wrapper.style.margin = '0 auto';
         wrapper.style.display = 'flex';
-        wrapper.style.gap = '2rem';
+        wrapper.style.gap = '1.5rem';
 
         // Left side: Word list
         const wordList = this.renderWordList();
@@ -179,6 +233,54 @@ export class WordSearchActivity {
         this.restoreHighlights();
     }
 
+    renderHeader() {
+        const header = createElement('div', 'word-search-header');
+        header.style.maxWidth = '1040px';
+        header.style.margin = '0 auto 1rem';
+        header.style.display = 'flex';
+        header.style.alignItems = 'flex-end';
+        header.style.justifyContent = 'space-between';
+        header.style.gap = '1rem';
+        header.style.flexWrap = 'wrap';
+
+        const copy = createElement('div');
+        const title = createElement('h2');
+        title.textContent = 'Word Search';
+        title.style.margin = '0 0 0.35rem';
+        title.style.color = '#f8fafc';
+        title.style.fontSize = '1.75rem';
+        title.style.lineHeight = '1.1';
+        copy.appendChild(title);
+
+        const subtitle = createElement('p');
+        subtitle.textContent = `Find ${this.words.length} hidden words. Words can go across, down, diagonal, or backward.`;
+        subtitle.style.margin = '0';
+        subtitle.style.color = '#cbd5e1';
+        subtitle.style.fontSize = '0.95rem';
+        copy.appendChild(subtitle);
+        header.appendChild(copy);
+
+        const actions = createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '0.5rem';
+        actions.style.flexWrap = 'wrap';
+
+        const newPuzzleButton = createElement('button', 'btn primary-btn');
+        newPuzzleButton.type = 'button';
+        newPuzzleButton.textContent = 'New Puzzle';
+        newPuzzleButton.addEventListener('click', () => this.startNewPuzzle());
+        actions.appendChild(newPuzzleButton);
+
+        const shuffleButton = createElement('button', 'btn secondary-btn');
+        shuffleButton.type = 'button';
+        shuffleButton.textContent = 'Shuffle Same Words';
+        shuffleButton.addEventListener('click', () => this.restart());
+        actions.appendChild(shuffleButton);
+
+        header.appendChild(actions);
+        return header;
+    }
+
     restoreHighlights() {
         // Re-apply visual highlighting to found words
         for (const wordPos of this.wordPositions) {
@@ -190,57 +292,139 @@ export class WordSearchActivity {
 
     renderWordList() {
         const listContainer = createElement('div', 'word-list-container');
-        listContainer.style.flex = '0 0 200px';
+        listContainer.style.flex = '0 0 260px';
         listContainer.style.padding = '1rem';
-        listContainer.style.background = '#f9fafb';
-        listContainer.style.borderRadius = '0.5rem';
+        listContainer.style.background = 'rgba(15, 23, 42, 0.88)';
+        listContainer.style.border = '1px solid rgba(148, 163, 184, 0.22)';
+        listContainer.style.borderRadius = '0.75rem';
         listContainer.style.height = 'fit-content';
+        listContainer.style.boxShadow = '0 18px 45px rgba(0, 0, 0, 0.24)';
 
         const heading = createElement('h3');
-        heading.textContent = 'Find These Words';
-        heading.style.marginBottom = '1rem';
+        heading.textContent = 'This Round';
+        heading.style.margin = '0 0 0.75rem';
         heading.style.fontSize = '1.125rem';
         heading.style.fontWeight = '600';
+        heading.style.color = '#f8fafc';
         listContainer.appendChild(heading);
+
+        const roundMeta = createElement('p');
+        roundMeta.textContent = `Round: ${this.words.length} words`;
+        roundMeta.style.marginBottom = '0.4rem';
+        roundMeta.style.color = '#cbd5e1';
+        roundMeta.style.fontSize = '0.875rem';
+        listContainer.appendChild(roundMeta);
 
         const progress = createElement('p');
         progress.id = 'word-search-progress';
-        progress.textContent = `${this.foundWords.size} / ${this.words.length} found`;
-        progress.style.marginBottom = '1rem';
-        progress.style.color = '#6b7280';
+        const leftCount = Math.max(0, this.words.length - this.foundWords.size);
+        progress.textContent = `${this.foundWords.size} found · ${leftCount} left`;
+        progress.style.marginBottom = '0.5rem';
+        progress.style.color = '#cbd5e1';
         progress.style.fontSize = '0.875rem';
         listContainer.appendChild(progress);
 
-        const list = createElement('ul');
-        list.style.listStyle = 'none';
-        list.style.padding = '0';
-        list.style.margin = '0';
+        const progressTrack = createElement('div');
+        progressTrack.style.width = '100%';
+        progressTrack.style.height = '0.45rem';
+        progressTrack.style.background = 'rgba(148, 163, 184, 0.22)';
+        progressTrack.style.borderRadius = '999px';
+        progressTrack.style.overflow = 'hidden';
+        progressTrack.style.marginBottom = '1rem';
 
-        this.words.forEach(wordObj => {
-            // Remove spaces for display consistency
-            const word = wordObj.word.toUpperCase().replace(/\s+/g, '');
-            const item = createElement('li');
-            item.style.padding = '0.5rem';
-            item.style.marginBottom = '0.25rem';
-            item.style.borderRadius = '0.25rem';
-            item.style.fontSize = '0.875rem';
-            item.style.fontWeight = '500';
-            item.dataset.word = word;
+        const progressFill = createElement('div');
+        const percentage = this.words.length ? Math.round((this.foundWords.size / this.words.length) * 100) : 0;
+        progressFill.style.width = `${percentage}%`;
+        progressFill.style.height = '100%';
+        progressFill.style.background = 'linear-gradient(90deg, #22c55e, #14b8a6)';
+        progressFill.style.transition = 'width 0.25s ease';
+        progressTrack.appendChild(progressFill);
+        listContainer.appendChild(progressTrack);
 
-            if (this.foundWords.has(word)) {
-                item.style.textDecoration = 'line-through';
-                item.style.color = '#10b981';
-                item.textContent = `✓ ${word}`;
-            } else {
-                item.style.color = '#374151';
-                item.textContent = word;
-            }
+        const remainingWords = this.words.filter(wordObj => !this.foundWords.has(wordObj.puzzleWord));
+        const foundWords = this.words.filter(wordObj => this.foundWords.has(wordObj.puzzleWord));
 
-            list.appendChild(item);
-        });
+        const buildList = (title, items, isFound = false) => {
+            if (items.length === 0) return null;
+            const section = createElement('div');
+            section.style.marginTop = '0.75rem';
 
-        listContainer.appendChild(list);
+            const sectionTitle = createElement('div');
+            sectionTitle.textContent = title;
+            sectionTitle.style.fontSize = '0.75rem';
+            sectionTitle.style.fontWeight = '700';
+            sectionTitle.style.color = '#94a3b8';
+            sectionTitle.style.marginBottom = '0.35rem';
+            section.appendChild(sectionTitle);
+
+            const list = createElement('ul');
+            list.style.listStyle = 'none';
+            list.style.padding = '0';
+            list.style.margin = '0';
+
+            items.forEach(wordObj => {
+                list.appendChild(this.renderWordListItem(wordObj, isFound));
+            });
+
+            section.appendChild(list);
+            return section;
+        };
+
+        const remainingSection = buildList('Still Looking', remainingWords);
+        const foundSection = buildList('Found', foundWords, true);
+        if (remainingSection) listContainer.appendChild(remainingSection);
+        if (foundSection) listContainer.appendChild(foundSection);
+
+        if (this.words.length === 0) {
+            const empty = createElement('p');
+            empty.textContent = 'No playable words in this round.';
+            empty.style.color = '#cbd5e1';
+            empty.style.fontSize = '0.875rem';
+            listContainer.appendChild(empty);
+        }
+
         return listContainer;
+    }
+
+    renderWordListItem(wordObj, isFound = false) {
+        const word = wordObj.puzzleWord;
+        const item = createElement('li');
+        item.style.padding = '0.55rem 0.65rem';
+        item.style.marginBottom = '0.35rem';
+        item.style.borderRadius = '0.5rem';
+        item.style.fontSize = '0.875rem';
+        item.style.fontWeight = '500';
+        item.style.background = isFound ? 'rgba(34, 197, 94, 0.12)' : 'rgba(30, 41, 59, 0.82)';
+        item.style.border = isFound ? '1px solid rgba(34, 197, 94, 0.28)' : '1px solid rgba(148, 163, 184, 0.14)';
+        item.dataset.word = word;
+
+        const originalLabel = this.getOriginalLabel(wordObj);
+        const showOriginal = originalLabel && this.normalizeWord(originalLabel) !== word;
+        if (originalLabel) {
+            item.title = `Vocabulary word: ${originalLabel}`;
+        }
+
+        const puzzleLabel = createElement('div');
+        puzzleLabel.textContent = isFound ? `✓ ${word}` : word;
+        puzzleLabel.style.color = isFound ? '#86efac' : '#f8fafc';
+        puzzleLabel.style.fontWeight = '700';
+        if (isFound) {
+            puzzleLabel.style.textDecoration = 'line-through';
+        }
+        item.appendChild(puzzleLabel);
+
+        if (showOriginal) {
+            const original = createElement('div');
+            original.textContent = originalLabel;
+            original.style.fontSize = '0.74rem';
+            original.style.fontWeight = '500';
+            original.style.color = isFound ? '#bbf7d0' : '#94a3b8';
+            original.style.marginTop = '0.15rem';
+            original.style.textDecoration = 'none';
+            item.appendChild(original);
+        }
+
+        return item;
     }
 
     renderGrid() {
@@ -275,7 +459,7 @@ export class WordSearchActivity {
                 cell.style.fontWeight = '600';
                 cell.style.fontSize = '0.875rem';
                 cell.style.cursor = 'pointer';
-                cell.style.transition = 'all 0.15s';
+                cell.style.transition = 'background 0.15s, color 0.15s, transform 0.15s';
 
                 cell.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));
                 cell.addEventListener('pointerenter', (e) => this.handlePointerEnter(e, r, c));
@@ -334,28 +518,37 @@ export class WordSearchActivity {
     handleMouseEnter(row, col) {
         if (!this.isSelecting) return;
 
-        const last = this.selectedCells[this.selectedCells.length - 1];
-
-        // Check if continuing in same direction or starting new selection
-        if (this.selectedCells.length === 1 || this.isInLine(this.selectedCells[0], last, row, col)) {
-            // Only add if not already in selection
-            if (!this.selectedCells.some(c => c.row === row && c.col === col)) {
-                this.selectedCells.push({ row, col });
-                this.updateCellSelection();
-            }
+        const nextSelection = this.getStraightSelection(this.selectedCells[0], row, col);
+        if (nextSelection) {
+            this.selectedCells = nextSelection;
+            this.updateCellSelection();
         }
     }
 
-    isInLine(start, current, newRow, newCol) {
-        // Check if new cell continues the line from start through current
-        if (this.selectedCells.length === 1) return true; // Any direction is fine for second cell
+    getStraightSelection(start, endRow, endCol) {
+        const rowDiff = endRow - start.row;
+        const colDiff = endCol - start.col;
+        const rowStep = Math.sign(rowDiff);
+        const colStep = Math.sign(colDiff);
+        const rowDistance = Math.abs(rowDiff);
+        const colDistance = Math.abs(colDiff);
 
-        const dr = Math.sign(current.row - start.row);
-        const dc = Math.sign(current.col - start.col);
-        const expectedRow = current.row + dr;
-        const expectedCol = current.col + dc;
+        const isStraight =
+            rowDiff === 0 ||
+            colDiff === 0 ||
+            rowDistance === colDistance;
 
-        return newRow === expectedRow && newCol === expectedCol;
+        if (!isStraight) return null;
+
+        const length = Math.max(rowDistance, colDistance) + 1;
+        const cells = [];
+        for (let i = 0; i < length; i++) {
+            cells.push({
+                row: start.row + rowStep * i,
+                col: start.col + colStep * i
+            });
+        }
+        return cells;
     }
 
     updateCellSelection() {
@@ -365,6 +558,7 @@ export class WordSearchActivity {
             if (!cell.classList.contains('found')) {
                 cell.style.background = '#0f172a';
                 cell.style.color = '#f8fafc';
+                cell.style.transform = 'scale(1)';
             }
         });
 
@@ -372,8 +566,9 @@ export class WordSearchActivity {
         this.selectedCells.forEach(({ row, col }) => {
             const cell = this.container.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
             if (cell && !cell.classList.contains('found')) {
-                cell.style.background = '#dbeafe';
+                cell.style.background = '#facc15';
                 cell.style.color = '#0f172a';
+                cell.style.transform = 'scale(1.04)';
             }
         });
     }
@@ -423,14 +618,15 @@ export class WordSearchActivity {
             const cell = this.container.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`);
             if (cell) {
                 cell.classList.add('found');
-                cell.style.background = '#d1fae5';
+                cell.style.background = '#99f6e4';
                 cell.style.color = '#0f172a';
+                cell.style.transform = 'scale(1)';
             }
         });
     }
 
     updateWordList() {
-        const wordListContainer = document.querySelector('.word-list-container');
+        const wordListContainer = this.container.querySelector('.word-list-container');
         if (wordListContainer) {
             const newWordList = this.renderWordList();
             wordListContainer.parentNode.replaceChild(newWordList, wordListContainer);
@@ -438,6 +634,14 @@ export class WordSearchActivity {
     }
 
     getScore() {
+        if (this.words.length === 0) {
+            return {
+                score: 0,
+                details: 'No word-search words available',
+                isComplete: false
+            };
+        }
+
         const percentage = Math.round((this.foundWords.size / this.words.length) * 100);
         const isComplete = this.foundWords.size === this.words.length;
         
@@ -472,12 +676,18 @@ export class WordSearchActivity {
             <div class="completion-screen" style="background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 1rem; text-align: center;">
                 <h2>🎉 All Words Found!</h2>
                 <p>You found all ${this.words.length} words!</p>
-                <button id="replay-wordsearch" class="btn primary-btn" style="margin-top: 1rem;">🔄 Play Again</button>
+                <button id="new-wordsearch" class="btn primary-btn" style="margin-top: 1rem;">New Puzzle</button>
+                <button id="replay-wordsearch" class="btn secondary-btn" style="margin-top: 1rem; margin-left: 0.5rem;">Shuffle Same Words</button>
                 <button id="close-wordsearch" class="btn secondary-btn" style="margin-top: 0.5rem; margin-left: 0.5rem;">Close</button>
             </div>
         `;
         
         document.body.appendChild(overlay);
+
+        overlay.querySelector('#new-wordsearch').addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            this.startNewPuzzle();
+        });
         
         overlay.querySelector('#replay-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
@@ -487,6 +697,14 @@ export class WordSearchActivity {
         overlay.querySelector('#close-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
         });
+    }
+
+    startNewPuzzle() {
+        if (typeof this.options.onNewPuzzle === 'function') {
+            this.options.onNewPuzzle();
+        } else {
+            this.restart();
+        }
     }
     
     restart() {
@@ -510,5 +728,10 @@ export class WordSearchActivity {
         }
         
         this.render();
+    }
+
+    destroy() {
+        document.removeEventListener('pointerup', this.handleDocumentPointerEnd);
+        document.removeEventListener('pointercancel', this.handleDocumentPointerEnd);
     }
 }

@@ -1,17 +1,27 @@
 import { createElement, $ } from '../main.js';
 
 export class QuizActivity {
-    constructor(container, words, onProgress) {
+    constructor(container, words, onProgress, onSaveState = null, initialState = null) {
         this.container = container;
         this.words = words;
         this.onProgress = onProgress;
+        this.onSaveState = onSaveState;
+        this.initialState = initialState;
         this.currentIndex = 0;
         this.score = 0;
+        this.answeredCount = 0;
         this.totalQuestions = words.length;
         this.questions = this.generateQuestions();
+        this.selectedAnswers = [];
         this.isFinished = false;
 
+        this.restoreState();
+        this.saveState();
         this.render();
+    }
+
+    getStorageKey() {
+        return `quiz_state_${this.words[0]?.word || 'empty'}_${this.words.length}`;
     }
 
     generateQuestions() {
@@ -39,13 +49,77 @@ export class QuizActivity {
         });
     }
 
+    restoreState() {
+        if (this.applySavedState(this.initialState)) return;
+
+        const saved = localStorage.getItem(this.getStorageKey());
+        if (!saved) return;
+
+        try {
+            this.applySavedState(JSON.parse(saved));
+        } catch (error) {
+            console.error('Error restoring quiz state:', error);
+        }
+    }
+
+    applySavedState(state) {
+        if (!state || state.mode !== 'quiz-v1' || state.wordsLength !== this.words.length) {
+            return false;
+        }
+        if (!this.hasMatchingWordKeys(state.wordKeys)) return false;
+
+        if (Array.isArray(state.questions) && state.questions.length === this.totalQuestions) {
+            this.questions = state.questions;
+        }
+
+        this.currentIndex = Math.min(
+            Math.max(0, Number(state.currentIndex) || 0),
+            Math.max(0, this.totalQuestions - 1)
+        );
+        this.score = Math.max(0, Number(state.score) || 0);
+        this.answeredCount = Math.max(0, Number(state.answeredCount) || 0);
+        this.selectedAnswers = Array.isArray(state.selectedAnswers) ? state.selectedAnswers : [];
+        this.isFinished = Boolean(state.isFinished);
+        return true;
+    }
+
+    hasMatchingWordKeys(wordKeys) {
+        if (!Array.isArray(wordKeys) || wordKeys.length === 0) return true;
+        if (wordKeys.length !== this.words.length) return false;
+        return wordKeys.every((wordKey, index) => wordKey === this.words[index]?.word);
+    }
+
+    saveState() {
+        const state = {
+            mode: 'quiz-v1',
+            wordsLength: this.words.length,
+            wordKeys: this.words.map(word => word.word),
+            questions: this.questions,
+            currentIndex: this.currentIndex,
+            selectedAnswers: this.selectedAnswers,
+            score: this.score,
+            answeredCount: this.answeredCount,
+            isFinished: this.isFinished,
+            updatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+        if (typeof this.onSaveState === 'function') {
+            this.onSaveState(state);
+        }
+    }
+
     getScore() {
         if (this.totalQuestions === 0) return { score: 0, details: 'No questions' };
 
-        const percentage = Math.round((this.score / this.totalQuestions) * 100);
+        const progress = Math.round((this.answeredCount / this.totalQuestions) * 100);
+        const accuracy = this.answeredCount === 0 ? 0 : Math.round((this.score / this.answeredCount) * 100);
+
         return {
-            score: percentage,
-            details: `Correct: ${this.score}/${this.totalQuestions}`
+            score: progress,
+            details: `Answered: ${this.answeredCount}/${this.totalQuestions}. Correct: ${this.score}/${this.answeredCount || 0} (${accuracy}% accuracy)`,
+            accuracy,
+            isComplete: this.answeredCount === this.totalQuestions
         };
     }
 
@@ -108,7 +182,10 @@ export class QuizActivity {
         const buttons = this.container.querySelectorAll('.option-btn');
         buttons.forEach(b => b.disabled = true);
 
-        if (selected === correct) {
+        const currentQuestionIndex = this.currentIndex;
+        const isCorrect = selected === correct;
+
+        if (isCorrect) {
             btn.classList.add('correct'); // You might need to add CSS for this
             btn.style.backgroundColor = '#10b981'; // Green
             btn.style.color = 'white';
@@ -127,19 +204,27 @@ export class QuizActivity {
             });
         }
 
+        this.answeredCount++;
+        this.selectedAnswers[currentQuestionIndex] = {
+            selected,
+            correct,
+            isCorrect
+        };
+
         if (this.onProgress) {
             this.onProgress(this.getScore());
         }
 
+        if (this.currentIndex < this.totalQuestions - 1) {
+            this.currentIndex++;
+        } else {
+            this.isFinished = true;
+        }
+        this.saveState();
+
         // Wait and move to next
         setTimeout(() => {
-            if (this.currentIndex < this.totalQuestions - 1) {
-                this.currentIndex++;
-                this.render();
-            } else {
-                this.isFinished = true;
-                this.render();
-            }
+            this.render();
         }, 1500);
     }
 
@@ -148,11 +233,12 @@ export class QuizActivity {
         summary.style.textAlign = 'center';
 
         const result = this.getScore();
+        const accuracy = result.accuracy || 0;
 
         summary.innerHTML = `
             <h2>🎉 Quiz Complete!</h2>
             <div style="font-size: 4rem; font-weight: bold; color: var(--primary); margin: 2rem 0;">
-                ${result.score}%
+                ${accuracy}%
             </div>
             <p style="font-size: 1.5rem; margin-bottom: 2rem;">${result.details}</p>
             <button id="restart-quiz" class="btn primary-btn">🔄 Play Again</button>
@@ -167,14 +253,17 @@ export class QuizActivity {
         // Reset game state
         this.currentIndex = 0;
         this.score = 0;
+        this.answeredCount = 0;
+        this.selectedAnswers = [];
         this.isFinished = false;
         
         // Regenerate questions with new shuffle
         this.questions = this.generateQuestions();
+        this.saveState();
         
         // Notify progress system of new session
         if (this.onProgress) {
-            this.onProgress({ score: 0, details: 'Correct: 0/0', isComplete: false, isReplay: true });
+            this.onProgress({ score: 0, details: `Answered: 0/${this.totalQuestions}. Correct: 0/0 (0% accuracy)`, accuracy: 0, isComplete: false, isReplay: true });
         }
         
         this.render();

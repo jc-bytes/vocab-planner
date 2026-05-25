@@ -11,6 +11,7 @@ export class CrosswordActivity {
         this.grid = [];
         this.placedWords = [];
         this.score = 0;
+        this.activeWordNumber = null;
 
         this.init();
     }
@@ -219,30 +220,14 @@ export class CrosswordActivity {
 
     render() {
         this.container.innerHTML = '';
+        this.activeWordNumber = this.activeWordNumber || this.placedWords[0]?.number || null;
 
         const wrapper = createElement('div', 'crossword-wrapper');
+        wrapper.appendChild(this.renderHeader());
 
-        // Clues Panel
-        const cluesPanel = createElement('div', 'cw-clues');
-        const acrossList = createElement('div', 'cw-clues-list');
-        acrossList.innerHTML = '<h4>Across</h4>';
-        const downList = createElement('div', 'cw-clues-list');
-        downList.innerHTML = '<h4>Down</h4>';
-
-        this.placedWords.forEach(w => {
-            const item = createElement('div', 'cw-clue-item');
-            item.innerHTML = `<strong>${w.number}.</strong> ${w.definition}`;
-            item.addEventListener('click', () => this.highlightWord(w));
-
-            if (w.direction === 'across') {
-                acrossList.appendChild(item);
-            } else {
-                downList.appendChild(item);
-            }
-        });
-
-        cluesPanel.appendChild(acrossList);
-        cluesPanel.appendChild(downList);
+        const gameArea = createElement('div', 'crossword-game-area');
+        const boardPanel = createElement('div', 'cw-board-panel');
+        const cluesPanel = this.renderCluesPanel();
 
         // Grid
         const gridEl = createElement('div', 'cw-grid');
@@ -252,6 +237,8 @@ export class CrosswordActivity {
             for (let c = 0; c < this.gridSize; c++) {
                 const cellData = this.grid[r][c];
                 const cell = createElement('div', 'cw-grid-cell');
+                cell.dataset.row = r;
+                cell.dataset.col = c;
 
                 if (cellData) {
                     const input = createElement('input', 'cw-cell');
@@ -264,6 +251,7 @@ export class CrosswordActivity {
                     input.addEventListener('input', (e) => this.handleInput(e, r, c));
                     input.addEventListener('keydown', (e) => this.handleKey(e, r, c));
                     input.addEventListener('focus', () => this.handleFocus(r, c));
+                    input.addEventListener('click', () => this.handleFocus(r, c));
 
                     cell.appendChild(input);
 
@@ -280,13 +268,96 @@ export class CrosswordActivity {
             }
         }
 
-        wrapper.appendChild(gridEl);
-        wrapper.appendChild(cluesPanel);
+        boardPanel.appendChild(gridEl);
+        gameArea.appendChild(boardPanel);
+        gameArea.appendChild(cluesPanel);
+        wrapper.appendChild(gameArea);
         this.container.appendChild(wrapper);
+        this.updateHighlights();
+        this.updateProgressUI();
+    }
+
+    renderHeader() {
+        const header = createElement('div', 'crossword-header');
+        const copy = createElement('div');
+
+        const title = createElement('h2');
+        title.textContent = 'Crossword';
+        copy.appendChild(title);
+
+        const subtitle = createElement('p');
+        subtitle.textContent = `Use the clues to fill in ${this.placedWords.length} vocabulary words.`;
+        copy.appendChild(subtitle);
+
+        const progressWrap = createElement('div', 'cw-progress-wrap');
+        const progressText = createElement('div', 'cw-progress-text');
+        progressText.id = 'cw-progress-text';
+        progressWrap.appendChild(progressText);
+
+        const progressTrack = createElement('div', 'cw-progress-track');
+        const progressFill = createElement('div', 'cw-progress-fill');
+        progressFill.id = 'cw-progress-fill';
+        progressTrack.appendChild(progressFill);
+        progressWrap.appendChild(progressTrack);
+
+        header.appendChild(copy);
+        header.appendChild(progressWrap);
+        return header;
+    }
+
+    renderCluesPanel() {
+        const cluesPanel = createElement('div', 'cw-clues');
+        const activePanel = createElement('div', 'cw-active-clue');
+        activePanel.id = 'cw-active-clue';
+        cluesPanel.appendChild(activePanel);
+
+        const controls = createElement('div', 'cw-controls');
+        const checkButton = createElement('button', 'btn primary-btn');
+        checkButton.type = 'button';
+        checkButton.textContent = 'Check';
+        checkButton.addEventListener('click', () => this.checkAnswers());
+        controls.appendChild(checkButton);
+
+        const revealButton = createElement('button', 'btn secondary-btn');
+        revealButton.type = 'button';
+        revealButton.textContent = 'Reveal Letter';
+        revealButton.addEventListener('click', () => this.revealLetter());
+        controls.appendChild(revealButton);
+
+        const clearButton = createElement('button', 'btn secondary-btn');
+        clearButton.type = 'button';
+        clearButton.textContent = 'Clear';
+        clearButton.addEventListener('click', () => this.clearPuzzle());
+        controls.appendChild(clearButton);
+
+        cluesPanel.appendChild(controls);
+
+        const acrossList = createElement('div', 'cw-clues-list');
+        acrossList.innerHTML = '<h4>Across</h4>';
+        const downList = createElement('div', 'cw-clues-list');
+        downList.innerHTML = '<h4>Down</h4>';
+
+        this.placedWords.forEach(w => {
+            const item = createElement('div', 'cw-clue-item');
+            item.dataset.wordNumber = w.number;
+            item.innerHTML = `<strong>${w.number}.</strong> ${w.definition} <span class="cw-clue-length">(${w.word.length})</span>`;
+            item.addEventListener('click', () => this.setActiveWord(w, true));
+
+            if (w.direction === 'across') {
+                acrossList.appendChild(item);
+            } else {
+                downList.appendChild(item);
+            }
+        });
+
+        cluesPanel.appendChild(acrossList);
+        cluesPanel.appendChild(downList);
+        return cluesPanel;
     }
 
     handleInput(e, r, c) {
-        const val = e.target.value;
+        const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+        e.target.value = val;
         if (this.grid[r][c]) {
             this.grid[r][c].value = val;
         }
@@ -300,38 +371,225 @@ export class CrosswordActivity {
             this.saveState(); // Save on input
             this.checkProgress();
         }
+        this.clearCheckMarks();
+        this.updateProgressUI();
     }
 
     handleKey(e, r, c) {
         if (e.key === 'Backspace' && !e.target.value) {
             this.focusPrev(r, c);
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            this.focusRelative(r, c, 0, 1);
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.focusRelative(r, c, 0, -1);
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            this.focusRelative(r, c, 1, 0);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            this.focusRelative(r, c, -1, 0);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            this.toggleActiveWordAtCell(r, c);
         }
     }
 
     handleFocus(r, c) {
-        // Highlight logic could go here
+        const words = this.getWordsAtCell(r, c);
+        if (words.length === 0) return;
+
+        const current = this.getActiveWord();
+        const nextWord = current && words.some(w => w.number === current.number)
+            ? current
+            : words[0];
+        this.setActiveWord(nextWord, false);
     }
 
     focusNext(r, c) {
-        // Try right
-        let next = this.getCell(r, c + 1);
-        if (next) { next.focus(); return; }
-        // Try down
-        next = this.getCell(r + 1, c);
-        if (next) { next.focus(); return; }
+        const word = this.getActiveWord();
+        if (word) {
+            const cells = this.getWordCells(word);
+            const index = cells.findIndex(cell => cell.row === r && cell.col === c);
+            const nextCell = cells[index + 1];
+            if (nextCell) {
+                this.getCell(nextCell.row, nextCell.col)?.focus();
+                return;
+            }
+        }
+        this.focusRelative(r, c, 0, 1) || this.focusRelative(r, c, 1, 0);
     }
 
     focusPrev(r, c) {
-        // Try left
-        let prev = this.getCell(r, c - 1);
-        if (prev) { prev.focus(); return; }
-        // Try up
-        prev = this.getCell(r - 1, c);
-        if (prev) { prev.focus(); return; }
+        const word = this.getActiveWord();
+        if (word) {
+            const cells = this.getWordCells(word);
+            const index = cells.findIndex(cell => cell.row === r && cell.col === c);
+            const prevCell = cells[index - 1];
+            if (prevCell) {
+                this.getCell(prevCell.row, prevCell.col)?.focus();
+                return;
+            }
+        }
+        this.focusRelative(r, c, 0, -1) || this.focusRelative(r, c, -1, 0);
+    }
+
+    focusRelative(r, c, dr, dc) {
+        const next = this.getCell(r + dr, c + dc);
+        if (next) {
+            next.focus();
+            return true;
+        }
+        return false;
     }
 
     getCell(r, c) {
         return this.container.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+    }
+
+    getCellWrapper(r, c) {
+        return this.container.querySelector(`.cw-grid-cell[data-row="${r}"][data-col="${c}"]`);
+    }
+
+    getActiveWord() {
+        return this.placedWords.find(word => word.number === this.activeWordNumber) || null;
+    }
+
+    getWordCells(wordObj) {
+        const cells = [];
+        const word = wordObj.word.toUpperCase();
+        for (let i = 0; i < word.length; i++) {
+            cells.push({
+                row: wordObj.direction === 'across' ? wordObj.row : wordObj.row + i,
+                col: wordObj.direction === 'across' ? wordObj.col + i : wordObj.col
+            });
+        }
+        return cells;
+    }
+
+    getWordsAtCell(r, c) {
+        return this.placedWords.filter(word => (
+            this.getWordCells(word).some(cell => cell.row === r && cell.col === c)
+        ));
+    }
+
+    setActiveWord(wordObj, focusStart = false) {
+        if (!wordObj) return;
+        this.activeWordNumber = wordObj.number;
+        this.updateHighlights();
+        if (focusStart) {
+            this.getCell(wordObj.row, wordObj.col)?.focus();
+        }
+    }
+
+    toggleActiveWordAtCell(r, c) {
+        const words = this.getWordsAtCell(r, c);
+        if (words.length < 2) return;
+        const currentIndex = words.findIndex(word => word.number === this.activeWordNumber);
+        const nextWord = words[(currentIndex + 1) % words.length];
+        this.setActiveWord(nextWord, false);
+    }
+
+    updateHighlights() {
+        const activeWord = this.getActiveWord();
+        this.container.querySelectorAll('.cw-grid-cell').forEach(cell => {
+            cell.classList.remove('active', 'start');
+        });
+        this.container.querySelectorAll('.cw-clue-item').forEach(item => {
+            item.classList.toggle('active', Number(item.dataset.wordNumber) === this.activeWordNumber);
+        });
+
+        if (!activeWord) return;
+        this.getWordCells(activeWord).forEach(({ row, col }) => {
+            this.getCellWrapper(row, col)?.classList.add('active');
+        });
+        this.getCellWrapper(activeWord.row, activeWord.col)?.classList.add('start');
+        this.updateActiveClue();
+    }
+
+    updateActiveClue() {
+        const panel = this.container.querySelector('#cw-active-clue');
+        const activeWord = this.getActiveWord();
+        if (!panel || !activeWord) return;
+
+        panel.innerHTML = `
+            <div class="cw-active-label">${activeWord.number} ${activeWord.direction}</div>
+            <div class="cw-active-text">${activeWord.definition}</div>
+            <div class="cw-active-meta">${activeWord.word.length} letters</div>
+        `;
+    }
+
+    getSolvedCount() {
+        return this.placedWords.filter(word => (
+            this.getWordCells(word).every(({ row, col }) => {
+                const value = this.grid[row][col]?.value || '';
+                return value.toUpperCase() === this.grid[row][col]?.char;
+            })
+        )).length;
+    }
+
+    updateProgressUI() {
+        const solved = this.getSolvedCount();
+        const left = Math.max(0, this.placedWords.length - solved);
+        const percentage = this.placedWords.length ? Math.round((solved / this.placedWords.length) * 100) : 0;
+        const text = this.container.querySelector('#cw-progress-text');
+        const fill = this.container.querySelector('#cw-progress-fill');
+        if (text) text.textContent = `${solved} solved · ${left} left`;
+        if (fill) fill.style.width = `${percentage}%`;
+    }
+
+    clearCheckMarks() {
+        this.container.querySelectorAll('.cw-cell').forEach(input => {
+            input.classList.remove('correct', 'incorrect');
+        });
+    }
+
+    checkAnswers() {
+        this.container.querySelectorAll('.cw-cell').forEach(input => {
+            input.classList.remove('correct', 'incorrect');
+            if (!input.value) return;
+            input.classList.add(input.value.toUpperCase() === input.dataset.answer ? 'correct' : 'incorrect');
+        });
+        this.checkProgress();
+        this.updateProgressUI();
+    }
+
+    revealLetter() {
+        const focused = document.activeElement?.classList?.contains('cw-cell') ? document.activeElement : null;
+        const activeWord = this.getActiveWord();
+        const cells = activeWord ? this.getWordCells(activeWord) : [];
+        let target = focused;
+
+        if (!target && cells.length > 0) {
+            const emptyCell = cells.find(({ row, col }) => !this.grid[row][col]?.value);
+            target = emptyCell ? this.getCell(emptyCell.row, emptyCell.col) : this.getCell(cells[0].row, cells[0].col);
+        }
+
+        if (!target) return;
+
+        const row = Number(target.dataset.row);
+        const col = Number(target.dataset.col);
+        target.value = target.dataset.answer;
+        if (this.grid[row][col]) this.grid[row][col].value = target.dataset.answer;
+        target.classList.add('correct');
+        this.saveState();
+        this.checkProgress();
+        this.updateProgressUI();
+        this.focusNext(row, col);
+    }
+
+    clearPuzzle() {
+        this.container.querySelectorAll('.cw-cell').forEach(input => {
+            const row = Number(input.dataset.row);
+            const col = Number(input.dataset.col);
+            input.value = '';
+            input.classList.remove('correct', 'incorrect');
+            if (this.grid[row][col]) this.grid[row][col].value = '';
+        });
+        this.saveState();
+        this.checkProgress();
+        this.updateProgressUI();
     }
 
     checkProgress() {
@@ -404,6 +662,6 @@ export class CrosswordActivity {
     }
 
     highlightWord(wordObj) {
-        // Optional: highlight cells for this word
+        this.setActiveWord(wordObj, true);
     }
 }

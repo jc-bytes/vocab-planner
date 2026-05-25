@@ -1,13 +1,16 @@
 export class GalacticBreaker {
-    constructor(canvas, onGameOver) {
+    constructor(canvas, onGameOver, onScoreChange = null) {
         this.canvas = canvas;
         this.onGameOver = onGameOver;
+        this.onScoreChange = onScoreChange;
         this.ctx = canvas.getContext('2d');
         this.width = canvas.width;
         this.height = canvas.height;
 
         this.animationId = null;
         this.isRunning = false;
+        this.isServing = true;
+        this.lastReportedScore = null;
 
         // Game Objects
         this.paddle = {
@@ -27,8 +30,8 @@ export class GalacticBreaker {
             y: this.height - 50,
             radius: 8,
             speed: 5,
-            dx: 4,
-            dy: -4,
+            dx: 0,
+            dy: 0,
             color: '#fbbf24',
             trail: [],
             fireball: false
@@ -77,6 +80,60 @@ export class GalacticBreaker {
 
         this.initBricks();
         this.bindControls();
+    }
+
+    reportScoreIfChanged() {
+        if (this.score !== this.lastReportedScore) {
+            this.lastReportedScore = this.score;
+            if (this.onScoreChange) {
+                this.onScoreChange(this.score);
+            }
+        }
+    }
+
+    clampPaddle() {
+        if (this.paddle.x < 0) this.paddle.x = 0;
+        if (this.paddle.x + this.paddle.width > this.width) {
+            this.paddle.x = this.width - this.paddle.width;
+        }
+    }
+
+    setPaddleCenterFromClientX(clientX) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.width / rect.width;
+        const canvasX = (clientX - rect.left) * scaleX;
+        this.paddle.x = canvasX - this.paddle.width / 2;
+        this.paddle.dx = 0;
+        this.clampPaddle();
+    }
+
+    isPointInsideCanvas(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        return (
+            clientX >= rect.left &&
+            clientX <= rect.right &&
+            clientY >= rect.top &&
+            clientY <= rect.bottom
+        );
+    }
+
+    attachServeBallToPaddle() {
+        if (!this.isServing || this.balls.length !== 1) return;
+        const ball = this.balls[0];
+        ball.x = this.paddle.x + this.paddle.width / 2;
+        ball.y = this.paddle.y - ball.radius - 2;
+        ball.dx = 0;
+        ball.dy = 0;
+        ball.trail = [];
+    }
+
+    launchServeBall() {
+        if (!this.isServing || this.balls.length !== 1) return;
+        const ball = this.balls[0];
+        const hitPos = (ball.x - this.paddle.x) / this.paddle.width;
+        ball.dx = (hitPos - 0.5) * 8 || 4;
+        ball.dy = -4;
+        this.isServing = false;
     }
 
     initBricks() {
@@ -228,11 +285,17 @@ export class GalacticBreaker {
     }
 
     bindControls() {
+        this.previousTouchAction = this.canvas.style.touchAction;
+        this.canvas.style.touchAction = 'none';
+
         this.keyDownHandler = (e) => {
             if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
                 this.paddle.dx = this.paddle.speed;
             } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
                 this.paddle.dx = -this.paddle.speed;
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                this.launchServeBall();
             }
         };
 
@@ -243,12 +306,75 @@ export class GalacticBreaker {
             }
         };
 
+        this.pointerMoveHandler = (e) => {
+            this.setPaddleCenterFromClientX(e.clientX);
+        };
+
+        this.pointerDownHandler = (e) => {
+            this.setPaddleCenterFromClientX(e.clientX);
+            this.launchServeBall();
+        };
+
+        this.mouseDownHandler = (e) => {
+            this.setPaddleCenterFromClientX(e.clientX);
+            this.launchServeBall();
+        };
+
+        this.clickHandler = (e) => {
+            this.setPaddleCenterFromClientX(e.clientX);
+            this.launchServeBall();
+        };
+
+        this.documentMouseDownHandler = (e) => {
+            if (!this.isPointInsideCanvas(e.clientX, e.clientY)) return;
+            this.setPaddleCenterFromClientX(e.clientX);
+            this.launchServeBall();
+        };
+
+        this.documentPointerDownHandler = (e) => {
+            if (!this.isPointInsideCanvas(e.clientX, e.clientY)) return;
+            this.setPaddleCenterFromClientX(e.clientX);
+            this.launchServeBall();
+        };
+
+        this.touchMoveHandler = (e) => {
+            if (e.touches.length === 0) return;
+            e.preventDefault();
+            this.setPaddleCenterFromClientX(e.touches[0].clientX);
+        };
+
+        this.touchStartHandler = (e) => {
+            if (e.touches.length === 0) return;
+            e.preventDefault();
+            this.setPaddleCenterFromClientX(e.touches[0].clientX);
+            this.launchServeBall();
+        };
+
+        this.documentTouchStartHandler = (e) => {
+            if (e.touches.length === 0) return;
+            const touch = e.touches[0];
+            if (!this.isPointInsideCanvas(touch.clientX, touch.clientY)) return;
+            e.preventDefault();
+            this.setPaddleCenterFromClientX(touch.clientX);
+            this.launchServeBall();
+        };
+
         document.addEventListener('keydown', this.keyDownHandler);
         document.addEventListener('keyup', this.keyUpHandler);
+        document.addEventListener('mousedown', this.documentMouseDownHandler);
+        document.addEventListener('pointerdown', this.documentPointerDownHandler);
+        document.addEventListener('touchstart', this.documentTouchStartHandler, { passive: false });
+        this.canvas.addEventListener('pointermove', this.pointerMoveHandler);
+        this.canvas.addEventListener('pointerdown', this.pointerDownHandler);
+        this.canvas.addEventListener('mousedown', this.mouseDownHandler);
+        this.canvas.addEventListener('click', this.clickHandler);
+        this.canvas.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+        this.canvas.addEventListener('touchstart', this.touchStartHandler, { passive: false });
     }
 
     start() {
         this.isRunning = true;
+        this.reportScoreIfChanged();
         this.loop();
     }
 
@@ -269,6 +395,16 @@ export class GalacticBreaker {
         if (this.animationId) cancelAnimationFrame(this.animationId);
         document.removeEventListener('keydown', this.keyDownHandler);
         document.removeEventListener('keyup', this.keyUpHandler);
+        document.removeEventListener('mousedown', this.documentMouseDownHandler);
+        document.removeEventListener('pointerdown', this.documentPointerDownHandler);
+        document.removeEventListener('touchstart', this.documentTouchStartHandler);
+        this.canvas.removeEventListener('pointermove', this.pointerMoveHandler);
+        this.canvas.removeEventListener('pointerdown', this.pointerDownHandler);
+        this.canvas.removeEventListener('mousedown', this.mouseDownHandler);
+        this.canvas.removeEventListener('click', this.clickHandler);
+        this.canvas.removeEventListener('touchmove', this.touchMoveHandler);
+        this.canvas.removeEventListener('touchstart', this.touchStartHandler);
+        this.canvas.style.touchAction = this.previousTouchAction || '';
     }
 
     loop() {
@@ -281,14 +417,16 @@ export class GalacticBreaker {
     update() {
         // Update paddle
         this.paddle.x += this.paddle.dx;
-        if (this.paddle.x < 0) this.paddle.x = 0;
-        if (this.paddle.x + this.paddle.width > this.width) {
-            this.paddle.x = this.width - this.paddle.width;
-        }
+        this.clampPaddle();
+        this.attachServeBallToPaddle();
 
         // Update balls
         for (let i = this.balls.length - 1; i >= 0; i--) {
             const ball = this.balls[i];
+
+            if (this.isServing && this.balls.length === 1) {
+                continue;
+            }
 
             // Trail effect
             ball.trail.push({ x: ball.x, y: ball.y });
@@ -453,20 +591,24 @@ export class GalacticBreaker {
             this.initBricks();
             this.resetBall();
         }
+
+        this.reportScoreIfChanged();
     }
 
     resetBall() {
+        this.isServing = true;
         this.balls = [{
             x: this.width / 2,
             y: this.height - 50,
             radius: 8,
             speed: 5 + (this.level - 1) * 0.5,
-            dx: 4,
-            dy: -4,
+            dx: 0,
+            dy: 0,
             color: '#fbbf24',
             trail: [],
             fireball: false
         }];
+        this.attachServeBallToPaddle();
     }
 
     draw() {
@@ -637,11 +779,21 @@ export class GalacticBreaker {
             this.ctx.fillStyle = '#8b5cf6';
             this.ctx.fillText(`BALLS: ${this.balls.length}`, this.width - 10, 55);
         }
+
+        if (this.isServing) {
+            this.ctx.textAlign = 'center';
+            this.ctx.font = 'bold 24px Arial';
+            this.ctx.fillStyle = '#f8fafc';
+            this.ctx.shadowColor = '#8b5cf6';
+            this.ctx.shadowBlur = 12;
+            this.ctx.fillText('Press Space or tap to launch', this.width / 2, this.height / 2 + 70);
+            this.ctx.shadowBlur = 0;
+        }
     }
 
     endGame() {
         this.stop();
-        alert(`Game Over!\nFinal Score: ${this.score}\nLevel Reached: ${this.level}`);
+        this.reportScoreIfChanged();
         if (this.onGameOver) this.onGameOver(this.score);
     }
 }

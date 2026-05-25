@@ -57,7 +57,7 @@ export class StudentGames {
             }
             return this.globalSettings;
         }
-        
+
         try {
             const db = supabaseService.getDatabase();
             const settingsRef = doc(db, 'appSettings', 'gamification');
@@ -82,7 +82,7 @@ export class StudentGames {
                 progressReward: 1
             };
         }
-        
+
         return this.globalSettings;
     }
     
@@ -137,7 +137,7 @@ export class StudentGames {
         }
 
         // Games with leaderboards enabled
-        const gamesWithLeaderboard = ['level-devil', 'radius-raid', 'packabunchas', 'spacepi'];
+        const gamesWithLeaderboard = ['galactic-breaker', 'level-devil', 'radius-raid', 'packabunchas', 'spacepi'];
         
         // Only save scores for games with leaderboards enabled
         if (!gamesWithLeaderboard.includes(gameId)) {
@@ -424,12 +424,12 @@ export class StudentGames {
             iframe.style.minHeight = '600px';
             iframe.style.display = 'block';
             iframe.style.overflow = 'hidden';
-        } else if (gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021') {
+        } else if (gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
             // Responsive games - let them size themselves but center them
-            iframe.style.width = 'auto';
+            iframe.style.width = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? '100%' : 'auto';
             iframe.style.minWidth = '80%';
             iframe.style.maxWidth = '100%';
-            iframe.style.height = '600px';
+            iframe.style.height = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? '900px' : '600px';
             iframe.style.minHeight = '400px';
             iframe.style.display = 'block';
             iframe.style.overflow = 'auto';
@@ -825,228 +825,292 @@ export class StudentGames {
         }
 
         if (await this.sm.progress.deductCoins(exchangeRate)) {
-            $('#game-selection').classList.add('hidden');
-            const gameStage = $('#game-stage');
-            gameStage.classList.remove('hidden');
-            
-            // Ensure game-stage is centered for all games
-            gameStage.style.display = 'flex';
-            gameStage.style.flexDirection = 'column';
-            gameStage.style.alignItems = 'center';
-            gameStage.style.justifyContent = 'center';
-            gameStage.style.width = '100%';
-            gameStage.style.minWidth = '80%'; // Prevent container from becoming too narrow
-            
-            // Prevent arrow keys from scrolling the page during gameplay
-            if (!this.arrowKeyHandler) {
-                this.arrowKeyHandler = (e) => {
-                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
-                        e.preventDefault();
-                    }
-                };
-            }
-            window.addEventListener('keydown', this.arrowKeyHandler);
-
             this.sm.gameTimeRemaining = 60;
-            this.updateGameTimer();
-
-            // Start Timer
-            this.sm.gameTimerInterval = setInterval(() => {
-                this.sm.gameTimeRemaining--;
-                this.updateGameTimer();
-                if (this.sm.gameTimeRemaining <= 0) {
-                    this.pauseGame();
-                }
-            }, 1000);
-
-            // Initialize Game Logic
-            const canvas = $('#game-canvas');
-
-            // Create a callback that offers replay if time remains
-            const gameOverCallback = (score) => {
-                this.saveHighScore(type, score);
-
-                // If there's time remaining, offer to play again
-                if (this.sm.gameTimeRemaining > 0) {
-                    const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.sm.gameTimeRemaining / 60)}:${(this.sm.gameTimeRemaining % 60).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
-
-                    if (playAgain) {
-                        // Restart the same game
-                        this.sm.currentGame = null;
-                        this.startGame(type);
-                    } else {
-                        // Exit game
-                        this.stopCurrentGame();
-                    }
-                } else {
-                    // No time left, just exit
-                    this.stopCurrentGame();
-                }
-            };
-
-            if (type === 'galactic-breaker') {
-                import('../games/galacticBreaker.js').then(module => {
-                    this.sm.currentGame = new module.GalacticBreaker(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'snake') {
-                import('../games/snake.js').then(module => {
-                    this.sm.currentGame = new module.Snake(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'flappy-bird') {
-                import('../games/flappyBird.js').then(module => {
-                    this.sm.currentGame = new module.FlappyBird(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'space-invaders') {
-                import('../games/spaceInvaders.js').then(module => {
-                    this.sm.currentGame = new module.SpaceInvaders(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'target-shooter') {
-                import('../games/targetShooter.js').then(module => {
-                    this.sm.currentGame = new module.TargetShooter(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'pong') {
-                import('../games/pong.js').then(module => {
-                    this.sm.currentGame = new module.Pong(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'whack-a-mole') {
-                import('../games/whackAMole.js').then(module => {
-                    this.sm.currentGame = new module.WhackAMole(canvas, gameOverCallback);
-                    this.sm.currentGame.start();
-                });
-            } else if (type === 'level-devil') {
-                this.loadHTMLGame(
-                    'level-devil',
-                    'js/games/Level Devil - NOT A Troll Game.html',
-                    'level-devil-score',
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'ball-roll-3d') {
-                this.loadHTMLGame(
-                    'ball-roll-3d',
-                    encodeURI('js/games/[3D]ボールころころ2.html'),
-                    null, // No score reporting for this game
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'appel') {
-                this.loadHTMLGame(
-                    'appel',
-                    encodeURI('js/games/Appel v1.html'),
-                    null, // No score reporting for this game
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'ball-blast') {
-                this.loadHTMLGame(
-                    'ball-blast',
-                    encodeURI('js/games/Ball Blast - Mobile friendly.html'),
-                    null, // No score reporting for this game
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'radius-raid') {
-                this.loadHTMLGame(
-                    'radius-raid',
-                    'js/games/radius-raid-master/index.html',
-                    'radius-raid-score', // Score reporting enabled
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'packabunchas') {
-                this.loadHTMLGame(
-                    'packabunchas',
-                    'js/games/packabunchas-main/index.html',
-                    'packabunchas-score', // Score reporting enabled
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'spacepi') {
-                this.loadHTMLGame(
-                    'spacepi',
-                    'js/games/spacepi-master/index.html',
-                    'spacepi-score', // Score reporting enabled
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'mystic-valley') {
-                this.loadHTMLGame(
-                    'mystic-valley',
-                    encodeURI('js/games/Mystic Valley.html'),
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'slash-knight') {
-                this.loadHTMLGame(
-                    'slash-knight',
-                    encodeURI('js/games/Slash Knight.html'),
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'black-hole-square') {
-                this.loadHTMLGame(
-                    'black-hole-square',
-                    'js/games/black-hole-square-master/public/index.html',
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'glitch-buster') {
-                // Glitch Buster - using standalone HTML file
-                const glitchPath = 'js/games/glitch-buster-master/glitch buster.html';
-                this.loadHTMLGame(
-                    'glitch-buster',
-                    glitchPath,
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'callisto') {
-                // Callisto - using standalone HTML file
-                const callistoPath = 'js/games/js13k-callisto-main/index.html';
-                this.loadHTMLGame(
-                    'callisto',
-                    callistoPath,
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            } else if (type === 'js13k2021') {
-                // Galaxy Rider (JS13K 2021) - using standalone HTML file
-                const js13kPath = 'js/games/galaxy_rider.html';
-                this.loadHTMLGame(
-                    'js13k2021',
-                    js13kPath,
-                    null, // No score reporting initially
-                    gameOverCallback,
-                    canvas,
-                    gameStage
-                );
-            }
+            this.launchGame(type, { resetTimer: true });
         }
     }
 
-    stopCurrentGame() {
+    restartCurrentGame(type) {
+        this.cleanupCurrentGame({ keepTimer: true, saveScore: false });
+        this.launchGame(type, { resetTimer: false });
+    }
+
+    launchGame(type, { resetTimer = false } = {}) {
+        $('#game-selection').classList.add('hidden');
+        const gameStage = $('#game-stage');
+        gameStage.classList.remove('hidden');
+
+        // Ensure game-stage is centered for all games
+        gameStage.style.display = 'flex';
+        gameStage.style.flexDirection = 'column';
+        gameStage.style.alignItems = 'center';
+        gameStage.style.justifyContent = 'center';
+        gameStage.style.width = '100%';
+        gameStage.style.minWidth = '80%'; // Prevent container from becoming too narrow
+
+        // Prevent arrow keys from scrolling the page during gameplay
+        if (!this.arrowKeyHandler) {
+            this.arrowKeyHandler = (e) => {
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                    e.preventDefault();
+                }
+            };
+        }
+        window.addEventListener('keydown', this.arrowKeyHandler);
+
+        this.updateGameTimer();
+        if (resetTimer || !this.sm.gameTimerInterval) {
+            this.startGameTimer();
+        }
+
+        // Initialize Game Logic
+        const canvas = $('#game-canvas');
+
+        // Create a callback that offers replay if time remains
+        const gameOverCallback = (score) => {
+            this.saveHighScore(type, score);
+
+            // If there's time remaining, offer to play again
+            if (this.sm.gameTimeRemaining > 0) {
+                const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.sm.gameTimeRemaining / 60)}:${(this.sm.gameTimeRemaining % 60).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
+
+                if (playAgain) {
+                    this.restartCurrentGame(type);
+                } else {
+                    // Exit game
+                    this.stopCurrentGame();
+                    this.showGameSelection();
+                }
+            } else {
+                // No time left, just exit
+                this.stopCurrentGame();
+                this.showGameSelection();
+            }
+        };
+
+        let gameLaunched = true;
+
+        if (type === 'galactic-breaker') {
+            import('../games/galacticBreaker.js').then(module => {
+                const scoreDisplay = $('#game-score');
+                const updateGalacticBreakerScore = (score) => {
+                    const numericScore = Number(score) || 0;
+                    this.sm.currentGameScore = numericScore;
+                    if (scoreDisplay) {
+                        scoreDisplay.style.display = 'block';
+                        scoreDisplay.textContent = `Score: ${numericScore.toLocaleString()}`;
+                    }
+                };
+
+                this.sm.currentGameScore = 0;
+                this.sm.currentGameMetadata = null;
+                updateGalacticBreakerScore(0);
+
+                this.sm.currentGame = new module.GalacticBreaker(canvas, gameOverCallback, updateGalacticBreakerScore);
+                this.sm.currentGame.gameType = type;
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'snake') {
+            import('../games/snake.js').then(module => {
+                this.sm.currentGame = new module.Snake(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'flappy-bird') {
+            import('../games/flappyBird.js').then(module => {
+                this.sm.currentGame = new module.FlappyBird(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'space-invaders') {
+            import('../games/spaceInvaders.js').then(module => {
+                this.sm.currentGame = new module.SpaceInvaders(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'target-shooter') {
+            import('../games/targetShooter.js').then(module => {
+                this.sm.currentGame = new module.TargetShooter(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'pong') {
+            import('../games/pong.js').then(module => {
+                this.sm.currentGame = new module.Pong(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'whack-a-mole') {
+            import('../games/whackAMole.js').then(module => {
+                this.sm.currentGame = new module.WhackAMole(canvas, gameOverCallback);
+                this.sm.currentGame.start();
+            });
+        } else if (type === 'level-devil') {
+            this.loadHTMLGame(
+                'level-devil',
+                'js/games/Level Devil - NOT A Troll Game.html',
+                'level-devil-score',
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'ball-roll-3d') {
+            this.loadHTMLGame(
+                'ball-roll-3d',
+                encodeURI('js/games/[3D]ボールころころ2.html'),
+                null, // No score reporting for this game
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'appel') {
+            this.loadHTMLGame(
+                'appel',
+                encodeURI('js/games/Appel v1.html'),
+                null, // No score reporting for this game
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'ball-blast') {
+            this.loadHTMLGame(
+                'ball-blast',
+                encodeURI('js/games/Ball Blast - Mobile friendly.html'),
+                null, // No score reporting for this game
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'radius-raid') {
+            this.loadHTMLGame(
+                'radius-raid',
+                'js/games/radius-raid-master/index.html',
+                'radius-raid-score', // Score reporting enabled
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'packabunchas') {
+            this.loadHTMLGame(
+                'packabunchas',
+                'js/games/packabunchas-main/index.html',
+                'packabunchas-score', // Score reporting enabled
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'spacepi') {
+            this.loadHTMLGame(
+                'spacepi',
+                'js/games/spacepi-master/index.html',
+                'spacepi-score', // Score reporting enabled
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'mystic-valley') {
+            this.loadHTMLGame(
+                'mystic-valley',
+                encodeURI('js/games/Mystic Valley.html'),
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'slash-knight') {
+            this.loadHTMLGame(
+                'slash-knight',
+                encodeURI('js/games/Slash Knight.html'),
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'black-hole-square') {
+            this.loadHTMLGame(
+                'black-hole-square',
+                'js/games/black-hole-square-master/public/index.html',
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'glitch-buster') {
+            // Glitch Buster - using standalone HTML file
+            const glitchPath = 'js/games/glitch-buster-master/glitch buster.html';
+            this.loadHTMLGame(
+                'glitch-buster',
+                glitchPath,
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'callisto') {
+            // Callisto - using standalone HTML file
+            const callistoPath = 'js/games/js13k-callisto-main/index.html';
+            this.loadHTMLGame(
+                'callisto',
+                callistoPath,
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'js13k2021') {
+            // Galaxy Rider (JS13K 2021) - using standalone HTML file
+            const js13kPath = 'js/games/galaxy_rider.html';
+            this.loadHTMLGame(
+                'js13k2021',
+                js13kPath,
+                null, // No score reporting initially
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'my-digital-garden') {
+            this.loadHTMLGame(
+                'my-digital-garden',
+                'js/games/my-digital-garden/index.html',
+                null, // No leaderboard score reporting for the first test pass
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else if (type === 'grow-your-garden') {
+            this.loadHTMLGame(
+                'grow-your-garden',
+                'js/games/grow-your-garden/index.html',
+                null, // Upstream game uses local saves; no arcade leaderboard hook yet
+                gameOverCallback,
+                canvas,
+                gameStage
+            );
+        } else {
+            gameLaunched = false;
+        }
+
+        if (!gameLaunched) {
+            notifications.warning('This game is not available yet. Please refresh and try again.');
+            this.stopCurrentGame();
+            this.showGameSelection();
+        }
+    }
+
+    clearGameTimer() {
+        if (this.sm.gameTimerInterval) {
+            clearInterval(this.sm.gameTimerInterval);
+            this.sm.gameTimerInterval = null;
+        }
+    }
+
+    startGameTimer() {
+        this.clearGameTimer();
+        this.sm.gameTimerInterval = setInterval(() => {
+            this.sm.gameTimeRemaining = Math.max(0, this.sm.gameTimeRemaining - 1);
+            this.updateGameTimer();
+            if (this.sm.gameTimeRemaining <= 0) {
+                this.pauseGame();
+            }
+        }, 1000);
+    }
+
+    cleanupCurrentGame({ keepTimer = false, saveScore = true } = {}) {
         // Store current game type before cleanup for score saving
         const currentGameType = this.sm.currentGame?.gameType || null;
         
@@ -1059,16 +1123,11 @@ export class StudentGames {
                 window.removeEventListener('message', this.sm.currentGame.messageHandler);
             }
             // Report final score if available (for games with score reporting)
-            if (this.sm.currentGameScore !== undefined && this.sm.currentGameScore > 0 && currentGameType) {
+            if (saveScore && this.sm.currentGameScore !== undefined && this.sm.currentGameScore > 0 && currentGameType) {
                 this.saveHighScore(currentGameType, this.sm.currentGameScore, this.sm.currentGameMetadata);
             }
             this.sm.currentGame = null;
             this.sm.currentGameScore = 0;
-        }
-        
-        // Remove arrow key prevention handler
-        if (this.arrowKeyHandler) {
-            window.removeEventListener('keydown', this.arrowKeyHandler);
         }
         
         // Clean up any remaining iframes (fallback cleanup)
@@ -1091,11 +1150,18 @@ export class StudentGames {
         if (scoreDisplay) {
             scoreDisplay.style.display = 'none';
         }
-        
-        if (this.sm.gameTimerInterval) {
-            clearInterval(this.sm.gameTimerInterval);
-            this.sm.gameTimerInterval = null;
+
+        if (!keepTimer) {
+            this.clearGameTimer();
         }
+    }
+
+    stopCurrentGame() {
+        // Remove arrow key prevention handler
+        if (this.arrowKeyHandler) {
+            window.removeEventListener('keydown', this.arrowKeyHandler);
+        }
+        this.cleanupCurrentGame();
     }
 
     async pauseGame() {
@@ -1130,10 +1196,7 @@ export class StudentGames {
         this.sm.isGamePaused = true;
 
         // Stop the timer
-        if (this.sm.gameTimerInterval) {
-            clearInterval(this.sm.gameTimerInterval);
-            this.sm.gameTimerInterval = null;
-        }
+        this.clearGameTimer();
 
         // Not enough coins - end game
         notifications.warning('Time up! Not enough coins to continue.');

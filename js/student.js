@@ -76,18 +76,37 @@ class StudentManager {
             { id: 'black-hole-square', name: 'Black Hole Square', icon: '⬛', desc: 'Clean up the squares!' },
             { id: 'glitch-buster', name: 'Glitch Buster', icon: '💥', desc: 'Bust the glitches!' },
             { id: 'callisto', name: 'Callisto', icon: '🌌', desc: '3D space action!' },
-            { id: 'js13k2021', name: 'JS13K 2021', icon: '🎮', desc: 'TypeScript adventure!' }
+            { id: 'js13k2021', name: 'JS13K 2021', icon: '🎮', desc: 'TypeScript adventure!' },
+            { id: 'my-digital-garden', name: 'My Magical Garden', icon: '🌸', desc: 'Breed flowers and fill the garden!' },
+            { id: 'grow-your-garden', name: 'Grow Your Garden', icon: '🌱', desc: 'Plant, harvest, and upgrade your garden!' }
         ];
         // HTML/Scratch games that don't have leaderboards (Level Devil has leaderboard now)
-        this.htmlGames = ['ball-roll-3d', 'appel', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021'];
+        this.htmlGames = ['ball-roll-3d', 'appel', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
         this.currentGameIndex = 0;
         this.authInitialized = false;
         this.authDisabled = DEV_AUTH_DISABLED;
         this.joinGrade = this.getJoinGradeFromUrl();
         this.mustChangePassword = false;
         this.cloudVocabs = [];
+        this.availableVocabs = [];
         this.cloudSaveTimeout = null;
         this.unitImages = {};
+        this.routeReady = false;
+        this.isApplyingRoute = false;
+        this.activityRouteTypes = [
+            'illustration',
+            'matching',
+            'flashcards',
+            'quiz',
+            'synonym-antonym',
+            'word-search',
+            'crossword',
+            'hangman',
+            'scramble',
+            'wordle',
+            'speed-match',
+            'fill-in-blank'
+        ];
 
         // Initialize modular components
         this.auth = new StudentAuth(this);
@@ -116,7 +135,7 @@ class StudentManager {
             this.progress.loadLocalProgress();
             this.auth.updateHeader();
             this.activities.renderDashboard();
-            this.switchView('main-menu-view');
+            await this.restoreRouteOrDefault();
             return;
         }
 
@@ -176,13 +195,13 @@ class StudentManager {
     }
 
     // DEPRECATED: Use this.activities.loadVocabulary() instead
-    async loadVocabulary(vocabMeta) {
-        return this.activities.loadVocabulary(vocabMeta);
+    async loadVocabulary(vocabMeta, options = {}) {
+        return this.activities.loadVocabulary(vocabMeta, options);
     }
 
     // DEPRECATED: Use this.activities.showActivityMenu() instead
-    showActivityMenu() {
-        return this.activities.showActivityMenu();
+    showActivityMenu(options = {}) {
+        return this.activities.showActivityMenu(options);
     }
 
     // DEPRECATED: Use this.auth.initBackendAuth() instead
@@ -373,32 +392,343 @@ class StudentManager {
         }
     }
 
+    normalizeStudentProfile(profile = {}) {
+        const firstName = String(profile.firstName || profile.first_name || '').trim();
+        const lastName = String(profile.lastName || profile.last_name || '').trim();
+        const grade = profile.grade ?? profile.gradeLevel ?? profile.grade_level ?? '';
+        const group = profile.group ?? profile.sectionLetter ?? profile.section_letter ?? '';
+        const normalizedGroup = group ? String(group).trim().toUpperCase() : '';
+        const name = String(profile.name || `${firstName} ${lastName}`.trim()).trim();
+
+        return {
+            firstName,
+            lastName,
+            name,
+            grade: grade === null || grade === undefined ? '' : String(grade).trim(),
+            group: normalizedGroup,
+            sectionLetter: normalizedGroup,
+            studentId: profile.studentId || profile.student_id || '',
+            email: String(profile.email || '').trim().toLowerCase()
+        };
+    }
+
+    mergeStudentProfile(primary = {}, fallback = {}) {
+        const normalizedPrimary = this.normalizeStudentProfile(primary);
+        const normalizedFallback = this.normalizeStudentProfile(fallback);
+
+        return {
+            ...normalizedFallback,
+            ...normalizedPrimary,
+            firstName: normalizedPrimary.firstName || normalizedFallback.firstName,
+            lastName: normalizedPrimary.lastName || normalizedFallback.lastName,
+            name: normalizedPrimary.name || normalizedFallback.name,
+            grade: normalizedPrimary.grade || normalizedFallback.grade,
+            group: normalizedPrimary.group || normalizedFallback.group,
+            sectionLetter: normalizedPrimary.sectionLetter || normalizedFallback.sectionLetter,
+            studentId: normalizedPrimary.studentId || normalizedFallback.studentId,
+            email: normalizedPrimary.email || normalizedFallback.email
+        };
+    }
+
+    hasCompleteStudentProfile(profile = this.studentProfile) {
+        const normalized = this.normalizeStudentProfile(profile);
+        return Boolean(
+            normalized.firstName &&
+            normalized.lastName &&
+            normalized.grade &&
+            normalized.group
+        );
+    }
+
+    cleanupActivity() {
+        if (this.activityInstance && typeof this.activityInstance.destroy === 'function') {
+            this.activityInstance.destroy();
+        }
+
+        const activityContainer = $('#activity-container');
+        if (activityContainer) {
+            activityContainer.innerHTML = '';
+            activityContainer.classList.remove('flashcards-activity-container');
+        }
+
+        $('#activity-view')?.classList.remove('flashcards-active');
+        const indicator = $('#activity-progress-indicator');
+        if (indicator) {
+            indicator.textContent = 'Progress: 0%';
+            indicator.classList.add('hidden');
+        }
+
+        this.currentActivityType = null;
+        this.activityInstance = null;
+    }
+
+    slugifyRouteId(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    getVocabRouteId(vocab) {
+        return String(vocab?.id || this.slugifyRouteId(vocab?.name) || '').trim();
+    }
+
+    getCurrentVocabRouteId() {
+        return this.getVocabRouteId(this.currentVocab);
+    }
+
+    safeDecodeRoutePart(value) {
+        try {
+            return decodeURIComponent(value);
+        } catch {
+            return value;
+        }
+    }
+
+    parseRoute(hash = window.location.hash) {
+        const rawHash = String(hash || '');
+        if (!rawHash || rawHash === '#') return null;
+
+        const routeText = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
+        const [rawPath, rawQuery = ''] = routeText.split('?');
+        const path = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+        const parts = path.split('/').filter(Boolean).map(part => this.safeDecodeRoutePart(part));
+
+        if (parts.length === 1 && parts[0] === 'menu') {
+            return { view: 'menu' };
+        }
+
+        if (parts.length === 1 && parts[0] === 'units') {
+            return { view: 'units' };
+        }
+
+        if (parts.length === 1 && parts[0] === 'arcade') {
+            return { view: 'arcade' };
+        }
+
+        if (parts[0] === 'unit' && parts[1]) {
+            if (parts.length === 2) {
+                return { view: 'unit', unitId: parts[1] };
+            }
+
+            if (parts.length === 4 && parts[2] === 'activity' && parts[3]) {
+                const params = new URLSearchParams(rawQuery);
+                const wordParam = params.get('word');
+                let word = null;
+                let wordWasInvalid = false;
+
+                if (wordParam !== null) {
+                    const parsedWord = Number.parseInt(wordParam, 10);
+                    if (Number.isFinite(parsedWord) && parsedWord >= 1) {
+                        word = parsedWord;
+                    } else {
+                        word = 1;
+                        wordWasInvalid = true;
+                    }
+                }
+
+                return {
+                    view: 'activity',
+                    unitId: parts[1],
+                    activityType: parts[3],
+                    word,
+                    hasWordParam: wordParam !== null,
+                    wordWasInvalid
+                };
+            }
+        }
+
+        return { view: 'invalid' };
+    }
+
+    buildRoute(route) {
+        if (!route || !route.view) return '#/menu';
+
+        if (route.view === 'menu') return '#/menu';
+        if (route.view === 'units') return '#/units';
+        if (route.view === 'arcade') return '#/arcade';
+
+        if (route.view === 'unit' && route.unitId) {
+            return `#/unit/${encodeURIComponent(route.unitId)}`;
+        }
+
+        if (route.view === 'activity' && route.unitId && route.activityType) {
+            let hash = `#/unit/${encodeURIComponent(route.unitId)}/activity/${encodeURIComponent(route.activityType)}`;
+            if (route.activityType === 'illustration') {
+                const word = Number.isFinite(route.word) && route.word >= 1 ? Math.floor(route.word) : 1;
+                hash += `?word=${word}`;
+            }
+            return hash;
+        }
+
+        return '#/menu';
+    }
+
+    setRoute(route, options = {}) {
+        const hash = this.buildRoute(route);
+        if (window.location.hash === hash) return;
+
+        const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
+        const method = options.replace ? 'replaceState' : 'pushState';
+        window.history[method](null, '', nextUrl);
+    }
+
+    async navigateTo(route, options = {}) {
+        this.setRoute(route, options);
+        await this.applyRoute(route);
+    }
+
+    async restoreRouteOrDefault(defaultRoute = { view: 'menu' }) {
+        this.routeReady = true;
+        const route = this.parseRoute();
+
+        if (!route) {
+            this.setRoute(defaultRoute, { replace: true });
+            await this.applyRoute(defaultRoute);
+            return;
+        }
+
+        await this.applyRoute(route);
+    }
+
+    handleRouteChange() {
+        if (!this.routeReady || this.isApplyingRoute) return;
+        if (!this.authDisabled && !this.currentUser) return;
+        this.applyRoute(this.parseRoute());
+    }
+
+    findVocabByRouteId(unitId) {
+        const normalized = String(unitId || '').trim();
+        if (!normalized) return null;
+
+        if (!Array.isArray(this.availableVocabs) || this.availableVocabs.length === 0) {
+            this.activities.renderDashboard();
+        }
+
+        return (this.availableVocabs || []).find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+    }
+
+    isKnownActivityType(activityType) {
+        return this.activityRouteTypes.includes(activityType);
+    }
+
+    showUnitsView() {
+        this.cleanupActivity();
+        this.currentVocab = null;
+        this.activities.renderDashboard();
+        this.switchView('vocab-selection-view');
+    }
+
+    showArcadeView() {
+        this.cleanupActivity();
+        this.currentVocab = null;
+        this.switchView('arcade-view');
+        this.games.updateArcadeUI();
+        this.games.updateGameSelectionUI();
+        this.games.updateLeaderboardGame();
+    }
+
+    async applyRoute(route) {
+        const targetRoute = route && route.view ? route : { view: 'menu' };
+        this.isApplyingRoute = true;
+
+        try {
+            if (targetRoute.view === 'invalid') {
+                this.setRoute({ view: 'units' }, { replace: true });
+                this.showUnitsView();
+                return;
+            }
+
+            if (targetRoute.view === 'menu') {
+                this.cleanupActivity();
+                this.currentVocab = null;
+                this.switchView('main-menu-view');
+                return;
+            }
+
+            if (targetRoute.view === 'units') {
+                this.showUnitsView();
+                return;
+            }
+
+            if (targetRoute.view === 'arcade') {
+                this.showArcadeView();
+                return;
+            }
+
+            if (targetRoute.view === 'unit' || targetRoute.view === 'activity') {
+                const vocab = this.findVocabByRouteId(targetRoute.unitId);
+                if (!vocab) {
+                    this.setRoute({ view: 'units' }, { replace: true });
+                    this.showUnitsView();
+                    return;
+                }
+
+                await this.activities.loadVocabulary(vocab, { fromRoute: true });
+
+                if (targetRoute.view === 'unit') {
+                    return;
+                }
+
+                if (!this.isKnownActivityType(targetRoute.activityType)) {
+                    this.setRoute({ view: 'unit', unitId: this.getCurrentVocabRouteId() }, { replace: true });
+                    return;
+                }
+
+                const requestedWord = targetRoute.activityType === 'illustration'
+                    ? (Number.isFinite(targetRoute.word) ? targetRoute.word : 1)
+                    : null;
+
+                this.activities.startActivity(targetRoute.activityType, {
+                    fromRoute: true,
+                    initialWordIndex: requestedWord ? requestedWord - 1 : 0,
+                    requestedWord,
+                    hasWordParam: targetRoute.hasWordParam,
+                    wordWasInvalid: targetRoute.wordWasInvalid
+                });
+
+                if (targetRoute.activityType === 'illustration') {
+                    const restoredWord = (this.activityInstance?.currentIndex || 0) + 1;
+                    if (targetRoute.wordWasInvalid || !targetRoute.hasWordParam || requestedWord !== restoredWord) {
+                        this.setRoute({
+                            view: 'activity',
+                            unitId: this.getCurrentVocabRouteId(),
+                            activityType: 'illustration',
+                            word: restoredWord
+                        }, { replace: true });
+                    }
+                }
+            }
+        } finally {
+            this.isApplyingRoute = false;
+        }
+    }
+
     initListeners() {
+        window.addEventListener('hashchange', () => this.handleRouteChange());
+        window.addEventListener('popstate', () => this.handleRouteChange());
+
         // Navigation
         this.addListener('#back-to-vocab', 'click', () => {
-            this.currentVocab = null;
-            this.switchView('vocab-selection-view');
+            this.navigateTo({ view: 'units' });
         });
 
         this.addListener('#menu-vocab-btn', 'click', () => {
-            this.switchView('vocab-selection-view');
+            this.navigateTo({ view: 'units' });
         });
 
         // Arcade Navigation
         this.addListener('#menu-arcade-btn', 'click', () => {
-            this.switchView('arcade-view');
-            this.games.updateArcadeUI();
-            this.games.updateGameSelectionUI();
-            // Load initial leaderboard (or hide if HTML game)
-            this.games.updateLeaderboardGame();
+            this.navigateTo({ view: 'arcade' });
         });
 
         this.addListener('#back-to-main-menu-btn', 'click', () => {
-            this.switchView('main-menu-view');
+            this.navigateTo({ view: 'menu' });
         });
 
         this.addListener('#back-from-arcade-btn', 'click', () => {
-            this.switchView('main-menu-view');
+            this.navigateTo({ view: 'menu' });
         });
 
         // Leaderboard Navigation
@@ -455,9 +785,13 @@ class StudentManager {
         });
 
         this.addListener('#back-to-menu-btn', 'click', () => {
-            this.switchView('activity-menu-view');
-            // Clear activity container
-            $('#activity-container').innerHTML = '';
+            this.cleanupActivity();
+            const unitId = this.getCurrentVocabRouteId();
+            if (unitId) {
+                this.navigateTo({ view: 'unit', unitId });
+            } else {
+                this.navigateTo({ view: 'units' });
+            }
         });
 
         this.addListener('#student-login-form', 'submit', (e) => this.handleStudentLogin(e));
@@ -486,16 +820,23 @@ class StudentManager {
 
 
         // Generate Final Report
+        this.addListener('#download-word-hunt-btn', 'click', () => {
+            this.activities.downloadWordHuntSubmission();
+        });
+
         this.addListener('#generate-final-report-btn', 'click', () => {
             if (this.currentVocab) {
                 // First, save the current activity's score if there's one active
-                if (this.currentActivityInstance && typeof this.currentActivityInstance.getScore === 'function' && this.currentActivityType) {
-                    const result = this.currentActivityInstance.getScore();
+                if (this.activityInstance && typeof this.activityInstance.getScore === 'function' && this.currentActivityType) {
+                    const result = this.activityInstance.getScore();
                     this.unitScores[this.currentActivityType] = result;
-                    this.saveLocalProgress();
+                    this.progress.saveLocalProgress();
                 }
 
-                ReportGenerator.generateReport(this.studentProfile, this.currentVocab.name, this.unitScores);
+                ReportGenerator.generateReport(this.studentProfile, this.currentVocab, this.unitScores, {
+                    wordHunt: this.unitWordHunt || {},
+                    loadImage: path => supabaseService.downloadWordHuntImage(path)
+                });
             }
         });
 
@@ -530,14 +871,15 @@ class StudentManager {
                 group = group.toUpperCase();
             }
 
-            this.studentProfile = {
+            this.studentProfile = this.normalizeStudentProfile({
                 firstName,
                 lastName,
                 name: `${firstName} ${lastName}`.trim(), // For backward compatibility
                 grade,
                 group,
+                sectionLetter: group,
                 email: this.currentUser?.email || this.studentProfile.email || ''
-            };
+            });
 
             try {
                 if (this.currentUser && !this.authDisabled) {
@@ -852,8 +1194,8 @@ class StudentManager {
     }
 
     // DEPRECATED: Use this.activities.startActivity() instead
-    startActivity(type) {
-        return this.activities.startActivity(type);
+    startActivity(type, options = {}) {
+        return this.activities.startActivity(type, options);
     }
 
 

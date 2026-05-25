@@ -18,7 +18,7 @@ export class StudentAuth {
             this.sm.currentRole = 'student';
             this.setAuthStatus('Local development');
             this.updateGuestStatus(true);
-            this.sm.switchView('main-menu-view');
+            await this.sm.restoreRouteOrDefault();
             return;
         }
 
@@ -61,10 +61,6 @@ export class StudentAuth {
         this.sm.updateGuestStatus(false);
 
         const name = user.displayName || user.email || 'Signed in';
-        const avatar = $('#user-avatar');
-        if (avatar) {
-            avatar.src = user.photoURL || '';
-        }
         const nameEl = $('#user-name');
         if (nameEl) {
             nameEl.textContent = name;
@@ -107,14 +103,10 @@ export class StudentAuth {
         }
 
         this.sm.updateHeader();
+        this.sm.progress.startCoinSync();
         this.sm.renderDashboard();
-        this.sm.switchView('main-menu-view');
-        const requiresProfile = !(
-            this.sm.studentProfile.firstName &&
-            this.sm.studentProfile.lastName &&
-            this.sm.studentProfile.grade &&
-            this.sm.studentProfile.group
-        );
+        await this.sm.restoreRouteOrDefault();
+        const requiresProfile = !this.sm.hasCompleteStudentProfile();
 
         if (requiresProfile) {
             this.sm.checkProfile(true);
@@ -122,6 +114,7 @@ export class StudentAuth {
     }
 
     handleBackendSignOut() {
+        this.sm.progress.stopCoinSync();
         this.sm.currentUser = null;
         localStorage.removeItem('was_logged_in');
         if (this.sm.cloudSaveTimeout) {
@@ -130,6 +123,7 @@ export class StudentAuth {
         }
         this.sm.updateGuestStatus(true);
         this.sm.setAuthStatus('Signed out');
+        this.sm.routeReady = false;
         this.sm.switchView('login-view');
     }
 
@@ -140,14 +134,14 @@ export class StudentAuth {
             this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
 
             if (profile && this.sm.currentRole === 'student') {
-                this.sm.studentProfile = {
+                this.sm.studentProfile = this.sm.normalizeStudentProfile({
                     firstName: profile.firstName || '',
                     lastName: profile.lastName || '',
                     name: profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim(),
                     grade: profile.grade || '',
-                    group: profile.group || '',
+                    group: profile.group || profile.sectionLetter || profile.section_letter || '',
                     email: profile.email || user.email || ''
-                };
+                });
             }
 
             localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
@@ -179,12 +173,8 @@ export class StudentAuth {
     }
 
     checkProfile(force = false) {
-        const isComplete = Boolean(
-            this.sm.studentProfile.firstName &&
-            this.sm.studentProfile.lastName &&
-            this.sm.studentProfile.grade &&
-            this.sm.studentProfile.group
-        );
+        this.sm.studentProfile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
+        const isComplete = this.sm.hasCompleteStudentProfile();
 
         if (isComplete && !force) {
             return;

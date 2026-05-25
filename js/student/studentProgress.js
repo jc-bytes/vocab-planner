@@ -8,32 +8,135 @@ import { notifications } from '../notifications.js';
 import { supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../supabaseService.js';
 import { imageDB } from '../db.js';
 
+const DEFAULT_COIN_DATA = {
+    balance: 0,
+    giftCoins: 0,
+    totalEarned: 0,
+    totalSpent: 0,
+    totalGifted: 0
+};
+
+const COIN_SYNC_INTERVAL_MS = 30000;
+const LOCAL_COIN_AUTHORITY_MS = 15000;
+
 export class StudentProgress {
     constructor(studentManager) {
         this.sm = studentManager;
+        this.coinRealtimeUnsubscribe = null;
+        this.coinSyncInterval = null;
+        this.storageSyncHandler = null;
+        this.focusSyncHandler = null;
+        this.visibilitySyncHandler = null;
+        this.onlineSyncHandler = null;
+        this.clientId = sessionStorage.getItem('student_coin_client_id') ||
+            (crypto.randomUUID ? crypto.randomUUID() : `client-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+        sessionStorage.setItem('student_coin_client_id', this.clientId);
     }
 
     migrateCoinData(data) {
         // If already new format, return as-is
         if (data.coinData) {
             return {
-                coinData: data.coinData,
-                coinHistory: data.coinHistory || []
+                coinData: this.normalizeCoinData(data.coinData),
+                coinHistory: this.normalizeCoinHistory(data.coinHistory || [])
             };
         }
 
         // Migrate from old format
         const oldCoins = data.coins || 0;
         return {
-            coinData: {
+            coinData: this.normalizeCoinData({
                 balance: oldCoins,
                 giftCoins: 0,
                 totalEarned: oldCoins, // Estimate - assume all were earned
                 totalSpent: 0,
                 totalGifted: 0
-            },
+            }),
             coinHistory: []
         };
+    }
+
+    normalizeCoinData(coinData = {}) {
+        return {
+            balance: Number(coinData.balance) || 0,
+            giftCoins: Number(coinData.giftCoins) || 0,
+            totalEarned: Number(coinData.totalEarned) || 0,
+            totalSpent: Number(coinData.totalSpent) || 0,
+            totalGifted: Number(coinData.totalGifted) || 0
+        };
+    }
+
+    normalizeTimestamp(timestamp) {
+        const date = timestamp ? new Date(timestamp) : new Date();
+        return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+    }
+
+    coinHistoryFingerprint(entry = {}) {
+        return [
+            entry.type || '',
+            Number(entry.amount) || 0,
+            entry.source || '',
+            entry.description || '',
+            entry.timestamp || ''
+        ].join('|');
+    }
+
+    normalizeCoinHistory(history = []) {
+        if (!Array.isArray(history)) return [];
+
+        const byKey = new Map();
+        history.forEach(entry => {
+            if (!entry || typeof entry !== 'object') return;
+            const normalized = {
+                id: entry.id || '',
+                type: entry.type || 'earn',
+                amount: Number(entry.amount) || 0,
+                source: entry.source || 'activity',
+                description: entry.description || '',
+                timestamp: this.normalizeTimestamp(entry.timestamp),
+                clientId: entry.clientId || ''
+            };
+            normalized.id = normalized.id || `legacy-${this.coinHistoryFingerprint(normalized)}`;
+            byKey.set(normalized.id, normalized);
+        });
+
+        return Array.from(byKey.values())
+            .sort((a, b) => this.timestampMs(a.timestamp) - this.timestampMs(b.timestamp))
+            .slice(-100);
+    }
+
+    mergeCoinHistories(...histories) {
+        return this.normalizeCoinHistory(histories.flat());
+    }
+
+    timestampMs(value) {
+        if (!value) return 0;
+        if (typeof value === 'object' && value.seconds !== undefined) return value.seconds * 1000;
+        if (typeof value.toDate === 'function') return value.toDate().getTime();
+        const parsed = new Date(value).getTime();
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    latestCoinHistoryMs(history = this.sm.coinHistory) {
+        return this.normalizeCoinHistory(history).reduce((latest, entry) => {
+            return Math.max(latest, this.timestampMs(entry.timestamp));
+        }, 0);
+    }
+
+    getUnsyncedLocalCoinHistory(cloudHistory = []) {
+        const cloudKeys = new Set(this.normalizeCoinHistory(cloudHistory).map(entry => entry.id));
+        return this.normalizeCoinHistory(this.sm.coinHistory).filter(entry => !cloudKeys.has(entry.id));
+    }
+
+    hasAuthoritativeLocalCoinActivity(cloudHistory = [], cloudUpdatedAt = null) {
+        const unsynced = this.getUnsyncedLocalCoinHistory(cloudHistory);
+        if (unsynced.length === 0) return false;
+
+        const newestUnsynced = this.latestCoinHistoryMs(unsynced);
+        const cloudUpdated = this.timestampMs(cloudUpdatedAt);
+        const isFresh = Date.now() - newestUnsynced <= LOCAL_COIN_AUTHORITY_MS;
+
+        return isFresh || newestUnsynced > cloudUpdated;
     }
 
     loadLocalProgress() {
@@ -43,8 +146,12 @@ export class StudentProgress {
                 const parsed = JSON.parse(saved);
                 if (parsed && typeof parsed === 'object') {
                     this.sm.progressData = parsed;
-                    if (this.sm.progressData.studentProfile && this.sm.progressData.studentProfile.name) {
-                        this.sm.studentProfile = this.sm.progressData.studentProfile;
+                    if (this.sm.progressData.studentProfile && typeof this.sm.progressData.studentProfile === 'object') {
+                        this.sm.studentProfile = this.sm.mergeStudentProfile(
+                            this.sm.studentProfile,
+                            this.sm.progressData.studentProfile
+                        );
+                        this.sm.progressData.studentProfile = this.sm.studentProfile;
                     }
                     
                     // Migrate coin data
@@ -61,13 +168,7 @@ export class StudentProgress {
             console.error('Error loading progress:', e);
             // Reset if corrupt
             this.sm.progressData = { studentProfile: {}, units: {} };
-            this.sm.coinData = {
-                balance: 0,
-                giftCoins: 0,
-                totalEarned: 0,
-                totalSpent: 0,
-                totalGifted: 0
-            };
+            this.sm.coinData = { ...DEFAULT_COIN_DATA };
             this.sm.coinHistory = [];
         }
     }
@@ -75,6 +176,8 @@ export class StudentProgress {
     saveLocalProgress(skipCloud = false) {
         try {
             this.sm.progressData.studentProfile = this.sm.studentProfile;
+            this.sm.coinData = this.normalizeCoinData(this.sm.coinData);
+            this.sm.coinHistory = this.normalizeCoinHistory(this.sm.coinHistory);
             // Save both old and new format for compatibility
             this.sm.coins = this.sm.coinData.balance; // Legacy support
             this.sm.progressData.coins = this.sm.coins;
@@ -89,6 +192,148 @@ export class StudentProgress {
         }
     }
 
+    applyCoinSnapshot(coinData, coinHistory, options = {}) {
+        const normalizedCoinData = this.normalizeCoinData(coinData);
+        const normalizedHistory = this.normalizeCoinHistory(coinHistory || this.sm.coinHistory);
+
+        this.sm.coinData = normalizedCoinData;
+        this.sm.coinHistory = normalizedHistory;
+        this.sm.coins = normalizedCoinData.balance;
+        this.sm.progressData.coinData = normalizedCoinData;
+        this.sm.progressData.coinHistory = normalizedHistory;
+        this.sm.progressData.coins = normalizedCoinData.balance;
+        this.sm.updateCoinDisplay();
+
+        if (options.saveLocal) {
+            this.saveLocalProgress(true);
+        }
+    }
+
+    shouldApplyIncomingLocalCoins(data) {
+        const incoming = this.migrateCoinData(data || {});
+        const incomingLatest = this.latestCoinHistoryMs(incoming.coinHistory);
+        const currentLatest = this.latestCoinHistoryMs(this.sm.coinHistory);
+
+        if (incomingLatest > currentLatest) return true;
+        if (incomingLatest < currentLatest) return false;
+
+        const incomingCoins = incoming.coinData;
+        if (incomingCoins.balance < this.sm.coinData.balance) return false;
+        return (
+            incomingCoins.balance !== this.sm.coinData.balance ||
+            incomingCoins.giftCoins !== this.sm.coinData.giftCoins ||
+            incomingCoins.totalEarned !== this.sm.coinData.totalEarned ||
+            incomingCoins.totalSpent !== this.sm.coinData.totalSpent ||
+            incomingCoins.totalGifted !== this.sm.coinData.totalGifted
+        );
+    }
+
+    applyLocalProgressFromStorage(rawValue) {
+        if (!rawValue) return;
+
+        try {
+            const parsed = JSON.parse(rawValue);
+            if (!this.shouldApplyIncomingLocalCoins(parsed)) return;
+
+            const incoming = this.migrateCoinData(parsed);
+            this.applyCoinSnapshot(incoming.coinData, incoming.coinHistory);
+        } catch (error) {
+            console.warn('Ignored invalid local coin sync payload:', error);
+        }
+    }
+
+    startCoinSync() {
+        if (this.sm.authDisabled || !this.sm.currentUser) return;
+
+        this.stopCoinSync();
+        const userId = this.sm.currentUser.uid;
+
+        this.storageSyncHandler = event => {
+            if (event.key === 'student_progress') {
+                this.applyLocalProgressFromStorage(event.newValue);
+            }
+        };
+        window.addEventListener('storage', this.storageSyncHandler);
+
+        this.visibilitySyncHandler = () => {
+            if (document.visibilityState === 'visible') {
+                this.refreshCoinsFromCloud({ silent: true });
+            }
+        };
+        document.addEventListener('visibilitychange', this.visibilitySyncHandler);
+
+        this.focusSyncHandler = () => this.refreshCoinsFromCloud({ silent: true });
+        this.onlineSyncHandler = () => this.refreshCoinsFromCloud({ silent: true });
+        window.addEventListener('focus', this.focusSyncHandler);
+        window.addEventListener('online', this.onlineSyncHandler);
+
+        this.coinSyncInterval = window.setInterval(() => {
+            this.refreshCoinsFromCloud({ silent: true });
+        }, COIN_SYNC_INTERVAL_MS);
+
+        if (typeof supabaseService.subscribeToStudentProgress === 'function') {
+            this.coinRealtimeUnsubscribe = supabaseService.subscribeToStudentProgress(userId, progress => {
+                this.applyRemoteCoinProgress(progress);
+            });
+        }
+    }
+
+    stopCoinSync() {
+        if (this.coinRealtimeUnsubscribe) {
+            this.coinRealtimeUnsubscribe();
+            this.coinRealtimeUnsubscribe = null;
+        }
+        if (this.coinSyncInterval) {
+            window.clearInterval(this.coinSyncInterval);
+            this.coinSyncInterval = null;
+        }
+        if (this.storageSyncHandler) {
+            window.removeEventListener('storage', this.storageSyncHandler);
+            this.storageSyncHandler = null;
+        }
+        if (this.visibilitySyncHandler) {
+            document.removeEventListener('visibilitychange', this.visibilitySyncHandler);
+            this.visibilitySyncHandler = null;
+        }
+        if (this.focusSyncHandler) {
+            window.removeEventListener('focus', this.focusSyncHandler);
+            this.focusSyncHandler = null;
+        }
+        if (this.onlineSyncHandler) {
+            window.removeEventListener('online', this.onlineSyncHandler);
+            this.onlineSyncHandler = null;
+        }
+    }
+
+    applyRemoteCoinProgress(progress) {
+        if (!progress) return;
+        const cloudCoinData = this.migrateCoinData(progress);
+
+        if (this.hasAuthoritativeLocalCoinActivity(cloudCoinData.coinHistory, progress.updatedAt)) {
+            this.saveProgressToCloud();
+            return;
+        }
+
+        this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
+        this.sm.setAuthStatus('☁️ Synced');
+    }
+
+    async refreshCoinsFromCloud(options = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) return;
+
+        try {
+            const db = supabaseService.getDatabase();
+            const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
+            const snapshot = await getDoc(docRef);
+            if (!snapshot.exists()) return;
+            this.applyRemoteCoinProgress(snapshot.data());
+        } catch (error) {
+            if (!options.silent) {
+                console.warn('Could not refresh coins from cloud:', error);
+            }
+        }
+    }
+
     async loadCloudProgress() {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
@@ -99,33 +344,30 @@ export class StudentProgress {
 
             if (snapshot.exists()) {
                 const data = snapshot.data();
-
-                // Migrate coin data from cloud
                 const cloudCoinData = this.migrateCoinData(data);
                 const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
                 const localGiftCoins = this.sm.coinData.giftCoins || 0;
-
-                // Merge coin data - preserve local earned/spent, but use cloud giftCoins
-                // For balance: if we have recent local transactions, prefer local (more recent)
-                // Otherwise, use max to prevent losing coins
-                const localRecentTransactions = this.sm.coinHistory.slice(-10).some(h => 
-                    h.type === 'spend' || h.type === 'earn' || h.type === 'accept'
+                const localHasAuthority = this.hasAuthoritativeLocalCoinActivity(
+                    cloudCoinData.coinHistory,
+                    data.updatedAt
                 );
-                const mergedBalance = localRecentTransactions 
-                    ? this.sm.coinData.balance  // Use local if we have recent activity
-                    : Math.max(this.sm.coinData.balance, cloudCoinData.coinData.balance);
-                
-                this.sm.coinData = {
-                    balance: mergedBalance,
-                    giftCoins: cloudGiftCoins, // Always use cloud giftCoins (teacher updates)
-                    totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoinData.coinData.totalEarned),
-                    totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoinData.coinData.totalSpent),
-                    totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoinData.coinData.totalGifted)
-                };
+                const mergedHistory = localHasAuthority
+                    ? this.mergeCoinHistories(cloudCoinData.coinHistory, this.sm.coinHistory)
+                    : cloudCoinData.coinHistory;
+
+                this.sm.coinData = localHasAuthority
+                    ? this.normalizeCoinData({
+                        ...this.sm.coinData,
+                        giftCoins: cloudGiftCoins,
+                        totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoinData.coinData.totalEarned),
+                        totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoinData.coinData.totalSpent),
+                        totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoinData.coinData.totalGifted)
+                    })
+                    : cloudCoinData.coinData;
+                this.sm.coinHistory = mergedHistory;
 
                 // Check for new gifts
                 if (cloudGiftCoins > localGiftCoins) {
-                    const newGifts = cloudGiftCoins - localGiftCoins;
                     this.sm.showNotificationBadge();
                     // Don't auto-accept, wait for user to click accept
                 }
@@ -133,21 +375,24 @@ export class StudentProgress {
                 // Legacy support
                 this.sm.coins = this.sm.coinData.balance;
 
+                const mergedStudentProfile = this.sm.mergeStudentProfile(
+                    this.sm.studentProfile,
+                    data.studentProfile || {}
+                );
+
                 this.sm.progressData = {
-                    studentProfile: data.studentProfile || this.sm.studentProfile,
+                    studentProfile: mergedStudentProfile,
                     units: data.units || {},
                     coins: this.sm.coins,
                     coinData: this.sm.coinData,
-                    coinHistory: data.coinHistory || this.sm.coinHistory || []
+                    coinHistory: this.sm.coinHistory
                 };
-                this.sm.coinHistory = this.sm.progressData.coinHistory;
                 this.sm.updateCoinDisplay();
-                this.sm.studentProfile = this.sm.progressData.studentProfile || this.sm.studentProfile;
+                this.sm.studentProfile = mergedStudentProfile;
                 await this.restoreImagesFromProgress();
                 this.saveLocalProgress(true);
 
-                // Sync if local balance is higher
-                if (this.sm.coinData.balance > cloudCoinData.coinData.balance) {
+                if (localHasAuthority) {
                     await this.saveProgressToCloud();
                 } else {
                     this.sm.setAuthStatus('☁️ Synced');
@@ -192,47 +437,34 @@ export class StudentProgress {
             // Get current cloud data first to prevent overwriting newer data
             const snapshot = await getDoc(docRef);
             let cloudCoinData = null;
+            let cloudUpdatedAt = null;
             if (snapshot.exists()) {
                 const data = snapshot.data();
                 cloudCoinData = this.migrateCoinData(data);
+                cloudUpdatedAt = data.updatedAt;
             }
 
-            // Merge coin data - preserve cloud giftCoins (teacher updates), but use local if we just accepted
-            let mergedGiftCoins = cloudCoinData?.coinData.giftCoins || this.sm.coinData.giftCoins;
-            if (this.sm.coinData.giftCoins === 0 && cloudCoinData?.coinData.giftCoins > 0) {
-                const recentAccept = this.sm.coinHistory.slice(-5).some(h => h.type === 'accept');
-                if (recentAccept) {
-                    mergedGiftCoins = 0;
-                }
-            }
-            
-            // Determine which balance to use
-            const recentTransactions = this.sm.coinHistory.slice(-10).some(h => 
-                h.type === 'spend' || h.type === 'earn' || h.type === 'accept'
-            );
-            let mergedBalance;
-            if (recentTransactions) {
-                mergedBalance = this.sm.coinData.balance;
-            } else {
-                mergedBalance = Math.max(this.sm.coinData.balance, cloudCoinData?.coinData.balance || 0);
-            }
+            const cloudHistory = cloudCoinData?.coinHistory || [];
+            const localHasAuthority = this.hasAuthoritativeLocalCoinActivity(cloudHistory, cloudUpdatedAt);
+            const localUnsynced = this.getUnsyncedLocalCoinHistory(cloudHistory);
+            const recentLocalAccept = localUnsynced.some(entry => entry.type === 'accept');
+            const cloudCoins = cloudCoinData?.coinData || { ...DEFAULT_COIN_DATA };
+            const mergedBalance = !cloudCoinData || localHasAuthority
+                ? this.sm.coinData.balance
+                : cloudCoins.balance;
+            const mergedGiftCoins = recentLocalAccept && this.sm.coinData.giftCoins === 0
+                ? 0
+                : Math.max(this.sm.coinData.giftCoins, cloudCoins.giftCoins || 0);
             
             const mergedCoinData = {
                 balance: mergedBalance,
                 giftCoins: mergedGiftCoins,
-                totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoinData?.coinData.totalEarned || 0),
-                totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoinData?.coinData.totalSpent || 0),
-                totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoinData?.coinData.totalGifted || 0)
+                totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoins.totalEarned || 0),
+                totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoins.totalSpent || 0),
+                totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoins.totalGifted || 0)
             };
 
-            if (cloudCoinData && cloudCoinData.coinData.balance > this.sm.coinData.balance && !recentTransactions) {
-                this.sm.coinData.balance = cloudCoinData.coinData.balance;
-            }
-
-            // Merge coin history
-            const mergedHistory = [...(cloudCoinData?.coinHistory || []), ...this.sm.coinHistory]
-                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-                .slice(-100);
+            const mergedHistory = this.mergeCoinHistories(cloudHistory, this.sm.coinHistory);
 
             const payload = {
                 studentProfile: this.sm.studentProfile,
@@ -251,6 +483,7 @@ export class StudentProgress {
             this.sm.coinHistory = mergedHistory;
             this.sm.coins = this.sm.coinData.balance; // Legacy
             this.sm.updateCoinDisplay();
+            this.saveLocalProgress(true);
 
             this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
@@ -264,6 +497,8 @@ export class StudentProgress {
         for (const [unitName, unitData] of Object.entries(this.sm.progressData.units)) {
             if (!unitData.images) continue;
             for (const [word, dataUrl] of Object.entries(unitData.images)) {
+                if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) continue;
+
                 try {
                     const blob = await this.dataURLToBlob(dataUrl);
                     await imageDB.saveDrawing(unitName, word, blob);
@@ -279,17 +514,18 @@ export class StudentProgress {
     }
 
     addCoinHistory(type, amount, source, description = '') {
+        const timestamp = new Date().toISOString();
         this.sm.coinHistory.push({
+            id: `${this.clientId}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
             type,
             amount,
             source,
             description,
-            timestamp: new Date().toISOString()
+            timestamp,
+            clientId: this.clientId
         });
         // Keep only last 100 entries
-        if (this.sm.coinHistory.length > 100) {
-            this.sm.coinHistory = this.sm.coinHistory.slice(-100);
-        }
+        this.sm.coinHistory = this.normalizeCoinHistory(this.sm.coinHistory);
     }
 
     addCoins(amount, source = 'activity', description = '') {
@@ -364,13 +600,12 @@ export class StudentProgress {
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
             
             const snapshot = await getDoc(docRef);
-            let existingCoinData = this.sm.coinData;
+            let cloudHistory = [];
             if (snapshot.exists()) {
                 const data = snapshot.data();
-                if (data.coinData) {
-                    existingCoinData = data.coinData;
-                }
+                cloudHistory = this.migrateCoinData(data).coinHistory;
             }
+            const mergedHistory = this.mergeCoinHistories(cloudHistory, this.sm.coinHistory);
             
             await setDoc(docRef, {
                 coinData: {
@@ -380,12 +615,14 @@ export class StudentProgress {
                     totalSpent: this.sm.coinData.totalSpent,
                     totalGifted: this.sm.coinData.totalGifted
                 },
-                coinHistory: this.sm.coinHistory.slice(-100),
+                coinHistory: mergedHistory,
                 coins: this.sm.coinData.balance, // Legacy support
                 updatedAt: serverTimestamp()
             }, { merge: true });
             
-            this.saveLocalProgress();
+            this.sm.coinHistory = mergedHistory;
+            this.saveLocalProgress(true);
+            this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
             console.error('Error saving after accepting coins:', error);
             // If save fails, restore the gift coins so user can try again

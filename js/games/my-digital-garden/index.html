@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Magical Garden</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <button id="soundbutton" aria-label="Toggle music"></button>
+    <audio id="sound" loop src="https://github.com/LegendJurai/My-Digital-Garden/raw/refs/heads/main/001-Full-Track.mp3"></audio>
+
+    <section id="startscreen">
+      <img class="scroll" src="https://firebasestorage.googleapis.com/v0/b/codedex-io.appspot.com/o/buildAssets%2FQgYgmwPsphfU0ponX2J6%2Fscroll_1.png?alt=media&token=fe08dabc-d9e7-4d46-bd68-47308db6848e" alt="">
+      <div id="startcontainer">
+        <h2 id="welcome">Welcome to</h2>
+        <h1 id="headline">My Magical Garden</h1>
+        <p>Combine matching seeds and plants to discover magical flowers. Drag two of the same stage together: seeds become seedlings, seedlings become elemental flowers, and flowers can reveal rare discoveries.</p>
+        <p>The notebook tracks every formula you unlock. The flowerbed shows your discovered flowers. Complete the garden by discovering every flower.</p>
+      </div>
+      <button id="startbutton" aria-label="Start game">
+        <img src="https://firebasestorage.googleapis.com/v0/b/codedex-io.appspot.com/o/buildAssets%2FQgYgmwPsphfU0ponX2J6%2Fstartbutton.png?alt=media&token=fad3792a-a2a8-4626-833f-3bebf447a1ed" alt="Start">
+      </button>
+    </section>
+
+    <main id="game" hidden>
+      <header class="back">
+        <h1 id="header">My Magical Garden</h1>
+      </header>
+      <section class="flexblock">
+        <aside id="notebook">
+          <img class="notebook" src="https://firebasestorage.googleapis.com/v0/b/codedex-io.appspot.com/o/buildAssets%2FQgYgmwPsphfU0ponX2J6%2Fnotebook.png?alt=media&token=bcdf97c7-6183-4cc1-bbce-c4a056464166" alt="Notebook">
+          <div id="formula-list" class="formula-container"></div>
+        </aside>
+
+        <section class="garden">
+          <img id="gardenpicture" alt="Garden" src="https://firebasestorage.googleapis.com/v0/b/codedex-io.appspot.com/o/buildAssets%2Fgrj7Uul6QPOgcp6YSmLq%2Fgarten.jpg?alt=media&token=62fd0ba7-a364-44e2-b974-0e5f10e62f82">
+          <div id="box" hidden>
+            <div id="textbox">
+              <h3>Congratulations!</h3>
+              <h4 id="flowerDiscovered">You discovered a new plant.</h4>
+              <img id="flowerImage" alt="">
+              <p id="content"></p>
+              <button id="closeButton">Close</button>
+            </div>
+          </div>
+          <div id="dropArea"></div>
+        </section>
+
+        <aside id="plantcontainer">
+          <img class="plantcontainer" alt="Flowerbed" src="https://firebasestorage.googleapis.com/v0/b/codedex-io.appspot.com/o/buildAssets%2Fgrj7Uul6QPOgcp6YSmLq%2Fflowerbed.png?alt=media&token=4a971f07-9111-49b5-a058-51eef5ee5a83">
+          <div id="plantbox" class="plantbox"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>

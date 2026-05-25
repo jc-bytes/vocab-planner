@@ -5,7 +5,10 @@
 
 import { $, $$, createElement, fetchJSON } from '../main.js';
 import { notifications } from '../notifications.js';
-import { supabaseService, getDocs, collection } from '../supabaseService.js';
+import { supabaseService, getDocs, collection, getCurrentSchoolYear } from '../supabaseService.js';
+import { imageDB } from '../db.js';
+import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
+import { ReportGenerator } from '../reportGenerator.js';
 import { MatchingActivity } from '../activities/matching.js';
 import { FlashcardsActivity } from '../activities/flashcards.js';
 import { QuizActivity } from '../activities/quiz.js';
@@ -15,6 +18,7 @@ import { WordSearchActivity } from '../activities/wordSearch.js';
 import { CrosswordActivity } from '../activities/crossword.js';
 import { HangmanActivity } from '../activities/hangman.js';
 import { ScrambleActivity } from '../activities/scramble.js';
+import { WordleActivity } from '../activities/wordle.js';
 import { SpeedMatchActivity } from '../activities/speedMatch.js';
 import { FillInBlankActivity } from '../activities/fillInBlank.js';
 
@@ -90,8 +94,8 @@ export class StudentActivities {
         if (!this.sm.currentVocab) return null;
         
         const totalWords = this.sm.currentVocab.words.length;
-        const activities = ['matching', 'quiz', 'synonym-antonym', 'word-search', 'crossword', 
-                          'hangman', 'scramble', 'speed-match', 'fill-in-blank'];
+        const activities = ['matching', 'quiz', 'synonym-antonym', 'word-search', 'crossword',
+                          'hangman', 'scramble', 'wordle', 'speed-match', 'fill-in-blank'];
         
         const stats = {};
         
@@ -122,10 +126,10 @@ export class StudentActivities {
     }
     
     // Get words prioritized by least practiced
-    getPrioritizedWords(activityType, limit = 10) {
+    getPrioritizedWords(activityType, limit = 10, sourceWords = null) {
         if (!this.sm.currentVocab) return [];
         
-        const allWords = [...this.sm.currentVocab.words];
+        const allWords = [...(sourceWords || this.sm.currentVocab.words)];
         const practiced = this.wordCoverage[activityType] || {};
         
         // Sort by practice count (ascending) then shuffle within same count
@@ -184,6 +188,7 @@ export class StudentActivities {
         const container = $('#vocab-list');
         container.innerHTML = '';
         container.className = 'vocab-groups';
+        this.sm.availableVocabs = [];
 
         let vocabs = [];
 
@@ -243,6 +248,7 @@ export class StudentActivities {
             return;
         }
 
+        this.sm.availableVocabs = vocabs;
         this.renderVocabularyGroups(container, vocabs);
     }
 
@@ -260,6 +266,71 @@ export class StudentActivities {
         if (key === 'IIT') return 'IIT';
         if (key === 'IIIT') return 'IIIT';
         return 'Other Units';
+    }
+
+    getUnitGrade(vocab = this.sm.currentVocab) {
+        const profileGrade = this.sm.studentProfile?.grade;
+        if (profileGrade) return String(profileGrade);
+        if (Array.isArray(vocab?.grades) && vocab.grades.length > 0) return String(vocab.grades[0]);
+        if (vocab?.grade) return String(vocab.grade);
+        return '';
+    }
+
+    ensureUnitProgress(vocab = this.sm.currentVocab) {
+        if (!vocab) return null;
+        if (!this.sm.progressData.units) this.sm.progressData.units = {};
+
+        const existing = this.sm.progressData.units[vocab.name] || {};
+        const unitProgress = {
+            ...existing,
+            unitId: this.sm.getVocabRouteId(vocab),
+            trimester: this.getTrimesterKey(vocab.trimester),
+            schoolYear: existing.schoolYear || getCurrentSchoolYear(),
+            grade: this.getUnitGrade(vocab),
+            scores: existing.scores || {},
+            images: existing.images || {},
+            wordHunt: existing.wordHunt || {},
+            states: existing.states || {}
+        };
+
+        this.sm.progressData.units[vocab.name] = unitProgress;
+        return unitProgress;
+    }
+
+    getCurrentUnitProgress() {
+        if (!this.sm.currentVocab) return null;
+        return this.ensureUnitProgress(this.sm.currentVocab);
+    }
+
+    restoreWordsFromState(initialState, fallbackWords, filter = null) {
+        const wordKeys = Array.isArray(initialState?.wordKeys) ? initialState.wordKeys : null;
+        if (!wordKeys || wordKeys.length === 0 || !this.sm.currentVocab?.words) {
+            return fallbackWords;
+        }
+
+        const eligibleWords = filter
+            ? this.sm.currentVocab.words.filter(filter)
+            : this.sm.currentVocab.words;
+        const wordsByKey = new Map(eligibleWords.map(word => [word.word, word]));
+        const restoredWords = wordKeys.map(wordKey => wordsByKey.get(wordKey)).filter(Boolean);
+
+        return restoredWords.length === wordKeys.length ? restoredWords : fallbackWords;
+    }
+
+    getWordHuntWords(settings = {}) {
+        if (!this.sm.currentVocab?.words) return [];
+
+        const selectedWords = this.sm.currentVocab.words.filter(word => (
+            word.wordHunt === true ||
+            word.wordHunt === 'true' ||
+            word.word_hunt === true
+        ));
+        if (selectedWords.length > 0) {
+            return selectedWords;
+        }
+
+        const fallbackLimit = settings.illustration || 5;
+        return this.sm.currentVocab.words.slice(0, fallbackLimit);
     }
 
     renderVocabularyGroups(container, vocabs) {
@@ -311,11 +382,22 @@ export class StudentActivities {
         return card;
     }
 
-    async loadVocabulary(vocabMeta) {
+    async loadVocabulary(vocabMeta, options = {}) {
         let vocabData = null;
 
         if (vocabMeta.path) {
-            vocabData = await fetchJSON(vocabMeta.path);
+            const fetched = await fetchJSON(vocabMeta.path);
+            if (fetched) {
+                vocabData = {
+                    ...vocabMeta,
+                    ...fetched,
+                    id: fetched.id || vocabMeta.id,
+                    path: vocabMeta.path,
+                    grades: fetched.grades || vocabMeta.grades,
+                    trimester: fetched.trimester || vocabMeta.trimester,
+                    __source: vocabMeta.__source
+                };
+            }
         } else {
             vocabData = vocabMeta;
         }
@@ -328,30 +410,29 @@ export class StudentActivities {
 
         this.sm.currentVocab = vocabData;
 
-        // Restore scores from persistence
-        if (!this.sm.progressData.units) this.sm.progressData.units = {};
-
-        // Initialize unit entry if not exists, but preserve existing scores
-        if (!this.sm.progressData.units[this.sm.currentVocab.name]) {
-            this.sm.progressData.units[this.sm.currentVocab.name] = {
-                scores: {},
-                images: {},
-                states: {}
-            };
-        }
+        const unitProgress = this.ensureUnitProgress(this.sm.currentVocab);
 
         // Load scores into current session (reference to the stored object)
-        this.sm.unitScores = this.sm.progressData.units[this.sm.currentVocab.name].scores;
-        this.sm.unitImages = this.sm.progressData.units[this.sm.currentVocab.name].images || {};
-        this.sm.unitStates = this.sm.progressData.units[this.sm.currentVocab.name].states || {};
+        this.sm.unitScores = unitProgress.scores;
+        this.sm.unitImages = unitProgress.images;
+        this.sm.unitWordHunt = unitProgress.wordHunt;
+        this.sm.unitStates = unitProgress.states;
         
         // Initialize word coverage tracking
         this.initWordCoverage();
+        await this.migrateLegacyWordHuntImages();
 
-        this.showActivityMenu();
+        if (!options.fromRoute) {
+            const unitId = this.sm.getCurrentVocabRouteId();
+            if (unitId) {
+                this.sm.setRoute({ view: 'unit', unitId });
+            }
+        }
+
+        this.showActivityMenu(options);
     }
 
-    showActivityMenu() {
+    showActivityMenu(options = {}) {
         $('#current-unit-title').textContent = this.sm.currentVocab.name;
 
         // Get word coverage stats
@@ -380,16 +461,15 @@ export class StudentActivities {
 
             if (scoreData) {
                 const badge = createElement('div', 'progress-badge');
-                badge.textContent = `${progress}%`;
+                const nonReplayable = ['flashcards', 'illustration'];
+                badge.textContent = nonReplayable.includes(type) ? `${progress}%` : `Best ${progress}%`;
                 if (isComplete) badge.classList.add('complete');
                 card.appendChild(badge);
                 
                 // Show plays count for replayable activities
-                const nonReplayable = ['flashcards', 'illustration'];
                 if (!nonReplayable.includes(type) && scoreData.plays > 0) {
                     const playsBadge = createElement('div', 'plays-badge');
-                    playsBadge.textContent = `${scoreData.plays} plays`;
-                    playsBadge.style.cssText = 'position: absolute; bottom: 0.5rem; right: 0.5rem; font-size: 0.7rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 0.2rem 0.4rem; border-radius: 4px;';
+                    playsBadge.textContent = scoreData.plays === 1 ? '1 play' : `${scoreData.plays} plays`;
                     card.appendChild(playsBadge);
                 }
             }
@@ -399,9 +479,9 @@ export class StudentActivities {
                 const coverage = coverageStats[type];
                 if (coverage.practiced > 0) {
                     const coverageBadge = createElement('div', 'coverage-badge');
-                    coverageBadge.textContent = `📚 ${coverage.practiced}/${coverage.total}`;
-                    coverageBadge.title = `${coverage.percentage}% of words practiced`;
-                    coverageBadge.style.cssText = 'position: absolute; bottom: 0.5rem; left: 0.5rem; font-size: 0.7rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 0.2rem 0.4rem; border-radius: 4px;';
+                    const allSeen = coverage.practiced >= coverage.total;
+                    coverageBadge.textContent = allSeen ? `All ${coverage.total} seen` : `${coverage.practiced} seen`;
+                    coverageBadge.title = `${coverage.practiced} of ${coverage.total} unit words have appeared in this activity. New rounds rotate through less-practiced words.`;
                     card.appendChild(coverageBadge);
                 }
             }
@@ -409,6 +489,13 @@ export class StudentActivities {
         
         // Update overall coverage display if element exists
         this.updateOverallCoverageDisplay(coverageStats);
+
+        if (!options.fromRoute) {
+            const unitId = this.sm.getCurrentVocabRouteId();
+            if (unitId) {
+                this.sm.setRoute({ view: 'unit', unitId });
+            }
+        }
 
         this.sm.switchView('activity-menu-view');
     }
@@ -439,12 +526,131 @@ export class StudentActivities {
         }
     }
 
-    startActivity(type) {
+    async uploadWordHuntImage(word, blob, imageInfo = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) return null;
+
+        const unitProgress = this.getCurrentUnitProgress();
+        const path = supabaseService.buildWordHuntImagePath({
+            userId: this.sm.currentUser.uid,
+            schoolYear: unitProgress.schoolYear,
+            trimesterKey: unitProgress.trimester,
+            grade: unitProgress.grade,
+            unitId: unitProgress.unitId,
+            word
+        });
+
+        await supabaseService.uploadWordHuntImage({ path, blob });
+
+        const now = new Date().toISOString();
+        return {
+            hasImage: true,
+            imagePath: path,
+            imageSizeBytes: imageInfo.sizeBytes || blob.size,
+            imageWidth: imageInfo.width || null,
+            imageHeight: imageInfo.height || null,
+            imageUpdatedAt: now,
+            updatedAt: now,
+            pendingImageUpload: false
+        };
+    }
+
+    async loadWordHuntImage(path) {
+        if (this.sm.authDisabled || !path) return null;
+        return supabaseService.downloadWordHuntImage(path);
+    }
+
+    async downloadWordHuntSubmission() {
+        if (!this.sm.currentVocab) return;
+
+        if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
+            this.sm.unitScores[this.sm.currentActivityType] = this.sm.activityInstance.getScore();
+            this.sm.progress.saveLocalProgress();
+        }
+
+        await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
+            wordHunt: this.sm.unitWordHunt || {},
+            loadImage: path => this.loadWordHuntImage(path)
+        });
+    }
+
+    async migrateLegacyWordHuntImages() {
+        if (this.sm.authDisabled || !this.sm.currentUser || !this.sm.currentVocab) return;
+
+        const unitName = this.sm.currentVocab.name;
+        const unitProgress = this.getCurrentUnitProgress();
+        const images = unitProgress.images || {};
+        const wordHunt = unitProgress.wordHunt || {};
+        let changed = false;
+
+        for (const [word, dataUrl] of Object.entries(images)) {
+            if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) continue;
+
+            const existingEntry = wordHunt[word] || {};
+            if (existingEntry.imagePath) {
+                delete images[word];
+                changed = true;
+                continue;
+            }
+
+            try {
+                const sourceBlob = await dataUrlToBlob(dataUrl);
+                const imageData = await compressImageToWebp(sourceBlob);
+                await imageDB.saveDrawing(unitName, word, imageData.blob);
+                const metadata = await this.uploadWordHuntImage(word, imageData.blob, imageData);
+                wordHunt[word] = {
+                    ...existingEntry,
+                    ...metadata,
+                    hasImage: true,
+                    updatedAt: metadata?.updatedAt || new Date().toISOString()
+                };
+                delete images[word];
+                changed = true;
+            } catch (error) {
+                console.warn('Could not migrate legacy Word Hunt image:', unitName, word, error);
+            }
+        }
+
+        if (changed) {
+            unitProgress.images = images;
+            unitProgress.wordHunt = wordHunt;
+            this.sm.unitImages = images;
+            this.sm.unitWordHunt = wordHunt;
+            this.sm.progress.saveLocalProgress();
+        }
+    }
+
+    startActivity(type, options = {}) {
+        if (!this.sm.currentVocab) {
+            this.sm.navigateTo({ view: 'units' });
+            return;
+        }
+
+        if (!this.sm.isKnownActivityType(type)) {
+            this.showActivityMenu({ fromRoute: true });
+            return;
+        }
+
+        if (!options.fromRoute) {
+            const unitId = this.sm.getCurrentVocabRouteId();
+            if (unitId) {
+                const route = { view: 'activity', unitId, activityType: type };
+                if (type === 'illustration') {
+                    route.word = Math.max(1, (options.initialWordIndex || 0) + 1);
+                }
+                this.sm.setRoute(route);
+            }
+        }
+
         this.sm.currentActivityType = type; // Track current activity type
         this.sm.switchView('activity-view');
 
         const container = $('#activity-container');
+        if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
+            this.sm.activityInstance.destroy();
+        }
         container.innerHTML = ''; // Clear previous
+        container.classList.remove('flashcards-activity-container');
+        $('#activity-view')?.classList.remove('flashcards-active');
 
         const onProgress = this.handleAutoSave.bind(this);
         const onSaveState = this.handleStateSave.bind(this);
@@ -456,14 +662,18 @@ export class StudentActivities {
             let words = filter 
                 ? this.sm.currentVocab.words.filter(filter)
                 : [...this.sm.currentVocab.words];
-            return this.getPrioritizedWords(type, Math.min(limit, words.length));
+            return this.getPrioritizedWords(type, Math.min(limit, words.length), words);
         };
 
         switch (type) {
             case 'matching':
                 const matchingLimit = settings.matching || 10;
-                const matchingWords = getPrioritized(matchingLimit, w => w.word.length >= 2);
-                this.sm.activityInstance = new MatchingActivity(container, matchingWords, onProgress);
+                const matchingWords = this.restoreWordsFromState(
+                    initialState,
+                    getPrioritized(matchingLimit, w => w.word.length >= 2),
+                    w => w.word.length >= 2
+                );
+                this.sm.activityInstance = new MatchingActivity(container, matchingWords, onProgress, onSaveState, initialState);
                 // Mark words as used when activity starts
                 this.markWordsPracticed(type, matchingWords);
                 break;
@@ -475,40 +685,78 @@ export class StudentActivities {
                 break;
             case 'quiz':
                 const quizLimit = settings.quiz || 10;
-                const quizWords = getPrioritized(quizLimit);
-                this.sm.activityInstance = new QuizActivity(container, quizWords, onProgress);
+                const quizWords = this.restoreWordsFromState(initialState, getPrioritized(quizLimit));
+                this.sm.activityInstance = new QuizActivity(container, quizWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, quizWords);
                 break;
             case 'synonym-antonym':
                 const synonymLimit = settings.synonymAntonym || 10;
-                const synonymWords = getPrioritized(synonymLimit, w => (w.synonyms?.length > 0 || w.antonyms?.length > 0));
-                this.sm.activityInstance = new SynonymAntonymActivity(container, synonymWords, onProgress);
+                const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);
+                const synonymWords = this.restoreWordsFromState(
+                    initialState,
+                    getPrioritized(synonymLimit, synonymFilter),
+                    synonymFilter
+                );
+                this.sm.activityInstance = new SynonymAntonymActivity(container, synonymWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, synonymWords);
                 break;
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
-                const illustrationLimit = settings.illustration || 10;
-                const illustrationWords = this.sm.currentVocab.words.slice(0, illustrationLimit);
+                const illustrationWords = this.getWordHuntWords(settings);
                 this.sm.activityInstance = new IllustrationActivity(
                     container,
                     illustrationWords,
                     this.sm.currentVocab.name,
                     onProgress,
-                    this.handleIllustrationSave.bind(this)
+                    this.handleIllustrationSave.bind(this),
+                    this.sm.unitWordHunt,
+                    {
+                        initialIndex: options.initialWordIndex || 0,
+                        onWordChange: index => {
+                            const unitId = this.sm.getCurrentVocabRouteId();
+                            if (!unitId) return;
+                            this.sm.setRoute({
+                                view: 'activity',
+                                unitId,
+                                activityType: 'illustration',
+                                word: index + 1
+                            }, { replace: true });
+                        },
+                        uploadImage: (word, blob, imageInfo) => this.uploadWordHuntImage(word, blob, imageInfo),
+                        loadImage: path => this.loadWordHuntImage(path),
+                        onDownloadWordHunt: () => this.downloadWordHuntSubmission()
+                    }
                 );
                 break;
             case 'word-search':
                 const wordSearchLimit = settings.wordSearch || 10;
-                const wordSearchWords = getPrioritized(wordSearchLimit, w => w.word.length >= 4);
+                const wordSearchWords = this.restoreWordsFromState(
+                    initialState,
+                    getPrioritized(wordSearchLimit, w => w.word.length >= 4),
+                    w => w.word.length >= 4
+                );
                 // Pass vocab ID (or name as fallback) for stable persistence
                 const vocabID = this.sm.currentVocab.id || this.sm.currentVocab.name;
-                this.sm.activityInstance = new WordSearchActivity(container, wordSearchWords, onProgress, vocabID);
-                this.markWordsPracticed(type, wordSearchWords);
+                this.sm.activityInstance = new WordSearchActivity(
+                    container,
+                    wordSearchWords,
+                    onProgress,
+                    vocabID,
+                    onSaveState,
+                    initialState,
+                    {
+                        onNewPuzzle: () => {
+                            this.resetActivityState('word-search');
+                            this.startActivity('word-search', { fromRoute: true });
+                        }
+                    }
+                );
+                this.markWordsPracticed(type, this.sm.activityInstance.words);
                 break;
             case 'crossword':
                 const crosswordWords = getPrioritized(this.sm.currentVocab.words.length);
                 this.sm.activityInstance = new CrosswordActivity(container, crosswordWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, crosswordWords);
+                this.markWordsPracticed(type, this.sm.activityInstance.placedWords);
                 break;
             case 'hangman':
                 const hangmanWords = getPrioritized(this.sm.currentVocab.words.length);
@@ -519,6 +767,22 @@ export class StudentActivities {
                 const scrambleWords = getPrioritized(this.sm.currentVocab.words.length);
                 this.sm.activityInstance = new ScrambleActivity(container, scrambleWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, scrambleWords);
+                break;
+            case 'wordle':
+                const wordleLimit = settings.wordle || 10;
+                const wordleWords = this.restoreWordsFromState(
+                    initialState,
+                    getPrioritized(wordleLimit, w => {
+                        const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
+                        return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
+                    }),
+                    w => {
+                        const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
+                        return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
+                    }
+                );
+                this.sm.activityInstance = new WordleActivity(container, wordleWords, onProgress, onSaveState, initialState);
+                this.markWordsPracticed(type, wordleWords);
                 break;
             case 'speed-match':
                 // Speed match uses all words randomly during gameplay
@@ -639,11 +903,16 @@ export class StudentActivities {
         
         // Clear localStorage state
         const stateKeys = [
+            `flashcards_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
+            `flashcards_state_${this.sm.currentVocab.words.length}`,
             `hangman_state_${this.sm.currentVocab.words.length}`,
             `scramble_state_${this.sm.currentVocab.words.length}`,
+            `wordle_state_${this.sm.currentVocab.words.length}`,
             `crossword_state_${this.sm.currentVocab.words.length}`,
             `fib_state_${this.sm.currentVocab.words.length}`,
             `matching_state_${this.sm.currentVocab.words[0]?.word}_${this.sm.currentVocab.words.length}`,
+            `quiz_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
+            `synonym_antonym_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
             `word_search_state_${vocabID}`,
             `speedmatch_highscore_${this.sm.currentVocab.words.length}`
         ];
@@ -657,37 +926,91 @@ export class StudentActivities {
         if (this.sm.unitStates && this.sm.unitStates[activityType]) {
             delete this.sm.unitStates[activityType];
         }
+
+        if (activityType === 'illustration') {
+            localStorage.removeItem(`word_hunt_state_${vocabName}_${this.sm.currentVocab.words.length}`);
+            if (this.sm.progressData.units[vocabName]?.wordHunt) {
+                delete this.sm.progressData.units[vocabName].wordHunt;
+            }
+            this.sm.unitWordHunt = {};
+        }
         
         // Reset session progress
         if (this.sm.sessionProgress && this.sm.sessionProgress[activityType]) {
             this.sm.sessionProgress[activityType].lastScore = 0;
         }
+
+        this.sm.progress.saveLocalProgress();
     }
 
-    handleIllustrationSave(vocabName, word, dataUrl) {
+    handleIllustrationSave(vocabName, word, payload) {
         const unitName = vocabName || (this.sm.currentVocab ? this.sm.currentVocab.name : null);
         if (!unitName) return;
-        if (!this.sm.progressData.units) this.sm.progressData.units = {};
-        if (!this.sm.progressData.units[unitName]) {
-            this.sm.progressData.units[unitName] = { scores: {}, images: {} };
+        const unitProgress = this.sm.currentVocab && this.sm.currentVocab.name === unitName
+            ? this.getCurrentUnitProgress()
+            : (this.sm.progressData.units?.[unitName] || null);
+        if (!unitProgress) return;
+
+        if (!unitProgress.images) unitProgress.images = {};
+        if (!unitProgress.wordHunt) unitProgress.wordHunt = {};
+
+        if (typeof payload === 'string') {
+            console.warn('Ignored legacy base64 Word Hunt image payload.');
+        } else if (payload && typeof payload === 'object') {
+            if (payload.entry) {
+                unitProgress.wordHunt[word] = payload.entry;
+
+                if (payload.entry.imagePath && typeof unitProgress.images[word] === 'string') {
+                    delete unitProgress.images[word];
+                }
+            }
         }
-        if (!this.sm.progressData.units[unitName].images) {
-            this.sm.progressData.units[unitName].images = {};
-        }
-        this.sm.progressData.units[unitName].images[word] = dataUrl;
+
         if (this.sm.currentVocab && this.sm.currentVocab.name === unitName) {
-            this.sm.unitImages = this.sm.progressData.units[unitName].images;
+            this.sm.unitImages = unitProgress.images;
+            this.sm.unitWordHunt = unitProgress.wordHunt;
         }
         this.sm.progress.saveLocalProgress();
     }
 
+    sanitizeActivityState(stateData) {
+        if (stateData === null) return null;
+
+        try {
+            const serialized = JSON.stringify(stateData);
+            if (/data:image\/|base64/i.test(serialized)) {
+                console.warn('Rejected activity state because it contains image data.');
+                return undefined;
+            }
+
+            const byteLength = new TextEncoder().encode(serialized).length;
+            if (byteLength > 50 * 1024) {
+                console.warn(`Rejected activity state above 50 KB (${byteLength} bytes).`);
+                return undefined;
+            }
+
+            return JSON.parse(serialized);
+        } catch (error) {
+            console.warn('Rejected invalid activity state:', error);
+            return undefined;
+        }
+    }
+
     handleStateSave(stateData) {
         if (this.sm.currentVocab && this.sm.currentActivityType) {
-            if (!this.sm.progressData.units[this.sm.currentVocab.name].states) {
-                this.sm.progressData.units[this.sm.currentVocab.name].states = {};
+            const sanitizedState = this.sanitizeActivityState(stateData);
+            if (sanitizedState === undefined) return;
+
+            const unitProgress = this.getCurrentUnitProgress();
+            if (!unitProgress.states) unitProgress.states = {};
+
+            if (sanitizedState === null) {
+                delete unitProgress.states[this.sm.currentActivityType];
+            } else {
+                unitProgress.states[this.sm.currentActivityType] = sanitizedState;
             }
-            this.sm.progressData.units[this.sm.currentVocab.name].states[this.sm.currentActivityType] = stateData;
-            this.sm.unitStates = this.sm.progressData.units[this.sm.currentVocab.name].states;
+
+            this.sm.unitStates = unitProgress.states;
             this.sm.progress.saveLocalProgress();
         }
     }

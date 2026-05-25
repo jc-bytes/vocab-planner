@@ -18,8 +18,7 @@ const DEV_AUTH_DISABLED = false;
 const DEV_TEACHER_USER = {
     uid: 'dev-teacher',
     displayName: 'Development Teacher',
-    email: 'teacher@local.dev',
-    photoURL: ''
+    email: 'teacher@local.dev'
 };
 const DEV_GAMIFICATION_SETTINGS_KEY = 'dev_gamification_settings';
 
@@ -320,7 +319,6 @@ class TeacherManager {
         const signOutBtn = $('#teacher-sign-out-btn');
         const userInfo = $('#teacher-user-info');
         const userName = $('#teacher-user-name');
-        const avatar = $('#teacher-user-avatar');
         const loginViewBtn = $('#teacher-login-view-btn');
 
         if (this.authDisabled) {
@@ -339,7 +337,6 @@ class TeacherManager {
             if (userInfo) {
                 userInfo.style.display = 'flex';
                 if (userName) userName.textContent = user.displayName || user.email || '';
-                if (avatar) avatar.src = user.photoURL || '';
             }
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
@@ -928,10 +925,11 @@ class TeacherManager {
         $('#setting-quiz').value = settings.quiz || 10;
         $('#setting-synonym-antonym').value = settings.synonymAntonym || 10;
         $('#setting-word-search').value = settings.wordSearch || 10;
-        $('#setting-illustration').value = settings.illustration || 10;
+        $('#setting-illustration').value = settings.illustration || 5;
         $('#setting-crossword').value = settings.crossword || 10;
         $('#setting-hangman').value = settings.hangman || 10;
         $('#setting-scramble').value = settings.scramble || 10;
+        $('#setting-wordle').value = settings.wordle || 10;
         $('#setting-speed-match').value = settings.speedMatch || 10;
         $('#setting-fill-in-blank').value = settings.fillInBlank || 10;
 
@@ -1074,7 +1072,7 @@ class TeacherManager {
         });
         $('#setting-illustration').addEventListener('input', (e) => {
             if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
-            this.vocabSet.activitySettings.illustration = parseInt(e.target.value) || 10;
+            this.vocabSet.activitySettings.illustration = parseInt(e.target.value) || 5;
             this.triggerAutoSave();
         });
         $('#setting-crossword').addEventListener('input', (e) => {
@@ -1090,6 +1088,11 @@ class TeacherManager {
         $('#setting-scramble').addEventListener('input', (e) => {
             if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
             this.vocabSet.activitySettings.scramble = parseInt(e.target.value) || 10;
+            this.triggerAutoSave();
+        });
+        $('#setting-wordle').addEventListener('input', (e) => {
+            if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+            this.vocabSet.activitySettings.wordle = parseInt(e.target.value) || 10;
             this.triggerAutoSave();
         });
         $('#setting-speed-match').addEventListener('input', (e) => {
@@ -1476,9 +1479,18 @@ class TeacherManager {
     renderWords() {
         const container = $('#words-container');
         container.innerHTML = '';
+        const selectedCount = this.vocabSet.words.filter(word => this.isWordHuntWord(word)).length;
+        const summary = createElement('div', 'word-hunt-selection-summary');
+        summary.innerHTML = `
+            <strong>Word Hunt</strong>
+            <span>${selectedCount} ${selectedCount === 1 ? 'word' : 'words'} selected</span>
+        `;
+        container.appendChild(summary);
 
         this.vocabSet.words.forEach((word, index) => {
             const card = createElement('div', 'word-card');
+            const isWordHunt = this.isWordHuntWord(word);
+            card.classList.toggle('word-hunt-selected', isWordHunt);
             card.innerHTML = `
                 <div class="word-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h3>${word.word}</h3>
@@ -1488,15 +1500,29 @@ class TeacherManager {
                     </div>
                 </div>
                 <span class="pos-tag">${word.part_of_speech}</span>
+                ${isWordHunt ? '<span class="word-hunt-badge">Word Hunt</span>' : ''}
                 <p>${word.definition}</p>
+                <label class="word-hunt-card-toggle">
+                    <input type="checkbox" class="word-hunt-toggle" data-index="${index}" ${isWordHunt ? 'checked' : ''}>
+                    <span>Word Hunt</span>
+                </label>
                 ${word.image ? `<div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-muted)">🖼️ ${word.image}</div>` : ''}
             `;
 
             card.querySelector('.edit-btn').addEventListener('click', () => this.openWordModal(index));
             card.querySelector('.delete-btn').addEventListener('click', () => this.deleteWord(index));
+            card.querySelector('.word-hunt-toggle').addEventListener('change', (event) => {
+                this.vocabSet.words[index].wordHunt = event.target.checked;
+                this.renderWords();
+                this.triggerAutoSave();
+            });
 
             container.appendChild(card);
         });
+    }
+
+    isWordHuntWord(word = {}) {
+        return word.wordHunt === true || word.wordHunt === 'true' || word.word_hunt === true;
     }
 
     openWordModal(index = -1) {
@@ -1510,6 +1536,7 @@ class TeacherManager {
         $('#def-input').value = '';
         $('#example-input').value = '';
         $('#image-input').value = '';
+        $('#word-hunt-input').checked = false;
         this.updateImagePreview('');
 
         if (index > -1) {
@@ -1520,6 +1547,7 @@ class TeacherManager {
             $('#def-input').value = word.definition;
             $('#example-input').value = word.example || '';
             $('#image-input').value = word.image || '';
+            $('#word-hunt-input').checked = this.isWordHuntWord(word);
             this.updateImagePreview(word.image || '');
         } else {
             title.textContent = 'Add New Word';
@@ -1534,16 +1562,22 @@ class TeacherManager {
     }
 
     saveWord() {
+        const existingWord = this.editingWordIndex > -1
+            ? this.vocabSet.words[this.editingWordIndex]
+            : {};
         const newWord = {
+            ...existingWord,
             word: $('#word-input').value.trim(),
             part_of_speech: $('#pos-input').value,
             definition: $('#def-input').value.trim(),
             example: $('#example-input').value.trim(),
             image: $('#image-input').value.trim(),
-            difficulty: 1, // Default
-            synonyms: [], // TODO: Add UI for this
-            antonyms: []  // TODO: Add UI for this
+            wordHunt: $('#word-hunt-input').checked,
+            difficulty: existingWord.difficulty || 1,
+            synonyms: existingWord.synonyms || [],
+            antonyms: existingWord.antonyms || []
         };
+        delete newWord.word_hunt;
 
         if (!newWord.word || !newWord.definition) {
             alert('Word and Definition are required!');
@@ -1558,12 +1592,14 @@ class TeacherManager {
 
         this.closeModal();
         this.renderWords();
+        this.triggerAutoSave();
     }
 
     deleteWord(index) {
         if (confirm('Are you sure you want to delete this word?')) {
             this.vocabSet.words.splice(index, 1);
             this.renderWords();
+            this.triggerAutoSave();
         }
     }
 
@@ -3417,7 +3453,9 @@ Object.assign(TeacherManager.prototype, {
             hangman: 'Hangman',
             fillInBlank: 'Fill in Blank',
             wordSearch: 'Word Search',
-            crossword: 'Crossword'
+            crossword: 'Crossword',
+            scramble: 'Word Scramble',
+            wordle: 'Vocabulary Wordle'
         };
         const completion = {};
         
@@ -3489,7 +3527,9 @@ Object.assign(TeacherManager.prototype, {
             hangman: 'Hangman',
             fillInBlank: 'Fill in Blank',
             wordSearch: 'Word Search',
-            crossword: 'Crossword'
+            crossword: 'Crossword',
+            scramble: 'Word Scramble',
+            wordle: 'Vocabulary Wordle'
         };
         const usage = {};
         
@@ -3531,9 +3571,10 @@ Object.assign(TeacherManager.prototype, {
             wordSearch: 'Word Search',
             crossword: 'Crossword',
             scramble: 'Word Scramble',
+            wordle: 'Vocabulary Wordle',
             speedMatch: 'Speed Match',
             synonymAntonym: 'Synonym/Antonym',
-            illustration: 'Image Hunt'
+            illustration: 'Word Hunt'
         };
         
         filteredData.forEach(student => {
