@@ -1,0 +1,73 @@
+{
+  "id": "grade8_it_may_week11_testing_revision",
+  "name": "Grade 8 IT Practice: May Week 11 - Testing and Revision",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "readability",
+      "definition": "How easy text is to read.",
+      "example": "Students used readability during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "alt text",
+      "definition": "Text that describes an image for accessibility.",
+      "example": "Students used alt text during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "link",
+      "definition": "A way to open a web page or file.",
+      "example": "Students used link during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "Students used revision during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "publish",
+      "definition": "To make a site or work available to others.",
+      "example": "Students used publish during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

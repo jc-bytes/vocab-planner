@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_december_week1_sensors_conditions",
+  "name": "Grade 6 T3 Practice: December Week 1 - Sensors and Conditions",
+  "description": "Practice words for sensors, conditions, and messages.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "sensor",
+      "definition": "A part that detects something around it.",
+      "example": "The sensor detected an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that must be true for something to happen.",
+      "example": "The condition checks for an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "if/then",
+      "definition": "A rule where one action happens if a condition is true.",
+      "example": "The if/then rule showed a sun icon in bright light.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "light",
+      "definition": "Brightness that a sensor can detect.",
+      "example": "The light level was high near the window.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "temperature",
+      "definition": "How hot or cold something is.",
+      "example": "The temperature changed during the test.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Words or symbols sent or shown to someone.",
+      "example": "The micro:bit showed a message.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "flowchart",
+      "definition": "A diagram that shows steps or choices.",
+      "example": "The flowchart showed what the robot should do.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

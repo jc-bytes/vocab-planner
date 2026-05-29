@@ -5,7 +5,7 @@
 
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
-import { supabaseService } from '../supabaseService.js';
+import { studentApi as supabaseService } from '../services/studentApi.js';
 
 export class StudentAuth {
     constructor(studentManager) {
@@ -60,12 +60,6 @@ export class StudentAuth {
         this.sm.setAuthStatus('🔐 Signed in');
         this.sm.updateGuestStatus(false);
 
-        const name = user.displayName || user.email || 'Signed in';
-        const nameEl = $('#user-name');
-        if (nameEl) {
-            nameEl.textContent = name;
-        }
-
         // Try to fetch role and profile.
         try {
             await this.fetchAndSetRole(user);
@@ -104,6 +98,7 @@ export class StudentAuth {
 
         this.sm.updateHeader();
         this.sm.progress.startCoinSync();
+        await this.sm.activities.loadSchoolCalendar();
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();
         const requiresProfile = !this.sm.hasCompleteStudentProfile();
@@ -161,10 +156,9 @@ export class StudentAuth {
 
     updateHeader() {
         const headerTitle = $('.header-left h1');
-        const fullName = this.sm.studentProfile.firstName && this.sm.studentProfile.lastName
-            ? `${this.sm.studentProfile.firstName} ${this.sm.studentProfile.lastName}`
-            : this.sm.studentProfile.name || 'Student';
-        headerTitle.textContent = `Welcome, ${fullName}`;
+        const profile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
+        const studentName = profile.name || this.sm.currentUser?.displayName || 'Student';
+        headerTitle.textContent = studentName;
 
         const editButton = $('#edit-profile-btn');
         if (editButton) {
@@ -205,9 +199,22 @@ export class StudentAuth {
 
     setAuthStatus(text) {
         const statusEl = $('#auth-status');
-        if (statusEl) {
-            statusEl.textContent = text;
-        }
+        if (!statusEl) return;
+        const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';
+        const normalized = label.toLowerCase();
+        const state = !navigator.onLine || normalized.includes('offline')
+            ? 'offline'
+            : normalized.includes('failed') || normalized.includes('fail')
+                ? 'error'
+                : normalized.includes('syncing') || normalized.includes('saving') || normalized.includes('signed in') || normalized.includes('ready')
+                    ? 'pending'
+                    : normalized.includes('synced') || normalized.includes('saved locally') || normalized.includes('local development')
+                        ? 'synced'
+                        : 'pending';
+        statusEl.textContent = '';
+        statusEl.dataset.state = state;
+        statusEl.title = label;
+        statusEl.setAttribute('aria-label', label);
     }
 
     updateGuestStatus(isGuest) {

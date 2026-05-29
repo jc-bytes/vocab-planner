@@ -1,0 +1,73 @@
+{
+  "id": "grade8_it_may_week12_presentation",
+  "name": "Grade 8 IT Practice: May Week 12 - Presentation",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "presentation",
+      "definition": "Sharing work or ideas with others.",
+      "example": "Students used presentation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "design choice",
+      "definition": "A decision made while designing.",
+      "example": "Students used design choice during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what happened and what you learned.",
+      "example": "Students used reflection during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "audience",
+      "definition": "The people who will see or use something.",
+      "example": "Students used audience during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "portfolio",
+      "definition": "A collection of work that shows learning.",
+      "example": "Students used portfolio during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

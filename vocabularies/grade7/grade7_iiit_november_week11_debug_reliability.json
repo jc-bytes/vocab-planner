@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iiit_november_week11_debug_reliability",
+  "name": "Grade 7 IIIT Practice: November Week 11 - Debug Reliability",
+  "description": "Practice words for retesting and improving reliability.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in code.",
+      "example": "Students used debug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "retest",
+      "definition": "To test again after making a change.",
+      "example": "Students used retest during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stable",
+      "definition": "Working in a steady and dependable way.",
+      "example": "Students used stable during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "unstable",
+      "definition": "Not working in a steady or dependable way.",
+      "example": "Students used unstable during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "adjustment",
+      "definition": "A small change made to improve something.",
+      "example": "Students used adjustment during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logbook",
+      "definition": "A record of tests, changes, and notes.",
+      "example": "Students used logbook during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

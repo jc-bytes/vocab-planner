@@ -1,0 +1,31 @@
+{
+  "id": "grade6_t1_april_week2_web_page_structure",
+  "name": "Grade 6 T1 Practice: April Week 2 - Web Page Structure",
+  "description": "Practice words for organizing and previewing a web page.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {"word": "title", "definition": "The name or main heading.", "example": "The title told visitors the page topic.", "difficulty": 1, "synonyms": ["heading"], "antonyms": []},
+    {"word": "header", "definition": "The top part of a page.", "example": "The header showed the title.", "difficulty": 1, "synonyms": ["top area"], "antonyms": []},
+    {"word": "section", "definition": "One organized part of a page.", "example": "The first section had the main idea.", "difficulty": 1, "synonyms": ["part"], "antonyms": []},
+    {"word": "image", "definition": "A picture.", "example": "The image helped explain the topic.", "difficulty": 1, "synonyms": ["picture"], "antonyms": ["text"]},
+    {"word": "text", "definition": "Words written on a page.", "example": "The text explained the image.", "difficulty": 1, "synonyms": ["words"], "antonyms": ["image"]},
+    {"word": "layout", "definition": "How things are arranged on a page.", "example": "A clear layout is easy to read.", "difficulty": 1, "synonyms": ["arrangement"], "antonyms": []},
+    {"word": "preview", "definition": "To check how something looks before sharing it.", "example": "The student used preview before submitting the page.", "difficulty": 1, "synonyms": ["check view"], "antonyms": []},
+    {"word": "readable", "definition": "Easy to read and understand.", "example": "Large text made the page readable.", "difficulty": 1, "synonyms": ["clear"], "antonyms": ["confusing"]}
+  ]
+}

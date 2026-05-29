@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iit_august_week10_visualization",
+  "name": "Grade 9 IIT Practice: August Week 10 - Visualization",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "clean data",
+      "definition": "Data that is corrected and organized.",
+      "example": "Students used clean data during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "visualization",
+      "definition": "A visual display of data.",
+      "example": "Students used visualization during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "data story",
+      "definition": "An explanation that uses data as evidence.",
+      "example": "Students used data story during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "screenshot",
+      "definition": "An image of what is on the screen.",
+      "example": "Students used screenshot during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "link",
+      "definition": "A way to open a web page or file.",
+      "example": "Students used link during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "progress",
+      "definition": "Movement toward finishing a task.",
+      "example": "Students used progress during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_july_week6_light_rgb",
+  "name": "Grade 8 IIT Practice: July Week 6 - Light and RGB",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "photoresistor",
+      "definition": "A sensor that changes value with light.",
+      "example": "Students used photoresistor during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "light sensor",
+      "definition": "A sensor that detects light.",
+      "example": "Students used light sensor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "A limit where an action changes.",
+      "example": "Students used threshold during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "dim",
+      "definition": "Not very bright.",
+      "example": "Students used dim during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "bright",
+      "definition": "Giving a lot of light.",
+      "example": "Students used bright during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "RGB",
+      "definition": "Red, green, and blue colors used to make other colors.",
+      "example": "Students used RGB during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "color mix",
+      "definition": "A color made by combining other colors.",
+      "example": "Students used color mix during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

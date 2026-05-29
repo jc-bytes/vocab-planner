@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_october_week3_3d_basics",
+  "name": "Grade 6 T3 Practice: October Week 3 - 3D Basics",
+  "description": "Practice words for basic 3D modeling actions.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "3D",
+      "definition": "Having height, width, and depth.",
+      "example": "A cube is a 3D shape.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "shape",
+      "definition": "A form such as a cube, sphere, or cylinder.",
+      "example": "The model started with one shape.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "move",
+      "definition": "To change where something is.",
+      "example": "We move the shape to the center.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "resize",
+      "definition": "To make something bigger or smaller.",
+      "example": "We resize the box to fit the model.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "rotate",
+      "definition": "To turn something around.",
+      "example": "We rotate the shape sideways.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "duplicate",
+      "definition": "To make a copy.",
+      "example": "We duplicate the wheel shape.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "model",
+      "definition": "A simple version or design of something.",
+      "example": "The 3D model looked like a desk tidy.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_november_week9_project_habits",
+  "name": "Grade 9 IIIT Practice: November Week 9 - Project Habits",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "effort",
+      "definition": "The work and energy put into a task.",
+      "example": "Students used effort during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "organization",
+      "definition": "Keeping work clear and easy to find.",
+      "example": "Students used organization during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "safe use",
+      "definition": "Using tools or materials carefully.",
+      "example": "Students used safe use during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "perseverance",
+      "definition": "Continuing to try when work is difficult.",
+      "example": "Students used perseverance during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "team role",
+      "definition": "A responsibility in a group.",
+      "example": "Students used team role during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "build schedule",
+      "definition": "A plan for when parts of a project will be built.",
+      "example": "Students used build schedule during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

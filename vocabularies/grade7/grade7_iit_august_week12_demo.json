@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_august_week12_demo",
+  "name": "Grade 7 IIT Practice: August Week 12 - Demo",
+  "description": "Practice words for demonstrating and reflecting on the dance game.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "demo",
+      "definition": "A short demonstration of how something works.",
+      "example": "Students used demo during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "presentation",
+      "definition": "Sharing work or ideas with others.",
+      "example": "Students used presentation during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "application",
+      "definition": "A real use for a skill or project.",
+      "example": "Students used application during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "rubric",
+      "definition": "A guide that explains how work will be graded.",
+      "example": "Students used rubric during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what happened and what you learned.",
+      "example": "Students used reflection during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

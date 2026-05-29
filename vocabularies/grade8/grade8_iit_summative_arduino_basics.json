@@ -1,0 +1,105 @@
+{
+  "id": "grade8_iit_summative_arduino_basics",
+  "name": "Grade 8 IIT Summative: Arduino Basics",
+  "description": "Ten core second-trimester words for the Grade 8 Arduino vocabulary table.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "Arduino",
+      "definition": "A board and tool used for physical computing.",
+      "example": "Students used Arduino during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Freenove",
+      "definition": "A kit used to learn Arduino-style electronics.",
+      "example": "Students used Freenove during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "microcontroller",
+      "definition": "A small computer board that controls electronics.",
+      "example": "Students used microcontroller during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "circuit",
+      "definition": "A path that electricity can follow.",
+      "example": "Students used circuit during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "breadboard",
+      "definition": "A board used to build circuits without soldering.",
+      "example": "Students used breadboard during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pin",
+      "definition": "A connection point on a board.",
+      "example": "Students used pin during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "power",
+      "definition": "Electricity used to run a circuit.",
+      "example": "Students used power during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "ground",
+      "definition": "The return path for electricity in a circuit.",
+      "example": "Students used ground during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "resistor",
+      "definition": "A part that limits electric current.",
+      "example": "Students used resistor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A small light that a program can control.",
+      "example": "Students used LED during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

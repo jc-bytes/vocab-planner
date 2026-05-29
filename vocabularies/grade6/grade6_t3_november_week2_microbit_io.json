@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_november_week2_microbit_io",
+  "name": "Grade 6 T3 Practice: November Week 2 - micro:bit Input and Output",
+  "description": "Practice words for micro:bit parts, inputs, and outputs.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "micro:bit",
+      "definition": "A tiny computer used to learn coding.",
+      "example": "The micro:bit showed a heart icon.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information or an action that goes into a device or program.",
+      "example": "A button press is an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A small light on a device or robot.",
+      "example": "The LED turned red when the program started.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "button",
+      "definition": "A part you press to give input.",
+      "example": "Button A made the number increase.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "display",
+      "definition": "A screen or lights that show output.",
+      "example": "The display showed a smile.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "icon",
+      "definition": "A small picture or symbol.",
+      "example": "The icon appeared on the LED display.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

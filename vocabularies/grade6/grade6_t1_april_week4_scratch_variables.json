@@ -1,0 +1,33 @@
+{
+  "id": "grade6_t1_april_week4_scratch_variables",
+  "name": "Grade 6 T1 Practice: April Week 4 - Scratch Variables",
+  "description": "Practice words for a Scratch score challenge.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {"word": "Scratch", "definition": "A coding tool that uses blocks.", "example": "The class used Scratch to make a score game.", "difficulty": 1, "synonyms": ["coding tool"], "antonyms": []},
+    {"word": "sprite", "definition": "A character or object in Scratch.", "example": "The sprite changed the score.", "difficulty": 1, "synonyms": ["character"], "antonyms": []},
+    {"word": "block", "definition": "A coding instruction in Scratch.", "example": "The block added one point.", "difficulty": 1, "synonyms": ["instruction"], "antonyms": []},
+    {"word": "script", "definition": "A group of blocks that tells a sprite what to do.", "example": "The script ran when the sprite was clicked.", "difficulty": 1, "synonyms": ["code stack"], "antonyms": []},
+    {"word": "variable", "definition": "A place in a program that stores something that can change.", "example": "The variable stored the score.", "difficulty": 1, "synonyms": ["changing place"], "antonyms": []},
+    {"word": "value", "definition": "The number or information stored in a variable.", "example": "The score value changed from 0 to 1.", "difficulty": 1, "synonyms": ["amount"], "antonyms": []},
+    {"word": "score", "definition": "Points in a game.", "example": "The score went up when the player clicked.", "difficulty": 1, "synonyms": ["points"], "antonyms": []},
+    {"word": "change", "definition": "To make something different.", "example": "The block changed the score.", "difficulty": 1, "synonyms": ["make different"], "antonyms": ["keep"]},
+    {"word": "test", "definition": "To try something to see if it works.", "example": "The student tested the game.", "difficulty": 1, "synonyms": ["check"], "antonyms": ["guess"]},
+    {"word": "debug", "definition": "To find and fix a problem.", "example": "The student debugged the score problem.", "difficulty": 1, "synonyms": ["fix"], "antonyms": ["break"]}
+  ]
+}

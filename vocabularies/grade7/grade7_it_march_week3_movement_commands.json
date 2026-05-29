@@ -1,0 +1,81 @@
+{
+  "id": "grade7_it_march_week3_movement_commands",
+  "name": "Grade 7 IT Practice: March Week 3 - Movement Commands",
+  "description": "Practice words for basic robot movement.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "movement",
+      "definition": "A change in position.",
+      "example": "Students used movement during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "forward",
+      "definition": "Moving toward the front.",
+      "example": "Students used forward during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "backward",
+      "definition": "Moving toward the back.",
+      "example": "Students used backward during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "turn",
+      "definition": "To change direction.",
+      "example": "Students used turn during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "speed",
+      "definition": "How fast something moves.",
+      "example": "Students used speed during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "time",
+      "definition": "How long something happens.",
+      "example": "Students used time during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stop",
+      "definition": "To end movement or action.",
+      "example": "Students used stop during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

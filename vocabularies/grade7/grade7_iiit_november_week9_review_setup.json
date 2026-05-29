@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_november_week9_review_setup",
+  "name": "Grade 7 IIIT Practice: November Week 9 - Review Setup",
+  "description": "Practice words for reviewing third-trimester concepts.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "spreadsheet",
+      "definition": "A tool that organizes information in rows and columns.",
+      "example": "Students used spreadsheet during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Scratch",
+      "definition": "A block coding tool for making programs and games.",
+      "example": "Students used Scratch during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "source",
+      "definition": "Where information or media comes from.",
+      "example": "Students used source during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "microbit",
+      "definition": "A small computer board used for coding projects.",
+      "example": "Students used microbit during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects information from the environment.",
+      "example": "Students used sensor during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "A limit where an action changes.",
+      "example": "Students used threshold during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "signal",
+      "definition": "A sign or message sent to show information.",
+      "example": "Students used signal during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

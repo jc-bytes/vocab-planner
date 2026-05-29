@@ -1,0 +1,30 @@
+{
+  "id": "grade6_t1_march_week2_sending_messages",
+  "name": "Grade 6 T1 Practice: March Week 2 - Sending Messages",
+  "description": "Practice words for sending messages and packet order.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {"word": "send", "definition": "To move a message to another person or place.", "example": "The computer can send a message online.", "difficulty": 1, "synonyms": ["deliver"], "antonyms": ["receive"]},
+    {"word": "receive", "definition": "To get a message from another person or place.", "example": "The browser receives information from a website.", "difficulty": 1, "synonyms": ["get"], "antonyms": ["send"]},
+    {"word": "part", "definition": "One piece of something bigger.", "example": "A packet is one part of a message.", "difficulty": 1, "synonyms": ["piece"], "antonyms": ["whole"]},
+    {"word": "order", "definition": "The correct sequence for things.", "example": "Packets need to be put back in order.", "difficulty": 1, "synonyms": ["sequence"], "antonyms": ["mixed up"]},
+    {"word": "missing", "definition": "Not there when it should be.", "example": "The message was hard to read when one packet was missing.", "difficulty": 1, "synonyms": ["lost"], "antonyms": ["present"]},
+    {"word": "route", "definition": "The path something takes to get somewhere.", "example": "A packet can take a route through the network.", "difficulty": 1, "synonyms": ["path"], "antonyms": []},
+    {"word": "delivery", "definition": "Getting something to the correct place.", "example": "Packet delivery helps the message arrive.", "difficulty": 1, "synonyms": ["arrival"], "antonyms": ["loss"]}
+  ]
+}

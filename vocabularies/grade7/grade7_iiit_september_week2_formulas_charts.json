@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_september_week2_formulas_charts",
+  "name": "Grade 7 IIIT Practice: September Week 2 - Formulas and Charts",
+  "description": "Practice words for formulas, functions, and chart interpretation.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "formula",
+      "definition": "A rule that calculates a value.",
+      "example": "Students used formula during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "function",
+      "definition": "A built-in formula tool, such as AVERAGE.",
+      "example": "Students used function during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "average",
+      "definition": "A number found by adding values and dividing by how many values there are.",
+      "example": "Students used average during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "minimum",
+      "definition": "The smallest value.",
+      "example": "Students used minimum during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "maximum",
+      "definition": "The largest value.",
+      "example": "Students used maximum during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "chart",
+      "definition": "A visual way to show data.",
+      "example": "Students used chart during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "interpretation",
+      "definition": "An explanation of what data means.",
+      "example": "Students used interpretation during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

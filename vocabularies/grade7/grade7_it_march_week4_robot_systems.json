@@ -1,0 +1,73 @@
+{
+  "id": "grade7_it_march_week4_robot_systems",
+  "name": "Grade 7 IT Practice: March Week 4 - Robot Systems",
+  "description": "Practice words for robots as systems and debugging.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "system",
+      "definition": "Parts that work together.",
+      "example": "Students used system during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "process",
+      "definition": "The steps a system or program uses.",
+      "example": "Students used process during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sequence",
+      "definition": "Steps in the correct order.",
+      "example": "Students used sequence during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in code.",
+      "example": "Students used debug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

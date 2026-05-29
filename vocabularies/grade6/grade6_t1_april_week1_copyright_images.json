@@ -1,0 +1,30 @@
+{
+  "id": "grade6_t1_april_week1_copyright_images",
+  "name": "Grade 6 T1 Practice: April Week 1 - Copyright and Images",
+  "description": "Practice words for choosing safe images and giving credit.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {"word": "copyright", "definition": "A rule that protects a creator's work.", "example": "Copyright means we cannot use every picture we find.", "difficulty": 1, "synonyms": ["creator protection"], "antonyms": []},
+    {"word": "credit", "definition": "A note that says who made something or where it came from.", "example": "The student added credit for the image.", "difficulty": 1, "synonyms": ["source note"], "antonyms": []},
+    {"word": "source", "definition": "The place where information or an image came from.", "example": "The source was written below the picture.", "difficulty": 1, "synonyms": ["origin"], "antonyms": []},
+    {"word": "creator", "definition": "The person who made something.", "example": "The creator took the photo.", "difficulty": 1, "synonyms": ["maker"], "antonyms": []},
+    {"word": "safe", "definition": "Okay to use without causing a problem.", "example": "The class looked for a safe image for the project.", "difficulty": 1, "synonyms": ["allowed"], "antonyms": ["unsafe"]},
+    {"word": "permission", "definition": "Approval to use or share something.", "example": "Some images need permission before use.", "difficulty": 1, "synonyms": ["approval"], "antonyms": []},
+    {"word": "image", "definition": "A picture.", "example": "The image matched the web page topic.", "difficulty": 1, "synonyms": ["picture"], "antonyms": ["text"]}
+  ]
+}

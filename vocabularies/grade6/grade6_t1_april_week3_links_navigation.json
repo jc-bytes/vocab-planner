@@ -1,0 +1,31 @@
+{
+  "id": "grade6_t1_april_week3_links_navigation",
+  "name": "Grade 6 T1 Practice: April Week 3 - Links and Navigation",
+  "description": "Practice words for moving around a website and testing links.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {"word": "link", "definition": "Something you click to open another page or place.", "example": "The link opened the class page.", "difficulty": 1, "synonyms": ["connection"], "antonyms": []},
+    {"word": "menu", "definition": "A list of choices or links.", "example": "The menu helped visitors choose a page.", "difficulty": 1, "synonyms": ["choice list"], "antonyms": []},
+    {"word": "home page", "definition": "The first or main page of a website.", "example": "The home page introduced the project.", "difficulty": 1, "synonyms": ["main page"], "antonyms": []},
+    {"word": "navigation", "definition": "How people move around a website.", "example": "Good navigation helps visitors find information.", "difficulty": 1, "synonyms": ["moving around"], "antonyms": []},
+    {"word": "button", "definition": "Something on a screen that you click or tap.", "example": "The button opened the next page.", "difficulty": 1, "synonyms": ["click item"], "antonyms": []},
+    {"word": "page", "definition": "One screen or document in a website.", "example": "The website had a home page and a project page.", "difficulty": 1, "synonyms": ["web page"], "antonyms": []},
+    {"word": "test", "definition": "To try something to see if it works.", "example": "The student tested the link.", "difficulty": 1, "synonyms": ["check"], "antonyms": ["guess"]},
+    {"word": "feedback", "definition": "Helpful comments about what works and what can improve.", "example": "A partner gave feedback about the menu.", "difficulty": 1, "synonyms": ["suggestions"], "antonyms": []}
+  ]
+}

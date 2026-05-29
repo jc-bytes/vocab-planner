@@ -1,0 +1,73 @@
+{
+  "id": "grade8_iit_august_week13_cleanup",
+  "name": "Grade 8 IIT Practice: August Week 13 - Cleanup",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "cleanup",
+      "definition": "Putting materials or files back in order.",
+      "example": "Students used cleanup during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "kit",
+      "definition": "A set of tools or parts.",
+      "example": "Students used kit during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "component",
+      "definition": "One electronic part.",
+      "example": "Students used component during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "file",
+      "definition": "A saved document, image, or project on a computer.",
+      "example": "Students used file during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "archive",
+      "definition": "To store files neatly for later.",
+      "example": "Students used archive during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "return",
+      "definition": "To put something back where it belongs.",
+      "example": "Students used return during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

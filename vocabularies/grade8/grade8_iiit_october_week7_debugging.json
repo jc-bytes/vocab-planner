@@ -1,0 +1,81 @@
+{
+  "id": "grade8_iiit_october_week7_debugging",
+  "name": "Grade 8 IIIT Practice: October Week 7 - Debugging",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem.",
+      "example": "Students used debug during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "colon",
+      "definition": "The two-dot punctuation mark used in Python blocks.",
+      "example": "Students used colon during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "indentation",
+      "definition": "Spaces at the start of a code line.",
+      "example": "Students used indentation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "comparison",
+      "definition": "Checking how two values are related.",
+      "example": "Students used comparison during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "variable name",
+      "definition": "The name used for a value in code.",
+      "example": "Students used variable name during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "error",
+      "definition": "A problem that stops code or makes it wrong.",
+      "example": "Students used error during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "fix",
+      "definition": "A change that solves a problem.",
+      "example": "Students used fix during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade8_it_may_week9_portfolio_planning",
+  "name": "Grade 8 IT Practice: May Week 9 - Portfolio Planning",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "portfolio",
+      "definition": "A collection of work that shows learning.",
+      "example": "Students used portfolio during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "evidence",
+      "definition": "Information that shows what happened or supports an idea.",
+      "example": "Students used evidence during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "campaign",
+      "definition": "A planned message that asks people to care or act.",
+      "example": "Students used campaign during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "research",
+      "definition": "Looking for information to answer a question.",
+      "example": "Students used research during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "source credit",
+      "definition": "A note showing where information or media came from.",
+      "example": "Students used source credit during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "page plan",
+      "definition": "A plan for pages and content.",
+      "example": "Students used page plan during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "call to action",
+      "definition": "Words that ask the reader to do something.",
+      "example": "Students used call to action during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

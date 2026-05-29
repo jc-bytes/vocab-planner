@@ -1,0 +1,81 @@
+{
+  "id": "grade8_iiit_october_week4_first_python",
+  "name": "Grade 8 IIIT Practice: October Week 4 - First Python",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "algorithm",
+      "definition": "A clear set of steps to solve a problem.",
+      "example": "Students used algorithm during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "program",
+      "definition": "Instructions a computer can run.",
+      "example": "Students used program during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "syntax",
+      "definition": "The exact rules for writing code.",
+      "example": "Students used syntax during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "print",
+      "definition": "A command that shows text output.",
+      "example": "Students used print during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "string",
+      "definition": "Text stored in a program.",
+      "example": "Students used string during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "assignment",
+      "definition": "Giving a value to a variable.",
+      "example": "Students used assignment during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

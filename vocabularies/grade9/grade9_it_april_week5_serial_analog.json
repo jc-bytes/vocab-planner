@@ -1,0 +1,81 @@
+{
+  "id": "grade9_it_april_week5_serial_analog",
+  "name": "Grade 9 IT Practice: April Week 5 - Serial and Analog",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "serial monitor",
+      "definition": "A tool that shows messages from a program.",
+      "example": "Students used serial monitor during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "baud rate",
+      "definition": "The speed used for serial messages.",
+      "example": "Students used baud rate during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "data",
+      "definition": "Facts or values that can be used or studied.",
+      "example": "Students used data during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent or shown.",
+      "example": "Students used message during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "analog input",
+      "definition": "A changing sensor value read by a board.",
+      "example": "Students used analog input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "potentiometer",
+      "definition": "A knob that changes an analog value.",
+      "example": "Students used potentiometer during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "brightness",
+      "definition": "How light or dark something is.",
+      "example": "Students used brightness during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

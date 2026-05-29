@@ -1,0 +1,73 @@
+{
+  "id": "grade8_it_march_week2_alignment_grouping",
+  "name": "Grade 8 IT Practice: March Week 2 - Alignment and Grouping",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "alignment",
+      "definition": "Lining objects up neatly.",
+      "example": "Students used alignment during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "distribution",
+      "definition": "Spacing objects evenly.",
+      "example": "Students used distribution during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "grouping",
+      "definition": "Joining objects so they move together.",
+      "example": "Students used grouping during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "duplicate",
+      "definition": "To make a copy.",
+      "example": "Students used duplicate during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "resize",
+      "definition": "To change size.",
+      "example": "Students used resize during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "rotate",
+      "definition": "To turn an object.",
+      "example": "Students used rotate during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

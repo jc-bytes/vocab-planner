@@ -1,7 +1,6 @@
 import { $, $$, createElement, fetchJSON, notifications } from './main.js';
-import { ReportGenerator } from './reportGenerator.js';
 import {
-    supabaseService,
+    studentApi as supabaseService,
     getDocs,
     collection,
     doc,
@@ -13,13 +12,11 @@ import {
     where,
     orderBy,
     limit
-} from './supabaseService.js';
-import { imageDB } from './db.js';
+} from './services/studentApi.js';
 // Import modular components
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
 import { StudentActivities } from './student/studentActivities.js';
-import { StudentGames } from './student/studentGames.js';
 
 const DEV_AUTH_DISABLED = false;
 const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
@@ -89,6 +86,11 @@ class StudentManager {
         this.mustChangePassword = false;
         this.cloudVocabs = [];
         this.availableVocabs = [];
+        this.schoolCalendar = null;
+        this.studentVocabularyDrilldown = {
+            trimester: null,
+            month: null
+        };
         this.cloudSaveTimeout = null;
         this.unitImages = {};
         this.routeReady = false;
@@ -112,7 +114,8 @@ class StudentManager {
         this.auth = new StudentAuth(this);
         this.progress = new StudentProgress(this);
         this.activities = new StudentActivities(this);
-        this.games = new StudentGames(this);
+        this.games = null;
+        this.gamesPromise = null;
 
         this.init();
     }
@@ -120,6 +123,8 @@ class StudentManager {
     async init() {
         // Attach listeners first so buttons work immediately
         this.initListeners();
+        window.addEventListener('online', () => this.setAuthStatus('Synced'));
+        window.addEventListener('offline', () => this.setAuthStatus('Offline'));
         this.prefillRegistrationFromJoinLink();
 
         // Default view/state
@@ -132,6 +137,7 @@ class StudentManager {
             this.auth.updateGuestStatus(true);
 
             await this.activities.loadManifest();
+            await this.activities.loadSchoolCalendar();
             this.progress.loadLocalProgress();
             this.auth.updateHeader();
             this.activities.renderDashboard();
@@ -390,6 +396,36 @@ class StudentManager {
             targetView.classList.remove('hidden');
             targetView.classList.add('active');
         }
+
+        this.updateStudentNav(viewId);
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    getStudentSectionForView(viewId) {
+        if (viewId === 'arcade-view') return 'arcade';
+        if ([
+            'vocab-selection-view',
+            'activity-menu-view',
+            'activity-view'
+        ].includes(viewId)) return 'vocabulary';
+        if (viewId === 'main-menu-view') return 'today';
+        return '';
+    }
+
+    updateStudentNav(viewId) {
+        const section = this.getStudentSectionForView(viewId);
+        const shell = $('#student-tab-shell');
+        if (shell) {
+            shell.classList.toggle('hidden', !section);
+        }
+
+        $$('.student-tab').forEach(tab => {
+            const isActive = tab.dataset.section === section;
+            tab.classList.toggle('active', isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
     }
 
     normalizeStudentProfile(profile = {}) {
@@ -478,6 +514,23 @@ class StudentManager {
         return this.getVocabRouteId(this.currentVocab);
     }
 
+    async getGames() {
+        if (this.games) return this.games;
+
+        if (!this.gamesPromise) {
+            this.gamesPromise = import('./student/studentGames.js')
+                .then(({ StudentGames }) => {
+                    this.games = new StudentGames(this);
+                    return this.games;
+                })
+                .finally(() => {
+                    this.gamesPromise = null;
+                });
+        }
+
+        return this.gamesPromise;
+    }
+
     safeDecodeRoutePart(value) {
         try {
             return decodeURIComponent(value);
@@ -500,7 +553,13 @@ class StudentManager {
         }
 
         if (parts.length === 1 && parts[0] === 'units') {
-            return { view: 'units' };
+            const params = new URLSearchParams(rawQuery);
+            return {
+                view: 'units',
+                all: params.get('all') === '1',
+                trimester: params.get('trimester') || null,
+                month: params.get('month') || null
+            };
         }
 
         if (parts.length === 1 && parts[0] === 'arcade') {
@@ -546,7 +605,14 @@ class StudentManager {
         if (!route || !route.view) return '#/menu';
 
         if (route.view === 'menu') return '#/menu';
-        if (route.view === 'units') return '#/units';
+        if (route.view === 'units') {
+            const params = new URLSearchParams();
+            if (route.all) params.set('all', '1');
+            if (route.trimester) params.set('trimester', route.trimester);
+            if (route.month) params.set('month', route.month);
+            const query = params.toString();
+            return query ? `#/units?${query}` : '#/units';
+        }
         if (route.view === 'arcade') return '#/arcade';
 
         if (route.view === 'unit' && route.unitId) {
@@ -613,20 +679,31 @@ class StudentManager {
         return this.activityRouteTypes.includes(activityType);
     }
 
-    showUnitsView() {
+    showUnitsView(route = {}) {
         this.cleanupActivity();
         this.currentVocab = null;
+        if (route.all) {
+            this.resetStudentVocabularyDrilldown();
+        } else if (route.trimester) {
+            this.studentVocabularyDrilldown = {
+                trimester: route.trimester,
+                month: route.month || null
+            };
+        } else if (!this.studentVocabularyDrilldown?.trimester) {
+            this.setStudentVocabularyDrilldownToCurrentTrimester();
+        }
         this.activities.renderDashboard();
         this.switchView('vocab-selection-view');
     }
 
-    showArcadeView() {
+    async showArcadeView() {
         this.cleanupActivity();
         this.currentVocab = null;
         this.switchView('arcade-view');
-        this.games.updateArcadeUI();
-        this.games.updateGameSelectionUI();
-        this.games.updateLeaderboardGame();
+        const games = await this.getGames();
+        games.updateArcadeUI();
+        games.updateGameSelectionUI();
+        games.updateLeaderboardGame();
     }
 
     async applyRoute(route) {
@@ -643,17 +720,18 @@ class StudentManager {
             if (targetRoute.view === 'menu') {
                 this.cleanupActivity();
                 this.currentVocab = null;
+                this.activities.renderStudentHome();
                 this.switchView('main-menu-view');
                 return;
             }
 
             if (targetRoute.view === 'units') {
-                this.showUnitsView();
+                this.showUnitsView(targetRoute);
                 return;
             }
 
             if (targetRoute.view === 'arcade') {
-                this.showArcadeView();
+                await this.showArcadeView();
                 return;
             }
 
@@ -680,7 +758,7 @@ class StudentManager {
                     ? (Number.isFinite(targetRoute.word) ? targetRoute.word : 1)
                     : null;
 
-                this.activities.startActivity(targetRoute.activityType, {
+                await this.activities.startActivity(targetRoute.activityType, {
                     fromRoute: true,
                     initialWordIndex: requestedWord ? requestedWord - 1 : 0,
                     requestedWord,
@@ -715,11 +793,25 @@ class StudentManager {
         });
 
         this.addListener('#menu-vocab-btn', 'click', () => {
-            this.navigateTo({ view: 'units' });
+            this.setStudentVocabularyDrilldownToCurrentTrimester();
+            this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
+        });
+
+        this.addListener('#student-tab-today', 'click', () => {
+            this.navigateTo({ view: 'menu' });
+        });
+
+        this.addListener('#student-tab-vocabulary', 'click', () => {
+            this.setStudentVocabularyDrilldownToCurrentTrimester();
+            this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
         });
 
         // Arcade Navigation
         this.addListener('#menu-arcade-btn', 'click', () => {
+            this.navigateTo({ view: 'arcade' });
+        });
+
+        this.addListener('#student-tab-arcade', 'click', () => {
             this.navigateTo({ view: 'arcade' });
         });
 
@@ -735,52 +827,59 @@ class StudentManager {
         // Removed prev-game-btn and next-game-btn listeners
 
         // Game Selection Navigation
-        this.addListener('#prev-game-select-btn', 'click', () => {
+        this.addListener('#prev-game-select-btn', 'click', async () => {
+            const games = await this.getGames();
             this.currentGameIndex = (this.currentGameIndex - 1 + this.gamesList.length) % this.gamesList.length;
-            this.games.updateGameSelectionUI();
-            this.games.updateLeaderboardGame();
+            games.updateGameSelectionUI();
+            games.updateLeaderboardGame();
         });
 
-        this.addListener('#next-game-select-btn', 'click', () => {
+        this.addListener('#next-game-select-btn', 'click', async () => {
+            const games = await this.getGames();
             this.currentGameIndex = (this.currentGameIndex + 1) % this.gamesList.length;
-            this.games.updateGameSelectionUI();
-            this.games.updateLeaderboardGame();
+            games.updateGameSelectionUI();
+            games.updateLeaderboardGame();
         });
 
         // Note: #play-current-game-btn listener is attached dynamically in updateGameSelectionUI()
 
 
         this.addListener('#add-time-btn', 'click', async () => {
+            const games = await this.getGames();
             // Use global gamification settings
-            await this.games.loadGlobalSettings();
-            const exchangeRate = this.games.getExchangeRate();
+            await games.loadGlobalSettings();
+            const exchangeRate = games.getExchangeRate();
             const extensionSeconds = 60;
 
             if (await this.progress.deductCoins(exchangeRate)) {
-                this.games.addGameTime(extensionSeconds);
+                games.addGameTime(extensionSeconds);
             } else {
                 notifications.warning(`You need ${exchangeRate} coins to add time.`);
             }
         });
 
-        this.addListener('#exit-game-btn', 'click', () => {
-            this.games.stopCurrentGame();
-            this.games.showGameSelection();
+        this.addListener('#exit-game-btn', 'click', async () => {
+            const games = await this.getGames();
+            games.stopCurrentGame();
+            games.showGameSelection();
         });
 
         // Leaderboard Modal
-        this.addListener('#show-leaderboard-btn', 'click', () => {
-            this.games.showLeaderboardModal();
+        this.addListener('#show-leaderboard-btn', 'click', async () => {
+            const games = await this.getGames();
+            games.showLeaderboardModal();
         });
 
-        this.addListener('#close-leaderboard-modal', 'click', () => {
-            this.games.hideLeaderboardModal();
+        this.addListener('#close-leaderboard-modal', 'click', async () => {
+            const games = await this.getGames();
+            games.hideLeaderboardModal();
         });
 
         // Close modal when clicking outside
-        this.addListener('#leaderboard-modal', 'click', (e) => {
+        this.addListener('#leaderboard-modal', 'click', async (e) => {
             if (e.target.id === 'leaderboard-modal') {
-                this.games.hideLeaderboardModal();
+                const games = await this.getGames();
+                games.hideLeaderboardModal();
             }
         });
 
@@ -811,9 +910,9 @@ class StudentManager {
 
         // Activity Selection
         $$('.activity-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', async () => {
                 const activityType = card.dataset.activity;
-                this.activities.startActivity(activityType);
+                await this.activities.startActivity(activityType);
             });
         });
 
@@ -824,7 +923,7 @@ class StudentManager {
             this.activities.downloadWordHuntSubmission();
         });
 
-        this.addListener('#generate-final-report-btn', 'click', () => {
+        this.addListener('#generate-final-report-btn', 'click', async () => {
             if (this.currentVocab) {
                 // First, save the current activity's score if there's one active
                 if (this.activityInstance && typeof this.activityInstance.getScore === 'function' && this.currentActivityType) {
@@ -833,6 +932,7 @@ class StudentManager {
                     this.progress.saveLocalProgress();
                 }
 
+                const { ReportGenerator } = await import('./reportGenerator.js');
                 ReportGenerator.generateReport(this.studentProfile, this.currentVocab, this.unitScores, {
                     wordHunt: this.unitWordHunt || {},
                     loadImage: path => supabaseService.downloadWordHuntImage(path)
@@ -896,6 +996,20 @@ class StudentManager {
             this.auth.updateHeader();
             this.activities.renderDashboard();
         });
+    }
+
+    resetStudentVocabularyDrilldown() {
+        this.studentVocabularyDrilldown = {
+            trimester: null,
+            month: null
+        };
+    }
+
+    setStudentVocabularyDrilldownToCurrentTrimester() {
+        this.studentVocabularyDrilldown = {
+            trimester: this.activities.getCurrentTrimesterKey(),
+            month: null
+        };
     }
 
     showAuthPanel(panel) {
@@ -1072,9 +1186,22 @@ class StudentManager {
 
     setAuthStatus(text) {
         const statusEl = $('#auth-status');
-        if (statusEl) {
-            statusEl.textContent = text;
-        }
+        if (!statusEl) return;
+        const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';
+        const normalized = label.toLowerCase();
+        const state = !navigator.onLine || normalized.includes('offline')
+            ? 'offline'
+            : normalized.includes('failed') || normalized.includes('fail')
+                ? 'error'
+                : normalized.includes('syncing') || normalized.includes('saving') || normalized.includes('signed in') || normalized.includes('ready')
+                    ? 'pending'
+                    : normalized.includes('synced') || normalized.includes('saved locally') || normalized.includes('local development')
+                        ? 'synced'
+                        : 'pending';
+        statusEl.textContent = '';
+        statusEl.dataset.state = state;
+        statusEl.title = label;
+        statusEl.setAttribute('aria-label', label);
     }
 
     addListener(selector, event, handler) {
@@ -1218,8 +1345,8 @@ class StudentManager {
     }
 
     // DEPRECATED: Use this.games.formatTime() instead
-    formatTime(seconds) {
-        return this.games.formatTime(seconds);
+    async formatTime(seconds) {
+        return (await this.getGames()).formatTime(seconds);
     }
 
     // DEPRECATED: Use this.progress.updateCoinDisplay() instead
@@ -1364,58 +1491,58 @@ class StudentManager {
     }
 
     // DEPRECATED: Use this.games.updateArcadeUI() instead
-    updateArcadeUI() {
-        return this.games.updateArcadeUI();
+    async updateArcadeUI() {
+        return (await this.getGames()).updateArcadeUI();
     }
 
     // DEPRECATED: Use this.games.updateGameSelectionUI() instead
-    updateGameSelectionUI() {
-        return this.games.updateGameSelectionUI();
+    async updateGameSelectionUI() {
+        return (await this.getGames()).updateGameSelectionUI();
     }
 
     // DEPRECATED: Use this.games.saveHighScore() instead
     async saveHighScore(gameId, score, metadata = null) {
-        return this.games.saveHighScore(gameId, score, metadata);
+        return (await this.getGames()).saveHighScore(gameId, score, metadata);
     }
 
     // DEPRECATED: Use this.games.updateLeaderboardGame() instead
-    updateLeaderboardGame() {
-        return this.games.updateLeaderboardGame();
+    async updateLeaderboardGame() {
+        return (await this.getGames()).updateLeaderboardGame();
     }
 
     // DEPRECATED: Use this.games.loadLeaderboard() instead
     async loadLeaderboard(gameId) {
-        return this.games.loadLeaderboard(gameId);
+        return (await this.getGames()).loadLeaderboard(gameId);
     }
 
     // DEPRECATED: Use this.games.loadHTMLGame() instead
-    loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
-        return this.games.loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage);
+    async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
+        return (await this.getGames()).loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage);
     }
 
     // DEPRECATED: Use this.games.startGame() instead
     async startGame(type) {
-        return this.games.startGame(type);
+        return (await this.getGames()).startGame(type);
     }
 
     // DEPRECATED: Use this.games.stopCurrentGame() instead
-    stopCurrentGame() {
-        return this.games.stopCurrentGame();
+    async stopCurrentGame() {
+        return (await this.getGames()).stopCurrentGame();
     }
 
     // DEPRECATED: Use this.games.pauseGame() instead
     async pauseGame() {
-        return this.games.pauseGame();
+        return (await this.getGames()).pauseGame();
     }
 
     // DEPRECATED: Use this.games.addGameTime() instead
-    addGameTime(seconds = 60) {
-        return this.games.addGameTime(seconds);
+    async addGameTime(seconds = 60) {
+        return (await this.getGames()).addGameTime(seconds);
     }
 
     // DEPRECATED: Use this.games.updateGameTimer() instead
-    updateGameTimer() {
-        return this.games.updateGameTimer();
+    async updateGameTimer() {
+        return (await this.getGames()).updateGameTimer();
     }
 }
 

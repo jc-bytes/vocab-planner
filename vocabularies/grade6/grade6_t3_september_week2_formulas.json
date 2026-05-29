@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_september_week2_formulas",
+  "name": "Grade 6 T3 Practice: September Week 2 - Formulas",
+  "description": "Practice words for spreadsheet formulas and values.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "formula",
+      "definition": "A rule or calculation used by a spreadsheet.",
+      "example": "The formula added the costs.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "cell reference",
+      "definition": "The name of a cell, such as A1.",
+      "example": "The formula used the cell reference B2.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sum",
+      "definition": "The result of adding numbers together.",
+      "example": "The sum of 2 and 3 is 5.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "average",
+      "definition": "A usual or middle value found from a group of numbers.",
+      "example": "The average score was 8.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information or an action that goes into a device or program.",
+      "example": "A button press is an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "value",
+      "definition": "A number or piece of data in a program or spreadsheet.",
+      "example": "The cell value changed to 10.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

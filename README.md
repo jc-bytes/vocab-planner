@@ -10,6 +10,21 @@ A static, client-side vocabulary learning application designed for GitHub Pages.
 
 ## How to Run Locally
 
+### Project Helper
+You can use `./planner` for the student/teacher split:
+
+```bash
+./planner run student
+./planner run teacher
+./planner build student
+./planner build teacher
+./planner preview student
+./planner deploy teacher
+```
+
+`deploy` builds `dist-desktop` and only uploads if `PLANNER_DEPLOY_CMD` is set.
+By default, `run student` uses port 8000 and `run teacher` uses port 8001.
+
 ### Option 1: Using the Launcher (Recommended)
 1.  Double-click `start_app.command` in the project folder.
 2.  This will start a local server and open your browser to `http://localhost:8000`.
@@ -22,6 +37,30 @@ python3 -m http.server 8000
 ```
 
 *Note: Opening `index.html` directly may cause issues with loading vocabulary files due to browser security policies (CORS).*
+
+## Desktop App
+
+This project can also be packaged as a Windows/Mac desktop app with Tauri.
+
+```bash
+npm install
+npm run desktop:build
+```
+
+The default local build creates a macOS app bundle at:
+
+```text
+src-tauri/target/release/bundle/macos/Technology 6A.app
+```
+
+Additional package targets:
+
+```bash
+npm run desktop:build:mac-dmg
+npm run desktop:build:windows
+```
+
+The desktop build bundles the app shell and core JavaScript locally, keeps bundled vocabularies as an offline fallback, and syncs cloud content/progress through Supabase when the device is online. See `DESKTOP_RELEASE_CHECKLIST.md` before distributing installers to students.
 
 ## Building Games
 

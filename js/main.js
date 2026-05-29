@@ -37,17 +37,98 @@ export const store = {
 };
 
 // Utility to fetch JSON
-export async function fetchJSON(path) {
+const jsonCache = new Map();
+
+export async function fetchJSON(path, options = {}) {
+    if (!options.fresh && jsonCache.has(path)) {
+        return jsonCache.get(path);
+    }
+
     try {
-        const response = await fetch(path);
+        const url = new URL(path, window.location.href);
+        url.searchParams.set('_', Date.now().toString());
+        const response = await fetch(url.toString(), { cache: 'no-store' });
         if (!response.ok) throw new Error(`Failed to load ${path}`);
-        return await response.json();
+        const data = await response.json();
+        jsonCache.set(path, data);
+        return data;
     } catch (error) {
         console.error('Error fetching JSON:', error);
         notifications.error(`Failed to load ${path}. Please check your connection.`);
         return null;
     }
 }
+
+const loadedScripts = new Map();
+
+export function loadScript(src) {
+    if (loadedScripts.has(src)) return loadedScripts.get(src);
+
+    const promise = new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+        if (existing) {
+            if (existing.dataset.loaded === 'true') {
+                resolve();
+                return;
+            }
+            existing.addEventListener('load', resolve, { once: true });
+            existing.addEventListener('error', reject, { once: true });
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.dataset.loaded = 'false';
+        script.addEventListener('load', () => {
+            script.dataset.loaded = 'true';
+            resolve();
+        }, { once: true });
+        script.addEventListener('error', reject, { once: true });
+        document.head.appendChild(script);
+    });
+
+    loadedScripts.set(src, promise);
+    return promise;
+}
+
+function refreshLucideIcons() {
+    if (window.lucide?.createIcons) {
+        window.lucide.createIcons();
+    }
+}
+
+function initPasswordToggles() {
+    document.querySelectorAll('.password-toggle').forEach((button) => {
+        const inputId = button.getAttribute('aria-controls');
+        const input = inputId ? document.getElementById(inputId) : button.closest('.password-field')?.querySelector('input');
+        if (!input || button.dataset.passwordToggleReady === 'true') return;
+
+        button.dataset.passwordToggleReady = 'true';
+        button.setAttribute('aria-pressed', 'false');
+
+        button.addEventListener('click', () => {
+            const shouldShow = input.type === 'password';
+            input.type = shouldShow ? 'text' : 'password';
+            button.setAttribute('aria-pressed', shouldShow ? 'true' : 'false');
+            button.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
+            button.title = shouldShow ? 'Hide password' : 'Show password';
+            button.innerHTML = `<i data-lucide="${shouldShow ? 'eye-off' : 'eye'}"></i>`;
+            refreshLucideIcons();
+            input.focus({ preventScroll: true });
+        });
+    });
+
+    refreshLucideIcons();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPasswordToggles);
+} else {
+    initPasswordToggles();
+}
+
+window.addEventListener('load', refreshLucideIcons);
 
 // Consistent error handler utility
 export function handleError(error, userMessage = null, context = '') {

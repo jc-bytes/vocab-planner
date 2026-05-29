@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_august_week9_ultrasonic_design",
+  "name": "Grade 8 IIT Practice: August Week 9 - Ultrasonic Design",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "ultrasonic sensor",
+      "definition": "A sensor that uses sound to measure distance.",
+      "example": "Students used ultrasonic sensor during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "distance",
+      "definition": "How far apart two things are.",
+      "example": "Students used distance during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "echo",
+      "definition": "A sound or signal that bounces back.",
+      "example": "Students used echo during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "trigger",
+      "definition": "Something that starts an action.",
+      "example": "Students used trigger during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "centimeter",
+      "definition": "A small unit for measuring length.",
+      "example": "Students used centimeter during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "A limit where an action changes.",
+      "example": "Students used threshold during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "An early version used for testing.",
+      "example": "Students used prototype during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test case",
+      "definition": "A planned test with expected behavior.",
+      "example": "Students used test case during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

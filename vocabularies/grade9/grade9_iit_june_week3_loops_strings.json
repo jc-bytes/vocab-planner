@@ -1,0 +1,89 @@
+{
+  "id": "grade9_iit_june_week3_loops_strings",
+  "name": "Grade 9 IIT Practice: June Week 3 - Loops and Strings",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "for loop",
+      "definition": "A loop that repeats for each item in a group.",
+      "example": "Students used for loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "count",
+      "definition": "To find how many there are.",
+      "example": "Students used count during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "filter",
+      "definition": "To show or use only items that match a rule.",
+      "example": "Students used filter during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "label",
+      "definition": "A name or short description.",
+      "example": "Students used label during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debugging",
+      "definition": "Finding and fixing problems.",
+      "example": "Students used debugging during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "character",
+      "definition": "One letter, number, space, or symbol in text.",
+      "example": "Students used character during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "length",
+      "definition": "How many items or characters something has.",
+      "example": "Students used length during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "substring",
+      "definition": "A smaller part of a string.",
+      "example": "Students used substring during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

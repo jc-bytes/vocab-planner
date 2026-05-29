@@ -1,0 +1,105 @@
+{
+  "id": "grade8_iiit_summative_app_design",
+  "name": "Grade 8 IIIT Summative: App Design",
+  "description": "Ten core third-trimester words for the Grade 8 app design vocabulary table.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "decomposition",
+      "definition": "Breaking a big task into smaller parts.",
+      "example": "Students used decomposition during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "user",
+      "definition": "A person who uses a product or system.",
+      "example": "Students used user during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "screen",
+      "definition": "One view or page in an app.",
+      "example": "Students used screen during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "event",
+      "definition": "Something that starts an action in a program.",
+      "example": "Students used event during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "app",
+      "definition": "A program designed for a user task.",
+      "example": "Students used app during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "button",
+      "definition": "A part the user can press.",
+      "example": "Students used button during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "variable",
+      "definition": "A value that can change in a program.",
+      "example": "Students used variable during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

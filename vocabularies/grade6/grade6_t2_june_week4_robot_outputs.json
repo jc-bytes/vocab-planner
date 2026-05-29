@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_june_week4_robot_outputs",
+  "name": "Grade 6 T2 Practice: June Week 4 - Robot Outputs",
+  "description": "Practice words for robot outputs and signals.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "signal",
+      "definition": "A sign that gives information.",
+      "example": "The LED signal showed the robot was finished.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A small light on a device or robot.",
+      "example": "The LED turned red when the program started.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "buzzer",
+      "definition": "A small part that makes a sound.",
+      "example": "The buzzer made a short beep.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "state",
+      "definition": "What something is doing or how it is at a moment.",
+      "example": "Stop is one robot state.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "start",
+      "definition": "The beginning of an action or program.",
+      "example": "The robot beeped at the start.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "finish",
+      "definition": "The end of an action or program.",
+      "example": "The robot flashed an LED at the finish.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

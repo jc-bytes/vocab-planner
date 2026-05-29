@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_october_week6_blog_media",
+  "name": "Grade 7 IIIT Practice: October Week 6 - Blog Media",
+  "description": "Practice words for blog posts and media layout.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "blog",
+      "definition": "A web page or post that shares ideas or information.",
+      "example": "Students used blog during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "heading",
+      "definition": "A title for a section of text.",
+      "example": "Students used heading during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "caption",
+      "definition": "Short text that explains an image.",
+      "example": "Students used caption during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "paragraph",
+      "definition": "A group of sentences about one idea.",
+      "example": "Students used paragraph during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "layout",
+      "definition": "How text and images are arranged.",
+      "example": "Students used layout during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "call to action",
+      "definition": "Words that ask the reader to do something.",
+      "example": "Students used call to action during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "credit",
+      "definition": "A note that says who made or provided something.",
+      "example": "Students used credit during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_november_week8_test_table",
+  "name": "Grade 7 IIIT Practice: November Week 8 - Test Table",
+  "description": "Practice words for sensor testing and reliability.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "ultrasonic",
+      "definition": "Using sound waves to measure distance.",
+      "example": "Students used ultrasonic during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "distance",
+      "definition": "How far apart two things are.",
+      "example": "Students used distance during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "trigger",
+      "definition": "Something that starts an action.",
+      "example": "Students used trigger during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test table",
+      "definition": "A table used to record test results.",
+      "example": "Students used test table during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "expected",
+      "definition": "What you think should happen.",
+      "example": "Students used expected during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "actual",
+      "definition": "What really happens.",
+      "example": "Students used actual during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reliability",
+      "definition": "How dependably something works.",
+      "example": "Students used reliability during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

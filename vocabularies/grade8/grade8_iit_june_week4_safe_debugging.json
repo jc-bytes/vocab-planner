@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_june_week4_safe_debugging",
+  "name": "Grade 8 IIT Practice: June Week 4 - Safe Debugging",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "power",
+      "definition": "Electricity used to run a circuit.",
+      "example": "Students used power during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "ground",
+      "definition": "The return path for electricity in a circuit.",
+      "example": "Students used ground during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "resistor",
+      "definition": "A part that limits electric current.",
+      "example": "Students used resistor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "direction",
+      "definition": "The way something faces or moves.",
+      "example": "Students used direction during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "checklist",
+      "definition": "A list used to make sure steps are done.",
+      "example": "Students used checklist during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "builder",
+      "definition": "The person who builds the physical parts.",
+      "example": "Students used builder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "coder",
+      "definition": "The person who works on the code.",
+      "example": "Students used coder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "recorder",
+      "definition": "The person who writes notes or evidence.",
+      "example": "Students used recorder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

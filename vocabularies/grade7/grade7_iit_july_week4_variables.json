@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_july_week4_variables",
+  "name": "Grade 7 IIT Practice: July Week 4 - Variables",
+  "description": "Practice words for variables and if/else choices.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "variable",
+      "definition": "A named place that stores a value that can change.",
+      "example": "Students used variable during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "value",
+      "definition": "Information stored in a variable or cell.",
+      "example": "Students used value during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "score",
+      "definition": "A number that tracks points or progress.",
+      "example": "Students used score during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "selection",
+      "definition": "Code that chooses what to do based on a condition.",
+      "example": "Students used selection during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "if/else",
+      "definition": "A code choice between two actions.",
+      "example": "Students used if/else during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

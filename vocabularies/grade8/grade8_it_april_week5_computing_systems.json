@@ -1,0 +1,97 @@
+{
+  "id": "grade8_it_april_week5_computing_systems",
+  "name": "Grade 8 IT Practice: April Week 5 - Computing Systems",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 9,
+    "flashcards": 9,
+    "quiz": 9,
+    "illustration": 9,
+    "synonymAntonym": 9,
+    "wordSearch": 9,
+    "crossword": 9,
+    "hangman": 9,
+    "scramble": 9,
+    "speedMatch": 9,
+    "fillInBlank": 9
+  },
+  "words": [
+    {
+      "word": "hardware",
+      "definition": "The physical parts of a computer or device.",
+      "example": "Students used hardware during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "software",
+      "definition": "Programs that tell hardware what to do.",
+      "example": "Students used software during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "processor",
+      "definition": "The part that carries out instructions.",
+      "example": "Students used processor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "memory",
+      "definition": "Short-term storage used while a computer works.",
+      "example": "Students used memory during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "storage",
+      "definition": "Long-term space for files and programs.",
+      "example": "Students used storage during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "operating system",
+      "definition": "Software that manages a computer.",
+      "example": "Students used operating system during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "program",
+      "definition": "Instructions a computer can run.",
+      "example": "Students used program during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

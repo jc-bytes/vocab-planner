@@ -1,7 +1,6 @@
-import { $, $$, createElement, fetchJSON, notifications } from './main.js';
-import { QuizMaker } from './quizMaker.js';
+import { $, $$, createElement, loadScript, notifications } from './main.js';
 import {
-    supabaseService,
+    teacherApi as supabaseService,
     doc,
     setDoc,
     deleteDoc,
@@ -11,16 +10,47 @@ import {
     serverTimestamp,
     query,
     where,
-    addDoc
-} from './supabaseService.js';
+    addDoc,
+    writeBatch
+} from './services/teacherApi.js';
+import {
+    SCHOOL_CALENDAR_LOCAL_KEY,
+    SCHOOL_CALENDAR_SETTINGS_KEY,
+    calculateVocabularyPlacement,
+    getDefaultSchoolCalendar,
+    loadManifest,
+    loadVocabularyFile,
+    normalizeSchoolCalendar
+} from './services/vocabularyApi.js';
 
 const DEV_AUTH_DISABLED = false;
+const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
 const DEV_TEACHER_USER = {
     uid: 'dev-teacher',
     displayName: 'Development Teacher',
     email: 'teacher@local.dev'
 };
 const DEV_GAMIFICATION_SETTINGS_KEY = 'dev_gamification_settings';
+const VOCAB_ACTIVITY_OPTIONS = [
+    { id: 'illustration', label: 'Word Hunt' },
+    { id: 'matching', label: 'Matching' },
+    { id: 'flashcards', label: 'Flashcards' },
+    { id: 'quiz', label: 'Quiz' },
+    { id: 'synonym-antonym', label: 'Synonym & Antonym' },
+    { id: 'word-search', label: 'Word Search' },
+    { id: 'crossword', label: 'Crossword' },
+    { id: 'hangman', label: 'Hangman' },
+    { id: 'scramble', label: 'Word Scramble' },
+    { id: 'wordle', label: 'Vocabulary Wordle' },
+    { id: 'speed-match', label: 'Speed Match' },
+    { id: 'fill-in-blank', label: 'Fill in Blank' }
+];
+const VOCAB_ACTIVITY_IDS = VOCAB_ACTIVITY_OPTIONS.map(activity => activity.id);
+const DEFAULT_REQUIRED_BY_PURPOSE = {
+    summative: ['flashcards', 'matching', 'quiz'],
+    practice: ['flashcards', 'matching'],
+    default: ['flashcards', 'matching']
+};
 
 class TeacherManager {
     constructor() {
@@ -46,40 +76,70 @@ class TeacherManager {
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
         this.dataViewerInitialized = false;
+        this.exportListenersInitialized = false;
+        this.libraryItems = [];
+        this.libraryDrilldown = {
+            grade: null,
+            trimester: null,
+            month: null
+        };
+        this.teacherLibraryCache = null;
+        this.teacherLibraryPromise = null;
+        this.schoolCalendar = getDefaultSchoolCalendar();
+        this.studentProgressCache = null;
+        this.studentProgressPromise = null;
+        this.overviewStudentLoadScheduled = false;
+        this.isApplyingRoute = false;
+        this.routeReady = false;
+        this.lastVocabularyRoute = null;
 
         this.init();
     }
 
     async init() {
         this.initListeners();
+        window.addEventListener('online', () => this.setCloudStatus('Ready', 'info'));
+        window.addEventListener('offline', () => this.setCloudStatus('Offline', 'muted'));
 
         if (this.authDisabled) {
             this.startDevelopmentSession();
             return;
         }
 
-        this.showLoginView();
-
         await this.initAuth();
     }
 
-    startDevelopmentSession() {
+    async startDevelopmentSession() {
         this.isAuthenticated = true;
         this.currentUser = DEV_TEACHER_USER;
         this.currentRole = 'teacher';
         this.updateAuthUI(DEV_TEACHER_USER);
-        this.showDashboard();
-        this.loadLibrary();
+        await this.loadSchoolCalendarSettings();
+        await this.restoreRouteOrDefault();
     }
 
     async initAuth() {
         try {
             await supabaseService.init();
+            const restoredUser = supabaseService.getCurrentUser();
+            let restoredUserHandled = false;
+
+            if (restoredUser) {
+                await this.handleAuthWithRole(restoredUser);
+                restoredUserHandled = true;
+            } else {
+                this.showLoginView();
+            }
 
             supabaseService.onAuthStateChanged((user) => {
                 if (user) {
+                    if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
+                        restoredUserHandled = false;
+                        return;
+                    }
                     this.handleAuthWithRole(user);
                 } else {
+                    restoredUserHandled = false;
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);
@@ -136,8 +196,8 @@ class TeacherManager {
             this.currentUser = user;
             localStorage.setItem('was_logged_in', 'true');
             this.updateAuthUI(user);
-            this.showDashboard();
-            this.loadLibrary();
+            await this.loadSchoolCalendarSettings();
+            await this.restoreRouteOrDefault();
         } catch (err) {
             console.error('Role check failed:', err);
             this.showAuthError('Could not verify teacher role.');
@@ -148,15 +208,29 @@ class TeacherManager {
     async fetchUserRole(user) {
         try {
             const profile = await supabaseService.getProfile(user.uid);
-            return profile?.role || 'student';
+            const role = profile?.role || 'student';
+            localStorage.setItem(`userRole_${user.uid}`, role);
+            return role;
         } catch (err) {
             console.error('Failed to fetch role', err);
-            return 'student';
+            const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
+            if (cachedRole) return cachedRole;
+            throw err;
         }
     }
 
     switchView(viewId) {
-        const views = ['teacher-login-view', 'teacher-dashboard-view', 'teacher-editor-view', 'teacher-progress-view', 'quiz-maker-view', 'teacher-data-management-view'];
+        const views = [
+            'teacher-loading-view',
+            'teacher-login-view',
+            'teacher-overview-view',
+            'teacher-dashboard-view',
+            'teacher-editor-view',
+            'teacher-progress-view',
+            'teacher-quizzes-view',
+            'quiz-maker-view',
+            'teacher-data-management-view'
+        ];
         views.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -168,13 +242,168 @@ class TeacherManager {
                 el.classList.remove('active');
             }
         });
+        const isTeacherView = !['teacher-loading-view', 'teacher-login-view'].includes(viewId);
+        $('#teacher-tab-shell')?.classList.toggle('hidden', !isTeacherView);
+        this.setActiveTeacherTab(this.getSectionForView(viewId));
+        this.updateTeacherRouteForView(viewId);
+        this.refreshIcons();
     }
 
     showDashboard() {
         if (!this.ensureAuthenticated(false)) return;
-        this.switchView('teacher-dashboard-view');
-        $('#export-btn').classList.add('hidden');
-        this.loadGamificationSettings();
+        this.showTeacherSection('overview');
+    }
+
+    safeDecodeRoutePart(value) {
+        try {
+            return decodeURIComponent(value);
+        } catch {
+            return value;
+        }
+    }
+
+    parseRoute(hash = window.location.hash) {
+        const rawHash = String(hash || '');
+        if (!rawHash || rawHash === '#') return null;
+
+        const routeText = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
+        const [rawPath, rawQuery = ''] = routeText.split('?');
+        const path = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
+        const parts = path.split('/').filter(Boolean).map(part => this.safeDecodeRoutePart(part));
+        const params = new URLSearchParams(rawQuery);
+
+        if (parts[0] !== 'teacher') return null;
+        if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
+        if (parts[1] === 'students') return { view: 'students' };
+        if (parts[1] === 'quizzes') return { view: 'quizzes' };
+        if (parts[1] === 'data-settings') return { view: 'data-settings', tab: params.get('tab') || undefined };
+        if (parts[1] === 'vocabulary' && parts[2] === 'editor') return { view: 'editor' };
+        if (parts[1] === 'vocabulary') {
+            return {
+                view: 'vocabulary',
+                grade: params.get('grade') || null,
+                trimester: params.get('trimester') || null,
+                month: params.get('month') || null
+            };
+        }
+
+        return { view: 'overview' };
+    }
+
+    buildRoute(route) {
+        if (!route || !route.view) return '#/teacher/overview';
+        if (route.view === 'overview') return '#/teacher/overview';
+        if (route.view === 'students') return '#/teacher/students';
+        if (route.view === 'quizzes') return '#/teacher/quizzes';
+        if (route.view === 'editor') return '#/teacher/vocabulary/editor';
+        if (route.view === 'data-settings') {
+            const params = new URLSearchParams();
+            if (route.tab) params.set('tab', route.tab);
+            const query = params.toString();
+            return `#/teacher/data-settings${query ? `?${query}` : ''}`;
+        }
+        if (route.view === 'vocabulary') {
+            const params = new URLSearchParams();
+            if (route.grade) params.set('grade', route.grade);
+            if (route.trimester) params.set('trimester', route.trimester);
+            if (route.month) params.set('month', route.month);
+            const query = params.toString();
+            return `#/teacher/vocabulary${query ? `?${query}` : ''}`;
+        }
+        return '#/teacher/overview';
+    }
+
+    currentTeacherRouteForView(viewId) {
+        if (viewId === 'teacher-dashboard-view') {
+            return {
+                view: 'vocabulary',
+                grade: this.libraryDrilldown.grade,
+                trimester: this.libraryDrilldown.trimester,
+                month: this.libraryDrilldown.month
+            };
+        }
+        if (viewId === 'teacher-editor-view') return { view: 'editor' };
+        if (viewId === 'teacher-progress-view') return { view: 'students' };
+        if (viewId === 'teacher-quizzes-view' || viewId === 'quiz-maker-view') return { view: 'quizzes' };
+        if (viewId === 'teacher-data-management-view') return { view: 'data-settings' };
+        return { view: 'overview' };
+    }
+
+    setRoute(route, options = {}) {
+        const hash = this.buildRoute(route);
+        if (window.location.hash === hash) return;
+        const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
+        const method = options.replace ? 'replaceState' : 'pushState';
+        window.history[method](null, '', nextUrl);
+    }
+
+    updateTeacherRouteForView(viewId, options = {}) {
+        if (this.isApplyingRoute || !this.isAuthenticated || viewId === 'teacher-login-view') return;
+        this.setRoute(this.currentTeacherRouteForView(viewId), options);
+    }
+
+    updateVocabularyRoute(options = {}) {
+        if (this.isApplyingRoute || !this.isAuthenticated) return;
+        this.lastVocabularyRoute = {
+            view: 'vocabulary',
+            grade: this.libraryDrilldown.grade,
+            trimester: this.libraryDrilldown.trimester,
+            month: this.libraryDrilldown.month
+        };
+        this.setRoute(this.lastVocabularyRoute, options);
+    }
+
+    async restoreRouteOrDefault(defaultRoute = { view: 'overview' }) {
+        this.routeReady = true;
+        const route = this.parseRoute() || defaultRoute;
+        if (!this.parseRoute()) {
+            this.setRoute(route, { replace: true });
+        }
+        await this.applyRoute(route);
+    }
+
+    async handleRouteChange() {
+        if (!this.isAuthenticated) return;
+        const route = this.parseRoute() || { view: 'overview' };
+        await this.applyRoute(route);
+    }
+
+    async applyRoute(route) {
+        if (!route || this.isApplyingRoute) return;
+        this.isApplyingRoute = true;
+        try {
+            switch (route.view) {
+                case 'vocabulary':
+                    this.libraryDrilldown = {
+                        grade: route.grade || null,
+                        trimester: route.trimester || null,
+                        month: route.month || null
+                    };
+                    this.lastVocabularyRoute = { ...route };
+                    this.switchView('teacher-dashboard-view');
+                    await this.loadLibrary();
+                    break;
+                case 'editor':
+                    this.showEditor();
+                    break;
+                case 'students':
+                    await this.showProgressView();
+                    break;
+                case 'quizzes':
+                    await this.showQuizzesView();
+                    break;
+                case 'data-settings':
+                    await this.showDataManagementView({ tab: route.tab });
+                    break;
+                case 'overview':
+                default:
+                    this.switchView('teacher-overview-view');
+                    this.loadTeacherOverview();
+                    break;
+            }
+        } finally {
+            this.isApplyingRoute = false;
+        }
     }
     
     async loadGamificationSettings() {
@@ -225,6 +454,218 @@ class TeacherManager {
             console.error('Error loading gamification settings:', error);
         }
     }
+
+    async loadSchoolCalendarSettings() {
+        if (this.authDisabled) {
+            try {
+                const settings = JSON.parse(localStorage.getItem(SCHOOL_CALENDAR_LOCAL_KEY) || 'null');
+                this.schoolCalendar = normalizeSchoolCalendar(settings);
+            } catch (error) {
+                console.error('Error loading local school calendar:', error);
+                this.schoolCalendar = getDefaultSchoolCalendar();
+            }
+            this.updateSchoolCalendarUI();
+            return;
+        }
+
+        try {
+            const db = supabaseService.getDatabase();
+            const settingsRef = doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY);
+            const settingsSnap = await getDoc(settingsRef);
+            this.schoolCalendar = normalizeSchoolCalendar(settingsSnap.exists() ? settingsSnap.data() : null);
+            this.updateSchoolCalendarUI();
+        } catch (error) {
+            console.error('Error loading school calendar:', error);
+            this.schoolCalendar = getDefaultSchoolCalendar();
+            this.updateSchoolCalendarUI();
+        }
+    }
+
+    updateSchoolCalendarUI() {
+        const calendar = normalizeSchoolCalendar(this.schoolCalendar);
+        const setValue = (id, value) => {
+            const input = $(id);
+            if (input) input.value = value || '';
+        };
+
+        setValue('#school-calendar-year', calendar.schoolYear);
+        setValue('#calendar-it-start', calendar.trimesters.IT.startDate);
+        setValue('#calendar-it-end', calendar.trimesters.IT.endDate);
+        setValue('#calendar-iit-start', calendar.trimesters.IIT.startDate);
+        setValue('#calendar-iit-end', calendar.trimesters.IIT.endDate);
+        setValue('#calendar-iiit-start', calendar.trimesters.IIIT.startDate);
+        setValue('#calendar-iiit-end', calendar.trimesters.IIIT.endDate);
+    }
+
+    readSchoolCalendarFromUI() {
+        return normalizeSchoolCalendar({
+            schoolYear: $('#school-calendar-year')?.value,
+            trimesters: {
+                IT: {
+                    startDate: $('#calendar-it-start')?.value,
+                    endDate: $('#calendar-it-end')?.value
+                },
+                IIT: {
+                    startDate: $('#calendar-iit-start')?.value,
+                    endDate: $('#calendar-iit-end')?.value
+                },
+                IIIT: {
+                    startDate: $('#calendar-iiit-start')?.value,
+                    endDate: $('#calendar-iiit-end')?.value
+                }
+            }
+        });
+    }
+
+    validateSchoolCalendar(calendar) {
+        const errors = [];
+        ['IT', 'IIT', 'IIIT'].forEach(trimester => {
+            const range = calendar.trimesters[trimester];
+            if (!range.startDate || !range.endDate) {
+                errors.push(`${trimester} needs a start and end date.`);
+                return;
+            }
+            if (range.startDate > range.endDate) {
+                errors.push(`${trimester} start date must be before its end date.`);
+            }
+        });
+        return errors;
+    }
+
+    async saveSchoolCalendarSettings() {
+        const calendar = this.readSchoolCalendarFromUI();
+        const errors = this.validateSchoolCalendar(calendar);
+        const statusEl = $('#school-calendar-save-status');
+        const saveBtn = $('#save-school-calendar-btn');
+
+        if (errors.length > 0) {
+            if (statusEl) statusEl.textContent = errors[0];
+            notifications.error(errors[0]);
+            return;
+        }
+
+        try {
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i data-lucide="loader-circle"></i> Saving...';
+                this.refreshIcons();
+            }
+            if (statusEl) statusEl.textContent = 'Saving calendar...';
+
+            this.schoolCalendar = calendar;
+
+            if (this.authDisabled) {
+                localStorage.setItem(SCHOOL_CALENDAR_LOCAL_KEY, JSON.stringify(calendar));
+                const localResult = this.recalculateLocalVocabularyPlacements(calendar);
+                this.invalidateTeacherLibraryCache();
+                this.updateFormUI();
+                const message = `Calendar saved locally. Updated ${localResult.updated} draft vocabularies; ${localResult.skipped} skipped.`;
+                if (statusEl) statusEl.textContent = message;
+                notifications.success(message);
+                return;
+            }
+
+            const db = supabaseService.getDatabase();
+            const settingsRef = doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY);
+            await setDoc(settingsRef, {
+                ...calendar,
+                updatedAt: serverTimestamp(),
+                updatedBy: this.currentUser?.email || 'unknown'
+            }, { merge: true });
+
+            const result = await this.recalculateCloudVocabularyPlacements(calendar);
+            this.invalidateTeacherLibraryCache();
+            this.updateFormUI();
+            const message = `Calendar saved. Updated ${result.updated} cloud vocabularies; ${result.skipped} skipped.`;
+            if (statusEl) statusEl.textContent = message;
+            notifications.success(message);
+        } catch (error) {
+            console.error('Error saving school calendar:', error);
+            if (statusEl) statusEl.textContent = 'Failed to save calendar.';
+            notifications.error('Failed to save school calendar.');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i data-lucide="calendar-check"></i> Save Calendar';
+                this.refreshIcons();
+            }
+        }
+    }
+
+    buildPlacementPatch(assignedDate, calendar = this.schoolCalendar) {
+        const placement = calculateVocabularyPlacement(assignedDate, calendar);
+        if (!placement) {
+            return {
+                assignedDate: '',
+                trimester: '',
+                month: '',
+                week: ''
+            };
+        }
+
+        return {
+            assignedDate: placement.assignedDate,
+            trimester: placement.trimester || '',
+            month: placement.month || '',
+            week: placement.week || ''
+        };
+    }
+
+    applyAssignedDatePlacement(vocab = this.vocabSet) {
+        if (!vocab?.assignedDate) return;
+        Object.assign(vocab, this.buildPlacementPatch(vocab.assignedDate));
+    }
+
+    recalculateLocalVocabularyPlacements(calendar) {
+        const vocabs = this.getLocalVocabs();
+        let updated = 0;
+        let skipped = 0;
+
+        const recalculated = vocabs.map(vocab => {
+            if (!vocab.assignedDate) {
+                skipped += 1;
+                return vocab;
+            }
+
+            updated += 1;
+            return {
+                ...vocab,
+                ...this.buildPlacementPatch(vocab.assignedDate, calendar)
+            };
+        });
+
+        localStorage.setItem('teacher_vocab_library', JSON.stringify(recalculated));
+        if (this.vocabSet?.assignedDate) {
+            this.applyAssignedDatePlacement(this.vocabSet);
+        }
+        return { updated, skipped };
+    }
+
+    async recalculateCloudVocabularyPlacements(calendar) {
+        const cloudVocabs = await this.fetchCloudVocabs();
+        const db = supabaseService.getDatabase();
+        let updated = 0;
+        let skipped = 0;
+
+        await Promise.all(cloudVocabs.map(async vocab => {
+            if (!vocab.assignedDate) {
+                skipped += 1;
+                return;
+            }
+
+            updated += 1;
+            const ref = doc(db, this.VOCAB_COLLECTION, vocab.id);
+            await setDoc(ref, {
+                ...this.buildPlacementPatch(vocab.assignedDate, calendar),
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+        }));
+
+        if (this.vocabSet?.assignedDate) {
+            this.applyAssignedDatePlacement(this.vocabSet);
+        }
+        return { updated, skipped };
+    }
     
     async saveGamificationSettings() {
         const exchangeRate = parseInt($('#global-exchange-rate')?.value) || 10;
@@ -237,7 +678,8 @@ class TeacherManager {
         try {
             if (saveBtn) {
                 saveBtn.disabled = true;
-                saveBtn.innerHTML = '⏳ Saving...';
+                saveBtn.innerHTML = '<i data-lucide="loader-circle"></i> Saving...';
+                this.refreshIcons();
             }
             if (statusEl) statusEl.textContent = 'Saving settings...';
 
@@ -252,7 +694,7 @@ class TeacherManager {
 
                 if (statusEl) {
                     statusEl.style.color = 'var(--success-color)';
-                    statusEl.textContent = '✅ Settings saved locally.';
+                    statusEl.textContent = 'Settings saved locally.';
                     setTimeout(() => {
                         statusEl.textContent = '';
                         statusEl.style.color = 'var(--text-muted)';
@@ -276,7 +718,7 @@ class TeacherManager {
             
             if (statusEl) {
                 statusEl.style.color = 'var(--success-color)';
-                statusEl.textContent = '✅ Settings saved successfully!';
+                statusEl.textContent = 'Settings saved successfully.';
                 setTimeout(() => {
                     statusEl.textContent = '';
                     statusEl.style.color = 'var(--text-muted)';
@@ -288,13 +730,14 @@ class TeacherManager {
             console.error('Error saving gamification settings:', error);
             if (statusEl) {
                 statusEl.style.color = 'var(--danger-color)';
-                statusEl.textContent = '❌ Failed to save settings. Check permissions.';
+                statusEl.textContent = 'Failed to save settings. Check permissions.';
             }
             notifications.error('Failed to save settings.');
         } finally {
             if (saveBtn) {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = '💾 Save Settings';
+                saveBtn.innerHTML = '<i data-lucide="save"></i> Save Settings';
+                this.refreshIcons();
             }
         }
     }
@@ -302,7 +745,6 @@ class TeacherManager {
     showEditor() {
         if (!this.ensureAuthenticated(false)) return;
         this.switchView('teacher-editor-view');
-        $('#export-btn').classList.remove('hidden');
     }
 
     showLoginView() {
@@ -311,20 +753,16 @@ class TeacherManager {
             return;
         }
         this.switchView('teacher-login-view');
-        $('#export-btn').classList.add('hidden');
     }
 
     updateAuthUI(user) {
         const headerLoginBtn = $('#teacher-login-btn');
         const signOutBtn = $('#teacher-sign-out-btn');
-        const userInfo = $('#teacher-user-info');
-        const userName = $('#teacher-user-name');
         const loginViewBtn = $('#teacher-login-view-btn');
 
         if (this.authDisabled) {
             if (headerLoginBtn) headerLoginBtn.style.display = 'none';
             if (signOutBtn) signOutBtn.style.display = 'none';
-            if (userInfo) userInfo.style.display = 'none';
             if (loginViewBtn) loginViewBtn.style.display = 'none';
             this.showAuthError('');
             this.setCloudStatus('Local development', 'muted');
@@ -334,25 +772,20 @@ class TeacherManager {
         if (user) {
             if (headerLoginBtn) headerLoginBtn.style.display = 'none';
             if (signOutBtn) signOutBtn.style.display = 'inline-flex';
-            if (userInfo) {
-                userInfo.style.display = 'flex';
-                if (userName) userName.textContent = user.displayName || user.email || '';
-            }
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
                 loginViewBtn.innerHTML = '🔐 Sign in';
             }
             this.showAuthError('');
-            this.setCloudStatus('☁️ Ready', 'info');
+            this.setCloudStatus('Ready', 'info');
         } else {
             if (headerLoginBtn) headerLoginBtn.style.display = 'inline-flex';
             if (signOutBtn) signOutBtn.style.display = 'none';
-            if (userInfo) userInfo.style.display = 'none';
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
                 loginViewBtn.innerHTML = '🔐 Sign in';
             }
-            this.setCloudStatus('☁️ Offline', 'muted');
+            this.setCloudStatus('Offline', 'muted');
         }
     }
 
@@ -366,6 +799,24 @@ class TeacherManager {
             errorEl.textContent = '';
             errorEl.style.display = 'none';
         }
+    }
+
+    showTeacherAuthPanel(mode = 'login') {
+        const isSignup = mode === 'signup';
+        $('#teacher-login-panel')?.classList.toggle('hidden', isSignup);
+        $('#teacher-signup-panel')?.classList.toggle('hidden', !isSignup);
+
+        const loginBtn = $('#show-teacher-login-btn');
+        const signupBtn = $('#show-teacher-signup-btn');
+        loginBtn?.classList.toggle('active', !isSignup);
+        signupBtn?.classList.toggle('active', isSignup);
+        loginBtn?.classList.toggle('primary-btn', !isSignup);
+        loginBtn?.classList.toggle('secondary-btn', isSignup);
+        signupBtn?.classList.toggle('primary-btn', isSignup);
+        signupBtn?.classList.toggle('secondary-btn', !isSignup);
+        loginBtn?.setAttribute('aria-selected', isSignup ? 'false' : 'true');
+        signupBtn?.setAttribute('aria-selected', isSignup ? 'true' : 'false');
+        this.showAuthError('');
     }
 
     async handleTeacherLogin(event) {
@@ -630,14 +1081,210 @@ class TeacherManager {
     setCloudStatus(text, state = 'info') {
         const el = $('#teacher-cloud-status');
         if (!el) return;
-        const colors = {
-            info: 'var(--text-muted)',
-            success: 'var(--accent-color)',
-            error: 'var(--danger-color)',
-            muted: 'var(--text-muted)'
+        const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';
+        const normalized = label.toLowerCase();
+        const dotState = !navigator.onLine || normalized.includes('offline') || normalized.includes('signed out')
+            ? 'offline'
+            : state === 'error' || normalized.includes('failed') || normalized.includes('fail')
+                ? 'error'
+                : normalized.includes('saving') || normalized.includes('loading')
+                    ? 'pending'
+                    : 'synced';
+
+        el.textContent = '';
+        el.dataset.state = dotState;
+        el.title = label;
+        el.setAttribute('aria-label', label);
+    }
+
+    refreshIcons() {
+        if (window.lucide?.createIcons) {
+            window.lucide.createIcons();
+        }
+    }
+
+    getSectionForView(viewId) {
+        const map = {
+            'teacher-overview-view': 'overview',
+            'teacher-dashboard-view': 'vocabulary',
+            'teacher-editor-view': 'vocabulary',
+            'teacher-progress-view': 'students',
+            'teacher-quizzes-view': 'quizzes',
+            'quiz-maker-view': 'quizzes',
+            'teacher-data-management-view': 'data-settings'
         };
-        el.textContent = text;
-        el.style.color = colors[state] || colors.info;
+        return map[viewId] || '';
+    }
+
+    setActiveTeacherTab(sectionId) {
+        $$('.teacher-tab').forEach(tab => {
+            const active = tab.dataset.section === sectionId;
+            tab.classList.toggle('active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab.tabIndex = active ? 0 : -1;
+        });
+    }
+
+    showTeacherSection(sectionId, options = {}) {
+        if (!this.ensureAuthenticated(false)) return;
+        switch (sectionId) {
+            case 'overview':
+                this.switchView('teacher-overview-view');
+                this.loadTeacherOverview();
+                break;
+            case 'vocabulary':
+                if (options.editor) {
+                    this.showEditor();
+                    break;
+                }
+                this.showVocabularyLibrary();
+                break;
+            case 'students':
+                this.showProgressView();
+                break;
+            case 'quizzes':
+                this.showQuizzesView();
+                break;
+            case 'data-settings':
+                this.showDataManagementView(options);
+                break;
+            default:
+                this.showTeacherSection('overview');
+        }
+    }
+
+    showVocabularyLibrary() {
+        if (!this.ensureAuthenticated(false)) return;
+        this.resetLibraryDrilldown();
+        this.switchView('teacher-dashboard-view');
+        this.loadLibrary();
+    }
+
+    async loadTeacherOverview() {
+        if (!this.ensureAuthenticated(false)) return;
+        this.renderOverviewLoadingState();
+        this.loadOverviewVocabCount();
+
+        if (this.studentProgressCache) {
+            this.applyStudentProgressData(this.studentProgressCache.data);
+            this.renderOverviewStats();
+            this.renderOverviewRecentActivity();
+            return;
+        }
+
+        this.scheduleOverviewStudentDataLoad();
+    }
+
+    renderOverviewLoadingState() {
+        $('#overview-total-students').textContent = this.studentProgressCache ? this.allStudentData.length : '--';
+        $('#overview-active-students').textContent = this.studentProgressCache ? $('#overview-active-students').textContent : '--';
+        $('#overview-avg-coins').textContent = this.studentProgressCache ? $('#overview-avg-coins').textContent : '--';
+        const recentContainer = $('#overview-recent-activity');
+        if (recentContainer && !this.studentProgressCache) {
+            recentContainer.innerHTML = '<div class="loading-spinner">Loading recent activity...</div>';
+        }
+    }
+
+    scheduleOverviewStudentDataLoad() {
+        if (this.overviewStudentLoadScheduled || this.studentProgressPromise) return;
+        this.overviewStudentLoadScheduled = true;
+
+        const load = async () => {
+            try {
+                await this.getStudentProgressData({ showError: false });
+                if (this.getSectionForView('teacher-overview-view') === 'overview' && !$('#teacher-overview-view')?.classList.contains('hidden')) {
+                    this.renderOverviewStats();
+                    this.renderOverviewRecentActivity();
+                }
+            } catch {
+                const recentContainer = $('#overview-recent-activity');
+                if (recentContainer) {
+                    recentContainer.innerHTML = '<p class="teacher-empty-state">Student activity is unavailable right now.</p>';
+                }
+            } finally {
+                this.overviewStudentLoadScheduled = false;
+            }
+        };
+
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(load, { timeout: 2500 });
+        } else {
+            window.setTimeout(load, 1200);
+        }
+    }
+
+    renderOverviewStats() {
+        const total = this.allStudentData.length;
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        const active = this.allStudentData.filter(student => {
+            const time = this.getStudentUpdatedTime(student);
+            return time && now - time <= sevenDays;
+        }).length;
+        const totalCoins = this.allStudentData.reduce((sum, student) => {
+            const coins = student.coinData?.balance ?? student.coins ?? 0;
+            return sum + coins;
+        }, 0);
+        const avgCoins = total ? Math.round(totalCoins / total) : 0;
+
+        $('#overview-total-students').textContent = total || '--';
+        $('#overview-active-students').textContent = active || '0';
+        $('#overview-avg-coins').textContent = `${avgCoins}`;
+    }
+
+    async loadOverviewVocabCount() {
+        const countEl = $('#overview-vocab-count');
+        if (!countEl) return;
+        try {
+            const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
+            countEl.textContent = `${cloudVocabs.length + remoteVocabs.length + localVocabs.length}`;
+        } catch (error) {
+            console.error('Failed to load overview vocabulary count:', error);
+            countEl.textContent = '--';
+        }
+    }
+
+    renderOverviewRecentActivity() {
+        const container = $('#overview-recent-activity');
+        if (!container) return;
+        const recent = this.allStudentData
+            .map(student => ({ student, time: this.getStudentUpdatedTime(student) }))
+            .filter(item => item.time)
+            .sort((a, b) => b.time - a.time)
+            .slice(0, 6);
+
+        if (recent.length === 0) {
+            container.innerHTML = '<p class="teacher-empty-state">No recent student activity yet.</p>';
+            return;
+        }
+
+        container.innerHTML = recent.map(({ student, time }) => {
+            const profile = student.studentProfile || {};
+            const name = profile.firstName && profile.lastName
+                ? `${profile.firstName} ${profile.lastName}`
+                : (profile.name || student.email || 'Unknown student');
+            const grade = profile.grade ? `Grade ${profile.grade}` : 'No grade';
+            const date = new Date(time).toLocaleString();
+            return `
+                <div class="teacher-activity-item">
+                    <div>
+                        <strong>${name}</strong>
+                        <span>${grade}</span>
+                    </div>
+                    <time>${date}</time>
+                </div>
+            `;
+        }).join('');
+    }
+
+    getStudentUpdatedTime(student) {
+        const value = student?.updatedAt;
+        if (!value) return 0;
+        if (typeof value.toMillis === 'function') return value.toMillis();
+        if (value.seconds) return value.seconds * 1000;
+        if (typeof value === 'number') return value;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
     }
 
     ensureAuthenticated(showAlert = true) {
@@ -654,6 +1301,55 @@ class TeacherManager {
         return true;
     }
 
+    invalidateTeacherLibraryCache() {
+        this.teacherLibraryCache = null;
+        this.teacherLibraryPromise = null;
+    }
+
+    invalidateStudentProgressCache() {
+        this.studentProgressCache = null;
+        this.studentProgressPromise = null;
+        this.allStudentData = [];
+        this.filteredStudentData = [];
+    }
+
+    async getTeacherLibrary({ forceRefresh = false } = {}) {
+        if (!forceRefresh && this.teacherLibraryCache) {
+            return this.teacherLibraryCache;
+        }
+
+        if (!forceRefresh && this.teacherLibraryPromise) {
+            return this.teacherLibraryPromise;
+        }
+
+        this.teacherLibraryPromise = Promise.all([
+            this.fetchCloudVocabs(),
+            loadManifest()
+        ]).then(([cloudVocabs, manifestData]) => {
+            const remoteVocabs = Array.isArray(manifestData?.vocabularies) ? manifestData.vocabularies : [];
+            const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
+            const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
+            const items = [
+                ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
+                ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
+                ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
+            ];
+
+            this.teacherLibraryCache = {
+                cloudVocabs,
+                remoteVocabs,
+                localVocabs,
+                items,
+                loadedAt: Date.now()
+            };
+            return this.teacherLibraryCache;
+        }).finally(() => {
+            this.teacherLibraryPromise = null;
+        });
+
+        return this.teacherLibraryPromise;
+    }
+
     async loadLibrary() {
         const list = $('#library-list');
         if (!list) return;
@@ -666,13 +1362,7 @@ class TeacherManager {
         list.innerHTML = '<div class="loading-spinner">Loading library...</div>';
 
         try {
-            const [cloudVocabs, manifestData] = await Promise.all([
-                this.fetchCloudVocabs(),
-                fetchJSON('vocabularies/manifest.json')
-            ]);
-
-            const remoteVocabs = manifestData && manifestData.vocabularies ? manifestData.vocabularies : [];
-            const localVocabs = this.getLocalVocabs();
+            const { cloudVocabs, remoteVocabs, localVocabs, items } = await this.getTeacherLibrary();
 
             list.innerHTML = '';
 
@@ -681,21 +1371,527 @@ class TeacherManager {
                 return;
             }
 
-            cloudVocabs.forEach(vocab => {
-                this.createLibraryCard(list, vocab, 'cloud');
-            });
-
-            remoteVocabs.forEach(vocab => {
-                this.createLibraryCard(list, vocab, 'remote');
-            });
-
-            localVocabs.forEach(vocab => {
-                this.createLibraryCard(list, vocab, 'local');
-            });
+            this.libraryItems = items;
+            this.renderLibraryBrowser(list);
+            this.refreshIcons();
         } catch (error) {
             console.error('Failed to load vocabularies:', error);
             list.innerHTML = '<p>Failed to load vocabulary list.</p>';
         }
+    }
+
+    resetLibraryDrilldown() {
+        this.libraryDrilldown = {
+            grade: null,
+            trimester: null,
+            month: null
+        };
+    }
+
+    buildLibraryGroups(items = this.libraryItems) {
+        const gradeGroups = new Map();
+
+        items.forEach(({ vocab, type }) => {
+            const grades = this.getVocabGrades(vocab);
+            const trimesterKey = this.getTeacherTrimesterKey(vocab);
+
+            grades.forEach(grade => {
+                if (!gradeGroups.has(grade)) {
+                    gradeGroups.set(grade, new Map());
+                }
+
+                const trimesterGroups = gradeGroups.get(grade);
+                if (!trimesterGroups.has(trimesterKey)) {
+                    trimesterGroups.set(trimesterKey, []);
+                }
+
+                trimesterGroups.get(trimesterKey).push({ vocab, type });
+            });
+        });
+
+        return gradeGroups;
+    }
+
+    renderLibraryBrowser(container = $('#library-list')) {
+        if (!container) return;
+
+        container.classList.remove('vocab-grid');
+        container.classList.add('teacher-library-browser');
+        container.innerHTML = '';
+
+        const gradeGroups = this.buildLibraryGroups();
+        const selectedGrade = this.libraryDrilldown.grade;
+        const selectedTrimester = this.libraryDrilldown.trimester;
+        const selectedMonth = this.libraryDrilldown.month;
+
+        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+            this.resetLibraryDrilldown();
+            this.renderGradePicker(container, gradeGroups);
+            return;
+        }
+
+        const trimesterGroups = gradeGroups.get(selectedGrade);
+
+        if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
+            this.libraryDrilldown.trimester = null;
+            this.libraryDrilldown.month = null;
+            this.renderTrimesterPicker(container, selectedGrade, trimesterGroups);
+            return;
+        }
+
+        const monthGroups = this.buildMonthGroups(trimesterGroups.get(selectedTrimester));
+
+        if (!selectedMonth || !monthGroups.has(selectedMonth)) {
+            this.libraryDrilldown.month = null;
+            this.renderMonthPicker(container, selectedGrade, selectedTrimester, monthGroups);
+            return;
+        }
+
+        this.renderAssignmentPicker(container, selectedGrade, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
+    }
+
+    renderLibraryBreadcrumb(container, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
+        const nav = createElement('div', 'teacher-library-breadcrumb');
+
+        const gradesButton = this.createLibraryBreadcrumbButton('Grades', () => {
+            this.resetLibraryDrilldown();
+            this.updateVocabularyRoute();
+            this.renderLibraryBrowser();
+        });
+        nav.appendChild(gradesButton);
+
+        if (selectedGrade) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const gradeLabel = this.formatGradeLabel(selectedGrade);
+            const gradeButton = selectedTrimester || selectedMonth
+                ? this.createLibraryBreadcrumbButton(gradeLabel, () => {
+                    this.libraryDrilldown = { grade: selectedGrade, trimester: null, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
+            nav.appendChild(gradeButton);
+        }
+
+        if (selectedTrimester) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
+            const trimesterNode = selectedMonth
+                ? this.createLibraryBreadcrumbButton(trimesterLabel, () => {
+                    this.libraryDrilldown = { grade: selectedGrade, trimester: selectedTrimester, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+            nav.appendChild(trimesterNode);
+        }
+
+        if (selectedMonth) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth)));
+        }
+
+        container.appendChild(nav);
+    }
+
+    createLibraryBreadcrumbButton(label, onClick) {
+        const button = createElement('button', 'teacher-library-crumb-btn', label);
+        button.type = 'button';
+        button.addEventListener('click', onClick);
+        return button;
+    }
+
+    renderGradePicker(container, gradeGroups) {
+        this.renderLibraryBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(gradeGroups.entries())
+            .sort(([gradeA], [gradeB]) => this.compareGradeLabels(gradeA, gradeB))
+            .forEach(([grade, trimesterGroups]) => {
+                const totalUnits = Array.from(trimesterGroups.values()).reduce((sum, group) => sum + group.length, 0);
+                const trimesterSummary = Array.from(trimesterGroups.entries())
+                    .sort(([trimesterA], [trimesterB]) => {
+                        return this.getTeacherTrimesterOrder(trimesterA) - this.getTeacherTrimesterOrder(trimesterB);
+                    })
+                    .map(([trimesterKey, vocabItems]) => `${this.getTeacherTrimesterShortLabel(trimesterKey)}: ${vocabItems.length}`)
+                    .join(' · ');
+
+                const card = this.createLibraryChoiceCard({
+                    title: this.formatGradeLabel(grade),
+                    count: this.formatUnitCount(totalUnits),
+                    meta: trimesterSummary,
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.libraryDrilldown = { grade, trimester: null, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderTrimesterPicker(container, selectedGrade, trimesterGroups) {
+        this.renderLibraryBreadcrumb(container, selectedGrade);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(trimesterGroups.entries())
+            .sort(([trimesterA], [trimesterB]) => {
+                return this.getTeacherTrimesterOrder(trimesterA) - this.getTeacherTrimesterOrder(trimesterB);
+            })
+            .forEach(([trimesterKey, vocabItems]) => {
+                const monthSummary = this.formatMonthSummary(this.buildMonthGroups(vocabItems));
+                const card = this.createLibraryChoiceCard({
+                    title: this.getTeacherTrimesterLabel(trimesterKey),
+                    count: this.formatUnitCount(vocabItems.length),
+                    meta: monthSummary || this.formatGradeLabel(selectedGrade),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.libraryDrilldown = { grade: selectedGrade, trimester: trimesterKey, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderMonthPicker(container, selectedGrade, selectedTrimester, monthGroups) {
+        this.renderLibraryBreadcrumb(container, selectedGrade, selectedTrimester);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(monthGroups.entries())
+            .sort(([monthA], [monthB]) => this.getTeacherMonthOrder(monthA) - this.getTeacherMonthOrder(monthB))
+            .forEach(([monthKey, vocabItems]) => {
+                const card = this.createLibraryChoiceCard({
+                    title: this.getTeacherMonthLabel(monthKey),
+                    count: this.formatUnitCount(vocabItems.length),
+                    meta: this.formatGradeLabel(selectedGrade),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.libraryDrilldown = {
+                        grade: selectedGrade,
+                        trimester: selectedTrimester,
+                        month: monthKey
+                    };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderAssignmentPicker(container, selectedGrade, selectedTrimester, selectedMonth, vocabItems) {
+        this.renderLibraryBreadcrumb(container, selectedGrade, selectedTrimester, selectedMonth);
+
+        const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid');
+        vocabItems
+            .sort((itemA, itemB) => this.compareVocabPlacement(itemA.vocab, itemB.vocab))
+            .forEach(({ vocab, type }) => {
+                this.createLibraryCard(grid, vocab, type);
+            });
+
+        container.appendChild(grid);
+    }
+
+    createLibraryChoiceCard({ title, count, meta, icon }) {
+        const card = createElement('button', 'teacher-library-choice-card');
+        card.type = 'button';
+
+        const text = createElement('span', 'teacher-library-choice-text');
+        const titleEl = createElement('strong', null, title);
+        const countEl = createElement('span', 'teacher-library-choice-count', count);
+        text.append(titleEl, countEl);
+
+        if (meta) {
+            text.appendChild(createElement('small', null, meta));
+        }
+
+        card.appendChild(text);
+
+        if (icon) {
+            const iconEl = createElement('i');
+            iconEl.setAttribute('data-lucide', icon);
+            card.appendChild(iconEl);
+        }
+
+        return card;
+    }
+
+    getVocabGrades(vocab) {
+        const explicitGrades = Array.isArray(vocab?.grades) ? vocab.grades : [vocab?.grades, vocab?.grade, vocab?.gradeLevel];
+        const cleanedGrades = explicitGrades
+            .flatMap(grade => {
+                if (grade === null || grade === undefined) return [];
+                return String(grade).split(',');
+            })
+            .map(grade => this.normalizeGradeLabel(grade))
+            .filter(Boolean);
+
+        if (cleanedGrades.length > 0) {
+            return Array.from(new Set(cleanedGrades));
+        }
+
+        const source = `${vocab?.id || ''} ${vocab?.name || ''} ${vocab?.path || ''}`;
+        const inferredGrade = source.match(/\bgrade\s*([0-9]{1,2})(?=\D|$)/i);
+        return inferredGrade ? [inferredGrade[1]] : ['Other'];
+    }
+
+    normalizeGradeLabel(grade) {
+        if (grade === null || grade === undefined) return '';
+        const value = String(grade).trim();
+        if (!value) return '';
+        return value.replace(/^grade\s*/i, '').trim() || value;
+    }
+
+    compareGradeLabels(gradeA, gradeB) {
+        const valueA = this.getGradeSortValue(gradeA);
+        const valueB = this.getGradeSortValue(gradeB);
+
+        if (valueA !== valueB) {
+            return valueA - valueB;
+        }
+
+        return this.formatGradeLabel(gradeA).localeCompare(this.formatGradeLabel(gradeB));
+    }
+
+    getGradeSortValue(grade) {
+        const match = String(grade || '').match(/[0-9]+/);
+        return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+    }
+
+    formatGradeLabel(grade) {
+        const value = String(grade || '').trim();
+        return /^[0-9]+$/.test(value) ? `Grade ${value}` : value;
+    }
+
+    getTeacherTrimesterKey(vocabOrTrimester) {
+        const isVocab = vocabOrTrimester && typeof vocabOrTrimester === 'object';
+        const rawTrimester = isVocab ? vocabOrTrimester.trimester : vocabOrTrimester;
+        const normalized = this.normalizeTeacherTrimester(rawTrimester);
+
+        if (isVocab && vocabOrTrimester.assignedDate && !rawTrimester) {
+            return 'other';
+        }
+
+        if (normalized !== 'other' || !isVocab) {
+            return normalized;
+        }
+
+        const source = `${vocabOrTrimester.id || ''} ${vocabOrTrimester.name || ''} ${vocabOrTrimester.path || ''}`;
+        const shorthandMatch = source.match(/(?:^|[\s_-])t\s*([123])(?:[\s_-]|$)/i);
+        const wordMatch = source.match(/\btrimester\s*([123])\b/i);
+        const inferred = shorthandMatch?.[1] || wordMatch?.[1] || '';
+        return this.normalizeTeacherTrimester(inferred);
+    }
+
+    normalizeTeacherTrimester(trimester) {
+        const value = String(trimester || '').trim().toUpperCase().replace(/\s+/g, '');
+
+        if (['1', 'T1', 'IT', 'I', 'FIRST', '1ST'].includes(value)) return 'IT';
+        if (['2', 'T2', 'IIT', 'II', 'SECOND', '2ND'].includes(value)) return 'IIT';
+        if (['3', 'T3', 'IIIT', 'III', 'THIRD', '3RD'].includes(value)) return 'IIIT';
+        return 'other';
+    }
+
+    getTeacherTrimesterLabel(trimesterKey) {
+        const labels = {
+            IT: '1st Trimester',
+            IIT: '2nd Trimester',
+            IIIT: '3rd Trimester',
+            other: 'Other'
+        };
+
+        return labels[trimesterKey] || labels.other;
+    }
+
+    getTeacherTrimesterShortLabel(trimesterKey) {
+        const labels = {
+            IT: 'T1',
+            IIT: 'T2',
+            IIIT: 'T3',
+            other: 'Other'
+        };
+
+        return labels[trimesterKey] || labels.other;
+    }
+
+    getTeacherTrimesterOrder(trimesterKey) {
+        const order = {
+            IT: 1,
+            IIT: 2,
+            IIIT: 3,
+            other: 99
+        };
+
+        return order[trimesterKey] || order.other;
+    }
+
+    buildMonthGroups(vocabItems = []) {
+        const monthGroups = new Map();
+
+        vocabItems.forEach(({ vocab, type }) => {
+            const monthKey = this.getTeacherMonthKey(vocab);
+            if (!monthGroups.has(monthKey)) {
+                monthGroups.set(monthKey, []);
+            }
+
+            monthGroups.get(monthKey).push({ vocab, type });
+        });
+
+        return monthGroups;
+    }
+
+    getTeacherMonthKey(vocab) {
+        const explicitMonth = this.normalizeTeacherMonth(vocab?.month);
+        if (explicitMonth !== 'other') return explicitMonth;
+        if (vocab?.assignedDate) return 'other';
+
+        const source = `${vocab?.id || ''} ${vocab?.name || ''} ${vocab?.path || ''}`;
+        const monthMatch = source.match(/(?:^|[^a-z])(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)(?=[^a-z]|$)/i);
+        return this.normalizeTeacherMonth(monthMatch?.[1]);
+    }
+
+    normalizeTeacherMonth(month) {
+        const value = String(month || '').trim().toLowerCase();
+        const aliases = {
+            january: 'january',
+            jan: 'january',
+            february: 'february',
+            feb: 'february',
+            march: 'march',
+            mar: 'march',
+            april: 'april',
+            apr: 'april',
+            may: 'may',
+            june: 'june',
+            jun: 'june',
+            july: 'july',
+            jul: 'july',
+            august: 'august',
+            aug: 'august',
+            september: 'september',
+            sept: 'september',
+            sep: 'september',
+            october: 'october',
+            oct: 'october',
+            november: 'november',
+            nov: 'november',
+            december: 'december',
+            dec: 'december'
+        };
+
+        return aliases[value] || 'other';
+    }
+
+    getTeacherMonthLabel(monthKey) {
+        const labels = {
+            january: 'January',
+            february: 'February',
+            march: 'March',
+            april: 'April',
+            may: 'May',
+            june: 'June',
+            july: 'July',
+            august: 'August',
+            september: 'September',
+            october: 'October',
+            november: 'November',
+            december: 'December',
+            other: 'Other'
+        };
+
+        return labels[monthKey] || labels.other;
+    }
+
+    getTeacherMonthShortLabel(monthKey) {
+        const labels = {
+            january: 'Jan',
+            february: 'Feb',
+            march: 'Mar',
+            april: 'Apr',
+            may: 'May',
+            june: 'Jun',
+            july: 'Jul',
+            august: 'Aug',
+            september: 'Sep',
+            october: 'Oct',
+            november: 'Nov',
+            december: 'Dec',
+            other: 'Other'
+        };
+
+        return labels[monthKey] || labels.other;
+    }
+
+    getTeacherMonthOrder(monthKey) {
+        const order = {
+            january: 1,
+            february: 2,
+            march: 3,
+            april: 4,
+            may: 5,
+            june: 6,
+            july: 7,
+            august: 8,
+            september: 9,
+            october: 10,
+            november: 11,
+            december: 12,
+            other: 99
+        };
+
+        return order[monthKey] || order.other;
+    }
+
+    formatMonthSummary(monthGroups) {
+        return Array.from(monthGroups.entries())
+            .sort(([monthA], [monthB]) => this.getTeacherMonthOrder(monthA) - this.getTeacherMonthOrder(monthB))
+            .map(([monthKey, vocabItems]) => `${this.getTeacherMonthShortLabel(monthKey)}: ${vocabItems.length}`)
+            .join(' · ');
+    }
+
+    getVocabSortName(vocab) {
+        return String(vocab?.name || vocab?.id || '').toLocaleLowerCase();
+    }
+
+    getVocabPlacementSortValue(vocab) {
+        if (vocab?.assignedDate) return String(vocab.assignedDate);
+        const week = Number(vocab?.week || this.inferTeacherWeek(vocab) || 99);
+        return `${String(week).padStart(2, '0')}-${this.getVocabSortName(vocab)}`;
+    }
+
+    compareVocabPlacement(vocabA, vocabB) {
+        const placementA = this.getVocabPlacementSortValue(vocabA);
+        const placementB = this.getVocabPlacementSortValue(vocabB);
+
+        if (placementA !== placementB) {
+            return placementA.localeCompare(placementB);
+        }
+
+        return this.getVocabSortName(vocabA).localeCompare(this.getVocabSortName(vocabB));
+    }
+
+    formatVocabPlacementLabel(vocab) {
+        const trimester = this.getTeacherTrimesterKey(vocab);
+        const week = vocab?.week || this.inferTeacherWeek(vocab);
+        if (trimester !== 'other' && week) return `Week ${week} of ${trimester}`;
+        if (trimester !== 'other') return trimester;
+        return '';
+    }
+
+    formatUnitCount(count) {
+        return `${count} ${count === 1 ? 'unit' : 'units'}`;
     }
 
     async fetchCloudVocabs() {
@@ -705,7 +1901,7 @@ class TeacherManager {
         try {
             const db = supabaseService.getDatabase();
             const snapshot = await getDocs(collection(db, this.VOCAB_COLLECTION));
-            this.setCloudStatus('☁️ Ready', 'info');
+            this.setCloudStatus('Ready', 'info');
             return snapshot.docs.map(docSnap => {
                 const data = docSnap.data();
                 return {
@@ -716,7 +1912,7 @@ class TeacherManager {
             });
         } catch (error) {
             console.error('Failed to fetch cloud vocabularies:', error);
-            this.setCloudStatus('⚠️ Cloud load failed', 'error');
+            this.setCloudStatus('Cloud load failed', 'error');
             return [];
         }
     }
@@ -724,6 +1920,17 @@ class TeacherManager {
     getLocalVocabs() {
         const stored = localStorage.getItem('teacher_vocab_library');
         return stored ? JSON.parse(stored) : [];
+    }
+
+    removeLocalVocab(id) {
+        if (!id) return false;
+        const before = this.getLocalVocabs();
+        const after = before.filter(vocab => vocab.id !== id);
+        if (after.length === before.length) return false;
+
+        localStorage.setItem('teacher_vocab_library', JSON.stringify(after));
+        this.invalidateTeacherLibraryCache();
+        return true;
     }
 
     saveToLocal(vocab) {
@@ -741,18 +1948,18 @@ class TeacherManager {
         }
 
         localStorage.setItem('teacher_vocab_library', JSON.stringify(vocabs));
+        this.invalidateTeacherLibraryCache();
     }
 
     createLibraryCard(container, vocab, type) {
-        const card = createElement('div', 'card option-card');
-        card.style.width = 'auto';
-        card.style.margin = '0';
-        card.style.cursor = 'pointer';
-        card.style.position = 'relative';
+        const card = createElement('div', 'card teacher-vocab-card');
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `Open ${vocab.name || vocab.id || 'vocabulary'}`);
 
         const badgeStyles = {
             remote: { color: 'var(--primary-color)', text: 'Repo' },
-            local: { color: 'var(--accent-color)', text: 'Local' },
+            local: { color: 'var(--accent-color)', text: 'Draft' },
             cloud: { color: 'var(--primary-hover)', text: 'Cloud' }
         };
 
@@ -760,15 +1967,15 @@ class TeacherManager {
 
         let deleteBtnHtml = '';
         if (type === 'local' || type === 'cloud') {
-            const label = type === 'cloud' ? 'Delete Cloud' : 'Delete Local';
-            deleteBtnHtml = `<button class="delete-vocab-btn" style="position:absolute; bottom:10px; right:10px; background:transparent; border:none; color:red; cursor:pointer; font-size:1.2rem;" title="${label}">🗑️</button>`;
+            const label = type === 'cloud' ? 'Delete Cloud' : 'Delete Draft';
+            deleteBtnHtml = `<button class="delete-vocab-btn" title="${label}" aria-label="${label}"><i data-lucide="trash-2"></i></button>`;
         }
 
         card.innerHTML = `
-            <div class="badge" style="position:absolute; top:10px; right:10px; background:${badge.color}; color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${badge.text}</div>
-            <div class="icon">${type === 'cloud' ? '☁️' : '📝'}</div>
+            <div class="badge" style="background:${badge.color};">${badge.text}</div>
             <h3>${vocab.name || 'Untitled'}</h3>
             <small style="color:var(--text-muted)">${vocab.id}</small>
+            ${this.formatVocabPlacementLabel(vocab) ? `<small style="color:var(--text-muted); display:block; margin-top:0.35rem;">${this.formatVocabPlacementLabel(vocab)}</small>` : ''}
             ${deleteBtnHtml}
         `;
 
@@ -785,13 +1992,18 @@ class TeacherManager {
                 this.loadLocalVocabulary(vocab);
             }
         });
+        card.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            card.click();
+        });
 
         if (type === 'local' || type === 'cloud') {
             const deleteBtn = card.querySelector('.delete-vocab-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    const label = type === 'cloud' ? 'cloud' : 'local';
+                    const label = type === 'cloud' ? 'cloud' : 'draft';
                     if (confirm(`Delete ${label} vocabulary "${vocab.name}"? This cannot be undone.`)) {
                         if (type === 'local') {
                             this.deleteLocalVocab(vocab.id);
@@ -807,9 +2019,7 @@ class TeacherManager {
     }
 
     deleteLocalVocab(id) {
-        let vocabs = this.getLocalVocabs();
-        vocabs = vocabs.filter(v => v.id !== id);
-        localStorage.setItem('teacher_vocab_library', JSON.stringify(vocabs));
+        this.removeLocalVocab(id);
     }
 
     async deleteCloudVocab(id) {
@@ -818,6 +2028,7 @@ class TeacherManager {
             const db = supabaseService.getDatabase();
             const ref = doc(db, this.VOCAB_COLLECTION, id);
             await deleteDoc(ref);
+            this.invalidateTeacherLibraryCache();
         } catch (err) {
             console.error('Failed to delete cloud vocab', err);
             alert('Could not delete cloud vocabulary.');
@@ -831,7 +2042,7 @@ class TeacherManager {
 
     async loadVocabularyFromPath(path) {
         if (!this.ensureAuthenticated()) return;
-        const data = await fetchJSON(path);
+        const data = await loadVocabularyFile(path);
         if (data) {
             this.loadVocabularyObject(data);
         } else {
@@ -851,6 +2062,8 @@ class TeacherManager {
     // Helper to trigger auto-save
     triggerAutoSave() {
         if (!this.vocabSet.id) return;
+        this.applyAssignedDatePlacement(this.vocabSet);
+        this.normalizeActivityFlowSettings();
 
         if (this.authDisabled) {
             this.saveToLocal(this.vocabSet);
@@ -873,7 +2086,7 @@ class TeacherManager {
         }
         if (!this.isAuthenticated || !this.vocabSet.id) return;
         clearTimeout(this.cloudSaveTimeout);
-        this.setCloudStatus('☁️ Saving...', 'info');
+        this.setCloudStatus('Saving...', 'info');
         this.cloudSaveTimeout = setTimeout(() => {
             this.saveToCloud();
         }, 800);
@@ -883,23 +2096,29 @@ class TeacherManager {
         if (this.authDisabled) return;
         if (!this.ensureAuthenticated(false)) return;
         if (!this.vocabSet.id) return;
+        this.normalizeActivityFlowSettings();
 
         try {
             const db = supabaseService.getDatabase();
             const docRef = doc(db, this.VOCAB_COLLECTION, this.vocabSet.id);
-            const { __source, ...rest } = this.vocabSet;
+            const { __source, source, ...rest } = this.vocabSet;
             const payload = {
                 ...rest,
                 ownerId: this.currentUser ? this.currentUser.uid : null,
                 updatedAt: serverTimestamp()
             };
             await setDoc(docRef, payload);
-            this.setCloudStatus('✅ Saved to cloud', 'success');
-            setTimeout(() => this.setCloudStatus('☁️ Ready', 'info'), 1500);
+            this.vocabSet.source = 'cloud';
+            this.removeLocalVocab(this.vocabSet.id);
+            this.invalidateTeacherLibraryCache();
+            this.setCloudStatus('Saved to cloud', 'success');
+            setTimeout(() => this.setCloudStatus('Ready', 'info'), 1500);
+            return true;
         } catch (error) {
             console.error('Failed to save vocabulary to backend:', error);
-            this.setCloudStatus('⚠️ Save failed', 'error');
+            this.setCloudStatus('Save failed', 'error');
             notifications.error('Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');
+            return false;
         }
     }
 
@@ -913,10 +2132,18 @@ class TeacherManager {
     }
 
     updateFormUI() {
+        this.applyAssignedDatePlacement(this.vocabSet);
         $('#vocab-id').value = this.vocabSet.id || '';
         $('#vocab-name').value = this.vocabSet.name || '';
         $('#vocab-desc').value = this.vocabSet.description || '';
         $('#vocab-grade').value = this.vocabSet.grades ? this.vocabSet.grades.join(', ') : (this.vocabSet.grade || '');
+        $('#vocab-assigned-date').value = this.vocabSet.assignedDate || '';
+        $('#vocab-trimester').value = this.getTeacherTrimesterKey(this.vocabSet.trimester || this.vocabSet) === 'other'
+            ? ''
+            : this.getTeacherTrimesterKey(this.vocabSet.trimester || this.vocabSet);
+        $('#vocab-month').value = this.getTeacherMonthKey(this.vocabSet) === 'other' ? '' : this.getTeacherMonthKey(this.vocabSet);
+        $('#vocab-week').value = this.vocabSet.week || this.inferTeacherWeek(this.vocabSet) || '';
+        this.updatePlacementControlState();
 
         // Load activity settings
         const settings = this.vocabSet.activitySettings || {};
@@ -938,13 +2165,229 @@ class TeacherManager {
         $('#setting-exchange-rate').value = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
         $('#setting-progress-reward').value = settings.progressReward !== undefined ? settings.progressReward : 1;
 
+        this.renderActivityFlowSettings();
         this.renderWords();
     }
 
+    inferTeacherWeek(vocab) {
+        if (vocab?.assignedDate) return '';
+        const source = `${vocab?.week || ''} ${vocab?.id || ''} ${vocab?.name || ''} ${vocab?.path || ''}`;
+        const match = source.match(/(?:^|[^a-z])week\s*([0-9]{1,2})(?=[^0-9]|$)/i);
+        return match ? Number(match[1]) : '';
+    }
+
+    updatePlacementControlState() {
+        const isDerived = Boolean(this.vocabSet.assignedDate);
+        ['#vocab-trimester', '#vocab-month', '#vocab-week'].forEach(selector => {
+            const field = $(selector);
+            if (!field) return;
+            field.disabled = isDerived;
+            field.title = isDerived
+                ? 'Derived from the assigned date and school calendar. Clear Assigned Date to edit manually.'
+                : '';
+        });
+    }
+
+    setVocabPlacementField(field, value) {
+        const cleanedValue = String(value || '').trim();
+
+        if (field === 'trimester') {
+            const trimester = this.normalizeTeacherTrimester(cleanedValue);
+            if (trimester === 'other') {
+                delete this.vocabSet.trimester;
+            } else {
+                this.vocabSet.trimester = trimester;
+            }
+        } else if (field === 'month') {
+            const month = this.normalizeTeacherMonth(cleanedValue);
+            if (month === 'other') {
+                delete this.vocabSet.month;
+            } else {
+                this.vocabSet.month = month;
+            }
+        } else if (field === 'week') {
+            const week = Number(cleanedValue);
+            if (Number.isInteger(week) && week > 0) {
+                this.vocabSet.week = week;
+            } else {
+                delete this.vocabSet.week;
+            }
+        }
+
+        this.triggerAutoSave();
+    }
+
+    setVocabAssignedDate(value) {
+        const assignedDate = String(value || '').trim();
+
+        if (!assignedDate) {
+            this.vocabSet.assignedDate = '';
+            this.updatePlacementControlState();
+            this.triggerAutoSave();
+            return;
+        }
+
+        Object.assign(this.vocabSet, this.buildPlacementPatch(assignedDate));
+        $('#vocab-trimester').value = this.vocabSet.trimester || '';
+        $('#vocab-month').value = this.vocabSet.month || '';
+        $('#vocab-week').value = this.vocabSet.week || '';
+        this.updatePlacementControlState();
+        this.triggerAutoSave();
+    }
+
+    slugifyVocabPart(value) {
+        return String(value || '')
+            .toLowerCase()
+            .replace(/&/g, 'and')
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '')
+            .slice(0, 48);
+    }
+
+    createVocabIdSuggestion() {
+        const grade = this.getVocabGrades(this.vocabSet)[0] || 'custom';
+        const trimester = this.getTeacherTrimesterKey(this.vocabSet);
+        const month = this.getTeacherMonthKey(this.vocabSet);
+        const week = this.vocabSet.week || this.inferTeacherWeek(this.vocabSet);
+        const title = this.slugifyVocabPart(this.vocabSet.name || this.vocabSet.id || 'vocabulary');
+        const parts = [
+            `grade${this.slugifyVocabPart(grade) || 'custom'}`,
+            trimester !== 'other' ? trimester.toLowerCase() : '',
+            month !== 'other' ? month : '',
+            week ? `week${week}` : '',
+            title
+        ].filter(Boolean);
+        return parts.join('_') || `vocab_${Date.now()}`;
+    }
+
+    async publishVocabulary({ asNew = false } = {}) {
+        if (!this.ensureAuthenticated()) return;
+        this.applyAssignedDatePlacement(this.vocabSet);
+
+        if (asNew) {
+            const suggestedId = this.createVocabIdSuggestion();
+            const newId = prompt('New vocabulary ID', suggestedId);
+            if (!newId) return;
+            this.vocabSet.id = this.slugifyVocabPart(newId) || suggestedId;
+            $('#vocab-id').value = this.vocabSet.id;
+            delete this.vocabSet.source;
+        }
+
+        this.normalizeActivityFlowSettings();
+        const saved = await this.saveToCloud();
+
+        if (saved) {
+            notifications.success(asNew ? 'Saved as a new vocabulary.' : 'Vocabulary update saved.');
+            this.loadLibrary();
+        } else {
+            this.saveToLocal(this.vocabSet);
+        }
+    }
+
+    getDefaultRequiredActivities(vocab = this.vocabSet) {
+        const purpose = String(vocab?.purpose || '').trim().toLowerCase();
+        return DEFAULT_REQUIRED_BY_PURPOSE[purpose] || DEFAULT_REQUIRED_BY_PURPOSE.default;
+    }
+
+    getActivityFlowConfig(vocab = this.vocabSet) {
+        const settings = vocab?.activitySettings || {};
+        const validIds = new Set(VOCAB_ACTIVITY_IDS);
+        const hasExplicitFlow = Array.isArray(settings.requiredActivities) || Array.isArray(settings.additionalActivities);
+        const defaultRequired = this.getDefaultRequiredActivities(vocab).filter(id => validIds.has(id));
+        const requestedRequired = hasExplicitFlow ? settings.requiredActivities : defaultRequired;
+        const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
+            .filter(id => validIds.has(id));
+        const uniqueRequired = [...new Set(required)];
+        const requiredSet = new Set(uniqueRequired);
+        const requestedAdditional = hasExplicitFlow
+            ? settings.additionalActivities
+            : VOCAB_ACTIVITY_IDS.filter(id => !requiredSet.has(id));
+        const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])
+            .filter(id => validIds.has(id) && !requiredSet.has(id));
+        const uniqueAdditional = [...new Set(additional)];
+
+        if (uniqueRequired.length === 0) {
+            uniqueRequired.push('flashcards');
+        }
+
+        return {
+            required: uniqueRequired,
+            additional: uniqueAdditional,
+            hidden: VOCAB_ACTIVITY_IDS.filter(id => !uniqueRequired.includes(id) && !uniqueAdditional.includes(id))
+        };
+    }
+
+    normalizeActivityFlowSettings() {
+        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+        const flow = this.getActivityFlowConfig(this.vocabSet);
+        this.vocabSet.activitySettings.requiredActivities = flow.required;
+        this.vocabSet.activitySettings.additionalActivities = flow.additional;
+        return flow;
+    }
+
+    setActivityFlowChoice(activityId, choice) {
+        if (!VOCAB_ACTIVITY_IDS.includes(activityId)) return;
+        if (!['required', 'additional', 'hidden'].includes(choice)) return;
+        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+
+        const flow = this.getActivityFlowConfig(this.vocabSet);
+        let required = flow.required.filter(id => id !== activityId);
+        let additional = flow.additional.filter(id => id !== activityId);
+
+        if (choice === 'required') {
+            required.push(activityId);
+        } else if (choice === 'additional') {
+            additional.push(activityId);
+        }
+
+        if (required.length === 0) {
+            notifications.warning('At least one required activity is needed.');
+            required = [activityId];
+            additional = additional.filter(id => id !== activityId);
+        }
+
+        this.vocabSet.activitySettings.requiredActivities = [...new Set(required)];
+        this.vocabSet.activitySettings.additionalActivities = [...new Set(additional)];
+        this.renderActivityFlowSettings();
+        this.triggerAutoSave();
+    }
+
+    renderActivityFlowSettings() {
+        const container = $('#activity-flow-settings');
+        if (!container) return;
+
+        const flow = this.getActivityFlowConfig(this.vocabSet);
+        container.innerHTML = '';
+
+        VOCAB_ACTIVITY_OPTIONS.forEach(activity => {
+            const currentValue = flow.required.includes(activity.id)
+                ? 'required'
+                : flow.additional.includes(activity.id)
+                    ? 'additional'
+                    : 'hidden';
+            const group = createElement('div', 'form-group');
+            group.style.cssText = 'background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem;';
+            group.innerHTML = `
+                <label for="flow-${activity.id}" style="display:block; margin-bottom:0.35rem;">${activity.label}</label>
+                <select id="flow-${activity.id}" class="activity-flow-select" data-activity="${activity.id}">
+                    <option value="required"${currentValue === 'required' ? ' selected' : ''}>Required</option>
+                    <option value="additional"${currentValue === 'additional' ? ' selected' : ''}>Additional</option>
+                    <option value="hidden"${currentValue === 'hidden' ? ' selected' : ''}>Hidden</option>
+                </select>
+            `;
+            container.appendChild(group);
+        });
+    }
+
     initListeners() {
+        window.addEventListener('hashchange', () => this.handleRouteChange());
+        window.addEventListener('popstate', () => this.handleRouteChange());
+
         if (!this.authDisabled) {
             $('#teacher-login-form')?.addEventListener('submit', (event) => this.handleTeacherLogin(event));
             $('#teacher-signup-form')?.addEventListener('submit', (event) => this.handleTeacherSignup(event));
+            $('#show-teacher-login-btn')?.addEventListener('click', () => this.showTeacherAuthPanel('login'));
+            $('#show-teacher-signup-btn')?.addEventListener('click', () => this.showTeacherAuthPanel('signup'));
             $('#teacher-login-btn')?.addEventListener('click', () => this.showLoginView());
 
             const signOutBtn = $('#teacher-sign-out-btn');
@@ -960,12 +2403,40 @@ class TeacherManager {
             }
         }
 
+        $$('.teacher-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.showTeacherSection(tab.dataset.section);
+            });
+            tab.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                const tabs = Array.from($$('.teacher-tab'));
+                const currentIndex = tabs.indexOf(tab);
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                tabs[nextIndex].focus();
+                this.showTeacherSection(tabs[nextIndex].dataset.section);
+            });
+        });
+
+        $('#overview-create-vocab-btn')?.addEventListener('click', () => this.startNewVocab());
+        $('#overview-students-btn')?.addEventListener('click', () => this.showTeacherSection('students'));
+        $('#overview-vocabulary-btn')?.addEventListener('click', () => this.showTeacherSection('vocabulary'));
+        $('#overview-quiz-btn')?.addEventListener('click', () => this.showTeacherSection('quizzes'));
+        $('#overview-settings-btn')?.addEventListener('click', () => this.showTeacherSection('data-settings'));
+        $('#overview-export-btn')?.addEventListener('click', () => {
+            this.showTeacherSection('data-settings', { tab: 'export' });
+        });
+
         // Dashboard Actions
         $('#create-new-btn').addEventListener('click', () => {
             this.startNewVocab();
         });
 
-        $('#view-progress-btn').addEventListener('click', () => {
+        $('#view-progress-btn')?.addEventListener('click', () => {
             this.showProgressView();
         });
         
@@ -977,15 +2448,30 @@ class TeacherManager {
             });
         }
 
+        const saveSchoolCalendarBtn = $('#save-school-calendar-btn');
+        if (saveSchoolCalendarBtn) {
+            saveSchoolCalendarBtn.addEventListener('click', () => {
+                this.saveSchoolCalendarSettings();
+            });
+        }
+
         $('#back-to-dashboard').addEventListener('click', () => {
             if (!this.ensureAuthenticated(false)) return;
             // Auto-save before leaving
             this.triggerAutoSave();
-            this.loadLibrary(); // Refresh library list
-            this.showDashboard();
+            if (this.parseRoute()?.view === 'editor' && this.lastVocabularyRoute && window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+            if (this.lastVocabularyRoute) {
+                this.setRoute(this.lastVocabularyRoute);
+                this.applyRoute(this.lastVocabularyRoute);
+                return;
+            }
+            this.showVocabularyLibrary();
         });
 
-        $('#back-to-dashboard-from-progress').addEventListener('click', () => {
+        $('#back-to-dashboard-from-progress')?.addEventListener('click', () => {
             this.showDashboard();
         });
 
@@ -1032,6 +2518,10 @@ class TeacherManager {
 
         $('#reset-student-password-btn')?.addEventListener('click', () => this.handlePasswordReset());
 
+        $('#quiz-open-current-btn')?.addEventListener('click', () => {
+            this.openQuizMaker({ returnTo: 'quizzes' });
+        });
+
 
         // Meta fields
         $('#vocab-id').addEventListener('input', (e) => { this.vocabSet.id = e.target.value; this.triggerAutoSave(); });
@@ -1042,6 +2532,25 @@ class TeacherManager {
             const val = e.target.value;
             this.vocabSet.grades = val.split(',').map(s => s.trim()).filter(s => s !== '');
             this.triggerAutoSave();
+        });
+        $('#vocab-assigned-date').addEventListener('change', (e) => {
+            this.setVocabAssignedDate(e.target.value);
+        });
+        $('#vocab-trimester').addEventListener('change', (e) => {
+            this.setVocabPlacementField('trimester', e.target.value);
+        });
+        $('#vocab-month').addEventListener('change', (e) => {
+            this.setVocabPlacementField('month', e.target.value);
+        });
+        $('#vocab-week').addEventListener('input', (e) => {
+            this.setVocabPlacementField('week', e.target.value);
+        });
+
+        $('#publish-update-btn')?.addEventListener('click', () => {
+            this.publishVocabulary({ asNew: false });
+        });
+        $('#publish-new-version-btn')?.addEventListener('click', () => {
+            this.publishVocabulary({ asNew: true });
         });
 
         // Activity Settings
@@ -1105,6 +2614,10 @@ class TeacherManager {
             this.vocabSet.activitySettings.fillInBlank = parseInt(e.target.value) || 10;
             this.triggerAutoSave();
         });
+        $('#activity-flow-settings')?.addEventListener('change', (e) => {
+            if (!e.target.classList.contains('activity-flow-select')) return;
+            this.setActivityFlowChoice(e.target.dataset.activity, e.target.value);
+        });
 
         // Gamification Settings
         $('#setting-completion-bonus').addEventListener('input', (e) => {
@@ -1130,7 +2643,7 @@ class TeacherManager {
         });
         $('#generate-quiz-btn').addEventListener('click', () => {
             if (!this.ensureAuthenticated()) return;
-            this.handleGenerateQuiz();
+            this.openQuizMaker({ returnTo: 'editor' });
         });
 
         // Modal Actions
@@ -1160,6 +2673,7 @@ class TeacherManager {
         // Export
         $('#export-btn').addEventListener('click', () => {
             if (!this.ensureAuthenticated()) return;
+            this.normalizeActivityFlowSettings();
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.vocabSet, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
@@ -1201,12 +2715,6 @@ class TeacherManager {
             e.target.value = '';
         });
 
-        // Quiz generation
-        $('#generate-quiz-btn').addEventListener('click', () => {
-            if (!this.ensureAuthenticated()) return;
-            // New Quiz Maker Flow
-            this.openQuizMaker();
-        });
         // Disable old modal listeners or redirect them
         $('#close-quiz-modal').addEventListener('click', () => {
             $('#quiz-modal').classList.add('hidden');
@@ -1224,12 +2732,100 @@ class TeacherManager {
         });
     }
 
-    openQuizMaker() {
+    async openQuizMaker(options = {}) {
+        if (!this.vocabSet || !Array.isArray(this.vocabSet.words) || this.vocabSet.words.length === 0) {
+            notifications.warning('Choose a vocabulary with words before opening the quiz builder.');
+            this.showQuizzesView();
+            return;
+        }
+        this.quizReturnView = options.returnTo || this.quizReturnView || 'quizzes';
         this.switchView('quiz-maker-view');
-        // Initialize QuizMaker with current vocab
+        const { QuizMaker } = await import('./quizMaker.js?v=section-composer-20260528k');
         this.quizMaker = new QuizMaker(this.vocabSet, () => {
-            this.showEditor();
+            if (this.quizReturnView === 'editor') {
+                this.showEditor();
+            } else {
+                this.showQuizzesView();
+            }
         });
+    }
+
+    async showQuizzesView() {
+        if (!this.ensureAuthenticated(false)) return;
+        this.switchView('teacher-quizzes-view');
+        this.updateQuizHubSummary();
+        await this.loadQuizPicker();
+    }
+
+    updateQuizHubSummary() {
+        const title = $('#quiz-active-vocab-name');
+        const meta = $('#quiz-active-vocab-meta');
+        const openBtn = $('#quiz-open-current-btn');
+        const hasWords = Array.isArray(this.vocabSet.words) && this.vocabSet.words.length > 0;
+
+        if (title) title.textContent = hasWords ? (this.vocabSet.name || this.vocabSet.id || 'Selected vocabulary') : 'No vocabulary selected';
+        if (meta) {
+            meta.textContent = hasWords
+                ? `${this.vocabSet.words.length} words ready for printable quiz generation.`
+                : 'Choose a vocabulary set below to generate printable questions.';
+        }
+        if (openBtn) openBtn.disabled = !hasWords;
+    }
+
+    async loadQuizPicker() {
+        const container = $('#quiz-vocab-picker');
+        if (!container) return;
+        container.innerHTML = '<div class="loading-spinner">Loading vocabulary choices...</div>';
+        try {
+            const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
+            const choices = [
+                ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
+                ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
+                ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
+            ];
+
+            if (choices.length === 0) {
+                container.innerHTML = '<p class="teacher-empty-state">No vocabulary sets are available yet.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            choices.forEach(choice => this.createQuizPickerCard(container, choice.vocab, choice.type));
+            this.refreshIcons();
+        } catch (error) {
+            console.error('Failed to load quiz vocabulary picker:', error);
+            container.innerHTML = '<p class="teacher-empty-state">Could not load vocabulary choices.</p>';
+        }
+    }
+
+    createQuizPickerCard(container, vocab, type) {
+        const card = createElement('button', 'teacher-vocab-pick-card');
+        card.type = 'button';
+        const badgeText = type === 'cloud' ? 'Cloud' : type === 'local' ? 'Draft' : 'Repo';
+        const grades = Array.isArray(vocab.grades) ? vocab.grades.join(', ') : (vocab.grade || '');
+        card.innerHTML = `
+            <span class="teacher-source-badge">${badgeText}</span>
+            <strong>${vocab.name || 'Untitled'}</strong>
+            <small>${vocab.id || ''}${grades ? ` · Grade ${grades}` : ''}</small>
+        `;
+        card.addEventListener('click', async () => {
+            if (type === 'remote') {
+                const data = await loadVocabularyFile(vocab.path);
+                if (!data) {
+                    notifications.error('Could not load that vocabulary.');
+                    return;
+                }
+                this.vocabSet = data;
+            } else {
+                this.vocabSet = JSON.parse(JSON.stringify(vocab));
+                if (type === 'cloud') this.vocabSet.source = 'cloud';
+            }
+            this.updateFormUI();
+            this.renderWords();
+            this.updateQuizHubSummary();
+            this.openQuizMaker({ returnTo: 'quizzes' });
+        });
+        container.appendChild(card);
     }
 
     // -------------------- Quiz Generation --------------------
@@ -1423,7 +3019,7 @@ class TeacherManager {
 
         // 2. Load current manifest and update it
         try {
-            let manifest = await fetchJSON('vocabularies/manifest.json');
+            let manifest = await loadManifest({ fresh: true });
             if (!manifest) {
                 manifest = { vocabularies: [] };
             }
@@ -1436,6 +3032,10 @@ class TeacherManager {
                 name: vocab.name,
                 description: vocab.description || '',
                 grades: vocab.grades || (vocab.grade ? [vocab.grade] : []),
+                assignedDate: vocab.assignedDate || '',
+                trimester: vocab.trimester || '',
+                month: vocab.month || '',
+                week: vocab.week || '',
                 path: `vocabularies/${vocab.id}.json`
             };
 
@@ -1495,8 +3095,8 @@ class TeacherManager {
                 <div class="word-header" style="display:flex; justify-content:space-between; align-items:center;">
                     <h3>${word.word}</h3>
                     <div class="actions">
-                        <button class="btn text-btn edit-btn" data-index="${index}">✏️</button>
-                        <button class="btn text-btn delete-btn" data-index="${index}" style="color:var(--danger-color)">🗑️</button>
+                        <button class="btn text-btn edit-btn" data-index="${index}" aria-label="Edit word"><i data-lucide="pencil"></i></button>
+                        <button class="btn text-btn delete-btn" data-index="${index}" style="color:var(--danger-color)" aria-label="Delete word"><i data-lucide="trash-2"></i></button>
                     </div>
                 </div>
                 <span class="pos-tag">${word.part_of_speech}</span>
@@ -1506,7 +3106,7 @@ class TeacherManager {
                     <input type="checkbox" class="word-hunt-toggle" data-index="${index}" ${isWordHunt ? 'checked' : ''}>
                     <span>Word Hunt</span>
                 </label>
-                ${word.image ? `<div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-muted)">🖼️ ${word.image}</div>` : ''}
+                ${word.image ? `<div style="margin-top:0.5rem; font-size:0.8rem; color:var(--text-muted)">${word.image}</div>` : ''}
             `;
 
             card.querySelector('.edit-btn').addEventListener('click', () => this.openWordModal(index));
@@ -1519,6 +3119,7 @@ class TeacherManager {
 
             container.appendChild(card);
         });
+        this.refreshIcons();
     }
 
     isWordHuntWord(word = {}) {
@@ -1630,6 +3231,7 @@ class TeacherManager {
             return;
         }
 
+        this.normalizeActivityFlowSettings();
         const dataStr = JSON.stringify(this.vocabSet, null, 2);
         const blob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -1667,7 +3269,6 @@ class TeacherManager {
     async showProgressView() {
         if (!this.ensureAuthenticated(false)) return;
         this.switchView('teacher-progress-view');
-        $('#export-btn').classList.add('hidden');
 
         const loadingEl = $('#progress-loading');
         const listEl = $('#student-progress-list');
@@ -1685,20 +3286,69 @@ class TeacherManager {
         if (loadingEl) loadingEl.classList.add('hidden');
     }
 
-    async fetchAllStudentProgress() {
+    async fetchAllStudentProgress(options = {}) {
+        try {
+            return await this.getStudentProgressData(options);
+        } catch {
+            this.applyStudentProgressData([]);
+            return [];
+        }
+    }
+
+    applyStudentProgressData(data) {
+        this.allStudentData = Array.isArray(data) ? data : [];
+        this.filteredStudentData = [...this.allStudentData];
+    }
+
+    async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
         if (this.authDisabled) {
-            this.allStudentData = [];
-            this.filteredStudentData = [];
-            return;
+            this.applyStudentProgressData([]);
+            this.studentProgressCache = {
+                data: [],
+                loadedAt: Date.now()
+            };
+            return [];
         }
 
-        try {
-            this.allStudentData = await supabaseService.getStudentsWithProgress();
-            this.filteredStudentData = [...this.allStudentData];
-        } catch (error) {
-            console.error('Error fetching student progress:', error);
-            notifications.error('Failed to load student data.');
+        if (!forceRefresh && this.studentProgressCache) {
+            this.applyStudentProgressData(this.studentProgressCache.data);
+            return this.studentProgressCache.data;
         }
+
+        if (!forceRefresh && this.studentProgressPromise) {
+            try {
+                const data = await this.studentProgressPromise;
+                this.applyStudentProgressData(data);
+                return data;
+            } catch (error) {
+                if (showError) {
+                    notifications.error('Failed to load student data.');
+                }
+                throw error;
+            }
+        }
+
+        this.studentProgressPromise = supabaseService.getStudentsWithProgress()
+            .then(data => {
+                this.studentProgressCache = {
+                    data,
+                    loadedAt: Date.now()
+                };
+                this.applyStudentProgressData(data);
+                return data;
+            })
+            .catch(error => {
+                console.error('Error fetching student progress:', error);
+                if (showError) {
+                    notifications.error('Failed to load student data.');
+                }
+                throw error;
+            })
+            .finally(() => {
+                this.studentProgressPromise = null;
+            });
+
+        return this.studentProgressPromise;
     }
 
     populateFilters() {
@@ -1784,7 +3434,7 @@ class TeacherManager {
                 <td style="padding: 1rem; color: var(--text-muted);">${student.email || profile.email || '-'}</td>
                 <td style="padding: 1rem;">${profile.grade || '-'}</td>
                 <td style="padding: 1rem;">${profile.group || '-'}</td>
-                <td style="padding: 1rem;">🪙 ${student.coins || 0}</td>
+                <td style="padding: 1rem;">${student.coins || 0}</td>
                 <td style="padding: 1rem;">${lastActive}</td>
                 <td style="padding: 1rem;">
                     <button class="btn text-btn view-details-btn" data-id="${student.id}">View Details</button>
@@ -2122,7 +3772,6 @@ class TeacherManager {
 
         try {
             const db = supabaseService.getDatabase();
-            const { writeBatch } = await import('./supabaseService.js');
             const batch = writeBatch(db);
 
             // First, fetch all student data
@@ -2216,8 +3865,8 @@ class TeacherManager {
         const total = this.allStudentData.length;
         const now = Date.now();
         const active = this.allStudentData.filter(s => {
-            if (!s.updatedAt) return false;
-            const date = s.updatedAt.seconds ? s.updatedAt.seconds * 1000 : s.updatedAt;
+            const date = this.getStudentUpdatedTime(s);
+            if (!date) return false;
             return now - date <= 7 * 24 * 60 * 60 * 1000;
         }).length;
         const avgCoins = total ? Math.round(this.allStudentData.reduce((sum, s) => sum + (s.coins || 0), 0) / total) : 0;
@@ -2464,6 +4113,8 @@ Object.assign(TeacherManager.prototype, {
     },
 
     initExportListeners() {
+        if (this.exportListenersInitialized) return;
+        this.exportListenersInitialized = true;
         // Student selection radio buttons
         const studentSelectionRadios = document.querySelectorAll('input[name="student-selection"]');
         studentSelectionRadios.forEach(radio => {
@@ -3068,7 +4719,7 @@ Object.assign(TeacherManager.prototype, {
             resetSection.style.opacity = '1';
             resetSection.style.pointerEvents = 'auto';
             resetBtn.disabled = false;
-            resetStatus.innerHTML = '<span style="color: var(--success-color);">✅ Export completed. Reset is now enabled.</span>';
+            resetStatus.innerHTML = '<span style="color: var(--success-color);">Export completed. Reset is now enabled.</span>';
         }
     },
 
@@ -3194,15 +4845,22 @@ Object.assign(TeacherManager.prototype, {
         }
     },
 
-    showDataManagementView() {
+    async showDataManagementView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.switchView('teacher-data-management-view');
+        this.loadGamificationSettings();
+        this.loadSchoolCalendarSettings();
+        if (this.allStudentData.length === 0) {
+            await this.fetchAllStudentProgress();
+        }
         // Initialize data viewer if not already done
         if (!this.dataViewerInitialized) {
             this.initDataViewer();
         }
+        this.initExportListeners();
+        this.populateExportGradeSelect();
         // Switch to dashboard tab by default
-        this.switchDataTab('dashboard');
+        this.switchDataTab(options.tab || 'dashboard');
     },
 
     async loadDashboardData() {
@@ -3221,7 +4879,7 @@ Object.assign(TeacherManager.prototype, {
         const totalStudents = filteredData.length;
         const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
         const activeStudents = filteredData.filter(s => {
-            const lastActive = s.updatedAt?.toMillis?.() || s.updatedAt || 0;
+            const lastActive = this.getStudentUpdatedTime(s);
             return lastActive > sevenDaysAgo;
         }).length;
         
@@ -3238,16 +4896,15 @@ Object.assign(TeacherManager.prototype, {
         
         // Load vocabulary count
         try {
-            const db = supabaseService.getDatabase();
-            const vocabSnapshot = await getDocs(collection(db, 'vocabularies'));
-            $('#dashboard-vocab-count').textContent = vocabSnapshot.size;
+            const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
+            $('#dashboard-vocab-count').textContent = cloudVocabs.length + remoteVocabs.length + localVocabs.length;
         } catch (err) {
             console.error('Error loading vocab count:', err);
             $('#dashboard-vocab-count').textContent = '--';
         }
 
         // Load charts
-        this.renderDashboardCharts();
+        await this.renderDashboardCharts();
         this.renderRecentActivity();
     },
     
@@ -3304,10 +4961,35 @@ Object.assign(TeacherManager.prototype, {
         });
     },
 
-    renderDashboardCharts() {
+    async ensureChartLibrary() {
+        if (window.Chart) return window.Chart;
+
+        if (window.__TAURI_INTERNALS__ || window.__TAURI__) {
+            const module = await import('chart.js/auto');
+            window.Chart = window.Chart || module.default;
+            return window.Chart;
+        }
+
+        await loadScript(CHART_JS_CDN);
+        if (!window.Chart) {
+            throw new Error('Chart.js library not loaded');
+        }
+
+        return window.Chart;
+    },
+
+    async renderDashboardCharts() {
+        let Chart;
+        try {
+            Chart = await this.ensureChartLibrary();
+        } catch (error) {
+            console.error('Unable to load dashboard charts:', error);
+            return;
+        }
+
         // Activity Completion Chart
         const activityCtx = document.getElementById('activity-chart')?.getContext('2d');
-        if (activityCtx && typeof Chart !== 'undefined') {
+        if (activityCtx) {
             const activityData = this.calculateActivityCompletion();
             if (this.activityChart) this.activityChart.destroy();
             this.activityChart = new Chart(activityCtx, {
@@ -3346,7 +5028,7 @@ Object.assign(TeacherManager.prototype, {
 
         // Progress by Grade Chart
         const gradeCtx = document.getElementById('grade-progress-chart')?.getContext('2d');
-        if (gradeCtx && typeof Chart !== 'undefined') {
+        if (gradeCtx) {
             const gradeData = this.calculateGradeProgress();
             if (this.gradeChart) this.gradeChart.destroy();
             this.gradeChart = new Chart(gradeCtx, {
@@ -3376,7 +5058,7 @@ Object.assign(TeacherManager.prototype, {
 
         // Coin Distribution Chart
         const coinCtx = document.getElementById('coin-distribution-chart')?.getContext('2d');
-        if (coinCtx && typeof Chart !== 'undefined') {
+        if (coinCtx) {
             const coinData = this.calculateCoinDistribution();
             if (this.coinChart) this.coinChart.destroy();
             this.coinChart = new Chart(coinCtx, {
@@ -3414,7 +5096,7 @@ Object.assign(TeacherManager.prototype, {
 
         // Activity Usage Chart
         const usageCtx = document.getElementById('activity-usage-chart')?.getContext('2d');
-        if (usageCtx && typeof Chart !== 'undefined') {
+        if (usageCtx) {
             const usageData = this.calculateActivityUsage();
             if (this.usageChart) this.usageChart.destroy();
             this.usageChart = new Chart(usageCtx, {

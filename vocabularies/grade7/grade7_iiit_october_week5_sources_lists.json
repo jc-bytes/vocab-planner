@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_october_week5_sources_lists",
+  "name": "Grade 7 IIIT Practice: October Week 5 - Sources and Lists",
+  "description": "Practice words for lists, credible sources, and citation.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "list",
+      "definition": "A group of related items stored together.",
+      "example": "Students used list during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "item",
+      "definition": "One thing in a list.",
+      "example": "Students used item during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "index",
+      "definition": "A position number in a list.",
+      "example": "Students used index during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "source",
+      "definition": "Where information or media comes from.",
+      "example": "Students used source during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "credible",
+      "definition": "Trustworthy and believable.",
+      "example": "Students used credible during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "citation",
+      "definition": "Information that shows where a source came from.",
+      "example": "Students used citation during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "plagiarism",
+      "definition": "Using someone else's work as if it were your own.",
+      "example": "Students used plagiarism during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

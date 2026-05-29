@@ -1,0 +1,81 @@
+{
+  "id": "grade9_iit_june_week2_list_methods",
+  "name": "Grade 9 IIT Practice: June Week 2 - List Methods",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "method",
+      "definition": "A command that performs an action on data.",
+      "example": "Students used method during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "add",
+      "definition": "To put something in.",
+      "example": "Students used add during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "remove",
+      "definition": "To take something out.",
+      "example": "Students used remove during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sort",
+      "definition": "To arrange data in order.",
+      "example": "Students used sort during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "display",
+      "definition": "To show information.",
+      "example": "Students used display during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "while loop",
+      "definition": "A loop that repeats while a condition is true.",
+      "example": "Students used while loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stopping point",
+      "definition": "The condition that makes a loop end.",
+      "example": "Students used stopping point during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

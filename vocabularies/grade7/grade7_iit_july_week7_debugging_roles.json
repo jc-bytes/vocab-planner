@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_july_week7_debugging_roles",
+  "name": "Grade 7 IIT Practice: July Week 7 - Debugging Roles",
+  "description": "Practice words for debugging and pair-programming roles.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in code.",
+      "example": "Students used debug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "trace",
+      "definition": "To follow code step by step.",
+      "example": "Students used trace during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "bug",
+      "definition": "A mistake in a program.",
+      "example": "Students used bug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "driver",
+      "definition": "The partner controlling the computer during pair work.",
+      "example": "Students used driver during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "navigator",
+      "definition": "The partner who guides and checks the work during pair work.",
+      "example": "Students used navigator during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

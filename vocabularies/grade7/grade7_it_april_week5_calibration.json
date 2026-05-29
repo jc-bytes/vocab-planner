@@ -1,0 +1,73 @@
+{
+  "id": "grade7_it_april_week5_calibration",
+  "name": "Grade 7 IT Practice: April Week 5 - Calibration",
+  "description": "Practice words for speed, time, distance, and accuracy.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "speed",
+      "definition": "How fast something moves.",
+      "example": "Students used speed during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "time",
+      "definition": "How long something happens.",
+      "example": "Students used time during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "distance",
+      "definition": "How far apart two things are.",
+      "example": "Students used distance during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "direction",
+      "definition": "The way something moves or points.",
+      "example": "Students used direction during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "calibration",
+      "definition": "Adjusting something so it works more accurately.",
+      "example": "Students used calibration during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "accuracy",
+      "definition": "How close a result is to what was expected.",
+      "example": "Students used accuracy during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

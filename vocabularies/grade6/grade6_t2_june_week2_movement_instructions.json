@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_june_week2_movement_instructions",
+  "name": "Grade 6 T2 Practice: June Week 2 - Movement Instructions",
+  "description": "Practice words for movement instructions and timing.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "sequence",
+      "definition": "Steps in the correct order.",
+      "example": "The robot followed the movement sequence.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "forward",
+      "definition": "Toward the front.",
+      "example": "The robot moved forward.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "backward",
+      "definition": "Toward the back.",
+      "example": "The robot moved backward.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "turn",
+      "definition": "To change direction.",
+      "example": "The robot made a left turn.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stop",
+      "definition": "To end movement.",
+      "example": "The robot stopped at the marker.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "speed",
+      "definition": "How fast something moves.",
+      "example": "We lowered the speed so the robot stayed on the path.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "time",
+      "definition": "How long something lasts.",
+      "example": "The robot moved for two seconds of time.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

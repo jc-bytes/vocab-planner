@@ -1,0 +1,73 @@
+{
+  "id": "grade7_it_may_week11_testing_debugging",
+  "name": "Grade 7 IT Practice: May Week 11 - Testing and Debugging",
+  "description": "Practice words for debugging and documenting robot performance.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in code.",
+      "example": "Students used debug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "trial",
+      "definition": "One test attempt.",
+      "example": "Students used trial during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "performance",
+      "definition": "How well something works.",
+      "example": "Students used performance during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "documentation",
+      "definition": "Notes or records that explain the work.",
+      "example": "Students used documentation during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what happened and what you learned.",
+      "example": "Students used reflection during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

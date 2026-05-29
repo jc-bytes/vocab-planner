@@ -3,29 +3,138 @@
  * Handles vocabulary loading, activity management, and progress tracking
  */
 
-import { $, $$, createElement, fetchJSON } from '../main.js';
+import { $, $$, createElement } from '../main.js';
 import { notifications } from '../notifications.js';
-import { supabaseService, getDocs, collection, getCurrentSchoolYear } from '../supabaseService.js';
+import { doc, getDoc, studentApi as supabaseService } from '../services/studentApi.js';
+import {
+    SCHOOL_CALENDAR_LOCAL_KEY,
+    SCHOOL_CALENDAR_SETTINGS_KEY,
+    calculateVocabularyPlacement,
+    getCurrentTrimesterFromCalendar,
+    getCurrentSchoolYear,
+    loadCloudVocabularyList,
+    loadManifest,
+    loadVocabularyFile,
+    normalizeSchoolCalendar,
+    preloadVocabularyFile
+} from '../services/vocabularyApi.js';
 import { imageDB } from '../db.js';
 import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
-import { ReportGenerator } from '../reportGenerator.js';
-import { MatchingActivity } from '../activities/matching.js';
-import { FlashcardsActivity } from '../activities/flashcards.js';
-import { QuizActivity } from '../activities/quiz.js';
-import { IllustrationActivity } from '../activities/illustration.js';
-import { SynonymAntonymActivity } from '../activities/synonymAntonym.js';
-import { WordSearchActivity } from '../activities/wordSearch.js';
-import { CrosswordActivity } from '../activities/crossword.js';
-import { HangmanActivity } from '../activities/hangman.js';
-import { ScrambleActivity } from '../activities/scramble.js';
-import { WordleActivity } from '../activities/wordle.js';
-import { SpeedMatchActivity } from '../activities/speedMatch.js';
-import { FillInBlankActivity } from '../activities/fillInBlank.js';
+
+const VOCAB_ACTIVITY_IDS = [
+    'illustration',
+    'matching',
+    'flashcards',
+    'quiz',
+    'synonym-antonym',
+    'word-search',
+    'crossword',
+    'hangman',
+    'scramble',
+    'wordle',
+    'speed-match',
+    'fill-in-blank'
+];
+const DEFAULT_REQUIRED_BY_PURPOSE = {
+    summative: ['flashcards', 'matching', 'quiz'],
+    practice: ['flashcards', 'matching'],
+    default: ['flashcards', 'matching']
+};
+const ACTIVITY_MODULES = {
+    matching: () => import('../activities/matching.js'),
+    flashcards: () => import('../activities/flashcards.js'),
+    quiz: () => import('../activities/quiz.js'),
+    illustration: () => import('../activities/illustration.js'),
+    'synonym-antonym': () => import('../activities/synonymAntonym.js'),
+    'word-search': () => import('../activities/wordSearch.js'),
+    crossword: () => import('../activities/crossword.js'),
+    hangman: () => import('../activities/hangman.js'),
+    scramble: () => import('../activities/scramble.js'),
+    wordle: () => import('../activities/wordle.js'),
+    'speed-match': () => import('../activities/speedMatch.js'),
+    'fill-in-blank': () => import('../activities/fillInBlank.js')
+};
+const ACTIVITY_EXPORTS = {
+    matching: 'MatchingActivity',
+    flashcards: 'FlashcardsActivity',
+    quiz: 'QuizActivity',
+    illustration: 'IllustrationActivity',
+    'synonym-antonym': 'SynonymAntonymActivity',
+    'word-search': 'WordSearchActivity',
+    crossword: 'CrosswordActivity',
+    hangman: 'HangmanActivity',
+    scramble: 'ScrambleActivity',
+    wordle: 'WordleActivity',
+    'speed-match': 'SpeedMatchActivity',
+    'fill-in-blank': 'FillInBlankActivity'
+};
+const MONTH_INDEX = {
+    january: 0,
+    february: 1,
+    march: 2,
+    april: 3,
+    may: 4,
+    june: 5,
+    july: 6,
+    august: 7,
+    september: 8,
+    october: 9,
+    november: 10,
+    december: 11
+};
 
 export class StudentActivities {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
         this.wordCoverage = {}; // Track which words have been used in each activity
+        this.activityModulePromises = new Map();
+        this.activityPreloadKeys = new Set();
+    }
+
+    scheduleIdleTask(callback, timeout = 1500) {
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(callback, { timeout });
+        } else {
+            window.setTimeout(callback, timeout);
+        }
+    }
+
+    getCurrentTrimesterKey(date = new Date()) {
+        const calendarTrimester = getCurrentTrimesterFromCalendar(date, this.sm.schoolCalendar);
+        if (calendarTrimester) return calendarTrimester;
+
+        const month = date.getMonth() + 1;
+
+        if (month >= 3 && month <= 5) return 'IT';
+        if (month >= 6 && month <= 8) return 'IIT';
+        return 'IIIT';
+    }
+
+    async loadSchoolCalendar() {
+        if (this.sm.authDisabled) {
+            try {
+                const localCalendar = JSON.parse(localStorage.getItem(SCHOOL_CALENDAR_LOCAL_KEY) || 'null');
+                this.sm.schoolCalendar = localCalendar ? normalizeSchoolCalendar(localCalendar) : null;
+            } catch (error) {
+                console.error('Failed to load local school calendar:', error);
+                this.sm.schoolCalendar = null;
+            }
+            return;
+        }
+
+        if (!this.sm.currentUser) {
+            this.sm.schoolCalendar = null;
+            return;
+        }
+
+        try {
+            const db = supabaseService.getDatabase();
+            const settingsSnap = await getDoc(doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY));
+            this.sm.schoolCalendar = settingsSnap.exists() ? normalizeSchoolCalendar(settingsSnap.data()) : null;
+        } catch (error) {
+            console.error('Failed to load school calendar:', error);
+            this.sm.schoolCalendar = null;
+        }
     }
     
     // Initialize word coverage tracking for current vocabulary
@@ -144,7 +253,7 @@ export class StudentActivities {
     }
 
     async loadManifest() {
-        const data = await fetchJSON('vocabularies/manifest.json');
+        const data = await loadManifest();
         if (data) {
             this.sm.manifest = data;
         } else {
@@ -154,42 +263,7 @@ export class StudentActivities {
         }
     }
 
-    async loadCloudVocabularies() {
-        if (this.sm.authDisabled) {
-            this.sm.cloudVocabs = [];
-            return;
-        }
-
-        try {
-            await supabaseService.init();
-            const db = supabaseService.getDatabase();
-            const snapshot = await getDocs(collection(db, 'vocabularies'));
-            this.sm.cloudVocabs = snapshot.docs.map(docSnap => ({
-                id: docSnap.id,
-                ...docSnap.data(),
-                __source: 'cloud'
-            }));
-        } catch (error) {
-            console.error('Failed to load cloud vocabularies:', error);
-            const isOffline = !navigator.onLine;
-            if (isOffline) {
-                // Silently fail offline - we'll use local/manifest vocabularies
-                this.sm.cloudVocabs = [];
-            } else {
-                notifications.warning('Could not load cloud vocabularies. Using local versions.');
-                this.sm.cloudVocabs = [];
-            }
-            // Re-throw to let caller know we failed
-            throw error;
-        }
-    }
-
-    renderDashboard() {
-        const container = $('#vocab-list');
-        container.innerHTML = '';
-        container.className = 'vocab-groups';
-        this.sm.availableVocabs = [];
-
+    getAllVocabularySources() {
         let vocabs = [];
 
         if (Array.isArray(this.sm.cloudVocabs) && this.sm.cloudVocabs.length > 0) {
@@ -220,36 +294,339 @@ export class StudentActivities {
             console.error("Error loading local vocabularies", e);
         }
 
+        return this.dedupeVocabularySources(vocabs);
+    }
+
+    dedupeVocabularySources(vocabs = []) {
+        const priority = {
+            cloud: 3,
+            local: 2,
+            manifest: 1
+        };
+        const byKey = new Map();
+
+        vocabs.forEach(vocab => {
+            const key = vocab.id || vocab.path || vocab.name;
+            if (!key) return;
+
+            const current = byKey.get(key);
+            const currentPriority = priority[current?.__source] || 0;
+            const nextPriority = priority[vocab.__source] || 0;
+
+            if (!current || nextPriority >= currentPriority) {
+                byKey.set(key, {
+                    ...(current || {}),
+                    ...vocab
+                });
+            }
+        });
+
+        return Array.from(byKey.values());
+    }
+
+    getVisibleVocabularyList(options = {}) {
+        const { currentTrimesterOnly = false } = options;
+        let vocabs = this.getAllVocabularySources();
+
         if (vocabs.length === 0) {
-            container.innerHTML = '<p>No vocabularies found.</p>';
-            return;
+            return { vocabs: [], message: 'No vocabularies found.' };
         }
 
-        // Filter by grade if set
         const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
 
         if (studentGrade) {
             vocabs = vocabs.filter(v => {
-                // Check 'grades' array first
                 if (v.grades && Array.isArray(v.grades)) {
                     return v.grades.some(g => String(g).trim() === studentGrade);
                 }
-                // Fallback to 'grade' field
                 if (v.grade) {
                     return String(v.grade).trim() === studentGrade;
                 }
-                // If no grade specified on vocab, show it by default
                 return true;
             });
         }
 
         if (vocabs.length === 0) {
-            container.innerHTML = `<p>No vocabularies found for Grade ${studentGrade}. <br><small>Try clearing your grade in profile to see all.</small></p>`;
-            return;
+            return {
+                vocabs: [],
+                message: `No vocabularies found for Grade ${studentGrade}.`
+            };
+        }
+
+        if (currentTrimesterOnly) {
+            const currentTrimester = this.getCurrentTrimesterKey();
+            vocabs = vocabs.filter(v => this.getVocabTrimesterKey(v) === currentTrimester);
+
+            if (vocabs.length === 0) {
+                const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
+                return {
+                    vocabs: [],
+                    message: `No ${this.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
+                };
+            }
         }
 
         this.sm.availableVocabs = vocabs;
-        this.renderVocabularyGroups(container, vocabs);
+        return { vocabs, message: '' };
+    }
+
+    async loadCloudVocabularies() {
+        if (this.sm.authDisabled) {
+            this.sm.cloudVocabs = [];
+            return;
+        }
+
+        try {
+            this.sm.cloudVocabs = await loadCloudVocabularyList(supabaseService);
+        } catch (error) {
+            console.error('Failed to load cloud vocabularies:', error);
+            const isOffline = !navigator.onLine;
+            if (isOffline) {
+                // Silently fail offline - we'll use local/manifest vocabularies
+                this.sm.cloudVocabs = [];
+            } else {
+                notifications.warning('Could not load cloud vocabularies. Using local versions.');
+                this.sm.cloudVocabs = [];
+            }
+            // Re-throw to let caller know we failed
+            throw error;
+        }
+    }
+
+    renderDashboard() {
+        const container = $('#vocab-list');
+        container.innerHTML = '';
+        container.className = 'vocab-groups';
+        this.sm.availableVocabs = [];
+
+        const { vocabs, message } = this.getVisibleVocabularyList();
+
+        if (vocabs.length === 0) {
+            container.innerHTML = `<p>${message}</p>`;
+            return;
+        }
+
+        this.renderVocabularyBrowser(container, vocabs);
+        this.scheduleFirstVocabularyPreload(container);
+    }
+
+    getVocabSchedule(vocab, date = new Date()) {
+        let assignedDate = vocab.assignedDate || '';
+        let month = String(vocab.month || '').trim().toLowerCase();
+        let week = Number.parseInt(vocab.week, 10);
+
+        if (assignedDate && this.sm.schoolCalendar) {
+            const placement = calculateVocabularyPlacement(assignedDate, this.sm.schoolCalendar);
+            month = placement?.month || month;
+            week = Number.parseInt(placement?.week, 10) || week;
+        }
+
+        const searchableText = `${vocab.id || ''} ${vocab.name || ''} ${vocab.path || ''}`.toLowerCase();
+        if (!month) {
+            month = Object.keys(MONTH_INDEX).find(key => searchableText.includes(key)) || '';
+        }
+        if (!Number.isFinite(week)) {
+            const weekMatch = searchableText.match(/week[\s_-]*(\d{1,2})/);
+            week = weekMatch ? Number.parseInt(weekMatch[1], 10) : 0;
+        }
+
+        if (!month && week > 0) {
+            month = this.getMonthFromTrimesterWeek(this.getVocabTrimesterKey(vocab), week);
+        }
+
+        if (!month) {
+            month = this.getFallbackMonthForTrimester(this.getVocabTrimesterKey(vocab));
+        }
+
+        let dueDate = null;
+        if (assignedDate) {
+            dueDate = new Date(`${assignedDate}T12:00:00`);
+        } else if (month && Number.isFinite(week) && week > 0) {
+            const year = date.getFullYear();
+            dueDate = new Date(year, MONTH_INDEX[month], 1 + ((week - 1) * 7), 12);
+        }
+
+        return {
+            month,
+            week: Number.isFinite(week) ? week : 0,
+            dueDate,
+            label: [month ? month[0].toUpperCase() + month.slice(1) : '', week ? `Week ${week}` : '']
+                .filter(Boolean)
+                .join(' ')
+        };
+    }
+
+    getMonthFromTrimesterWeek(trimester, week) {
+        const key = this.getTrimesterKey(trimester);
+        if (key === 'IT') {
+            if (week <= 4) return 'march';
+            if (week <= 8) return 'april';
+            return 'may';
+        }
+        if (key === 'IIT') {
+            if (week <= 4) return 'june';
+            if (week <= 8) return 'july';
+            return 'august';
+        }
+        if (key === 'IIIT') {
+            if (week <= 4) return 'september';
+            if (week <= 8) return 'october';
+            if (week <= 12) return 'november';
+            return 'december';
+        }
+        return '';
+    }
+
+    getFallbackMonthForTrimester(trimester) {
+        const key = this.getTrimesterKey(trimester);
+        if (key === 'IT') return 'may';
+        if (key === 'IIT') return 'august';
+        if (key === 'IIIT') return 'december';
+        return '';
+    }
+
+    getUnitProgressSummary(vocab) {
+        const unitProgress = this.sm.progressData?.units?.[vocab.name] || {};
+        const scores = unitProgress.scores || {};
+        const flow = this.getActivityFlowConfig(vocab);
+        const completedRequired = flow.required.filter(activityType => {
+            const scoreData = scores[activityType];
+            return Boolean(scoreData?.isComplete) || (Number(scoreData?.score) || 0) >= 100;
+        }).length;
+        const latestPlayed = Object.values(scores).reduce((latest, scoreData) => {
+            const timestamp = scoreData?.lastPlayed || scoreData?.updatedAt || '';
+            const time = timestamp ? new Date(timestamp).getTime() : 0;
+            return Number.isFinite(time) ? Math.max(latest, time) : latest;
+        }, 0);
+        const bestScore = Object.values(scores).reduce((best, scoreData) => {
+            return Math.max(best, Number(scoreData?.score) || 0);
+        }, 0);
+
+        return {
+            scores,
+            completedRequired,
+            requiredTotal: flow.required.length,
+            isComplete: flow.required.length > 0 && completedRequired >= flow.required.length,
+            latestPlayed,
+            bestScore
+        };
+    }
+
+    renderStudentHome() {
+        const container = $('#student-home-dashboard');
+        if (!container) return;
+
+        container.innerHTML = '';
+        const { vocabs, message } = this.getVisibleVocabularyList({ currentTrimesterOnly: true });
+
+        if (vocabs.length === 0) {
+            container.innerHTML = `<p class="teacher-empty-state">${message}</p>`;
+            return;
+        }
+
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentWeek = Math.floor((today.getDate() - 1) / 7) + 1;
+        const decorated = vocabs.map(vocab => ({
+            vocab,
+            schedule: this.getVocabSchedule(vocab, today),
+            progress: this.getUnitProgressSummary(vocab)
+        })).sort((a, b) => {
+            const aTime = a.schedule.dueDate?.getTime() || 0;
+            const bTime = b.schedule.dueDate?.getTime() || 0;
+            if (aTime !== bTime) return aTime - bTime;
+            return String(a.vocab.name || '').localeCompare(String(b.vocab.name || ''));
+        });
+
+        const dueItems = decorated
+            .filter(item => {
+                if (item.progress.isComplete) return false;
+                if (item.schedule.dueDate) return item.schedule.dueDate <= today;
+                if (!item.schedule.month || !item.schedule.week) return true;
+                const monthIndex = MONTH_INDEX[item.schedule.month];
+                return monthIndex < currentMonth || (monthIndex === currentMonth && item.schedule.week <= currentWeek);
+            })
+            .slice(-2)
+            .reverse();
+
+        const recentItems = decorated
+            .filter(item => item.progress.latestPlayed > 0 && !item.progress.isComplete)
+            .sort((a, b) => b.progress.latestPlayed - a.progress.latestPlayed)
+            .slice(0, 2);
+
+        const weekItems = decorated
+            .filter(item => {
+                const monthIndex = MONTH_INDEX[item.schedule.month];
+                return monthIndex === currentMonth && item.schedule.week === currentWeek;
+            })
+            .slice(0, 3);
+
+        const fallbackWeekItems = weekItems.length > 0
+            ? weekItems
+            : decorated
+                .filter(item => !item.progress.isComplete)
+                .slice(-3)
+                .reverse();
+
+        container.appendChild(this.createHomePanel('Pending', 'Due this trimester', dueItems, 'No pending units due yet.'));
+        container.appendChild(this.createHomePanel('Recent', 'Unfinished practice', recentItems, 'No unfinished recent work.'));
+        container.appendChild(this.createHomePanel('This Week', 'Current vocabulary', fallbackWeekItems, 'No vocabulary is scheduled this week.'));
+        this.scheduleFirstVocabularyPreload(container);
+
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
+    createHomePanel(title, subtitle, items, emptyText) {
+        const panel = createElement('section', 'student-home-panel');
+        panel.innerHTML = `
+            <div class="teacher-panel-header">
+                <div>
+                    <h3>${title}</h3>
+                    <p>${subtitle}</p>
+                </div>
+            </div>
+        `;
+
+        const list = createElement('div', 'student-home-list');
+        if (items.length === 0) {
+            list.innerHTML = `<p class="teacher-empty-state">${emptyText}</p>`;
+        } else {
+            items.forEach(item => list.appendChild(this.createHomeUnitCard(item)));
+        }
+        panel.appendChild(list);
+        return panel;
+    }
+
+    createHomeUnitCard(item) {
+        const { vocab, schedule, progress } = item;
+        const card = createElement('button', 'student-home-unit');
+        card.type = 'button';
+        if (vocab.path) card.dataset.vocabPath = vocab.path;
+
+        const progressText = progress.requiredTotal > 0
+            ? `${progress.completedRequired}/${progress.requiredTotal} required`
+            : `${progress.bestScore}% best`;
+
+        card.innerHTML = `
+            <div class="student-home-unit-icon"><i data-lucide="book-open"></i></div>
+            <div class="student-home-unit-copy">
+                <strong>${vocab.name || 'Vocabulary Unit'}</strong>
+                <span>${schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab))}</span>
+            </div>
+            <div class="student-home-unit-status">
+                <span>${progressText}</span>
+                <i data-lucide="chevron-right"></i>
+            </div>
+        `;
+        if (vocab.path) {
+            const preload = () => preloadVocabularyFile(vocab.path);
+            card.addEventListener('pointerenter', preload, { once: true });
+            card.addEventListener('focus', preload, { once: true });
+        }
+        card.addEventListener('click', () => this.loadVocabulary(vocab));
+        return card;
     }
 
     getTrimesterKey(trimester) {
@@ -260,12 +637,47 @@ export class StudentActivities {
         return 'other';
     }
 
+    getVocabTrimesterKey(vocab) {
+        if (vocab?.assignedDate && this.sm.schoolCalendar) {
+            const placement = calculateVocabularyPlacement(vocab.assignedDate, this.sm.schoolCalendar);
+            if (placement?.trimester) return placement.trimester;
+        }
+
+        return this.getTrimesterKey(vocab?.trimester);
+    }
+
     getTrimesterLabel(trimester) {
         const key = this.getTrimesterKey(trimester);
         if (key === 'IT') return 'IT';
         if (key === 'IIT') return 'IIT';
         if (key === 'IIIT') return 'IIIT';
         return 'Other Units';
+    }
+
+    getTrimesterShortLabel(trimester) {
+        return this.getTrimesterLabel(trimester);
+    }
+
+    getTrimesterOrder(trimester) {
+        const order = {
+            IT: 1,
+            IIT: 2,
+            IIIT: 3,
+            other: 99
+        };
+
+        return order[this.getTrimesterKey(trimester)] || order.other;
+    }
+
+    formatUnitCount(count) {
+        return `${count} ${count === 1 ? 'unit' : 'units'}`;
+    }
+
+    formatMonthSummary(monthGroups) {
+        return Array.from(monthGroups.entries())
+            .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+            .map(([monthKey, monthVocabs]) => `${this.getMonthLabel(monthKey)}: ${monthVocabs.length}`)
+            .join(' · ');
     }
 
     getUnitGrade(vocab = this.sm.currentVocab) {
@@ -284,7 +696,7 @@ export class StudentActivities {
         const unitProgress = {
             ...existing,
             unitId: this.sm.getVocabRouteId(vocab),
-            trimester: this.getTrimesterKey(vocab.trimester),
+            trimester: this.getVocabTrimesterKey(vocab),
             schoolYear: existing.schoolYear || getCurrentSchoolYear(),
             grade: this.getUnitGrade(vocab),
             scores: existing.scores || {},
@@ -333,9 +745,278 @@ export class StudentActivities {
         return this.sm.currentVocab.words.slice(0, fallbackLimit);
     }
 
+    getDefaultRequiredActivities(vocab = this.sm.currentVocab) {
+        const purpose = String(vocab?.purpose || '').trim().toLowerCase();
+        return DEFAULT_REQUIRED_BY_PURPOSE[purpose] || DEFAULT_REQUIRED_BY_PURPOSE.default;
+    }
+
+    getActivityFlowConfig(vocab = this.sm.currentVocab) {
+        const settings = vocab?.activitySettings || {};
+        const validIds = new Set(VOCAB_ACTIVITY_IDS);
+        const hasExplicitFlow = Array.isArray(settings.requiredActivities) || Array.isArray(settings.additionalActivities);
+        const defaultRequired = this.getDefaultRequiredActivities(vocab).filter(id => validIds.has(id));
+        const requestedRequired = hasExplicitFlow ? settings.requiredActivities : defaultRequired;
+        const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
+            .filter(id => validIds.has(id));
+        const uniqueRequired = [...new Set(required)];
+        const requiredSet = new Set(uniqueRequired);
+        const requestedAdditional = hasExplicitFlow
+            ? settings.additionalActivities
+            : VOCAB_ACTIVITY_IDS.filter(id => !requiredSet.has(id));
+        const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])
+            .filter(id => validIds.has(id) && !requiredSet.has(id));
+
+        if (uniqueRequired.length === 0) {
+            uniqueRequired.push('flashcards');
+        }
+
+        return {
+            required: uniqueRequired,
+            additional: [...new Set(additional)]
+        };
+    }
+
+    isActivityComplete(activityType) {
+        const scoreData = this.sm.unitScores?.[activityType];
+        if (!scoreData) return false;
+        return Boolean(scoreData.isComplete) || (Number(scoreData.score) || 0) >= 100;
+    }
+
+    getRequiredCompletion(flow = this.getActivityFlowConfig()) {
+        const completed = flow.required.filter(activityType => this.isActivityComplete(activityType)).length;
+        return {
+            completed,
+            total: flow.required.length,
+            isComplete: flow.required.length > 0 && completed >= flow.required.length
+        };
+    }
+
+    isActivityUnlocked(activityType) {
+        const flow = this.getActivityFlowConfig();
+        if (flow.required.includes(activityType)) return true;
+        if (!flow.additional.includes(activityType)) return false;
+        return this.getRequiredCompletion(flow).isComplete;
+    }
+
+    updateActivityGateDisplay(cards, flow = this.getActivityFlowConfig()) {
+        const grid = document.querySelector('#activity-menu-view .activities-grid');
+        if (!grid) return;
+
+        const completion = this.getRequiredCompletion(flow);
+        let status = $('#required-activities-status');
+        if (!status) {
+            status = createElement('div', 'required-activities-status');
+            status.id = 'required-activities-status';
+            status.style.cssText = 'max-width: 800px; margin: 0 auto 1rem; color: var(--text-muted); font-weight: 600;';
+            grid.parentNode.insertBefore(status, grid);
+        }
+        status.textContent = `Required activities: ${completion.completed}/${completion.total} complete`;
+
+        const allCards = Array.from(cards);
+        allCards.forEach(card => card.remove());
+        grid.querySelectorAll('.activity-flow-section, .activity-hidden-holder').forEach(section => section.remove());
+        grid.style.display = 'block';
+
+        const createSection = (title, className) => {
+            const section = createElement('section', `activity-flow-section ${className}`);
+            section.style.cssText = 'margin: 0 auto 1.5rem; max-width: 1000px;';
+            const heading = createElement('h3');
+            heading.textContent = title;
+            heading.style.cssText = 'margin: 0 0 0.75rem; color: var(--text-main);';
+            const innerGrid = createElement('div', 'activities-grid-inner');
+            innerGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;';
+            section.appendChild(heading);
+            section.appendChild(innerGrid);
+            grid.appendChild(section);
+            return innerGrid;
+        };
+
+        const requiredGrid = createSection('Required Activities', 'required-activity-section');
+        const additionalGrid = completion.isComplete ? createSection('Additional Practice', 'additional-activity-section') : null;
+        const hiddenHolder = createElement('div', 'activity-hidden-holder');
+        hiddenHolder.style.display = 'none';
+        grid.appendChild(hiddenHolder);
+
+        allCards.forEach(card => {
+            const activityType = card.dataset.activity;
+            card.classList.toggle('required-activity-card', flow.required.includes(activityType));
+            card.classList.toggle('additional-activity-card', flow.additional.includes(activityType));
+
+            if (flow.required.includes(activityType)) {
+                requiredGrid.appendChild(card);
+            } else if (flow.additional.includes(activityType) && completion.isComplete && additionalGrid) {
+                additionalGrid.appendChild(card);
+            } else {
+                hiddenHolder.appendChild(card);
+            }
+        });
+    }
+
+    renderVocabularyBrowser(container = $('#vocab-list'), vocabs = null) {
+        if (!container) return;
+
+        container.classList.remove('vocab-grid', 'vocab-groups');
+        container.classList.add('teacher-library-browser');
+        container.innerHTML = '';
+
+        const visibleVocabs = Array.isArray(vocabs) ? vocabs : this.getVisibleVocabularyList().vocabs;
+        const drilldown = this.sm.studentVocabularyDrilldown || { trimester: null, month: null };
+        const trimesterGroups = this.buildVocabularyTrimesterGroups(visibleVocabs);
+        const selectedTrimester = drilldown.trimester;
+        const selectedMonth = drilldown.month;
+
+        if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
+            this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
+            this.renderStudentTrimesterPicker(container, trimesterGroups);
+            return;
+        }
+
+        const monthGroups = this.buildVocabularyMonthGroups(trimesterGroups.get(selectedTrimester));
+
+        if (!selectedMonth || !monthGroups.has(selectedMonth)) {
+            this.sm.studentVocabularyDrilldown.month = null;
+            this.renderStudentMonthPicker(container, selectedTrimester, monthGroups);
+            return;
+        }
+
+        this.renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
+    }
+
+    buildVocabularyTrimesterGroups(vocabs = []) {
+        return vocabs.reduce((groups, vocab) => {
+            const trimesterKey = this.getVocabTrimesterKey(vocab);
+            if (!groups.has(trimesterKey)) groups.set(trimesterKey, []);
+            groups.get(trimesterKey).push(vocab);
+            return groups;
+        }, new Map());
+    }
+
+    renderStudentLibraryBreadcrumb(container, selectedTrimester = null, selectedMonth = null) {
+        const nav = createElement('div', 'teacher-library-breadcrumb');
+        const rootButton = this.createStudentBreadcrumbButton('Vocabulary', () => {
+            this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
+            this.sm.navigateTo({ view: 'units', all: true });
+        });
+        nav.appendChild(rootButton);
+
+        if (selectedTrimester) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const trimesterLabel = this.getTrimesterLabel(selectedTrimester);
+            const trimesterNode = selectedMonth
+                ? this.createStudentBreadcrumbButton(trimesterLabel, () => {
+                    this.sm.studentVocabularyDrilldown = { trimester: selectedTrimester, month: null };
+                    this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+            nav.appendChild(trimesterNode);
+        }
+
+        if (selectedMonth) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getMonthLabel(selectedMonth)));
+        }
+
+        container.appendChild(nav);
+    }
+
+    createStudentBreadcrumbButton(label, onClick) {
+        const button = createElement('button', 'teacher-library-crumb-btn', label);
+        button.type = 'button';
+        button.addEventListener('click', onClick);
+        return button;
+    }
+
+    renderStudentTrimesterPicker(container, trimesterGroups) {
+        this.renderStudentLibraryBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(trimesterGroups.entries())
+            .sort(([trimesterA], [trimesterB]) => this.getTrimesterOrder(trimesterA) - this.getTrimesterOrder(trimesterB))
+            .forEach(([trimesterKey, trimesterVocabs]) => {
+                const card = this.createStudentLibraryChoiceCard({
+                    title: this.getTrimesterLabel(trimesterKey),
+                    count: this.formatUnitCount(trimesterVocabs.length),
+                    meta: this.formatMonthSummary(this.buildVocabularyMonthGroups(trimesterVocabs)),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.sm.studentVocabularyDrilldown = { trimester: trimesterKey, month: null };
+                    this.sm.navigateTo({ view: 'units', trimester: trimesterKey });
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+        this.refreshIcons();
+    }
+
+    renderStudentMonthPicker(container, selectedTrimester, monthGroups) {
+        this.renderStudentLibraryBreadcrumb(container, selectedTrimester);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(monthGroups.entries())
+            .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+            .forEach(([monthKey, monthVocabs]) => {
+                const card = this.createStudentLibraryChoiceCard({
+                    title: this.getMonthLabel(monthKey),
+                    count: this.formatUnitCount(monthVocabs.length),
+                    meta: this.getTrimesterLabel(selectedTrimester),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.sm.studentVocabularyDrilldown = {
+                        trimester: selectedTrimester,
+                        month: monthKey
+                    };
+                    this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: monthKey });
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+        this.refreshIcons();
+    }
+
+    renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs) {
+        this.renderStudentLibraryBreadcrumb(container, selectedTrimester, selectedMonth);
+
+        const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
+        monthVocabs
+            .sort((a, b) => this.compareVocabularySchedule(a, b))
+            .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
+
+        container.appendChild(grid);
+        this.scheduleFirstVocabularyPreload(container);
+    }
+
+    createStudentLibraryChoiceCard({ title, count, meta, icon }) {
+        const card = createElement('button', 'teacher-library-choice-card');
+        card.type = 'button';
+
+        const text = createElement('span', 'teacher-library-choice-text');
+        text.appendChild(createElement('strong', null, title));
+        text.appendChild(createElement('span', 'teacher-library-choice-count', count));
+        if (meta) text.appendChild(createElement('small', null, meta));
+        card.appendChild(text);
+
+        if (icon) {
+            const iconEl = createElement('i');
+            iconEl.setAttribute('data-lucide', icon);
+            card.appendChild(iconEl);
+        }
+
+        return card;
+    }
+
+    refreshIcons() {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+
     renderVocabularyGroups(container, vocabs) {
         const grouped = vocabs.reduce((groups, vocab) => {
-            const key = this.getTrimesterKey(vocab.trimester);
+            const key = this.getVocabTrimesterKey(vocab);
             if (!groups[key]) groups[key] = [];
             groups[key].push(vocab);
             return groups;
@@ -352,15 +1033,118 @@ export class StudentActivities {
                 <span>${trimesterVocabs.length} ${trimesterVocabs.length === 1 ? 'unit' : 'units'}</span>
             `;
 
-            const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
-            trimesterVocabs
-                .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')))
-                .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
+            const monthGroups = this.buildVocabularyMonthGroups(trimesterVocabs);
+            const monthList = createElement('div', 'student-vocab-month-list');
+            Array.from(monthGroups.entries())
+                .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+                .forEach(([monthKey, monthVocabs]) => {
+                    const monthSection = createElement('section', 'student-vocab-month-group');
+                    const monthHeading = createElement('div', 'student-vocab-month-heading');
+                    monthHeading.innerHTML = `
+                        <h4>${this.getMonthLabel(monthKey)}</h4>
+                        <span>${monthVocabs.length} ${monthVocabs.length === 1 ? 'unit' : 'units'}</span>
+                    `;
+
+                    const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
+                    monthVocabs
+                        .sort((a, b) => this.compareVocabularySchedule(a, b))
+                        .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
+
+                    monthSection.appendChild(monthHeading);
+                    monthSection.appendChild(grid);
+                    monthList.appendChild(monthSection);
+                });
 
             group.appendChild(heading);
-            group.appendChild(grid);
+            group.appendChild(monthList);
             container.appendChild(group);
         });
+    }
+
+    buildVocabularyMonthGroups(vocabs = []) {
+        return vocabs.reduce((groups, vocab) => {
+            const schedule = this.getVocabSchedule(vocab);
+            const monthKey = this.normalizeMonthKey(schedule.month);
+            if (!groups.has(monthKey)) groups.set(monthKey, []);
+            groups.get(monthKey).push(vocab);
+            return groups;
+        }, new Map());
+    }
+
+    normalizeMonthKey(month) {
+        const value = String(month || '').trim().toLowerCase();
+        const aliases = {
+            january: 'january',
+            jan: 'january',
+            february: 'february',
+            feb: 'february',
+            march: 'march',
+            mar: 'march',
+            april: 'april',
+            apr: 'april',
+            may: 'may',
+            june: 'june',
+            jun: 'june',
+            july: 'july',
+            jul: 'july',
+            august: 'august',
+            aug: 'august',
+            september: 'september',
+            sept: 'september',
+            sep: 'september',
+            october: 'october',
+            oct: 'october',
+            november: 'november',
+            nov: 'november',
+            december: 'december',
+            dec: 'december'
+        };
+
+        return aliases[value] || 'other';
+    }
+
+    getMonthLabel(monthKey) {
+        const labels = {
+            january: 'January',
+            february: 'February',
+            march: 'March',
+            april: 'April',
+            may: 'May',
+            june: 'June',
+            july: 'July',
+            august: 'August',
+            september: 'September',
+            october: 'October',
+            november: 'November',
+            december: 'December',
+            other: 'Other'
+        };
+
+        return labels[monthKey] || labels.other;
+    }
+
+    getMonthOrder(monthKey) {
+        if (monthKey in MONTH_INDEX) return MONTH_INDEX[monthKey] + 1;
+        return 99;
+    }
+
+    compareVocabularySchedule(a, b) {
+        const scheduleA = this.getVocabSchedule(a);
+        const scheduleB = this.getVocabSchedule(b);
+        const dateA = scheduleA.dueDate?.getTime?.() || 0;
+        const dateB = scheduleB.dueDate?.getTime?.() || 0;
+
+        if (dateA !== dateB) {
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            return dateA - dateB;
+        }
+
+        if (scheduleA.week !== scheduleB.week) {
+            return (scheduleA.week || 99) - (scheduleB.week || 99);
+        }
+
+        return String(a.name || '').localeCompare(String(b.name || ''));
     }
 
     createVocabularyCard(vocab) {
@@ -378,28 +1162,83 @@ export class StudentActivities {
             ${vocab.grades ? `<small>Grade: ${vocab.grades.join(', ')}</small>` : ''}
             <small style="color:var(--text-muted); display:block; margin-top:0.5rem;">${sourceLabel}</small>
         `;
+        if (vocab.path) {
+            card.dataset.vocabPath = vocab.path;
+            const preload = () => preloadVocabularyFile(vocab.path);
+            card.addEventListener('pointerenter', preload, { once: true });
+            card.addEventListener('focus', preload, { once: true });
+        }
         card.addEventListener('click', () => this.loadVocabulary(vocab));
         return card;
     }
 
+    scheduleFirstVocabularyPreload(container) {
+        const firstRepoCard = container.querySelector('[data-vocab-path]');
+        const path = firstRepoCard?.dataset?.vocabPath;
+        if (!path) return;
+
+        this.scheduleIdleTask(() => {
+            preloadVocabularyFile(path);
+        }, 1200);
+    }
+
+    async loadVocabularyOverride(vocabMeta) {
+        if (this.sm.authDisabled || !vocabMeta?.id) return null;
+
+        try {
+            const db = supabaseService.getDatabase();
+            const snapshot = await getDoc(doc(db, 'vocabularies', vocabMeta.id));
+            if (!snapshot.exists()) return null;
+            return {
+                ...snapshot.data(),
+                __source: 'cloud'
+            };
+        } catch (error) {
+            console.warn('Could not load live vocabulary settings:', error);
+            return null;
+        }
+    }
+
+    mergeVocabularyData({ meta = {}, fileData = null, override = null } = {}) {
+        const merged = {
+            ...meta,
+            ...(fileData || {}),
+            ...(override || {})
+        };
+
+        merged.id = override?.id || fileData?.id || meta.id;
+        merged.path = meta.path || override?.path || fileData?.path;
+        merged.grades = override?.grades?.length ? override.grades : (fileData?.grades || meta.grades);
+        merged.assignedDate = override?.assignedDate || fileData?.assignedDate || meta.assignedDate;
+        merged.trimester = override?.trimester || fileData?.trimester || meta.trimester;
+        merged.month = override?.month || fileData?.month || meta.month;
+        merged.week = override?.week || fileData?.week || meta.week;
+        merged.words = Array.isArray(override?.words) && override.words.length > 0
+            ? override.words
+            : (Array.isArray(fileData?.words) ? fileData.words : (meta.words || []));
+        merged.activitySettings = {
+            ...(fileData?.activitySettings || {}),
+            ...(meta.activitySettings || {}),
+            ...(override?.activitySettings || {})
+        };
+        merged.__source = override?.__source || meta.__source;
+
+        return merged;
+    }
+
     async loadVocabulary(vocabMeta, options = {}) {
         let vocabData = null;
+        const override = await this.loadVocabularyOverride(vocabMeta);
 
         if (vocabMeta.path) {
-            const fetched = await fetchJSON(vocabMeta.path);
+            const fetched = await loadVocabularyFile(vocabMeta.path, { fresh: true });
             if (fetched) {
-                vocabData = {
-                    ...vocabMeta,
-                    ...fetched,
-                    id: fetched.id || vocabMeta.id,
-                    path: vocabMeta.path,
-                    grades: fetched.grades || vocabMeta.grades,
-                    trimester: fetched.trimester || vocabMeta.trimester,
-                    __source: vocabMeta.__source
-                };
+                vocabData = this.mergeVocabularyData({ meta: vocabMeta, fileData: fetched, override });
+            } else if (override) {
+                vocabData = this.mergeVocabularyData({ meta: vocabMeta, override });
             }
         } else {
-            vocabData = vocabMeta;
+            vocabData = this.mergeVocabularyData({ meta: vocabMeta, override });
         }
 
         if (!vocabData) {
@@ -437,6 +1276,7 @@ export class StudentActivities {
 
         // Get word coverage stats
         const coverageStats = this.getWordCoverageStats();
+        const activityFlow = this.getActivityFlowConfig();
 
         // Update progress on cards
         const cards = $$('.activity-card');
@@ -486,6 +1326,7 @@ export class StudentActivities {
                 }
             }
         });
+        this.updateActivityGateDisplay(cards, activityFlow);
         
         // Update overall coverage display if element exists
         this.updateOverallCoverageDisplay(coverageStats);
@@ -498,6 +1339,33 @@ export class StudentActivities {
         }
 
         this.sm.switchView('activity-menu-view');
+        this.scheduleActivityPreload(activityFlow);
+    }
+
+    getNextActivityPreloadType(flow = this.getActivityFlowConfig()) {
+        const completion = this.getRequiredCompletion(flow);
+
+        if (completion.isComplete) {
+            return flow.additional.find(activityType => this.isActivityUnlocked(activityType)) || null;
+        }
+
+        return flow.required.find(activityType => !this.isActivityComplete(activityType))
+            || flow.required.find(activityType => this.isActivityUnlocked(activityType))
+            || null;
+    }
+
+    scheduleActivityPreload(flow = this.getActivityFlowConfig()) {
+        const activityType = this.getNextActivityPreloadType(flow);
+        if (!activityType) return;
+
+        const vocabId = this.sm.getCurrentVocabRouteId() || this.sm.currentVocab?.name || 'current';
+        const key = `${vocabId}:${activityType}`;
+        if (this.activityPreloadKeys.has(key)) return;
+        this.activityPreloadKeys.add(key);
+
+        this.scheduleIdleTask(() => {
+            this.loadActivityClass(activityType).catch(() => {});
+        }, 900);
     }
     
     updateOverallCoverageDisplay(coverageStats) {
@@ -567,6 +1435,7 @@ export class StudentActivities {
             this.sm.progress.saveLocalProgress();
         }
 
+        const { ReportGenerator } = await import('../reportGenerator.js');
         await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
             wordHunt: this.sm.unitWordHunt || {},
             loadImage: path => this.loadWordHuntImage(path)
@@ -619,13 +1488,46 @@ export class StudentActivities {
         }
     }
 
-    startActivity(type, options = {}) {
+    async loadActivityClass(type) {
+        const loadModule = ACTIVITY_MODULES[type];
+        const exportName = ACTIVITY_EXPORTS[type];
+
+        if (!loadModule || !exportName) {
+            throw new Error(`Unknown activity type: ${type}`);
+        }
+
+        if (!this.activityModulePromises.has(type)) {
+            this.activityModulePromises.set(type, loadModule());
+        }
+
+        const module = await this.activityModulePromises.get(type);
+        const ActivityClass = module[exportName];
+
+        if (!ActivityClass) {
+            this.activityModulePromises.delete(type);
+            throw new Error(`Activity export ${exportName} was not found.`);
+        }
+
+        return ActivityClass;
+    }
+
+    async startActivity(type, options = {}) {
         if (!this.sm.currentVocab) {
             this.sm.navigateTo({ view: 'units' });
             return;
         }
 
         if (!this.sm.isKnownActivityType(type)) {
+            this.showActivityMenu({ fromRoute: true });
+            return;
+        }
+
+        if (!this.isActivityUnlocked(type)) {
+            notifications.warning('Finish the required activities first to unlock additional practice.');
+            const unitId = this.sm.getCurrentVocabRouteId();
+            if (unitId) {
+                this.sm.setRoute({ view: 'unit', unitId }, { replace: true });
+            }
             this.showActivityMenu({ fromRoute: true });
             return;
         }
@@ -651,11 +1553,24 @@ export class StudentActivities {
         container.innerHTML = ''; // Clear previous
         container.classList.remove('flashcards-activity-container');
         $('#activity-view')?.classList.remove('flashcards-active');
+        container.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
 
         const onProgress = this.handleAutoSave.bind(this);
         const onSaveState = this.handleStateSave.bind(this);
         const initialState = this.sm.unitStates ? this.sm.unitStates[type] : null;
         const settings = this.sm.currentVocab.activitySettings || {};
+        let ActivityClass;
+
+        try {
+            ActivityClass = await this.loadActivityClass(type);
+        } catch (error) {
+            console.error('Failed to load activity module:', error);
+            container.innerHTML = '<p class="error">Could not load this activity. Please try again.</p>';
+            notifications.error('Could not load this activity.');
+            return;
+        }
+
+        container.innerHTML = '';
         
         // Helper to get prioritized words (least practiced first)
         const getPrioritized = (limit, filter = null) => {
@@ -673,7 +1588,7 @@ export class StudentActivities {
                     getPrioritized(matchingLimit, w => w.word.length >= 2),
                     w => w.word.length >= 2
                 );
-                this.sm.activityInstance = new MatchingActivity(container, matchingWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, matchingWords, onProgress, onSaveState, initialState);
                 // Mark words as used when activity starts
                 this.markWordsPracticed(type, matchingWords);
                 break;
@@ -681,12 +1596,12 @@ export class StudentActivities {
                 // Flashcards: use all words (non-replayable, study mode)
                 const flashcardsLimit = settings.flashcards || this.sm.currentVocab.words.length;
                 const flashcardsWords = this.sm.currentVocab.words.slice(0, flashcardsLimit);
-                this.sm.activityInstance = new FlashcardsActivity(container, flashcardsWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, flashcardsWords, onProgress, onSaveState, initialState);
                 break;
             case 'quiz':
                 const quizLimit = settings.quiz || 10;
                 const quizWords = this.restoreWordsFromState(initialState, getPrioritized(quizLimit));
-                this.sm.activityInstance = new QuizActivity(container, quizWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, quizWords);
                 break;
             case 'synonym-antonym':
@@ -697,13 +1612,13 @@ export class StudentActivities {
                     getPrioritized(synonymLimit, synonymFilter),
                     synonymFilter
                 );
-                this.sm.activityInstance = new SynonymAntonymActivity(container, synonymWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, synonymWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, synonymWords);
                 break;
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
                 const illustrationWords = this.getWordHuntWords(settings);
-                this.sm.activityInstance = new IllustrationActivity(
+                this.sm.activityInstance = new ActivityClass(
                     container,
                     illustrationWords,
                     this.sm.currentVocab.name,
@@ -737,7 +1652,7 @@ export class StudentActivities {
                 );
                 // Pass vocab ID (or name as fallback) for stable persistence
                 const vocabID = this.sm.currentVocab.id || this.sm.currentVocab.name;
-                this.sm.activityInstance = new WordSearchActivity(
+                this.sm.activityInstance = new ActivityClass(
                     container,
                     wordSearchWords,
                     onProgress,
@@ -747,7 +1662,9 @@ export class StudentActivities {
                     {
                         onNewPuzzle: () => {
                             this.resetActivityState('word-search');
-                            this.startActivity('word-search', { fromRoute: true });
+                            this.startActivity('word-search', { fromRoute: true }).catch(error => {
+                                console.error('Failed to restart word search:', error);
+                            });
                         }
                     }
                 );
@@ -755,17 +1672,17 @@ export class StudentActivities {
                 break;
             case 'crossword':
                 const crosswordWords = getPrioritized(this.sm.currentVocab.words.length);
-                this.sm.activityInstance = new CrosswordActivity(container, crosswordWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, this.sm.activityInstance.placedWords);
                 break;
             case 'hangman':
                 const hangmanWords = getPrioritized(this.sm.currentVocab.words.length);
-                this.sm.activityInstance = new HangmanActivity(container, hangmanWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, hangmanWords);
                 break;
             case 'scramble':
                 const scrambleWords = getPrioritized(this.sm.currentVocab.words.length);
-                this.sm.activityInstance = new ScrambleActivity(container, scrambleWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, scrambleWords);
                 break;
             case 'wordle':
@@ -781,18 +1698,18 @@ export class StudentActivities {
                         return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
                     }
                 );
-                this.sm.activityInstance = new WordleActivity(container, wordleWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, wordleWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, wordleWords);
                 break;
             case 'speed-match':
                 // Speed match uses all words randomly during gameplay
-                this.sm.activityInstance = new SpeedMatchActivity(container, this.sm.currentVocab.words, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, this.sm.currentVocab.words, onProgress, onSaveState, initialState);
                 // Mark all words as potentially practiced
                 this.markWordsPracticed(type, this.sm.currentVocab.words);
                 break;
             case 'fill-in-blank':
                 const fibWords = getPrioritized(this.sm.currentVocab.words.length, w => w.example);
-                this.sm.activityInstance = new FillInBlankActivity(container, fibWords, onProgress, onSaveState, initialState);
+                this.sm.activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, fibWords);
                 break;
             default:
@@ -883,6 +1800,7 @@ export class StudentActivities {
             }
             
             this.sm.progress.saveLocalProgress();
+            this.scheduleActivityPreload();
 
             // Update in-game progress indicator
             const indicator = $('#activity-progress-indicator');

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_may_week10_project_build",
+  "name": "Grade 9 IT Practice: May Week 10 - Project Build",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "subsystem",
+      "definition": "One smaller part of a larger system.",
+      "example": "Students used subsystem during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "wiring",
+      "definition": "How electronic parts are connected.",
+      "example": "Students used wiring during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "code logic",
+      "definition": "The rules and order used in code.",
+      "example": "Students used code logic during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "documentation",
+      "definition": "Notes or records that explain work.",
+      "example": "Students used documentation during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test result",
+      "definition": "What happened during a test.",
+      "example": "Students used test result during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem.",
+      "example": "Students used debug during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade9_iit_july_week4_data_science",
+  "name": "Grade 9 IIT Practice: July Week 4 - Data Science",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "sequence",
+      "definition": "Steps or items in order.",
+      "example": "Students used sequence during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "text",
+      "definition": "Words or characters.",
+      "example": "Students used text during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "analysis",
+      "definition": "Looking closely at data to understand it.",
+      "example": "Students used analysis during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "data science",
+      "definition": "Using data to answer questions.",
+      "example": "Students used data science during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "observation",
+      "definition": "Something noticed from data or testing.",
+      "example": "Students used observation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "decision",
+      "definition": "A choice made after thinking about information.",
+      "example": "Students used decision during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "investigative cycle",
+      "definition": "Steps for asking, collecting, analyzing, and concluding with data.",
+      "example": "Students used investigative cycle during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

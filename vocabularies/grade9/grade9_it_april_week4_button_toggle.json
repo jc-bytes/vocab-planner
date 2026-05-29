@@ -1,0 +1,81 @@
+{
+  "id": "grade9_it_april_week4_button_toggle",
+  "name": "Grade 9 IT Practice: April Week 4 - Button Toggle",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "button",
+      "definition": "A part the user can press.",
+      "example": "Students used button during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pressed",
+      "definition": "Pushed down or activated.",
+      "example": "Students used pressed during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "released",
+      "definition": "Not being pressed anymore.",
+      "example": "Students used released during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "state",
+      "definition": "The current condition of something.",
+      "example": "Students used state during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "toggle",
+      "definition": "To switch between two states.",
+      "example": "Students used toggle during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stable",
+      "definition": "Working in a steady and dependable way.",
+      "example": "Students used stable during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

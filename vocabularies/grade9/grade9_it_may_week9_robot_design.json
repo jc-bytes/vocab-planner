@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_may_week9_robot_design",
+  "name": "Grade 9 IT Practice: May Week 9 - Robot Design",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "robot goal",
+      "definition": "What the robot should do.",
+      "example": "Students used robot goal during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "component list",
+      "definition": "A list of parts needed for a project.",
+      "example": "Students used component list during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "state chart",
+      "definition": "A table or diagram showing states and actions.",
+      "example": "Students used state chart during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "design plan",
+      "definition": "A plan for building and testing a project.",
+      "example": "Students used design plan during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test step",
+      "definition": "One action used to check if something works.",
+      "example": "Students used test step during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

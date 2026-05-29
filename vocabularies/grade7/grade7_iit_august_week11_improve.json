@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_august_week11_improve",
+  "name": "Grade 7 IIT Practice: August Week 11 - Improve",
+  "description": "Practice words for improving game features.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "score",
+      "definition": "A number that tracks points or progress.",
+      "example": "Students used score during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "timer",
+      "definition": "A tool or variable that tracks time.",
+      "example": "Students used timer during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "organization",
+      "definition": "Keeping work clear and easy to follow.",
+      "example": "Students used organization during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "functionality",
+      "definition": "How well something does what it should do.",
+      "example": "Students used functionality during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "application",
+      "definition": "A real use for a skill or project.",
+      "example": "Students used application during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what happened and what you learned.",
+      "example": "Students used reflection during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

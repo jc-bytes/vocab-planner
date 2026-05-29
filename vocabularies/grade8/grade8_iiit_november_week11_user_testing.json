@@ -1,0 +1,73 @@
+{
+  "id": "grade8_iiit_november_week11_user_testing",
+  "name": "Grade 8 IIIT Practice: November Week 11 - User Testing",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "user testing",
+      "definition": "Letting a user try a product and give feedback.",
+      "example": "Students used user testing during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "clarity",
+      "definition": "How easy something is to understand.",
+      "example": "Students used clarity during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "positive feature",
+      "definition": "A part that works well.",
+      "example": "Students used positive feature during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logbook",
+      "definition": "A record of project notes and tests.",
+      "example": "Students used logbook during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "speaking notes",
+      "definition": "Short notes used during a presentation.",
+      "example": "Students used speaking notes during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "solution",
+      "definition": "A way to solve a problem.",
+      "example": "Students used solution during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_may_week12_demonstration",
+  "name": "Grade 9 IT Practice: May Week 12 - Demonstration",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "demonstration",
+      "definition": "Showing how something works.",
+      "example": "Students used demonstration during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what happened and what you learned.",
+      "example": "Students used reflection during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "testing evidence",
+      "definition": "Proof from tests that shows what happened.",
+      "example": "Students used testing evidence during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "state logic",
+      "definition": "Rules for how a system changes between states.",
+      "example": "Students used state logic during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "project log",
+      "definition": "A record of project work and tests.",
+      "example": "Students used project log during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "presentation",
+      "definition": "Sharing work or ideas with others.",
+      "example": "Students used presentation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

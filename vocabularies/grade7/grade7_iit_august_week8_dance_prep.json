@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_august_week8_dance_prep",
+  "name": "Grade 7 IIT Practice: August Week 8 - Dance Prep",
+  "description": "Practice words for dance game preparation.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "game",
+      "definition": "An interactive activity with rules or goals.",
+      "example": "Students used game during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "costume",
+      "definition": "A sprite appearance in Scratch.",
+      "example": "Students used costume during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sound",
+      "definition": "Audio used in a project.",
+      "example": "Students used sound during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "timing",
+      "definition": "When actions happen and how long they last.",
+      "example": "Students used timing during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

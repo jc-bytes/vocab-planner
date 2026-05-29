@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_august_week9_project_planning",
+  "name": "Grade 7 IIT Practice: August Week 9 - Project Planning",
+  "description": "Practice words for dance game planning and scoring.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "prototype",
+      "definition": "An early version used for testing.",
+      "example": "Students used prototype during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "rubric",
+      "definition": "A guide that explains how work will be graded.",
+      "example": "Students used rubric during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "goal",
+      "definition": "What you are trying to achieve.",
+      "example": "Students used goal during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "subroutine",
+      "definition": "A smaller named part of a program that can be reused.",
+      "example": "Students used subroutine during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "timer",
+      "definition": "A tool or variable that tracks time.",
+      "example": "Students used timer during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "score",
+      "definition": "A number that tracks points or progress.",
+      "example": "Students used score during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

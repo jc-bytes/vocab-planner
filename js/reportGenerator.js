@@ -1,7 +1,21 @@
-import { createElement, $ } from './main.js';
+import { createElement, $, loadScript } from './main.js';
 import { imageDB } from './db.js';
 
+const HTML2CANVAS_SRC = 'js/libs/html2canvas.min.js';
+
 export class ReportGenerator {
+    static async ensureHtml2Canvas() {
+        if (typeof window.html2canvas === 'function') return window.html2canvas;
+
+        await loadScript(HTML2CANVAS_SRC);
+
+        if (typeof window.html2canvas !== 'function') {
+            throw new Error('html2canvas library not loaded');
+        }
+
+        return window.html2canvas;
+    }
+
     static getStudentInfo(studentProfile = {}) {
         const fullName = studentProfile.firstName && studentProfile.lastName
             ? `${studentProfile.firstName} ${studentProfile.lastName}`
@@ -176,11 +190,7 @@ export class ReportGenerator {
         });
 
         try {
-            // Ensure html2canvas is loaded
-            if (typeof html2canvas === 'undefined') {
-                throw new Error('html2canvas library not loaded');
-            }
-
+            const html2canvas = await this.ensureHtml2Canvas();
             const canvas = await html2canvas(reportCard);
             const imgData = canvas.toDataURL('image/png');
 
@@ -250,9 +260,7 @@ export class ReportGenerator {
         document.body.appendChild(reportCard);
 
         try {
-            if (typeof html2canvas === 'undefined') {
-                throw new Error('html2canvas library not loaded');
-            }
+            const html2canvas = await this.ensureHtml2Canvas();
 
             const detailsContainer = reportCard.querySelector('#word-hunt-details');
             const section = createElement('div');

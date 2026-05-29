@@ -1,0 +1,81 @@
+{
+  "id": "grade8_it_may_week10_homepage_media",
+  "name": "Grade 8 IT Practice: May Week 10 - Homepage and Media",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "homepage",
+      "definition": "The main page of a website.",
+      "example": "Students used homepage during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "title",
+      "definition": "The name of a page or project.",
+      "example": "Students used title during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "purpose",
+      "definition": "The reason something is made.",
+      "example": "Students used purpose during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "caption",
+      "definition": "Short text that explains an image.",
+      "example": "Students used caption during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "media",
+      "definition": "Images, video, sound, or other digital content.",
+      "example": "Students used media during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "video",
+      "definition": "Moving images with or without sound.",
+      "example": "Students used video during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "accessibility",
+      "definition": "Making something usable by more people.",
+      "example": "Students used accessibility during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

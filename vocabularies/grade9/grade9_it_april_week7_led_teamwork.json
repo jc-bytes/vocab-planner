@@ -1,0 +1,97 @@
+{
+  "id": "grade9_it_april_week7_led_teamwork",
+  "name": "Grade 9 IT Practice: April Week 7 - LED Teamwork",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 9,
+    "flashcards": 9,
+    "quiz": 9,
+    "illustration": 9,
+    "synonymAntonym": 9,
+    "wordSearch": 9,
+    "crossword": 9,
+    "hangman": 9,
+    "scramble": 9,
+    "speedMatch": 9,
+    "fillInBlank": 9
+  },
+  "words": [
+    {
+      "word": "addressable LED",
+      "definition": "A light that can be controlled separately in a strip or group.",
+      "example": "Students used addressable LED during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pixel",
+      "definition": "One tiny dot in a digital image or display.",
+      "example": "Students used pixel during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "animation",
+      "definition": "A sequence of images or changes that looks like movement.",
+      "example": "Students used animation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "Something that repeats or has a clear order.",
+      "example": "Students used pattern during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "speed",
+      "definition": "How fast something happens or moves.",
+      "example": "Students used speed during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "builder",
+      "definition": "The person who builds the physical parts.",
+      "example": "Students used builder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "coder",
+      "definition": "The person who works on the code.",
+      "example": "Students used coder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "tester",
+      "definition": "The person who checks if it works.",
+      "example": "Students used tester during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "recorder",
+      "definition": "The person who writes notes or evidence.",
+      "example": "Students used recorder during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

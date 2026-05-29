@@ -5,7 +5,7 @@
 
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
-import { supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../supabaseService.js';
+import { studentApi as supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../services/studentApi.js';
 import { imageDB } from '../db.js';
 
 const DEFAULT_COIN_DATA = {
@@ -184,6 +184,9 @@ export class StudentProgress {
             this.sm.progressData.coinData = this.sm.coinData;
             this.sm.progressData.coinHistory = this.sm.coinHistory;
             localStorage.setItem('student_progress', JSON.stringify(this.sm.progressData));
+            if (!navigator.onLine && this.sm.currentUser) {
+                this.sm.setAuthStatus('Saved locally - offline');
+            }
             if (!skipCloud) {
                 this.sm.scheduleCloudSync();
             }
@@ -263,7 +266,10 @@ export class StudentProgress {
         document.addEventListener('visibilitychange', this.visibilitySyncHandler);
 
         this.focusSyncHandler = () => this.refreshCoinsFromCloud({ silent: true });
-        this.onlineSyncHandler = () => this.refreshCoinsFromCloud({ silent: true });
+        this.onlineSyncHandler = () => {
+            this.flushLocalSyncQueue({ silent: true });
+            this.refreshCoinsFromCloud({ silent: true });
+        };
         window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
 
@@ -276,6 +282,8 @@ export class StudentProgress {
                 this.applyRemoteCoinProgress(progress);
             });
         }
+
+        this.flushLocalSyncQueue({ silent: true });
     }
 
     stopCoinSync() {
@@ -488,8 +496,65 @@ export class StudentProgress {
             this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
             console.error('Failed to save progress to cloud:', error);
-            this.sm.setAuthStatus('⚠️ Cloud save failed');
+            await this.enqueueProgressSync();
+            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Sync failed - saved locally' : 'Saved locally - offline');
         }
+    }
+
+    buildProgressSyncPayload() {
+        return {
+            studentProfile: this.sm.studentProfile,
+            units: this.sm.progressData.units || {},
+            coins: this.sm.coinData.balance,
+            coinData: this.normalizeCoinData(this.sm.coinData),
+            coinHistory: this.normalizeCoinHistory(this.sm.coinHistory),
+            email: this.sm.currentUser?.email || this.sm.studentProfile.email || '',
+            role: this.sm.currentRole || 'student'
+        };
+    }
+
+    async enqueueProgressSync() {
+        try {
+            await imageDB.enqueueSyncAction('student-progress', this.buildProgressSyncPayload());
+        } catch (queueError) {
+            console.warn('Could not queue progress for later sync:', queueError);
+        }
+    }
+
+    async flushLocalSyncQueue(options = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser || !navigator.onLine) return;
+
+        let pending = [];
+        try {
+            pending = await imageDB.getPendingSyncActions();
+        } catch (error) {
+            if (!options.silent) console.warn('Could not read local sync queue:', error);
+            return;
+        }
+
+        if (pending.length === 0) return;
+        this.sm.setAuthStatus('☁️ Syncing local changes...');
+
+        for (const record of pending) {
+            try {
+                if (record.type === 'student-progress') {
+                    const db = supabaseService.getDatabase();
+                    const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
+                    await setDoc(docRef, {
+                        ...(record.payload || {}),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                await imageDB.completeSyncAction(record.id);
+            } catch (error) {
+                await imageDB.markSyncActionFailed(record, error);
+                this.sm.setAuthStatus('⚠️ Sync failed - saved locally');
+                if (!options.silent) console.warn('Could not sync queued local change:', error);
+                return;
+            }
+        }
+
+        this.sm.setAuthStatus('☁️ Synced');
     }
 
     async restoreImagesFromProgress() {

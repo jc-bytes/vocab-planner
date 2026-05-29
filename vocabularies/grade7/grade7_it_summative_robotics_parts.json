@@ -1,0 +1,105 @@
+{
+  "id": "grade7_it_summative_robotics_parts",
+  "name": "Grade 7 IT Summative: Robotics Parts",
+  "description": "Ten core first-trimester words for the Grade 7 robotics vocabulary table.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "mBot",
+      "definition": "A small robot used to learn robotics and coding.",
+      "example": "Students used mBot during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "hardware",
+      "definition": "The physical parts of a computer or robot.",
+      "example": "Students used hardware during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "software",
+      "definition": "Programs that tell a computer or robot what to do.",
+      "example": "Students used software during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "chassis",
+      "definition": "The frame that holds robot parts together.",
+      "example": "Students used chassis during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "motor",
+      "definition": "A part that makes movement by turning or spinning.",
+      "example": "Students used motor during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects information from the environment.",
+      "example": "Students used sensor during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A small light that a program can control.",
+      "example": "Students used LED during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "buzzer",
+      "definition": "A part that makes a sound.",
+      "example": "Students used buzzer during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "controller",
+      "definition": "The board that controls the robot parts.",
+      "example": "Students used controller during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "control board",
+      "definition": "The main board that connects and controls robot parts.",
+      "example": "Students used control board during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

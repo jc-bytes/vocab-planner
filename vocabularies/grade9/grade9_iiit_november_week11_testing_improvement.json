@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_november_week11_testing_improvement",
+  "name": "Grade 9 IIIT Practice: November Week 11 - Testing and Improvement",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "test criteria",
+      "definition": "Rules used to decide if a test succeeds.",
+      "example": "Students used test criteria during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "weakness",
+      "definition": "A part that does not work well yet.",
+      "example": "Students used weakness during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "evidence",
+      "definition": "Information that shows what happened or supports an idea.",
+      "example": "Students used evidence during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "limitation",
+      "definition": "Something that makes results less complete or certain.",
+      "example": "Students used limitation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "explanation",
+      "definition": "A clear description of how or why something works.",
+      "example": "Students used explanation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

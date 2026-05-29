@@ -1,0 +1,73 @@
+{
+  "id": "grade6_t3_november_week1_present_reflect",
+  "name": "Grade 6 T3 Practice: November Week 1 - Present and Reflect",
+  "description": "Practice words for presenting, feedback, and reflection.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "present",
+      "definition": "To show and explain work to others.",
+      "example": "Students present their projects.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about work.",
+      "example": "The feedback helped me improve the model.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improve",
+      "definition": "To make something better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "goal",
+      "definition": "What you are trying to do.",
+      "example": "The goal was to follow the route.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "artifact",
+      "definition": "A thing made during a project.",
+      "example": "The chart was one project artifact.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what worked and what to improve.",
+      "example": "The reflection described one debugging step.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

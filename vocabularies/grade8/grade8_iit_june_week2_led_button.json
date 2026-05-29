@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_june_week2_led_button",
+  "name": "Grade 8 IIT Practice: June Week 2 - LED and Button",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "sequence",
+      "definition": "Steps or items in order.",
+      "example": "Students used sequence during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output pin",
+      "definition": "A pin used to control an output.",
+      "example": "Students used output pin during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "delay",
+      "definition": "A pause in a program.",
+      "example": "Students used delay during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "HIGH",
+      "definition": "An on or high signal.",
+      "example": "Students used HIGH during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LOW",
+      "definition": "An off or low signal.",
+      "example": "Students used LOW during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "button",
+      "definition": "A part the user can press.",
+      "example": "Students used button during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

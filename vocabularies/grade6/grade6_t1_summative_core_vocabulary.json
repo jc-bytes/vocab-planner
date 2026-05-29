@@ -1,0 +1,103 @@
+{
+  "id": "grade6_t1_summative_core_vocabulary",
+  "name": "Grade 6 T1 Summative: Core Vocabulary",
+  "description": "Ten core first-trimester words for the Grade 6 summative vocabulary table.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "internet",
+      "definition": "A worldwide system that lets computers and people share information.",
+      "example": "We use the internet to visit websites and send messages.",
+      "difficulty": 1,
+      "synonyms": ["online network"],
+      "antonyms": ["offline"]
+    },
+    {
+      "word": "website",
+      "definition": "A place online with pages of information.",
+      "example": "The class opened a website about recycling.",
+      "difficulty": 1,
+      "synonyms": ["site"],
+      "antonyms": []
+    },
+    {
+      "word": "browser",
+      "definition": "An app used to open websites.",
+      "example": "A browser shows the web page on the screen.",
+      "difficulty": 1,
+      "synonyms": ["web browser"],
+      "antonyms": []
+    },
+    {
+      "word": "address",
+      "definition": "A name or number that helps find a place online.",
+      "example": "A website address tells the browser where to go.",
+      "difficulty": 1,
+      "synonyms": ["location"],
+      "antonyms": []
+    },
+    {
+      "word": "domain name",
+      "definition": "The readable name of a website.",
+      "example": "example.com is a domain name.",
+      "difficulty": 1,
+      "synonyms": ["website name"],
+      "antonyms": []
+    },
+    {
+      "word": "DNS",
+      "definition": "A system that helps match a website name to its online address.",
+      "example": "DNS helps the browser find a website.",
+      "difficulty": 2,
+      "synonyms": ["domain name system"],
+      "antonyms": []
+    },
+    {
+      "word": "IP address",
+      "definition": "A number address used by computers on a network.",
+      "example": "A website server has an IP address.",
+      "difficulty": 2,
+      "synonyms": ["number address"],
+      "antonyms": []
+    },
+    {
+      "word": "packet",
+      "definition": "A small part of a message sent online.",
+      "example": "A long message can travel as many packets.",
+      "difficulty": 1,
+      "synonyms": ["message part"],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent from one person or place to another.",
+      "example": "The student sent a message to the group.",
+      "difficulty": 1,
+      "synonyms": ["note"],
+      "antonyms": []
+    },
+    {
+      "word": "network",
+      "definition": "A group of connected devices that can share information.",
+      "example": "The school network connects computers.",
+      "difficulty": 1,
+      "synonyms": ["connected devices"],
+      "antonyms": []
+    }
+  ]
+}

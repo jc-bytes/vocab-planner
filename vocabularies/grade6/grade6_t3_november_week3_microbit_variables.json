@@ -1,0 +1,73 @@
+{
+  "id": "grade6_t3_november_week3_microbit_variables",
+  "name": "Grade 6 T3 Practice: November Week 3 - micro:bit Variables",
+  "description": "Practice words for counters and changing values.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "variable",
+      "definition": "A named place that stores a changing value.",
+      "example": "The variable kept the score.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "value",
+      "definition": "A number or piece of data in a program or spreadsheet.",
+      "example": "The cell value changed to 10.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "increase",
+      "definition": "To make a number larger.",
+      "example": "Pressing A can increase the counter.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "decrease",
+      "definition": "To make a number smaller.",
+      "example": "Pressing B can decrease the counter.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "counter",
+      "definition": "A program or value that counts.",
+      "example": "The counter went up by one.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reset",
+      "definition": "To set something back to the start.",
+      "example": "The reset button changed the value to zero.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

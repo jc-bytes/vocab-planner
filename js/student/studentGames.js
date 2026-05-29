@@ -6,7 +6,7 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import {
-    supabaseService,
+    studentApi as supabaseService,
     getDocs,
     collection,
     doc,
@@ -17,7 +17,7 @@ import {
     where,
     orderBy,
     limit
-} from '../supabaseService.js';
+} from '../services/studentApi.js';
 
 export class StudentGames {
     constructor(studentManager) {

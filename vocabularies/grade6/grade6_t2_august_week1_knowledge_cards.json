@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_august_week1_knowledge_cards",
+  "name": "Grade 6 T2 Practice: August Week 1 - Knowledge Cards",
+  "description": "Practice words for mBot card stations and actions.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "movement",
+      "definition": "Changing place or position.",
+      "example": "The robot movement started slowly.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects something around it.",
+      "example": "The sensor detected an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in a program.",
+      "example": "We debug when the robot turns the wrong way.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "card",
+      "definition": "A small guide with steps or information.",
+      "example": "The card helped us find the right block.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "station",
+      "definition": "A place set up for one activity.",
+      "example": "The sensor station had a test line.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "action",
+      "definition": "Something a device or person does.",
+      "example": "The robot action was a short turn.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

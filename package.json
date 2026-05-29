@@ -1,0 +1,27 @@
+{
+  "name": "technology-6a-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "desktop:dev": "vite --host 127.0.0.1",
+    "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
+    "desktop:build": "npm run desktop:build:web && tauri build --bundles app",
+    "desktop:build:mac-dmg": "npm run desktop:build:web && tauri build --bundles dmg",
+    "desktop:build:windows": "npm run desktop:build:web && tauri build --bundles nsis",
+    "desktop:preview": "npm run desktop:build:web && vite preview --outDir dist-desktop --host 127.0.0.1",
+    "plans:sync-school": "python3 scripts/sync_school_word_plans.py",
+    "plans:sync-school-drive": "python3 scripts/sync_school_word_plans.py --layout school --dest \"/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026\"",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "chart.js": "^4.4.9",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.5.0",
+    "vite": "^6.3.5"
+  }
+}

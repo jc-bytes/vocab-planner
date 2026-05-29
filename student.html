@@ -7,11 +7,19 @@
     <title>Student Dashboard - Vocabulary App</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+            }
+        }
+    </script>
 </head>
 
 <body>
     <div class="app-container">
-        <header class="app-header">
+        <header class="app-header student-app-header">
             <div class="header-left">
                 <a href="index.html" class="back-link" style="display:none;">← Home</a>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -20,17 +28,33 @@
                         style="font-size:0.9rem;">✏️</button>
                 </div>
             </div>
+            <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
+                <div class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
+                    <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
+                        aria-selected="true" data-section="today">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Today</span>
+                    </button>
+                    <button class="teacher-tab student-tab" id="student-tab-vocabulary" type="button" role="tab"
+                        aria-selected="false" data-section="vocabulary">
+                        <i data-lucide="book-open"></i>
+                        <span>Vocabulary</span>
+                    </button>
+                    <button class="teacher-tab student-tab" id="student-tab-arcade" type="button" role="tab"
+                        aria-selected="false" data-section="arcade">
+                        <i data-lucide="gamepad-2"></i>
+                        <span>Arcade</span>
+                    </button>
+                </div>
+            </nav>
             <div class="header-actions">
                 <!-- Authenticated/User Status -->
                 <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
                     <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">🪙 0</div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span id="user-name" style="font-size: 0.875rem; color: var(--text-muted);"></span>
-                    </div>
-                    <span id="auth-status" style="font-size: 0.75rem; color: var(--success-color);"
-                        title="Progress sync status">☁️ Syncing...</span>
-                    <button id="sign-out-btn" class="btn text-btn" style="font-size: 0.875rem;">Sign
-                        Out</button>
+                    <span id="auth-status" class="status-dot" title="Syncing" aria-label="Syncing"></span>
+                    <button id="sign-out-btn" class="btn text-btn icon-btn" title="Sign out" aria-label="Sign out">
+                        <i data-lucide="log-out"></i>
+                    </button>
                 </div>
                 <div id="guest-status" style="display:none; align-items: center; gap: 1rem;">
                     <span style="font-size:0.85rem; color:var(--text-muted);">Signed out</span>
@@ -69,7 +93,13 @@
                             </div>
                             <div class="form-group">
                                 <label for="login-password">Password</label>
-                                <input type="password" id="login-password" autocomplete="current-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="login-password" autocomplete="current-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="login-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="btn primary-btn" style="width: 100%;">Log In</button>
                         </form>
@@ -109,11 +139,23 @@
                             </div>
                             <div class="form-group">
                                 <label for="register-password">Password</label>
-                                <input type="password" id="register-password" autocomplete="new-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="register-password" autocomplete="new-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="register-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="register-confirm-password">Confirm Password</label>
-                                <input type="password" id="register-confirm-password" autocomplete="new-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="register-confirm-password" autocomplete="new-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="register-confirm-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="btn primary-btn" style="width: 100%;">Create Account</button>
                         </form>
@@ -126,29 +168,25 @@
 
             <!-- View: Main Menu -->
             <section id="main-menu-view" class="view hidden">
-                <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem; color: var(--primary-color);">What
-                    would you like to do?</h2>
-                <div class="menu-grid"
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 800px; margin: 0 auto;">
-                    <div class="card menu-card" id="menu-vocab-btn"
-                        style="cursor: pointer; text-align: center; padding: 3rem 2rem; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Vocabulary Units</h3>
-                        <p style="color: var(--text-muted);">Practice your words and earn coins!</p>
+                <div class="student-dashboard-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Student dashboard</p>
+                        <h2>Pick up where learning left off.</h2>
                     </div>
-                    <div class="card menu-card" id="menu-arcade-btn"
-                        style="cursor: pointer; text-align: center; padding: 3rem 2rem; transition: transform 0.2s, box-shadow 0.2s;">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">🕹️</div>
-                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">The Arcade</h3>
-                        <p style="color: var(--text-muted);">Spend your coins on fun games!</p>
-                    </div>
+                    <button id="menu-vocab-btn" class="btn secondary-btn" type="button">
+                        <i data-lucide="book-open"></i>
+                        All Units
+                    </button>
+                </div>
+                <div id="student-home-dashboard" class="student-home-dashboard">
+                    <div class="loading-spinner">Loading dashboard...</div>
                 </div>
             </section>
 
             <!-- Vocabulary Selection View -->
             <section id="vocab-selection-view" class="view hidden">
                 <div class="section-header">
-                    <button id="back-to-main-menu-btn" class="btn text-btn">← Main Menu</button>
+                    <button id="back-to-main-menu-btn" class="btn text-btn">← Today</button>
                     <h2>Choose a Unit</h2>
                 </div>
                 <div id="vocab-list" class="vocab-grid">
@@ -243,7 +281,7 @@
             <!-- View: Arcade -->
             <section id="arcade-view" class="view hidden">
                 <div class="section-header">
-                    <button id="back-from-arcade-btn" class="btn text-btn">← Back to Menu</button>
+                    <button id="back-from-arcade-btn" class="btn text-btn">← Today</button>
                     <h2>🕹️ The Arcade</h2>
                 </div>
 
@@ -343,11 +381,23 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="change-password-new">New Password</label>
-                        <input type="password" id="change-password-new" autocomplete="new-password" minlength="6" required>
+                        <div class="password-field">
+                            <input type="password" id="change-password-new" autocomplete="new-password" minlength="6" required>
+                            <button type="button" class="password-toggle" aria-label="Show password"
+                                aria-controls="change-password-new" title="Show password">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="change-password-confirm">Confirm New Password</label>
-                        <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="6" required>
+                        <div class="password-field">
+                            <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="6" required>
+                            <button type="button" class="password-toggle" aria-label="Show password"
+                                aria-controls="change-password-confirm" title="Show password">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="change-password-status" style="color: var(--danger-color); font-size: 0.9rem;"></div>
                 </div>
@@ -358,9 +408,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="js/libs/html2canvas.min.js"></script>
-    <script src="js/main.js" type="module"></script>
+    <script src="js/desktop.js" type="module"></script>
     <script src="js/student.js" type="module"></script>
 </body>
 

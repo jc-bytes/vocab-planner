@@ -1,0 +1,81 @@
+{
+  "id": "grade8_iiit_october_week8_microbit_setup",
+  "name": "Grade 8 IIIT Practice: October Week 8 - Micro:bit Setup",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "Scratch Link",
+      "definition": "A tool that helps Scratch connect to devices.",
+      "example": "Students used Scratch Link during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bluetooth",
+      "definition": "A wireless way for nearby devices to communicate.",
+      "example": "Students used Bluetooth during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Micro:bit",
+      "definition": "A small computer board used for coding projects.",
+      "example": "Students used Micro:bit during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "accelerometer",
+      "definition": "A sensor that detects tilt or movement.",
+      "example": "Students used accelerometer during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "x-axis",
+      "definition": "The left-right direction in a coordinate system.",
+      "example": "Students used x-axis during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "y-axis",
+      "definition": "The up-down direction in a coordinate system.",
+      "example": "Students used y-axis during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sprite",
+      "definition": "A character or object in Scratch.",
+      "example": "Students used sprite during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_july_week5_operators",
+  "name": "Grade 7 IIT Practice: July Week 5 - Operators",
+  "description": "Practice words for comparison and logic operators.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "operator",
+      "definition": "A symbol or block that compares or calculates.",
+      "example": "Students used operator during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "comparison",
+      "definition": "Checking how two values are related.",
+      "example": "Students used comparison during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logic",
+      "definition": "Rules used to make decisions.",
+      "example": "Students used logic during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "true",
+      "definition": "Correct or matching a condition.",
+      "example": "Students used true during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "false",
+      "definition": "Not correct or not matching a condition.",
+      "example": "Students used false during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "response",
+      "definition": "What happens after an input or event.",
+      "example": "Students used response during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

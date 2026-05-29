@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_july_week7_buzzer_servo",
+  "name": "Grade 8 IIT Practice: July Week 7 - Buzzer and Servo",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "buzzer",
+      "definition": "A part that makes sound.",
+      "example": "Students used buzzer during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "tone",
+      "definition": "A sound with a certain pitch.",
+      "example": "Students used tone during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "frequency",
+      "definition": "How fast something repeats, often for sound.",
+      "example": "Students used frequency during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "duration",
+      "definition": "How long something lasts.",
+      "example": "Students used duration during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "servo",
+      "definition": "A motor that moves to an angle.",
+      "example": "Students used servo during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "angle",
+      "definition": "A measurement of a turn.",
+      "example": "Students used angle during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "signal wire",
+      "definition": "A wire that carries a control signal.",
+      "example": "Students used signal wire during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sweep",
+      "definition": "A smooth movement from one side to another.",
+      "example": "Students used sweep during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

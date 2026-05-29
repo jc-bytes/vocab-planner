@@ -1,0 +1,81 @@
+{
+  "id": "grade9_iiit_october_week6_project_problem",
+  "name": "Grade 9 IIIT Practice: October Week 6 - Project Problem",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "problem statement",
+      "definition": "A clear sentence explaining the problem.",
+      "example": "Students used problem statement during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "user",
+      "definition": "A person who uses a product or system.",
+      "example": "Students used user during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "constraint",
+      "definition": "A limit or rule for a project.",
+      "example": "Students used constraint during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "prototype tool",
+      "definition": "A tool used to make or test an early version.",
+      "example": "Students used prototype tool during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logbook",
+      "definition": "A record of project notes and tests.",
+      "example": "Students used logbook during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "material",
+      "definition": "An item or part used for work.",
+      "example": "Students used material during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test",
+      "definition": "To try something and check what happens.",
+      "example": "Students used test during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

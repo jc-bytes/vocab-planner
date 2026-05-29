@@ -1,0 +1,81 @@
+{
+  "id": "grade9_iiit_september_week2_sound_quality",
+  "name": "Grade 9 IIIT Practice: September Week 2 - Sound Quality",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "sample rate",
+      "definition": "How often sound is measured each second.",
+      "example": "Students used sample rate during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sample size",
+      "definition": "How much detail each sound sample stores.",
+      "example": "Students used sample size during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "microphone",
+      "definition": "A device that captures sound.",
+      "example": "Students used microphone during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "speaker",
+      "definition": "A device that produces sound.",
+      "example": "Students used speaker during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sound quality",
+      "definition": "How clear or accurate sound is.",
+      "example": "Students used sound quality during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "audio",
+      "definition": "Sound stored or played by a device.",
+      "example": "Students used audio during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "file setting",
+      "definition": "An option that changes how a file is saved.",
+      "example": "Students used file setting during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

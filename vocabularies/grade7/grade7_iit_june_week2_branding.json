@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iit_june_week2_branding",
+  "name": "Grade 7 IIT Practice: June Week 2 - Branding",
+  "description": "Practice words for branding and consistent design.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "brand",
+      "definition": "The style and identity of a product or group.",
+      "example": "Students used brand during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logo",
+      "definition": "A symbol or design that represents a group or idea.",
+      "example": "Students used logo during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "palette",
+      "definition": "A planned set of colors.",
+      "example": "Students used palette during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "typography",
+      "definition": "The style and arrangement of text.",
+      "example": "Students used typography during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "consistency",
+      "definition": "Keeping choices the same across a design.",
+      "example": "Students used consistency during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about how to improve.",
+      "example": "Students used feedback during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "Students used revision during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

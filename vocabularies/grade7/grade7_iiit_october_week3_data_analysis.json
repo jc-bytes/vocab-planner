@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iiit_october_week3_data_analysis",
+  "name": "Grade 7 IIIT Practice: October Week 3 - Data Analysis",
+  "description": "Practice words for sorting, filtering, and patterns.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "sort",
+      "definition": "To arrange data in order.",
+      "example": "Students used sort during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "filter",
+      "definition": "To show only data that matches a rule.",
+      "example": "Students used filter during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "COUNTIF",
+      "definition": "A spreadsheet function that counts items matching a condition.",
+      "example": "Students used COUNTIF during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "formatting",
+      "definition": "Changing how text or data looks.",
+      "example": "Students used formatting during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "Something that repeats or has a clear order.",
+      "example": "Students used pattern during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_july_week3_scratch_intro",
+  "name": "Grade 7 IIT Practice: July Week 3 - Scratch Intro",
+  "description": "Practice words for Scratch sequences and events.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "Scratch",
+      "definition": "A block coding tool for making programs and games.",
+      "example": "Students used Scratch during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sprite",
+      "definition": "A character or object in a Scratch or mBlock project.",
+      "example": "Students used sprite during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "script",
+      "definition": "A group of connected blocks that run together.",
+      "example": "Students used script during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "event",
+      "definition": "Something that starts an action in a program.",
+      "example": "Students used event during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "block",
+      "definition": "A coding command that snaps into a program.",
+      "example": "Students used block during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sequence",
+      "definition": "Steps in the correct order.",
+      "example": "Students used sequence during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

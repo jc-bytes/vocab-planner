@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_december_week12_final_demo",
+  "name": "Grade 9 IIIT Practice: December Week 12 - Final Demo",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "demonstration",
+      "definition": "Showing how something works.",
+      "example": "Students used demonstration during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "design choice",
+      "definition": "A decision made while designing.",
+      "example": "Students used design choice during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "testing evidence",
+      "definition": "Proof from tests that shows what happened.",
+      "example": "Students used testing evidence during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "final reflection",
+      "definition": "A final note about learning and improvement.",
+      "example": "Students used final reflection during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "product",
+      "definition": "Something created for a project.",
+      "example": "Students used product during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "presentation",
+      "definition": "Sharing work or ideas with others.",
+      "example": "Students used presentation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

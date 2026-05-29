@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iit_august_week9_project_readiness",
+  "name": "Grade 9 IIT Practice: August Week 9 - Project Readiness",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "project readiness",
+      "definition": "Being prepared to begin project work.",
+      "example": "Students used project readiness during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "responsible data",
+      "definition": "Data used carefully and fairly.",
+      "example": "Students used responsible data during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "deadline",
+      "definition": "The time when work is due.",
+      "example": "Students used deadline during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "dataset",
+      "definition": "A collection of related data.",
+      "example": "Students used dataset during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "source",
+      "definition": "Where information or media comes from.",
+      "example": "Students used source during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "product format",
+      "definition": "The type of final product being made.",
+      "example": "Students used product format during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

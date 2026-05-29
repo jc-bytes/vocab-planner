@@ -1,0 +1,105 @@
+{
+  "id": "grade7_iiit_summative_spreadsheets",
+  "name": "Grade 7 IIIT Summative: Spreadsheets",
+  "description": "Ten core third-trimester words for the Grade 7 spreadsheet vocabulary table.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "spreadsheet",
+      "definition": "A tool that organizes information in rows and columns.",
+      "example": "Students used spreadsheet during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sheet",
+      "definition": "One page or tab in a spreadsheet file.",
+      "example": "Students used sheet during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "row",
+      "definition": "A horizontal line of cells.",
+      "example": "Students used row during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "column",
+      "definition": "A vertical line of cells.",
+      "example": "Students used column during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "cell",
+      "definition": "One box in a spreadsheet.",
+      "example": "Students used cell during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "cell reference",
+      "definition": "The name of a cell, such as A1.",
+      "example": "Students used cell reference during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "formula",
+      "definition": "A rule that calculates a value.",
+      "example": "Students used formula during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "function",
+      "definition": "A built-in formula tool, such as AVERAGE.",
+      "example": "Students used function during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "average",
+      "definition": "A number found by adding values and dividing by how many values there are.",
+      "example": "Students used average during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "chart",
+      "definition": "A visual way to show data.",
+      "example": "Students used chart during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

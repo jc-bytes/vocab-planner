@@ -1,0 +1,81 @@
+{
+  "id": "grade7_it_march_week2_mblock_workspace",
+  "name": "Grade 7 IT Practice: March Week 2 - mBlock Workspace",
+  "description": "Practice words for mBlock tools and first scripts.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "mBlock",
+      "definition": "A block coding tool used to program the mBot.",
+      "example": "Students used mBlock during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "workspace",
+      "definition": "The area in a program where you do your work.",
+      "example": "Students used workspace during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sprite",
+      "definition": "A character or object in a Scratch or mBlock project.",
+      "example": "Students used sprite during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "block",
+      "definition": "A coding command that snaps into a program.",
+      "example": "Students used block during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "script",
+      "definition": "A group of connected blocks that run together.",
+      "example": "Students used script during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "upload",
+      "definition": "To send a program from the computer to the robot.",
+      "example": "Students used upload during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "interface",
+      "definition": "The screen and tools used to work with a program.",
+      "example": "Students used interface during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

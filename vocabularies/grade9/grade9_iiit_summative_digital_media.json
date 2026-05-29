@@ -1,0 +1,105 @@
+{
+  "id": "grade9_iiit_summative_digital_media",
+  "name": "Grade 9 IIIT Summative: Digital Media",
+  "description": "Ten core third-trimester words for the Grade 9 digital media vocabulary table.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "STEM",
+      "definition": "Science, technology, engineering, and math used to solve problems.",
+      "example": "Students used STEM during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pixel",
+      "definition": "One tiny dot in a digital image or display.",
+      "example": "Students used pixel during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "resolution",
+      "definition": "The amount of detail in an image.",
+      "example": "Students used resolution during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "color depth",
+      "definition": "How many colors an image can store.",
+      "example": "Students used color depth during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sample",
+      "definition": "A small piece of sound or data used for measurement.",
+      "example": "Students used sample during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects information from the environment.",
+      "example": "Students used sensor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "file size",
+      "definition": "How much storage a file uses.",
+      "example": "Students used file size during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "quality",
+      "definition": "How good or clear something is.",
+      "example": "Students used quality during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "compression",
+      "definition": "Making a file smaller, sometimes with less quality.",
+      "example": "Students used compression during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "RGB",
+      "definition": "Red, green, and blue colors used to make other colors.",
+      "example": "Students used RGB during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

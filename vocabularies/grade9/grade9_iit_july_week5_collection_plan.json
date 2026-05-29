@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iit_july_week5_collection_plan",
+  "name": "Grade 9 IIT Practice: July Week 5 - Collection Plan",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "data question",
+      "definition": "A question that can be answered with data.",
+      "example": "Students used data question during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "measurable",
+      "definition": "Able to be counted or measured.",
+      "example": "Students used measurable during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "survey",
+      "definition": "Questions used to collect answers.",
+      "example": "Students used survey during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "data type",
+      "definition": "The kind of data, such as number or text.",
+      "example": "Students used data type during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "method",
+      "definition": "A command that performs an action on data.",
+      "example": "Students used method during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "privacy",
+      "definition": "Keeping personal information protected.",
+      "example": "Students used privacy during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

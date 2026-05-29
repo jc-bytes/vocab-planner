@@ -1,127 +1,1610 @@
 {
   "vocabularies": [
     {
-      "id": "grade6_t1_internet_addresses_packets",
-      "name": "Grade 6 T1: Internet Addresses and Packets",
-      "description": "Internet addresses, domain names, DNS, IP addresses, packets, headers, payloads, and data transfer.",
-      "grades": ["6"],
+      "id": "grade6_t1_summative_core_vocabulary",
+      "name": "Grade 6 T1 Summative: Core Vocabulary",
+      "description": "Ten core first-trimester words for the Grade 6 summative vocabulary table.",
+      "grades": [
+        "6"
+      ],
       "trimester": "1",
-      "path": "vocabularies/grade6/t1_internet_addresses_packets.json"
+      "purpose": "summative",
+      "path": "vocabularies/grade6/grade6_t1_summative_core_vocabulary.json"
     },
     {
-      "id": "grade6_t1_online_communication_collaboration",
-      "name": "Grade 6 T1: Online Communication and Collaboration",
-      "description": "Responsible communication, public and private messages, audiences, permissions, and shared digital work.",
-      "grades": ["6"],
+      "id": "grade6_t1_march_week2_sending_messages",
+      "name": "Grade 6 T1 Practice: March Week 2 - Sending Messages",
+      "description": "Practice words for sending messages and packet order.",
+      "grades": [
+        "6"
+      ],
       "trimester": "1",
-      "path": "vocabularies/grade6/t1_online_communication_collaboration.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_march_week2_sending_messages.json"
     },
     {
-      "id": "grade6_t1_web_design_copyright",
-      "name": "Grade 6 T1: Web Design and Copyright",
-      "description": "Website features, web page layout, navigation, image choice, copyright, credit, and fair use.",
-      "grades": ["6"],
+      "id": "grade6_t1_march_week3_working_together_online",
+      "name": "Grade 6 T1 Practice: March Week 3 - Working Together Online",
+      "description": "Practice words for online collaboration and shared work.",
+      "grades": [
+        "6"
+      ],
       "trimester": "1",
-      "path": "vocabularies/grade6/t1_web_design_copyright.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_march_week3_working_together_online.json"
     },
     {
-      "id": "grade6_t1_scratch_variables",
-      "name": "Grade 6 T1: Scratch Variables",
-      "description": "Scratch game vocabulary for sprites, scripts, variables, values, scores, and debugging.",
-      "grades": ["6"],
+      "id": "grade6_t1_march_week4_safe_communication_websites",
+      "name": "Grade 6 T1 Practice: March Week 4 - Safe Communication and Websites",
+      "description": "Practice words for safe communication and basic website planning.",
+      "grades": [
+        "6"
+      ],
       "trimester": "1",
-      "path": "vocabularies/grade6/t1_scratch_variables.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_march_week4_safe_communication_websites.json"
     },
     {
-      "id": "grade6_t1_responsible_technology",
-      "name": "Grade 6 T1: Responsible Technology and E-Waste",
-      "description": "Internet Day vocabulary, reliable information, recycling, reuse, repair, e-waste, and sustainable habits.",
-      "grades": ["6"],
+      "id": "grade6_t1_april_week1_copyright_images",
+      "name": "Grade 6 T1 Practice: April Week 1 - Copyright and Images",
+      "description": "Practice words for choosing safe images and giving credit.",
+      "grades": [
+        "6"
+      ],
       "trimester": "1",
-      "path": "vocabularies/grade6/t1_responsible_technology.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_april_week1_copyright_images.json"
     },
     {
-      "id": "grade6_t2_robotics_safety_parts",
-      "name": "Grade 6 T2: Robotics Safety and mBot Parts",
-      "description": "Robotics routines, safe handling, robot parts, sensors, motors, boards, LEDs, buzzers, and power.",
-      "grades": ["6"],
+      "id": "grade6_t1_april_week2_web_page_structure",
+      "name": "Grade 6 T1 Practice: April Week 2 - Web Page Structure",
+      "description": "Practice words for organizing and previewing a web page.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_april_week2_web_page_structure.json"
+    },
+    {
+      "id": "grade6_t1_april_week3_links_navigation",
+      "name": "Grade 6 T1 Practice: April Week 3 - Links and Navigation",
+      "description": "Practice words for moving around a website and testing links.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_april_week3_links_navigation.json"
+    },
+    {
+      "id": "grade6_t1_april_week4_scratch_variables",
+      "name": "Grade 6 T1 Practice: April Week 4 - Scratch Variables",
+      "description": "Practice words for a Scratch score challenge.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_april_week4_scratch_variables.json"
+    },
+    {
+      "id": "grade6_t1_may_week1_internet_day",
+      "name": "Grade 6 T1 Practice: May Week 1 - Internet Day",
+      "description": "Practice words for responsible Internet Day choices and campaign messages.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_may_week1_internet_day.json"
+    },
+    {
+      "id": "grade6_t1_may_week2_recycling_ewaste",
+      "name": "Grade 6 T1 Practice: May Week 2 - Recycling and E-Waste",
+      "description": "Practice words for responsible technology waste choices.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_may_week2_recycling_ewaste.json"
+    },
+    {
+      "id": "grade6_t1_may_week3_awareness_product",
+      "name": "Grade 6 T1 Practice: May Week 3 - Awareness Product",
+      "description": "Practice words for planning and presenting an awareness product.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "1",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t1_may_week3_awareness_product.json"
+    },
+    {
+      "id": "grade6_t2_summative_robotics_vocabulary",
+      "name": "Grade 6 T2 Summative: Robotics Vocabulary",
+      "description": "Ten core second-trimester words for the Grade 6 robotics summative vocabulary table.",
+      "grades": [
+        "6"
+      ],
       "trimester": "2",
-      "path": "vocabularies/grade6/t2_robotics_safety_parts.json"
+      "purpose": "summative",
+      "path": "vocabularies/grade6/grade6_t2_summative_robotics_vocabulary.json"
     },
     {
-      "id": "grade6_t2_mbot_movement_debugging_outputs",
-      "name": "Grade 6 T2: mBot Movement, Debugging, and Outputs",
-      "description": "Movement commands, sequence, speed, time, turns, debugging, outputs, LEDs, buzzers, and robot signals.",
-      "grades": ["6"],
+      "id": "grade6_t2_june_week2_movement_instructions",
+      "name": "Grade 6 T2 Practice: June Week 2 - Movement Instructions",
+      "description": "Practice words for movement instructions and timing.",
+      "grades": [
+        "6"
+      ],
       "trimester": "2",
-      "path": "vocabularies/grade6/t2_mbot_movement_debugging_outputs.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_june_week2_movement_instructions.json"
     },
     {
-      "id": "grade6_t2_mbot_loops_sensors_challenges",
-      "name": "Grade 6 T2: mBot Loops, Sensors, and Challenges",
-      "description": "Loops, repeated patterns, sensors, conditions, if/then logic, route maps, challenge goals, and success rules.",
-      "grades": ["6"],
+      "id": "grade6_t2_june_week3_debugging_paths",
+      "name": "Grade 6 T2 Practice: June Week 3 - Debugging Paths",
+      "description": "Practice words for testing, debugging, and improving robot paths.",
+      "grades": [
+        "6"
+      ],
       "trimester": "2",
-      "path": "vocabularies/grade6/t2_mbot_loops_sensors_challenges.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_june_week3_debugging_paths.json"
     },
     {
-      "id": "grade6_t3_spreadsheets_data_formulas",
-      "name": "Grade 6 T3: Spreadsheets, Data, and Formulas",
-      "description": "Spreadsheet vocabulary for data, information, rows, columns, cells, formulas, references, sums, and averages.",
-      "grades": ["6"],
-      "trimester": "3",
-      "path": "vocabularies/grade6/t3_spreadsheets_data_formulas.json"
+      "id": "grade6_t2_june_week4_robot_outputs",
+      "name": "Grade 6 T2 Practice: June Week 4 - Robot Outputs",
+      "description": "Practice words for robot outputs and signals.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_june_week4_robot_outputs.json"
     },
     {
-      "id": "grade6_t3_planning_charts",
-      "name": "Grade 6 T3: Planning Tables and Charts",
-      "description": "Planning spreadsheet vocabulary for budgets, quantities, costs, totals, charts, titles, labels, categories, and conclusions.",
-      "grades": ["6"],
-      "trimester": "3",
-      "path": "vocabularies/grade6/t3_planning_charts.json"
+      "id": "grade6_t2_july_week1_route_accuracy",
+      "name": "Grade 6 T2 Practice: July Week 1 - Route Accuracy",
+      "description": "Practice words for route maps and accurate movement.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_july_week1_route_accuracy.json"
     },
     {
-      "id": "grade6_t3_3d_modeling_project_sharing",
-      "name": "Grade 6 T3: 3D Modeling and Project Sharing",
-      "description": "3D modeling tools, shapes, movement, resizing, rotating, duplicating, grouping, prototypes, presentations, and feedback.",
-      "grades": ["6"],
-      "trimester": "3",
-      "path": "vocabularies/grade6/t3_3d_modeling_project_sharing.json"
+      "id": "grade6_t2_july_week2_repeat_patterns",
+      "name": "Grade 6 T2 Practice: July Week 2 - Repeat Patterns",
+      "description": "Practice words for loops and repeated movement patterns.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_july_week2_repeat_patterns.json"
     },
     {
-      "id": "grade6_t3_microbit_programming_projects",
-      "name": "Grade 6 T3: micro:bit Programming Projects",
-      "description": "micro:bit parts, inputs, outputs, LED display, buttons, variables, sensors, conditions, and final project explanations.",
-      "grades": ["6"],
-      "trimester": "3",
-      "path": "vocabularies/grade6/t3_microbit_programming_projects.json"
+      "id": "grade6_t2_july_week3_sensor_detection",
+      "name": "Grade 6 T2 Practice: July Week 3 - Sensor Detection",
+      "description": "Practice words for sensors, inputs, and responses.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_july_week3_sensor_detection.json"
     },
-    {"id": "grade7_it_mbot_parts_mblock", "name": "Grade 7 IT: mBot Parts and mBlock", "description": "mBot hardware, software, robot parts, sensors, mBlock workspace, scripts, blocks, and uploading programs.", "grades": ["7"], "trimester": "IT", "path": "vocabularies/grade7/it_mbot_parts_mblock.json"},
-    {"id": "grade7_it_movement_sensors_feedback", "name": "Grade 7 IT: Movement, Sensors, and Feedback", "description": "Controlled motion, speed, timing, calibration, LEDs, sound signals, ultrasonic readings, thresholds, and if/else reactions.", "grades": ["7"], "trimester": "IT", "path": "vocabularies/grade7/it_movement_sensors_feedback.json"},
-    {"id": "grade7_it_maze_navigation_project", "name": "Grade 7 IT: Maze Navigation Project", "description": "Maze vocabulary, route planning, algorithms, prototypes, testing evidence, debugging, teamwork, and final robot presentations.", "grades": ["7"], "trimester": "IT", "path": "vocabularies/grade7/it_maze_navigation_project.json"},
-    {"id": "grade7_iit_poster_branding", "name": "Grade 7 IIT: Posters and Branding", "description": "Digital messages, environmental posters, Canva design, copyright-friendly images, branding, logos, palettes, typography, consistency, and feedback.", "grades": ["7"], "trimester": "IIT", "path": "vocabularies/grade7/iit_poster_branding.json"},
-    {"id": "grade7_iit_scratch_foundations", "name": "Grade 7 IIT: Scratch Programming Foundations", "description": "Scratch sequences, sprites, events, variables, selection, comparisons, logic operators, loops, debugging, and pair programming.", "grades": ["7"], "trimester": "IIT", "path": "vocabularies/grade7/iit_scratch_foundations.json"},
-    {"id": "grade7_iit_scratch_dance_game", "name": "Grade 7 IIT: Scratch Dance Game Project", "description": "Dance game planning, sprites, costumes, sounds, input timing, subroutines, score, timer, feedback, testing, and project presentation.", "grades": ["7"], "trimester": "IIT", "path": "vocabularies/grade7/iit_scratch_dance_game.json"},
-    {"id": "grade7_iiit_spreadsheets_charts", "name": "Grade 7 IIIT: Spreadsheets and Charts", "description": "Spreadsheet components, formatting, formulas, functions, chart creation, sorting, filtering, COUNTIF, conditional formatting, and data interpretation.", "grades": ["7"], "trimester": "IIIT", "path": "vocabularies/grade7/iiit_spreadsheets_charts.json"},
-    {"id": "grade7_iiit_sources_blogs_media", "name": "Grade 7 IIIT: Credible Sources and Blog Media", "description": "Source credibility, plagiarism, citation, Creative Commons, blog features, captions, headings, layout, calls to action, and cause-based media posts.", "grades": ["7"], "trimester": "IIIT", "path": "vocabularies/grade7/iiit_sources_blogs_media.json"},
-    {"id": "grade7_iiit_microbit_sensor_systems", "name": "Grade 7 IIIT: micro:bit Sensor Systems", "description": "micro:bit input-output systems, ultrasonic distance readings, thresholds, Bluetooth signals, sound outputs, test tables, reliability, and the Mandrake project.", "grades": ["7"], "trimester": "IIIT", "path": "vocabularies/grade7/iiit_microbit_sensor_systems.json"},
-    {"id": "grade8_it_vector_graphics_design", "name": "Grade 8 IT: Vector Graphics and Design", "description": "Vector graphics, bitmap images, fill, stroke, z-order, alignment, grouping, paths, nodes, SVG markup, and campaign logo improvement.", "grades": ["8"], "trimester": "IT", "path": "vocabularies/grade8/it_vector_graphics_design.json"},
-    {"id": "grade8_it_computing_systems_ai", "name": "Grade 8 IT: Computing Systems and AI", "description": "Hardware, software, processor, memory, storage, input, output, operating systems, logic, AI, machine learning, training, testing, open source, and responsible remixing.", "grades": ["8"], "trimester": "IT", "path": "vocabularies/grade8/it_computing_systems_ai.json"},
-    {"id": "grade8_it_web_portfolio_search", "name": "Grade 8 IT: Web Portfolio and Search", "description": "HTML, CSS, images, alt text, links, search keywords, operators, credits, Google Sites portfolios, navigation, videos, and calls to action.", "grades": ["8"], "trimester": "IT", "path": "vocabularies/grade8/it_web_portfolio_search.json"},
-    {"id": "grade8_iit_arduino_circuit_basics", "name": "Grade 8 IIT: Arduino Circuit Basics", "description": "Arduino and Freenove kit parts, breadboard connections, pins, power, ground, resistors, LEDs, sketches, upload, delay, serial monitor, and troubleshooting.", "grades": ["8"], "trimester": "IIT", "path": "vocabularies/grade8/iit_arduino_circuit_basics.json"},
-    {"id": "grade8_iit_analog_inputs_outputs", "name": "Grade 8 IIT: Analog Inputs and Outputs", "description": "Digital and analog signals, ADC values, potentiometers, light sensors, PWM, brightness, RGB LEDs, buzzers, servos, thresholds, and conditions.", "grades": ["8"], "trimester": "IIT", "path": "vocabularies/grade8/iit_analog_inputs_outputs.json"},
-    {"id": "grade8_iit_integrated_arduino_project", "name": "Grade 8 IIT: Integrated Arduino Project", "description": "Ultrasonic sensing, project design plans, input-process-output diagrams, circuit diagrams, test cases, prototypes, debugging, documentation, demonstrations, and reflections.", "grades": ["8"], "trimester": "IIT", "path": "vocabularies/grade8/iit_integrated_arduino_project.json"},
-    {"id": "grade8_iiit_app_design_events", "name": "Grade 8 IIIT: App Design and Events", "description": "Decomposition, app purpose, users, screens, interfaces, buttons, labels, wireframes, events, screen flow, timers, user needs, variables, and test cases.", "grades": ["8"], "trimester": "IIIT", "path": "vocabularies/grade8/iiit_app_design_events.json"},
-    {"id": "grade8_iiit_python_programming", "name": "Grade 8 IIIT: Python Programming", "description": "Python algorithms, syntax, print, strings, variables, assignment, input, arithmetic, operators, selection, random numbers, branches, loops, counters, flags, and debugging.", "grades": ["8"], "trimester": "IIIT", "path": "vocabularies/grade8/iiit_python_programming.json"},
-    {"id": "grade8_iiit_representation_microbit_game", "name": "Grade 8 IIIT: Representation and micro:bit Game", "description": "Symbols, bits, binary, bytes, decimal conversion, Scratch Link, Bluetooth, micro:bit accelerometer, axes, sensor-controlled games, testing, and presentation.", "grades": ["8"], "trimester": "IIIT", "path": "vocabularies/grade8/iiit_representation_microbit_game.json"},
-    {"id": "grade9_it_physical_computing_foundations", "name": "Grade 9 IT: Physical Computing Foundations", "description": "Input-process-output systems, lab safety, digital and analog signals, Arduino/Freenove basics, LED blink, setup, loop, delay, circuits, and debugging routines.", "grades": ["9"], "trimester": "IT", "path": "vocabularies/grade9/it_physical_computing_foundations.json"},
-    {"id": "grade9_it_inputs_outputs_state_logic", "name": "Grade 9 IT: Inputs, Outputs, and State Logic", "description": "Button input, toggle control, serial monitor data, potentiometers, sensor thresholds, RGB outputs, addressable LED animation, states, and state logic charts.", "grades": ["9"], "trimester": "IT", "path": "vocabularies/grade9/it_inputs_outputs_state_logic.json"},
-    {"id": "grade9_it_robotics_prototype_project", "name": "Grade 9 IT: Robotics Prototype Project", "description": "Robotics project planning, component lists, subsystems, state charts, test steps, prototypes, reliability, optimization, project logs, evidence, and demonstrations.", "grades": ["9"], "trimester": "IT", "path": "vocabularies/grade9/it_robotics_prototype_project.json"},
-    {"id": "grade9_iit_python_sequences_loops", "name": "Grade 9 IIT: Python Sequences and Loops", "description": "Python lists, indexes, append, remove, sort, while loops, for loops, strings, characters, substrings, patterns, conditions, and debugging.", "grades": ["9"], "trimester": "IIT", "path": "vocabularies/grade9/iit_python_sequences_loops.json"},
-    {"id": "grade9_iit_data_collection_cleaning", "name": "Grade 9 IIT: Data Collection and Cleaning", "description": "Data science, data questions, investigative cycle, survey items, data types, privacy rules, collection methods, tables, headings, units, missing values, cleaning, and change logs.", "grades": ["9"], "trimester": "IIT", "path": "vocabularies/grade9/iit_data_collection_cleaning.json"},
-    {"id": "grade9_iit_data_products_analysis", "name": "Grade 9 IIT: Data Products and Analysis", "description": "Charts, patterns, outliers, correlation, observations, inferences, conclusions, limitations, recommendations, dashboards, reports, Tinkercad mock-ups, and evidence-based presentations.", "grades": ["9"], "trimester": "IIT", "path": "vocabularies/grade9/iit_data_products_analysis.json"},
-    {"id": "grade9_iiit_digital_media_representation", "name": "Grade 9 IIIT: Digital Media Representation", "description": "STEM launch vocabulary, pixels, resolution, color depth, RGB intensity, image size, samples, sampling rate, sample size, microphones, speakers, compression, quality, and file-size tradeoffs.", "grades": ["9"], "trimester": "IIIT", "path": "vocabularies/grade9/iiit_digital_media_representation.json"},
-    {"id": "grade9_iiit_cybersecurity_risk", "name": "Grade 9 IIIT: Cyber Security and Risk", "description": "Personal and sensitive data, phishing, baiting, pretexting, urgency, malware, viruses, worms, trojans, ransomware, botnets, brute force, DDoS, firewalls, updates, probability, impact, protection, and risk maps.", "grades": ["9"], "trimester": "IIIT", "path": "vocabularies/grade9/iiit_cybersecurity_risk.json"},
-    {"id": "grade9_iiit_stem_prototype_project", "name": "Grade 9 IIIT: STEM Prototype Project", "description": "STEM project problems, users, constraints, proposals, tools, sketches, Tinkercad concepts, materials, test criteria, project logs, prototypes, proof of concept, improvements, limitations, evidence, and presentations.", "grades": ["9"], "trimester": "IIIT", "path": "vocabularies/grade9/iiit_stem_prototype_project.json"}
+    {
+      "id": "grade6_t2_july_week4_conditions_flowcharts",
+      "name": "Grade 6 T2 Practice: July Week 4 - Conditions and Flowcharts",
+      "description": "Practice words for simple conditions and robot responses.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_july_week4_conditions_flowcharts.json"
+    },
+    {
+      "id": "grade6_t2_july_week5_mini_challenge_plan",
+      "name": "Grade 6 T2 Practice: July Week 5 - Mini-Challenge Plan",
+      "description": "Practice words for planning a small mBot challenge.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_july_week5_mini_challenge_plan.json"
+    },
+    {
+      "id": "grade6_t2_august_week1_knowledge_cards",
+      "name": "Grade 6 T2 Practice: August Week 1 - Knowledge Cards",
+      "description": "Practice words for mBot card stations and actions.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_august_week1_knowledge_cards.json"
+    },
+    {
+      "id": "grade6_t2_august_week2_final_challenge_plan",
+      "name": "Grade 6 T2 Practice: August Week 2 - Final Challenge Plan",
+      "description": "Practice words for planning and improving the final mBot challenge.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_august_week2_final_challenge_plan.json"
+    },
+    {
+      "id": "grade6_t2_august_week3_demo_reflection",
+      "name": "Grade 6 T2 Practice: August Week 3 - Demo Reflection",
+      "description": "Practice words for testing, explaining, and reflecting on the final robotics challenge.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "2",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t2_august_week3_demo_reflection.json"
+    },
+    {
+      "id": "grade6_t3_summative_spreadsheet_vocabulary",
+      "name": "Grade 6 T3 Summative: Spreadsheet Vocabulary",
+      "description": "Ten core third-trimester words for the Grade 6 spreadsheet summative vocabulary table.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "summative",
+      "path": "vocabularies/grade6/grade6_t3_summative_spreadsheet_vocabulary.json"
+    },
+    {
+      "id": "grade6_t3_september_week2_formulas",
+      "name": "Grade 6 T3 Practice: September Week 2 - Formulas",
+      "description": "Practice words for spreadsheet formulas and values.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_september_week2_formulas.json"
+    },
+    {
+      "id": "grade6_t3_october_week1_budget_planning",
+      "name": "Grade 6 T3 Practice: October Week 1 - Budget Planning",
+      "description": "Practice words for planning with quantities, costs, and totals.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_october_week1_budget_planning.json"
+    },
+    {
+      "id": "grade6_t3_october_week2_charts",
+      "name": "Grade 6 T3 Practice: October Week 2 - Charts",
+      "description": "Practice words for chart parts and conclusions.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_october_week2_charts.json"
+    },
+    {
+      "id": "grade6_t3_october_week3_3d_basics",
+      "name": "Grade 6 T3 Practice: October Week 3 - 3D Basics",
+      "description": "Practice words for basic 3D modeling actions.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_october_week3_3d_basics.json"
+    },
+    {
+      "id": "grade6_t3_october_week4_design_prototype",
+      "name": "Grade 6 T3 Practice: October Week 4 - Design Prototype",
+      "description": "Practice words for planning and improving a simple model.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_october_week4_design_prototype.json"
+    },
+    {
+      "id": "grade6_t3_november_week1_present_reflect",
+      "name": "Grade 6 T3 Practice: November Week 1 - Present and Reflect",
+      "description": "Practice words for presenting, feedback, and reflection.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_november_week1_present_reflect.json"
+    },
+    {
+      "id": "grade6_t3_november_week2_microbit_io",
+      "name": "Grade 6 T3 Practice: November Week 2 - micro:bit Input and Output",
+      "description": "Practice words for micro:bit parts, inputs, and outputs.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_november_week2_microbit_io.json"
+    },
+    {
+      "id": "grade6_t3_november_week3_microbit_variables",
+      "name": "Grade 6 T3 Practice: November Week 3 - micro:bit Variables",
+      "description": "Practice words for counters and changing values.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_november_week3_microbit_variables.json"
+    },
+    {
+      "id": "grade6_t3_december_week1_sensors_conditions",
+      "name": "Grade 6 T3 Practice: December Week 1 - Sensors and Conditions",
+      "description": "Practice words for sensors, conditions, and messages.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_december_week1_sensors_conditions.json"
+    },
+    {
+      "id": "grade6_t3_december_week2_final_project",
+      "name": "Grade 6 T3 Practice: December Week 2 - Final Project",
+      "description": "Practice words for building and improving the final micro:bit project.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_december_week2_final_project.json"
+    },
+    {
+      "id": "grade6_t3_december_week3_demonstrate_explain",
+      "name": "Grade 6 T3 Practice: December Week 3 - Demonstrate and Explain",
+      "description": "Practice words for demonstrating and explaining the final project.",
+      "grades": [
+        "6"
+      ],
+      "trimester": "3",
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_december_week3_demonstrate_explain.json"
+    },
+    {
+      "id": "grade7_it_summative_robotics_parts",
+      "name": "Grade 7 IT Summative: Robotics Parts",
+      "description": "Ten core first-trimester words for the Grade 7 robotics vocabulary table.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "summative",
+      "path": "vocabularies/grade7/grade7_it_summative_robotics_parts.json"
+    },
+    {
+      "id": "grade7_it_march_week2_mblock_workspace",
+      "name": "Grade 7 IT Practice: March Week 2 - mBlock Workspace",
+      "description": "Practice words for mBlock tools and first scripts.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_march_week2_mblock_workspace.json"
+    },
+    {
+      "id": "grade7_it_march_week3_movement_commands",
+      "name": "Grade 7 IT Practice: March Week 3 - Movement Commands",
+      "description": "Practice words for basic robot movement.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_march_week3_movement_commands.json"
+    },
+    {
+      "id": "grade7_it_march_week4_robot_systems",
+      "name": "Grade 7 IT Practice: March Week 4 - Robot Systems",
+      "description": "Practice words for robots as systems and debugging.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_march_week4_robot_systems.json"
+    },
+    {
+      "id": "grade7_it_april_week5_calibration",
+      "name": "Grade 7 IT Practice: April Week 5 - Calibration",
+      "description": "Practice words for speed, time, distance, and accuracy.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_april_week5_calibration.json"
+    },
+    {
+      "id": "grade7_it_april_week6_route_planning",
+      "name": "Grade 7 IT Practice: April Week 6 - Route Planning",
+      "description": "Practice words for planning and improving robot routes.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_april_week6_route_planning.json"
+    },
+    {
+      "id": "grade7_it_april_week7_feedback_signals",
+      "name": "Grade 7 IT Practice: April Week 7 - Feedback Signals",
+      "description": "Practice words for lights, sound, and robot state signals.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_april_week7_feedback_signals.json"
+    },
+    {
+      "id": "grade7_it_april_week8_sensor_conditions",
+      "name": "Grade 7 IT Practice: April Week 8 - Sensor Conditions",
+      "description": "Practice words for ultrasonic sensors and if/else reactions.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_april_week8_sensor_conditions.json"
+    },
+    {
+      "id": "grade7_it_may_week9_maze_planning",
+      "name": "Grade 7 IT Practice: May Week 9 - Maze Planning",
+      "description": "Practice words for maze route planning.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_may_week9_maze_planning.json"
+    },
+    {
+      "id": "grade7_it_may_week10_project_plan",
+      "name": "Grade 7 IT Practice: May Week 10 - Project Plan",
+      "description": "Practice words for planning the mBot maze project.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_may_week10_project_plan.json"
+    },
+    {
+      "id": "grade7_it_may_week11_testing_debugging",
+      "name": "Grade 7 IT Practice: May Week 11 - Testing and Debugging",
+      "description": "Practice words for debugging and documenting robot performance.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_may_week11_testing_debugging.json"
+    },
+    {
+      "id": "grade7_it_may_week12_presentation",
+      "name": "Grade 7 IT Practice: May Week 12 - Presentation",
+      "description": "Practice words for presenting the maze solution.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_it_may_week12_presentation.json"
+    },
+    {
+      "id": "grade7_iit_summative_poster_media_design",
+      "name": "Grade 7 IIT Summative: Poster and Media Design",
+      "description": "Ten core second-trimester words for the Grade 7 poster and media design vocabulary table.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade7/grade7_iit_summative_poster_media_design.json"
+    },
+    {
+      "id": "grade7_iit_june_week2_branding",
+      "name": "Grade 7 IIT Practice: June Week 2 - Branding",
+      "description": "Practice words for branding and consistent design.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_june_week2_branding.json"
+    },
+    {
+      "id": "grade7_iit_july_week3_scratch_intro",
+      "name": "Grade 7 IIT Practice: July Week 3 - Scratch Intro",
+      "description": "Practice words for Scratch sequences and events.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_july_week3_scratch_intro.json"
+    },
+    {
+      "id": "grade7_iit_july_week4_variables",
+      "name": "Grade 7 IIT Practice: July Week 4 - Variables",
+      "description": "Practice words for variables and if/else choices.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_july_week4_variables.json"
+    },
+    {
+      "id": "grade7_iit_july_week5_operators",
+      "name": "Grade 7 IIT Practice: July Week 5 - Operators",
+      "description": "Practice words for comparison and logic operators.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_july_week5_operators.json"
+    },
+    {
+      "id": "grade7_iit_july_week6_loops",
+      "name": "Grade 7 IIT Practice: July Week 6 - Loops",
+      "description": "Practice words for loops and timing.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_july_week6_loops.json"
+    },
+    {
+      "id": "grade7_iit_july_week7_debugging_roles",
+      "name": "Grade 7 IIT Practice: July Week 7 - Debugging Roles",
+      "description": "Practice words for debugging and pair-programming roles.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_july_week7_debugging_roles.json"
+    },
+    {
+      "id": "grade7_iit_august_week8_dance_prep",
+      "name": "Grade 7 IIT Practice: August Week 8 - Dance Prep",
+      "description": "Practice words for dance game preparation.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_august_week8_dance_prep.json"
+    },
+    {
+      "id": "grade7_iit_august_week9_project_planning",
+      "name": "Grade 7 IIT Practice: August Week 9 - Project Planning",
+      "description": "Practice words for dance game planning and scoring.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_august_week9_project_planning.json"
+    },
+    {
+      "id": "grade7_iit_august_week10_build",
+      "name": "Grade 7 IIT Practice: August Week 10 - Build",
+      "description": "Practice words for building and testing dance game logic.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_august_week10_build.json"
+    },
+    {
+      "id": "grade7_iit_august_week11_improve",
+      "name": "Grade 7 IIT Practice: August Week 11 - Improve",
+      "description": "Practice words for improving game features.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_august_week11_improve.json"
+    },
+    {
+      "id": "grade7_iit_august_week12_demo",
+      "name": "Grade 7 IIT Practice: August Week 12 - Demo",
+      "description": "Practice words for demonstrating and reflecting on the dance game.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iit_august_week12_demo.json"
+    },
+    {
+      "id": "grade7_iiit_summative_spreadsheets",
+      "name": "Grade 7 IIIT Summative: Spreadsheets",
+      "description": "Ten core third-trimester words for the Grade 7 spreadsheet vocabulary table.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade7/grade7_iiit_summative_spreadsheets.json"
+    },
+    {
+      "id": "grade7_iiit_september_week2_formulas_charts",
+      "name": "Grade 7 IIIT Practice: September Week 2 - Formulas and Charts",
+      "description": "Practice words for formulas, functions, and chart interpretation.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_september_week2_formulas_charts.json"
+    },
+    {
+      "id": "grade7_iiit_october_week3_data_analysis",
+      "name": "Grade 7 IIIT Practice: October Week 3 - Data Analysis",
+      "description": "Practice words for sorting, filtering, and patterns.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_october_week3_data_analysis.json"
+    },
+    {
+      "id": "grade7_iiit_october_week4_scratch_decomposition",
+      "name": "Grade 7 IIIT Practice: October Week 4 - Scratch Decomposition",
+      "description": "Practice words for decomposition and subroutines.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_october_week4_scratch_decomposition.json"
+    },
+    {
+      "id": "grade7_iiit_october_week5_sources_lists",
+      "name": "Grade 7 IIIT Practice: October Week 5 - Sources and Lists",
+      "description": "Practice words for lists, credible sources, and citation.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_october_week5_sources_lists.json"
+    },
+    {
+      "id": "grade7_iiit_october_week6_blog_media",
+      "name": "Grade 7 IIIT Practice: October Week 6 - Blog Media",
+      "description": "Practice words for blog posts and media layout.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_october_week6_blog_media.json"
+    },
+    {
+      "id": "grade7_iiit_october_week7_sensor_systems",
+      "name": "Grade 7 IIIT Practice: October Week 7 - Sensor Systems",
+      "description": "Practice words for micro:bit input and output systems.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_october_week7_sensor_systems.json"
+    },
+    {
+      "id": "grade7_iiit_november_week8_test_table",
+      "name": "Grade 7 IIIT Practice: November Week 8 - Test Table",
+      "description": "Practice words for sensor testing and reliability.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_november_week8_test_table.json"
+    },
+    {
+      "id": "grade7_iiit_november_week9_review_setup",
+      "name": "Grade 7 IIIT Practice: November Week 9 - Review Setup",
+      "description": "Practice words for reviewing third-trimester concepts.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_november_week9_review_setup.json"
+    },
+    {
+      "id": "grade7_iiit_november_week10_project_plan",
+      "name": "Grade 7 IIIT Practice: November Week 10 - Project Plan",
+      "description": "Practice words for planning the Mandrake Detection System.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_november_week10_project_plan.json"
+    },
+    {
+      "id": "grade7_iiit_november_week11_debug_reliability",
+      "name": "Grade 7 IIIT Practice: November Week 11 - Debug Reliability",
+      "description": "Practice words for retesting and improving reliability.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_november_week11_debug_reliability.json"
+    },
+    {
+      "id": "grade7_iiit_november_week12_presentation",
+      "name": "Grade 7 IIIT Practice: November Week 12 - Presentation",
+      "description": "Practice words for presenting the final system.",
+      "grades": [
+        "7"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_iiit_november_week12_presentation.json"
+    },
+    {
+      "id": "grade8_it_summative_vector_graphics",
+      "name": "Grade 8 IT Summative: Vector Graphics",
+      "description": "Ten core first-trimester words for the Grade 8 vector graphics vocabulary table.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "summative",
+      "path": "vocabularies/grade8/grade8_it_summative_vector_graphics.json"
+    },
+    {
+      "id": "grade8_it_march_week2_alignment_grouping",
+      "name": "Grade 8 IT Practice: March Week 2 - Alignment and Grouping",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_march_week2_alignment_grouping.json"
+    },
+    {
+      "id": "grade8_it_march_week3_campaign_graphics",
+      "name": "Grade 8 IT Practice: March Week 3 - Campaign Graphics",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_march_week3_campaign_graphics.json"
+    },
+    {
+      "id": "grade8_it_march_week4_svg_markup",
+      "name": "Grade 8 IT Practice: March Week 4 - SVG and Markup",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_march_week4_svg_markup.json"
+    },
+    {
+      "id": "grade8_it_april_week5_computing_systems",
+      "name": "Grade 8 IT Practice: April Week 5 - Computing Systems",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_april_week5_computing_systems.json"
+    },
+    {
+      "id": "grade8_it_april_week6_ai_responsible_remix",
+      "name": "Grade 8 IT Practice: April Week 6 - AI and Responsible Remix",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_april_week6_ai_responsible_remix.json"
+    },
+    {
+      "id": "grade8_it_april_week7_html_css",
+      "name": "Grade 8 IT Practice: April Week 7 - HTML and CSS",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_april_week7_html_css.json"
+    },
+    {
+      "id": "grade8_it_april_week8_search_portfolio",
+      "name": "Grade 8 IT Practice: April Week 8 - Search and Portfolio",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_april_week8_search_portfolio.json"
+    },
+    {
+      "id": "grade8_it_may_week9_portfolio_planning",
+      "name": "Grade 8 IT Practice: May Week 9 - Portfolio Planning",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_may_week9_portfolio_planning.json"
+    },
+    {
+      "id": "grade8_it_may_week10_homepage_media",
+      "name": "Grade 8 IT Practice: May Week 10 - Homepage and Media",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_may_week10_homepage_media.json"
+    },
+    {
+      "id": "grade8_it_may_week11_testing_revision",
+      "name": "Grade 8 IT Practice: May Week 11 - Testing and Revision",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_may_week11_testing_revision.json"
+    },
+    {
+      "id": "grade8_it_may_week12_presentation",
+      "name": "Grade 8 IT Practice: May Week 12 - Presentation",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_may_week12_presentation.json"
+    },
+    {
+      "id": "grade8_it_may_week13_archive_reflection",
+      "name": "Grade 8 IT Practice: May Week 13 - Archive and Reflection",
+      "description": "Practice words for Grade 8 first-trimester work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_it_may_week13_archive_reflection.json"
+    },
+    {
+      "id": "grade8_iit_summative_arduino_basics",
+      "name": "Grade 8 IIT Summative: Arduino Basics",
+      "description": "Ten core second-trimester words for the Grade 8 Arduino vocabulary table.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade8/grade8_iit_summative_arduino_basics.json"
+    },
+    {
+      "id": "grade8_iit_june_week2_led_button",
+      "name": "Grade 8 IIT Practice: June Week 2 - LED and Button",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_june_week2_led_button.json"
+    },
+    {
+      "id": "grade8_iit_june_week3_state_serial",
+      "name": "Grade 8 IIT Practice: June Week 3 - State and Serial",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_june_week3_state_serial.json"
+    },
+    {
+      "id": "grade8_iit_june_week4_safe_debugging",
+      "name": "Grade 8 IIT Practice: June Week 4 - Safe Debugging",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_june_week4_safe_debugging.json"
+    },
+    {
+      "id": "grade8_iit_july_week5_analog_values",
+      "name": "Grade 8 IIT Practice: July Week 5 - Analog Values",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_july_week5_analog_values.json"
+    },
+    {
+      "id": "grade8_iit_july_week6_light_rgb",
+      "name": "Grade 8 IIT Practice: July Week 6 - Light and RGB",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_july_week6_light_rgb.json"
+    },
+    {
+      "id": "grade8_iit_july_week7_buzzer_servo",
+      "name": "Grade 8 IIT Practice: July Week 7 - Buzzer and Servo",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_july_week7_buzzer_servo.json"
+    },
+    {
+      "id": "grade8_iit_july_week8_integrated_challenge",
+      "name": "Grade 8 IIT Practice: July Week 8 - Integrated Challenge",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_july_week8_integrated_challenge.json"
+    },
+    {
+      "id": "grade8_iit_august_week9_ultrasonic_design",
+      "name": "Grade 8 IIT Practice: August Week 9 - Ultrasonic Design",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_august_week9_ultrasonic_design.json"
+    },
+    {
+      "id": "grade8_iit_august_week10_prototype_build",
+      "name": "Grade 8 IIT Practice: August Week 10 - Prototype Build",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_august_week10_prototype_build.json"
+    },
+    {
+      "id": "grade8_iit_august_week11_reliability",
+      "name": "Grade 8 IIT Practice: August Week 11 - Reliability",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_august_week11_reliability.json"
+    },
+    {
+      "id": "grade8_iit_august_week12_demonstration",
+      "name": "Grade 8 IIT Practice: August Week 12 - Demonstration",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_august_week12_demonstration.json"
+    },
+    {
+      "id": "grade8_iit_august_week13_cleanup",
+      "name": "Grade 8 IIT Practice: August Week 13 - Cleanup",
+      "description": "Practice words for Grade 8 second-trimester Arduino work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iit_august_week13_cleanup.json"
+    },
+    {
+      "id": "grade8_iiit_summative_app_design",
+      "name": "Grade 8 IIIT Summative: App Design",
+      "description": "Ten core third-trimester words for the Grade 8 app design vocabulary table.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade8/grade8_iiit_summative_app_design.json"
+    },
+    {
+      "id": "grade8_iiit_september_week2_events_flow",
+      "name": "Grade 8 IIIT Practice: September Week 2 - Events and Flow",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_september_week2_events_flow.json"
+    },
+    {
+      "id": "grade8_iiit_september_week3_user_needs",
+      "name": "Grade 8 IIIT Practice: September Week 3 - User Needs",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_september_week3_user_needs.json"
+    },
+    {
+      "id": "grade8_iiit_october_week4_first_python",
+      "name": "Grade 8 IIIT Practice: October Week 4 - First Python",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_october_week4_first_python.json"
+    },
+    {
+      "id": "grade8_iiit_october_week5_numbers_selection",
+      "name": "Grade 8 IIIT Practice: October Week 5 - Numbers and Selection",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_october_week5_numbers_selection.json"
+    },
+    {
+      "id": "grade8_iiit_october_week6_loops_branches",
+      "name": "Grade 8 IIIT Practice: October Week 6 - Loops and Branches",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_october_week6_loops_branches.json"
+    },
+    {
+      "id": "grade8_iiit_october_week7_debugging",
+      "name": "Grade 8 IIIT Practice: October Week 7 - Debugging",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_october_week7_debugging.json"
+    },
+    {
+      "id": "grade8_iiit_october_week8_microbit_setup",
+      "name": "Grade 8 IIIT Practice: October Week 8 - Micro:bit Setup",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_october_week8_microbit_setup.json"
+    },
+    {
+      "id": "grade8_iiit_november_week9_binary_representation",
+      "name": "Grade 8 IIIT Practice: November Week 9 - Binary Representation",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_november_week9_binary_representation.json"
+    },
+    {
+      "id": "grade8_iiit_november_week10_game_build",
+      "name": "Grade 8 IIIT Practice: November Week 10 - Game Build",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_november_week10_game_build.json"
+    },
+    {
+      "id": "grade8_iiit_november_week11_user_testing",
+      "name": "Grade 8 IIIT Practice: November Week 11 - User Testing",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_november_week11_user_testing.json"
+    },
+    {
+      "id": "grade8_iiit_november_week12_presentation",
+      "name": "Grade 8 IIIT Practice: November Week 12 - Presentation",
+      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+      "grades": [
+        "8"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_iiit_november_week12_presentation.json"
+    },
+    {
+      "id": "grade9_it_summative_physical_computing",
+      "name": "Grade 9 IT Summative: Physical Computing",
+      "description": "Ten core first-trimester words for the Grade 9 physical computing vocabulary table.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "summative",
+      "path": "vocabularies/grade9/grade9_it_summative_physical_computing.json"
+    },
+    {
+      "id": "grade9_it_march_week2_blink_signals",
+      "name": "Grade 9 IT Practice: March Week 2 - Blink and Signals",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_march_week2_blink_signals.json"
+    },
+    {
+      "id": "grade9_it_march_week3_lab_routine",
+      "name": "Grade 9 IT Practice: March Week 3 - Lab Routine",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_march_week3_lab_routine.json"
+    },
+    {
+      "id": "grade9_it_april_week4_button_toggle",
+      "name": "Grade 9 IT Practice: April Week 4 - Button Toggle",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_april_week4_button_toggle.json"
+    },
+    {
+      "id": "grade9_it_april_week5_serial_analog",
+      "name": "Grade 9 IT Practice: April Week 5 - Serial and Analog",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_april_week5_serial_analog.json"
+    },
+    {
+      "id": "grade9_it_april_week6_sensor_rgb",
+      "name": "Grade 9 IT Practice: April Week 6 - Sensor and RGB",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_april_week6_sensor_rgb.json"
+    },
+    {
+      "id": "grade9_it_april_week7_led_teamwork",
+      "name": "Grade 9 IT Practice: April Week 7 - LED Teamwork",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_april_week7_led_teamwork.json"
+    },
+    {
+      "id": "grade9_it_april_week8_state_prototype",
+      "name": "Grade 9 IT Practice: April Week 8 - State Prototype",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_april_week8_state_prototype.json"
+    },
+    {
+      "id": "grade9_it_may_week9_robot_design",
+      "name": "Grade 9 IT Practice: May Week 9 - Robot Design",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_may_week9_robot_design.json"
+    },
+    {
+      "id": "grade9_it_may_week10_project_build",
+      "name": "Grade 9 IT Practice: May Week 10 - Project Build",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_may_week10_project_build.json"
+    },
+    {
+      "id": "grade9_it_may_week11_reliability",
+      "name": "Grade 9 IT Practice: May Week 11 - Reliability",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_may_week11_reliability.json"
+    },
+    {
+      "id": "grade9_it_may_week12_demonstration",
+      "name": "Grade 9 IT Practice: May Week 12 - Demonstration",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_may_week12_demonstration.json"
+    },
+    {
+      "id": "grade9_it_may_week13_archive",
+      "name": "Grade 9 IT Practice: May Week 13 - Archive",
+      "description": "Practice words for Grade 9 first-trimester physical computing work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_it_may_week13_archive.json"
+    },
+    {
+      "id": "grade9_iit_summative_python_data",
+      "name": "Grade 9 IIT Summative: Python and Data",
+      "description": "Ten core second-trimester words for the Grade 9 Python and data vocabulary table.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade9/grade9_iit_summative_python_data.json"
+    },
+    {
+      "id": "grade9_iit_june_week2_list_methods",
+      "name": "Grade 9 IIT Practice: June Week 2 - List Methods",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_june_week2_list_methods.json"
+    },
+    {
+      "id": "grade9_iit_june_week3_loops_strings",
+      "name": "Grade 9 IIT Practice: June Week 3 - Loops and Strings",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_june_week3_loops_strings.json"
+    },
+    {
+      "id": "grade9_iit_july_week4_data_science",
+      "name": "Grade 9 IIT Practice: July Week 4 - Data Science",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_july_week4_data_science.json"
+    },
+    {
+      "id": "grade9_iit_july_week5_collection_plan",
+      "name": "Grade 9 IIT Practice: July Week 5 - Collection Plan",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_july_week5_collection_plan.json"
+    },
+    {
+      "id": "grade9_iit_july_week6_cleaning_model",
+      "name": "Grade 9 IIT Practice: July Week 6 - Cleaning and Model",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_july_week6_cleaning_model.json"
+    },
+    {
+      "id": "grade9_iit_july_week7_charts_patterns",
+      "name": "Grade 9 IIT Practice: July Week 7 - Charts and Patterns",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_july_week7_charts_patterns.json"
+    },
+    {
+      "id": "grade9_iit_august_week8_data_product",
+      "name": "Grade 9 IIT Practice: August Week 8 - Data Product",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_august_week8_data_product.json"
+    },
+    {
+      "id": "grade9_iit_august_week9_project_readiness",
+      "name": "Grade 9 IIT Practice: August Week 9 - Project Readiness",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_august_week9_project_readiness.json"
+    },
+    {
+      "id": "grade9_iit_august_week10_visualization",
+      "name": "Grade 9 IIT Practice: August Week 10 - Visualization",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_august_week10_visualization.json"
+    },
+    {
+      "id": "grade9_iit_august_week11_revision",
+      "name": "Grade 9 IIT Practice: August Week 11 - Revision",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_august_week11_revision.json"
+    },
+    {
+      "id": "grade9_iit_august_week12_presentation",
+      "name": "Grade 9 IIT Practice: August Week 12 - Presentation",
+      "description": "Practice words for Grade 9 second-trimester Python and data work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iit_august_week12_presentation.json"
+    },
+    {
+      "id": "grade9_iiit_summative_digital_media",
+      "name": "Grade 9 IIIT Summative: Digital Media",
+      "description": "Ten core third-trimester words for the Grade 9 digital media vocabulary table.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "summative",
+      "path": "vocabularies/grade9/grade9_iiit_summative_digital_media.json"
+    },
+    {
+      "id": "grade9_iiit_september_week2_sound_quality",
+      "name": "Grade 9 IIIT Practice: September Week 2 - Sound Quality",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_september_week2_sound_quality.json"
+    },
+    {
+      "id": "grade9_iiit_october_week3_personal_data",
+      "name": "Grade 9 IIIT Practice: October Week 3 - Personal Data",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_october_week3_personal_data.json"
+    },
+    {
+      "id": "grade9_iiit_october_week4_social_malware",
+      "name": "Grade 9 IIIT Practice: October Week 4 - Social Engineering and Malware",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_october_week4_social_malware.json"
+    },
+    {
+      "id": "grade9_iiit_october_week5_security_risk",
+      "name": "Grade 9 IIIT Practice: October Week 5 - Security Risk",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_october_week5_security_risk.json"
+    },
+    {
+      "id": "grade9_iiit_october_week6_project_problem",
+      "name": "Grade 9 IIIT Practice: October Week 6 - Project Problem",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_october_week6_project_problem.json"
+    },
+    {
+      "id": "grade9_iiit_october_week7_risk_map",
+      "name": "Grade 9 IIIT Practice: October Week 7 - Risk Map",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_october_week7_risk_map.json"
+    },
+    {
+      "id": "grade9_iiit_november_week8_proposal",
+      "name": "Grade 9 IIIT Practice: November Week 8 - Proposal",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_november_week8_proposal.json"
+    },
+    {
+      "id": "grade9_iiit_november_week9_project_habits",
+      "name": "Grade 9 IIIT Practice: November Week 9 - Project Habits",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_november_week9_project_habits.json"
+    },
+    {
+      "id": "grade9_iiit_november_week10_build_evidence",
+      "name": "Grade 9 IIIT Practice: November Week 10 - Build Evidence",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_november_week10_build_evidence.json"
+    },
+    {
+      "id": "grade9_iiit_november_week11_testing_improvement",
+      "name": "Grade 9 IIIT Practice: November Week 11 - Testing and Improvement",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_november_week11_testing_improvement.json"
+    },
+    {
+      "id": "grade9_iiit_december_week12_final_demo",
+      "name": "Grade 9 IIIT Practice: December Week 12 - Final Demo",
+      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "grades": [
+        "9"
+      ],
+      "trimester": "IIIT",
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_iiit_december_week12_final_demo.json"
+    }
   ]
 }

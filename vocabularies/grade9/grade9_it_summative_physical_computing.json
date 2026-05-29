@@ -1,0 +1,105 @@
+{
+  "id": "grade9_it_summative_physical_computing",
+  "name": "Grade 9 IT Summative: Physical Computing",
+  "description": "Ten core first-trimester words for the Grade 9 physical computing vocabulary table.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "process",
+      "definition": "The steps a system or program uses.",
+      "example": "Students used process during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "system",
+      "definition": "Parts that work together.",
+      "example": "Students used system during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "device",
+      "definition": "A tool or machine that does a task.",
+      "example": "Students used device during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "circuit",
+      "definition": "A path that electricity can follow.",
+      "example": "Students used circuit during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "An Arduino program.",
+      "example": "Students uploaded a sketch to the Arduino board.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "upload",
+      "definition": "To send a program to a device.",
+      "example": "Students used upload during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem.",
+      "example": "Students used debug during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test",
+      "definition": "To try something and check what happens.",
+      "example": "Students used test during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

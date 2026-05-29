@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_november_week10_build_evidence",
+  "name": "Grade 9 IIIT Practice: November Week 10 - Build Evidence",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "prototype",
+      "definition": "An early version used for testing.",
+      "example": "Students used prototype during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "model section",
+      "definition": "One part of a model.",
+      "example": "Students used model section during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "tool",
+      "definition": "Something used to complete a task.",
+      "example": "Students used tool during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test result",
+      "definition": "What happened during a test.",
+      "example": "Students used test result during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "photo",
+      "definition": "A picture used as evidence.",
+      "example": "Students used photo during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "screenshot",
+      "definition": "An image of what is on the screen.",
+      "example": "Students used screenshot during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_october_week4_design_prototype",
+  "name": "Grade 6 T3 Practice: October Week 4 - Design Prototype",
+  "description": "Practice words for planning and improving a simple model.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "design",
+      "definition": "A plan for how something will look or work.",
+      "example": "The design showed three shapes.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "A first version used for testing.",
+      "example": "The prototype helped us find changes.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "A quick drawing of an idea.",
+      "example": "The sketch showed the model plan.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "group",
+      "definition": "To join objects so they work as one.",
+      "example": "We group the shapes together.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improve",
+      "definition": "To make something better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "purpose",
+      "definition": "The reason something is made or used.",
+      "example": "The purpose was to hold pencils.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "feedback",
+      "definition": "Helpful comments about work.",
+      "example": "The feedback helped me improve the model.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

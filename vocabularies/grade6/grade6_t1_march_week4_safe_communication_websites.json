@@ -1,0 +1,33 @@
+{
+  "id": "grade6_t1_march_week4_safe_communication_websites",
+  "name": "Grade 6 T1 Practice: March Week 4 - Safe Communication and Websites",
+  "description": "Practice words for safe communication and basic website planning.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {"word": "public", "definition": "Able to be seen by many people.", "example": "A public post can be seen by many people.", "difficulty": 1, "synonyms": ["open"], "antonyms": ["private"]},
+    {"word": "private", "definition": "Only for certain people.", "example": "A private message is not for everyone.", "difficulty": 1, "synonyms": ["limited"], "antonyms": ["public"]},
+    {"word": "audience", "definition": "The people who see or hear a message.", "example": "Think about the audience before posting.", "difficulty": 1, "synonyms": ["viewers"], "antonyms": []},
+    {"word": "permission", "definition": "Approval to do or share something.", "example": "Ask permission before sharing a photo.", "difficulty": 1, "synonyms": ["approval"], "antonyms": []},
+    {"word": "web page", "definition": "One page in a website.", "example": "The student planned one web page.", "difficulty": 1, "synonyms": ["page"], "antonyms": []},
+    {"word": "title", "definition": "The name or main heading.", "example": "The title tells visitors the topic.", "difficulty": 1, "synonyms": ["heading"], "antonyms": []},
+    {"word": "menu", "definition": "A list of choices or links.", "example": "The menu helped visitors find pages.", "difficulty": 1, "synonyms": ["choice list"], "antonyms": []},
+    {"word": "link", "definition": "Something you click to open another page or place.", "example": "The link opened a useful website.", "difficulty": 1, "synonyms": ["connection"], "antonyms": []},
+    {"word": "image", "definition": "A picture.", "example": "The image made the page easier to understand.", "difficulty": 1, "synonyms": ["picture"], "antonyms": ["text"]},
+    {"word": "section", "definition": "One organized part of a page.", "example": "The first section introduced the topic.", "difficulty": 1, "synonyms": ["part"], "antonyms": []}
+  ]
+}

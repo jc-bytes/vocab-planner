@@ -1,0 +1,81 @@
+{
+  "id": "grade7_it_april_week8_sensor_conditions",
+  "name": "Grade 7 IT Practice: April Week 8 - Sensor Conditions",
+  "description": "Practice words for ultrasonic sensors and if/else reactions.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "ultrasonic",
+      "definition": "Using sound waves to measure distance.",
+      "example": "Students used ultrasonic during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reading",
+      "definition": "A value measured by a sensor.",
+      "example": "Students used reading during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "A limit where an action changes.",
+      "example": "Students used threshold during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "if",
+      "definition": "A code word used to check a condition.",
+      "example": "Students used if during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "else",
+      "definition": "A code word for what happens when an if condition is false.",
+      "example": "Students used else during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reactive",
+      "definition": "Able to respond when something changes.",
+      "example": "Students used reactive during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

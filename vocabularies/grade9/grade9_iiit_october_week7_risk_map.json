@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_october_week7_risk_map",
+  "name": "Grade 9 IIIT Practice: October Week 7 - Risk Map",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "probability",
+      "definition": "How likely something is to happen.",
+      "example": "Students used probability during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "impact",
+      "definition": "How serious the result would be.",
+      "example": "Students used impact during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "risk map",
+      "definition": "A chart that compares risks.",
+      "example": "Students used risk map during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "protection strategy",
+      "definition": "A plan for reducing risk.",
+      "example": "Students used protection strategy during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "recommendation",
+      "definition": "Advice about what should be done.",
+      "example": "Students used recommendation during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "proof of concept",
+      "definition": "A small test showing an idea can work.",
+      "example": "Students used proof of concept during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

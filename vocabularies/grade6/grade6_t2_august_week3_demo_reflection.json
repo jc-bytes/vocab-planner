@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_august_week3_demo_reflection",
+  "name": "Grade 6 T2 Practice: August Week 3 - Demo Reflection",
+  "description": "Practice words for testing, explaining, and reflecting on the final robotics challenge.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "challenge",
+      "definition": "A task that takes effort to complete.",
+      "example": "The challenge was to reach the finish marker.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test",
+      "definition": "To try something and see if it works.",
+      "example": "We test the program before showing it.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in a program.",
+      "example": "We debug when the robot turns the wrong way.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improve",
+      "definition": "To make something better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "audience",
+      "definition": "The people who see or hear your work.",
+      "example": "The audience watched the robot demo.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "explain",
+      "definition": "To make an idea clear with words.",
+      "example": "Students explain what their robot does.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "reflection",
+      "definition": "Thinking about what worked and what to improve.",
+      "example": "The reflection described one debugging step.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

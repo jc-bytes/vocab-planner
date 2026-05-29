@@ -1,0 +1,73 @@
+{
+  "id": "grade6_t2_july_week4_conditions_flowcharts",
+  "name": "Grade 6 T2 Practice: July Week 4 - Conditions and Flowcharts",
+  "description": "Practice words for simple conditions and robot responses.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "if",
+      "definition": "A word used to start a condition.",
+      "example": "If the sensor sees an obstacle, the robot stops.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that must be true for something to happen.",
+      "example": "The condition checks for an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "response",
+      "definition": "What happens after an input or condition.",
+      "example": "The response was a beep.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "true",
+      "definition": "Correct or happening.",
+      "example": "The condition is true when the object is close.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "false",
+      "definition": "Not correct or not happening.",
+      "example": "The condition is false when the path is clear.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "flowchart",
+      "definition": "A diagram that shows steps or choices.",
+      "example": "The flowchart showed what the robot should do.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

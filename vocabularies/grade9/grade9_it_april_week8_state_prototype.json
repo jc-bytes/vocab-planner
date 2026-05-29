@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_april_week8_state_prototype",
+  "name": "Grade 9 IT Practice: April Week 8 - State Prototype",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "state logic",
+      "definition": "Rules for how a system changes between states.",
+      "example": "Students used state logic during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input trigger",
+      "definition": "An input that starts a response.",
+      "example": "Students used input trigger during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output response",
+      "definition": "What the system does after an input.",
+      "example": "Students used output response during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "An early version used for testing.",
+      "example": "Students used prototype during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "project log",
+      "definition": "A record of project work and tests.",
+      "example": "Students used project log during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

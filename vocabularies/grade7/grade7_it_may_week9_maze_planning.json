@@ -1,0 +1,73 @@
+{
+  "id": "grade7_it_may_week9_maze_planning",
+  "name": "Grade 7 IT Practice: May Week 9 - Maze Planning",
+  "description": "Practice words for maze route planning.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "maze",
+      "definition": "A path challenge with turns and obstacles.",
+      "example": "Students used maze during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "route",
+      "definition": "The planned path to follow.",
+      "example": "Students used route during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "checkpoint",
+      "definition": "A place used to check progress on a route.",
+      "example": "Students used checkpoint during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "obstacle",
+      "definition": "Something that blocks the way.",
+      "example": "Students used obstacle during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "prototype",
+      "definition": "An early version used for testing.",
+      "example": "Students used prototype during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "algorithm",
+      "definition": "A clear set of steps to solve a problem.",
+      "example": "Students used algorithm during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

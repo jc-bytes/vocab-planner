@@ -8,6 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="landing-container">
@@ -31,9 +38,16 @@
         </main>
 
         <footer class="landing-footer">
-            <p>Runs entirely on GitHub Pages. No backend required.</p>
+            <p>
+                <span data-desktop-version>Web version</span>
+                ·
+                <span data-network-status>Online</span>
+                ·
+                <a href="https://github.com/" data-desktop-update-link>Check for installer updates</a>
+            </p>
         </footer>
     </div>
     <script src="js/main.js" type="module"></script>
+    <script src="js/desktop.js" type="module"></script>
 </body>
 </html>

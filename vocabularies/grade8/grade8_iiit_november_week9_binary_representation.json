@@ -1,0 +1,81 @@
+{
+  "id": "grade8_iiit_november_week9_binary_representation",
+  "name": "Grade 8 IIIT Practice: November Week 9 - Binary Representation",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "representation",
+      "definition": "A way to show information.",
+      "example": "Students used representation during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "symbol",
+      "definition": "A mark or picture that stands for something.",
+      "example": "Students used symbol during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "bit",
+      "definition": "A single binary digit, 0 or 1.",
+      "example": "Students used bit during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "binary",
+      "definition": "A number system using only 0 and 1.",
+      "example": "Students used binary during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "byte",
+      "definition": "A group of 8 bits.",
+      "example": "Students used byte during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "code",
+      "definition": "Instructions or symbols used by a computer.",
+      "example": "Students used code during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "decimal",
+      "definition": "The number system using digits 0 through 9.",
+      "example": "Students used decimal during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

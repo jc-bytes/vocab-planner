@@ -1,0 +1,73 @@
+{
+  "id": "grade6_t2_july_week2_repeat_patterns",
+  "name": "Grade 6 T2 Practice: July Week 2 - Repeat Patterns",
+  "description": "Practice words for loops and repeated movement patterns.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "repeat",
+      "definition": "To do something again.",
+      "example": "The robot can repeat the same move.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "loop",
+      "definition": "A part of a program that repeats.",
+      "example": "A loop made the square path shorter to code.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "Something that repeats in a regular way.",
+      "example": "Forward and turn made a pattern.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "square",
+      "definition": "A shape with four equal sides.",
+      "example": "The robot drove in a square.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "zigzag",
+      "definition": "A path that turns left and right again and again.",
+      "example": "The robot followed a zigzag route.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "shorter",
+      "definition": "Using less length, time, or space.",
+      "example": "The loop made the program shorter.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iit_august_week11_revision",
+  "name": "Grade 9 IIT Practice: August Week 11 - Revision",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "peer feedback",
+      "definition": "Helpful comments from a classmate.",
+      "example": "Students used peer feedback during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "calculation",
+      "definition": "A math result found by using numbers.",
+      "example": "Students used calculation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "label",
+      "definition": "A name or short description.",
+      "example": "Students used label during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "revision",
+      "definition": "A changed version made after review.",
+      "example": "Students used revision during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "evidence statement",
+      "definition": "A sentence that uses evidence.",
+      "example": "Students used evidence statement during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "limitation",
+      "definition": "Something that makes results less complete or certain.",
+      "example": "Students used limitation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

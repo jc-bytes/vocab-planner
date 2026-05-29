@@ -1,0 +1,81 @@
+{
+  "id": "grade8_it_march_week3_campaign_graphics",
+  "name": "Grade 8 IT Practice: March Week 3 - Campaign Graphics",
+  "description": "Practice words for Grade 8 first-trimester work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "campaign",
+      "definition": "A planned message that asks people to care or act.",
+      "example": "Students used campaign during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "audience",
+      "definition": "The people who will see or use something.",
+      "example": "Students used audience during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent or shown.",
+      "example": "Students used message during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "icon",
+      "definition": "A small picture that represents an idea.",
+      "example": "Students used icon during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "logo",
+      "definition": "A symbol or design that represents a group or idea.",
+      "example": "Students used logo during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "originality",
+      "definition": "Making work that is your own idea.",
+      "example": "Students used originality during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "A rough drawing or plan.",
+      "example": "Students used sketch during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

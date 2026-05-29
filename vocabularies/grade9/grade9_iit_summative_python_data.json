@@ -1,0 +1,105 @@
+{
+  "id": "grade9_iit_summative_python_data",
+  "name": "Grade 9 IIT Summative: Python and Data",
+  "description": "Ten core second-trimester words for the Grade 9 Python and data vocabulary table.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "Python",
+      "definition": "A programming language used for coding.",
+      "example": "Students used Python during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "list",
+      "definition": "A group of related items stored together.",
+      "example": "Students used list during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "item",
+      "definition": "One thing in a list.",
+      "example": "Students used item during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "index",
+      "definition": "A position number in a list.",
+      "example": "Students used index during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "string",
+      "definition": "Text stored in a program.",
+      "example": "Students used string during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "loop",
+      "definition": "Code that repeats.",
+      "example": "Students used loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that can be true or false.",
+      "example": "Students used condition during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "data",
+      "definition": "Facts or values that can be used or studied.",
+      "example": "Students used data during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "value",
+      "definition": "Information stored in a variable, cell, or program.",
+      "example": "Students used value during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_october_week3_personal_data",
+  "name": "Grade 9 IIIT Practice: October Week 3 - Personal Data",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "personal data",
+      "definition": "Information about a person.",
+      "example": "Students used personal data during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "public data",
+      "definition": "Information that is okay for many people to see.",
+      "example": "Students used public data during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensitive data",
+      "definition": "Information that needs extra protection.",
+      "example": "Students used sensitive data during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "online service",
+      "definition": "A website or app that provides a tool online.",
+      "example": "Students used online service during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "safer choice",
+      "definition": "An action that better protects people or data.",
+      "example": "Students used safer choice during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "privacy",
+      "definition": "Keeping personal information protected.",
+      "example": "Students used privacy during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

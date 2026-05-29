@@ -1,0 +1,81 @@
+{
+  "id": "grade7_iiit_october_week7_sensor_systems",
+  "name": "Grade 7 IIIT Practice: October Week 7 - Sensor Systems",
+  "description": "Practice words for micro:bit input and output systems.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "input",
+      "definition": "Information that goes into a system or program.",
+      "example": "Students used input during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a system or program produces.",
+      "example": "Students used output during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects information from the environment.",
+      "example": "Students used sensor during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "signal",
+      "definition": "A sign or message sent to show information.",
+      "example": "Students used signal during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold",
+      "definition": "A limit where an action changes.",
+      "example": "Students used threshold during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bluetooth",
+      "definition": "A wireless way for devices to communicate nearby.",
+      "example": "Students used Bluetooth during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "microbit",
+      "definition": "A small computer board used for coding projects.",
+      "example": "Students used microbit during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

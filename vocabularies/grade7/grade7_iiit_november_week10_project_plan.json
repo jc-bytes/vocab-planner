@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iiit_november_week10_project_plan",
+  "name": "Grade 7 IIIT Practice: November Week 10 - Project Plan",
+  "description": "Practice words for planning the Mandrake Detection System.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "purpose",
+      "definition": "The reason something is made.",
+      "example": "Students used purpose during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "parts",
+      "definition": "Pieces that make up a system or object.",
+      "example": "Students used parts during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "diagram",
+      "definition": "A simple drawing that shows parts or ideas.",
+      "example": "Students used diagram during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "threshold rule",
+      "definition": "A rule that uses a limit to decide what happens.",
+      "example": "Students used threshold rule during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "code plan",
+      "definition": "A plan for the blocks or steps a program needs.",
+      "example": "Students used code plan during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "test plan",
+      "definition": "A plan for how to check if something works.",
+      "example": "Students used test plan during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

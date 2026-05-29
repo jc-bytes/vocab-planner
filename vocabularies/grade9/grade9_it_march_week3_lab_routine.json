@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_march_week3_lab_routine",
+  "name": "Grade 9 IT Practice: March Week 3 - Lab Routine",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "safety",
+      "definition": "Careful actions that prevent harm or damage.",
+      "example": "Students used safety during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "checklist",
+      "definition": "A list used to make sure steps are done.",
+      "example": "Students used checklist during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "material",
+      "definition": "An item or part used for work.",
+      "example": "Students used material during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "persistence",
+      "definition": "Continuing to try when something is difficult.",
+      "example": "Students used persistence during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "instruction",
+      "definition": "A step that tells what to do.",
+      "example": "Students used instruction during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "fix",
+      "definition": "A change that solves a problem.",
+      "example": "Students used fix during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_july_week1_route_accuracy",
+  "name": "Grade 6 T2 Practice: July Week 1 - Route Accuracy",
+  "description": "Practice words for route maps and accurate movement.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "speed",
+      "definition": "How fast something moves.",
+      "example": "We lowered the speed so the robot stayed on the path.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "time",
+      "definition": "How long something lasts.",
+      "example": "The robot moved for two seconds of time.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "turn",
+      "definition": "To change direction.",
+      "example": "The robot made a left turn.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sequence",
+      "definition": "Steps in the correct order.",
+      "example": "The robot followed the movement sequence.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "route",
+      "definition": "The path used to get from one place to another.",
+      "example": "The route had two turns.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "accurate",
+      "definition": "Correct and close to the target.",
+      "example": "An accurate turn stopped at the marker.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "marker",
+      "definition": "An object or line used to show a place.",
+      "example": "The marker showed where the robot should stop.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

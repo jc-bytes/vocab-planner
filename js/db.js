@@ -2,6 +2,7 @@ export class ImageDB {
     constructor() {
         this.dbName = 'VocabAppDB';
         this.storeName = 'drawings';
+        this.syncStoreName = 'syncQueue';
         this.db = null;
     }
 
@@ -9,12 +10,17 @@ export class ImageDB {
         if (this.db) return this.db;
 
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, 1);
+            const request = indexedDB.open(this.dbName, 2);
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     db.createObjectStore(this.storeName, { keyPath: 'id' });
+                }
+                if (!db.objectStoreNames.contains(this.syncStoreName)) {
+                    const syncStore = db.createObjectStore(this.syncStoreName, { keyPath: 'id' });
+                    syncStore.createIndex('status', 'status', { unique: false });
+                    syncStore.createIndex('createdAt', 'createdAt', { unique: false });
                 }
             };
 
@@ -91,6 +97,77 @@ export class ImageDB {
             request.onsuccess = () => {
                 resolve(request.result || []);
             };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async enqueueSyncAction(type, payload = {}) {
+        await this.open();
+        const now = new Date().toISOString();
+        const record = {
+            id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+            type,
+            payload,
+            status: 'pending',
+            attempts: 0,
+            createdAt: now,
+            updatedAt: now
+        };
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
+            const store = transaction.objectStore(this.syncStoreName);
+            const request = store.put(record);
+
+            request.onsuccess = () => resolve(record);
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async getPendingSyncActions() {
+        await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.syncStoreName], 'readonly');
+            const store = transaction.objectStore(this.syncStoreName);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const records = request.result || [];
+                resolve(records
+                    .filter(record => record.status === 'pending')
+                    .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt))));
+            };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async completeSyncAction(id) {
+        await this.open();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
+            const store = transaction.objectStore(this.syncStoreName);
+            const request = store.delete(id);
+
+            request.onsuccess = () => resolve();
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    async markSyncActionFailed(record, error) {
+        await this.open();
+        const updated = {
+            ...record,
+            attempts: (Number(record.attempts) || 0) + 1,
+            lastError: error?.message || String(error || 'Sync failed'),
+            updatedAt: new Date().toISOString()
+        };
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
+            const store = transaction.objectStore(this.syncStoreName);
+            const request = store.put(updated);
+
+            request.onsuccess = () => resolve(updated);
             request.onerror = (e) => reject(e.target.error);
         });
     }

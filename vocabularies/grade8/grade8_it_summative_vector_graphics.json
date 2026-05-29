@@ -1,0 +1,105 @@
+{
+  "id": "grade8_it_summative_vector_graphics",
+  "name": "Grade 8 IT Summative: Vector Graphics",
+  "description": "Ten core first-trimester words for the Grade 8 vector graphics vocabulary table.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "vector graphic",
+      "definition": "An image made from shapes and paths that can scale cleanly.",
+      "example": "Students used vector graphic during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "bitmap",
+      "definition": "An image made from pixels.",
+      "example": "Students used bitmap during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "fill",
+      "definition": "The color inside a shape.",
+      "example": "Students used fill during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "stroke",
+      "definition": "The outline of a shape or path.",
+      "example": "Students used stroke during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "z-order",
+      "definition": "The front-to-back order of objects.",
+      "example": "Students used z-order during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "shape",
+      "definition": "A basic form such as a circle, box, or triangle.",
+      "example": "Students used shape during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "layer",
+      "definition": "A level used to organize objects in a design.",
+      "example": "Students used layer during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "object",
+      "definition": "One separate item in a design.",
+      "example": "Students used object during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "path",
+      "definition": "A line or shape made from points.",
+      "example": "Students used path during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "node",
+      "definition": "A point that controls part of a path.",
+      "example": "Students used node during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

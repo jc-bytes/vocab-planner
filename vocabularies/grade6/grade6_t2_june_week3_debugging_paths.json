@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t2_june_week3_debugging_paths",
+  "name": "Grade 6 T2 Practice: June Week 3 - Debugging Paths",
+  "description": "Practice words for testing, debugging, and improving robot paths.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "test",
+      "definition": "To try something and see if it works.",
+      "example": "We test the program before showing it.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in a program.",
+      "example": "We debug when the robot turns the wrong way.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improve",
+      "definition": "To make something better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "path",
+      "definition": "The way something moves from start to finish.",
+      "example": "The mBot followed a tape path.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "route",
+      "definition": "The path used to get from one place to another.",
+      "example": "The route had two turns.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "problem",
+      "definition": "Something that is not working or needs to be solved.",
+      "example": "The problem was a missing stop command.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "fix",
+      "definition": "To correct a problem.",
+      "example": "We changed the time to fix the movement.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

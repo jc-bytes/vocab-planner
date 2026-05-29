@@ -1,0 +1,81 @@
+{
+  "id": "grade9_iiit_october_week5_security_risk",
+  "name": "Grade 9 IIIT Practice: October Week 5 - Security Risk",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "brute force",
+      "definition": "Trying many passwords until one works.",
+      "example": "Students used brute force during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "DDoS",
+      "definition": "An attack that overloads a service with too much traffic.",
+      "example": "Students used DDoS during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "firewall",
+      "definition": "A tool that helps block unsafe network traffic.",
+      "example": "Students used firewall during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "update",
+      "definition": "A change made during a loop or process.",
+      "example": "Students used update during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "scenario",
+      "definition": "A short situation used for practice.",
+      "example": "Students used scenario during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "protection",
+      "definition": "A way to reduce risk or harm.",
+      "example": "Students used protection during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "risk",
+      "definition": "A possible problem or danger.",
+      "example": "Students used risk during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

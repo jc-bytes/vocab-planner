@@ -1,0 +1,73 @@
+{
+  "id": "grade7_it_may_week10_project_plan",
+  "name": "Grade 7 IT Practice: May Week 10 - Project Plan",
+  "description": "Practice words for planning the mBot maze project.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "goal",
+      "definition": "What you are trying to achieve.",
+      "example": "Students used goal during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sensor",
+      "definition": "A part that detects information from the environment.",
+      "example": "Students used sensor during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sequence",
+      "definition": "Steps in the correct order.",
+      "example": "Students used sequence during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "teamwork",
+      "definition": "Working together with others.",
+      "example": "Students used teamwork during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "responsibility",
+      "definition": "Taking care of your part of the work.",
+      "example": "Students used responsibility during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "evidence",
+      "definition": "Information that shows what happened or supports an idea.",
+      "example": "Students used evidence during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

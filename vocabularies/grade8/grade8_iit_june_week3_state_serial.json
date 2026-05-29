@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iit_june_week3_state_serial",
+  "name": "Grade 8 IIT Practice: June Week 3 - State and Serial",
+  "description": "Practice words for Grade 8 second-trimester Arduino work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "state",
+      "definition": "The current condition of something.",
+      "example": "Students used state during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "serial",
+      "definition": "A way for a device and computer to send messages.",
+      "example": "Students used serial during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "send",
+      "definition": "To move information to another place.",
+      "example": "Students used send during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "receive",
+      "definition": "To get information from another place.",
+      "example": "Students used receive during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "monitor",
+      "definition": "A screen or tool used to watch information.",
+      "example": "Students used monitor during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "baud rate",
+      "definition": "The speed used for serial messages.",
+      "example": "Students used baud rate during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "message",
+      "definition": "Information sent or shown.",
+      "example": "Students used message during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem.",
+      "example": "Students used debug during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

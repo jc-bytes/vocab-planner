@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_october_week2_charts",
+  "name": "Grade 6 T3 Practice: October Week 2 - Charts",
+  "description": "Practice words for chart parts and conclusions.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "chart",
+      "definition": "A visual way to show data.",
+      "example": "The chart compared the totals.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "title",
+      "definition": "The name of a page, chart, or project.",
+      "example": "The chart title explained the data.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "label",
+      "definition": "A word or short phrase that names something.",
+      "example": "The label showed what the column meant.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "category",
+      "definition": "A group used to sort information.",
+      "example": "Drinks was one category in the chart.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "axis",
+      "definition": "A line on a chart that helps show values or categories.",
+      "example": "The axis showed the costs.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "compare",
+      "definition": "To look at two or more things to see what is similar or different.",
+      "example": "We compare two chart bars.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "conclusion",
+      "definition": "An idea you decide after looking at evidence.",
+      "example": "The conclusion explained which item cost more.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

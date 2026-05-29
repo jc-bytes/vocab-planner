@@ -1,0 +1,73 @@
+{
+  "id": "grade7_iit_july_week6_loops",
+  "name": "Grade 7 IIT Practice: July Week 6 - Loops",
+  "description": "Practice words for loops and timing.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "loop",
+      "definition": "Code that repeats.",
+      "example": "Students used loop during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "iteration",
+      "definition": "One repeat of a loop.",
+      "example": "Students used iteration during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "repeat",
+      "definition": "To do something again.",
+      "example": "Students used repeat during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "countdown",
+      "definition": "Counting backward to a final number.",
+      "example": "Students used countdown during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "rhythm",
+      "definition": "A repeated beat or timing pattern.",
+      "example": "Students used rhythm during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "debug",
+      "definition": "To find and fix a problem in code.",
+      "example": "Students used debug during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

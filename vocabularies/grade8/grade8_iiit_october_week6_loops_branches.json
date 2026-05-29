@@ -1,0 +1,89 @@
+{
+  "id": "grade8_iiit_october_week6_loops_branches",
+  "name": "Grade 8 IIIT Practice: October Week 6 - Loops and Branches",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "random",
+      "definition": "Chosen without a fixed pattern.",
+      "example": "Students used random during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "import",
+      "definition": "To bring a code tool into a program.",
+      "example": "Students used import during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "elif",
+      "definition": "A Python choice used after if and before else.",
+      "example": "Students used elif during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "branch",
+      "definition": "One possible path in a program.",
+      "example": "Students used branch during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "loop",
+      "definition": "Code that repeats.",
+      "example": "Students used loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "counter",
+      "definition": "A variable used to count.",
+      "example": "Students used counter during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "update",
+      "definition": "A change made during a loop or process.",
+      "example": "Students used update during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "while",
+      "definition": "A loop that repeats while a condition is true.",
+      "example": "Students used while during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

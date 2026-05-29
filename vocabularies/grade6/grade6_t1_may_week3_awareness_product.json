@@ -1,0 +1,33 @@
+{
+  "id": "grade6_t1_may_week3_awareness_product",
+  "name": "Grade 6 T1 Practice: May Week 3 - Awareness Product",
+  "description": "Practice words for planning and presenting an awareness product.",
+  "grades": ["6"],
+  "trimester": "1",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {"word": "audience", "definition": "The people a message is made for.", "example": "The audience was sixth-grade students.", "difficulty": 1, "synonyms": ["viewers"], "antonyms": []},
+    {"word": "message", "definition": "An idea or information someone shares.", "example": "The poster message was to recycle batteries.", "difficulty": 1, "synonyms": ["idea"], "antonyms": []},
+    {"word": "title", "definition": "The name or main heading.", "example": "The title told people the topic.", "difficulty": 1, "synonyms": ["heading"], "antonyms": []},
+    {"word": "fact", "definition": "Something true that can be checked.", "example": "The student added one fact about e-waste.", "difficulty": 1, "synonyms": ["true detail"], "antonyms": ["opinion"]},
+    {"word": "tip", "definition": "A short piece of helpful advice.", "example": "The slide gave one tip about reusing devices.", "difficulty": 1, "synonyms": ["advice"], "antonyms": []},
+    {"word": "action", "definition": "Something a person can do.", "example": "The action was to bring old batteries to a safe place.", "difficulty": 1, "synonyms": ["step"], "antonyms": []},
+    {"word": "poster", "definition": "A visual message with words and images.", "example": "The poster shared one internet rule.", "difficulty": 1, "synonyms": ["sign"], "antonyms": []},
+    {"word": "slide", "definition": "One page in a presentation.", "example": "The slide showed three tips.", "difficulty": 1, "synonyms": ["presentation page"], "antonyms": []},
+    {"word": "infographic", "definition": "A visual that explains information with pictures and short text.", "example": "The infographic showed how to reduce e-waste.", "difficulty": 1, "synonyms": ["information picture"], "antonyms": []},
+    {"word": "present", "definition": "To show and explain work to others.", "example": "The student presented the poster to the class.", "difficulty": 1, "synonyms": ["show"], "antonyms": []}
+  ]
+}

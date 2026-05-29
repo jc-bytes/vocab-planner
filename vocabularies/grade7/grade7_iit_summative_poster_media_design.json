@@ -1,0 +1,105 @@
+{
+  "id": "grade7_iit_summative_poster_media_design",
+  "name": "Grade 7 IIT Summative: Poster and Media Design",
+  "description": "Ten core second-trimester words for the Grade 7 poster and media design vocabulary table.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "IIT",
+  "purpose": "summative",
+  "activitySettings": {
+    "matching": 10,
+    "flashcards": 10,
+    "quiz": 10,
+    "illustration": 10,
+    "synonymAntonym": 10,
+    "wordSearch": 10,
+    "crossword": 10,
+    "hangman": 10,
+    "scramble": 10,
+    "speedMatch": 10,
+    "fillInBlank": 10
+  },
+  "words": [
+    {
+      "word": "audience",
+      "definition": "The people who will see or use something.",
+      "example": "Students used audience during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "purpose",
+      "definition": "The reason something is made.",
+      "example": "Students used purpose during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "poster",
+      "definition": "A visual message with text and images.",
+      "example": "Students used poster during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Canva",
+      "definition": "An online tool for making designs.",
+      "example": "Students used Canva during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "contrast",
+      "definition": "A clear difference that helps things stand out.",
+      "example": "Students used contrast during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "alignment",
+      "definition": "How text and objects line up.",
+      "example": "Students used alignment during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "readability",
+      "definition": "How easy text is to read.",
+      "example": "Students used readability during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "copyright-free",
+      "definition": "Allowed to use without breaking copyright rules.",
+      "example": "Students used copyright-free during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Creative Commons",
+      "definition": "A license that explains how work may be used.",
+      "example": "Students used Creative Commons during the project.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "credit",
+      "definition": "A note that says who made or provided something.",
+      "example": "Students used credit during the project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

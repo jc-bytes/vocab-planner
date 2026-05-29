@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_december_week3_demonstrate_explain",
+  "name": "Grade 6 T3 Practice: December Week 3 - Demonstrate and Explain",
+  "description": "Practice words for demonstrating and explaining the final project.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "input",
+      "definition": "Information or an action that goes into a device or program.",
+      "example": "A button press is an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "A sound can be an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "condition",
+      "definition": "A rule that must be true for something to happen.",
+      "example": "The condition checks for an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "variable",
+      "definition": "A named place that stores a changing value.",
+      "example": "The variable kept the score.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improve",
+      "definition": "To make something better.",
+      "example": "We improve the route after testing.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "demonstrate",
+      "definition": "To show how something works.",
+      "example": "Students demonstrate their final program.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "explain",
+      "definition": "To make an idea clear with words.",
+      "example": "Students explain what their robot does.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

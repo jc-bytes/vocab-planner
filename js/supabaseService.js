@@ -1,5 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SUPABASE_CONFIG, isSupabaseConfigured } from '../config/supabase-config.js';
+import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
 
 const TABLE_ALIASES = {
     appSettings: 'app_settings',
@@ -52,6 +51,7 @@ const FIELD_ALIASES = {
     },
     vocabularies: {
         activitySettings: 'activity_settings',
+        assignedDate: 'assigned_date',
         ownerId: 'owner_id',
         updatedAt: 'updated_at'
     }
@@ -66,8 +66,6 @@ const DEFAULT_COIN_DATA = {
 };
 
 export const WORD_HUNT_IMAGE_BUCKET = 'word-hunt-images';
-
-const resolveConfig = () => window.SUPABASE_CONFIG || SUPABASE_CONFIG;
 
 const resolveTable = (collectionName) => TABLE_ALIASES[collectionName] || collectionName;
 
@@ -217,6 +215,10 @@ const toClientRow = (tableName, row) => {
             name: row.name || '',
             description: row.description || '',
             grades: row.grades || [],
+            assignedDate: row.assigned_date || '',
+            trimester: row.trimester || '',
+            month: row.month || '',
+            week: row.week || '',
             activitySettings: row.activity_settings || {},
             words: row.words || [],
             ownerId: row.owner_id || null,
@@ -302,6 +304,14 @@ const fromClientPayload = (tableName, payload = {}, id = null) => {
                 : payload.grade
                     ? [String(payload.grade)]
                     : undefined,
+            assigned_date: (payload.assignedDate ?? payload.assigned_date) === ''
+                ? null
+                : payload.assignedDate ?? payload.assigned_date,
+            trimester: payload.trimester ?? undefined,
+            month: payload.month ?? undefined,
+            week: payload.week === '' || payload.week === null || payload.week === undefined
+                ? null
+                : Number.parseInt(String(payload.week), 10),
             activity_settings: payload.activitySettings,
             words: payload.words,
             owner_id: payload.ownerId,
@@ -391,6 +401,7 @@ const applyConstraints = (builder, tableName, constraints = []) => {
 export const supabaseService = {
     client: null,
     currentUser: null,
+    currentSession: null,
 
     async init() {
         if (this.client) return this;
@@ -399,17 +410,11 @@ export const supabaseService = {
             throw new Error('Supabase is not configured. Update config/supabase-config.js with your project URL and publishable key.');
         }
 
-        const config = resolveConfig();
-        this.client = createClient(config.url, config.publishableKey, {
-            auth: {
-                autoRefreshToken: true,
-                detectSessionInUrl: true,
-                persistSession: true
-            }
-        });
+        this.client = createSupabaseClient();
 
         const { data } = await this.client.auth.getSession();
-        this.currentUser = normalizeUser(data.session?.user || null);
+        this.currentSession = data.session || null;
+        this.currentUser = normalizeUser(this.currentSession?.user || null);
         return this;
     },
 
@@ -431,10 +436,15 @@ export const supabaseService = {
         return this.currentUser;
     },
 
+    getCurrentSession() {
+        return this.currentSession;
+    },
+
     async signInWithPassword(email, password) {
         await this.init();
         const { data, error } = await this.client.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        this.currentSession = data.session || null;
         this.currentUser = normalizeUser(data.user);
         return { ...data, user: this.currentUser };
     },
@@ -470,8 +480,10 @@ export const supabaseService = {
                 throw new Error(`Account created, but no session was returned. Try logging in instead. ${message}`);
             }
 
+            this.currentSession = loginData.session || null;
             this.currentUser = normalizeUser(loginData.user);
         } else {
+            this.currentSession = data.session || null;
             this.currentUser = normalizeUser(data.user);
         }
 
@@ -499,8 +511,10 @@ export const supabaseService = {
                 throw new Error(`Teacher account created, but no session was returned. Try logging in instead. ${message}`);
             }
 
+            this.currentSession = loginData.session || null;
             this.currentUser = normalizeUser(loginData.user);
         } else {
+            this.currentSession = data.session || null;
             this.currentUser = normalizeUser(data.user);
         }
 
@@ -759,7 +773,8 @@ export const supabaseService = {
 
     async signOut() {
         await this.init();
-        await this.client.auth.signOut();
+        await this.client.auth.signOut({ scope: 'local' });
+        this.currentSession = null;
         this.currentUser = null;
     },
 
@@ -768,9 +783,10 @@ export const supabaseService = {
             throw new Error('Supabase client has not been initialized.');
         }
 
-        const { data } = this.client.auth.onAuthStateChange((_event, session) => {
+        const { data } = this.client.auth.onAuthStateChange((event, session) => {
+            this.currentSession = session || null;
             this.currentUser = normalizeUser(session?.user || null);
-            callback(this.currentUser);
+            setTimeout(() => callback(this.currentUser, event, this.currentSession), 0);
         });
 
         return () => data.subscription.unsubscribe();

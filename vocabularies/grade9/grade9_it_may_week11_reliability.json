@@ -1,0 +1,73 @@
+{
+  "id": "grade9_it_may_week11_reliability",
+  "name": "Grade 9 IT Practice: May Week 11 - Reliability",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "reliability",
+      "definition": "How dependably something works.",
+      "example": "Students used reliability during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "code comment",
+      "definition": "A note in code that explains something.",
+      "example": "Students used code comment during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "controlled test",
+      "definition": "A test where conditions are carefully chosen.",
+      "example": "Students used controlled test during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pass/fail",
+      "definition": "A result showing whether something worked or not.",
+      "example": "Students used pass/fail during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "weak point",
+      "definition": "The part that needs the most improvement.",
+      "example": "Students used weak point during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "improvement",
+      "definition": "A change that makes something better.",
+      "example": "Students used improvement during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "grade9_iiit_november_week8_proposal",
+  "name": "Grade 9 IIIT Practice: November Week 8 - Proposal",
+  "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "proposal",
+      "definition": "A plan submitted for approval.",
+      "example": "Students used proposal during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "platform",
+      "definition": "The tool or system used to build something.",
+      "example": "Students used platform during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "sketch",
+      "definition": "A rough drawing or plan.",
+      "example": "Students used sketch during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Tinkercad",
+      "definition": "An online tool for making simple 3D models.",
+      "example": "Students used Tinkercad during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "expected evidence",
+      "definition": "Proof you expect to collect.",
+      "example": "Students used expected evidence during the class activity.",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "approval",
+      "definition": "Permission to continue.",
+      "example": "Students used approval during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

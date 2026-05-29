@@ -1,0 +1,73 @@
+{
+  "id": "grade6_t2_july_week3_sensor_detection",
+  "name": "Grade 6 T2 Practice: July Week 3 - Sensor Detection",
+  "description": "Practice words for sensors, inputs, and responses.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "2",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 6,
+    "flashcards": 6,
+    "quiz": 6,
+    "illustration": 6,
+    "synonymAntonym": 6,
+    "wordSearch": 6,
+    "crossword": 6,
+    "hangman": 6,
+    "scramble": 6,
+    "speedMatch": 6,
+    "fillInBlank": 6
+  },
+  "words": [
+    {
+      "word": "sensor",
+      "definition": "A part that detects something around it.",
+      "example": "The sensor detected an object.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "detect",
+      "definition": "To notice or find something.",
+      "example": "The sensor can detect a line.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "obstacle",
+      "definition": "Something in the way.",
+      "example": "The robot stopped before the obstacle.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "line",
+      "definition": "A long mark or path to follow.",
+      "example": "The sensor looked for the black line.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information or an action that goes into a device or program.",
+      "example": "A button press is an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "response",
+      "definition": "What happens after an input or condition.",
+      "example": "The response was a beep.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

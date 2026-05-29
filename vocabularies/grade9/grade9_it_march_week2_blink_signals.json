@@ -1,0 +1,89 @@
+{
+  "id": "grade9_it_march_week2_blink_signals",
+  "name": "Grade 9 IT Practice: March Week 2 - Blink and Signals",
+  "description": "Practice words for Grade 9 first-trimester physical computing work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "digital",
+      "definition": "Using clear separate values, like on or off.",
+      "example": "Students used digital during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "analog",
+      "definition": "Using values that can change smoothly.",
+      "example": "Students used analog during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "signal",
+      "definition": "A sign or message sent by a system.",
+      "example": "Students used signal during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "LED",
+      "definition": "A small light that a program can control.",
+      "example": "Students used LED during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "blink",
+      "definition": "To turn on and off.",
+      "example": "Students used blink during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "setup",
+      "definition": "The part of a program that runs first.",
+      "example": "Students used setup during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "loop",
+      "definition": "Code that repeats.",
+      "example": "Students used loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "delay",
+      "definition": "A pause in a program.",
+      "example": "Students used delay during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

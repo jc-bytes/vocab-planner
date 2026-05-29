@@ -7,60 +7,127 @@
     <title>Teacher Dashboard - Vocabulary App</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+            }
+        }
+    </script>
 </head>
 
 <body>
     <div class="app-container">
-        <header class="app-header">
-            <div class="header-left">
-                <a href="index.html" class="back-link">← Home</a>
-                <h1>Teacher Dashboard</h1>
-            </div>
+        <header class="app-header teacher-app-header">
+            <nav id="teacher-tab-shell" class="teacher-tab-shell hidden" aria-label="Teacher sections">
+                <div class="teacher-tabs" role="tablist" aria-label="Teacher tools">
+                    <button class="teacher-tab active" id="tab-overview" type="button" role="tab" aria-selected="true"
+                        aria-controls="teacher-overview-view" data-section="overview">
+                        <i data-lucide="layout-dashboard"></i>
+                        Overview
+                    </button>
+                    <button class="teacher-tab" id="tab-vocabulary" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-dashboard-view" data-section="vocabulary">
+                        <i data-lucide="book-open"></i>
+                        Vocabulary
+                    </button>
+                    <button class="teacher-tab" id="tab-students" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-progress-view" data-section="students">
+                        <i data-lucide="users"></i>
+                        Students
+                    </button>
+                    <button class="teacher-tab" id="tab-quizzes" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-quizzes-view" data-section="quizzes">
+                        <i data-lucide="file-text"></i>
+                        Quizzes
+                    </button>
+                    <button class="teacher-tab" id="tab-data-settings" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-data-management-view" data-section="data-settings">
+                        <i data-lucide="settings"></i>
+                        Data & Settings
+                    </button>
+                </div>
+            </nav>
+
             <div class="header-actions">
-                <div id="teacher-auth-controls" style="display:flex; align-items:center; gap:0.75rem;">
-                    <div id="teacher-user-info" style="display:none; align-items:center; gap:0.5rem;">
-                        <span id="teacher-user-name" style="font-size:0.9rem; color:var(--text-muted);"></span>
-                    </div>
-                    <span id="teacher-cloud-status" style="font-size:0.8rem; color:var(--text-muted);">Signed out</span>
-                    <button id="teacher-sign-out-btn" class="btn text-btn" style="display:none;">Sign Out</button>
+                <div id="teacher-auth-controls" class="teacher-auth-controls">
+                    <span id="teacher-cloud-status" class="status-dot" title="Signed out" aria-label="Signed out" data-state="offline"></span>
+                    <button id="teacher-sign-out-btn" class="btn text-btn icon-btn" title="Sign out" aria-label="Sign out" style="display:none;">
+                        <i data-lucide="log-out"></i>
+                    </button>
                     <button id="teacher-login-btn" class="btn secondary-btn" style="display:none;">Sign in</button>
                 </div>
-                <button id="export-btn" class="btn primary-btn hidden">Export JSON</button>
             </div>
         </header>
 
         <main class="teacher-main">
+            <!-- View: Loading -->
+            <section id="teacher-loading-view" class="view active">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh;">
+                    <div class="loading-spinner" style="width: 50px; height: 50px; border-width: 4px;"></div>
+                    <p style="margin-top: 1rem; color: var(--text-muted);">Loading session...</p>
+                </div>
+            </section>
+
             <!-- View: Login -->
-            <section id="teacher-login-view" class="view active">
-                <div class="card" style="padding:2rem; max-width:720px; margin:0 auto;">
-                    <h2 style="margin-bottom:1.5rem; text-align:center;">Teacher Access</h2>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem;">
+            <section id="teacher-login-view" class="view hidden">
+                <div class="card teacher-login-card">
+                    <h2>Teacher Access</h2>
+                    <div class="teacher-auth-switch" role="tablist" aria-label="Teacher access mode">
+                        <button id="show-teacher-login-btn" class="btn primary-btn teacher-auth-toggle active"
+                            type="button" role="tab" aria-selected="true" aria-controls="teacher-login-panel">
+                            Log In
+                        </button>
+                        <button id="show-teacher-signup-btn" class="btn secondary-btn teacher-auth-toggle"
+                            type="button" role="tab" aria-selected="false" aria-controls="teacher-signup-panel">
+                            Sign Up
+                        </button>
+                    </div>
+                    <div id="teacher-login-panel" class="teacher-auth-panel" role="tabpanel" aria-labelledby="show-teacher-login-btn">
                         <form id="teacher-login-form">
-                            <h3 style="margin-bottom:1rem;">Log In</h3>
                             <div class="form-group">
                                 <label for="teacher-email">Email</label>
                                 <input type="email" id="teacher-email" autocomplete="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="teacher-password">Password</label>
-                                <input type="password" id="teacher-password" autocomplete="current-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="teacher-password" autocomplete="current-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="teacher-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="btn primary-btn" style="width:100%;">Log In</button>
                         </form>
-
+                    </div>
+                    <div id="teacher-signup-panel" class="teacher-auth-panel hidden" role="tabpanel" aria-labelledby="show-teacher-signup-btn">
                         <form id="teacher-signup-form">
-                            <h3 style="margin-bottom:1rem;">Sign Up</h3>
                             <div class="form-group">
                                 <label for="teacher-signup-email">Email</label>
                                 <input type="email" id="teacher-signup-email" autocomplete="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="teacher-signup-password">Password</label>
-                                <input type="password" id="teacher-signup-password" autocomplete="new-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="teacher-signup-password" autocomplete="new-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="teacher-signup-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="teacher-signup-confirm">Confirm Password</label>
-                                <input type="password" id="teacher-signup-confirm" autocomplete="new-password" minlength="6" required>
+                                <div class="password-field">
+                                    <input type="password" id="teacher-signup-confirm" autocomplete="new-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="teacher-signup-confirm" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button type="submit" class="btn secondary-btn" style="width:100%;">Create Teacher Account</button>
                         </form>
@@ -70,73 +137,126 @@
                 </div>
             </section>
 
-            <!-- View: Teacher Dashboard -->
-            <section id="teacher-dashboard-view" class="view hidden">
-                <div class="dashboard-actions card" style="margin-bottom: 2rem; text-align: center; padding: 3rem;">
-                    <h2>Manage Vocabularies</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Create new sets, import existing ones, or
-                        edit from the library.</p>
-                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <button id="create-new-btn" class="btn primary-btn"
-                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">+ Create New</button>
-                        <label for="import-file" class="btn secondary-btn"
-                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">📂 Import JSON</label>
-                        <input type="file" id="import-file" accept=".json" hidden>
-                        <button id="view-progress-btn" class="btn secondary-btn"
-                            style="font-size: 1.1rem; padding: 0.75rem 1.5rem;">📊 Student Progress</button>
+            <!-- View: Overview -->
+            <section id="teacher-overview-view" class="view hidden" role="tabpanel" aria-labelledby="tab-overview">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Daily teaching</p>
+                        <h2>Overview</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="overview-create-vocab-btn" class="btn primary-btn">
+                            <i data-lucide="plus"></i>
+                            New Vocabulary
+                        </button>
+                        <button id="overview-students-btn" class="btn secondary-btn">
+                            <i data-lucide="users"></i>
+                            View Students
+                        </button>
                     </div>
                 </div>
 
-                <!-- Gamification Settings -->
-                <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div>
-                            <h3 style="margin: 0; color: #fbbf24;">🎮 Gamification Settings</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Configure coin rewards and game costs for all students.</p>
+                <div class="teacher-stat-grid">
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Total Students</div>
+                        <div class="mini-stat-value" id="overview-total-students">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Active (7d)</div>
+                        <div class="mini-stat-value" id="overview-active-students">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Average Coins</div>
+                        <div class="mini-stat-value" id="overview-avg-coins">--</div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-label">Vocabulary Sets</div>
+                        <div class="mini-stat-value" id="overview-vocab-count">--</div>
+                    </div>
+                </div>
+
+                <div class="teacher-overview-grid">
+                    <section class="teacher-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Quick Actions</h3>
+                                <p>Common classroom tasks without hunting through the app.</p>
+                            </div>
                         </div>
-                        <button id="save-gamification-btn" class="btn primary-btn" style="padding: 0.5rem 1rem;">
-                            💾 Save Settings
+                        <div class="teacher-action-grid">
+                            <button class="teacher-action-card" id="overview-vocabulary-btn" type="button">
+                                <i data-lucide="book-open"></i>
+                                <span>Manage vocabulary</span>
+                            </button>
+                            <button class="teacher-action-card" id="overview-quiz-btn" type="button">
+                                <i data-lucide="file-text"></i>
+                                <span>Prepare quiz</span>
+                            </button>
+                            <button class="teacher-action-card" id="overview-settings-btn" type="button">
+                                <i data-lucide="sliders-horizontal"></i>
+                                <span>Game settings</span>
+                            </button>
+                            <button class="teacher-action-card" id="overview-export-btn" type="button">
+                                <i data-lucide="download"></i>
+                                <span>Export data</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="teacher-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Recent Activity</h3>
+                                <p>Latest student updates from progress data.</p>
+                            </div>
+                        </div>
+                        <div id="overview-recent-activity" class="teacher-activity-list">
+                            <div class="loading-spinner">Loading activity...</div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <!-- View: Vocabulary -->
+            <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Vocabulary</p>
+                        <h2>Library</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="create-new-btn" class="btn primary-btn">
+                            <i data-lucide="plus"></i>
+                            Create New
                         </button>
+                        <label for="import-file" class="btn secondary-btn">
+                            <i data-lucide="upload"></i>
+                            Import JSON
+                        </label>
+                        <input type="file" id="import-file" accept=".json" hidden>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-                        <div class="form-group" style="margin: 0;">
-                            <label for="global-exchange-rate" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Game Cost (Coins/Min)</label>
-                            <input type="number" id="global-exchange-rate" min="1" value="10" style="width: 100%; padding: 0.5rem;">
-                            <small style="color: var(--text-muted); font-size: 0.75rem;">Cost to play games per minute</small>
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label for="global-completion-bonus" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Completion Bonus (Coins)</label>
-                            <input type="number" id="global-completion-bonus" min="0" value="50" style="width: 100%; padding: 0.5rem;">
-                            <small style="color: var(--text-muted); font-size: 0.75rem;">Bonus for completing all activities</small>
-                        </div>
-                        <div class="form-group" style="margin: 0;">
-                            <label for="global-progress-reward" style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Progress Reward (Coins/10%)</label>
-                            <input type="number" id="global-progress-reward" min="0" value="1" style="width: 100%; padding: 0.5rem;">
-                            <small style="color: var(--text-muted); font-size: 0.75rem;">Coins earned per 10% progress</small>
-                        </div>
-                    </div>
-                    <div id="gamification-save-status" style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);"></div>
                 </div>
 
                 <section class="library-section">
-                    <h2 style="margin-bottom: 1rem;">📚 Library</h2>
-                    <div id="library-list" class="vocab-grid">
+                    <div id="library-list" class="teacher-library-browser">
                         <div class="loading-spinner">Loading library...</div>
                     </div>
                 </section>
             </section>
 
             <!-- View: Student Progress -->
-            <section id="teacher-progress-view" class="view hidden">
-                <div class="section-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <button id="back-to-dashboard-from-progress" class="btn text-btn">← Back to Dashboard</button>
-                        <h2 style="margin: 0;">Student Progress</h2>
+            <section id="teacher-progress-view" class="view hidden" role="tabpanel" aria-labelledby="tab-students">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Students</p>
+                        <h2>Progress</h2>
                     </div>
-                    <button id="open-data-management-btn" class="btn secondary-btn" style="padding: 0.75rem 1.5rem;">
-                        <span style="margin-right: 0.5rem;">⚙️</span>
-                        Data Management
-                    </button>
+                    <div class="teacher-toolbar">
+                        <button id="open-data-management-btn" class="btn secondary-btn">
+                            <i data-lucide="chart-no-axes-combined"></i>
+                            Analytics
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card"
@@ -289,11 +409,33 @@
             </div>
 
             <!-- View: Editor -->
-            <section id="teacher-editor-view" class="view hidden">
-                <div class="section-header" style="margin-bottom: 1rem;">
-                    <button id="back-to-dashboard" class="btn text-btn">← Back to Dashboard</button>
-                    <div style="flex:1"></div>
-                    <button id="generate-quiz-btn" class="btn secondary-btn">📝 Generate Summative Quiz</button>
+            <section id="teacher-editor-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
+                <div class="teacher-page-heading">
+                    <div>
+                        <button id="back-to-dashboard" class="btn text-btn teacher-back-btn">
+                            <i data-lucide="arrow-left"></i>
+                            Back to Library
+                        </button>
+                        <h2 style="margin: 0.35rem 0 0 0;">Vocabulary Editor</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="generate-quiz-btn" class="btn secondary-btn">
+                            <i data-lucide="file-text"></i>
+                            Generate Quiz
+                        </button>
+                        <button id="publish-update-btn" class="btn secondary-btn">
+                            <i data-lucide="cloud-upload"></i>
+                            Save Update
+                        </button>
+                        <button id="publish-new-version-btn" class="btn secondary-btn">
+                            <i data-lucide="copy-plus"></i>
+                            Save as New
+                        </button>
+                        <button id="export-btn" class="btn primary-btn">
+                            <i data-lucide="download"></i>
+                            Export JSON
+                        </button>
+                    </div>
                 </div>
 
                 <section class="vocab-meta-section card">
@@ -313,6 +455,43 @@
                     <div class="form-group">
                         <label for="vocab-grade">Grade Levels (comma separated)</label>
                         <input type="text" id="vocab-grade" placeholder="e.g., 6, 7">
+                    </div>
+                    <div class="form-group">
+                        <label for="vocab-assigned-date">Assigned Date</label>
+                        <input type="date" id="vocab-assigned-date">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vocab-trimester">Trimester</label>
+                            <select id="vocab-trimester">
+                                <option value="">Auto / Other</option>
+                                <option value="IT">1st Trimester</option>
+                                <option value="IIT">2nd Trimester</option>
+                                <option value="IIIT">3rd Trimester</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vocab-month">Month</label>
+                            <select id="vocab-month">
+                                <option value="">Auto / Other</option>
+                                <option value="january">January</option>
+                                <option value="february">February</option>
+                                <option value="march">March</option>
+                                <option value="april">April</option>
+                                <option value="may">May</option>
+                                <option value="june">June</option>
+                                <option value="july">July</option>
+                                <option value="august">August</option>
+                                <option value="september">September</option>
+                                <option value="october">October</option>
+                                <option value="november">November</option>
+                                <option value="december">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vocab-week">Week</label>
+                            <input type="number" id="vocab-week" min="1" max="52" placeholder="e.g., 2">
+                        </div>
                     </div>
                 </section>
 
@@ -382,6 +561,13 @@
                         </div>
                     </div>
 
+                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Student Activity Flow</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Choose which
+                        activities students must finish before additional practice appears.</p>
+                    <div id="activity-flow-settings" class="activity-flow-settings"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+                    </div>
+
                     <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #fbbf24;">Gamification Settings</h3>
                     <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Configure coin rewards
                         and costs.</p>
@@ -413,167 +599,116 @@
                 </section>
             </section>
 
+            <!-- View: Quizzes -->
+            <section id="teacher-quizzes-view" class="view hidden" role="tabpanel" aria-labelledby="tab-quizzes">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Quizzes</p>
+                        <h2>Printable Quiz Builder</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="quiz-open-current-btn" class="btn primary-btn">
+                            <i data-lucide="file-plus"></i>
+                            Open Builder
+                        </button>
+                    </div>
+                </div>
+
+                <section class="teacher-panel">
+                    <div class="teacher-panel-header">
+                        <div>
+                            <h3 id="quiz-active-vocab-name">No vocabulary selected</h3>
+                            <p id="quiz-active-vocab-meta">Choose a vocabulary set to generate printable questions.</p>
+                        </div>
+                    </div>
+                    <div id="quiz-vocab-picker" class="vocab-grid compact-vocab-grid">
+                        <div class="loading-spinner">Loading vocabulary choices...</div>
+                    </div>
+                </section>
+            </section>
+
             <!-- View: Quiz Maker -->
-            <section id="quiz-maker-view" class="view hidden">
+            <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="tab-quizzes">
                 <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
                     <!-- Sidebar -->
                     <aside class="quiz-sidebar card"
-                        style="width: 300px; display: flex; flex-direction: column; overflow-y: auto;">
+                        style="width: 360px; display: flex; flex-direction: column; overflow-y: auto;">
                         <h3 style="margin-bottom: 1rem;">Quiz Tools</h3>
 
-                        <div class="tool-section">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Add
-                                Questions</h4>
-                            <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                                <div
-                                    style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem;">
-                                    <span style="flex:1;">Type</span>
-                                    <span style="width:70px; text-align:center;">Pts/Q</span>
-                                    <span style="width:70px; text-align:center;">Count</span>
-                                    <span style="width:90px; text-align:center;">Order</span>
-                                </div>
-                                <div id="quiz-type-list" style="display:flex; flex-direction:column; gap:0.5rem;">
-                                    <!-- Rows keep their data-type for JS ordering -->
-                                    <div class="quiz-row" data-type="mc"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="mc"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="mc"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Multiple Choice</label>
-                                        <input type="number" id="mc-points" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="mc-count" min="0" value="5"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="tf"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="tf"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="tf"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">True / False</label>
-                                        <input type="number" id="tf-points" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="tf-count" min="0" value="5"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="matching"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="matching"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="matching"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Matching</label>
-                                        <input type="number" id="match-points" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="match-count" min="0" value="5"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="short"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="short"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="short"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Short Answer</label>
-                                        <input type="number" id="short-points" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="short-count" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="synonym"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="synonym"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="synonym"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Synonym / Antonym</label>
-                                        <input type="number" id="synonym-points" min="0" value="1"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="synonym-count" min="0" value="5"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="wordsearch"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="wordsearch"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="wordsearch"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Word Search</label>
-                                        <input type="number" id="wordsearch-points" min="0" value="10"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="wordsearch-count" min="0" value="0"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                    <div class="quiz-row" data-type="crossword"
-                                        style="position:relative; display:grid; grid-template-columns: 1fr 70px 70px; gap:0.4rem; align-items:center; padding:0.75rem 0.55rem 0.55rem 0.55rem; border:1px solid var(--border-color); border-radius:10px; background: rgba(255,255,255,0.05);">
-                                        <div style="position:absolute; top:6px; right:6px; display:flex; gap:0.25rem;">
-                                            <button type="button" class="btn text-btn order-up" data-type="crossword"
-                                                title="Move up">↑</button>
-                                            <button type="button" class="btn text-btn order-down" data-type="crossword"
-                                                title="Move down">↓</button>
-                                        </div>
-                                        <label style="font-size: 0.8rem; font-weight:600;">Crossword</label>
-                                        <input type="number" id="crossword-points" min="0" value="10"
-                                            style="padding:0.3rem; text-align:center;">
-                                        <input type="number" id="crossword-count" min="0" value="0"
-                                            style="padding:0.3rem; text-align:center;">
-                                    </div>
-                                </div>
-                                <button id="generate-questions-btn" class="btn primary-btn"
-                                    style="margin-top: 0.5rem;">Generate Quiz</button>
-                                <p
-                                    style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
-                                    Tip: Reorder sections with arrows. Word Search and Crossword still start on a new
-                                    page.
-                                </p>
-                            </div>
+                        <div class="quiz-tool-tabs" role="tablist" aria-label="Quiz builder tools">
+                            <button class="quiz-tool-tab active" type="button" data-quiz-tool-tab="build">Build</button>
+                            <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="details">Details</button>
+                            <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="rubric">Rubric</button>
+                            <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="style">Style</button>
+                            <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="export">Export</button>
                         </div>
 
-                        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid var(--border-color);">
+                        <div class="tool-section quiz-tool-panel active" data-quiz-tool-panel="build">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Quiz
+                                Sections</h4>
+                            <div class="quiz-section-toolbar">
+                                <select id="quiz-section-type-select" aria-label="Question section type">
+                                    <option value="mc">Multiple Choice</option>
+                                    <option value="sata">Select All That Apply</option>
+                                    <option value="tf">True / False</option>
+                                    <option value="matching">Matching</option>
+                                    <option value="short">Short Answer</option>
+                                    <option value="synonym">Synonym / Antonym</option>
+                                    <option value="wordsearch">Word Search</option>
+                                    <option value="crossword">Crossword</option>
+                                </select>
+                                <button id="add-quiz-section-btn" class="btn secondary-btn" type="button">
+                                    <i data-lucide="plus"></i>
+                                    Add
+                                </button>
+                                <button id="generate-questions-btn" class="btn primary-btn" type="button">
+                                    <i data-lucide="refresh-cw"></i>
+                                    Regenerate
+                                </button>
+                            </div>
+                            <div id="quiz-section-list" class="quiz-section-list"></div>
+                            <p class="quiz-tool-note">
+                                Build the quiz as ordered sections. Changes update the preview automatically.
+                            </p>
+                        </div>
 
-                        <div class="tool-section">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Settings
-                            </h4>
+                        <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="details">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Document
+                                Details</h4>
                             <div class="form-group">
                                 <label style="font-size: 0.8rem;">Quiz Title</label>
                                 <input type="text" id="quiz-title-input" style="width: 100%;">
                             </div>
-                            <div class="form-group">
-                                <label style="font-size: 0.8rem;">Instructions</label>
-                                <textarea id="quiz-instructions-input" rows="3" style="width: 100%;"></textarea>
-                            </div>
-
-                            <h4
-                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; margin-top: 1rem;">
-                                Header & Rubric</h4>
                             <div class="form-group">
                                 <label style="font-size: 0.8rem;">School Name</label>
                                 <input type="text" id="quiz-school-input" value="ACADEMIA INTERNACIONAL DE DAVID"
                                     style="width: 100%;">
                             </div>
                             <div class="form-group">
+                                <label style="font-size: 0.8rem;">Teacher Name</label>
+                                <input type="text" id="quiz-teacher-input" value="Porfirio Rios" style="width: 100%;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Grade</label>
+                                <input type="text" id="quiz-grade-input" placeholder="Grade 9" style="width: 100%;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: 0.8rem;">Instructions</label>
+                                <textarea id="quiz-instructions-input" rows="3" style="width: 100%;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="rubric">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Rubric</h4>
+                            <div class="form-group">
                                 <label style="font-size: 0.8rem;">Rubric</label>
                                 <button id="edit-rubric-btn" class="btn secondary-btn"
                                     style="width:100%; font-size:0.8rem;">Edit Rubric Table</button>
                             </div>
+                        </div>
 
-                            <h4
-                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; margin-top: 1rem;">
-                                Page Style</h4>
+                        <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="style">
+                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Page Style</h4>
                             <div class="form-group">
                                 <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
                                     <input type="checkbox" id="quiz-border-toggle" checked> Show Border
@@ -582,20 +717,21 @@
                             <div class="form-group">
                                 <label style="font-size: 0.8rem;">Font</label>
                                 <select id="quiz-font-select" style="width:100%;">
-                                    <option value="'Inter', sans-serif">Sans Serif (Modern)</option>
-                                    <option value="'Times New Roman', serif">Serif (Classic)</option>
+                                    <option value="Arial, sans-serif">Arial 12 pt</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div style="margin-top: auto; padding-top: 1rem;">
-                            <button id="quiz-maker-print-btn" class="btn primary-btn"
-                                style="width: 100%; margin-bottom: 0.5rem;">🖨️ Print / PDF</button>
-                            <button id="quiz-maker-image-btn" class="btn secondary-btn"
-                                style="width: 100%; margin-bottom: 0.5rem;">🖼️ Export as Image</button>
-                            <button id="quiz-maker-pdf-btn" class="btn secondary-btn"
-                                style="width: 100%; margin-bottom: 0.5rem;">📄 Export as PDF</button>
-                            <button id="quiz-maker-close-btn" class="btn text-btn" style="width: 100%;">Close
+                        <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="export">
+                            <button id="quiz-maker-print-btn" class="btn primary-btn" type="button"
+                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="printer"></i> Print / PDF</button>
+                            <button id="quiz-maker-image-btn" class="btn secondary-btn" type="button"
+                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="image"></i> Export as Image</button>
+                            <button id="quiz-maker-pdf-btn" class="btn secondary-btn" type="button"
+                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="file-down"></i> Export as PDF</button>
+                            <button id="quiz-maker-word-btn" class="btn secondary-btn" type="button"
+                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="file-text"></i> Export as Word</button>
+                            <button id="quiz-maker-close-btn" class="btn text-btn" type="button" style="width: 100%;">Close
                                 Editor</button>
                         </div>
                     </aside>
@@ -615,27 +751,106 @@
             </section>
 
             <!-- View: Data Management -->
-            <section id="teacher-data-management-view" class="view hidden" style="max-width: 80%; margin: 0 auto;">
-                <div class="section-header" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <button id="back-to-progress-from-data" class="btn text-btn">← Back to Student Progress</button>
-                        <h2 style="margin: 0;">⚙️ Data Management</h2>
+            <section id="teacher-data-management-view" class="view hidden" role="tabpanel" aria-labelledby="tab-data-settings">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Data & Settings</p>
+                        <h2>Management</h2>
                     </div>
                 </div>
+
+                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
+                    <div class="teacher-panel-header">
+                        <div>
+                            <h3>Gamification Settings</h3>
+                            <p>Configure coin rewards and game costs for all students.</p>
+                        </div>
+                        <button id="save-gamification-btn" class="btn primary-btn">
+                            <i data-lucide="save"></i>
+                            Save Settings
+                        </button>
+                    </div>
+                    <div class="teacher-settings-grid">
+                        <div class="form-group">
+                            <label for="global-exchange-rate">Game Cost (Coins/Min)</label>
+                            <input type="number" id="global-exchange-rate" min="1" value="10">
+                            <small>Cost to play games per minute.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="global-completion-bonus">Completion Bonus (Coins)</label>
+                            <input type="number" id="global-completion-bonus" min="0" value="50">
+                            <small>Bonus for completing all activities.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="global-progress-reward">Progress Reward (Coins/10%)</label>
+                            <input type="number" id="global-progress-reward" min="0" value="1">
+                            <small>Coins earned per 10% progress.</small>
+                        </div>
+                    </div>
+                    <div id="gamification-save-status" class="teacher-inline-status"></div>
+                </section>
+
+                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
+                    <div class="teacher-panel-header">
+                        <div>
+                            <h3>School Calendar</h3>
+                            <p>Set trimester date ranges for vocabulary weeks.</p>
+                        </div>
+                        <button id="save-school-calendar-btn" class="btn primary-btn">
+                            <i data-lucide="calendar-check"></i>
+                            Save Calendar
+                        </button>
+                    </div>
+                    <div class="teacher-settings-grid">
+                        <div class="form-group">
+                            <label for="school-calendar-year">School Year</label>
+                            <input type="number" id="school-calendar-year" min="2000" max="2100" placeholder="2026">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-it-start">IT Start</label>
+                            <input type="date" id="calendar-it-start">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-it-end">IT End</label>
+                            <input type="date" id="calendar-it-end">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-iit-start">IIT Start</label>
+                            <input type="date" id="calendar-iit-start">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-iit-end">IIT End</label>
+                            <input type="date" id="calendar-iit-end">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-iiit-start">IIIT Start</label>
+                            <input type="date" id="calendar-iiit-start">
+                        </div>
+                        <div class="form-group">
+                            <label for="calendar-iiit-end">IIIT End</label>
+                            <input type="date" id="calendar-iiit-end">
+                        </div>
+                    </div>
+                    <div id="school-calendar-save-status" class="teacher-inline-status"></div>
+                </section>
 
                 <!-- Tabs Navigation -->
                 <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.125)); margin-bottom: 2rem;">
                     <button class="data-tab-btn active" data-tab="dashboard" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid var(--primary-color, #6366f1); color: var(--text-main, #f8fafc); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        📊 Dashboard
+                        <i data-lucide="chart-no-axes-combined"></i>
+                        Dashboard
                     </button>
                     <button class="data-tab-btn" data-tab="export" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        📤 Export
+                        <i data-lucide="download"></i>
+                        Export
                     </button>
                     <button class="data-tab-btn" data-tab="view" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        📂 View Data
+                        <i data-lucide="folder-open"></i>
+                        View Data
                     </button>
                     <button class="data-tab-btn" data-tab="reset" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        🗑️ Reset
+                        <i data-lucide="trash-2"></i>
+                        Reset
                     </button>
                 </div>
 
@@ -643,7 +858,7 @@
                 <div id="data-dashboard-section" class="data-tab-content active">
                     <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
                         <div>
-                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">📊 Analytics Dashboard</h3>
+                            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">Analytics Dashboard</h3>
                             <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
                                 Visual insights into student progress, activity completion, and engagement metrics.
                             </p>
@@ -659,22 +874,22 @@
                     <!-- Summary Cards -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                         <div class="card" style="text-align: center; padding: 1.5rem;">
-                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                            <i data-lucide="users" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-total-students">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Total Students</div>
                         </div>
                         <div class="card" style="text-align: center; padding: 1.5rem;">
-                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                            <i data-lucide="activity" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);" id="dashboard-active-students">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Active (7 days)</div>
                         </div>
                         <div class="card" style="text-align: center; padding: 1.5rem;">
-                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🪙</div>
+                            <i data-lucide="coins" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-avg-coins">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Coins</div>
                         </div>
                         <div class="card" style="text-align: center; padding: 1.5rem;">
-                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                            <i data-lucide="book-open" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-vocab-count">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Vocabularies</div>
                         </div>
@@ -727,7 +942,7 @@
                 <!-- Export Tab -->
                 <div id="data-export-section" class="data-tab-content" style="display: none;">
                     <div style="margin-bottom: 2rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">📊 Data Export & Visualization</h3>
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">Data Export & Visualization</h3>
                         <p style="color: var(--text-muted, #6b7280); margin: 0; font-size: 0.95rem; line-height: 1.5;">
                             Before resetting data, you must export it. Select the data types and students you want to export, then preview and download.
                         </p>
@@ -788,15 +1003,15 @@
                     <!-- Action Buttons -->
                     <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
                         <button id="preview-data-btn" class="btn secondary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
-                            <span style="margin-right: 0.5rem;">👁️</span>
+                            <i data-lucide="eye"></i>
                             Preview Data
                         </button>
                         <button id="export-json-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
-                            <span style="margin-right: 0.5rem;">📥</span>
+                            <i data-lucide="download"></i>
                             Export JSON
                         </button>
                         <button id="export-csv-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
-                            <span style="margin-right: 0.5rem;">📊</span>
+                            <i data-lucide="table"></i>
                             Export CSV
                         </button>
                     </div>
@@ -827,7 +1042,7 @@
                     <!-- Export Status -->
                     <div id="export-status" style="display: none; padding: 1rem 1.25rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
-                            <span style="font-size: 1.2rem;">✅</span>
+                            <i data-lucide="circle-check"></i>
                             <div>
                                 <div style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-main, #f8fafc);">Export Completed</div>
                                 <div id="export-status-text" style="font-size: 0.9rem; color: #34d399;">Ready to proceed with reset</div>
@@ -846,7 +1061,7 @@
                 <!-- View Data Tab -->
                 <div id="data-viewer-section" class="data-tab-content" style="display: none;">
                     <div style="margin-bottom: 2rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">📂 View Exported Data</h3>
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">View Exported Data</h3>
                         <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
                             Load a previously exported JSON file to view all progress data, vocabulary scores, and student information.
                         </p>
@@ -855,7 +1070,7 @@
                     <!-- File Loader -->
                     <div id="file-loader" style="border: 2px dashed var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 2.5rem; text-align: center; background: rgba(15, 23, 42, 0.3); transition: all 0.2s;">
                         <input type="file" id="load-json-file" accept=".json" style="display: none;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">📁</div>
+                        <i data-lucide="folder-open" class="teacher-file-icon"></i>
                         <button id="choose-file-btn" class="btn primary-btn" style="padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 0.75rem;">
                             Choose JSON File
                         </button>
@@ -865,7 +1080,7 @@
                     <!-- File Info -->
                     <div id="file-info" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
-                            <span style="font-size: 1.2rem;">✅</span>
+                            <i data-lucide="circle-check"></i>
                             <div style="flex: 1;">
                                 <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">
                                     <span id="file-name"></span>
@@ -879,7 +1094,7 @@
                     <!-- Error Message -->
                     <div id="file-error" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #f87171;">
-                            <span style="font-size: 1.2rem;">❌</span>
+                            <i data-lucide="circle-x"></i>
                             <div>
                                 <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Error Loading File</div>
                                 <div id="error-message" style="font-size: 0.9rem; color: #fca5a5;"></div>
@@ -903,14 +1118,14 @@
                 <!-- Reset Tab -->
                 <div id="data-reset-section" class="data-tab-content" style="display: none; opacity: 0.5; pointer-events: none;">
                     <div style="margin-bottom: 1.5rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--danger-color, #f87171);">🗑️ Data Reset</h3>
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--danger-color, #f87171);">Data Reset</h3>
                         <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
-                            ⚠️ <strong>WARNING:</strong> This action cannot be undone! You must export data before resetting.
+                            <strong>WARNING:</strong> This action cannot be undone. You must export data before resetting.
                         </p>
                     </div>
                     <div id="reset-export-status" style="padding: 1rem 1.25rem; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #fbbf24;">
-                            <span style="font-size: 1.2rem;">⚠️</span>
+                            <i data-lucide="triangle-alert"></i>
                             <span style="font-weight: 500; color: var(--text-main, #f8fafc);">Export required before reset</span>
                         </div>
                     </div>
@@ -923,7 +1138,8 @@
                         </ul>
                     </div>
                     <button id="reset-data-btn" class="btn danger-btn" style="margin-top: 1.5rem; padding: 0.75rem 2rem; font-size: 1rem;" disabled>
-                        🗑️ Reset All Data
+                        <i data-lucide="trash-2"></i>
+                        Reset All Data
                     </button>
                 </div>
             </section>
@@ -1000,9 +1216,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="js/main.js" type="module"></script>
-    <script src="js/libs/html2canvas.min.js"></script>
+    <script src="js/desktop.js" type="module"></script>
     <script src="js/teacher.js" type="module"></script>
 </body>
 

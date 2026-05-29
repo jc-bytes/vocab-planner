@@ -1,0 +1,89 @@
+{
+  "id": "grade9_iit_july_week7_charts_patterns",
+  "name": "Grade 9 IIT Practice: July Week 7 - Charts and Patterns",
+  "description": "Practice words for Grade 9 second-trimester Python and data work.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "IIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 8,
+    "flashcards": 8,
+    "quiz": 8,
+    "illustration": 8,
+    "synonymAntonym": 8,
+    "wordSearch": 8,
+    "crossword": 8,
+    "hangman": 8,
+    "scramble": 8,
+    "speedMatch": 8,
+    "fillInBlank": 8
+  },
+  "words": [
+    {
+      "word": "chart",
+      "definition": "A visual way to show data.",
+      "example": "Students used chart during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "bar chart",
+      "definition": "A chart that compares values using bars.",
+      "example": "Students used bar chart during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "line chart",
+      "definition": "A chart that shows change or trends.",
+      "example": "Students used line chart during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "scatter",
+      "definition": "A chart that shows points for two values.",
+      "example": "Students used scatter during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "pattern",
+      "definition": "Something that repeats or has a clear order.",
+      "example": "Students used pattern during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "outlier",
+      "definition": "A value that is very different from the others.",
+      "example": "Students used outlier during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "correlation",
+      "definition": "A relationship where two things seem to change together.",
+      "example": "Students used correlation during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "conclusion",
+      "definition": "A final idea based on evidence.",
+      "example": "Students used conclusion during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "grade8_iiit_november_week10_game_build",
+  "name": "Grade 8 IIIT Practice: November Week 10 - Game Build",
+  "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "IIIT",
+  "purpose": "practice",
+  "activitySettings": {
+    "matching": 7,
+    "flashcards": 7,
+    "quiz": 7,
+    "illustration": 7,
+    "synonymAntonym": 7,
+    "wordSearch": 7,
+    "crossword": 7,
+    "hangman": 7,
+    "scramble": 7,
+    "speedMatch": 7,
+    "fillInBlank": 7
+  },
+  "words": [
+    {
+      "word": "game shell",
+      "definition": "The basic starting structure of a game.",
+      "example": "Students used game shell during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "background",
+      "definition": "The scene behind sprites.",
+      "example": "Students used background during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "motion",
+      "definition": "Movement in a program.",
+      "example": "Students used motion during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "game loop",
+      "definition": "The repeated actions that keep a game running.",
+      "example": "Students used game loop during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "score",
+      "definition": "A number that tracks points or progress.",
+      "example": "Students used score during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "obstacle",
+      "definition": "Something that blocks or challenges the player.",
+      "example": "Students used obstacle during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "control",
+      "definition": "A way the player makes something happen.",
+      "example": "Students used control during the class activity.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ]
+}
