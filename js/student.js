@@ -1062,6 +1062,9 @@ class StudentManager {
         this.addListener('#edit-profile-btn', 'click', () => {
             this.checkProfile(true);
         });
+        this.addListener('#mobile-edit-profile-btn', 'click', () => {
+            this.checkProfile(true);
+        });
 
         // Profile Save
         this.addListener('#save-profile-btn', 'click', async () => {

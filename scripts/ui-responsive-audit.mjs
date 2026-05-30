@@ -388,14 +388,18 @@ async function assertStudentMobileMenu(page, baseUrl) {
         const toggle = visibleRect('#student-mobile-menu-toggle');
         const coin = visibleRect('#coin-balance');
         const status = visibleRect('#auth-status');
+        const profile = visibleRect('#mobile-edit-profile-btn');
         const signOut = visibleRect('#sign-out-btn');
+        const welcome = visibleRect('#welcome-header');
         const menuStyle = window.getComputedStyle(document.querySelector('#student-tabs'));
 
         return {
             toggle,
             coin,
             status,
+            profile,
             signOut,
+            welcome,
             label: document.querySelector('#student-mobile-section-label')?.textContent?.trim(),
             expanded: document.querySelector('#student-mobile-menu-toggle')?.getAttribute('aria-expanded'),
             menuHidden: menuStyle.display === 'none'
@@ -405,11 +409,15 @@ async function assertStudentMobileMenu(page, baseUrl) {
     if (!closedState.toggle || closedState.toggle.height < 44) {
         throw new Error(`Student mobile menu toggle is not a 44px visible control: ${JSON.stringify(closedState.toggle)}`);
     }
-    if (!closedState.coin || !closedState.status || !closedState.signOut) {
-        throw new Error(`Student mobile header must keep coins, status dot, and sign out visible: ${JSON.stringify(closedState)}`);
+    if (closedState.welcome) {
+        throw new Error(`Student mobile header should hide the large name row: ${JSON.stringify(closedState)}`);
+    }
+    if (!closedState.coin || !closedState.status || !closedState.profile || !closedState.signOut) {
+        throw new Error(`Student mobile header must keep coins, status, profile, and sign out visible: ${JSON.stringify(closedState)}`);
     }
     if (Math.abs(closedState.toggle.centerY - closedState.coin.centerY) > 10
         || Math.abs(closedState.toggle.centerY - closedState.status.centerY) > 10
+        || Math.abs(closedState.toggle.centerY - closedState.profile.centerY) > 10
         || Math.abs(closedState.toggle.centerY - closedState.signOut.centerY) > 10) {
         throw new Error(`Student mobile header controls are not aligned on one row: ${JSON.stringify(closedState)}`);
     }

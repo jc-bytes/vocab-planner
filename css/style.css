@@ -188,6 +188,10 @@ body {
     justify-self: center;
 }
 
+.student-mobile-profile-btn {
+    display: none;
+}
+
 .app-container>.teacher-main {
     padding: var(--spacing-md);
 }
@@ -4999,8 +5003,7 @@ button.activity-card {
     }
 
     .student-app-header.student-mobile-compact .header-left {
-        grid-column: 1 / -1;
-        min-width: 0;
+        display: none;
     }
 
     .student-app-header.student-mobile-compact .student-tab-shell {
@@ -5074,6 +5077,10 @@ button.activity-card {
         width: auto;
         justify-content: flex-end;
         flex-wrap: nowrap;
+    }
+
+    .student-app-header.student-mobile-compact .student-mobile-profile-btn {
+        display: inline-flex;
     }
 
     #user-info {
