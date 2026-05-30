@@ -161,7 +161,7 @@
                         </form>
                     </div>
 
-                    <div id="login-error" style="color: var(--danger-color); margin-top: 1rem; display: none;">
+                    <div id="login-error" role="alert" aria-live="assertive" style="color: var(--danger-color); margin-top: 1rem; display: none;">
                     </div>
                 </div>
             </section>
@@ -212,66 +212,66 @@
                 </div>
                 <div class="activities-grid">
                     <!-- Activity cards -->
-                    <div class="card activity-card" data-activity="illustration">
+                    <button type="button" class="card activity-card" data-activity="illustration">
                         <div class="icon">🧭</div>
                         <h3>Word Hunt</h3>
                         <p>Find the definition, an image, and two examples.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="matching">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="matching">
                         <div class="icon">🧩</div>
                         <h3>Matching</h3>
                         <p>Match words to definitions.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="flashcards">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="flashcards">
                         <div class="icon">📇</div>
                         <h3>Flashcards</h3>
                         <p>Study words and images.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="quiz">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="quiz">
                         <div class="icon">❓</div>
                         <h3>Quiz</h3>
                         <p>Test your knowledge.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="synonym-antonym">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="synonym-antonym">
                         <div class="icon">🔄</div>
                         <h3>Synonym & Antonym</h3>
                         <p>Challenge your word knowledge.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="word-search">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="word-search">
                         <div class="icon">🔍</div>
                         <h3>Word Search</h3>
                         <p>Find hidden vocabulary words.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="crossword">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="crossword">
                         <div class="icon">📝</div>
                         <h3>Crossword</h3>
                         <p>Solve definitions.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="hangman">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="hangman">
                         <div class="icon">🕵️‍♀️</div>
                         <h3>Hangman</h3>
                         <p>Guess the word.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="scramble">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="scramble">
                         <div class="icon">🌪️</div>
                         <h3>Word Scramble</h3>
                         <p>Unscramble the letters.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="wordle">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="wordle">
                         <div class="icon">🟩</div>
                         <h3>Vocabulary Wordle</h3>
                         <p>Guess words from clues.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="speed-match">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="speed-match">
                         <div class="icon">⏱️</div>
                         <h3>Speed Match</h3>
                         <p>Race against time.</p>
-                    </div>
-                    <div class="card activity-card" data-activity="fill-in-blank">
+                    </button>
+                    <button type="button" class="card activity-card" data-activity="fill-in-blank">
                         <div class="icon">✍️</div>
                         <h3>Fill in Blank</h3>
                         <p>Complete the sentence.</p>
-                    </div>
+                    </button>
                     <!-- Add more activities here -->
                 </div>
             </section>
@@ -325,11 +325,11 @@
     </div>
 
     <!-- Leaderboard Modal -->
-    <div id="leaderboard-modal" class="modal hidden">
+    <div id="leaderboard-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboard-modal-title">
         <div class="modal-content card" style="max-width: 600px; width: 90%; max-height: 80vh;">
             <div class="modal-header">
-                <h3 style="margin: 0;">🏆 Leaderboard</h3>
-                <button id="close-leaderboard-modal" class="btn text-btn" style="font-size: 1.5rem;">×</button>
+                <h3 id="leaderboard-modal-title" style="margin: 0;">🏆 Leaderboard</h3>
+                <button id="close-leaderboard-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close leaderboard">×</button>
             </div>
             <div class="modal-body">
                 <h4 id="current-game-name" style="margin: 0 0 1rem 0; text-align: center; color: var(--text-muted);">Galactic Breaker</h4>
@@ -342,10 +342,10 @@
     </div>
 
     <!-- Student Profile Modal -->
-    <div id="profile-modal" class="modal hidden">
+    <div id="profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" data-modal-required="true">
         <div class="modal-content card">
             <div class="modal-header">
-                <h3>Student Profile</h3>
+                <h3 id="profile-modal-title">Student Profile</h3>
             </div>
             <div class="modal-body">
                 <p style="margin-bottom: 1rem; color: var(--text-muted);">Please enter your details to start.</p>
@@ -379,10 +379,10 @@
     </div>
 
     <!-- Forced Password Change Modal -->
-    <div id="force-password-modal" class="modal hidden">
+    <div id="force-password-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="force-password-modal-title" data-modal-required="true">
         <div class="modal-content card" style="max-width: 460px;">
             <div class="modal-header">
-                <h3>Change Password</h3>
+                <h3 id="force-password-modal-title">Change Password</h3>
             </div>
             <form id="change-password-form">
                 <div class="modal-body">

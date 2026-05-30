@@ -3,7 +3,7 @@
  * Handles backend authentication, user profile, and auth state
  */
 
-import { $ } from '../main.js';
+import { $, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 
@@ -195,7 +195,10 @@ export class StudentAuth {
             $('#student-group').value = '';
         }
 
-        modal.classList.remove('hidden');
+        openModal(modal, {
+            dismissible: false,
+            initialFocus: '#student-firstname'
+        });
     }
 
     setAuthStatus(text) {
@@ -238,10 +241,7 @@ export class StudentAuth {
         const errorEl = $('#login-error');
         if (errorEl) {
             errorEl.textContent = message;
-            errorEl.style.display = 'block';
-            setTimeout(() => {
-                errorEl.style.display = 'none';
-            }, 5000);
+            errorEl.style.display = message ? 'block' : 'none';
         }
     }
 }

@@ -1,4 +1,4 @@
-import { $, $$, createElement, escapeHtml, loadScript, notifications } from './main.js';
+import { $, $$, closeModal as closeDialog, createElement, escapeHtml, loadScript, notifications, openModal, setupModal } from './main.js';
 import {
     teacherApi as supabaseService,
     doc,
@@ -2673,6 +2673,20 @@ class TeacherManager {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
 
+        setupModal('#student-detail-modal', {
+            dismissible: true,
+            onClose: () => {
+                this.activeStudentId = null;
+            }
+        });
+        setupModal('#word-modal', {
+            dismissible: true,
+            onClose: () => {
+                this.editingWordIndex = -1;
+            }
+        });
+        setupModal('#quiz-modal', { dismissible: true });
+
         if (!this.authDisabled) {
             $('#teacher-login-form')?.addEventListener('submit', (event) => this.handleTeacherLogin(event));
             $('#teacher-signup-form')?.addEventListener('submit', (event) => this.handleTeacherSignup(event));
@@ -2775,8 +2789,7 @@ class TeacherManager {
 
         // Detail Modal
         $('#close-detail-modal').addEventListener('click', () => {
-            $('#student-detail-modal').classList.add('hidden');
-            this.activeStudentId = null;
+            closeDialog('#student-detail-modal');
         });
 
         // Data Management View Navigation
@@ -2798,6 +2811,9 @@ class TeacherManager {
 
         // Bulk Coin Distribution
         $('#select-all-students')?.addEventListener('change', (e) => {
+            this.handleSelectAll(e.target.checked);
+        });
+        $('#select-visible-students-mobile')?.addEventListener('change', (e) => {
             this.handleSelectAll(e.target.checked);
         });
 
@@ -2941,12 +2957,11 @@ class TeacherManager {
         // Modal Actions
         $$('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
-                $('#word-modal').classList.add('hidden');
-                this.editingWordIndex = -1;
+                closeDialog('#word-modal');
             });
         });
         $('#close-quiz-modal').addEventListener('click', () => {
-            $('#quiz-modal').classList.add('hidden');
+            closeDialog('#quiz-modal');
         });
         $('#refresh-quiz-btn').addEventListener('click', () => this.handleGenerateQuiz(true));
         $('#print-quiz-btn').addEventListener('click', () => this.printQuiz());
@@ -3010,7 +3025,7 @@ class TeacherManager {
 
         // Disable old modal listeners or redirect them
         $('#close-quiz-modal').addEventListener('click', () => {
-            $('#quiz-modal').classList.add('hidden');
+            closeDialog('#quiz-modal');
         });
         // These buttons are inside the old modal, so they shouldn't be reachable if we don't open it.
         // But just in case:
@@ -3762,12 +3777,11 @@ class TeacherManager {
             title.textContent = 'Add New Word';
         }
 
-        modal.classList.remove('hidden');
+        openModal(modal, { initialFocus: '#word-input' });
     }
 
     closeModal() {
-        $('#word-modal').classList.add('hidden');
-        this.editingWordIndex = -1;
+        closeDialog('#word-modal');
     }
 
     saveWord() {
@@ -4014,80 +4028,158 @@ class TeacherManager {
 
     renderProgressTable() {
         const tbody = $('#student-progress-list');
-        if (!tbody) return;
-        tbody.innerHTML = '';
+        const cardList = $('#student-progress-cards');
+        if (tbody) tbody.innerHTML = '';
+        if (cardList) cardList.innerHTML = '';
+        if (!tbody && !cardList) return;
+
+        if (this.filteredStudentData.length === 0) {
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="padding: 1rem; color: var(--text-muted);">No students match the current filters.</td>
+                    </tr>
+                `;
+            }
+            if (cardList) {
+                cardList.innerHTML = '<p class="teacher-empty-state">No students match the current filters.</p>';
+            }
+            this.updateBulkToolbar();
+            this.updateSelectAllCheckbox();
+            return;
+        }
 
         this.filteredStudentData.forEach(student => {
             const profile = student.studentProfile || {};
+            const details = this.getStudentProgressDetails(student, profile);
             const tr = createElement('tr');
+            tr.dataset.studentId = student.id;
 
             // Add selected class if student is selected
             if (this.selectedStudents.has(student.id)) {
                 tr.classList.add('selected');
             }
 
-            const name = profile.firstName && profile.lastName
-                ? `${profile.firstName} ${profile.lastName}`
-                : (profile.name || 'Unknown');
-
-            const lastActive = student.updatedAt
-                ? new Date(student.updatedAt.seconds * 1000).toLocaleDateString()
-                : '-';
-
             tr.innerHTML = `
                 <td style="padding: 1rem;">
-                    <input type="checkbox" class="student-checkbox" data-id="${student.id}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
+                    <input type="checkbox" class="student-checkbox student-select-control" data-id="${escapeHtml(student.id)}" aria-label="Select ${details.name}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
                 </td>
-                <td style="padding: 1rem;">${name}</td>
-                <td style="padding: 1rem; color: var(--text-muted);">${student.email || profile.email || '-'}</td>
-                <td style="padding: 1rem;">${profile.grade || '-'}</td>
-                <td style="padding: 1rem;">${profile.group || '-'}</td>
-                <td style="padding: 1rem;">${student.coins || 0}</td>
-                <td style="padding: 1rem;">${lastActive}</td>
+                <td style="padding: 1rem;">${details.name}</td>
+                <td style="padding: 1rem; color: var(--text-muted);">${details.email}</td>
+                <td style="padding: 1rem;">${details.grade}</td>
+                <td style="padding: 1rem;">${details.group}</td>
+                <td style="padding: 1rem;">${details.coins}</td>
+                <td style="padding: 1rem;">${details.lastActive}</td>
                 <td style="padding: 1rem;">
-                    <button class="btn text-btn view-details-btn" data-id="${student.id}">View Details</button>
-                    <button class="btn secondary-btn add-coins-btn" data-id="${student.id}" style="margin-left:0.5rem;">Add Coins</button>
+                    <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
+                    <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}" style="margin-left:0.5rem;">Add Coins</button>
                 </td>
             `;
-            tbody.appendChild(tr);
+            tbody?.appendChild(tr);
+
+            if (cardList) {
+                const card = createElement('article', 'student-progress-mobile-card');
+                card.dataset.studentCardId = student.id;
+                if (this.selectedStudents.has(student.id)) {
+                    card.classList.add('selected');
+                }
+                card.innerHTML = `
+                    <div class="student-card-header">
+                        <label class="student-card-select">
+                            <input type="checkbox" class="student-checkbox student-select-control" data-id="${escapeHtml(student.id)}" aria-label="Select ${details.name}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
+                        </label>
+                        <div>
+                            <div class="student-card-name">${details.name}</div>
+                            <div class="student-card-email">${details.email}</div>
+                        </div>
+                    </div>
+                    <div class="student-card-meta">
+                        <span>Grade<strong>${details.grade}</strong></span>
+                        <span>Group<strong>${details.group}</strong></span>
+                        <span>Coins<strong>${details.coins}</strong></span>
+                        <span>Last Active<strong>${details.lastActive}</strong></span>
+                    </div>
+                    <div class="student-card-actions">
+                        <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
+                        <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}">Add Coins</button>
+                    </div>
+                `;
+                cardList.appendChild(card);
+            }
         });
 
-        // Add listeners to new buttons and checkboxes
+        this.bindStudentProgressControls();
+        this.updateSelectAllCheckbox();
+        this.updateBulkToolbar();
+    }
+
+    getStudentProgressDetails(student, profile = {}) {
+        const rawName = profile.firstName && profile.lastName
+            ? `${profile.firstName} ${profile.lastName}`
+            : (profile.name || 'Unknown');
+        const updatedAt = student.updatedAt;
+        const date = updatedAt?.toDate
+            ? updatedAt.toDate()
+            : updatedAt?.seconds
+                ? new Date(updatedAt.seconds * 1000)
+                : null;
+
+        return {
+            name: escapeHtml(rawName),
+            email: escapeHtml(student.email || profile.email || '-'),
+            grade: escapeHtml(profile.grade || '-'),
+            group: escapeHtml(profile.group || '-'),
+            coins: escapeHtml(student.coins || 0),
+            lastActive: date ? escapeHtml(date.toLocaleDateString()) : '-'
+        };
+    }
+
+    bindStudentProgressControls() {
         $$('.view-details-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
+                const id = e.currentTarget.dataset.id;
                 const student = this.allStudentData.find(s => s.id === id);
                 if (student) this.showStudentDetails(student);
             });
         });
         $$('.add-coins-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const id = e.target.dataset.id;
+                const id = e.currentTarget.dataset.id;
                 const student = this.allStudentData.find(s => s.id === id);
                 if (student) {
                     this.showStudentDetails(student);
-                    $('#coin-adjust-input').focus();
+                    window.requestAnimationFrame(() => $('#coin-adjust-input')?.focus());
                 }
             });
         });
-        $$('.student-checkbox').forEach(checkbox => {
+        $$('.student-select-control').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
-                const id = e.target.dataset.id;
-                if (e.target.checked) {
-                    this.selectedStudents.add(id);
-                } else {
-                    this.selectedStudents.delete(id);
-                }
-                this.updateBulkToolbar();
-                this.updateSelectAllCheckbox();
-                // Update row highlighting
-                const row = e.target.closest('tr');
-                if (e.target.checked) {
-                    row.classList.add('selected');
-                } else {
-                    row.classList.remove('selected');
-                }
+                this.setStudentSelected(e.currentTarget.dataset.id, e.currentTarget.checked);
             });
+        });
+    }
+
+    setStudentSelected(studentId, selected) {
+        if (!studentId) return;
+        if (selected) {
+            this.selectedStudents.add(studentId);
+        } else {
+            this.selectedStudents.delete(studentId);
+        }
+        this.updateStudentSelectionVisuals();
+        this.updateBulkToolbar();
+        this.updateSelectAllCheckbox();
+    }
+
+    updateStudentSelectionVisuals() {
+        $$('.student-select-control').forEach(control => {
+            control.checked = this.selectedStudents.has(control.dataset.id);
+        });
+        $$('tr[data-student-id]').forEach(row => {
+            row.classList.toggle('selected', this.selectedStudents.has(row.dataset.studentId));
+        });
+        $$('.student-progress-mobile-card').forEach(card => {
+            card.classList.toggle('selected', this.selectedStudents.has(card.dataset.studentCardId));
         });
     }
 
@@ -4164,7 +4256,7 @@ class TeacherManager {
         $('#detail-avg-score').textContent = avgScore === '-' ? '-' : `${avgScore}%`;
         $('#detail-total-activities').textContent = totalActivities || '-';
 
-        modal.classList.remove('hidden');
+        openModal(modal, { initialFocus: '#close-detail-modal' });
     }
 
     async updateStudentRole(role) {
@@ -4310,24 +4402,24 @@ class TeacherManager {
 
     handleSelectAll(checked) {
         if (checked) {
-            // Select all filtered students
             this.filteredStudentData.forEach(student => {
                 this.selectedStudents.add(student.id);
             });
         } else {
-            // Deselect all
-            this.selectedStudents.clear();
+            this.filteredStudentData.forEach(student => {
+                this.selectedStudents.delete(student.id);
+            });
         }
-        this.renderProgressTable();
+        this.updateStudentSelectionVisuals();
         this.updateBulkToolbar();
+        this.updateSelectAllCheckbox();
     }
 
     clearSelection() {
         this.selectedStudents.clear();
-        const selectAllCheckbox = $('#select-all-students');
-        if (selectAllCheckbox) selectAllCheckbox.checked = false;
-        this.renderProgressTable();
+        this.updateStudentSelectionVisuals();
         this.updateBulkToolbar();
+        this.updateSelectAllCheckbox();
     }
 
     updateBulkToolbar() {
@@ -4345,16 +4437,17 @@ class TeacherManager {
     }
 
     updateSelectAllCheckbox() {
-        const selectAllCheckbox = $('#select-all-students');
-        if (!selectAllCheckbox) return;
-
         const visibleStudentIds = this.filteredStudentData.map(s => s.id);
         const allVisibleSelected = visibleStudentIds.length > 0 &&
             visibleStudentIds.every(id => this.selectedStudents.has(id));
+        const someVisibleSelected = visibleStudentIds.some(id => this.selectedStudents.has(id));
 
-        selectAllCheckbox.checked = allVisibleSelected;
-        selectAllCheckbox.indeterminate = !allVisibleSelected &&
-            visibleStudentIds.some(id => this.selectedStudents.has(id));
+        ['#select-all-students', '#select-visible-students-mobile'].forEach(selector => {
+            const checkbox = $(selector);
+            if (!checkbox) return;
+            checkbox.checked = allVisibleSelected;
+            checkbox.indeterminate = !allVisibleSelected && someVisibleSelected;
+        });
     }
 
     async handleBulkCoinAdjust() {
@@ -5402,15 +5495,9 @@ Object.assign(TeacherManager.prototype, {
     switchDataTab(tab) {
         // Update tab buttons
         document.querySelectorAll('.data-tab-btn').forEach(btn => {
-            if (btn.dataset.tab === tab) {
-                btn.classList.add('active');
-                btn.style.borderBottomColor = 'var(--primary-color, #6366f1)';
-                btn.style.color = 'var(--text-main, #f8fafc)';
-            } else {
-                btn.classList.remove('active');
-                btn.style.borderBottomColor = 'transparent';
-                btn.style.color = 'var(--text-muted, #cbd5f5)';
-            }
+            const isActive = btn.dataset.tab === tab;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
 
         // Update tab content

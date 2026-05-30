@@ -132,7 +132,7 @@
                             <button type="submit" class="btn secondary-btn" style="width:100%;">Create Teacher Account</button>
                         </form>
                     </div>
-                    <div id="teacher-login-error" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
+                    <div id="teacher-login-error" role="alert" aria-live="assertive" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
                     </div>
                 </div>
             </section>
@@ -259,21 +259,21 @@
                     </div>
                 </div>
 
-                <div class="card" style="margin-bottom: 1.5rem;">
-                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                <div class="card student-filter-card">
+                    <div class="student-filter-grid">
+                        <div class="form-group">
                             <label for="filter-grade" style="font-size: 0.8rem;">Grade</label>
                             <select id="filter-grade" style="width: 100%; padding: 0.5rem;">
                                 <option value="">All Grades</option>
                             </select>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                        <div class="form-group">
                             <label for="filter-group" style="font-size: 0.8rem;">Group</label>
                             <select id="filter-group" style="width: 100%; padding: 0.5rem;">
                                 <option value="">All Groups</option>
                             </select>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
+                        <div class="form-group">
                             <label for="filter-search" style="font-size: 0.8rem;">Search Name</label>
                             <input type="text" id="filter-search" placeholder="Search student..."
                                 style="width: 100%; padding: 0.5rem;">
@@ -281,8 +281,14 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div style="overflow-x: auto; max-height: 60vh; overflow-y: auto;">
+                <div class="card student-progress-card">
+                    <div class="student-mobile-select-row">
+                        <label class="student-mobile-select-toggle">
+                            <input type="checkbox" id="select-visible-students-mobile">
+                            <span>Select visible students</span>
+                        </label>
+                    </div>
+                    <div class="student-progress-table-wrap table-scroll-wrapper">
                         <table style="width: 100%; border-collapse: collapse; text-align: left;">
                             <thead style="position: sticky; top: 0; background: var(--card-bg, rgba(15, 23, 42, 0.55)); z-index: 10;">
                                 <tr style="border-bottom: 2px solid var(--border-color);">
@@ -303,6 +309,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="student-progress-cards" class="student-progress-cards" aria-live="polite"></div>
                     <div id="progress-loading" class="loading-spinner hidden">Loading data...</div>
                 </div>
 
@@ -321,11 +328,11 @@
             </section>
 
             <!-- Modal: Student Details -->
-            <div id="student-detail-modal" class="modal hidden">
+            <div id="student-detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detail-student-name">
                 <div class="modal-content" style="max-width: 800px; width: 90%;">
                     <div class="modal-header">
                         <h2 id="detail-student-name">Student Name</h2>
-                        <button id="close-detail-modal" class="btn text-btn" style="font-size: 1.5rem;">&times;</button>
+                        <button id="close-detail-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close student details">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="detail-summary-grid">
@@ -841,20 +848,20 @@
                 </section>
 
                 <!-- Tabs Navigation -->
-                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.125)); margin-bottom: 2rem;">
-                    <button class="data-tab-btn active" data-tab="dashboard" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid var(--primary-color, #6366f1); color: var(--text-main, #f8fafc); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                <div class="data-tab-list">
+                    <button class="data-tab-btn active" data-tab="dashboard">
                         <i data-lucide="chart-no-axes-combined"></i>
                         Dashboard
                     </button>
-                    <button class="data-tab-btn" data-tab="export" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    <button class="data-tab-btn" data-tab="export">
                         <i data-lucide="download"></i>
                         Export
                     </button>
-                    <button class="data-tab-btn" data-tab="view" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    <button class="data-tab-btn" data-tab="view">
                         <i data-lucide="folder-open"></i>
                         View Data
                     </button>
-                    <button class="data-tab-btn" data-tab="reset" style="padding: 0.75rem 1.5rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted, #cbd5f5); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    <button class="data-tab-btn" data-tab="reset">
                         <i data-lucide="trash-2"></i>
                         Reset
                     </button>
@@ -862,14 +869,14 @@
 
                 <!-- Dashboard Tab -->
                 <div id="data-dashboard-section" class="data-tab-content active">
-                    <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div class="data-dashboard-header">
                         <div>
                             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">Analytics Dashboard</h3>
                             <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
                                 Visual insights into student progress, activity completion, and engagement metrics.
                             </p>
                         </div>
-                        <div class="card" style="padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="card data-grade-filter-card">
                             <label for="dashboard-grade-filter" style="font-weight: 500; white-space: nowrap; color: var(--text-main);">Filter by Grade:</label>
                             <select id="dashboard-grade-filter" style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg, rgba(15,23,42,0.6)); color: var(--text-color); min-width: 150px;">
                                 <option value="">All Grades</option>
@@ -878,7 +885,7 @@
                     </div>
 
                     <!-- Summary Cards -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="data-summary-grid">
                         <div class="card" style="text-align: center; padding: 1.5rem;">
                             <i data-lucide="users" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-total-students">--</div>
@@ -902,44 +909,44 @@
                     </div>
 
                     <!-- Charts Grid -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="data-chart-grid">
                         <!-- Activity Completion Chart -->
-                        <div class="card" style="padding: 1.5rem;">
+                        <div class="card data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Activity Completion</h4>
-                            <div style="position: relative; height: 300px;">
+                            <div class="data-chart-frame">
                                 <canvas id="activity-chart"></canvas>
                             </div>
                         </div>
 
                         <!-- Progress by Grade Chart -->
-                        <div class="card" style="padding: 1.5rem;">
+                        <div class="card data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Progress by Grade</h4>
-                            <div style="position: relative; height: 300px;">
+                            <div class="data-chart-frame">
                                 <canvas id="grade-progress-chart"></canvas>
                             </div>
                         </div>
 
                         <!-- Coin Distribution Chart -->
-                        <div class="card" style="padding: 1.5rem;">
+                        <div class="card data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Coin Distribution</h4>
-                            <div style="position: relative; height: 300px;">
+                            <div class="data-chart-frame">
                                 <canvas id="coin-distribution-chart"></canvas>
                             </div>
                         </div>
 
                         <!-- Activity Usage Chart -->
-                        <div class="card" style="padding: 1.5rem;">
+                        <div class="card data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Most Used Activities</h4>
-                            <div style="position: relative; height: 300px;">
+                            <div class="data-chart-frame">
                                 <canvas id="activity-usage-chart"></canvas>
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Activity Table -->
-                    <div class="card" style="padding: 1.5rem;">
+                    <div class="card data-recent-card">
                         <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Recent Activity</h4>
-                        <div id="recent-activity-table" style="max-height: 400px; overflow-y: auto;">
+                        <div id="recent-activity-table" class="table-scroll-wrapper data-table-region">
                             <div class="loading-spinner">Loading activity data...</div>
                         </div>
                     </div>
@@ -1060,7 +1067,7 @@
                     <div id="data-preview-section" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
                         <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Data Preview</h4>
                         <div id="preview-summary" style="margin-bottom: 1.5rem;"></div>
-                        <div id="preview-tables" style="max-height: 500px; overflow-y: auto; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                        <div id="preview-tables" class="table-scroll-wrapper data-table-region" style="max-height: 500px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
                     </div>
                 </div>
 
@@ -1117,7 +1124,7 @@
                     <!-- Data Tables (shown after successful load) -->
                     <div id="viewer-tables" style="display: none; margin-top: 2rem;">
                         <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Student Data</h4>
-                        <div id="viewer-tables-content" style="max-height: 600px; overflow-y: auto; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                        <div id="viewer-tables-content" class="table-scroll-wrapper data-table-region" style="max-height: 600px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
                     </div>
                 </div>
 
@@ -1153,11 +1160,11 @@
     </div>
 
     <!-- Word Editor Modal -->
-    <div id="word-modal" class="modal hidden">
+    <div id="word-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content card">
             <div class="modal-header">
                 <h3 id="modal-title">Edit Word</h3>
-                <button class="close-modal">×</button>
+                <button class="close-modal" aria-label="Close word editor">×</button>
             </div>
             <div class="modal-body">
                 <div class="form-row">
@@ -1205,14 +1212,14 @@
     </div>
 
     <!-- Quiz Preview Modal -->
-    <div id="quiz-modal" class="modal hidden">
+    <div id="quiz-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title">
         <div class="modal-content card" style="max-width: 900px; width: 95%; max-height: 90vh; overflow: auto;">
             <div class="modal-header">
                 <div>
-                    <h3 style="margin-bottom:0.25rem;">Summative Quiz Preview</h3>
+                    <h3 id="quiz-modal-title" style="margin-bottom:0.25rem;">Summative Quiz Preview</h3>
                     <small style="color:var(--text-muted);">Layout follows provided template.</small>
                 </div>
-                <button id="close-quiz-modal" class="btn text-btn" style="font-size: 1.5rem;">×</button>
+                <button id="close-quiz-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close quiz preview">×</button>
             </div>
             <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
                 <button id="refresh-quiz-btn" class="btn secondary-btn">🔄 Regenerate</button>

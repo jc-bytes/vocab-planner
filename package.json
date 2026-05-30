@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 8000",
+    "test:ui:responsive": "node scripts/ui-responsive-audit.mjs",
     "desktop:dev": "vite --host 127.0.0.1",
     "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
     "desktop:build": "npm run desktop:build:web && tauri build --bundles app",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",
+    "playwright": "^1.60.0",
     "vite": "^6.3.5"
   }
 }

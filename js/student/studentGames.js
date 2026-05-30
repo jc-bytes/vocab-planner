@@ -3,7 +3,7 @@
  * Handles game lifecycle, leaderboards, timer management, and HTML game loading
  */
 
-import { $ } from '../main.js';
+import { $, closeModal, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import {
     studentApi as supabaseService,
@@ -241,7 +241,7 @@ export class StudentGames {
     showLeaderboardModal() {
         const modal = $('#leaderboard-modal');
         if (modal) {
-            modal.classList.remove('hidden');
+            openModal(modal, { initialFocus: '#close-leaderboard-modal' });
             // Reload leaderboard for current game
             const game = this.sm.gamesList[this.sm.currentGameIndex];
             if (game) {
@@ -253,7 +253,7 @@ export class StudentGames {
     hideLeaderboardModal() {
         const modal = $('#leaderboard-modal');
         if (modal) {
-            modal.classList.add('hidden');
+            closeModal(modal);
         }
     }
     

@@ -1,4 +1,4 @@
-import { $, $$, createElement, fetchJSON, notifications } from './main.js';
+import { $, $$, closeModal as closeDialog, createElement, fetchJSON, notifications, openModal, setupModal } from './main.js';
 import {
     studentApi as supabaseService,
     getDocs,
@@ -835,6 +835,10 @@ class StudentManager {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
 
+        setupModal('#leaderboard-modal', { dismissible: true });
+        setupModal('#profile-modal', { dismissible: false });
+        setupModal('#force-password-modal', { dismissible: false });
+
         // Navigation
         this.addListener('#back-to-vocab', 'click', () => {
             this.navigateTo({ view: 'units' });
@@ -1040,7 +1044,7 @@ class StudentManager {
                 return;
             }
 
-            $('#profile-modal').classList.add('hidden');
+            closeDialog('#profile-modal', { restoreFocus: false });
             this.auth.updateHeader();
             this.activities.renderDashboard();
         });
@@ -1172,7 +1176,7 @@ class StudentManager {
         const modal = $('#force-password-modal');
         const status = $('#change-password-status');
         if (status) status.textContent = '';
-        if (modal) modal.classList.remove('hidden');
+        if (modal) openModal(modal, { dismissible: false, initialFocus: '#change-password-new' });
     }
 
     async handleForcedPasswordChange(event) {
@@ -1195,7 +1199,7 @@ class StudentManager {
             if (status) status.textContent = 'Updating password...';
             await supabaseService.updatePasswordAndClearFlag(password);
             this.mustChangePassword = false;
-            $('#force-password-modal')?.classList.add('hidden');
+            closeDialog('#force-password-modal', { restoreFocus: false });
             await this.auth.finishSignedInSession();
             notifications.success('Password updated.');
         } catch (error) {

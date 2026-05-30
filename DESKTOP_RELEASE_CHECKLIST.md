@@ -4,7 +4,7 @@
 
 1. Run `npm install`.
 2. Run `npm run desktop:build`.
-3. Open `src-tauri/target/release/bundle/macos/Technology 6A.app`.
+3. Open `src-tauri/target/release/bundle/macos/Vocabulary Master.app`.
 4. Confirm Student and Teacher pages load.
 5. Confirm first login works online.
 6. Reopen without internet and confirm the cached session still opens until manual logout.
