@@ -429,6 +429,50 @@ async function assertStudentMobileMenu(page, baseUrl) {
         throw new Error(`Student mobile menu closed state is wrong: ${JSON.stringify(closedState)}`);
     }
 
+    const dashboardState = await page.evaluate(() => {
+        const visible = (selector) => {
+            const element = document.querySelector(selector);
+            if (!element) return false;
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        };
+        const rectFor = (selector) => {
+            const element = document.querySelector(selector);
+            if (!element) return null;
+            const rect = element.getBoundingClientRect();
+            return {
+                top: Math.round(rect.top),
+                bottom: Math.round(rect.bottom),
+                height: Math.round(rect.height),
+                centerY: Math.round(rect.top + rect.height / 2)
+            };
+        };
+        const visiblePanels = Array.from(document.querySelectorAll('.student-home-panel'))
+            .filter(panel => window.getComputedStyle(panel).display !== 'none')
+            .map(panel => panel.dataset.panel);
+        return {
+            headingVisible: visible('.student-dashboard-heading > div:first-child'),
+            tabsVisible: visible('.student-home-tabs'),
+            activeTab: document.querySelector('.student-home-tab.active')?.dataset.panel,
+            visiblePanels,
+            subject: rectFor('#student-subject-picker'),
+            allUnits: rectFor('#menu-vocab-btn')
+        };
+    });
+
+    if (dashboardState.headingVisible
+        || !dashboardState.tabsVisible
+        || dashboardState.activeTab !== 'pending'
+        || dashboardState.visiblePanels.length !== 1
+        || dashboardState.visiblePanels[0] !== 'pending') {
+        throw new Error(`Student mobile dashboard is not compacted into one active panel: ${JSON.stringify(dashboardState)}`);
+    }
+    if (!dashboardState.subject || !dashboardState.allUnits
+        || Math.abs(dashboardState.subject.centerY - dashboardState.allUnits.centerY) > 8) {
+        throw new Error(`Student mobile class picker and All Units are not aligned: ${JSON.stringify(dashboardState)}`);
+    }
+
     await page.locator('#student-mobile-menu-toggle').click();
     await page.waitForTimeout(100);
 

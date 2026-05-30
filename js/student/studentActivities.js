@@ -647,9 +647,51 @@ export class StudentActivities {
                 .slice(-3)
                 .reverse();
 
-        container.appendChild(this.createHomePanel('Pending', 'Due this trimester', dueItems, 'No pending units due yet.'));
-        container.appendChild(this.createHomePanel('Recent', 'Unfinished practice', recentItems, 'No unfinished recent work.'));
-        container.appendChild(this.createHomePanel('This Week', 'Current vocabulary', fallbackWeekItems, 'No vocabulary is scheduled this week.'));
+        const panels = [
+            {
+                key: 'pending',
+                title: 'Pending',
+                subtitle: 'Due this trimester',
+                items: dueItems,
+                emptyText: 'No pending units due yet.'
+            },
+            {
+                key: 'recent',
+                title: 'Recent',
+                subtitle: 'Unfinished practice',
+                items: recentItems,
+                emptyText: 'No unfinished recent work.'
+            },
+            {
+                key: 'week',
+                title: 'This Week',
+                subtitle: 'Current vocabulary',
+                items: fallbackWeekItems,
+                emptyText: 'No vocabulary is scheduled this week.'
+            }
+        ];
+
+        const tabList = createElement('div', 'student-home-tabs');
+        tabList.setAttribute('role', 'tablist');
+        tabList.setAttribute('aria-label', 'Dashboard sections');
+        panels.forEach((panel, index) => {
+            const tab = createElement('button', `student-home-tab${index === 0 ? ' active' : ''}`);
+            tab.type = 'button';
+            tab.id = `student-home-tab-${panel.key}`;
+            tab.dataset.panel = panel.key;
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+            tab.setAttribute('aria-controls', `student-home-panel-${panel.key}`);
+            tab.tabIndex = index === 0 ? 0 : -1;
+            tab.innerHTML = `<span>${panel.title}</span>`;
+            tabList.appendChild(tab);
+        });
+        container.appendChild(tabList);
+
+        panels.forEach((panel, index) => {
+            container.appendChild(this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText, index === 0));
+        });
+        this.bindHomePanelTabs(container);
         this.scheduleFirstVocabularyPreload(container);
 
         if (window.lucide) {
@@ -657,8 +699,44 @@ export class StudentActivities {
         }
     }
 
-    createHomePanel(title, subtitle, items, emptyText) {
-        const panel = createElement('section', 'student-home-panel');
+    bindHomePanelTabs(container) {
+        const tabs = Array.from(container.querySelectorAll('.student-home-tab'));
+        const panels = Array.from(container.querySelectorAll('.student-home-panel'));
+        const activate = (key, focus = false) => {
+            tabs.forEach(tab => {
+                const active = tab.dataset.panel === key;
+                tab.classList.toggle('active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.tabIndex = active ? 0 : -1;
+                if (active && focus) tab.focus({ preventScroll: true });
+            });
+            panels.forEach(panel => {
+                const active = panel.dataset.panel === key;
+                panel.classList.toggle('active', active);
+            });
+        };
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => activate(tab.dataset.panel));
+            tab.addEventListener('keydown', event => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                let nextIndex = index;
+                if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                activate(tabs[nextIndex].dataset.panel, true);
+            });
+        });
+    }
+
+    createHomePanel(key, title, subtitle, items, emptyText, active = false) {
+        const panel = createElement('section', `student-home-panel${active ? ' active' : ''}`);
+        panel.id = `student-home-panel-${key}`;
+        panel.dataset.panel = key;
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', `student-home-tab-${key}`);
         panel.innerHTML = `
             <div class="teacher-panel-header">
                 <div>
