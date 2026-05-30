@@ -367,6 +367,10 @@ async function assertStudentMobileMenu(page, baseUrl) {
     await page.goto(`${baseUrl}/student.html#/menu`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
     await page.waitForSelector('#student-tab-shell:not(.hidden)', { timeout: 5000 });
+    await page.evaluate(() => {
+        document.querySelector('.student-app-header')?.classList.remove('student-mobile-compact');
+    });
+    await page.waitForTimeout(50);
 
     const closedState = await page.evaluate(() => {
         const visibleRect = (selector) => {

@@ -4957,7 +4957,8 @@ button.activity-card {
         gap: 0.55rem;
     }
 
-    .student-app-header.student-mobile-compact {
+    .student-app-header.student-mobile-compact,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
         grid-template-columns: minmax(0, 1fr) max-content;
         align-items: center;
         gap: 0.55rem;
@@ -5002,11 +5003,13 @@ button.activity-card {
         white-space: normal;
     }
 
-    .student-app-header.student-mobile-compact .header-left {
+    .student-app-header.student-mobile-compact .header-left,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left {
         display: none;
     }
 
-    .student-app-header.student-mobile-compact .student-tab-shell {
+    .student-app-header.student-mobile-compact .student-tab-shell,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
         justify-self: stretch;
         position: relative;
         z-index: 30;
@@ -5014,11 +5017,13 @@ button.activity-card {
         min-width: 0;
     }
 
-    .student-app-header.student-mobile-compact .student-mobile-menu-toggle {
+    .student-app-header.student-mobile-compact .student-mobile-menu-toggle,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-menu-toggle {
         display: inline-flex;
     }
 
-    .student-app-header.student-mobile-compact .student-tabs {
+    .student-app-header.student-mobile-compact .student-tabs,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tabs {
         position: absolute;
         top: calc(100% + 0.4rem);
         left: 0;
@@ -5034,11 +5039,14 @@ button.activity-card {
         box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
     }
 
-    .student-tab-shell.mobile-menu-open .student-tabs {
+    .student-tab-shell.mobile-menu-open .student-tabs,
+    .student-app-header.student-mobile-compact .student-tab-shell.mobile-menu-open .student-tabs,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell.mobile-menu-open .student-tabs {
         display: grid;
     }
 
-    .student-app-header.student-mobile-compact .student-tab {
+    .student-app-header.student-mobile-compact .student-tab,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab {
         justify-content: flex-start;
         width: 100%;
         min-width: 0;
@@ -5051,7 +5059,8 @@ button.activity-card {
         width: auto;
     }
 
-    .student-app-header.student-mobile-compact .header-actions {
+    .student-app-header.student-mobile-compact .header-actions,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
         justify-self: end;
         min-width: 0;
         width: auto;
@@ -5073,13 +5082,16 @@ button.activity-card {
     }
 
     .student-app-header.student-mobile-compact .header-actions,
-    .student-app-header.student-mobile-compact #user-info {
+    .student-app-header.student-mobile-compact #user-info,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info {
         width: auto;
         justify-content: flex-end;
         flex-wrap: nowrap;
     }
 
-    .student-app-header.student-mobile-compact .student-mobile-profile-btn {
+    .student-app-header.student-mobile-compact .student-mobile-profile-btn,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-profile-btn {
         display: inline-flex;
     }
 
