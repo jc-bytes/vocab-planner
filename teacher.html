@@ -748,132 +748,156 @@
                     </div>
                 </div>
 
-                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
-                    <div class="teacher-panel-header">
-                        <div>
-                            <h3>Subjects</h3>
-                            <p>Create and organize subjects used by vocabulary sets.</p>
-                        </div>
-                        <button id="save-subjects-btn" class="btn primary-btn">
-                            <i data-lucide="save"></i>
-                            Save Subjects
-                        </button>
-                    </div>
-                    <div class="teacher-settings-grid" style="align-items: end;">
-                        <div class="form-group">
-                            <label for="new-subject-name">New Subject</label>
-                            <input type="text" id="new-subject-name" placeholder="e.g., Science">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-subject-color">Color</label>
-                            <input type="color" id="new-subject-color" value="#16a34a">
-                        </div>
-                        <button id="add-subject-btn" class="btn secondary-btn" type="button">
-                            <i data-lucide="plus"></i>
-                            Add Subject
-                        </button>
-                    </div>
-                    <div id="subjects-manager-list" class="subjects-manager-list"></div>
-                    <div id="subjects-save-status" class="teacher-inline-status"></div>
-                </section>
-
-                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
-                    <div class="teacher-panel-header">
-                        <div>
-                            <h3>Gamification Settings</h3>
-                            <p>Configure coin rewards and game costs for all students.</p>
-                        </div>
-                        <button id="save-gamification-btn" class="btn primary-btn">
-                            <i data-lucide="save"></i>
-                            Save Settings
-                        </button>
-                    </div>
-                    <div class="teacher-settings-grid">
-                        <div class="form-group">
-                            <label for="global-exchange-rate">Game Cost (Coins/Min)</label>
-                            <input type="number" id="global-exchange-rate" min="1" value="10">
-                            <small>Cost to play games per minute.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="global-completion-bonus">Completion Bonus (Coins)</label>
-                            <input type="number" id="global-completion-bonus" min="0" value="50">
-                            <small>Bonus for completing all activities.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="global-progress-reward">Progress Reward (Coins/10%)</label>
-                            <input type="number" id="global-progress-reward" min="0" value="1">
-                            <small>Coins earned per 10% progress.</small>
-                        </div>
-                    </div>
-                    <div id="gamification-save-status" class="teacher-inline-status"></div>
-                </section>
-
-                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
-                    <div class="teacher-panel-header">
-                        <div>
-                            <h3>School Calendar</h3>
-                            <p>Set trimester date ranges for vocabulary weeks.</p>
-                        </div>
-                        <button id="save-school-calendar-btn" class="btn primary-btn">
-                            <i data-lucide="calendar-check"></i>
-                            Save Calendar
-                        </button>
-                    </div>
-                    <div class="teacher-settings-grid">
-                        <div class="form-group">
-                            <label for="school-calendar-year">School Year</label>
-                            <input type="number" id="school-calendar-year" min="2000" max="2100" placeholder="2026">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-it-start">IT Start</label>
-                            <input type="date" id="calendar-it-start">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-it-end">IT End</label>
-                            <input type="date" id="calendar-it-end">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-iit-start">IIT Start</label>
-                            <input type="date" id="calendar-iit-start">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-iit-end">IIT End</label>
-                            <input type="date" id="calendar-iit-end">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-iiit-start">IIIT Start</label>
-                            <input type="date" id="calendar-iiit-start">
-                        </div>
-                        <div class="form-group">
-                            <label for="calendar-iiit-end">IIIT End</label>
-                            <input type="date" id="calendar-iiit-end">
-                        </div>
-                    </div>
-                    <div id="school-calendar-save-status" class="teacher-inline-status"></div>
-                </section>
-
-                <!-- Tabs Navigation -->
-                <div class="data-tab-list">
-                    <button class="data-tab-btn active" data-tab="dashboard">
+                <div class="data-tab-list" role="tablist" aria-label="Data and settings sections">
+                    <button class="data-tab-btn active" id="data-tab-subjects" type="button" role="tab"
+                        aria-selected="true" aria-controls="data-subjects-section" data-tab="subjects">
+                        <i data-lucide="layers"></i>
+                        Subjects
+                    </button>
+                    <button class="data-tab-btn" id="data-tab-gamification" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-gamification-section" data-tab="gamification">
+                        <i data-lucide="coins"></i>
+                        Coins
+                    </button>
+                    <button class="data-tab-btn" id="data-tab-calendar" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-calendar-section" data-tab="calendar">
+                        <i data-lucide="calendar-days"></i>
+                        Calendar
+                    </button>
+                    <button class="data-tab-btn" id="data-tab-dashboard" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-dashboard-section" data-tab="dashboard">
                         <i data-lucide="chart-no-axes-combined"></i>
                         Dashboard
                     </button>
-                    <button class="data-tab-btn" data-tab="export">
+                    <button class="data-tab-btn" id="data-tab-export" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-export-section" data-tab="export">
                         <i data-lucide="download"></i>
                         Export
                     </button>
-                    <button class="data-tab-btn" data-tab="view">
+                    <button class="data-tab-btn" id="data-tab-view" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-viewer-section" data-tab="view">
                         <i data-lucide="folder-open"></i>
                         View Data
                     </button>
-                    <button class="data-tab-btn" data-tab="reset">
+                    <button class="data-tab-btn" id="data-tab-reset" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-reset-section" data-tab="reset">
                         <i data-lucide="trash-2"></i>
                         Reset
                     </button>
                 </div>
 
+                <div id="data-subjects-section" class="data-tab-content active" role="tabpanel" aria-labelledby="data-tab-subjects">
+                    <section class="teacher-panel data-settings-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Subjects</h3>
+                                <p>Create and organize subjects used by vocabulary sets.</p>
+                            </div>
+                            <button id="save-subjects-btn" class="btn primary-btn">
+                                <i data-lucide="save"></i>
+                                Save Subjects
+                            </button>
+                        </div>
+                        <div class="teacher-settings-grid" style="align-items: end;">
+                            <div class="form-group">
+                                <label for="new-subject-name">New Subject</label>
+                                <input type="text" id="new-subject-name" placeholder="e.g., Science">
+                            </div>
+                            <div class="form-group">
+                                <label for="new-subject-color">Color</label>
+                                <input type="color" id="new-subject-color" value="#16a34a">
+                            </div>
+                            <button id="add-subject-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="plus"></i>
+                                Add Subject
+                            </button>
+                        </div>
+                        <div id="subjects-manager-list" class="subjects-manager-list"></div>
+                        <div id="subjects-save-status" class="teacher-inline-status"></div>
+                    </section>
+                </div>
+
+                <div id="data-gamification-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-gamification" style="display: none;">
+                    <section class="teacher-panel data-settings-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Coin Settings</h3>
+                                <p>Configure coin rewards and game costs for all students.</p>
+                            </div>
+                            <button id="save-gamification-btn" class="btn primary-btn">
+                                <i data-lucide="save"></i>
+                                Save Settings
+                            </button>
+                        </div>
+                        <div class="teacher-settings-grid">
+                            <div class="form-group">
+                                <label for="global-exchange-rate">Game Cost (Coins/Min)</label>
+                                <input type="number" id="global-exchange-rate" min="1" value="10">
+                                <small>Cost to play games per minute.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="global-completion-bonus">Completion Bonus (Coins)</label>
+                                <input type="number" id="global-completion-bonus" min="0" value="50">
+                                <small>Bonus for completing all activities.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="global-progress-reward">Progress Reward (Coins/10%)</label>
+                                <input type="number" id="global-progress-reward" min="0" value="1">
+                                <small>Coins earned per 10% progress.</small>
+                            </div>
+                        </div>
+                        <div id="gamification-save-status" class="teacher-inline-status"></div>
+                    </section>
+                </div>
+
+                <div id="data-calendar-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-calendar" style="display: none;">
+                    <section class="teacher-panel data-settings-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>School Calendar</h3>
+                                <p>Set trimester date ranges for vocabulary weeks.</p>
+                            </div>
+                            <button id="save-school-calendar-btn" class="btn primary-btn">
+                                <i data-lucide="calendar-check"></i>
+                                Save Calendar
+                            </button>
+                        </div>
+                        <div class="teacher-settings-grid">
+                            <div class="form-group">
+                                <label for="school-calendar-year">School Year</label>
+                                <input type="number" id="school-calendar-year" min="2000" max="2100" placeholder="2026">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-it-start">IT Start</label>
+                                <input type="date" id="calendar-it-start">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-it-end">IT End</label>
+                                <input type="date" id="calendar-it-end">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-iit-start">IIT Start</label>
+                                <input type="date" id="calendar-iit-start">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-iit-end">IIT End</label>
+                                <input type="date" id="calendar-iit-end">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-iiit-start">IIIT Start</label>
+                                <input type="date" id="calendar-iiit-start">
+                            </div>
+                            <div class="form-group">
+                                <label for="calendar-iiit-end">IIIT End</label>
+                                <input type="date" id="calendar-iiit-end">
+                            </div>
+                        </div>
+                        <div id="school-calendar-save-status" class="teacher-inline-status"></div>
+                    </section>
+                </div>
+
                 <!-- Dashboard Tab -->
-                <div id="data-dashboard-section" class="data-tab-content active">
+                <div id="data-dashboard-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-dashboard" style="display: none;">
                     <div class="data-dashboard-header">
                         <div>
                             <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">Analytics Dashboard</h3>
@@ -958,7 +982,7 @@
                 </div>
 
                 <!-- Export Tab -->
-                <div id="data-export-section" class="data-tab-content" style="display: none;">
+                <div id="data-export-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-export" style="display: none;">
                     <div style="margin-bottom: 2rem;">
                         <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">Data Export & Visualization</h3>
                         <p style="color: var(--text-muted, #6b7280); margin: 0; font-size: 0.95rem; line-height: 1.5;">
@@ -1077,7 +1101,7 @@
                 </div>
 
                 <!-- View Data Tab -->
-                <div id="data-viewer-section" class="data-tab-content" style="display: none;">
+                <div id="data-viewer-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-view" style="display: none;">
                     <div style="margin-bottom: 2rem;">
                         <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">View Exported Data</h3>
                         <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
@@ -1134,7 +1158,7 @@
                 </div>
 
                 <!-- Reset Tab -->
-                <div id="data-reset-section" class="data-tab-content" style="display: none; opacity: 0.5; pointer-events: none;">
+                <div id="data-reset-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-reset" style="display: none; opacity: 0.5; pointer-events: none;">
                     <div style="margin-bottom: 1.5rem;">
                         <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--danger-color, #f87171);">Data Reset</h3>
                         <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">

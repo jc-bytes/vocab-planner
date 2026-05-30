@@ -1567,8 +1567,17 @@ select:focus {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    align-items: stretch;
     border-bottom: 2px solid var(--border-color);
     margin-bottom: 2rem;
+}
+
+.data-tab-content {
+    min-width: 0;
+}
+
+.data-settings-panel {
+    margin: 0;
 }
 
 .data-dashboard-header {
@@ -5133,16 +5142,22 @@ button.activity-card {
     }
 
     .data-tab-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
         border-bottom: 0;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
     }
 
     .data-tab-btn {
+        flex: 0 0 auto;
         border: 1px solid var(--border-color);
         border-radius: var(--radius-sm);
         background: rgba(255, 255, 255, 0.035);
-        white-space: normal;
+        scroll-snap-align: start;
+        white-space: nowrap;
     }
 
     .data-tab-btn.active {

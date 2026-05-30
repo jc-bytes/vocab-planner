@@ -316,6 +316,52 @@ async function assertTeacherMobileMenu(page, baseUrl) {
     }, null, { timeout: 5000 });
 }
 
+async function assertDataSettingsUnifiedTabs(page, baseUrl) {
+    await page.setViewportSize({ width: 390, height: viewportHeight });
+    await page.goto(`${baseUrl}/teacher.html#/teacher/data-settings`, { waitUntil: 'domcontentloaded' });
+    await waitForApp(page);
+
+    const initialState = await page.evaluate(() => {
+        const visiblePanels = Array.from(document.querySelectorAll('.data-tab-content'))
+            .filter(panel => window.getComputedStyle(panel).display !== 'none')
+            .map(panel => panel.id);
+        const tabListRect = document.querySelector('.data-tab-list')?.getBoundingClientRect();
+        return {
+            tabCount: document.querySelectorAll('.data-tab-btn').length,
+            selectedTab: document.querySelector('.data-tab-btn[aria-selected="true"]')?.dataset.tab,
+            tabListHeight: Math.round(tabListRect?.height || 0),
+            visiblePanels
+        };
+    });
+
+    if (initialState.tabCount !== 7
+        || initialState.selectedTab !== 'subjects'
+        || initialState.tabListHeight > 72
+        || initialState.visiblePanels.length !== 1
+        || initialState.visiblePanels[0] !== 'data-subjects-section') {
+        throw new Error(`Data & Settings should default to one unified Subjects tab: ${JSON.stringify(initialState)}`);
+    }
+
+    await page.locator('#data-tab-dashboard').click();
+    await page.waitForTimeout(100);
+
+    const dashboardState = await page.evaluate(() => {
+        const visiblePanels = Array.from(document.querySelectorAll('.data-tab-content'))
+            .filter(panel => window.getComputedStyle(panel).display !== 'none')
+            .map(panel => panel.id);
+        return {
+            selectedTab: document.querySelector('.data-tab-btn[aria-selected="true"]')?.dataset.tab,
+            visiblePanels
+        };
+    });
+
+    if (dashboardState.selectedTab !== 'dashboard'
+        || dashboardState.visiblePanels.length !== 1
+        || dashboardState.visiblePanels[0] !== 'data-dashboard-section') {
+        throw new Error(`Data & Settings dashboard tab did not isolate its panel: ${JSON.stringify(dashboardState)}`);
+    }
+}
+
 async function assertStudentActivityCardsAreButtons(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
     await page.goto(`${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`, { waitUntil: 'domcontentloaded' });
@@ -367,6 +413,7 @@ async function main() {
 
         await auditTeacherStudentModal(teacherPage, baseUrl);
         await assertTeacherMobileMenu(teacherPage, baseUrl);
+        await assertDataSettingsUnifiedTabs(teacherPage, baseUrl);
         await assertStudentActivityCardsAreButtons(studentPage, baseUrl);
 
         console.log(`Responsive UI audit passed across widths: ${widths.join(', ')}`);

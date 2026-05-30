@@ -5467,6 +5467,19 @@ Object.assign(TeacherManager.prototype, {
                 const tab = btn.dataset.tab;
                 this.switchDataTab(tab);
             });
+            btn.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                const tabs = Array.from(document.querySelectorAll('.data-tab-btn'));
+                const currentIndex = tabs.indexOf(btn);
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                tabs[nextIndex].focus();
+                this.switchDataTab(tabs[nextIndex].dataset.tab);
+            });
         });
         
         // Dashboard grade filter
@@ -5543,27 +5556,36 @@ Object.assign(TeacherManager.prototype, {
     },
 
     switchDataTab(tab) {
+        const sections = {
+            subjects: 'data-subjects-section',
+            gamification: 'data-gamification-section',
+            calendar: 'data-calendar-section',
+            dashboard: 'data-dashboard-section',
+            export: 'data-export-section',
+            view: 'data-viewer-section',
+            reset: 'data-reset-section'
+        };
+        const activeTab = sections[tab] ? tab : 'subjects';
+        const activeSectionId = sections[activeTab];
+
         // Update tab buttons
         document.querySelectorAll('.data-tab-btn').forEach(btn => {
-            const isActive = btn.dataset.tab === tab;
+            const isActive = btn.dataset.tab === activeTab;
             btn.classList.toggle('active', isActive);
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            btn.tabIndex = isActive ? 0 : -1;
         });
 
         // Update tab content
         document.querySelectorAll('.data-tab-content').forEach(content => {
-            content.style.display = 'none';
+            const isActive = content.id === activeSectionId;
+            content.classList.toggle('active', isActive);
+            content.style.display = isActive ? 'block' : 'none';
+            content.setAttribute('aria-hidden', isActive ? 'false' : 'true');
         });
 
-        if (tab === 'dashboard') {
-            $('#data-dashboard-section').style.display = 'block';
+        if (activeTab === 'dashboard') {
             this.loadDashboardData();
-        } else if (tab === 'export') {
-            $('#data-export-section').style.display = 'block';
-        } else if (tab === 'view') {
-            $('#data-viewer-section').style.display = 'block';
-        } else if (tab === 'reset') {
-            $('#data-reset-section').style.display = 'block';
         }
     },
 
@@ -5582,8 +5604,7 @@ Object.assign(TeacherManager.prototype, {
         }
         this.initExportListeners();
         this.populateExportGradeSelect();
-        // Switch to dashboard tab by default
-        this.switchDataTab(options.tab || 'dashboard');
+        this.switchDataTab(options.tab || 'subjects');
     },
 
     async loadDashboardData() {
