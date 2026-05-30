@@ -436,8 +436,7 @@ export class StudentActivities {
             <span class="subject-color-dot" style="background:${escapeHtml(selectedSubject.color)};"></span>
             <select id="${escapeHtml(selectId)}" class="student-subject-select" aria-label="Choose class">
                 ${subjects.map(subject => {
-                    const count = counts.get(subject.slug) || 0;
-                    return `<option value="${escapeHtml(subject.slug)}"${subject.slug === selectedSubject.slug ? ' selected' : ''}>${escapeHtml(subject.name)} (${count} ${count === 1 ? 'unit' : 'units'})</option>`;
+                    return `<option value="${escapeHtml(subject.slug)}"${subject.slug === selectedSubject.slug ? ' selected' : ''}>${escapeHtml(subject.name)}</option>`;
                 }).join('')}
             </select>
         `;
