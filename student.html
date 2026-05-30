@@ -29,7 +29,13 @@
                 </div>
             </div>
             <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
-                <div class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
+                <button id="student-mobile-menu-toggle" class="teacher-mobile-menu-toggle student-mobile-menu-toggle"
+                    type="button" aria-expanded="false" aria-controls="student-tabs"
+                    aria-label="Open student sections menu">
+                    <i data-lucide="menu"></i>
+                    <span id="student-mobile-section-label">Today</span>
+                </button>
+                <div id="student-tabs" class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
                     <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
                         aria-selected="true" data-section="today">
                         <i data-lucide="layout-dashboard"></i>

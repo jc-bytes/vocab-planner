@@ -4953,9 +4953,10 @@ button.activity-card {
         gap: 0.55rem;
     }
 
-    .student-app-header {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-sm);
+    .student-app-header.student-mobile-compact {
+        grid-template-columns: minmax(0, 1fr) max-content;
+        align-items: center;
+        gap: 0.55rem;
     }
 
     .teacher-app-header .teacher-tab-shell {
@@ -4997,18 +4998,46 @@ button.activity-card {
         white-space: normal;
     }
 
-    .student-app-header .student-tab-shell {
+    .student-app-header.student-mobile-compact .header-left {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+
+    .student-app-header.student-mobile-compact .student-tab-shell {
         justify-self: stretch;
-        width: 100%;
+        position: relative;
+        z-index: 30;
+        width: auto;
+        min-width: 0;
     }
 
-    .student-tabs {
+    .student-app-header.student-mobile-compact .student-mobile-menu-toggle {
+        display: inline-flex;
+    }
+
+    .student-app-header.student-mobile-compact .student-tabs {
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        display: none;
+        grid-template-columns: 1fr;
+        width: min(17rem, calc(100vw - 2rem));
+        max-height: min(70vh, 18rem);
+        overflow-y: auto;
+        justify-content: stretch;
+        padding: 0.35rem;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.98);
+        box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
+    }
+
+    .student-tab-shell.mobile-menu-open .student-tabs {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        width: 100%;
     }
 
-    .student-tab {
+    .student-app-header.student-mobile-compact .student-tab {
+        justify-content: flex-start;
+        width: 100%;
         min-width: 0;
         white-space: normal;
     }
@@ -5019,10 +5048,10 @@ button.activity-card {
         width: auto;
     }
 
-    .student-app-header .header-actions {
-        justify-self: start;
+    .student-app-header.student-mobile-compact .header-actions {
+        justify-self: end;
         min-width: 0;
-        width: 100%;
+        width: auto;
     }
 
     .header-actions,
@@ -5035,6 +5064,13 @@ button.activity-card {
 
     .teacher-app-header .header-actions,
     .teacher-app-header #teacher-auth-controls {
+        width: auto;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    .student-app-header.student-mobile-compact .header-actions,
+    .student-app-header.student-mobile-compact #user-info {
         width: auto;
         justify-content: flex-end;
         flex-wrap: nowrap;

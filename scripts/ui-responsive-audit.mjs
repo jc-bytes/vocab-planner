@@ -362,6 +362,84 @@ async function assertDataSettingsUnifiedTabs(page, baseUrl) {
     }
 }
 
+async function assertStudentMobileMenu(page, baseUrl) {
+    await page.setViewportSize({ width: 390, height: viewportHeight });
+    await page.goto(`${baseUrl}/student.html#/menu`, { waitUntil: 'domcontentloaded' });
+    await waitForApp(page);
+    await page.waitForSelector('#student-tab-shell:not(.hidden)', { timeout: 5000 });
+
+    const closedState = await page.evaluate(() => {
+        const visibleRect = (selector) => {
+            const element = document.querySelector(selector);
+            if (!element) return null;
+            const style = window.getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) {
+                return null;
+            }
+            return {
+                top: Math.round(rect.top),
+                bottom: Math.round(rect.bottom),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+                centerY: Math.round(rect.top + rect.height / 2)
+            };
+        };
+        const toggle = visibleRect('#student-mobile-menu-toggle');
+        const coin = visibleRect('#coin-balance');
+        const status = visibleRect('#auth-status');
+        const signOut = visibleRect('#sign-out-btn');
+        const menuStyle = window.getComputedStyle(document.querySelector('#student-tabs'));
+
+        return {
+            toggle,
+            coin,
+            status,
+            signOut,
+            label: document.querySelector('#student-mobile-section-label')?.textContent?.trim(),
+            expanded: document.querySelector('#student-mobile-menu-toggle')?.getAttribute('aria-expanded'),
+            menuHidden: menuStyle.display === 'none'
+        };
+    });
+
+    if (!closedState.toggle || closedState.toggle.height < 44) {
+        throw new Error(`Student mobile menu toggle is not a 44px visible control: ${JSON.stringify(closedState.toggle)}`);
+    }
+    if (!closedState.coin || !closedState.status || !closedState.signOut) {
+        throw new Error(`Student mobile header must keep coins, status dot, and sign out visible: ${JSON.stringify(closedState)}`);
+    }
+    if (Math.abs(closedState.toggle.centerY - closedState.coin.centerY) > 10
+        || Math.abs(closedState.toggle.centerY - closedState.status.centerY) > 10
+        || Math.abs(closedState.toggle.centerY - closedState.signOut.centerY) > 10) {
+        throw new Error(`Student mobile header controls are not aligned on one row: ${JSON.stringify(closedState)}`);
+    }
+    if (closedState.label !== 'Today' || closedState.expanded !== 'false' || !closedState.menuHidden) {
+        throw new Error(`Student mobile menu closed state is wrong: ${JSON.stringify(closedState)}`);
+    }
+
+    await page.locator('#student-mobile-menu-toggle').click();
+    await page.waitForTimeout(100);
+
+    const openState = await page.evaluate(() => {
+        const tabs = document.querySelector('#student-tabs');
+        return {
+            expanded: document.querySelector('#student-mobile-menu-toggle')?.getAttribute('aria-expanded'),
+            visible: tabs ? window.getComputedStyle(tabs).display !== 'none' : false,
+            activeLabel: document.querySelector('.student-tab.active')?.textContent?.trim().replace(/\s+/g, ' ')
+        };
+    });
+    if (openState.expanded !== 'true' || !openState.visible || openState.activeLabel !== 'Today') {
+        throw new Error(`Student mobile menu open state is wrong: ${JSON.stringify(openState)}`);
+    }
+
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => {
+        const tabs = document.querySelector('#student-tabs');
+        return document.querySelector('#student-mobile-menu-toggle')?.getAttribute('aria-expanded') === 'false'
+            && (!tabs || window.getComputedStyle(tabs).display === 'none');
+    }, null, { timeout: 5000 });
+}
+
 async function assertStudentActivityCardsAreButtons(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
     await page.goto(`${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`, { waitUntil: 'domcontentloaded' });
@@ -414,6 +492,7 @@ async function main() {
         await auditTeacherStudentModal(teacherPage, baseUrl);
         await assertTeacherMobileMenu(teacherPage, baseUrl);
         await assertDataSettingsUnifiedTabs(teacherPage, baseUrl);
+        await assertStudentMobileMenu(studentPage, baseUrl);
         await assertStudentActivityCardsAreButtons(studentPage, baseUrl);
 
         console.log(`Responsive UI audit passed across widths: ${widths.join(', ')}`);

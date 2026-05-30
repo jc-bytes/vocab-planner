@@ -468,12 +468,47 @@ class StudentManager {
         if (shell) {
             shell.classList.toggle('hidden', !section);
         }
+        $('.student-app-header')?.classList.toggle('student-mobile-compact', Boolean(section));
 
+        let activeLabel = 'Today';
         $$('.student-tab').forEach(tab => {
             const isActive = tab.dataset.section === section;
             tab.classList.toggle('active', isActive);
             tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            tab.tabIndex = isActive ? 0 : -1;
+            if (isActive) activeLabel = tab.textContent.trim().replace(/\s+/g, ' ');
         });
+        const mobileLabel = $('#student-mobile-section-label');
+        if (mobileLabel) mobileLabel.textContent = activeLabel;
+        this.closeStudentMobileMenu();
+    }
+
+    setStudentMobileMenu(open) {
+        const shell = $('#student-tab-shell');
+        const toggle = $('#student-mobile-menu-toggle');
+        const tabs = $('#student-tabs');
+        if (!shell || !toggle) return;
+
+        shell.classList.toggle('mobile-menu-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', open ? 'Close student sections menu' : 'Open student sections menu');
+
+        if (tabs) {
+            const mobileLayout = window.matchMedia('(max-width: 850px)').matches;
+            tabs.setAttribute('aria-hidden', mobileLayout && !open ? 'true' : 'false');
+        }
+    }
+
+    closeStudentMobileMenu({ focusToggle = false } = {}) {
+        const shell = $('#student-tab-shell');
+        const toggle = $('#student-mobile-menu-toggle');
+        if (!shell?.classList.contains('mobile-menu-open')) {
+            this.setStudentMobileMenu(false);
+            return;
+        }
+
+        this.setStudentMobileMenu(false);
+        if (focusToggle) toggle?.focus({ preventScroll: true });
     }
 
     normalizeStudentProfile(profile = {}) {
@@ -834,12 +869,28 @@ class StudentManager {
     initListeners() {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
+        window.addEventListener('resize', () => this.setStudentMobileMenu(false));
 
         setupModal('#leaderboard-modal', { dismissible: true });
         setupModal('#profile-modal', { dismissible: false });
         setupModal('#force-password-modal', { dismissible: false });
 
         // Navigation
+        this.addListener('#student-mobile-menu-toggle', 'click', (event) => {
+            event.stopPropagation();
+            const isOpen = $('#student-tab-shell')?.classList.contains('mobile-menu-open');
+            this.setStudentMobileMenu(!isOpen);
+        });
+
+        document.addEventListener('click', (event) => {
+            const shell = $('#student-tab-shell');
+            if (shell && !shell.contains(event.target)) this.closeStudentMobileMenu();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') this.closeStudentMobileMenu({ focusToggle: true });
+        });
+
         this.addListener('#back-to-vocab', 'click', () => {
             this.navigateTo({ view: 'units' });
         });
@@ -865,6 +916,22 @@ class StudentManager {
 
         this.addListener('#student-tab-arcade', 'click', () => {
             this.navigateTo({ view: 'arcade' });
+        });
+
+        $$('.student-tab').forEach(tab => {
+            tab.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                const tabs = Array.from($$('.student-tab'));
+                const currentIndex = tabs.indexOf(tab);
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                tabs[nextIndex].focus();
+                tabs[nextIndex].click();
+            });
         });
 
         this.addListener('#back-to-main-menu-btn', 'click', () => {
