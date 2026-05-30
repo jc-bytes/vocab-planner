@@ -811,6 +811,37 @@ select:focus {
     -webkit-overflow-scrolling: touch;
 }
 
+.teacher-mobile-menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.55rem;
+    width: 100%;
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.55);
+    color: var(--text-main);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.teacher-mobile-menu-toggle span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teacher-mobile-menu-toggle:focus-visible {
+    outline: 3px solid rgba(14, 165, 233, 0.8);
+    outline-offset: 2px;
+}
+
 .teacher-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -854,6 +885,7 @@ select:focus {
 }
 
 .teacher-tab svg,
+.teacher-mobile-menu-toggle svg,
 .btn svg,
 .data-tab-btn svg,
 .teacher-action-card svg,
@@ -4907,8 +4939,9 @@ button.activity-card {
     }
 
     .teacher-app-header {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-sm);
+        grid-template-columns: minmax(0, 1fr) max-content;
+        align-items: center;
+        gap: 0.55rem;
     }
 
     .student-app-header {
@@ -4918,16 +4951,39 @@ button.activity-card {
 
     .teacher-app-header .teacher-tab-shell {
         justify-self: stretch;
-        width: 100%;
+        position: relative;
+        z-index: 30;
+        width: auto;
+        min-width: 0;
+    }
+
+    .teacher-mobile-menu-toggle {
+        display: inline-flex;
     }
 
     .teacher-app-header .teacher-tabs {
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        display: none;
+        grid-template-columns: 1fr;
+        width: min(19rem, calc(100vw - 2rem));
+        max-height: min(70vh, 24rem);
+        overflow-y: auto;
+        justify-content: stretch;
+        padding: 0.35rem;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.98);
+        box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
+    }
+
+    .teacher-tab-shell.mobile-menu-open .teacher-tabs {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-        width: 100%;
     }
 
     .teacher-app-header .teacher-tab {
+        justify-content: flex-start;
+        width: 100%;
         min-width: 0;
         white-space: normal;
     }
@@ -4949,9 +5005,9 @@ button.activity-card {
     }
 
     .teacher-app-header .header-actions {
-        justify-self: start;
+        justify-self: end;
         min-width: 0;
-        width: 100%;
+        width: auto;
     }
 
     .student-app-header .header-actions {
@@ -4966,6 +5022,13 @@ button.activity-card {
     #teacher-auth-controls {
         width: 100%;
         justify-content: flex-start;
+    }
+
+    .teacher-app-header .header-actions,
+    .teacher-app-header #teacher-auth-controls {
+        width: auto;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
     }
 
     #user-info {
@@ -5364,7 +5427,8 @@ button.activity-card {
     }
 
     .teacher-app-header .teacher-tabs {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        width: min(18rem, calc(100vw - 1rem));
     }
 
     .teacher-tab,

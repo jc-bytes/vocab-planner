@@ -268,6 +268,7 @@ class TeacherManager {
         const isTeacherView = !['teacher-loading-view', 'teacher-login-view'].includes(viewId);
         $('#teacher-tab-shell')?.classList.toggle('hidden', !isTeacherView);
         this.setActiveTeacherTab(this.getSectionForView(viewId));
+        this.closeTeacherMobileMenu();
         this.updateTeacherRouteForView(viewId);
         this.refreshIcons();
     }
@@ -1311,16 +1312,49 @@ class TeacherManager {
     }
 
     setActiveTeacherTab(sectionId) {
+        let activeLabel = 'Overview';
         $$('.teacher-tab').forEach(tab => {
             const active = tab.dataset.section === sectionId;
             tab.classList.toggle('active', active);
             tab.setAttribute('aria-selected', active ? 'true' : 'false');
             tab.tabIndex = active ? 0 : -1;
+            if (active) activeLabel = tab.textContent.trim().replace(/\s+/g, ' ');
         });
+        const mobileLabel = $('#teacher-mobile-section-label');
+        if (mobileLabel) mobileLabel.textContent = activeLabel;
+    }
+
+    setTeacherMobileMenu(open) {
+        const shell = $('#teacher-tab-shell');
+        const toggle = $('#teacher-mobile-menu-toggle');
+        const tabs = $('#teacher-tabs');
+        if (!shell || !toggle) return;
+
+        shell.classList.toggle('mobile-menu-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        toggle.setAttribute('aria-label', open ? 'Close teacher sections menu' : 'Open teacher sections menu');
+
+        if (tabs) {
+            const mobileLayout = window.matchMedia('(max-width: 850px)').matches;
+            tabs.setAttribute('aria-hidden', mobileLayout && !open ? 'true' : 'false');
+        }
+    }
+
+    closeTeacherMobileMenu({ focusToggle = false } = {}) {
+        const shell = $('#teacher-tab-shell');
+        const toggle = $('#teacher-mobile-menu-toggle');
+        if (!shell?.classList.contains('mobile-menu-open')) {
+            this.setTeacherMobileMenu(false);
+            return;
+        }
+
+        this.setTeacherMobileMenu(false);
+        if (focusToggle) toggle?.focus({ preventScroll: true });
     }
 
     showTeacherSection(sectionId, options = {}) {
         if (!this.ensureAuthenticated(false)) return;
+        this.closeTeacherMobileMenu();
         switch (sectionId) {
             case 'overview':
                 this.switchView('teacher-overview-view');
@@ -2672,6 +2706,7 @@ class TeacherManager {
     initListeners() {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
+        window.addEventListener('resize', () => this.setTeacherMobileMenu(false));
 
         setupModal('#student-detail-modal', {
             dismissible: true,
@@ -2706,6 +2741,21 @@ class TeacherManager {
                 });
             }
         }
+
+        $('#teacher-mobile-menu-toggle')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isOpen = $('#teacher-tab-shell')?.classList.contains('mobile-menu-open');
+            this.setTeacherMobileMenu(!isOpen);
+        });
+
+        document.addEventListener('click', (event) => {
+            const shell = $('#teacher-tab-shell');
+            if (shell && !shell.contains(event.target)) this.closeTeacherMobileMenu();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') this.closeTeacherMobileMenu({ focusToggle: true });
+        });
 
         $$('.teacher-tab').forEach(tab => {
             tab.addEventListener('click', () => {

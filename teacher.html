@@ -21,7 +21,12 @@
     <div class="app-container">
         <header class="app-header teacher-app-header">
             <nav id="teacher-tab-shell" class="teacher-tab-shell hidden" aria-label="Teacher sections">
-                <div class="teacher-tabs" role="tablist" aria-label="Teacher tools">
+                <button id="teacher-mobile-menu-toggle" class="teacher-mobile-menu-toggle" type="button"
+                    aria-expanded="false" aria-controls="teacher-tabs" aria-label="Open teacher sections menu">
+                    <i data-lucide="menu"></i>
+                    <span id="teacher-mobile-section-label">Overview</span>
+                </button>
+                <div id="teacher-tabs" class="teacher-tabs" role="tablist" aria-label="Teacher tools">
                     <button class="teacher-tab active" id="tab-overview" type="button" role="tab" aria-selected="true"
                         aria-controls="teacher-overview-view" data-section="overview">
                         <i data-lucide="layout-dashboard"></i>
