@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default permissions for the Technology 6A desktop app",
+  "description": "Default permissions for the Vocabulary Master desktop app",
   "windows": ["main"],
   "permissions": []
 }

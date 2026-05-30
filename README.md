@@ -50,7 +50,7 @@ npm run desktop:build
 The default local build creates a macOS app bundle at:
 
 ```text
-src-tauri/target/release/bundle/macos/Technology 6A.app
+src-tauri/target/release/bundle/macos/Vocabulary Master.app
 ```
 
 Additional package targets:

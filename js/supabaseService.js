@@ -13,6 +13,7 @@ const PRIMARY_KEYS = {
     profiles: 'user_id',
     scores: 'id',
     student_progress: 'user_id',
+    subjects: 'slug',
     vocabularies: 'id'
 };
 
@@ -49,10 +50,15 @@ const FIELD_ALIASES = {
         updatedAt: 'updated_at',
         userId: 'user_id'
     },
+    subjects: {
+        sortOrder: 'sort_order',
+        updatedAt: 'updated_at'
+    },
     vocabularies: {
         activitySettings: 'activity_settings',
         assignedDate: 'assigned_date',
         ownerId: 'owner_id',
+        subjectSlug: 'subject_slug',
         updatedAt: 'updated_at'
     }
 };
@@ -215,6 +221,7 @@ const toClientRow = (tableName, row) => {
             name: row.name || '',
             description: row.description || '',
             grades: row.grades || [],
+            subjectSlug: row.subject_slug || 'technology',
             assignedDate: row.assigned_date || '',
             trimester: row.trimester || '',
             month: row.month || '',
@@ -222,6 +229,19 @@ const toClientRow = (tableName, row) => {
             activitySettings: row.activity_settings || {},
             words: row.words || [],
             ownerId: row.owner_id || null,
+            createdAt: toTimestamp(row.created_at),
+            updatedAt: toTimestamp(row.updated_at)
+        };
+    }
+
+    if (tableName === 'subjects') {
+        return {
+            id: row.slug,
+            slug: row.slug,
+            name: row.name || '',
+            color: row.color || '#2563eb',
+            sortOrder: Number(row.sort_order) || 0,
+            active: row.active !== false,
             createdAt: toTimestamp(row.created_at),
             updatedAt: toTimestamp(row.updated_at)
         };
@@ -304,6 +324,7 @@ const fromClientPayload = (tableName, payload = {}, id = null) => {
                 : payload.grade
                     ? [String(payload.grade)]
                     : undefined,
+            subject_slug: payload.subjectSlug || payload.subject_slug || payload.subject || 'technology',
             assigned_date: (payload.assignedDate ?? payload.assigned_date) === ''
                 ? null
                 : payload.assignedDate ?? payload.assigned_date,
@@ -315,6 +336,17 @@ const fromClientPayload = (tableName, payload = {}, id = null) => {
             activity_settings: payload.activitySettings,
             words: payload.words,
             owner_id: payload.ownerId,
+            updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
+        });
+    }
+
+    if (tableName === 'subjects') {
+        return cleanUndefined({
+            slug: id || payload.slug || payload.id,
+            name: payload.name,
+            color: payload.color,
+            sort_order: payload.sortOrder ?? payload.sort_order,
+            active: payload.active,
             updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
         });
     }
@@ -669,6 +701,7 @@ export const supabaseService = {
         trimesterKey = 'other',
         grade = 'unknown',
         unitId = 'unit',
+        subjectSlug = 'technology',
         word = 'word'
     } = {}) {
         if (!userId) {
@@ -679,6 +712,7 @@ export const supabaseService = {
             userId,
             slugifyStoragePart(schoolYear, 'year'),
             slugifyStoragePart(trimesterKey, 'trimester'),
+            `subject-${slugifyStoragePart(subjectSlug, 'technology')}`,
             `grade-${slugifyStoragePart(grade, 'unknown')}`,
             slugifyStoragePart(unitId, 'unit'),
             `${slugifyStoragePart(word, 'word')}.webp`

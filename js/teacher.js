@@ -1,4 +1,4 @@
-import { $, $$, createElement, loadScript, notifications } from './main.js';
+import { $, $$, createElement, escapeHtml, loadScript, notifications } from './main.js';
 import {
     teacherApi as supabaseService,
     doc,
@@ -14,17 +14,24 @@ import {
     writeBatch
 } from './services/teacherApi.js';
 import {
+    DEFAULT_SUBJECT_SLUG,
     SCHOOL_CALENDAR_LOCAL_KEY,
     SCHOOL_CALENDAR_SETTINGS_KEY,
+    SUBJECTS_LOCAL_KEY,
     calculateVocabularyPlacement,
+    getSubjectBySlug,
+    getVocabSubjectSlug,
     getDefaultSchoolCalendar,
     loadManifest,
+    loadSubjects,
     loadVocabularyFile,
+    normalizeSubject,
     normalizeSchoolCalendar
 } from './services/vocabularyApi.js';
 
 const DEV_AUTH_DISABLED = false;
 const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+const QUIZ_BUILDER_DRAFT_KEY = 'teacher_quiz_builder_active_draft';
 const DEV_TEACHER_USER = {
     uid: 'dev-teacher',
     displayName: 'Development Teacher',
@@ -59,6 +66,7 @@ class TeacherManager {
             name: '',
             description: '',
             grade: '',
+            subjectSlug: DEFAULT_SUBJECT_SLUG,
             activitySettings: {},
             words: []
         };
@@ -79,10 +87,19 @@ class TeacherManager {
         this.exportListenersInitialized = false;
         this.libraryItems = [];
         this.libraryDrilldown = {
+            subject: null,
             grade: null,
             trimester: null,
             month: null
         };
+        this.quizLibraryItems = [];
+        this.quizDrilldown = {
+            subject: null,
+            grade: null,
+            trimester: null,
+            month: null
+        };
+        this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
         this.schoolCalendar = getDefaultSchoolCalendar();
@@ -92,6 +109,10 @@ class TeacherManager {
         this.isApplyingRoute = false;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
+        this.quizMaker = null;
+        this.quizMakerVocabKey = null;
+        this.quizEditorOpen = false;
+        this.quizReturnView = 'quizzes';
 
         this.init();
     }
@@ -114,6 +135,7 @@ class TeacherManager {
         this.currentUser = DEV_TEACHER_USER;
         this.currentRole = 'teacher';
         this.updateAuthUI(DEV_TEACHER_USER);
+        await this.loadSubjectSettings();
         await this.loadSchoolCalendarSettings();
         await this.restoreRouteOrDefault();
     }
@@ -196,6 +218,7 @@ class TeacherManager {
             this.currentUser = user;
             localStorage.setItem('was_logged_in', 'true');
             this.updateAuthUI(user);
+            await this.loadSubjectSettings();
             await this.loadSchoolCalendarSettings();
             await this.restoreRouteOrDefault();
         } catch (err) {
@@ -275,12 +298,14 @@ class TeacherManager {
         if (parts[0] !== 'teacher') return null;
         if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
         if (parts[1] === 'students') return { view: 'students' };
+        if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
         if (parts[1] === 'quizzes') return { view: 'quizzes' };
         if (parts[1] === 'data-settings') return { view: 'data-settings', tab: params.get('tab') || undefined };
         if (parts[1] === 'vocabulary' && parts[2] === 'editor') return { view: 'editor' };
         if (parts[1] === 'vocabulary') {
             return {
                 view: 'vocabulary',
+                subject: params.get('subject') || null,
                 grade: params.get('grade') || null,
                 trimester: params.get('trimester') || null,
                 month: params.get('month') || null
@@ -295,6 +320,7 @@ class TeacherManager {
         if (route.view === 'overview') return '#/teacher/overview';
         if (route.view === 'students') return '#/teacher/students';
         if (route.view === 'quizzes') return '#/teacher/quizzes';
+        if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
         if (route.view === 'editor') return '#/teacher/vocabulary/editor';
         if (route.view === 'data-settings') {
             const params = new URLSearchParams();
@@ -304,6 +330,7 @@ class TeacherManager {
         }
         if (route.view === 'vocabulary') {
             const params = new URLSearchParams();
+            if (route.subject) params.set('subject', route.subject);
             if (route.grade) params.set('grade', route.grade);
             if (route.trimester) params.set('trimester', route.trimester);
             if (route.month) params.set('month', route.month);
@@ -317,6 +344,7 @@ class TeacherManager {
         if (viewId === 'teacher-dashboard-view') {
             return {
                 view: 'vocabulary',
+                subject: this.libraryDrilldown.subject,
                 grade: this.libraryDrilldown.grade,
                 trimester: this.libraryDrilldown.trimester,
                 month: this.libraryDrilldown.month
@@ -324,7 +352,8 @@ class TeacherManager {
         }
         if (viewId === 'teacher-editor-view') return { view: 'editor' };
         if (viewId === 'teacher-progress-view') return { view: 'students' };
-        if (viewId === 'teacher-quizzes-view' || viewId === 'quiz-maker-view') return { view: 'quizzes' };
+        if (viewId === 'teacher-quizzes-view') return { view: 'quizzes' };
+        if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
         if (viewId === 'teacher-data-management-view') return { view: 'data-settings' };
         return { view: 'overview' };
     }
@@ -346,6 +375,7 @@ class TeacherManager {
         if (this.isApplyingRoute || !this.isAuthenticated) return;
         this.lastVocabularyRoute = {
             view: 'vocabulary',
+            subject: this.libraryDrilldown.subject,
             grade: this.libraryDrilldown.grade,
             trimester: this.libraryDrilldown.trimester,
             month: this.libraryDrilldown.month
@@ -375,6 +405,7 @@ class TeacherManager {
             switch (route.view) {
                 case 'vocabulary':
                     this.libraryDrilldown = {
+                        subject: route.subject || null,
                         grade: route.grade || null,
                         trimester: route.trimester || null,
                         month: route.month || null
@@ -391,6 +422,9 @@ class TeacherManager {
                     break;
                 case 'quizzes':
                     await this.showQuizzesView();
+                    break;
+                case 'quiz-editor':
+                    await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });
                     break;
                 case 'data-settings':
                     await this.showDataManagementView({ tab: route.tab });
@@ -452,6 +486,166 @@ class TeacherManager {
             }
         } catch (error) {
             console.error('Error loading gamification settings:', error);
+        }
+    }
+
+    async loadSubjectSettings() {
+        try {
+            if (this.authDisabled) {
+                const stored = JSON.parse(localStorage.getItem(SUBJECTS_LOCAL_KEY) || '[]');
+                this.subjects = stored.length ? stored.map((subject, index) => normalizeSubject(subject, index)) : await loadSubjects();
+            } else {
+                this.subjects = await loadSubjects(supabaseService);
+            }
+        } catch (error) {
+            console.error('Error loading subjects:', error);
+            this.subjects = await loadSubjects();
+        }
+
+        this.renderSubjectManager();
+        this.updateSubjectSelect();
+    }
+
+    getSubjects() {
+        return (this.subjects && this.subjects.length ? this.subjects : []).map((subject, index) => normalizeSubject(subject, index));
+    }
+
+    getActiveSubjects() {
+        return this.getSubjects().filter(subject => subject.active !== false);
+    }
+
+    getSubjectForVocab(vocab = this.vocabSet) {
+        return getSubjectBySlug(this.getSubjects(), getVocabSubjectSlug(vocab));
+    }
+
+    getSubjectOptionsHtml(selectedSlug = DEFAULT_SUBJECT_SLUG) {
+        const normalizedSelected = getVocabSubjectSlug({ subjectSlug: selectedSlug });
+        return this.getSubjects()
+            .map(subject => `<option value="${escapeHtml(subject.slug)}"${subject.slug === normalizedSelected ? ' selected' : ''}>${escapeHtml(subject.name)}</option>`)
+            .join('');
+    }
+
+    updateSubjectSelect() {
+        const select = $('#vocab-subject');
+        if (!select) return;
+        const selected = getVocabSubjectSlug(this.vocabSet);
+        select.innerHTML = this.getSubjectOptionsHtml(selected);
+        select.value = selected;
+    }
+
+    renderSubjectManager() {
+        const container = $('#subjects-manager-list');
+        if (!container) return;
+
+        const subjects = this.getSubjects();
+        this.subjects = subjects;
+        container.innerHTML = '';
+
+        subjects.forEach((subject, index) => {
+            const row = createElement('div', 'subject-manager-row');
+            row.innerHTML = `
+                <span class="subject-color-dot" style="background:${escapeHtml(subject.color)};"></span>
+                <input type="text" class="subject-name-input" value="${escapeHtml(subject.name)}" aria-label="Subject name">
+                <input type="color" class="subject-color-input" value="${escapeHtml(subject.color)}" aria-label="Subject color">
+                <input type="number" class="subject-order-input" value="${escapeHtml(subject.sortOrder)}" aria-label="Subject order">
+                <label class="subject-active-toggle">
+                    <input type="checkbox" class="subject-active-input"${subject.active ? ' checked' : ''}>
+                    Active
+                </label>
+                <code>${escapeHtml(subject.slug)}</code>
+            `;
+
+            row.querySelector('.subject-name-input')?.addEventListener('input', event => {
+                this.subjects[index].name = event.target.value;
+                this.updateSubjectSelect();
+            });
+            row.querySelector('.subject-color-input')?.addEventListener('input', event => {
+                this.subjects[index].color = event.target.value;
+                row.querySelector('.subject-color-dot').style.background = event.target.value;
+            });
+            row.querySelector('.subject-order-input')?.addEventListener('input', event => {
+                this.subjects[index].sortOrder = Number(event.target.value) || ((index + 1) * 10);
+            });
+            row.querySelector('.subject-active-input')?.addEventListener('change', event => {
+                this.subjects[index].active = event.target.checked;
+            });
+
+            container.appendChild(row);
+        });
+    }
+
+    addSubjectFromForm() {
+        const input = $('#new-subject-name');
+        const colorInput = $('#new-subject-color');
+        const name = String(input?.value || '').trim();
+        if (!name) {
+            notifications.warning('Enter a subject name.');
+            return;
+        }
+
+        const subject = normalizeSubject({
+            name,
+            slug: name,
+            color: colorInput?.value || '#2563eb',
+            sortOrder: Math.max(0, ...this.getSubjects().map(item => Number(item.sortOrder) || 0)) + 10,
+            active: true
+        });
+
+        if (this.getSubjects().some(item => item.slug === subject.slug)) {
+            notifications.warning('A subject with that name already exists.');
+            return;
+        }
+
+        this.subjects = [...this.getSubjects(), subject];
+        if (input) input.value = '';
+        this.renderSubjectManager();
+        this.updateSubjectSelect();
+    }
+
+    async saveSubjectSettings() {
+        const statusEl = $('#subjects-save-status');
+        const saveBtn = $('#save-subjects-btn');
+        const subjects = this.getSubjects()
+            .map((subject, index) => normalizeSubject({
+                ...subject,
+                sortOrder: Number(subject.sortOrder) || ((index + 1) * 10)
+            }, index));
+
+        try {
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i data-lucide="loader-circle"></i> Saving...';
+                this.refreshIcons();
+            }
+            if (statusEl) statusEl.textContent = 'Saving subjects...';
+
+            this.subjects = subjects;
+            if (this.authDisabled) {
+                localStorage.setItem(SUBJECTS_LOCAL_KEY, JSON.stringify(subjects));
+            } else {
+                const db = supabaseService.getDatabase();
+                await Promise.all(subjects.map(subject => setDoc(doc(db, 'subjects', subject.slug), {
+                    ...subject,
+                    updatedAt: serverTimestamp()
+                }, { merge: true })));
+            }
+
+            this.invalidateTeacherLibraryCache();
+            this.renderSubjectManager();
+            this.updateSubjectSelect();
+            this.loadLibrary();
+            if (statusEl) statusEl.textContent = 'Subjects saved.';
+            notifications.success('Subjects saved.');
+        } catch (error) {
+            console.error('Error saving subjects:', error);
+            if (statusEl) statusEl.textContent = 'Failed to save subjects.';
+            notifications.error('Failed to save subjects.');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i data-lucide="save"></i> Save Subjects';
+                this.refreshIcons();
+            }
         }
     }
 
@@ -1143,7 +1337,11 @@ class TeacherManager {
                 this.showProgressView();
                 break;
             case 'quizzes':
-                this.showQuizzesView();
+                if (this.quizEditorOpen && this.quizMaker) {
+                    this.openQuizMaker({ returnTo: this.quizReturnView || 'quizzes' });
+                } else {
+                    this.showQuizzesView();
+                }
                 break;
             case 'data-settings':
                 this.showDataManagementView(options);
@@ -1326,7 +1524,9 @@ class TeacherManager {
             this.fetchCloudVocabs(),
             loadManifest()
         ]).then(([cloudVocabs, manifestData]) => {
-            const remoteVocabs = Array.isArray(manifestData?.vocabularies) ? manifestData.vocabularies : [];
+            const remoteVocabs = Array.isArray(manifestData?.vocabularies)
+                ? manifestData.vocabularies.map(vocab => ({ ...vocab, subjectSlug: getVocabSubjectSlug(vocab) }))
+                : [];
             const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
             const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
             const items = [
@@ -1382,6 +1582,7 @@ class TeacherManager {
 
     resetLibraryDrilldown() {
         this.libraryDrilldown = {
+            subject: null,
             grade: null,
             trimester: null,
             month: null
@@ -1389,11 +1590,17 @@ class TeacherManager {
     }
 
     buildLibraryGroups(items = this.libraryItems) {
-        const gradeGroups = new Map();
+        const subjectGroups = new Map();
 
         items.forEach(({ vocab, type }) => {
+            const subjectSlug = getVocabSubjectSlug(vocab);
             const grades = this.getVocabGrades(vocab);
             const trimesterKey = this.getTeacherTrimesterKey(vocab);
+
+            if (!subjectGroups.has(subjectSlug)) {
+                subjectGroups.set(subjectSlug, new Map());
+            }
+            const gradeGroups = subjectGroups.get(subjectSlug);
 
             grades.forEach(grade => {
                 if (!gradeGroups.has(grade)) {
@@ -1409,7 +1616,7 @@ class TeacherManager {
             });
         });
 
-        return gradeGroups;
+        return subjectGroups;
     }
 
     renderLibraryBrowser(container = $('#library-list')) {
@@ -1419,14 +1626,25 @@ class TeacherManager {
         container.classList.add('teacher-library-browser');
         container.innerHTML = '';
 
-        const gradeGroups = this.buildLibraryGroups();
+        const subjectGroups = this.buildLibraryGroups();
+        const selectedSubject = this.libraryDrilldown.subject;
         const selectedGrade = this.libraryDrilldown.grade;
         const selectedTrimester = this.libraryDrilldown.trimester;
         const selectedMonth = this.libraryDrilldown.month;
 
-        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+        if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
             this.resetLibraryDrilldown();
-            this.renderGradePicker(container, gradeGroups);
+            this.renderSubjectPicker(container, subjectGroups);
+            return;
+        }
+
+        const gradeGroups = subjectGroups.get(selectedSubject);
+
+        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+            this.libraryDrilldown.grade = null;
+            this.libraryDrilldown.trimester = null;
+            this.libraryDrilldown.month = null;
+            this.renderGradePicker(container, selectedSubject, gradeGroups);
             return;
         }
 
@@ -1435,7 +1653,7 @@ class TeacherManager {
         if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
             this.libraryDrilldown.trimester = null;
             this.libraryDrilldown.month = null;
-            this.renderTrimesterPicker(container, selectedGrade, trimesterGroups);
+            this.renderTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups);
             return;
         }
 
@@ -1443,29 +1661,42 @@ class TeacherManager {
 
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
             this.libraryDrilldown.month = null;
-            this.renderMonthPicker(container, selectedGrade, selectedTrimester, monthGroups);
+            this.renderMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
             return;
         }
 
-        this.renderAssignmentPicker(container, selectedGrade, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
+        this.renderAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
     }
 
-    renderLibraryBreadcrumb(container, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
+    renderLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
         const nav = createElement('div', 'teacher-library-breadcrumb');
 
-        const gradesButton = this.createLibraryBreadcrumbButton('Grades', () => {
+        const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
             this.resetLibraryDrilldown();
             this.updateVocabularyRoute();
             this.renderLibraryBrowser();
         });
-        nav.appendChild(gradesButton);
+        nav.appendChild(subjectsButton);
+
+        if (selectedSubject) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            const subjectButton = selectedGrade || selectedTrimester || selectedMonth
+                ? this.createLibraryBreadcrumbButton(subject.name, () => {
+                    this.libraryDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+            nav.appendChild(subjectButton);
+        }
 
         if (selectedGrade) {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
             const gradeLabel = this.formatGradeLabel(selectedGrade);
             const gradeButton = selectedTrimester || selectedMonth
                 ? this.createLibraryBreadcrumbButton(gradeLabel, () => {
-                    this.libraryDrilldown = { grade: selectedGrade, trimester: null, month: null };
+                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
                 })
@@ -1478,7 +1709,7 @@ class TeacherManager {
             const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
             const trimesterNode = selectedMonth
                 ? this.createLibraryBreadcrumbButton(trimesterLabel, () => {
-                    this.libraryDrilldown = { grade: selectedGrade, trimester: selectedTrimester, month: null };
+                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
                 })
@@ -1501,8 +1732,46 @@ class TeacherManager {
         return button;
     }
 
-    renderGradePicker(container, gradeGroups) {
+    renderSubjectPicker(container, subjectGroups) {
         this.renderLibraryBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(subjectGroups.entries())
+            .sort(([subjectA], [subjectB]) => {
+                const metaA = getSubjectBySlug(this.getSubjects(), subjectA);
+                const metaB = getSubjectBySlug(this.getSubjects(), subjectB);
+                if (metaA.sortOrder !== metaB.sortOrder) return metaA.sortOrder - metaB.sortOrder;
+                return metaA.name.localeCompare(metaB.name);
+            })
+            .forEach(([subjectSlug, gradeGroups]) => {
+                const subject = getSubjectBySlug(this.getSubjects(), subjectSlug);
+                const totalUnits = Array.from(gradeGroups.values())
+                    .reduce((sum, trimesterGroups) => sum + Array.from(trimesterGroups.values()).reduce((inner, group) => inner + group.length, 0), 0);
+                const gradeSummary = Array.from(gradeGroups.keys())
+                    .sort((gradeA, gradeB) => this.compareGradeLabels(gradeA, gradeB))
+                    .map(grade => this.formatGradeLabel(grade))
+                    .join(' · ');
+                const card = this.createLibraryChoiceCard({
+                    title: subject.name,
+                    count: this.formatUnitCount(totalUnits),
+                    meta: gradeSummary,
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.libraryDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null };
+                    this.updateVocabularyRoute();
+                    this.renderLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderGradePicker(container, selectedSubject, gradeGroups) {
+        this.renderLibraryBreadcrumb(container, selectedSubject);
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(gradeGroups.entries())
@@ -1523,7 +1792,7 @@ class TeacherManager {
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = { grade, trimester: null, month: null };
+                    this.libraryDrilldown = { subject: selectedSubject, grade, trimester: null, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
                     this.refreshIcons();
@@ -1534,8 +1803,8 @@ class TeacherManager {
         container.appendChild(grid);
     }
 
-    renderTrimesterPicker(container, selectedGrade, trimesterGroups) {
-        this.renderLibraryBreadcrumb(container, selectedGrade);
+    renderTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups) {
+        this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade);
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(trimesterGroups.entries())
@@ -1551,7 +1820,7 @@ class TeacherManager {
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = { grade: selectedGrade, trimester: trimesterKey, month: null };
+                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: trimesterKey, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
                     this.refreshIcons();
@@ -1562,8 +1831,8 @@ class TeacherManager {
         container.appendChild(grid);
     }
 
-    renderMonthPicker(container, selectedGrade, selectedTrimester, monthGroups) {
-        this.renderLibraryBreadcrumb(container, selectedGrade, selectedTrimester);
+    renderMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups) {
+        this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester);
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(monthGroups.entries())
@@ -1577,6 +1846,7 @@ class TeacherManager {
                 });
                 card.addEventListener('click', () => {
                     this.libraryDrilldown = {
+                        subject: selectedSubject,
                         grade: selectedGrade,
                         trimester: selectedTrimester,
                         month: monthKey
@@ -1591,8 +1861,8 @@ class TeacherManager {
         container.appendChild(grid);
     }
 
-    renderAssignmentPicker(container, selectedGrade, selectedTrimester, selectedMonth, vocabItems) {
-        this.renderLibraryBreadcrumb(container, selectedGrade, selectedTrimester, selectedMonth);
+    renderAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, vocabItems) {
+        this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth);
 
         const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid');
         vocabItems
@@ -1604,13 +1874,18 @@ class TeacherManager {
         container.appendChild(grid);
     }
 
-    createLibraryChoiceCard({ title, count, meta, icon }) {
+    createLibraryChoiceCard({ title, count, meta, icon, color = '' }) {
         const card = createElement('button', 'teacher-library-choice-card');
         card.type = 'button';
 
         const text = createElement('span', 'teacher-library-choice-text');
         const titleEl = createElement('strong', null, title);
         const countEl = createElement('span', 'teacher-library-choice-count', count);
+        if (color) {
+            const dot = createElement('span', 'subject-color-dot');
+            dot.style.background = color;
+            text.appendChild(dot);
+        }
         text.append(titleEl, countEl);
 
         if (meta) {
@@ -1919,7 +2194,10 @@ class TeacherManager {
 
     getLocalVocabs() {
         const stored = localStorage.getItem('teacher_vocab_library');
-        return stored ? JSON.parse(stored) : [];
+        return stored ? JSON.parse(stored).map(vocab => ({
+            ...vocab,
+            subjectSlug: getVocabSubjectSlug(vocab)
+        })) : [];
     }
 
     removeLocalVocab(id) {
@@ -1936,7 +2214,10 @@ class TeacherManager {
     saveToLocal(vocab) {
         if (!vocab.id) return; // Don't save without ID
         const { __source, ...rest } = vocab;
-        const cleanVocab = { ...rest };
+        const cleanVocab = {
+            ...rest,
+            subjectSlug: getVocabSubjectSlug(rest)
+        };
 
         let vocabs = this.getLocalVocabs();
         const index = vocabs.findIndex(v => v.id === vocab.id);
@@ -1964,6 +2245,7 @@ class TeacherManager {
         };
 
         const badge = badgeStyles[type] || badgeStyles.remote;
+        const subject = this.getSubjectForVocab(vocab);
 
         let deleteBtnHtml = '';
         if (type === 'local' || type === 'cloud') {
@@ -1973,9 +2255,10 @@ class TeacherManager {
 
         card.innerHTML = `
             <div class="badge" style="background:${badge.color};">${badge.text}</div>
-            <h3>${vocab.name || 'Untitled'}</h3>
-            <small style="color:var(--text-muted)">${vocab.id}</small>
-            ${this.formatVocabPlacementLabel(vocab) ? `<small style="color:var(--text-muted); display:block; margin-top:0.35rem;">${this.formatVocabPlacementLabel(vocab)}</small>` : ''}
+            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+            <h3>${escapeHtml(vocab.name || 'Untitled')}</h3>
+            <small style="color:var(--text-muted)">${escapeHtml(vocab.id)}</small>
+            ${this.formatVocabPlacementLabel(vocab) ? `<small style="color:var(--text-muted); display:block; margin-top:0.35rem;">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
             ${deleteBtnHtml}
         `;
 
@@ -2053,6 +2336,7 @@ class TeacherManager {
     loadVocabularyObject(vocab) {
         const clone = JSON.parse(JSON.stringify(vocab));
         delete clone.__source;
+        clone.subjectSlug = getVocabSubjectSlug(clone);
         this.vocabSet = clone;
         this.updateFormUI();
         this.renderWords();
@@ -2063,6 +2347,7 @@ class TeacherManager {
     triggerAutoSave() {
         if (!this.vocabSet.id) return;
         this.applyAssignedDatePlacement(this.vocabSet);
+        this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
         this.normalizeActivityFlowSettings();
 
         if (this.authDisabled) {
@@ -2096,6 +2381,7 @@ class TeacherManager {
         if (this.authDisabled) return;
         if (!this.ensureAuthenticated(false)) return;
         if (!this.vocabSet.id) return;
+        this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
         this.normalizeActivityFlowSettings();
 
         try {
@@ -2124,7 +2410,7 @@ class TeacherManager {
 
     startNewVocab() {
         if (!this.ensureAuthenticated()) return;
-        this.vocabSet = { id: `custom_${Date.now()}`, name: 'New Vocabulary', description: '', grades: [], words: [] };
+        this.vocabSet = { id: `custom_${Date.now()}`, name: 'New Vocabulary', description: '', subjectSlug: DEFAULT_SUBJECT_SLUG, grades: [], words: [] };
         this.updateFormUI();
         this.renderWords();
         this.triggerAutoSave(); // Save immediately so it appears in library
@@ -2133,9 +2419,11 @@ class TeacherManager {
 
     updateFormUI() {
         this.applyAssignedDatePlacement(this.vocabSet);
+        this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
         $('#vocab-id').value = this.vocabSet.id || '';
         $('#vocab-name').value = this.vocabSet.name || '';
         $('#vocab-desc').value = this.vocabSet.description || '';
+        this.updateSubjectSelect();
         $('#vocab-grade').value = this.vocabSet.grades ? this.vocabSet.grades.join(', ') : (this.vocabSet.grade || '');
         $('#vocab-assigned-date').value = this.vocabSet.assignedDate || '';
         $('#vocab-trimester').value = this.getTeacherTrimesterKey(this.vocabSet.trimester || this.vocabSet) === 'other'
@@ -2245,12 +2533,14 @@ class TeacherManager {
     }
 
     createVocabIdSuggestion() {
+        const subject = getVocabSubjectSlug(this.vocabSet);
         const grade = this.getVocabGrades(this.vocabSet)[0] || 'custom';
         const trimester = this.getTeacherTrimesterKey(this.vocabSet);
         const month = this.getTeacherMonthKey(this.vocabSet);
         const week = this.vocabSet.week || this.inferTeacherWeek(this.vocabSet);
         const title = this.slugifyVocabPart(this.vocabSet.name || this.vocabSet.id || 'vocabulary');
         const parts = [
+            this.slugifyVocabPart(subject) || DEFAULT_SUBJECT_SLUG,
             `grade${this.slugifyVocabPart(grade) || 'custom'}`,
             trimester !== 'other' ? trimester.toLowerCase() : '',
             month !== 'other' ? month : '',
@@ -2455,6 +2745,9 @@ class TeacherManager {
             });
         }
 
+        $('#add-subject-btn')?.addEventListener('click', () => this.addSubjectFromForm());
+        $('#save-subjects-btn')?.addEventListener('click', () => this.saveSubjectSettings());
+
         $('#back-to-dashboard').addEventListener('click', () => {
             if (!this.ensureAuthenticated(false)) return;
             // Auto-save before leaving
@@ -2518,15 +2811,14 @@ class TeacherManager {
 
         $('#reset-student-password-btn')?.addEventListener('click', () => this.handlePasswordReset());
 
-        $('#quiz-open-current-btn')?.addEventListener('click', () => {
-            this.openQuizMaker({ returnTo: 'quizzes' });
-        });
-
-
         // Meta fields
         $('#vocab-id').addEventListener('input', (e) => { this.vocabSet.id = e.target.value; this.triggerAutoSave(); });
         $('#vocab-name').addEventListener('input', (e) => { this.vocabSet.name = e.target.value; this.triggerAutoSave(); });
         $('#vocab-desc').addEventListener('input', (e) => { this.vocabSet.description = e.target.value; this.triggerAutoSave(); });
+        $('#vocab-subject')?.addEventListener('change', (e) => {
+            this.vocabSet.subjectSlug = getVocabSubjectSlug({ subjectSlug: e.target.value });
+            this.triggerAutoSave();
+        });
         $('#vocab-grade').addEventListener('input', (e) => {
             // Parse comma separated values into array of numbers/strings
             const val = e.target.value;
@@ -2696,6 +2988,7 @@ class TeacherManager {
             reader.onload = async (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
+                    data.subjectSlug = getVocabSubjectSlug(data);
                     this.vocabSet = data;
 
                     this.updateFormUI();
@@ -2732,44 +3025,112 @@ class TeacherManager {
         });
     }
 
+    getQuizBuilderVocabKey(vocab = this.vocabSet) {
+        const subjectSlug = getVocabSubjectSlug(vocab);
+        const unitId = vocab?.id || vocab?.path || vocab?.name || 'untitled';
+        return `${subjectSlug}:${unitId}`;
+    }
+
+    readQuizBuilderDraft() {
+        try {
+            return JSON.parse(localStorage.getItem(QUIZ_BUILDER_DRAFT_KEY) || 'null');
+        } catch {
+            return null;
+        }
+    }
+
+    saveQuizBuilderDraft(state) {
+        if (!state || !this.vocabSet || !Array.isArray(this.vocabSet.words) || this.vocabSet.words.length === 0) return;
+        try {
+            localStorage.setItem(QUIZ_BUILDER_DRAFT_KEY, JSON.stringify({
+                version: 1,
+                updatedAt: Date.now(),
+                returnTo: this.quizReturnView || 'quizzes',
+                vocabKey: this.getQuizBuilderVocabKey(this.vocabSet),
+                vocabSet: this.vocabSet,
+                state
+            }));
+        } catch (error) {
+            console.warn('Could not save quiz builder draft:', error);
+        }
+    }
+
+    restoreQuizDraftVocabIfNeeded(options = {}) {
+        const draft = this.readQuizBuilderDraft();
+        const hasCurrentWords = Array.isArray(this.vocabSet?.words) && this.vocabSet.words.length > 0;
+        if (options.restoreDraft && !hasCurrentWords && draft?.vocabSet?.words?.length) {
+            this.vocabSet = JSON.parse(JSON.stringify(draft.vocabSet));
+            this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
+            this.updateFormUI();
+            this.renderWords();
+        }
+        return draft;
+    }
+
+    closeQuizMakerToHub() {
+        if (this.quizMaker?.serializeState) {
+            this.saveQuizBuilderDraft(this.quizMaker.serializeState());
+        }
+        this.quizEditorOpen = false;
+        this.showQuizzesView();
+    }
+
     async openQuizMaker(options = {}) {
+        const draft = this.restoreQuizDraftVocabIfNeeded(options);
         if (!this.vocabSet || !Array.isArray(this.vocabSet.words) || this.vocabSet.words.length === 0) {
             notifications.warning('Choose a vocabulary with words before opening the quiz builder.');
-            this.showQuizzesView();
+            await this.showQuizzesView({ replaceRoute: true });
             return;
         }
-        this.quizReturnView = options.returnTo || this.quizReturnView || 'quizzes';
+
+        this.quizReturnView = options.returnTo || draft?.returnTo || this.quizReturnView || 'quizzes';
+        this.quizEditorOpen = true;
+        const vocabKey = this.getQuizBuilderVocabKey(this.vocabSet);
+
+        if (this.quizMaker && this.quizMakerVocabKey === vocabKey && !options.forceNew) {
+            this.switchView('quiz-maker-view');
+            if (this.quizMaker.serializeState) {
+                this.saveQuizBuilderDraft(this.quizMaker.serializeState());
+            }
+            return;
+        }
+
         this.switchView('quiz-maker-view');
-        const { QuizMaker } = await import('./quizMaker.js?v=section-composer-20260528k');
+        const draftState = draft?.vocabKey === vocabKey ? draft.state : null;
+        const { QuizMaker } = await import('./quizMaker.js?v=docx-logo-20260530');
+        this.quizMakerVocabKey = vocabKey;
         this.quizMaker = new QuizMaker(this.vocabSet, () => {
             if (this.quizReturnView === 'editor') {
+                this.quizEditorOpen = false;
                 this.showEditor();
             } else {
-                this.showQuizzesView();
+                this.closeQuizMakerToHub();
             }
+        }, {
+            state: draftState,
+            onStateChange: (state) => this.saveQuizBuilderDraft(state)
         });
     }
 
-    async showQuizzesView() {
+    async showQuizzesView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
+        this.quizEditorOpen = false;
         this.switchView('teacher-quizzes-view');
         this.updateQuizHubSummary();
         await this.loadQuizPicker();
+        if (options.replaceRoute) {
+            this.setRoute({ view: 'quizzes' }, { replace: true });
+        }
     }
 
     updateQuizHubSummary() {
         const title = $('#quiz-active-vocab-name');
         const meta = $('#quiz-active-vocab-meta');
-        const openBtn = $('#quiz-open-current-btn');
-        const hasWords = Array.isArray(this.vocabSet.words) && this.vocabSet.words.length > 0;
 
-        if (title) title.textContent = hasWords ? (this.vocabSet.name || this.vocabSet.id || 'Selected vocabulary') : 'No vocabulary selected';
+        if (title) title.textContent = 'Choose a vocabulary set';
         if (meta) {
-            meta.textContent = hasWords
-                ? `${this.vocabSet.words.length} words ready for printable quiz generation.`
-                : 'Choose a vocabulary set below to generate printable questions.';
+            meta.textContent = 'Open the builder from a specific unit card below.';
         }
-        if (openBtn) openBtn.disabled = !hasWords;
     }
 
     async loadQuizPicker() {
@@ -2777,20 +3138,15 @@ class TeacherManager {
         if (!container) return;
         container.innerHTML = '<div class="loading-spinner">Loading vocabulary choices...</div>';
         try {
-            const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
-            const choices = [
-                ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
-                ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
-                ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
-            ];
+            const { items } = await this.getTeacherLibrary();
 
-            if (choices.length === 0) {
+            if (!items || items.length === 0) {
                 container.innerHTML = '<p class="teacher-empty-state">No vocabulary sets are available yet.</p>';
                 return;
             }
 
-            container.innerHTML = '';
-            choices.forEach(choice => this.createQuizPickerCard(container, choice.vocab, choice.type));
+            this.quizLibraryItems = items;
+            this.renderQuizVocabularyBrowser(container);
             this.refreshIcons();
         } catch (error) {
             console.error('Failed to load quiz vocabulary picker:', error);
@@ -2798,15 +3154,265 @@ class TeacherManager {
         }
     }
 
+    resetQuizDrilldown() {
+        this.quizDrilldown = {
+            subject: null,
+            grade: null,
+            trimester: null,
+            month: null
+        };
+    }
+
+    renderQuizVocabularyBrowser(container = $('#quiz-vocab-picker')) {
+        if (!container) return;
+
+        container.classList.remove('vocab-grid', 'compact-vocab-grid');
+        container.classList.add('teacher-library-browser');
+        container.innerHTML = '';
+
+        const subjectGroups = this.buildLibraryGroups(this.quizLibraryItems);
+        const selectedSubject = this.quizDrilldown.subject;
+        const selectedGrade = this.quizDrilldown.grade;
+        const selectedTrimester = this.quizDrilldown.trimester;
+        const selectedMonth = this.quizDrilldown.month;
+
+        if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
+            this.resetQuizDrilldown();
+            this.renderQuizSubjectPicker(container, subjectGroups);
+            return;
+        }
+
+        const gradeGroups = subjectGroups.get(selectedSubject);
+
+        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+            this.quizDrilldown.grade = null;
+            this.quizDrilldown.trimester = null;
+            this.quizDrilldown.month = null;
+            this.renderQuizGradePicker(container, selectedSubject, gradeGroups);
+            return;
+        }
+
+        const trimesterGroups = gradeGroups.get(selectedGrade);
+
+        if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
+            this.quizDrilldown.trimester = null;
+            this.quizDrilldown.month = null;
+            this.renderQuizTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups);
+            return;
+        }
+
+        const monthGroups = this.buildMonthGroups(trimesterGroups.get(selectedTrimester));
+
+        if (!selectedMonth || !monthGroups.has(selectedMonth)) {
+            this.quizDrilldown.month = null;
+            this.renderQuizMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
+            return;
+        }
+
+        this.renderQuizAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
+    }
+
+    renderQuizBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
+        const nav = createElement('div', 'teacher-library-breadcrumb');
+
+        const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
+            this.resetQuizDrilldown();
+            this.renderQuizVocabularyBrowser();
+        });
+        nav.appendChild(subjectsButton);
+
+        if (selectedSubject) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            const subjectButton = selectedGrade || selectedTrimester || selectedMonth
+                ? this.createLibraryBreadcrumbButton(subject.name, () => {
+                    this.quizDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null };
+                    this.renderQuizVocabularyBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+            nav.appendChild(subjectButton);
+        }
+
+        if (selectedGrade) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const gradeLabel = this.formatGradeLabel(selectedGrade);
+            const gradeButton = selectedTrimester || selectedMonth
+                ? this.createLibraryBreadcrumbButton(gradeLabel, () => {
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null };
+                    this.renderQuizVocabularyBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
+            nav.appendChild(gradeButton);
+        }
+
+        if (selectedTrimester) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
+            const trimesterNode = selectedMonth
+                ? this.createLibraryBreadcrumbButton(trimesterLabel, () => {
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester, month: null };
+                    this.renderQuizVocabularyBrowser();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+            nav.appendChild(trimesterNode);
+        }
+
+        if (selectedMonth) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth)));
+        }
+
+        container.appendChild(nav);
+    }
+
+    renderQuizSubjectPicker(container, subjectGroups) {
+        this.renderQuizBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(subjectGroups.entries())
+            .sort(([subjectA], [subjectB]) => {
+                const metaA = getSubjectBySlug(this.getSubjects(), subjectA);
+                const metaB = getSubjectBySlug(this.getSubjects(), subjectB);
+                if (metaA.sortOrder !== metaB.sortOrder) return metaA.sortOrder - metaB.sortOrder;
+                return metaA.name.localeCompare(metaB.name);
+            })
+            .forEach(([subjectSlug, gradeGroups]) => {
+                const subject = getSubjectBySlug(this.getSubjects(), subjectSlug);
+                const totalUnits = Array.from(gradeGroups.values())
+                    .reduce((sum, trimesterGroups) => sum + Array.from(trimesterGroups.values()).reduce((inner, group) => inner + group.length, 0), 0);
+                const gradeSummary = Array.from(gradeGroups.keys())
+                    .sort((gradeA, gradeB) => this.compareGradeLabels(gradeA, gradeB))
+                    .map(grade => this.formatGradeLabel(grade))
+                    .join(' · ');
+                const card = this.createLibraryChoiceCard({
+                    title: subject.name,
+                    count: this.formatUnitCount(totalUnits),
+                    meta: gradeSummary,
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.quizDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null };
+                    this.renderQuizVocabularyBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderQuizGradePicker(container, selectedSubject, gradeGroups) {
+        this.renderQuizBreadcrumb(container, selectedSubject);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(gradeGroups.entries())
+            .sort(([gradeA], [gradeB]) => this.compareGradeLabels(gradeA, gradeB))
+            .forEach(([grade, trimesterGroups]) => {
+                const totalUnits = Array.from(trimesterGroups.values()).reduce((sum, group) => sum + group.length, 0);
+                const trimesterSummary = Array.from(trimesterGroups.entries())
+                    .sort(([trimesterA], [trimesterB]) => this.getTeacherTrimesterOrder(trimesterA) - this.getTeacherTrimesterOrder(trimesterB))
+                    .map(([trimesterKey, vocabItems]) => `${this.getTeacherTrimesterShortLabel(trimesterKey)}: ${vocabItems.length}`)
+                    .join(' · ');
+
+                const card = this.createLibraryChoiceCard({
+                    title: this.formatGradeLabel(grade),
+                    count: this.formatUnitCount(totalUnits),
+                    meta: trimesterSummary,
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.quizDrilldown = { subject: selectedSubject, grade, trimester: null, month: null };
+                    this.renderQuizVocabularyBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderQuizTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups) {
+        this.renderQuizBreadcrumb(container, selectedSubject, selectedGrade);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(trimesterGroups.entries())
+            .sort(([trimesterA], [trimesterB]) => this.getTeacherTrimesterOrder(trimesterA) - this.getTeacherTrimesterOrder(trimesterB))
+            .forEach(([trimesterKey, vocabItems]) => {
+                const monthSummary = this.formatMonthSummary(this.buildMonthGroups(vocabItems));
+                const card = this.createLibraryChoiceCard({
+                    title: this.getTeacherTrimesterLabel(trimesterKey),
+                    count: this.formatUnitCount(vocabItems.length),
+                    meta: monthSummary || this.formatGradeLabel(selectedGrade),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: trimesterKey, month: null };
+                    this.renderQuizVocabularyBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderQuizMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups) {
+        this.renderQuizBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(monthGroups.entries())
+            .sort(([monthA], [monthB]) => this.getTeacherMonthOrder(monthA) - this.getTeacherMonthOrder(monthB))
+            .forEach(([monthKey, vocabItems]) => {
+                const card = this.createLibraryChoiceCard({
+                    title: this.getTeacherMonthLabel(monthKey),
+                    count: this.formatUnitCount(vocabItems.length),
+                    meta: this.formatGradeLabel(selectedGrade),
+                    icon: 'chevron-right'
+                });
+                card.addEventListener('click', () => {
+                    this.quizDrilldown = {
+                        subject: selectedSubject,
+                        grade: selectedGrade,
+                        trimester: selectedTrimester,
+                        month: monthKey
+                    };
+                    this.renderQuizVocabularyBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderQuizAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, vocabItems) {
+        this.renderQuizBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth);
+
+        const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid compact-vocab-grid');
+        vocabItems
+            .sort((itemA, itemB) => this.compareVocabPlacement(itemA.vocab, itemB.vocab))
+            .forEach(({ vocab, type }) => {
+                this.createQuizPickerCard(grid, vocab, type);
+            });
+
+        container.appendChild(grid);
+    }
+
     createQuizPickerCard(container, vocab, type) {
         const card = createElement('button', 'teacher-vocab-pick-card');
         card.type = 'button';
         const badgeText = type === 'cloud' ? 'Cloud' : type === 'local' ? 'Draft' : 'Repo';
         const grades = Array.isArray(vocab.grades) ? vocab.grades.join(', ') : (vocab.grade || '');
+        const subject = this.getSubjectForVocab(vocab);
+        const placement = this.formatVocabPlacementLabel(vocab);
         card.innerHTML = `
             <span class="teacher-source-badge">${badgeText}</span>
-            <strong>${vocab.name || 'Untitled'}</strong>
-            <small>${vocab.id || ''}${grades ? ` · Grade ${grades}` : ''}</small>
+            <span class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</span>
+            <strong>${escapeHtml(vocab.name || 'Untitled')}</strong>
+            <small>${escapeHtml(vocab.id || '')}${grades ? ` · Grade ${escapeHtml(grades)}` : ''}</small>
+            ${placement ? `<small>${escapeHtml(placement)}</small>` : ''}
+            <span class="teacher-pick-action"><i data-lucide="file-plus"></i> Build quiz</span>
         `;
         card.addEventListener('click', async () => {
             if (type === 'remote') {
@@ -2818,6 +3424,7 @@ class TeacherManager {
                 this.vocabSet = data;
             } else {
                 this.vocabSet = JSON.parse(JSON.stringify(vocab));
+                this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
                 if (type === 'cloud') this.vocabSet.source = 'cloud';
             }
             this.updateFormUI();
@@ -3031,6 +3638,7 @@ class TeacherManager {
                 id: vocab.id,
                 name: vocab.name,
                 description: vocab.description || '',
+                subjectSlug: getVocabSubjectSlug(vocab),
                 grades: vocab.grades || (vocab.grade ? [vocab.grade] : []),
                 assignedDate: vocab.assignedDate || '',
                 trimester: vocab.trimester || '',
@@ -3253,6 +3861,7 @@ class TeacherManager {
         reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result);
+                data.subjectSlug = getVocabSubjectSlug(data);
                 this.vocabSet = data;
 
                 this.updateFormUI();
@@ -3278,7 +3887,6 @@ class TeacherManager {
         await this.fetchAllStudentProgress();
         this.populateFilters();
         this.applyFilters();
-        this.renderProgressStats();
         this.initExportListeners();
         this.populateExportGradeSelect();
         this.initDataViewer();
@@ -3698,7 +4306,6 @@ class TeacherManager {
 
         $('#detail-student-coins').textContent = coinData.balance;
         this.renderProgressTable();
-        this.renderProgressStats();
     }
 
     handleSelectAll(checked) {
@@ -3853,32 +4460,10 @@ class TeacherManager {
             // Clear selection and refresh UI
             this.clearSelection();
             this.renderProgressTable();
-            this.renderProgressStats();
         } catch (error) {
             console.error('Bulk coin adjustment failed:', error);
             alert('Failed to update coins. Please try again.');
         }
-    }
-
-
-    renderProgressStats() {
-        const total = this.allStudentData.length;
-        const now = Date.now();
-        const active = this.allStudentData.filter(s => {
-            const date = this.getStudentUpdatedTime(s);
-            if (!date) return false;
-            return now - date <= 7 * 24 * 60 * 60 * 1000;
-        }).length;
-        const avgCoins = total ? Math.round(this.allStudentData.reduce((sum, s) => sum + (s.coins || 0), 0) / total) : 0;
-        const top = this.allStudentData
-            .slice()
-            .sort((a, b) => (b.coins || 0) - (a.coins || 0))[0];
-
-        $('#stat-total-students').textContent = total || '--';
-        $('#stat-active').textContent = active || '0';
-        $('#stat-avg-coins').textContent = `${avgCoins}`;
-        const topProfile = top && top.studentProfile ? `${top.studentProfile.firstName || ''} ${top.studentProfile.lastName || ''}`.trim() : '';
-        $('#stat-top-student').textContent = top ? `${topProfile || (top.studentProfile?.name) || '—'} (${top.coins || 0})` : '--';
     }
 
     generateSummativeQuiz() {
@@ -4848,6 +5433,7 @@ Object.assign(TeacherManager.prototype, {
     async showDataManagementView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.switchView('teacher-data-management-view');
+        this.loadSubjectSettings();
         this.loadGamificationSettings();
         this.loadSchoolCalendarSettings();
         if (this.allStudentData.length === 0) {

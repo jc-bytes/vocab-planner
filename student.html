@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - Vocabulary App</title>
+    <title>Vocabulary Master - Student</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
@@ -173,10 +173,13 @@
                         <p class="teacher-eyebrow">Student dashboard</p>
                         <h2>Pick up where learning left off.</h2>
                     </div>
-                    <button id="menu-vocab-btn" class="btn secondary-btn" type="button">
-                        <i data-lucide="book-open"></i>
-                        All Units
-                    </button>
+                    <div class="student-dashboard-actions">
+                        <div id="student-subject-picker" class="student-subject-picker"></div>
+                        <button id="menu-vocab-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="book-open"></i>
+                            All Units
+                        </button>
+                    </div>
                 </div>
                 <div id="student-home-dashboard" class="student-home-dashboard">
                     <div class="loading-spinner">Loading dashboard...</div>
@@ -189,6 +192,7 @@
                     <button id="back-to-main-menu-btn" class="btn text-btn">← Today</button>
                     <h2>Choose a Unit</h2>
                 </div>
+                <div id="vocab-subject-picker" class="student-subject-picker"></div>
                 <div id="vocab-list" class="vocab-grid">
                     <!-- Vocabulary sets will be listed here -->
                     <div class="loading-spinner">Loading vocabularies...</div>
@@ -199,7 +203,10 @@
             <section id="activity-menu-view" class="view hidden">
                 <div class="section-header">
                     <button id="back-to-vocab" class="btn text-btn">← Back to Units</button>
-                    <h2 id="current-unit-title">Unit Title</h2>
+                    <div>
+                        <div id="current-unit-subject" class="unit-subject-label"></div>
+                        <h2 id="current-unit-title">Unit Title</h2>
+                    </div>
                     <button id="download-word-hunt-btn" class="btn secondary-btn">Download Word Hunt</button>
                     <button id="generate-final-report-btn" class="btn accent-btn">📜 Final Report</button>
                 </div>

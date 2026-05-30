@@ -4,6 +4,12 @@ export { getCurrentSchoolYear };
 
 export const SCHOOL_CALENDAR_SETTINGS_KEY = 'schoolCalendar';
 export const SCHOOL_CALENDAR_LOCAL_KEY = 'dev_school_calendar';
+export const DEFAULT_SUBJECT_SLUG = 'technology';
+export const SUBJECTS_LOCAL_KEY = 'dev_subjects';
+export const DEFAULT_SUBJECTS = Object.freeze([
+    { slug: 'technology', name: 'Technology', color: '#2563eb', sortOrder: 10, active: true },
+    { slug: 'science', name: 'Science', color: '#16a34a', sortOrder: 20, active: true }
+]);
 
 const MANIFEST_CACHE_KEY = 'vocab_manifest_cache_v1';
 const MANIFEST_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -24,6 +30,93 @@ const MONTH_KEYS = [
     'november',
     'december'
 ];
+const SUBJECT_COLORS = ['#2563eb', '#16a34a', '#db2777', '#f59e0b', '#7c3aed', '#0891b2'];
+
+export function normalizeSubjectSlug(value, fallback = DEFAULT_SUBJECT_SLUG) {
+    const normalized = String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/&/g, 'and')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    return normalized || fallback;
+}
+
+function titleFromSlug(slug) {
+    return String(slug || DEFAULT_SUBJECT_SLUG)
+        .split('-')
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function normalizeColor(value, fallback = '#2563eb') {
+    return /^#[0-9a-f]{6}$/i.test(String(value || '')) ? String(value) : fallback;
+}
+
+export function normalizeSubject(subject = {}, index = 0) {
+    const rawSlug = subject.slug || subject.id || subject.subjectSlug || subject.name;
+    const slug = normalizeSubjectSlug(rawSlug);
+    const defaultSubject = DEFAULT_SUBJECTS.find(item => item.slug === slug);
+    return {
+        slug,
+        id: slug,
+        name: String(subject.name || defaultSubject?.name || titleFromSlug(slug)).trim(),
+        color: normalizeColor(subject.color, defaultSubject?.color || SUBJECT_COLORS[index % SUBJECT_COLORS.length]),
+        sortOrder: Number.isFinite(Number(subject.sortOrder ?? subject.sort_order))
+            ? Number(subject.sortOrder ?? subject.sort_order)
+            : defaultSubject?.sortOrder ?? ((index + 1) * 10),
+        active: subject.active !== false
+    };
+}
+
+export function normalizeSubjects(subjects = []) {
+    const bySlug = new Map(DEFAULT_SUBJECTS.map((subject, index) => [
+        subject.slug,
+        normalizeSubject(subject, index)
+    ]));
+
+    (Array.isArray(subjects) ? subjects : []).forEach((subject, index) => {
+        const normalized = normalizeSubject(subject, index);
+        bySlug.set(normalized.slug, normalized);
+    });
+
+    return Array.from(bySlug.values()).sort((a, b) => {
+        if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+        return a.name.localeCompare(b.name);
+    });
+}
+
+export function getVocabSubjectSlug(vocab = {}) {
+    return normalizeSubjectSlug(vocab.subjectSlug || vocab.subject_slug || vocab.subject || vocab.course);
+}
+
+export function withDefaultSubject(vocab = {}) {
+    return {
+        ...vocab,
+        subjectSlug: getVocabSubjectSlug(vocab)
+    };
+}
+
+export function getSubjectBySlug(subjects = [], slug = DEFAULT_SUBJECT_SLUG) {
+    const normalizedSlug = normalizeSubjectSlug(slug);
+    return normalizeSubjects(subjects).find(subject => subject.slug === normalizedSlug)
+        || normalizeSubject({ slug: normalizedSlug });
+}
+
+export async function loadSubjects(api = null) {
+    if (!api) return normalizeSubjects();
+
+    try {
+        await api.init();
+        const db = api.getDatabase();
+        const snapshot = await getDocs(collection(db, 'subjects'));
+        return normalizeSubjects(snapshot.docs.map(docSnap => docSnap.data()));
+    } catch (error) {
+        console.warn('Could not load subjects, using defaults:', error);
+        return normalizeSubjects();
+    }
+}
 
 function parseDateOnly(value) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return null;
@@ -200,7 +293,7 @@ export async function loadManifest({ fresh = false } = {}) {
 
 export async function loadManifestVocabularyList(options = {}) {
     const manifest = await loadManifest(options);
-    return Array.isArray(manifest?.vocabularies) ? manifest.vocabularies : [];
+    return Array.isArray(manifest?.vocabularies) ? manifest.vocabularies.map(withDefaultSubject) : [];
 }
 
 function readVocabFileCache() {
@@ -268,7 +361,7 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false }
 
     const cached = getCachedVocabFile(normalizedPath);
     if (!fresh && isVocabFileCacheFresh(cached)) {
-        return cached.data;
+        return withDefaultSubject(cached.data);
     }
 
     const requestKey = `${normalizedPath}|${fresh ? 'fresh' : 'normal'}`;
@@ -281,14 +374,14 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false }
             if (data) {
                 writeCachedVocabFile(normalizedPath, data);
             }
-            return data;
+            return data ? withDefaultSubject(data) : data;
         })
         .catch(error => {
             if (!silent) {
                 console.warn(`Could not fetch vocabulary file ${normalizedPath}:`, error);
             }
             if (cached?.data) {
-                return cached.data;
+                return withDefaultSubject(cached.data);
             }
             return null;
         })
@@ -311,6 +404,7 @@ export async function loadCloudVocabularyList(api) {
     return snapshot.docs.map(docSnap => ({
         id: docSnap.id,
         ...docSnap.data(),
+        subjectSlug: getVocabSubjectSlug(docSnap.data()),
         __source: 'cloud'
     }));
 }

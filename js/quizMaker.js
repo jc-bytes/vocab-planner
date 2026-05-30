@@ -2,14 +2,22 @@ import { $, createElement, loadScript } from './main.js';
 
 const HTML2CANVAS_SRC = 'js/libs/html2canvas.min.js';
 const JSZIP_SRC = 'js/libs/jszip.min.js';
+const VOCAB_TITLE_PREFIX_PATTERN = /^\s*Grade\s+\d+\s+(?:T\d+|I{1,3}T)\s*(?:Practice|Summative|Review|Vocabulary)?\s*:\s*[^-]+-\s*/i;
+
+function cleanQuizTitle(value) {
+    const original = String(value || 'Quiz').trim();
+    return original.replace(VOCAB_TITLE_PREFIX_PATTERN, '').trim() || original || 'Quiz';
+}
 
 export class QuizMaker {
-    constructor(vocabSet, onClose) {
+    constructor(vocabSet, onClose, options = {}) {
         this.vocabSet = vocabSet;
         this.onClose = onClose;
+        this.onStateChange = typeof options.onStateChange === 'function' ? options.onStateChange : null;
+        this.suppressStateSave = true;
         this.questions = [];
         this.meta = {
-            title: `${vocabSet.name || 'Quiz'}`,
+            title: cleanQuizTitle(vocabSet.name || 'Quiz'),
             instructions: 'This is an individual summative activity. This sheet must be filled out in pen (black or blue). Follow the instructions given by the teacher, stay seated and focused on your activity at all times during this assignment.',
             schoolName: 'ACADEMIA INTERNACIONAL DE DAVID',
             teacherName: 'Porfirio Rios',
@@ -29,6 +37,7 @@ export class QuizMaker {
         this.dragSrcEl = null;
         this.sectionIdCounter = 0;
         this.autoGenerateTimer = null;
+        this.wordExportLogoRelId = null;
         this.sectionTypes = {
             mc: { title: 'Multiple Choice', countLabel: 'Questions', pointsLabel: 'Pts / question', defaults: { count: 5, points: 1 } },
             sata: { title: 'Select All That Apply', countLabel: 'Questions', pointsLabel: 'Pts / question', defaults: { count: 3, points: 2, choices: 5, correct: 2 } },
@@ -47,13 +56,70 @@ export class QuizMaker {
             this.createQuizSection('synonym', { count: 5, points: 1 })
         ];
 
-        this.init();
+        const restored = this.restoreState(options.state);
+        this.init({ shouldGenerate: !restored });
     }
 
-    init() {
+    init(options = {}) {
         this.renderEditor();
         this.attachGlobalListeners();
-        this.generateQuizFromSections();
+        if (options.shouldGenerate !== false) {
+            this.generateQuizFromSections();
+        }
+        this.suppressStateSave = false;
+        this.notifyStateChange();
+    }
+
+    restoreState(state) {
+        if (!state || typeof state !== 'object') return false;
+
+        try {
+            if (state.meta && typeof state.meta === 'object') {
+                this.meta = {
+                    ...this.meta,
+                    ...JSON.parse(JSON.stringify(state.meta)),
+                    rubric: Array.isArray(state.meta.rubric)
+                        ? JSON.parse(JSON.stringify(state.meta.rubric))
+                        : this.meta.rubric
+                };
+                this.meta.title = cleanQuizTitle(this.meta.title);
+            }
+
+            if (Array.isArray(state.quizSections)) {
+                this.quizSections = JSON.parse(JSON.stringify(state.quizSections));
+            }
+
+            if (Array.isArray(state.questions)) {
+                this.questions = JSON.parse(JSON.stringify(state.questions));
+            }
+
+            const maxSectionId = this.quizSections.reduce((max, section) => {
+                const match = String(section.id || '').match(/section-(\d+)/);
+                return match ? Math.max(max, parseInt(match[1], 10) || 0) : max;
+            }, 0);
+            this.sectionIdCounter = Math.max(parseInt(state.sectionIdCounter, 10) || 0, maxSectionId, this.sectionIdCounter);
+
+            return Array.isArray(state.quizSections) || Array.isArray(state.questions);
+        } catch (error) {
+            console.warn('Could not restore quiz draft state:', error);
+            return false;
+        }
+    }
+
+    serializeState() {
+        return JSON.parse(JSON.stringify({
+            version: 1,
+            meta: this.meta,
+            quizSections: this.quizSections,
+            questions: this.questions,
+            sectionIdCounter: this.sectionIdCounter
+        }));
+    }
+
+    notifyStateChange() {
+        if (this.suppressStateSave || !this.onStateChange) return;
+        this.syncSectionsFromInputs();
+        this.onStateChange(this.serializeState());
     }
 
     createQuizSection(type, overrides = {}) {
@@ -244,16 +310,14 @@ export class QuizMaker {
     }
 
     attachGlobalListeners() {
-        $('#quiz-maker-close-btn').onclick = () => this.onClose();
-        $('#quiz-maker-print-btn').onclick = () => this.printQuiz();
-        const imageBtn = $('#quiz-maker-image-btn');
-        if (imageBtn) {
-            imageBtn.onclick = () => this.exportAsImage();
-        }
-        const pdfBtn = $('#quiz-maker-pdf-btn');
-        if (pdfBtn) {
-            pdfBtn.onclick = () => this.exportAsPDF();
-        }
+        const closeEditor = () => {
+            this.notifyStateChange();
+            this.onClose();
+        };
+        const backBtn = $('#quiz-maker-back-btn');
+        if (backBtn) backBtn.onclick = closeEditor;
+        const closeBtn = $('#quiz-maker-close-btn');
+        if (closeBtn) closeBtn.onclick = closeEditor;
         const wordBtn = $('#quiz-maker-word-btn');
         if (wordBtn) {
             wordBtn.onclick = () => this.exportAsWord();
@@ -575,6 +639,8 @@ export class QuizMaker {
 
         try {
             this.updateTotalPoints();
+            const logoBuffer = await this.loadDocxLogo();
+            this.wordExportLogoRelId = logoBuffer ? 'rIdLogo' : null;
             const zip = new JSZip();
             zip.file('[Content_Types].xml', this.getDocxContentTypes());
             zip.folder('_rels').file('.rels', this.getDocxRootRels());
@@ -582,6 +648,9 @@ export class QuizMaker {
             word.file('document.xml', this.buildWordDocumentXml());
             word.file('styles.xml', this.getDocxStyles());
             word.folder('_rels').file('document.xml.rels', this.getDocxDocumentRels());
+            if (logoBuffer) {
+                word.folder('media').file('logo.jpeg', logoBuffer);
+            }
 
             const blob = await zip.generateAsync({
                 type: 'blob',
@@ -591,6 +660,19 @@ export class QuizMaker {
         } catch (err) {
             console.error('Export Word failed:', err);
             alert('Could not export Word document.');
+        } finally {
+            this.wordExportLogoRelId = null;
+        }
+    }
+
+    async loadDocxLogo() {
+        try {
+            const response = await fetch('logo.jpeg');
+            if (!response.ok) return null;
+            return await response.arrayBuffer();
+        } catch (error) {
+            console.warn('Could not embed logo in Word export:', error);
+            return null;
         }
     }
 
@@ -621,7 +703,7 @@ export class QuizMaker {
         });
 
         return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
     ${content.join('')}
     <w:sectPr>
@@ -641,7 +723,7 @@ export class QuizMaker {
     wordHeaderTable() {
         return this.wordTable([
             [
-                this.wordParagraph('AID', { bold: true, align: 'center' }),
+                this.wordLogoParagraph(),
                 [
                     this.wordParagraph(this.meta.schoolName || '', { bold: true, align: 'center', after: 40 }),
                     this.wordParagraph(this.meta.title || '', { bold: true, align: 'center', after: 40 }),
@@ -650,6 +732,55 @@ export class QuizMaker {
                 this.wordParagraph(' ', { align: 'center' })
             ]
         ], { widths: [1200, 7200, 1200], shading: 'F8FAFC' });
+    }
+
+    wordLogoParagraph() {
+        if (!this.wordExportLogoRelId) {
+            return this.wordParagraph('AID', { bold: true, align: 'center' });
+        }
+
+        const size = 914400;
+        return `
+            <w:p>
+                <w:pPr>
+                    <w:jc w:val="center"/>
+                    <w:spacing w:before="0" w:after="0"/>
+                </w:pPr>
+                <w:r>
+                    <w:drawing>
+                        <wp:inline distT="0" distB="0" distL="0" distR="0">
+                            <wp:extent cx="${size}" cy="${size}"/>
+                            <wp:effectExtent l="0" t="0" r="0" b="0"/>
+                            <wp:docPr id="1" name="School logo"/>
+                            <wp:cNvGraphicFramePr>
+                                <a:graphicFrameLocks noChangeAspect="1"/>
+                            </wp:cNvGraphicFramePr>
+                            <a:graphic>
+                                <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                                    <pic:pic>
+                                        <pic:nvPicPr>
+                                            <pic:cNvPr id="1" name="logo.jpeg"/>
+                                            <pic:cNvPicPr/>
+                                        </pic:nvPicPr>
+                                        <pic:blipFill>
+                                            <a:blip r:embed="${this.wordExportLogoRelId}"/>
+                                            <a:stretch><a:fillRect/></a:stretch>
+                                        </pic:blipFill>
+                                        <pic:spPr>
+                                            <a:xfrm>
+                                                <a:off x="0" y="0"/>
+                                                <a:ext cx="${size}" cy="${size}"/>
+                                            </a:xfrm>
+                                            <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                                        </pic:spPr>
+                                    </pic:pic>
+                                </a:graphicData>
+                            </a:graphic>
+                        </wp:inline>
+                    </w:drawing>
+                </w:r>
+            </w:p>
+        `;
     }
 
     wordInfoRow() {
@@ -847,6 +978,8 @@ export class QuizMaker {
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="jpeg" ContentType="image/jpeg"/>
+  <Default Extension="jpg" ContentType="image/jpeg"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 </Types>`;
@@ -860,8 +993,12 @@ export class QuizMaker {
     }
 
     getDocxDocumentRels() {
+        const logoRel = this.wordExportLogoRelId
+            ? `\n  <Relationship Id="${this.wordExportLogoRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.jpeg"/>`
+            : '';
         return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`;
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${logoRel}
+</Relationships>`;
     }
 
     getDocxStyles() {
@@ -1326,6 +1463,7 @@ export class QuizMaker {
                 this.meta.teacherName = e.target.textContent;
                 const teacherInput = $('#quiz-teacher-input');
                 if (teacherInput) teacherInput.value = this.meta.teacherName;
+                this.notifyStateChange();
             });
         }
 
@@ -1419,6 +1557,7 @@ export class QuizMaker {
 
         this.updateTotalPoints();
         this.renderSectionComposer();
+        this.notifyStateChange();
     }
 
     groupQuestionsByType() {

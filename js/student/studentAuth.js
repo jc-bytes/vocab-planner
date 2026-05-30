@@ -98,6 +98,7 @@ export class StudentAuth {
 
         this.sm.updateHeader();
         this.sm.progress.startCoinSync();
+        await this.sm.loadSubjectSettings();
         await this.sm.activities.loadSchoolCalendar();
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();

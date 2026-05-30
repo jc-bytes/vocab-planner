@@ -2,5 +2,5 @@
 pub fn run() {
     tauri::Builder::default()
         .run(tauri::generate_context!())
-        .expect("error while running Technology 6A desktop app");
+        .expect("error while running Vocabulary Master desktop app");
 }

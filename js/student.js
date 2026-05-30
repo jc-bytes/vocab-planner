@@ -13,6 +13,12 @@ import {
     orderBy,
     limit
 } from './services/studentApi.js';
+import {
+    DEFAULT_SUBJECT_SLUG,
+    getSubjectBySlug,
+    getVocabSubjectSlug,
+    loadSubjects
+} from './services/vocabularyApi.js';
 // Import modular components
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
@@ -87,6 +93,8 @@ class StudentManager {
         this.cloudVocabs = [];
         this.availableVocabs = [];
         this.schoolCalendar = null;
+        this.subjects = [];
+        this.selectedSubjectSlug = localStorage.getItem('student_selected_subject') || DEFAULT_SUBJECT_SLUG;
         this.studentVocabularyDrilldown = {
             trimester: null,
             month: null
@@ -137,6 +145,7 @@ class StudentManager {
             this.auth.updateGuestStatus(true);
 
             await this.activities.loadManifest();
+            await this.loadSubjectSettings();
             await this.activities.loadSchoolCalendar();
             this.progress.loadLocalProgress();
             this.auth.updateHeader();
@@ -147,6 +156,7 @@ class StudentManager {
 
         // Load manifest and local data
         await this.activities.loadManifest();
+        await this.loadSubjectSettings();
         this.progress.loadLocalProgress();
 
         await this.auth.initBackendAuth();
@@ -198,6 +208,44 @@ class StudentManager {
     // DEPRECATED: Use this.activities.renderDashboard() instead
     renderDashboard() {
         return this.activities.renderDashboard();
+    }
+
+    async loadSubjectSettings() {
+        this.subjects = await loadSubjects(this.authDisabled || !this.currentUser ? null : supabaseService);
+        this.ensureSelectedSubject();
+    }
+
+    getActiveSubjects() {
+        return (this.subjects || []).filter(subject => subject.active !== false);
+    }
+
+    getSelectedSubject() {
+        return getSubjectBySlug(this.subjects, this.selectedSubjectSlug);
+    }
+
+    selectSubject(subjectSlug) {
+        this.selectedSubjectSlug = getVocabSubjectSlug({ subjectSlug });
+        localStorage.setItem('student_selected_subject', this.selectedSubjectSlug);
+        this.resetStudentVocabularyDrilldown();
+        this.activities.renderDashboard();
+        this.activities.renderStudentHome();
+    }
+
+    ensureSelectedSubject(vocabs = null) {
+        const activeSubjects = this.getActiveSubjects();
+        const subjectSlugs = new Set(activeSubjects.map(subject => subject.slug));
+        if (Array.isArray(vocabs) && vocabs.length > 0) {
+            const availableSubjectSlugs = new Set(vocabs.map(vocab => getVocabSubjectSlug(vocab)));
+            if (!availableSubjectSlugs.has(this.selectedSubjectSlug)) {
+                const firstAvailable = activeSubjects.find(subject => availableSubjectSlugs.has(subject.slug));
+                if (firstAvailable) this.selectedSubjectSlug = firstAvailable.slug;
+            }
+        }
+        if (!subjectSlugs.has(this.selectedSubjectSlug)) {
+            this.selectedSubjectSlug = activeSubjects[0]?.slug || DEFAULT_SUBJECT_SLUG;
+        }
+        localStorage.setItem('student_selected_subject', this.selectedSubjectSlug);
+        return this.selectedSubjectSlug;
     }
 
     // DEPRECATED: Use this.activities.loadVocabulary() instead

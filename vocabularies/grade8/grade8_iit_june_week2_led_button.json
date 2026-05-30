@@ -1,5 +1,6 @@
 {
   "id": "grade8_iit_june_week2_led_button",
+  "subjectSlug": "technology",
   "name": "Grade 8 IIT Practice: June Week 2 - LED and Button",
   "description": "Practice words for Grade 8 second-trimester Arduino work.",
   "grades": [

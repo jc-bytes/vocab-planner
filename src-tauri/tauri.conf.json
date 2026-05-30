@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Technology 6A",
+  "productName": "Vocabulary Master",
   "version": "0.1.0",
-  "identifier": "pa.edu.aid.technology6a",
+  "identifier": "pa.edu.aid.vocabularymaster",
   "build": {
     "beforeDevCommand": "npm run desktop:dev",
     "beforeBuildCommand": "npm run desktop:build:web",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Technology 6A",
+        "title": "Vocabulary Master",
         "width": 1280,
         "height": 820,
         "minWidth": 980,
@@ -29,7 +29,7 @@
     "active": true,
     "targets": ["app"],
     "category": "Education",
-    "shortDescription": "Technology vocabulary and classroom practice app",
-    "longDescription": "Desktop app for Technology vocabulary, student practice, teacher dashboards, offline work, and later sync."
+    "shortDescription": "Multi-subject vocabulary and classroom practice app",
+    "longDescription": "Desktop app for teacher-managed vocabulary, student practice, teacher dashboards, offline work, and later sync."
   }
 }

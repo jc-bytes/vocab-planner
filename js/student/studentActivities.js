@@ -3,13 +3,15 @@
  * Handles vocabulary loading, activity management, and progress tracking
  */
 
-import { $, $$, createElement } from '../main.js';
+import { $, $$, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
 import { doc, getDoc, studentApi as supabaseService } from '../services/studentApi.js';
 import {
     SCHOOL_CALENDAR_LOCAL_KEY,
     SCHOOL_CALENDAR_SETTINGS_KEY,
     calculateVocabularyPlacement,
+    getSubjectBySlug,
+    getVocabSubjectSlug,
     getCurrentTrimesterFromCalendar,
     getCurrentSchoolYear,
     loadCloudVocabularyList,
@@ -141,7 +143,7 @@ export class StudentActivities {
     initWordCoverage() {
         if (!this.sm.currentVocab) return;
         
-        const vocabName = this.sm.currentVocab.name;
+        const vocabName = this.getUnitProgressKey(this.sm.currentVocab);
         
         // Load from progress data or initialize
         if (!this.sm.progressData.wordCoverage) {
@@ -189,7 +191,7 @@ export class StudentActivities {
         
         // Save coverage data
         if (this.sm.currentVocab) {
-            const vocabName = this.sm.currentVocab.name;
+            const vocabName = this.getUnitProgressKey(this.sm.currentVocab);
             if (!this.sm.progressData.wordCoverage) {
                 this.sm.progressData.wordCoverage = {};
             }
@@ -273,6 +275,7 @@ export class StudentActivities {
         if (this.sm.manifest && Array.isArray(this.sm.manifest.vocabularies)) {
             const manifestVocabs = this.sm.manifest.vocabularies.map(v => ({
                 ...v,
+                subjectSlug: getVocabSubjectSlug(v),
                 __source: 'manifest'
             }));
             vocabs = vocabs.concat(manifestVocabs);
@@ -285,6 +288,7 @@ export class StudentActivities {
                 if (Array.isArray(localVocabs)) {
                     const normalized = localVocabs.map(v => ({
                         ...v,
+                        subjectSlug: getVocabSubjectSlug(v),
                         __source: 'local'
                     }));
                     vocabs = vocabs.concat(normalized);
@@ -353,6 +357,18 @@ export class StudentActivities {
             };
         }
 
+        this.sm.ensureSelectedSubject(vocabs);
+        const selectedSubject = this.sm.getSelectedSubject();
+        vocabs = vocabs.filter(vocab => getVocabSubjectSlug(vocab) === this.sm.selectedSubjectSlug);
+
+        if (vocabs.length === 0) {
+            const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
+            return {
+                vocabs: [],
+                message: `No ${selectedSubject.name} vocabularies found${gradeContext}.`
+            };
+        }
+
         if (currentTrimesterOnly) {
             const currentTrimester = this.getCurrentTrimesterKey();
             vocabs = vocabs.filter(v => this.getVocabTrimesterKey(v) === currentTrimester);
@@ -361,13 +377,73 @@ export class StudentActivities {
                 const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
                 return {
                     vocabs: [],
-                    message: `No ${this.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
+                    message: `No ${selectedSubject.name} ${this.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
                 };
             }
         }
 
         this.sm.availableVocabs = vocabs;
         return { vocabs, message: '' };
+    }
+
+    getGradeMatchedVocabularySources() {
+        let vocabs = this.getAllVocabularySources();
+        const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
+
+        if (studentGrade) {
+            vocabs = vocabs.filter(v => {
+                if (v.grades && Array.isArray(v.grades)) {
+                    return v.grades.some(g => String(g).trim() === studentGrade);
+                }
+                if (v.grade) {
+                    return String(v.grade).trim() === studentGrade;
+                }
+                return true;
+            });
+        }
+
+        return vocabs;
+    }
+
+    renderSubjectPicker(targetId) {
+        const container = $(targetId);
+        if (!container) return;
+
+        const gradeVocabs = this.getGradeMatchedVocabularySources();
+        this.sm.ensureSelectedSubject(gradeVocabs);
+        const counts = gradeVocabs.reduce((map, vocab) => {
+            const subjectSlug = getVocabSubjectSlug(vocab);
+            map.set(subjectSlug, (map.get(subjectSlug) || 0) + 1);
+            return map;
+        }, new Map());
+
+        const subjects = this.sm.getActiveSubjects().filter(subject => counts.has(subject.slug));
+        if (subjects.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const selectedSubject = subjects.find(subject => subject.slug === this.sm.selectedSubjectSlug) || subjects[0];
+        const selectId = `${targetId.replace(/[^a-z0-9_-]/gi, '')}-class-select`;
+
+        container.innerHTML = '';
+        container.style.setProperty('--subject-color', selectedSubject.color);
+
+        const picker = createElement('label', 'student-class-picker');
+        picker.setAttribute('for', selectId);
+        picker.innerHTML = `
+            <span class="student-class-picker-label">Class</span>
+            <span class="subject-color-dot" style="background:${escapeHtml(selectedSubject.color)};"></span>
+            <select id="${escapeHtml(selectId)}" class="student-subject-select" aria-label="Choose class">
+                ${subjects.map(subject => {
+                    const count = counts.get(subject.slug) || 0;
+                    return `<option value="${escapeHtml(subject.slug)}"${subject.slug === selectedSubject.slug ? ' selected' : ''}>${escapeHtml(subject.name)} (${count} ${count === 1 ? 'unit' : 'units'})</option>`;
+                }).join('')}
+            </select>
+        `;
+
+        picker.querySelector('select')?.addEventListener('change', event => this.sm.selectSubject(event.target.value));
+        container.appendChild(picker);
     }
 
     async loadCloudVocabularies() {
@@ -395,6 +471,7 @@ export class StudentActivities {
 
     renderDashboard() {
         const container = $('#vocab-list');
+        this.renderSubjectPicker('#vocab-subject-picker');
         container.innerHTML = '';
         container.className = 'vocab-groups';
         this.sm.availableVocabs = [];
@@ -486,7 +563,9 @@ export class StudentActivities {
     }
 
     getUnitProgressSummary(vocab) {
-        const unitProgress = this.sm.progressData?.units?.[vocab.name] || {};
+        const unitProgress = this.sm.progressData?.units?.[this.getUnitProgressKey(vocab)]
+            || this.sm.progressData?.units?.[vocab.name]
+            || {};
         const scores = unitProgress.scores || {};
         const flow = this.getActivityFlowConfig(vocab);
         const completedRequired = flow.required.filter(activityType => {
@@ -516,6 +595,7 @@ export class StudentActivities {
         const container = $('#student-home-dashboard');
         if (!container) return;
 
+        this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
         const { vocabs, message } = this.getVisibleVocabularyList({ currentTrimesterOnly: true });
 
@@ -601,6 +681,7 @@ export class StudentActivities {
 
     createHomeUnitCard(item) {
         const { vocab, schedule, progress } = item;
+        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
         const card = createElement('button', 'student-home-unit');
         card.type = 'button';
         if (vocab.path) card.dataset.vocabPath = vocab.path;
@@ -612,8 +693,8 @@ export class StudentActivities {
         card.innerHTML = `
             <div class="student-home-unit-icon"><i data-lucide="book-open"></i></div>
             <div class="student-home-unit-copy">
-                <strong>${vocab.name || 'Vocabulary Unit'}</strong>
-                <span>${schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab))}</span>
+                <strong>${escapeHtml(vocab.name || 'Vocabulary Unit')}</strong>
+                <span>${escapeHtml(subject.name)} · ${escapeHtml(schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab)))}</span>
             </div>
             <div class="student-home-unit-status">
                 <span>${progressText}</span>
@@ -688,14 +769,25 @@ export class StudentActivities {
         return '';
     }
 
+    getUnitProgressKey(vocab = this.sm.currentVocab) {
+        const unitId = this.sm.getVocabRouteId(vocab) || vocab?.id || vocab?.name || 'unit';
+        return `${getVocabSubjectSlug(vocab)}:${unitId}`;
+    }
+
     ensureUnitProgress(vocab = this.sm.currentVocab) {
         if (!vocab) return null;
         if (!this.sm.progressData.units) this.sm.progressData.units = {};
 
-        const existing = this.sm.progressData.units[vocab.name] || {};
+        const progressKey = this.getUnitProgressKey(vocab);
+        const legacyProgress = this.sm.progressData.units[vocab.name] || {};
+        const existing = this.sm.progressData.units[progressKey] || (
+            getVocabSubjectSlug(vocab) === 'technology' ? legacyProgress : {}
+        );
         const unitProgress = {
             ...existing,
             unitId: this.sm.getVocabRouteId(vocab),
+            unitName: vocab.name || '',
+            subjectSlug: getVocabSubjectSlug(vocab),
             trimester: this.getVocabTrimesterKey(vocab),
             schoolYear: existing.schoolYear || getCurrentSchoolYear(),
             grade: this.getUnitGrade(vocab),
@@ -705,7 +797,7 @@ export class StudentActivities {
             states: existing.states || {}
         };
 
-        this.sm.progressData.units[vocab.name] = unitProgress;
+        this.sm.progressData.units[progressKey] = unitProgress;
         return unitProgress;
     }
 
@@ -1149,6 +1241,7 @@ export class StudentActivities {
 
     createVocabularyCard(vocab) {
         const card = createElement('div', 'card option-card');
+        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
         const sourceLabel = vocab.__source === 'cloud'
             ? 'Cloud'
             : vocab.__source === 'local'
@@ -1157,9 +1250,10 @@ export class StudentActivities {
 
         card.innerHTML = `
             <div class="icon">${vocab.__source === 'cloud' ? '☁️' : '📚'}</div>
-            <h3>${vocab.name}</h3>
-            <p>${vocab.description || ''}</p>
-            ${vocab.grades ? `<small>Grade: ${vocab.grades.join(', ')}</small>` : ''}
+            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+            <h3>${escapeHtml(vocab.name)}</h3>
+            <p>${escapeHtml(vocab.description || '')}</p>
+            ${vocab.grades ? `<small>Grade: ${escapeHtml(vocab.grades.join(', '))}</small>` : ''}
             <small style="color:var(--text-muted); display:block; margin-top:0.5rem;">${sourceLabel}</small>
         `;
         if (vocab.path) {
@@ -1208,6 +1302,7 @@ export class StudentActivities {
 
         merged.id = override?.id || fileData?.id || meta.id;
         merged.path = meta.path || override?.path || fileData?.path;
+        merged.subjectSlug = getVocabSubjectSlug(merged);
         merged.grades = override?.grades?.length ? override.grades : (fileData?.grades || meta.grades);
         merged.assignedDate = override?.assignedDate || fileData?.assignedDate || meta.assignedDate;
         merged.trimester = override?.trimester || fileData?.trimester || meta.trimester;
@@ -1273,6 +1368,12 @@ export class StudentActivities {
 
     showActivityMenu(options = {}) {
         $('#current-unit-title').textContent = this.sm.currentVocab.name;
+        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(this.sm.currentVocab));
+        const subjectEl = $('#current-unit-subject');
+        if (subjectEl) {
+            subjectEl.textContent = subject.name;
+            subjectEl.style.setProperty('--subject-color', subject.color);
+        }
 
         // Get word coverage stats
         const coverageStats = this.getWordCoverageStats();
@@ -1404,6 +1505,7 @@ export class StudentActivities {
             trimesterKey: unitProgress.trimester,
             grade: unitProgress.grade,
             unitId: unitProgress.unitId,
+            subjectSlug: unitProgress.subjectSlug,
             word
         });
 
@@ -1847,8 +1949,9 @@ export class StudentActivities {
 
         if (activityType === 'illustration') {
             localStorage.removeItem(`word_hunt_state_${vocabName}_${this.sm.currentVocab.words.length}`);
-            if (this.sm.progressData.units[vocabName]?.wordHunt) {
-                delete this.sm.progressData.units[vocabName].wordHunt;
+            const progressKey = this.getUnitProgressKey(this.sm.currentVocab);
+            if (this.sm.progressData.units[progressKey]?.wordHunt) {
+                delete this.sm.progressData.units[progressKey].wordHunt;
             }
             this.sm.unitWordHunt = {};
         }

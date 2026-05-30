@@ -29,6 +29,17 @@ export class ReportGenerator {
         return typeof vocabOrName === 'string' ? vocabOrName : (vocabOrName?.name || 'Vocabulary');
     }
 
+    static getSubjectName(vocabOrName) {
+        if (!vocabOrName || typeof vocabOrName === 'string') return 'Technology';
+        if (vocabOrName.subjectName) return vocabOrName.subjectName;
+        const slug = String(vocabOrName.subjectSlug || vocabOrName.subject_slug || 'technology');
+        return slug
+            .split('-')
+            .filter(Boolean)
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ') || 'Technology';
+    }
+
     static getWordHuntWords(vocabOrName) {
         const allWords = Array.isArray(vocabOrName?.words) ? vocabOrName.words : [];
         const selectedWords = allWords.filter(word => (
@@ -49,6 +60,7 @@ export class ReportGenerator {
 
     static async generateReport(studentProfile, vocabOrName, scores, options = {}) {
         const vocabName = this.getVocabName(vocabOrName);
+        const subjectName = this.getSubjectName(vocabOrName);
         const { fullName, grade, group } = this.getStudentInfo(studentProfile);
         const objectUrls = [];
 
@@ -122,6 +134,7 @@ export class ReportGenerator {
                 </div>
                 <div style="text-align: right;">
                     <div style="font-size: 1.5rem; font-weight: bold; color: #4f46e5;">${vocabName}</div>
+                    <div style="font-size: 0.95rem; color: #6b7280;">${subjectName}</div>
                 </div>
             </div>
 
@@ -176,7 +189,7 @@ export class ReportGenerator {
             </div>
 
             <div style="margin-top: 4rem; text-align: center; color: #9ca3af; font-size: 0.875rem;">
-                <p>Vocabulary Learning App • Automated Report</p>
+                <p>Vocabulary Master • Automated Report</p>
             </div>
         `;
 
@@ -211,6 +224,7 @@ export class ReportGenerator {
 
     static async generateWordHuntReport(studentProfile, vocabOrName, options = {}) {
         const vocabName = this.getVocabName(vocabOrName);
+        const subjectName = this.getSubjectName(vocabOrName);
         const { fullName, grade, group } = this.getStudentInfo(studentProfile);
         const objectUrls = [];
         const reportCard = createElement('div', 'report-card word-hunt-report-card');
@@ -233,6 +247,7 @@ export class ReportGenerator {
                 </div>
                 <div style="text-align: right;">
                     <div style="font-size: 1.4rem; font-weight: bold; color: #4f46e5;">${vocabName}</div>
+                    <div style="font-size: 0.95rem; color: #6b7280;">${subjectName}</div>
                 </div>
             </div>
 

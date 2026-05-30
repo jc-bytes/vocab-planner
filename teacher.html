@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Dashboard - Vocabulary App</title>
+    <title>Vocabulary Master - Teacher</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
@@ -259,26 +259,6 @@
                     </div>
                 </div>
 
-                <div class="card"
-                    style="margin-bottom: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Total Students</div>
-                        <div class="mini-stat-value" id="stat-total-students">--</div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Active (7d)</div>
-                        <div class="mini-stat-value" id="stat-active">--</div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Average Coins</div>
-                        <div class="mini-stat-value" id="stat-avg-coins">--</div>
-                    </div>
-                    <div class="mini-stat">
-                        <div class="mini-stat-label">Top Performer</div>
-                        <div class="mini-stat-value" id="stat-top-student">--</div>
-                    </div>
-                </div>
-
                 <div class="card" style="margin-bottom: 1.5rem;">
                     <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
                         <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
@@ -453,6 +433,10 @@
                         <textarea id="vocab-desc" placeholder="Brief description of this set"></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="vocab-subject">Subject</label>
+                        <select id="vocab-subject"></select>
+                    </div>
+                    <div class="form-group">
                         <label for="vocab-grade">Grade Levels (comma separated)</label>
                         <input type="text" id="vocab-grade" placeholder="e.g., 6, 7">
                     </div>
@@ -606,12 +590,6 @@
                         <p class="teacher-eyebrow">Quizzes</p>
                         <h2>Printable Quiz Builder</h2>
                     </div>
-                    <div class="teacher-toolbar">
-                        <button id="quiz-open-current-btn" class="btn primary-btn">
-                            <i data-lucide="file-plus"></i>
-                            Open Builder
-                        </button>
-                    </div>
                 </div>
 
                 <section class="teacher-panel">
@@ -621,7 +599,7 @@
                             <p id="quiz-active-vocab-meta">Choose a vocabulary set to generate printable questions.</p>
                         </div>
                     </div>
-                    <div id="quiz-vocab-picker" class="vocab-grid compact-vocab-grid">
+                    <div id="quiz-vocab-picker" class="teacher-library-browser">
                         <div class="loading-spinner">Loading vocabulary choices...</div>
                     </div>
                 </section>
@@ -633,6 +611,16 @@
                     <!-- Sidebar -->
                     <aside class="quiz-sidebar card"
                         style="width: 360px; display: flex; flex-direction: column; overflow-y: auto;">
+                        <div class="quiz-maker-header">
+                            <button id="quiz-maker-back-btn" class="btn text-btn" type="button">
+                                <i data-lucide="arrow-left"></i>
+                                Quizzes
+                            </button>
+                            <button id="quiz-maker-word-btn" class="btn primary-btn" type="button">
+                                <i data-lucide="file-text"></i>
+                                Export Word
+                            </button>
+                        </div>
                         <h3 style="margin-bottom: 1rem;">Quiz Tools</h3>
 
                         <div class="quiz-tool-tabs" role="tablist" aria-label="Quiz builder tools">
@@ -640,7 +628,6 @@
                             <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="details">Details</button>
                             <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="rubric">Rubric</button>
                             <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="style">Style</button>
-                            <button class="quiz-tool-tab" type="button" data-quiz-tool-tab="export">Export</button>
                         </div>
 
                         <div class="tool-section quiz-tool-panel active" data-quiz-tool-panel="build">
@@ -722,18 +709,8 @@
                             </div>
                         </div>
 
-                        <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="export">
-                            <button id="quiz-maker-print-btn" class="btn primary-btn" type="button"
-                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="printer"></i> Print / PDF</button>
-                            <button id="quiz-maker-image-btn" class="btn secondary-btn" type="button"
-                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="image"></i> Export as Image</button>
-                            <button id="quiz-maker-pdf-btn" class="btn secondary-btn" type="button"
-                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="file-down"></i> Export as PDF</button>
-                            <button id="quiz-maker-word-btn" class="btn secondary-btn" type="button"
-                                style="width: 100%; margin-bottom: 0.5rem;"><i data-lucide="file-text"></i> Export as Word</button>
-                            <button id="quiz-maker-close-btn" class="btn text-btn" type="button" style="width: 100%;">Close
-                                Editor</button>
-                        </div>
+                        <button id="quiz-maker-close-btn" class="btn text-btn" type="button" style="width: 100%;">Close
+                            Editor</button>
                     </aside>
 
                     <!-- Main Canvas -->
@@ -758,6 +735,35 @@
                         <h2>Management</h2>
                     </div>
                 </div>
+
+                <section class="teacher-panel" style="margin-bottom: 1.5rem;">
+                    <div class="teacher-panel-header">
+                        <div>
+                            <h3>Subjects</h3>
+                            <p>Create and organize subjects used by vocabulary sets.</p>
+                        </div>
+                        <button id="save-subjects-btn" class="btn primary-btn">
+                            <i data-lucide="save"></i>
+                            Save Subjects
+                        </button>
+                    </div>
+                    <div class="teacher-settings-grid" style="align-items: end;">
+                        <div class="form-group">
+                            <label for="new-subject-name">New Subject</label>
+                            <input type="text" id="new-subject-name" placeholder="e.g., Science">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-subject-color">Color</label>
+                            <input type="color" id="new-subject-color" value="#16a34a">
+                        </div>
+                        <button id="add-subject-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="plus"></i>
+                            Add Subject
+                        </button>
+                    </div>
+                    <div id="subjects-manager-list" class="subjects-manager-list"></div>
+                    <div id="subjects-save-status" class="teacher-inline-status"></div>
+                </section>
 
                 <section class="teacher-panel" style="margin-bottom: 1.5rem;">
                     <div class="teacher-panel-header">
