@@ -13,6 +13,25 @@ import {
     normalizeResponseTemplate,
     validateStructuredResponses
 } from '../activityStructuredResponse.js';
+import {
+    CARD_SORT_TRAY_ID,
+    CARD_SORT_TYPE,
+    normalizeCardSortResponse,
+    normalizeCardSortTemplate,
+    validateCardSortResponse
+} from '../activityCardSort.js';
+import {
+    SPREADSHEET_TABLE_TYPE,
+    normalizeSpreadsheetResponse,
+    normalizeSpreadsheetTemplate,
+    validateSpreadsheetResponse
+} from '../activitySpreadsheetTable.js';
+import {
+    IMAGE_HOTSPOT_TYPE,
+    normalizeImageHotspotResponse,
+    normalizeImageHotspotTemplate,
+    validateImageHotspotResponse
+} from '../activityImageHotspot.js';
 
 const ASSIGNMENT_COLLECTION = 'classroomActivityAssignments';
 const SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
@@ -30,6 +49,10 @@ export class StudentClassroomActivities {
         this.autosaveTimeout = null;
         this.editorAutosaveReady = false;
         this.editorAutosaveReadyTimeout = null;
+        this.pdfExportInProgress = false;
+        this.selectedHotspotLabelId = '';
+        this.draggingHotspotPinId = '';
+        this.suppressNextHotspotClick = false;
     }
 
     normalizeTextList(value, { uppercase = false } = {}) {
@@ -53,7 +76,13 @@ export class StudentClassroomActivities {
         const activityType = source.activityType || source.activity_type || 'map-diagram';
         const templateId = activityData.templateId
             || activityData.template_id
-            || (activityType === STRUCTURED_RESPONSE_TYPE ? 'worksheet' : DEFAULT_TEMPLATE_ID);
+            || (activityType === STRUCTURED_RESPONSE_TYPE
+                ? 'worksheet'
+                : (activityType === CARD_SORT_TYPE
+                    ? 'category-sort'
+                    : (activityType === SPREADSHEET_TABLE_TYPE
+                        ? 'data-table'
+                        : (activityType === IMAGE_HOTSPOT_TYPE ? 'label-image-parts' : DEFAULT_TEMPLATE_ID))));
         const normalizedActivityData = {
             ...activityData,
             templateId
@@ -62,6 +91,21 @@ export class StudentClassroomActivities {
         if (activityType === STRUCTURED_RESPONSE_TYPE) {
             normalizedActivityData.responseTemplate = normalizeResponseTemplate(
                 activityData.responseTemplate || activityData.response_template,
+                templateId
+            );
+        } else if (activityType === CARD_SORT_TYPE) {
+            normalizedActivityData.cardSortTemplate = normalizeCardSortTemplate(
+                activityData.cardSortTemplate || activityData.card_sort_template,
+                templateId
+            );
+        } else if (activityType === SPREADSHEET_TABLE_TYPE) {
+            normalizedActivityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(
+                activityData.spreadsheetTemplate || activityData.spreadsheet_template,
+                templateId
+            );
+        } else if (activityType === IMAGE_HOTSPOT_TYPE) {
+            normalizedActivityData.imageHotspotTemplate = normalizeImageHotspotTemplate(
+                activityData.imageHotspotTemplate || activityData.image_hotspot_template,
                 templateId
             );
         } else {
@@ -135,6 +179,8 @@ export class StudentClassroomActivities {
         clearTimeout(this.editorAutosaveReadyTimeout);
         this.autosaveTimeout = null;
         this.editorAutosaveReadyTimeout = null;
+        this.draggingHotspotPinId = '';
+        this.suppressNextHotspotClick = false;
     }
 
     getSubmissionId(assignmentId, studentId = this.sm.currentUser?.uid) {
@@ -191,9 +237,14 @@ export class StudentClassroomActivities {
             || null;
     }
 
-    async prepareSubmissionForCloud(submission) {
+    async prepareSubmissionForCloud(submission, assignment = this.currentAssignment) {
         const prepared = this.normalizeSubmission(submission);
-        if (this.currentAssignment?.activityType === STRUCTURED_RESPONSE_TYPE) {
+        if (
+            assignment?.activityType === STRUCTURED_RESPONSE_TYPE
+            || assignment?.activityType === CARD_SORT_TYPE
+            || assignment?.activityType === SPREADSHEET_TABLE_TYPE
+            || assignment?.activityType === IMAGE_HOTSPOT_TYPE
+        ) {
             return prepared;
         }
 
@@ -388,9 +439,10 @@ export class StudentClassroomActivities {
         container.appendChild(card);
     }
 
-    async findAssignment(assignmentId) {
+    async findAssignment(assignmentId, options = {}) {
+        const forceRefresh = options.forceRefresh === true;
         let assignment = this.assignments.find(item => item.id === assignmentId);
-        if (assignment) return assignment;
+        if (assignment && !forceRefresh) return assignment;
 
         try {
             const db = supabaseService.getDatabase();
@@ -401,19 +453,36 @@ export class StudentClassroomActivities {
                 this.assignments = [...this.assignments.filter(item => item.id !== assignment.id), assignment];
                 return assignment;
             }
+            return null;
         } catch (error) {
             console.error('Failed to fetch classroom activity assignment:', error);
         }
 
-        return null;
+        return assignment || null;
     }
 
     createSubmissionDraft(assignment) {
         const studentId = this.sm.currentUser?.uid || '';
         const now = new Date().toISOString();
-        const responseData = assignment.activityType === STRUCTURED_RESPONSE_TYPE
-            ? { structuredResponses: {} }
-            : {};
+        const starterScene = assignment.activityData?.excalidrawScene || null;
+        let responseData = {};
+        if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
+            responseData = { structuredResponses: {} };
+        } else if (assignment.activityType === CARD_SORT_TYPE) {
+            const template = normalizeCardSortTemplate(
+                assignment.activityData?.cardSortTemplate,
+                assignment.activityData?.templateId || 'category-sort'
+            );
+            responseData = { cardSortResponse: normalizeCardSortResponse(template) };
+        } else if (assignment.activityType === SPREADSHEET_TABLE_TYPE) {
+            const template = normalizeSpreadsheetTemplate(
+                assignment.activityData?.spreadsheetTemplate,
+                assignment.activityData?.templateId || 'data-table'
+            );
+            responseData = { spreadsheetResponse: normalizeSpreadsheetResponse(template) };
+        } else if (starterScene) {
+            responseData = { excalidrawScene: JSON.parse(JSON.stringify(starterScene)) };
+        }
         return this.normalizeSubmission({
             id: this.getSubmissionId(assignment.id, studentId),
             assignmentId: assignment.id,
@@ -439,12 +508,18 @@ export class StudentClassroomActivities {
             }
 
             const draft = localSubmission?.id ? localSubmission : this.createSubmissionDraft(assignment);
-            await setDoc(doc(db, SUBMISSION_COLLECTION, draft.id), {
-                ...draft,
+            const cloudDraft = await this.prepareSubmissionForCloud(draft, assignment);
+            await setDoc(doc(db, SUBMISSION_COLLECTION, cloudDraft.id), {
+                ...cloudDraft,
                 updatedAt: serverTimestamp()
             });
             this.removeLocalSubmission(draft.id);
-            return draft;
+            return this.normalizeSubmission({
+                ...draft,
+                responseDataStoragePath: cloudDraft.responseDataStoragePath,
+                responseDataStorageSizeBytes: cloudDraft.responseDataStorageSizeBytes,
+                responseDataStorageUpdatedAt: cloudDraft.responseDataStorageUpdatedAt
+            });
         } catch (error) {
             console.error('Failed to load classroom activity submission:', error);
             const draft = localSubmission?.id ? localSubmission : this.createSubmissionDraft(assignment);
@@ -475,9 +550,9 @@ export class StudentClassroomActivities {
         const root = $('#student-classroom-excalidraw-root');
         if (title) title.textContent = 'Classroom Activity';
         if (status) status.textContent = 'Loading activity...';
-        if (root) root.innerHTML = '<div class="loading-spinner">Loading canvas...</div>';
+        if (root) root.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
 
-        const assignment = await this.findAssignment(assignmentId);
+        const assignment = await this.findAssignment(assignmentId, { forceRefresh: true });
         if (!assignment) {
             notifications.warning('This activity is not available for your class.');
             this.sm.navigateTo({ view: 'classroom-activities' }, { replace: true });
@@ -508,9 +583,23 @@ export class StudentClassroomActivities {
         setText('#student-classroom-activity-title', assignment.title);
         setText('#student-classroom-activity-meta', metaParts.join(' · '));
         setText('#student-classroom-activity-description', assignment.description);
-        setText('#student-classroom-activity-instructions', assignment.studentInstructions || 'Complete the canvas activity.');
+        const defaultInstruction = assignment.activityType === CARD_SORT_TYPE
+            ? 'Complete the card sort activity.'
+            : (assignment.activityType === SPREADSHEET_TABLE_TYPE
+                ? 'Complete the spreadsheet activity.'
+                : (assignment.activityType === IMAGE_HOTSPOT_TYPE
+                    ? 'Complete the image labeling activity.'
+                    : 'Complete the canvas activity.'));
+        const defaultOutput = assignment.activityType === CARD_SORT_TYPE
+            ? 'Completed card sort'
+            : (assignment.activityType === SPREADSHEET_TABLE_TYPE
+                ? 'Completed table, chart, and reflection'
+                : (assignment.activityType === IMAGE_HOTSPOT_TYPE
+                    ? 'Labeled image with pins, notes, and reflection'
+                    : 'Canvas response'));
+        setText('#student-classroom-activity-instructions', assignment.studentInstructions || defaultInstruction);
         setText('#student-classroom-activity-materials', assignment.materials || 'No materials listed.');
-        setText('#student-classroom-activity-output', assignment.studentOutput || 'Canvas response');
+        setText('#student-classroom-activity-output', assignment.studentOutput || defaultOutput);
         this.renderLateBanner(lateState);
         this.setSaveStatus(submission.status === 'submitted'
             ? `${lateState.label ? `${lateState.label}. ` : ''}Submitted. You can still edit and resubmit.`
@@ -522,6 +611,7 @@ export class StudentClassroomActivities {
                 ? '<i data-lucide="send"></i> Resubmit'
                 : '<i data-lucide="send"></i> Submit';
         }
+        this.setPdfExportButtonState(false);
         if (window.lucide) window.lucide.createIcons();
     }
 
@@ -547,13 +637,36 @@ export class StudentClassroomActivities {
         root.innerHTML = '';
         root.oninput = null;
         root.onchange = null;
+        root.onclick = null;
+        root.ondragstart = null;
+        root.ondragover = null;
+        root.ondrop = null;
+        root.onpointerdown = null;
+        root.onpointermove = null;
+        root.onpointerup = null;
+        root.onpointercancel = null;
 
         if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
             this.mountStructuredResponse(assignment, submission, root);
             return;
         }
 
-        root.classList.remove('structured-response-root');
+        if (assignment.activityType === CARD_SORT_TYPE) {
+            this.mountCardSortResponse(assignment, submission, root);
+            return;
+        }
+
+        if (assignment.activityType === SPREADSHEET_TABLE_TYPE) {
+            await this.mountSpreadsheetResponse(assignment, submission, root);
+            return;
+        }
+
+        if (assignment.activityType === IMAGE_HOTSPOT_TYPE) {
+            await this.mountImageHotspotResponse(assignment, submission, root);
+            return;
+        }
+
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
         this.setSaveStatus('Loading canvas...');
 
         try {
@@ -601,6 +714,7 @@ export class StudentClassroomActivities {
         );
         const responses = submission.responseData?.structuredResponses || {};
         root.classList.add('structured-response-root');
+        root.classList.remove('card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
         root.innerHTML = this.renderStructuredResponseForm(template, responses);
         root.oninput = () => {
             this.syncStructuredResponses();
@@ -616,6 +730,494 @@ export class StudentClassroomActivities {
             this.editorAutosaveReady = true;
             this.editorAutosaveReadyTimeout = null;
         }, 500);
+    }
+
+    mountCardSortResponse(assignment, submission, root = $('#student-classroom-excalidraw-root')) {
+        if (!root) return;
+        const template = normalizeCardSortTemplate(
+            assignment.activityData?.cardSortTemplate,
+            assignment.activityData?.templateId || 'category-sort'
+        );
+        const response = normalizeCardSortResponse(template, submission.responseData?.cardSortResponse || {});
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            cardSortResponse: response
+        };
+        root.classList.add('card-sort-response-root');
+        root.classList.remove('structured-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
+        root.innerHTML = this.renderCardSortBoard(template, response);
+        root.onchange = event => {
+            const select = event.target.closest('[data-card-sort-target-select]');
+            if (!select) return;
+            this.moveCardSortCard(select.dataset.cardSortTargetSelect, select.value);
+        };
+        root.onclick = event => {
+            const moveButton = event.target.closest('[data-card-sort-move-card]');
+            if (!moveButton) return;
+            this.moveCardSortCardWithinLane(moveButton.dataset.cardSortMoveCard, moveButton.dataset.cardSortMoveDirection);
+        };
+        root.ondragstart = event => {
+            const cardEl = event.target.closest('[data-card-sort-card-id]');
+            if (!cardEl || !event.dataTransfer) return;
+            event.dataTransfer.setData('text/plain', cardEl.dataset.cardSortCardId);
+            event.dataTransfer.effectAllowed = 'move';
+        };
+        root.ondragover = event => {
+            if (event.target.closest('[data-card-sort-lane]')) {
+                event.preventDefault();
+                if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+            }
+        };
+        root.ondrop = event => {
+            const laneEl = event.target.closest('[data-card-sort-lane]');
+            if (!laneEl || !event.dataTransfer) return;
+            event.preventDefault();
+            const cardId = event.dataTransfer.getData('text/plain');
+            this.moveCardSortCard(cardId, laneEl.dataset.cardSortLane || CARD_SORT_TRAY_ID);
+        };
+        if (window.lucide) window.lucide.createIcons();
+        this.setSaveStatus(submission.source === 'local' ? 'Saved locally. Cloud retry pending.' : 'Card sort ready.');
+        clearTimeout(this.editorAutosaveReadyTimeout);
+        this.editorAutosaveReadyTimeout = window.setTimeout(() => {
+            this.editorAutosaveReady = true;
+            this.editorAutosaveReadyTimeout = null;
+        }, 500);
+    }
+
+    async mountSpreadsheetResponse(assignment, submission, root = $('#student-classroom-excalidraw-root')) {
+        if (!root) return;
+        const template = normalizeSpreadsheetTemplate(
+            assignment.activityData?.spreadsheetTemplate,
+            assignment.activityData?.templateId || 'data-table'
+        );
+        const response = normalizeSpreadsheetResponse(template, submission.responseData?.spreadsheetResponse || {});
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            spreadsheetResponse: response
+        };
+        root.classList.add('spreadsheet-table-response-root');
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'image-hotspot-response-root');
+        this.setSaveStatus('Loading spreadsheet...');
+
+        try {
+            const { mountSpreadsheetTable } = await import('../activitySpreadsheetEditor.js');
+            this.editorHandle = mountSpreadsheetTable(root, {
+                template,
+                response,
+                onChange: spreadsheetResponse => {
+                    if (!this.currentSubmission?.id) return;
+                    this.currentSubmission.responseData = {
+                        ...(this.currentSubmission.responseData || {}),
+                        spreadsheetResponse
+                    };
+                    if (this.editorAutosaveReady) this.queueAutosave();
+                }
+            });
+            this.setSaveStatus(submission.source === 'local' ? 'Saved locally. Cloud retry pending.' : 'Spreadsheet ready.');
+            clearTimeout(this.editorAutosaveReadyTimeout);
+            this.editorAutosaveReadyTimeout = window.setTimeout(() => {
+                this.editorAutosaveReady = true;
+                this.editorAutosaveReadyTimeout = null;
+            }, 500);
+        } catch (error) {
+            console.error('Failed to load spreadsheet activity:', error);
+            root.innerHTML = `
+                <div class="activity-editor-error" role="status">
+                    <h3>Spreadsheet unavailable</h3>
+                    <p>The table editor did not finish loading.</p>
+                </div>
+            `;
+            this.setSaveStatus('Spreadsheet editor unavailable.');
+            notifications.error('Could not load the spreadsheet activity.');
+        }
+    }
+
+    async mountImageHotspotResponse(assignment, submission, root = $('#student-classroom-excalidraw-root')) {
+        if (!root) return;
+        const template = normalizeImageHotspotTemplate(
+            assignment.activityData?.imageHotspotTemplate,
+            assignment.activityData?.templateId || 'label-image-parts'
+        );
+        const response = normalizeImageHotspotResponse(template, submission.responseData?.imageHotspotResponse || {});
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            imageHotspotResponse: response
+        };
+        root.classList.add('image-hotspot-response-root');
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root');
+        this.setSaveStatus('Loading image activity...');
+
+        try {
+            const imageUrl = template.image.storagePath
+                ? await supabaseService.getClassroomActivityImageUrl(template.image.storagePath)
+                : '';
+            const firstUnplacedRequired = template.labels.find(label => (
+                label.required && !response.pins.some(pin => pin.labelId === label.id)
+            ));
+            this.selectedHotspotLabelId = this.selectedHotspotLabelId
+                || firstUnplacedRequired?.id
+                || template.labels[0]?.id
+                || '';
+            root.innerHTML = this.renderImageHotspotActivity(template, response, imageUrl);
+            root.onclick = event => this.handleImageHotspotClick(event);
+            root.oninput = event => this.handleImageHotspotInput(event);
+            root.onchange = event => this.handleImageHotspotInput(event);
+            root.onpointerdown = event => this.handleImageHotspotPointerDown(event);
+            root.onpointermove = event => this.handleImageHotspotPointerMove(event);
+            root.onpointerup = event => this.handleImageHotspotPointerUp(event);
+            root.onpointercancel = event => this.handleImageHotspotPointerUp(event);
+            if (window.lucide) window.lucide.createIcons();
+            this.setSaveStatus(submission.source === 'local' ? 'Saved locally. Cloud retry pending.' : 'Image activity ready.');
+            clearTimeout(this.editorAutosaveReadyTimeout);
+            this.editorAutosaveReadyTimeout = window.setTimeout(() => {
+                this.editorAutosaveReady = true;
+                this.editorAutosaveReadyTimeout = null;
+            }, 500);
+        } catch (error) {
+            console.error('Failed to load image hotspot activity:', error);
+            root.innerHTML = `
+                <div class="activity-editor-error" role="status">
+                    <h3>Image activity unavailable</h3>
+                    <p>The activity image did not finish loading.</p>
+                </div>
+            `;
+            this.setSaveStatus('Image activity unavailable.');
+            notifications.error('Could not load the image activity.');
+        }
+    }
+
+    renderImageHotspotActivity(template, response = {}, imageUrl = '') {
+        const normalized = normalizeImageHotspotTemplate(template);
+        const normalizedResponse = normalizeImageHotspotResponse(normalized, response);
+        const labelMap = new Map(normalized.labels.map(label => [label.id, label]));
+        const selectedId = this.selectedHotspotLabelId || normalized.labels[0]?.id || '';
+        const placedLabelIds = new Set(normalizedResponse.pins.map(pin => pin.labelId));
+        const summary = validateImageHotspotResponse(normalized, normalizedResponse).summary;
+
+        return `
+            <div class="image-hotspot-activity-shell">
+                <div class="spreadsheet-table-toolbar image-hotspot-toolbar">
+                    <div>
+                        <strong>${escapeHtml(normalized.labels.length)} labels</strong>
+                        <span>${escapeHtml(summary.pinsPlaced)} pins placed · ${escapeHtml(summary.placedRequiredLabels)} / ${escapeHtml(summary.requiredLabels)} required labels</span>
+                    </div>
+                </div>
+
+                <div class="image-hotspot-student-grid">
+                    <div class="image-hotspot-image-frame is-student" data-image-hotspot-stage>
+                        ${imageUrl ? `
+                            <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(normalized.image.altText || 'Image hotspot activity')}">
+                        ` : '<div class="image-hotspot-image-placeholder">Image unavailable.</div>'}
+                        <div class="image-hotspot-pin-layer">
+                            ${normalizedResponse.pins.map((pin, index) => {
+                                const label = labelMap.get(pin.labelId);
+                                const color = label?.color || '#2563eb';
+                                return `
+                                    <button type="button" class="image-hotspot-pin" data-image-hotspot-pin-id="${escapeHtml(pin.id)}" style="--pin-x:${escapeHtml(pin.xPercent)}%; --pin-y:${escapeHtml(pin.yPercent)}%; --pin-color:${escapeHtml(color)};" aria-label="${escapeHtml(pin.labelText || label?.text || `Pin ${index + 1}`)}">
+                                        <span>${escapeHtml(index + 1)}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <aside class="image-hotspot-label-panel">
+                        <section>
+                            <h4>Labels</h4>
+                            <div class="image-hotspot-label-picker">
+                                ${normalized.labels.map(label => `
+                                    <button type="button" class="${label.id === selectedId ? 'is-selected' : ''} ${placedLabelIds.has(label.id) ? 'is-placed' : ''}" data-image-hotspot-select-label="${escapeHtml(label.id)}" style="--label-color:${escapeHtml(label.color)};">
+                                        <span></span>
+                                        <strong>${escapeHtml(label.text)}${label.required ? ' *' : ''}${label.hint ? `<small>${escapeHtml(label.hint)}</small>` : ''}</strong>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </section>
+
+                        <section>
+                            <h4>Pins</h4>
+                            <div class="image-hotspot-pin-list">
+                                ${normalizedResponse.pins.map((pin, index) => {
+                                    const label = labelMap.get(pin.labelId);
+                                    return `
+                                        <article data-image-hotspot-pin-row="${escapeHtml(pin.id)}">
+                                            <div>
+                                                <span class="image-hotspot-pin-number" style="--label-color:${escapeHtml(label?.color || '#2563eb')};">${escapeHtml(index + 1)}</span>
+                                                <strong>${escapeHtml(pin.labelText || label?.text || `Pin ${index + 1}`)}</strong>
+                                                <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-image-hotspot-delete-pin="${escapeHtml(pin.id)}" aria-label="Delete pin">
+                                                    <i data-lucide="trash-2"></i>
+                                                </button>
+                                            </div>
+                                            <textarea rows="2" placeholder="Note" data-image-hotspot-pin-note="${escapeHtml(pin.id)}">${escapeHtml(pin.note)}</textarea>
+                                        </article>
+                                    `;
+                                }).join('') || '<p class="spreadsheet-review-empty">No pins placed yet.</p>'}
+                            </div>
+                        </section>
+                    </aside>
+                </div>
+
+                ${normalized.reflectionPrompts.length ? `
+                    <section class="spreadsheet-reflection-panel image-hotspot-reflection-panel">
+                        ${normalized.reflectionPrompts.map(prompt => `
+                            <label class="spreadsheet-reflection-prompt">
+                                <span>${escapeHtml(prompt.prompt)}${prompt.required ? ' *' : ''}</span>
+                                <textarea rows="3" data-image-hotspot-reflection="${escapeHtml(prompt.id)}">${escapeHtml(normalizedResponse.reflections[prompt.id] || '')}</textarea>
+                            </label>
+                        `).join('')}
+                    </section>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    getImageHotspotTemplateAndResponse() {
+        const template = normalizeImageHotspotTemplate(
+            this.currentAssignment?.activityData?.imageHotspotTemplate,
+            this.currentAssignment?.activityData?.templateId || 'label-image-parts'
+        );
+        const response = normalizeImageHotspotResponse(template, this.currentSubmission?.responseData?.imageHotspotResponse || {});
+        return { template, response };
+    }
+
+    syncImageHotspotResponse() {
+        if (!this.currentSubmission?.id || this.currentAssignment?.activityType !== IMAGE_HOTSPOT_TYPE) return;
+        const { template, response } = this.getImageHotspotTemplateAndResponse();
+        const root = $('#student-classroom-excalidraw-root');
+        if (root) {
+            root.querySelectorAll('[data-image-hotspot-pin-note]').forEach(noteEl => {
+                const pin = response.pins.find(item => item.id === noteEl.dataset.imageHotspotPinNote);
+                if (pin) pin.note = noteEl.value || '';
+            });
+            root.querySelectorAll('[data-image-hotspot-reflection]').forEach(reflectionEl => {
+                response.reflections[reflectionEl.dataset.imageHotspotReflection] = reflectionEl.value || '';
+            });
+        }
+        response.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            imageHotspotResponse: normalizeImageHotspotResponse(template, response)
+        };
+    }
+
+    getImageHotspotPoint(event) {
+        const stage = event.target.closest('[data-image-hotspot-stage]');
+        const image = stage?.querySelector('img');
+        if (!stage || !image) return null;
+        const rect = image.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
+        const xPercent = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+        const yPercent = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
+        return { xPercent, yPercent };
+    }
+
+    updateImageHotspotPinPosition(pinId, point) {
+        if (!pinId || !point) return;
+        const { template, response } = this.getImageHotspotTemplateAndResponse();
+        const pin = response.pins.find(item => item.id === pinId);
+        if (!pin) return;
+        pin.xPercent = point.xPercent;
+        pin.yPercent = point.yPercent;
+        pin.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            imageHotspotResponse: normalizeImageHotspotResponse(template, response)
+        };
+        const pinEl = $(`[data-image-hotspot-pin-id="${CSS.escape(pinId)}"]`);
+        if (pinEl) {
+            pinEl.style.setProperty('--pin-x', `${pin.xPercent}%`);
+            pinEl.style.setProperty('--pin-y', `${pin.yPercent}%`);
+        }
+    }
+
+    async refreshImageHotspotActivity() {
+        if (!this.currentAssignment || !this.currentSubmission) return;
+        await this.mountImageHotspotResponse(this.currentAssignment, this.currentSubmission);
+    }
+
+    async placeImageHotspotPin(point) {
+        if (!point) return;
+        this.syncImageHotspotResponse();
+        const { template, response } = this.getImageHotspotTemplateAndResponse();
+        const selectedLabel = template.labels.find(label => label.id === this.selectedHotspotLabelId) || template.labels[0];
+        if (!selectedLabel) return;
+        let pins = response.pins;
+
+        if (!template.allowExtraPins) {
+            const existing = pins.find(pin => pin.labelId === selectedLabel.id);
+            if (existing) {
+                existing.xPercent = point.xPercent;
+                existing.yPercent = point.yPercent;
+                existing.updatedAt = new Date().toISOString();
+            } else if (pins.length < template.maxPins) {
+                pins.push({
+                    id: `pin_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                    labelId: selectedLabel.id,
+                    labelText: selectedLabel.text,
+                    xPercent: point.xPercent,
+                    yPercent: point.yPercent,
+                    note: '',
+                    updatedAt: new Date().toISOString()
+                });
+            } else {
+                notifications.warning(`Use no more than ${template.maxPins} pins.`);
+                return;
+            }
+        } else if (pins.length < template.maxPins) {
+            pins.push({
+                id: `pin_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                labelId: selectedLabel.id,
+                labelText: selectedLabel.text,
+                xPercent: point.xPercent,
+                yPercent: point.yPercent,
+                note: '',
+                updatedAt: new Date().toISOString()
+            });
+        } else {
+            notifications.warning(`Use no more than ${template.maxPins} pins.`);
+            return;
+        }
+
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            imageHotspotResponse: normalizeImageHotspotResponse(template, { ...response, pins })
+        };
+        await this.refreshImageHotspotActivity();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
+    async handleImageHotspotClick(event) {
+        const labelButton = event.target.closest('[data-image-hotspot-select-label]');
+        if (labelButton) {
+            this.selectedHotspotLabelId = labelButton.dataset.imageHotspotSelectLabel || '';
+            $('#student-classroom-excalidraw-root')?.querySelectorAll('[data-image-hotspot-select-label]').forEach(button => {
+                button.classList.toggle('is-selected', button.dataset.imageHotspotSelectLabel === this.selectedHotspotLabelId);
+            });
+            return;
+        }
+
+        const deleteButton = event.target.closest('[data-image-hotspot-delete-pin]');
+        if (deleteButton) {
+            this.syncImageHotspotResponse();
+            const { template, response } = this.getImageHotspotTemplateAndResponse();
+            response.pins = response.pins.filter(pin => pin.id !== deleteButton.dataset.imageHotspotDeletePin);
+            this.currentSubmission.responseData = {
+                ...(this.currentSubmission.responseData || {}),
+                imageHotspotResponse: normalizeImageHotspotResponse(template, response)
+            };
+            await this.refreshImageHotspotActivity();
+            if (this.editorAutosaveReady) this.queueAutosave();
+            return;
+        }
+
+        if (this.suppressNextHotspotClick) {
+            this.suppressNextHotspotClick = false;
+            return;
+        }
+
+        if (event.target.closest('[data-image-hotspot-pin-id]')) return;
+        if (event.target.closest('[data-image-hotspot-stage]')) {
+            await this.placeImageHotspotPin(this.getImageHotspotPoint(event));
+        }
+    }
+
+    handleImageHotspotInput(event) {
+        if (!event.target.closest('.image-hotspot-activity-shell')) return;
+        this.syncImageHotspotResponse();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
+    handleImageHotspotPointerDown(event) {
+        const pin = event.target.closest('[data-image-hotspot-pin-id]');
+        if (!pin) return;
+        this.draggingHotspotPinId = pin.dataset.imageHotspotPinId || '';
+        this.suppressNextHotspotClick = false;
+        pin.setPointerCapture?.(event.pointerId);
+        event.preventDefault();
+    }
+
+    handleImageHotspotPointerMove(event) {
+        if (!this.draggingHotspotPinId) return;
+        const point = this.getImageHotspotPoint(event);
+        this.updateImageHotspotPinPosition(this.draggingHotspotPinId, point);
+        this.suppressNextHotspotClick = true;
+    }
+
+    handleImageHotspotPointerUp(event) {
+        if (!this.draggingHotspotPinId) return;
+        const pinId = this.draggingHotspotPinId;
+        this.updateImageHotspotPinPosition(pinId, this.getImageHotspotPoint(event));
+        this.draggingHotspotPinId = '';
+        this.syncImageHotspotResponse();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
+    renderCardSortBoard(template, response = {}) {
+        const normalized = normalizeCardSortTemplate(template);
+        const normalizedResponse = normalizeCardSortResponse(normalized, response);
+        const categoryOptions = [
+            `<option value="${CARD_SORT_TRAY_ID}">Unsorted</option>`,
+            ...normalized.categories.map(category => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.title)}</option>`)
+        ].join('');
+        const renderCard = (cardId, laneId, index, total) => {
+            const card = normalized.cards.find(item => item.id === cardId);
+            if (!card) return '';
+            return `
+                <article class="card-sort-card" draggable="true" data-card-sort-card-id="${escapeHtml(card.id)}">
+                    <div>
+                        <strong>${escapeHtml(card.text)}</strong>
+                        ${card.helperText ? `<p>${escapeHtml(card.helperText)}</p>` : ''}
+                    </div>
+                    <div class="card-sort-card-actions">
+                        <label>
+                            <span>Move to</span>
+                            <select data-card-sort-target-select="${escapeHtml(card.id)}">
+                                ${categoryOptions.replace(`value="${escapeHtml(laneId)}"`, `value="${escapeHtml(laneId)}" selected`)}
+                            </select>
+                        </label>
+                        <div>
+                            <button type="button" class="btn text-btn icon-btn" data-card-sort-move-card="${escapeHtml(card.id)}" data-card-sort-move-direction="up" ${index <= 0 ? 'disabled' : ''} aria-label="Move card up">
+                                <i data-lucide="arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn text-btn icon-btn" data-card-sort-move-card="${escapeHtml(card.id)}" data-card-sort-move-direction="down" ${index >= total - 1 ? 'disabled' : ''} aria-label="Move card down">
+                                <i data-lucide="arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        };
+        const renderLane = (laneId, title, helperText = '') => {
+            const cardIds = normalizedResponse.placements[laneId] || [];
+            return `
+                <section class="card-sort-lane ${laneId === CARD_SORT_TRAY_ID ? 'card-sort-tray' : ''}" data-card-sort-lane="${escapeHtml(laneId)}">
+                    <div class="card-sort-lane-header">
+                        <h4>${escapeHtml(title)}</h4>
+                        <span>${escapeHtml(cardIds.length)}</span>
+                    </div>
+                    ${helperText ? `<p>${escapeHtml(helperText)}</p>` : ''}
+                    <div class="card-sort-card-list">
+                        ${cardIds.map((cardId, index) => renderCard(cardId, laneId, index, cardIds.length)).join('') || '<p class="card-sort-empty">Drop cards here.</p>'}
+                    </div>
+                </section>
+            `;
+        };
+
+        return `
+            <div class="student-card-sort-shell">
+                <section class="structured-response-block instructions-block">
+                    <h4>${escapeHtml(normalized.prompt)}</h4>
+                    ${normalized.helperText ? `<p>${escapeHtml(normalized.helperText)}</p>` : ''}
+                    ${normalized.requireAllCards ? '<p>Place every card before submitting.</p>' : ''}
+                </section>
+                <div class="card-sort-board">
+                    ${renderLane(CARD_SORT_TRAY_ID, 'Unsorted Cards')}
+                    <div class="card-sort-category-grid">
+                        ${normalized.categories.map(category => renderLane(category.id, category.title, category.helperText)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     renderStructuredResponseForm(template, responses = {}) {
@@ -944,9 +1546,127 @@ export class StudentClassroomActivities {
         };
     }
 
+    syncCardSortResponse() {
+        const root = $('#student-classroom-excalidraw-root');
+        if (!root || !this.currentSubmission?.id || this.currentAssignment?.activityType !== CARD_SORT_TYPE) return;
+        const template = normalizeCardSortTemplate(
+            this.currentAssignment.activityData?.cardSortTemplate,
+            this.currentAssignment.activityData?.templateId || 'category-sort'
+        );
+        const placements = { [CARD_SORT_TRAY_ID]: [] };
+        template.categories.forEach(category => {
+            placements[category.id] = [];
+        });
+        root.querySelectorAll('[data-card-sort-lane]').forEach(laneEl => {
+            const laneId = laneEl.dataset.cardSortLane || CARD_SORT_TRAY_ID;
+            if (!placements[laneId]) placements[laneId] = [];
+            laneEl.querySelectorAll('[data-card-sort-card-id]').forEach(cardEl => {
+                placements[laneId].push(cardEl.dataset.cardSortCardId);
+            });
+        });
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            cardSortResponse: normalizeCardSortResponse(template, {
+                placements,
+                updatedAt: new Date().toISOString()
+            })
+        };
+    }
+
+    syncSpreadsheetResponse() {
+        if (!this.currentSubmission?.id || this.currentAssignment?.activityType !== SPREADSHEET_TABLE_TYPE) return;
+        const template = normalizeSpreadsheetTemplate(
+            this.currentAssignment.activityData?.spreadsheetTemplate,
+            this.currentAssignment.activityData?.templateId || 'data-table'
+        );
+        const spreadsheetResponse = this.editorHandle?.getResponse?.()
+            || normalizeSpreadsheetResponse(template, this.currentSubmission.responseData?.spreadsheetResponse || {});
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            spreadsheetResponse: normalizeSpreadsheetResponse(template, spreadsheetResponse)
+        };
+    }
+
+    renderCurrentCardSortBoard() {
+        const root = $('#student-classroom-excalidraw-root');
+        if (!root || this.currentAssignment?.activityType !== CARD_SORT_TYPE || !this.currentSubmission?.id) return;
+        const template = normalizeCardSortTemplate(
+            this.currentAssignment.activityData?.cardSortTemplate,
+            this.currentAssignment.activityData?.templateId || 'category-sort'
+        );
+        const response = normalizeCardSortResponse(template, this.currentSubmission.responseData?.cardSortResponse || {});
+        root.innerHTML = this.renderCardSortBoard(template, response);
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    moveCardSortCard(cardId, targetLaneId) {
+        if (!cardId || this.currentAssignment?.activityType !== CARD_SORT_TYPE || !this.currentSubmission?.id) return;
+        this.syncCardSortResponse();
+        const template = normalizeCardSortTemplate(
+            this.currentAssignment.activityData?.cardSortTemplate,
+            this.currentAssignment.activityData?.templateId || 'category-sort'
+        );
+        const response = normalizeCardSortResponse(template, this.currentSubmission.responseData?.cardSortResponse || {});
+        const validLaneIds = new Set([CARD_SORT_TRAY_ID, ...template.categories.map(category => category.id)]);
+        const laneId = validLaneIds.has(targetLaneId) ? targetLaneId : CARD_SORT_TRAY_ID;
+        Object.keys(response.placements).forEach(key => {
+            response.placements[key] = (response.placements[key] || []).filter(existingCardId => existingCardId !== cardId);
+        });
+        response.placements[laneId] = response.placements[laneId] || [];
+        response.placements[laneId].push(cardId);
+        response.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            cardSortResponse: normalizeCardSortResponse(template, response)
+        };
+        this.renderCurrentCardSortBoard();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
+    moveCardSortCardWithinLane(cardId, direction = 'up') {
+        if (!cardId || this.currentAssignment?.activityType !== CARD_SORT_TYPE || !this.currentSubmission?.id) return;
+        this.syncCardSortResponse();
+        const template = normalizeCardSortTemplate(
+            this.currentAssignment.activityData?.cardSortTemplate,
+            this.currentAssignment.activityData?.templateId || 'category-sort'
+        );
+        const response = normalizeCardSortResponse(template, this.currentSubmission.responseData?.cardSortResponse || {});
+        const laneEntry = Object.entries(response.placements).find(([, cardIds]) => cardIds.includes(cardId));
+        if (!laneEntry) return;
+        const [laneId, cardIds] = laneEntry;
+        const index = cardIds.indexOf(cardId);
+        const targetIndex = direction === 'down' ? index + 1 : index - 1;
+        if (targetIndex < 0 || targetIndex >= cardIds.length) return;
+        const [moved] = cardIds.splice(index, 1);
+        cardIds.splice(targetIndex, 0, moved);
+        response.placements[laneId] = cardIds;
+        response.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            cardSortResponse: normalizeCardSortResponse(template, response)
+        };
+        this.renderCurrentCardSortBoard();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
     syncEditorScene() {
         if (this.currentAssignment?.activityType === STRUCTURED_RESPONSE_TYPE) {
             this.syncStructuredResponses();
+            return;
+        }
+
+        if (this.currentAssignment?.activityType === CARD_SORT_TYPE) {
+            this.syncCardSortResponse();
+            return;
+        }
+
+        if (this.currentAssignment?.activityType === SPREADSHEET_TABLE_TYPE) {
+            this.syncSpreadsheetResponse();
+            return;
+        }
+
+        if (this.currentAssignment?.activityType === IMAGE_HOTSPOT_TYPE) {
+            this.syncImageHotspotResponse();
             return;
         }
 
@@ -1000,6 +1720,70 @@ export class StudentClassroomActivities {
         }
     }
 
+    setPdfExportButtonState(isExporting = false) {
+        const button = $('#student-export-classroom-activity-pdf-btn');
+        if (!button) return;
+
+        button.disabled = isExporting || !this.currentSubmission?.id;
+        button.innerHTML = isExporting
+            ? '<i data-lucide="loader-circle"></i> Preparing PDF...'
+            : '<i data-lucide="download"></i> Export PDF';
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    async exportCurrentActivityPdf() {
+        if (this.pdfExportInProgress) return;
+        if (!this.currentAssignment || !this.currentSubmission?.id) {
+            notifications.warning('Open an activity before exporting a PDF.');
+            return;
+        }
+
+        this.pdfExportInProgress = true;
+        this.setPdfExportButtonState(true);
+
+        try {
+            this.setSaveStatus('Preparing PDF...');
+            this.syncEditorScene();
+            this.currentSubmission = this.normalizeSubmission({
+                ...this.currentSubmission,
+                studentProfile: this.sm.studentProfile || {},
+                updatedAt: new Date().toISOString()
+            });
+
+            const saved = await this.saveCurrentSubmission({ notifyOnError: false });
+            this.syncEditorScene();
+
+            const scene = (
+                this.currentAssignment.activityType === STRUCTURED_RESPONSE_TYPE
+                || this.currentAssignment.activityType === SPREADSHEET_TABLE_TYPE
+                || this.currentAssignment.activityType === IMAGE_HOTSPOT_TYPE
+            )
+                ? null
+                : this.currentSubmission.responseData?.excalidrawScene
+                    || await this.resolveSubmissionScene(this.currentAssignment, this.currentSubmission);
+            const { exportClassroomActivityPdf } = await import('../classroomActivityPdfExporter.js');
+            await exportClassroomActivityPdf({
+                assignment: this.currentAssignment,
+                submission: this.currentSubmission,
+                studentProfile: this.sm.studentProfile || this.currentSubmission.studentProfile,
+                scene
+            });
+
+            const savedLabel = this.currentSubmission.status === 'submitted'
+                ? 'PDF exported. Submission saved.'
+                : 'PDF exported. Draft saved.';
+            this.setSaveStatus(saved ? savedLabel : 'PDF exported. Saved locally. Cloud retry pending.');
+            notifications.success('PDF exported.');
+        } catch (error) {
+            console.error('Failed to export classroom activity PDF:', error);
+            this.setSaveStatus('PDF export failed.');
+            notifications.error('Could not export PDF.');
+        } finally {
+            this.pdfExportInProgress = false;
+            this.setPdfExportButtonState(false);
+        }
+    }
+
     async submitCurrentActivity() {
         if (!this.currentSubmission?.id) return;
         this.syncEditorScene();
@@ -1016,6 +1800,53 @@ export class StudentClassroomActivities {
                 const firstMissing = validation.missing[0] || 'a required response';
                 this.setSaveStatus(`Complete required prompt: ${firstMissing}`);
                 notifications.warning('Complete the required responses before submitting.');
+                return;
+            }
+        }
+        if (this.currentAssignment?.activityType === CARD_SORT_TYPE) {
+            const template = normalizeCardSortTemplate(
+                this.currentAssignment.activityData?.cardSortTemplate,
+                this.currentAssignment.activityData?.templateId || 'category-sort'
+            );
+            const validation = validateCardSortResponse(
+                template,
+                this.currentSubmission.responseData?.cardSortResponse || {}
+            );
+            if (!validation.valid) {
+                this.setSaveStatus('Place all required cards before submitting.');
+                notifications.warning('Place all required cards before submitting.');
+                return;
+            }
+        }
+        if (this.currentAssignment?.activityType === SPREADSHEET_TABLE_TYPE) {
+            const template = normalizeSpreadsheetTemplate(
+                this.currentAssignment.activityData?.spreadsheetTemplate,
+                this.currentAssignment.activityData?.templateId || 'data-table'
+            );
+            const validation = validateSpreadsheetResponse(
+                template,
+                this.currentSubmission.responseData?.spreadsheetResponse || {}
+            );
+            if (!validation.valid) {
+                const firstMissing = validation.missing[0] || 'required spreadsheet evidence';
+                this.setSaveStatus(`Complete: ${firstMissing}`);
+                notifications.warning('Complete the required spreadsheet evidence before submitting.');
+                return;
+            }
+        }
+        if (this.currentAssignment?.activityType === IMAGE_HOTSPOT_TYPE) {
+            const template = normalizeImageHotspotTemplate(
+                this.currentAssignment.activityData?.imageHotspotTemplate,
+                this.currentAssignment.activityData?.templateId || 'label-image-parts'
+            );
+            const validation = validateImageHotspotResponse(
+                template,
+                this.currentSubmission.responseData?.imageHotspotResponse || {}
+            );
+            if (!validation.valid) {
+                const firstMissing = validation.missing[0] || 'required image label evidence';
+                this.setSaveStatus(`Complete: ${firstMissing}`);
+                notifications.warning('Complete the required image labels before submitting.');
                 return;
             }
         }

@@ -956,7 +956,7 @@ class StudentManager {
         // Navigation
         this.addListener('#student-mobile-menu-toggle', 'click', (event) => {
             event.stopPropagation();
-            const isOpen = $('#student-tab-shell')?.classList.contains('mobile-menu-open');
+            const isOpen = $('#student-mobile-menu-toggle')?.getAttribute('aria-expanded') === 'true';
             this.setStudentMobileMenu(!isOpen);
         });
 
@@ -999,6 +999,10 @@ class StudentManager {
             this.classroomActivities.saveCurrentSubmission({ notifyOnError: true });
         });
 
+        this.addListener('#student-export-classroom-activity-pdf-btn', 'click', () => {
+            this.classroomActivities.exportCurrentActivityPdf();
+        });
+
         this.addListener('#student-submit-classroom-activity-btn', 'click', () => {
             this.classroomActivities.submitCurrentActivity();
         });
@@ -1009,11 +1013,6 @@ class StudentManager {
 
         this.addListener('#student-close-classroom-instructions-btn', 'click', () => {
             this.setClassroomInstructionsCollapsed(true);
-        });
-
-        // Arcade Navigation
-        this.addListener('#menu-arcade-btn', 'click', () => {
-            this.navigateTo({ view: 'arcade' });
         });
 
         this.addListener('#student-tab-arcade', 'click', () => {

@@ -44,6 +44,47 @@ import {
     structuredBlockUsesItems,
     structuredBlockUsesPairs
 } from './activityStructuredResponse.js';
+import {
+    CARD_SORT_ORDER_MODES,
+    CARD_SORT_TRAY_ID,
+    CARD_SORT_TYPE,
+    createCardSortCard,
+    createCardSortCategory,
+    createDefaultCardSortTemplate,
+    getCardSortCardStatus,
+    getCardSortPlacementSummary,
+    normalizeCardSortResponse,
+    normalizeCardSortTemplate
+} from './activityCardSort.js';
+import {
+    SPREADSHEET_CHART_TYPES,
+    SPREADSHEET_COLUMN_TYPES,
+    SPREADSHEET_MAX_COLUMNS,
+    SPREADSHEET_MAX_ROWS,
+    SPREADSHEET_TABLE_TYPE,
+    createDefaultSpreadsheetTemplate,
+    createSpreadsheetColumn,
+    createSpreadsheetPrompt,
+    getSpreadsheetCompletionSummary,
+    normalizeSpreadsheetTemplate
+} from './activitySpreadsheetTable.js';
+import {
+    IMAGE_HOTSPOT_COLORS,
+    IMAGE_HOTSPOT_MAX_LABELS,
+    IMAGE_HOTSPOT_MAX_PINS,
+    IMAGE_HOTSPOT_TYPE,
+    createDefaultImageHotspotTemplate,
+    createImageHotspotLabel,
+    createImageHotspotPrompt,
+    getImageHotspotCompletionSummary,
+    normalizeImageHotspotTemplate
+} from './activityImageHotspot.js';
+import {
+    renderImageHotspotSubmissionReview as renderSharedImageHotspotSubmissionReview,
+    renderSpreadsheetSubmissionReview as renderSharedSpreadsheetSubmissionReview,
+    renderStructuredSubmissionReview as renderSharedStructuredSubmissionReview
+} from './classroomActivityRenderers.js';
+import { compressImageToWebp } from './imageUtils.js';
 
 const DEV_AUTH_DISABLED = false;
 const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
@@ -122,11 +163,68 @@ const ACTIVITY_TEMPLATE_OPTIONS = [
         type: STRUCTURED_RESPONSE_TYPE,
         label: 'Checklist',
         description: 'Completion checklist with optional evidence and teacher notes.'
+    },
+    {
+        id: 'category-sort',
+        type: CARD_SORT_TYPE,
+        label: 'Category Sort',
+        description: 'Cards sorted into teacher-defined groups.'
+    },
+    {
+        id: 'sequence-sort',
+        type: CARD_SORT_TYPE,
+        label: 'Sequence Sort',
+        description: 'Cards arranged in one correct order.'
+    },
+    {
+        id: 'process-sort',
+        type: CARD_SORT_TYPE,
+        label: 'Process Sort',
+        description: 'Cards sorted into stages with optional order inside each stage.'
+    },
+    {
+        id: 'data-table',
+        type: SPREADSHEET_TABLE_TYPE,
+        label: 'Data Table',
+        description: 'Fixed columns with student-entered rows for classroom evidence.'
+    },
+    {
+        id: 'formula-practice',
+        type: SPREADSHEET_TABLE_TYPE,
+        label: 'Formula Practice',
+        description: 'Starter rows where students use simple spreadsheet formulas.'
+    },
+    {
+        id: 'chart-from-table',
+        type: SPREADSHEET_TABLE_TYPE,
+        label: 'Chart From Table',
+        description: 'Student-entered table that generates a chart from selected columns.'
+    },
+    {
+        id: 'label-image-parts',
+        type: IMAGE_HOTSPOT_TYPE,
+        label: 'Label Image Parts',
+        description: 'Students place required label pins on a teacher-uploaded image.'
+    },
+    {
+        id: 'screenshot-callouts',
+        type: IMAGE_HOTSPOT_TYPE,
+        label: 'Screenshot Callouts',
+        description: 'Students identify interface or screenshot areas with pins and notes.'
+    },
+    {
+        id: 'hotspot-explanation',
+        type: IMAGE_HOTSPOT_TYPE,
+        label: 'Hotspot Explanation',
+        description: 'Students add explanatory pins and short reflections on an image.'
     }
 ];
 const ACTIVITY_TYPE_LABELS = {
     'map-diagram': 'Map / Diagram',
-    [STRUCTURED_RESPONSE_TYPE]: 'Structured Response'
+    [STRUCTURED_RESPONSE_TYPE]: 'Structured Response',
+    [CARD_SORT_TYPE]: 'Card Sort',
+    [SPREADSHEET_TABLE_TYPE]: 'Spreadsheet / Data Table',
+    [IMAGE_HOTSPOT_TYPE]: 'Image Label / Hotspot'
 };
 
 class TeacherManager {
@@ -208,6 +306,7 @@ class TeacherManager {
         this.activityEditorAutosaveReady = false;
         this.activityEditorAutosaveReadyTimeout = null;
         this.activityEditorTab = 'settings';
+        this.activityImageUrlCache = new Map();
         this.structuredBuilderMode = 'build';
         this.deletedActivityIds = new Set();
         this.quizMaker = null;
@@ -2601,6 +2700,69 @@ class TeacherManager {
                 materials: 'Device and the work being checked.',
                 studentOutput: 'Completed checklist and any requested evidence or notes.',
                 makeupInstructions: 'Use the checklist to verify the makeup work before submitting it.'
+            },
+            'category-sort': {
+                teacherInstructions: 'Review the categories and card answers before assigning. Clarify whether students should explain their choices aloud or only sort the board.',
+                studentInstructions: 'Move each card into the category where it belongs. Use the notes on the cards and the category names to guide your decisions.',
+                materials: 'Device, class notes, vocabulary list or reference examples if needed.',
+                studentOutput: 'Completed card sort board with each card placed in a category.',
+                makeupInstructions: 'Complete the card sort independently using class notes and submit it during the next class period.'
+            },
+            'sequence-sort': {
+                teacherInstructions: 'Check that each step is in the expected order. Remind students that every card should be moved into the order lane.',
+                studentInstructions: 'Move every card into the order lane, then arrange the steps from first to last.',
+                materials: 'Device, process notes or reference instructions if needed.',
+                studentOutput: 'Completed sequence with all cards in the correct order.',
+                makeupInstructions: 'Use the process notes to place the sequence cards in order and submit the activity.'
+            },
+            'process-sort': {
+                teacherInstructions: 'Review each process stage and decide if order inside the stages matters for this activity.',
+                studentInstructions: 'Sort each card into the correct process stage. If a stage has more than one card, place them in the best order.',
+                materials: 'Device, class notes, procedure sheet or reference material if needed.',
+                studentOutput: 'Completed process sort with cards grouped by stage.',
+                makeupInstructions: 'Use the class notes to sort the process cards into stages and submit the activity.'
+            },
+            'data-table': {
+                teacherInstructions: 'Set the columns students should complete and clarify the number of useful data rows expected.',
+                studentInstructions: 'Complete the table with clear data. Add enough rows to show the pattern, result, or evidence from the activity.',
+                materials: 'Device, class notes, data source or observation sheet if needed.',
+                studentOutput: 'Completed data table with a short reflection.',
+                makeupInstructions: 'Use the activity notes or data source to complete the table and reflection.'
+            },
+            'formula-practice': {
+                teacherInstructions: 'Review the starter rows and formula column. Keep formulas simple enough for copied arithmetic, SUM, or AVERAGE practice.',
+                studentInstructions: 'Enter values in the table and use simple formulas to calculate the results. Check that your formulas match the row data.',
+                materials: 'Device and formula examples or class notes.',
+                studentOutput: 'Completed spreadsheet table with formulas and a formula reflection.',
+                makeupInstructions: 'Complete the starter table, enter the formulas, and explain what one formula calculated.'
+            },
+            'chart-from-table': {
+                teacherInstructions: 'Choose the label and value columns for the chart. Remind students that chart values must be numeric.',
+                studentInstructions: 'Enter label and value data in the table, generate the chart, and explain what the chart shows.',
+                materials: 'Device, data source or observation results if needed.',
+                studentOutput: 'Completed table, generated chart, and chart conclusion.',
+                makeupInstructions: 'Complete the data table, generate the chart, and write the chart conclusion.'
+            },
+            'label-image-parts': {
+                teacherInstructions: 'Upload the image and set the required labels students should place. Review the image once before assigning so every label has a clear location.',
+                studentInstructions: 'Place each required label pin on the correct part of the image. Use careful placement so the label points to the exact feature.',
+                materials: 'Device and the uploaded image or diagram reference.',
+                studentOutput: 'Image with all required label pins placed and a short reflection.',
+                makeupInstructions: 'Open the image, place each required label, and complete the reflection using class notes.'
+            },
+            'screenshot-callouts': {
+                teacherInstructions: 'Upload the screenshot and define the interface parts students should identify. Use notes when students should explain what each part does.',
+                studentInstructions: 'Place each callout pin on the matching part of the screenshot and add a short note for each one.',
+                materials: 'Device and the uploaded screenshot.',
+                studentOutput: 'Screenshot with labeled callout pins and notes.',
+                makeupInstructions: 'Use the screenshot and class notes to place each callout and explain the purpose of each part.'
+            },
+            'hotspot-explanation': {
+                teacherInstructions: 'Upload the image and decide how many explanatory hotspots students should add. Encourage specific notes tied to evidence in the image.',
+                studentInstructions: 'Add hotspot pins to important parts of the image and write a note explaining each choice.',
+                materials: 'Device, uploaded image, and class notes or reference material if needed.',
+                studentOutput: 'Image with explanatory hotspot pins, notes, and reflection.',
+                makeupInstructions: 'Add the required hotspots independently and explain your most important choice.'
             }
         };
 
@@ -2623,6 +2785,12 @@ class TeacherManager {
 
         if (activityType === STRUCTURED_RESPONSE_TYPE) {
             activityData.responseTemplate = createDefaultResponseTemplate(template.id);
+        } else if (activityType === CARD_SORT_TYPE) {
+            activityData.cardSortTemplate = createDefaultCardSortTemplate(template.id);
+        } else if (activityType === SPREADSHEET_TABLE_TYPE) {
+            activityData.spreadsheetTemplate = createDefaultSpreadsheetTemplate(template.id);
+        } else if (activityType === IMAGE_HOTSPOT_TYPE) {
+            activityData.imageHotspotTemplate = createDefaultImageHotspotTemplate(template.id);
         } else {
             activityData.excalidrawScene = null;
         }
@@ -2662,21 +2830,30 @@ class TeacherManager {
         const sourceData = activity && typeof activity === 'object' ? activity : {};
         const activityData = sourceData.activityData || sourceData.activity_data || {};
         const sourceActivityType = sourceData.activityType || sourceData.activity_type || '';
+        const fallbackTemplateId = sourceActivityType === STRUCTURED_RESPONSE_TYPE
+            ? 'worksheet'
+            : (sourceActivityType === CARD_SORT_TYPE
+                ? 'category-sort'
+                : (sourceActivityType === SPREADSHEET_TABLE_TYPE
+                    ? 'data-table'
+                    : (sourceActivityType === IMAGE_HOTSPOT_TYPE ? 'label-image-parts' : DEFAULT_ACTIVITY_TEMPLATE_ID)));
         const rawTemplateId = activityData.templateId
             || activityData.template_id
             || sourceData.templateId
             || sourceData.template_id
-            || (sourceActivityType === STRUCTURED_RESPONSE_TYPE ? 'worksheet' : DEFAULT_ACTIVITY_TEMPLATE_ID);
+            || fallbackTemplateId;
         let template = this.getActivityTemplate(rawTemplateId);
         let activityType = sourceActivityType || template.type || DEFAULT_ACTIVITY_TYPE;
+        const knownActivityTypes = new Set([DEFAULT_ACTIVITY_TYPE, STRUCTURED_RESPONSE_TYPE, CARD_SORT_TYPE, SPREADSHEET_TABLE_TYPE, IMAGE_HOTSPOT_TYPE]);
 
-        if (activityType === STRUCTURED_RESPONSE_TYPE && template.type !== STRUCTURED_RESPONSE_TYPE) {
-            template = this.getActivityTemplate('worksheet');
+        if (!knownActivityTypes.has(activityType)) {
+            activityType = template.type || DEFAULT_ACTIVITY_TYPE;
         }
 
-        if (activityType !== STRUCTURED_RESPONSE_TYPE && template.type === STRUCTURED_RESPONSE_TYPE) {
-            template = this.getActivityTemplate(DEFAULT_ACTIVITY_TEMPLATE_ID);
-            activityType = DEFAULT_ACTIVITY_TYPE;
+        if (template.type !== activityType) {
+            template = ACTIVITY_TEMPLATE_OPTIONS.find(option => option.type === activityType)
+                || this.getActivityTemplate(DEFAULT_ACTIVITY_TEMPLATE_ID);
+            activityType = template.type || DEFAULT_ACTIVITY_TYPE;
         }
 
         const defaults = this.getDefaultActivityInstructions(template.id);
@@ -2689,6 +2866,21 @@ class TeacherManager {
         if (activityType === STRUCTURED_RESPONSE_TYPE) {
             normalizedActivityData.responseTemplate = normalizeResponseTemplate(
                 activityData.responseTemplate || activityData.response_template,
+                template.id
+            );
+        } else if (activityType === CARD_SORT_TYPE) {
+            normalizedActivityData.cardSortTemplate = normalizeCardSortTemplate(
+                activityData.cardSortTemplate || activityData.card_sort_template,
+                template.id
+            );
+        } else if (activityType === SPREADSHEET_TABLE_TYPE) {
+            normalizedActivityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(
+                activityData.spreadsheetTemplate || activityData.spreadsheet_template,
+                template.id
+            );
+        } else if (activityType === IMAGE_HOTSPOT_TYPE) {
+            normalizedActivityData.imageHotspotTemplate = normalizeImageHotspotTemplate(
+                activityData.imageHotspotTemplate || activityData.image_hotspot_template,
                 template.id
             );
         } else {
@@ -2775,6 +2967,75 @@ class TeacherManager {
         })));
     }
 
+    stableCardSortTemplateSignature(template = {}) {
+        const normalized = normalizeCardSortTemplate(template);
+        return JSON.stringify({
+            prompt: normalized.prompt,
+            helperText: normalized.helperText,
+            requireAllCards: normalized.requireAllCards,
+            orderMode: normalized.orderMode,
+            categories: normalized.categories.map(category => ({
+                id: category.id,
+                title: category.title,
+                helperText: category.helperText
+            })),
+            cards: normalized.cards.map(card => ({
+                id: card.id,
+                text: card.text,
+                helperText: card.helperText,
+                expectedCategoryId: card.expectedCategoryId,
+                expectedOrder: card.expectedOrder
+            }))
+        });
+    }
+
+    stableSpreadsheetTemplateSignature(template = {}) {
+        const normalized = normalizeSpreadsheetTemplate(template);
+        return JSON.stringify({
+            templateId: normalized.templateId,
+            columns: normalized.columns.map(column => ({
+                id: column.id,
+                title: column.title,
+                type: column.type,
+                width: column.width
+            })),
+            seedData: normalized.seedData,
+            minRows: normalized.minRows,
+            maxRows: normalized.maxRows,
+            allowAddRows: normalized.allowAddRows,
+            chart: normalized.chart,
+            reflectionPrompts: normalized.reflectionPrompts.map(prompt => ({
+                id: prompt.id,
+                prompt: prompt.prompt,
+                required: prompt.required
+            }))
+        });
+    }
+
+    stableImageHotspotTemplateSignature(template = {}) {
+        const normalized = normalizeImageHotspotTemplate(template);
+        return JSON.stringify({
+            templateId: normalized.templateId,
+            image: normalized.image,
+            labels: normalized.labels.map(label => ({
+                id: label.id,
+                text: label.text,
+                hint: label.hint,
+                required: label.required,
+                color: label.color
+            })),
+            minPins: normalized.minPins,
+            maxPins: normalized.maxPins,
+            allowExtraPins: normalized.allowExtraPins,
+            requireNotes: normalized.requireNotes,
+            reflectionPrompts: normalized.reflectionPrompts.map(prompt => ({
+                id: prompt.id,
+                prompt: prompt.prompt,
+                required: prompt.required
+            }))
+        });
+    }
+
     getActivityDuplicateSignature(activity = {}) {
         const normalized = this.normalizeActivity(activity);
         const activityData = normalized.activityData || {};
@@ -2795,6 +3056,15 @@ class TeacherManager {
             scene: this.stableActivitySceneSignature(activityData.excalidrawScene),
             responseTemplate: normalized.activityType === STRUCTURED_RESPONSE_TYPE
                 ? this.stableResponseTemplateSignature(activityData.responseTemplate)
+                : '',
+            cardSortTemplate: normalized.activityType === CARD_SORT_TYPE
+                ? this.stableCardSortTemplateSignature(activityData.cardSortTemplate)
+                : '',
+            spreadsheetTemplate: normalized.activityType === SPREADSHEET_TABLE_TYPE
+                ? this.stableSpreadsheetTemplateSignature(activityData.spreadsheetTemplate)
+                : '',
+            imageHotspotTemplate: normalized.activityType === IMAGE_HOTSPOT_TYPE
+                ? this.stableImageHotspotTemplateSignature(activityData.imageHotspotTemplate)
                 : ''
         });
     }
@@ -3273,10 +3543,41 @@ class TeacherManager {
         return checklistCount ? `${blockLabel} · ${checklistCount} checklist` : blockLabel;
     }
 
+    getActivityCardSortSummary(activity = {}) {
+        const template = normalizeCardSortTemplate(activity.activityData?.cardSortTemplate, activity.activityData?.templateId || 'category-sort');
+        const categoryLabel = template.categories.length === 1 ? '1 category' : `${template.categories.length} categories`;
+        const cardLabel = template.cards.length === 1 ? '1 card' : `${template.cards.length} cards`;
+        return `${categoryLabel} · ${cardLabel}`;
+    }
+
+    getActivitySpreadsheetSummary(activity = {}) {
+        const template = normalizeSpreadsheetTemplate(activity.activityData?.spreadsheetTemplate, activity.activityData?.templateId || 'data-table');
+        const columnLabel = template.columns.length === 1 ? '1 column' : `${template.columns.length} columns`;
+        const rowLabel = `${template.minRows}-${template.maxRows} rows`;
+        return template.chart.enabled ? `${columnLabel} · ${rowLabel} · chart` : `${columnLabel} · ${rowLabel}`;
+    }
+
+    getActivityImageHotspotSummary(activity = {}) {
+        const template = normalizeImageHotspotTemplate(activity.activityData?.imageHotspotTemplate, activity.activityData?.templateId || 'label-image-parts');
+        const labelText = template.labels.length === 1 ? '1 label' : `${template.labels.length} labels`;
+        const pinText = `${template.minPins}-${template.maxPins} pins`;
+        return template.image.storagePath ? `${labelText} · ${pinText} · image` : `${labelText} · ${pinText} · needs image`;
+    }
+
     getActivityWorkspaceSummary(activity = {}) {
-        return activity.activityType === STRUCTURED_RESPONSE_TYPE
-            ? this.getActivityResponseSummary(activity)
-            : this.getActivityCanvasSummary(activity);
+        if (activity.activityType === STRUCTURED_RESPONSE_TYPE) {
+            return this.getActivityResponseSummary(activity);
+        }
+        if (activity.activityType === CARD_SORT_TYPE) {
+            return this.getActivityCardSortSummary(activity);
+        }
+        if (activity.activityType === SPREADSHEET_TABLE_TYPE) {
+            return this.getActivitySpreadsheetSummary(activity);
+        }
+        if (activity.activityType === IMAGE_HOTSPOT_TYPE) {
+            return this.getActivityImageHotspotSummary(activity);
+        }
+        return this.getActivityCanvasSummary(activity);
     }
 
     formatActivityUpdatedLabel(activity = {}) {
@@ -4080,11 +4381,13 @@ class TeacherManager {
         const statsEl = $('#activity-assignment-stats');
         const rosterEl = $('#activity-submission-roster');
         const submissionSummaryEl = $('#activity-submission-summary');
+        const updateAssignmentBtn = $('#update-published-activity-assignment-btn');
         if (titleEl) titleEl.textContent = 'Activity Review';
         if (summaryEl) summaryEl.textContent = 'Loading assignment...';
         if (statsEl) statsEl.innerHTML = '';
         if (rosterEl) rosterEl.innerHTML = '<div class="loading-spinner">Loading submissions...</div>';
         if (submissionSummaryEl) submissionSummaryEl.textContent = 'Loading submissions...';
+        if (updateAssignmentBtn) updateAssignmentBtn.disabled = true;
 
         try {
             let assignments = await this.getActivityAssignments({ forceRefresh: options.forceRefresh });
@@ -4102,6 +4405,7 @@ class TeacherManager {
             }
 
             this.activeActivityAssignment = assignment;
+            if (updateAssignmentBtn) updateAssignmentBtn.disabled = !assignment.sourceActivityId;
             if (titleEl) titleEl.textContent = assignment.title || 'Activity Review';
             if (summaryEl) {
                 summaryEl.textContent = `${this.formatAssignmentTarget(assignment)} · ${this.formatAssignmentWindow(assignment)}`;
@@ -4117,7 +4421,108 @@ class TeacherManager {
             console.error('Failed to load assignment review:', error);
             if (summaryEl) summaryEl.textContent = 'Could not load assignment review.';
             if (rosterEl) rosterEl.innerHTML = '<p class="teacher-empty-state">Could not load assignment submissions.</p>';
+            if (updateAssignmentBtn) updateAssignmentBtn.disabled = true;
             notifications.error('Could not load assignment review.');
+        }
+    }
+
+    buildActivityAssignmentUpdatePayload(assignment = {}, sourceActivity = {}) {
+        return {
+            id: assignment.id,
+            sourceActivityId: sourceActivity.id || assignment.sourceActivityId,
+            title: sourceActivity.title,
+            description: sourceActivity.description,
+            activityType: sourceActivity.activityType,
+            subjectSlug: sourceActivity.subjectSlug,
+            grades: sourceActivity.grades,
+            teacherInstructions: sourceActivity.teacherInstructions,
+            studentInstructions: sourceActivity.studentInstructions,
+            materials: sourceActivity.materials,
+            estimatedMinutes: sourceActivity.estimatedMinutes,
+            studentOutput: sourceActivity.studentOutput,
+            makeupInstructions: sourceActivity.makeupInstructions,
+            assessmentPurpose: sourceActivity.assessmentPurpose,
+            activityData: sourceActivity.activityData,
+            targetGrades: assignment.targetGrades,
+            targetSections: assignment.targetSections,
+            availableFrom: assignment.availableFrom || null,
+            dueDate: assignment.dueDate || null,
+            weekLabel: assignment.weekLabel || '',
+            status: assignment.status || 'active',
+            assignedBy: assignment.assignedBy || null,
+            updatedAt: serverTimestamp()
+        };
+    }
+
+    formatStartedSubmissionWarning(submissions = []) {
+        const counts = submissions.reduce((acc, submission) => {
+            const status = submission?.status || 'draft';
+            acc.total += 1;
+            acc[status] = (acc[status] || 0) + 1;
+            return acc;
+        }, { total: 0, draft: 0, submitted: 0 });
+        const pieces = [];
+        if (counts.draft) pieces.push(`${counts.draft} draft${counts.draft === 1 ? '' : 's'}`);
+        if (counts.submitted) pieces.push(`${counts.submitted} submitted`);
+        const startedText = pieces.length ? pieces.join(' and ') : `${counts.total} started`;
+        return `Update this published assignment? ${startedText} student response${counts.total === 1 ? '' : 's'} will be preserved. New prompts will appear blank, removed prompts will disappear, and started map canvases will stay as student copies.`;
+    }
+
+    async updatePublishedActivityAssignmentFromSource() {
+        if (!this.ensureAuthenticated(false)) return;
+        const assignment = this.normalizeActivityAssignment(this.activeActivityAssignment || {});
+        const updateButton = $('#update-published-activity-assignment-btn');
+        if (!assignment.id) {
+            notifications.warning('Open an assignment before updating it.');
+            return;
+        }
+        if (!assignment.sourceActivityId) {
+            notifications.warning('This assignment is not linked to a source library activity.');
+            return;
+        }
+
+        if (updateButton) updateButton.disabled = true;
+
+        try {
+            const db = supabaseService.getDatabase();
+            const sourceSnap = await getDoc(doc(db, this.ACTIVITY_COLLECTION, assignment.sourceActivityId));
+            if (!sourceSnap.exists()) {
+                notifications.error('Source library activity not found. Create a new assignment from the activity instead.');
+                return;
+            }
+
+            const sourceActivity = this.normalizeActivity({
+                id: sourceSnap.id,
+                ...sourceSnap.data(),
+                source: 'cloud'
+            });
+
+            if (sourceActivity.activityType !== assignment.activityType) {
+                notifications.warning('This source activity uses a different activity type. Create a new assignment instead.');
+                return;
+            }
+
+            const reviewSubmissions = this.activeActivityReview?.assignment?.id === assignment.id
+                ? Array.from(this.activeActivityReview.submissionsByStudent?.values?.() || []).filter(Boolean)
+                : await this.fetchActivitySubmissions(assignment.id);
+            if (reviewSubmissions.length > 0 && !window.confirm(this.formatStartedSubmissionWarning(reviewSubmissions))) {
+                return;
+            }
+
+            const payload = this.buildActivityAssignmentUpdatePayload(assignment, sourceActivity);
+            await setDoc(doc(db, this.ACTIVITY_ASSIGNMENT_COLLECTION, assignment.id), payload, { merge: true });
+
+            this.invalidateActivityAssignmentCache();
+            notifications.success('Published assignment updated.');
+            await this.showActivityAssignmentReview(assignment.id, { forceRefresh: true });
+        } catch (error) {
+            console.error('Failed to update published activity assignment:', error);
+            notifications.error('Could not update published assignment.');
+        } finally {
+            const currentAssignment = this.activeActivityAssignment;
+            if (updateButton && currentAssignment?.id === assignment.id) {
+                updateButton.disabled = !currentAssignment.sourceActivityId;
+            }
         }
     }
 
@@ -4260,7 +4665,7 @@ class TeacherManager {
         const root = $('#activity-review-excalidraw-root');
         const status = $('#activity-review-canvas-status');
         if (root) {
-            root.classList.remove('structured-review-root');
+            root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root');
             root.innerHTML = message
                 ? `
                     <div class="activity-review-empty-canvas">
@@ -4366,14 +4771,51 @@ class TeacherManager {
         this.activityReviewHandle?.unmount?.();
         this.activityReviewHandle = null;
         root.innerHTML = '';
-        root.classList.remove('structured-review-root');
-        if (status) status.textContent = assignment.activityType === STRUCTURED_RESPONSE_TYPE
-            ? `Loading ${this.getStudentRosterName(student)} responses...`
-            : `Loading ${this.getStudentRosterName(student)} canvas...`;
+        root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root');
+        if (status) {
+            status.textContent = assignment.activityType === STRUCTURED_RESPONSE_TYPE
+                ? `Loading ${this.getStudentRosterName(student)} responses...`
+                : (assignment.activityType === CARD_SORT_TYPE
+                    ? `Loading ${this.getStudentRosterName(student)} card sort...`
+                    : (assignment.activityType === SPREADSHEET_TABLE_TYPE
+                        ? `Loading ${this.getStudentRosterName(student)} table...`
+                        : (assignment.activityType === IMAGE_HOTSPOT_TYPE
+                            ? `Loading ${this.getStudentRosterName(student)} image labels...`
+                            : `Loading ${this.getStudentRosterName(student)} canvas...`)));
+        }
 
         if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
             root.classList.add('structured-review-root');
             root.innerHTML = this.renderStructuredSubmissionReview(assignment, submission);
+            if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+            this.refreshIcons();
+            return;
+        }
+
+        if (assignment.activityType === SPREADSHEET_TABLE_TYPE) {
+            root.classList.add('spreadsheet-review-root');
+            root.innerHTML = this.renderSpreadsheetSubmissionReview(assignment, submission);
+            if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+            this.refreshIcons();
+            return;
+        }
+
+        if (assignment.activityType === IMAGE_HOTSPOT_TYPE) {
+            root.classList.add('image-hotspot-review-root');
+            const template = normalizeImageHotspotTemplate(
+                assignment.activityData?.imageHotspotTemplate,
+                assignment.activityData?.templateId || 'label-image-parts'
+            );
+            const imageUrl = await this.resolveActivityImageUrl(template.image.storagePath);
+            root.innerHTML = this.renderImageHotspotSubmissionReview(assignment, submission, imageUrl);
+            if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+            this.refreshIcons();
+            return;
+        }
+
+        if (assignment.activityType === CARD_SORT_TYPE) {
+            root.classList.add('card-sort-review-root');
+            root.innerHTML = this.renderCardSortSubmissionReview(assignment, submission);
             if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
             this.refreshIcons();
             return;
@@ -4399,184 +4841,83 @@ class TeacherManager {
     }
 
     renderStructuredSubmissionReview(assignment, submission) {
-        const template = normalizeResponseTemplate(
-            assignment.activityData?.responseTemplate,
-            assignment.activityData?.templateId || 'worksheet'
+        return renderSharedStructuredSubmissionReview(assignment, submission);
+    }
+
+    renderSpreadsheetSubmissionReview(assignment, submission) {
+        return renderSharedSpreadsheetSubmissionReview(assignment, submission);
+    }
+
+    renderImageHotspotSubmissionReview(assignment, submission, imageUrl = '') {
+        return renderSharedImageHotspotSubmissionReview(assignment, submission, imageUrl);
+    }
+
+    renderCardSortSubmissionReview(assignment, submission) {
+        const template = normalizeCardSortTemplate(
+            assignment.activityData?.cardSortTemplate,
+            assignment.activityData?.templateId || 'category-sort'
         );
-        const responses = submission.responseData?.structuredResponses || {};
+        const response = normalizeCardSortResponse(template, submission.responseData?.cardSortResponse || {});
+        const summary = getCardSortPlacementSummary(template, response);
+        const renderCard = (cardId, laneId, index) => {
+            const status = getCardSortCardStatus(template, response, cardId, laneId, index);
+            const card = status.card;
+            if (!card) return '';
+            const badges = laneId === CARD_SORT_TRAY_ID
+                ? '<span class="card-sort-signal is-unplaced">Unplaced</span>'
+                : `
+                    <span class="card-sort-signal ${status.categoryMatches ? 'is-correct' : 'is-misplaced'}">
+                        ${status.categoryMatches ? 'Expected category' : `Expected ${escapeHtml(status.expectedCategoryTitle || 'another category')}`}
+                    </span>
+                    ${template.orderMode === 'within-categories' ? `
+                        <span class="card-sort-signal ${status.orderMatches ? 'is-correct' : 'is-misplaced'}">
+                            ${status.orderMatches ? 'Expected order' : `Expected #${escapeHtml(status.expectedOrder || '')}`}
+                        </span>
+                    ` : ''}
+                `;
+            return `
+                <article class="card-sort-card ${status.categoryMatches ? 'is-correct' : (laneId === CARD_SORT_TRAY_ID ? 'is-unplaced' : 'is-misplaced')}">
+                    <strong>${escapeHtml(card.text)}</strong>
+                    ${card.helperText ? `<p>${escapeHtml(card.helperText)}</p>` : ''}
+                    <div class="card-sort-review-signals">${badges}</div>
+                </article>
+            `;
+        };
 
         return `
-            <div class="structured-submission-review">
-                ${template.blocks.map(block => {
-                    const helper = block.helperText ? `<p>${escapeHtml(block.helperText)}</p>` : '';
-                    if (block.type === 'instructions') {
-                        return `
-                            <section class="structured-response-block instructions-block">
-                                <h4>${escapeHtml(block.prompt)}</h4>
-                                ${helper}
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'checklist') {
-                        const checkedItems = responses[block.id]?.checkedItems || {};
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-response-checklist readonly">
-                                    ${block.items.map(item => `
-                                        <div class="${checkedItems[item.id] ? 'is-checked' : ''}">
-                                            <i data-lucide="${checkedItems[item.id] ? 'check-square' : 'square'}"></i>
-                                            <span>${escapeHtml(item.text)}</span>
-                                        </div>
-                                    `).join('')}
+            <div class="card-sort-review">
+                <div class="card-sort-review-summary">
+                    <div><span>Placed</span><strong>${escapeHtml(summary.placedCards)} / ${escapeHtml(summary.totalCards)}</strong></div>
+                    <div><span>Expected category</span><strong>${escapeHtml(summary.correctCategory)} correct</strong></div>
+                    ${template.orderMode === 'within-categories'
+                        ? `<div><span>Expected order</span><strong>${escapeHtml(summary.correctOrder)} / ${escapeHtml(summary.orderedCards)}</strong></div>`
+                        : ''}
+                </div>
+                <div class="card-sort-board is-review">
+                    <section class="card-sort-lane card-sort-tray">
+                        <div class="card-sort-lane-header">
+                            <h4>Unsorted</h4>
+                            <span>${escapeHtml((response.placements[CARD_SORT_TRAY_ID] || []).length)}</span>
+                        </div>
+                        <div class="card-sort-card-list">
+                            ${(response.placements[CARD_SORT_TRAY_ID] || []).map((cardId, index) => renderCard(cardId, CARD_SORT_TRAY_ID, index)).join('') || '<p class="card-sort-empty">No unplaced cards.</p>'}
+                        </div>
+                    </section>
+                    <div class="card-sort-category-grid">
+                        ${template.categories.map(category => `
+                            <section class="card-sort-lane">
+                                <div class="card-sort-lane-header">
+                                    <h4>${escapeHtml(category.title)}</h4>
+                                    <span>${escapeHtml((response.placements[category.id] || []).length)}</span>
+                                </div>
+                                ${category.helperText ? `<p>${escapeHtml(category.helperText)}</p>` : ''}
+                                <div class="card-sort-card-list">
+                                    ${(response.placements[category.id] || []).map((cardId, index) => renderCard(cardId, category.id, index)).join('') || '<p class="card-sort-empty">No cards placed here.</p>'}
                                 </div>
                             </section>
-                        `;
-                    }
-
-                    if (block.type === 'multiple-choice' || block.type === 'multi-select') {
-                        const response = responses[block.id] || {};
-                        const selectedItemIds = block.type === 'multiple-choice'
-                            ? { [response.selectedItemId]: Boolean(response.selectedItemId) }
-                            : (Array.isArray(response.selectedItemIds)
-                                ? Object.fromEntries(response.selectedItemIds.map(itemId => [itemId, true]))
-                                : response.selectedItemIds || {});
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-response-checklist structured-response-options readonly">
-                                    ${block.items.map(item => {
-                                        const isSelected = selectedItemIds[item.id] === true;
-                                        const icon = block.type === 'multiple-choice'
-                                            ? (isSelected ? 'circle-dot' : 'circle')
-                                            : (isSelected ? 'check-square' : 'square');
-                                        return `
-                                            <div class="${isSelected ? 'is-checked' : ''}">
-                                                <i data-lucide="${icon}"></i>
-                                                <span>${escapeHtml(item.text)}</span>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'select') {
-                        const response = responses[block.id] || {};
-                        const selectedItem = block.items.find(item => item.id === response.selectedItemId);
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-answer-readonly">${escapeHtml(selectedItem?.text || 'No response yet.')}</div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'true-false') {
-                        const answer = responses[block.id]?.selectedItemId;
-                        const display = answer === 'true' ? 'True' : (answer === 'false' ? 'False' : 'No response yet.');
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-answer-readonly">${escapeHtml(display)}</div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'rating-scale' || block.type === 'number' || block.type === 'date') {
-                        const response = responses[block.id] || {};
-                        const answer = block.type === 'rating-scale'
-                            ? response.rating
-                            : (block.type === 'number' ? response.number : response.date);
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-answer-readonly">${escapeHtml(String(answer ?? '').trim() || 'No response yet.')}</div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'matching') {
-                        const matches = responses[block.id]?.matches || {};
-                        const matchMap = Object.fromEntries(block.items.map(item => [item.id, item.matchText]));
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-response-matching readonly">
-                                    ${block.items.map(item => `
-                                        <div class="structured-response-matching-row">
-                                            <span>${escapeHtml(item.text)}</span>
-                                            <strong>${escapeHtml(matchMap[matches[item.id]] || 'No match selected.')}</strong>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'ranking') {
-                        const ranks = responses[block.id]?.ranks || {};
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-response-ranking readonly">
-                                    ${block.items.map(item => `
-                                        <div>
-                                            <strong>${escapeHtml(ranks[item.id] || '-')}</strong>
-                                            <span>${escapeHtml(item.text)}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </section>
-                        `;
-                    }
-
-                    if (block.type === 'table-grid') {
-                        const cells = responses[block.id]?.cells || {};
-                        return `
-                            <section class="structured-response-block">
-                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                                ${helper}
-                                <div class="structured-response-table-wrapper">
-                                    <table class="structured-response-table readonly">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col"></th>
-                                                ${block.columns.map(column => `<th scope="col">${escapeHtml(column.text)}</th>`).join('')}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${block.rows.map(row => `
-                                                <tr>
-                                                    <th scope="row">${escapeHtml(row.text)}</th>
-                                                    ${block.columns.map(column => `<td>${escapeHtml(cells[row.id]?.[column.id] || '')}</td>`).join('')}
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-                        `;
-                    }
-
-                    const answer = String(responses[block.id]?.text || '').trim();
-                    return `
-                        <section class="structured-response-block">
-                            <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
-                            ${helper}
-                            <div class="structured-answer-readonly">${escapeHtml(answer || 'No response yet.')}</div>
-                        </section>
-                    `;
-                }).join('')}
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -4659,7 +5000,9 @@ class TeacherManager {
         const view = $('#teacher-activity-editor-view');
         const label = button.querySelector('span');
         const isFocused = view?.classList.contains('canvas-focus');
-        const focusLabel = this.isStructuredActivity() ? 'Focus Builder' : 'Focus Canvas';
+        const focusLabel = (this.isStructuredActivity() || this.isCardSortActivity() || this.isSpreadsheetActivity() || this.isImageHotspotActivity())
+            ? 'Focus Builder'
+            : 'Focus Canvas';
         button.setAttribute('aria-pressed', isFocused ? 'true' : 'false');
         if (label) label.textContent = isFocused ? 'Show Tabs' : focusLabel;
     }
@@ -4773,9 +5116,27 @@ class TeacherManager {
         return (activity?.activityType || activity?.activity_type) === STRUCTURED_RESPONSE_TYPE;
     }
 
+    isCardSortActivity(activity = this.activity) {
+        return (activity?.activityType || activity?.activity_type) === CARD_SORT_TYPE;
+    }
+
+    isSpreadsheetActivity(activity = this.activity) {
+        return (activity?.activityType || activity?.activity_type) === SPREADSHEET_TABLE_TYPE;
+    }
+
+    isImageHotspotActivity(activity = this.activity) {
+        return (activity?.activityType || activity?.activity_type) === IMAGE_HOTSPOT_TYPE;
+    }
+
     syncActivityWorkspace() {
         if (this.isStructuredActivity()) {
             this.syncStructuredResponseTemplate();
+        } else if (this.isCardSortActivity()) {
+            this.syncCardSortTemplate();
+        } else if (this.isSpreadsheetActivity()) {
+            this.syncSpreadsheetTemplate();
+        } else if (this.isImageHotspotActivity()) {
+            this.syncImageHotspotTemplate();
         } else {
             this.syncActivityEditorScene();
         }
@@ -4847,6 +5208,125 @@ class TeacherManager {
         };
     }
 
+    syncCardSortTemplate() {
+        const root = $('#activity-card-sort-root');
+        if (!root || root.classList.contains('hidden') || !this.activity?.id) return;
+        const currentTemplate = normalizeCardSortTemplate(
+            this.activity.activityData?.cardSortTemplate,
+            this.activity.activityData?.templateId || 'category-sort'
+        );
+        const categories = Array.from(root.querySelectorAll('[data-card-sort-category-id]')).map((categoryEl, index) => ({
+            id: categoryEl.dataset.cardSortCategoryId || `category_${index + 1}`,
+            title: categoryEl.querySelector('[data-card-sort-category-title]')?.value || `Category ${index + 1}`,
+            helperText: categoryEl.querySelector('[data-card-sort-category-helper]')?.value || ''
+        }));
+        const fallbackCategoryId = categories[0]?.id || currentTemplate.categories[0]?.id || '';
+        const cards = Array.from(root.querySelectorAll('[data-card-sort-card-id]')).map((cardEl, index) => ({
+            id: cardEl.dataset.cardSortCardId || `card_${index + 1}`,
+            text: cardEl.querySelector('[data-card-sort-card-text]')?.value || `Card ${index + 1}`,
+            helperText: cardEl.querySelector('[data-card-sort-card-helper]')?.value || '',
+            expectedCategoryId: cardEl.querySelector('[data-card-sort-card-category]')?.value || fallbackCategoryId,
+            expectedOrder: cardEl.querySelector('[data-card-sort-card-order]')?.value || index + 1
+        }));
+
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            cardSortTemplate: normalizeCardSortTemplate({
+                version: 1,
+                templateId: this.activity.activityData?.templateId || 'category-sort',
+                prompt: root.querySelector('[data-card-sort-field="prompt"]')?.value || currentTemplate.prompt,
+                helperText: root.querySelector('[data-card-sort-field="helperText"]')?.value || '',
+                requireAllCards: root.querySelector('[data-card-sort-field="requireAllCards"]')?.checked === true,
+                orderMode: root.querySelector('[data-card-sort-field="orderMode"]')?.value || currentTemplate.orderMode,
+                categories,
+                cards
+            }, this.activity.activityData?.templateId || 'category-sort')
+        };
+    }
+
+    syncSpreadsheetTemplate() {
+        const root = $('#activity-spreadsheet-root');
+        if (!root || root.classList.contains('hidden') || !this.activity?.id) return;
+        const currentTemplate = normalizeSpreadsheetTemplate(
+            this.activity.activityData?.spreadsheetTemplate,
+            this.activity.activityData?.templateId || 'data-table'
+        );
+        const columns = Array.from(root.querySelectorAll('[data-spreadsheet-column-id]')).map((columnEl, index) => ({
+            id: columnEl.dataset.spreadsheetColumnId || `column_${index + 1}`,
+            title: columnEl.querySelector('[data-spreadsheet-column-title]')?.value || `Column ${index + 1}`,
+            type: columnEl.querySelector('[data-spreadsheet-column-type]')?.value || 'text',
+            width: columnEl.querySelector('[data-spreadsheet-column-width]')?.value || 140
+        }));
+        const seedData = Array.from(root.querySelectorAll('[data-spreadsheet-seed-row]')).map(rowEl => (
+            Array.from(rowEl.querySelectorAll('[data-spreadsheet-seed-cell]')).map(cellEl => cellEl.value || '')
+        ));
+        const chartEnabled = root.querySelector('[data-spreadsheet-chart-enabled]')?.checked === true;
+        const reflectionPrompts = Array.from(root.querySelectorAll('[data-spreadsheet-prompt-id]')).map((promptEl, index) => ({
+            id: promptEl.dataset.spreadsheetPromptId || `prompt_${index + 1}`,
+            prompt: promptEl.querySelector('[data-spreadsheet-prompt-text]')?.value || `Reflection prompt ${index + 1}`,
+            required: promptEl.querySelector('[data-spreadsheet-prompt-required]')?.checked === true
+        }));
+
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            spreadsheetTemplate: normalizeSpreadsheetTemplate({
+                version: 1,
+                templateId: this.activity.activityData?.templateId || 'data-table',
+                columns,
+                seedData,
+                minRows: root.querySelector('[data-spreadsheet-field="minRows"]')?.value || currentTemplate.minRows,
+                maxRows: root.querySelector('[data-spreadsheet-field="maxRows"]')?.value || currentTemplate.maxRows,
+                allowAddRows: root.querySelector('[data-spreadsheet-field="allowAddRows"]')?.checked === true,
+                chart: {
+                    enabled: chartEnabled,
+                    type: root.querySelector('[data-spreadsheet-chart-type]')?.value || currentTemplate.chart.type,
+                    labelColumnId: root.querySelector('[data-spreadsheet-chart-label-column]')?.value || currentTemplate.chart.labelColumnId,
+                    valueColumnId: root.querySelector('[data-spreadsheet-chart-value-column]')?.value || currentTemplate.chart.valueColumnId
+                },
+                reflectionPrompts
+            }, this.activity.activityData?.templateId || 'data-table')
+        };
+    }
+
+    syncImageHotspotTemplate() {
+        const root = $('#activity-image-hotspot-root');
+        if (!root || root.classList.contains('hidden') || !this.activity?.id) return;
+        const currentTemplate = normalizeImageHotspotTemplate(
+            this.activity.activityData?.imageHotspotTemplate,
+            this.activity.activityData?.templateId || 'label-image-parts'
+        );
+        const labels = Array.from(root.querySelectorAll('[data-image-hotspot-label-id]')).map((labelEl, index) => ({
+            id: labelEl.dataset.imageHotspotLabelId || `label_${index + 1}`,
+            text: labelEl.querySelector('[data-image-hotspot-label-text]')?.value || `Label ${index + 1}`,
+            hint: labelEl.querySelector('[data-image-hotspot-label-hint]')?.value || '',
+            required: labelEl.querySelector('[data-image-hotspot-label-required]')?.checked === true,
+            color: labelEl.querySelector('[data-image-hotspot-label-color]')?.value || IMAGE_HOTSPOT_COLORS[index % IMAGE_HOTSPOT_COLORS.length]
+        }));
+        const reflectionPrompts = Array.from(root.querySelectorAll('[data-image-hotspot-prompt-id]')).map((promptEl, index) => ({
+            id: promptEl.dataset.imageHotspotPromptId || `prompt_${index + 1}`,
+            prompt: promptEl.querySelector('[data-image-hotspot-prompt-text]')?.value || `Reflection prompt ${index + 1}`,
+            required: promptEl.querySelector('[data-image-hotspot-prompt-required]')?.checked === true
+        }));
+
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            imageHotspotTemplate: normalizeImageHotspotTemplate({
+                version: 1,
+                templateId: this.activity.activityData?.templateId || 'label-image-parts',
+                image: {
+                    ...(currentTemplate.image || {}),
+                    altText: root.querySelector('[data-image-hotspot-field="altText"]')?.value || currentTemplate.image.altText
+                },
+                labels,
+                minPins: root.querySelector('[data-image-hotspot-field="minPins"]')?.value || currentTemplate.minPins,
+                maxPins: root.querySelector('[data-image-hotspot-field="maxPins"]')?.value || currentTemplate.maxPins,
+                allowExtraPins: root.querySelector('[data-image-hotspot-field="allowExtraPins"]')?.checked === true,
+                requireNotes: root.querySelector('[data-image-hotspot-field="requireNotes"]')?.checked === true,
+                reflectionPrompts
+            }, this.activity.activityData?.templateId || 'label-image-parts')
+        };
+    }
+
     configureExcalidrawAssets() {
         if (typeof window === 'undefined' || window.EXCALIDRAW_ASSET_PATH) return;
         const viteEnv = import.meta.env || {};
@@ -4861,12 +5341,30 @@ class TeacherManager {
             return;
         }
 
+        if (this.isCardSortActivity()) {
+            this.mountCardSortActivityEditor();
+            return;
+        }
+
+        if (this.isSpreadsheetActivity()) {
+            this.mountSpreadsheetActivityEditor();
+            return;
+        }
+
+        if (this.isImageHotspotActivity()) {
+            this.mountImageHotspotActivityEditor();
+            return;
+        }
+
         await this.mountMapActivityEditor();
     }
 
     async mountMapActivityEditor() {
         const root = $('#activity-excalidraw-root');
         const structuredRoot = $('#activity-structured-root');
+        const cardSortRoot = $('#activity-card-sort-root');
+        const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const imageHotspotRoot = $('#activity-image-hotspot-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -4879,6 +5377,12 @@ class TeacherManager {
         root.classList.remove('hidden');
         structuredRoot?.classList.add('hidden');
         if (structuredRoot) structuredRoot.innerHTML = '';
+        cardSortRoot?.classList.add('hidden');
+        if (cardSortRoot) cardSortRoot.innerHTML = '';
+        spreadsheetRoot?.classList.add('hidden');
+        if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        imageHotspotRoot?.classList.add('hidden');
+        if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Canvas');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Canvas');
         if (status) status.textContent = 'Loading editor...';
@@ -4924,6 +5428,9 @@ class TeacherManager {
     mountStructuredActivityEditor() {
         const root = $('#activity-structured-root');
         const canvasRoot = $('#activity-excalidraw-root');
+        const cardSortRoot = $('#activity-card-sort-root');
+        const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const imageHotspotRoot = $('#activity-image-hotspot-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -4934,6 +5441,12 @@ class TeacherManager {
         this.activityEditorAutosaveReadyTimeout = null;
         canvasRoot?.classList.add('hidden');
         if (canvasRoot) canvasRoot.innerHTML = '';
+        cardSortRoot?.classList.add('hidden');
+        if (cardSortRoot) cardSortRoot.innerHTML = '';
+        spreadsheetRoot?.classList.add('hidden');
+        if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        imageHotspotRoot?.classList.add('hidden');
+        if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
         root.classList.remove('hidden');
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Response Builder');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
@@ -4945,6 +5458,990 @@ class TeacherManager {
             responseTemplate: normalizeResponseTemplate(this.activity.activityData?.responseTemplate, templateId)
         };
         this.renderStructuredResponseBuilder(root);
+    }
+
+    mountCardSortActivityEditor() {
+        const root = $('#activity-card-sort-root');
+        const canvasRoot = $('#activity-excalidraw-root');
+        const structuredRoot = $('#activity-structured-root');
+        const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = true;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        canvasRoot?.classList.add('hidden');
+        if (canvasRoot) canvasRoot.innerHTML = '';
+        structuredRoot?.classList.add('hidden');
+        if (structuredRoot) structuredRoot.innerHTML = '';
+        spreadsheetRoot?.classList.add('hidden');
+        if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        imageHotspotRoot?.classList.add('hidden');
+        if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        root.classList.remove('hidden');
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Card Sort Builder');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
+        if (status) status.textContent = 'Builder ready.';
+
+        const templateId = this.activity?.activityData?.templateId || 'category-sort';
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            cardSortTemplate: normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, templateId)
+        };
+        this.renderCardSortBuilder(root);
+    }
+
+    mountSpreadsheetActivityEditor() {
+        const root = $('#activity-spreadsheet-root');
+        const canvasRoot = $('#activity-excalidraw-root');
+        const structuredRoot = $('#activity-structured-root');
+        const cardSortRoot = $('#activity-card-sort-root');
+        const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = true;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        canvasRoot?.classList.add('hidden');
+        if (canvasRoot) canvasRoot.innerHTML = '';
+        structuredRoot?.classList.add('hidden');
+        if (structuredRoot) structuredRoot.innerHTML = '';
+        cardSortRoot?.classList.add('hidden');
+        if (cardSortRoot) cardSortRoot.innerHTML = '';
+        imageHotspotRoot?.classList.add('hidden');
+        if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        root.classList.remove('hidden');
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Spreadsheet Builder');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
+        if (status) status.textContent = 'Builder ready.';
+
+        const templateId = this.activity?.activityData?.templateId || 'data-table';
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            spreadsheetTemplate: normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, templateId)
+        };
+        this.renderSpreadsheetBuilder(root);
+    }
+
+    mountImageHotspotActivityEditor() {
+        const root = $('#activity-image-hotspot-root');
+        const canvasRoot = $('#activity-excalidraw-root');
+        const structuredRoot = $('#activity-structured-root');
+        const cardSortRoot = $('#activity-card-sort-root');
+        const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = true;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        canvasRoot?.classList.add('hidden');
+        if (canvasRoot) canvasRoot.innerHTML = '';
+        structuredRoot?.classList.add('hidden');
+        if (structuredRoot) structuredRoot.innerHTML = '';
+        cardSortRoot?.classList.add('hidden');
+        if (cardSortRoot) cardSortRoot.innerHTML = '';
+        spreadsheetRoot?.classList.add('hidden');
+        if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        root.classList.remove('hidden');
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Image Hotspot Builder');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
+        if (status) status.textContent = 'Builder ready.';
+
+        const templateId = this.activity?.activityData?.templateId || 'label-image-parts';
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            imageHotspotTemplate: normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, templateId)
+        };
+        this.renderImageHotspotBuilder(root);
+    }
+
+    async resolveActivityImageUrl(path) {
+        if (!path) return '';
+        if (this.activityImageUrlCache.has(path)) {
+            return this.activityImageUrlCache.get(path);
+        }
+
+        const url = await supabaseService.getClassroomActivityImageUrl(path);
+        this.activityImageUrlCache.set(path, url);
+        return url;
+    }
+
+    hydrateImageHotspotImages(root, template = {}) {
+        const path = template.image?.storagePath || '';
+        if (!root || !path) return;
+
+        this.resolveActivityImageUrl(path)
+            .then(url => {
+                if (!url) return;
+                root.querySelectorAll(`[data-image-hotspot-src="${CSS.escape(path)}"]`).forEach(image => {
+                    image.src = url;
+                    image.classList.remove('hidden');
+                });
+                root.querySelectorAll(`[data-image-hotspot-placeholder="${CSS.escape(path)}"]`).forEach(placeholder => {
+                    placeholder.classList.add('hidden');
+                });
+            })
+            .catch(error => {
+                console.warn('Could not load classroom activity image preview:', error);
+            });
+    }
+
+    renderImageHotspotBuilder(root = $('#activity-image-hotspot-root')) {
+        if (!root || !this.activity?.id) return;
+        const template = normalizeImageHotspotTemplate(
+            this.activity.activityData?.imageHotspotTemplate,
+            this.activity.activityData?.templateId || 'label-image-parts'
+        );
+        this.activity.activityData.imageHotspotTemplate = template;
+        const labelCountText = template.labels.length === 1 ? '1 label' : `${template.labels.length} labels`;
+        const imageStatus = template.image.storagePath ? 'Image ready' : 'Upload image';
+
+        root.innerHTML = `
+            <div class="structured-builder-shell image-hotspot-builder-shell">
+                <div class="structured-mode-header image-hotspot-mode-header">
+                    <div>
+                        <h4>Build Image Hotspot</h4>
+                        <p>${escapeHtml(`${labelCountText} · ${template.minPins}-${template.maxPins} pins · ${imageStatus}`)}</p>
+                    </div>
+                </div>
+
+                <section class="image-hotspot-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Image</h4>
+                            <p>Background students will label with pins.</p>
+                        </div>
+                        <label class="btn secondary-btn image-hotspot-upload-btn">
+                            <i data-lucide="upload"></i>
+                            Upload Image
+                            <input type="file" accept="image/png,image/jpeg,image/webp" data-image-hotspot-upload>
+                        </label>
+                    </div>
+                    <div class="image-hotspot-builder-image-row">
+                        <div class="image-hotspot-image-frame is-preview">
+                            ${template.image.storagePath ? `
+                                <img class="hidden" data-image-hotspot-src="${escapeHtml(template.image.storagePath)}" alt="${escapeHtml(template.image.altText || 'Activity image')}">
+                                <div class="image-hotspot-image-placeholder" data-image-hotspot-placeholder="${escapeHtml(template.image.storagePath)}">Loading image...</div>
+                            ` : '<div class="image-hotspot-image-placeholder">No image uploaded yet.</div>'}
+                        </div>
+                        <label>
+                            <span>Alt Text</span>
+                            <textarea rows="3" data-image-hotspot-field="altText">${escapeHtml(template.image.altText)}</textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="image-hotspot-builder-section">
+                    <div class="card-sort-builder-grid image-hotspot-pin-settings">
+                        <label>
+                            <span>Required Pins</span>
+                            <input type="number" min="0" max="${IMAGE_HOTSPOT_MAX_PINS}" data-image-hotspot-field="minPins" value="${escapeHtml(template.minPins)}">
+                        </label>
+                        <label>
+                            <span>Maximum Pins</span>
+                            <input type="number" min="1" max="${IMAGE_HOTSPOT_MAX_PINS}" data-image-hotspot-field="maxPins" value="${escapeHtml(template.maxPins)}">
+                        </label>
+                        <label class="structured-required-toggle">
+                            <input type="checkbox" data-image-hotspot-field="allowExtraPins" ${template.allowExtraPins ? 'checked' : ''}>
+                            <span>Allow extra pins</span>
+                        </label>
+                        <label class="structured-required-toggle">
+                            <input type="checkbox" data-image-hotspot-field="requireNotes" ${template.requireNotes ? 'checked' : ''}>
+                            <span>Require pin notes</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="image-hotspot-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Labels</h4>
+                            <p>Students place these as pins on the image.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-image-hotspot-add-label ${template.labels.length >= IMAGE_HOTSPOT_MAX_LABELS ? 'disabled' : ''}>
+                            <i data-lucide="plus"></i>
+                            Add Label
+                        </button>
+                    </div>
+                    <div class="image-hotspot-builder-label-list">
+                        ${template.labels.map((label, index) => this.renderImageHotspotBuilderLabel(label, index, template.labels.length)).join('')}
+                    </div>
+                </section>
+
+                <section class="image-hotspot-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Reflection Prompts</h4>
+                            <p>Short student explanations after labeling.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-image-hotspot-add-prompt>
+                            <i data-lucide="plus"></i>
+                            Add Prompt
+                        </button>
+                    </div>
+                    <div class="image-hotspot-builder-prompt-list">
+                        ${template.reflectionPrompts.map((prompt, index) => this.renderImageHotspotBuilderPrompt(prompt, index, template.reflectionPrompts.length)).join('')}
+                    </div>
+                </section>
+            </div>
+        `;
+
+        root.onclick = event => this.handleImageHotspotBuilderClick(event);
+        root.oninput = event => this.handleImageHotspotBuilderInput(event);
+        root.onchange = event => {
+            if (event.target.matches('[data-image-hotspot-upload]')) {
+                this.handleImageHotspotImageUpload(event);
+                return;
+            }
+            this.handleImageHotspotBuilderInput(event);
+        };
+        this.hydrateImageHotspotImages(root, template);
+        this.refreshIcons();
+    }
+
+    renderImageHotspotBuilderLabel(label, index, total) {
+        return `
+            <article class="structured-builder-block image-hotspot-builder-label" data-image-hotspot-label-id="${escapeHtml(label.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(label.text || `Label ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-image-hotspot-delete-label ${total <= 1 ? 'disabled' : ''} aria-label="Delete label">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields image-hotspot-label-fields">
+                    <label>
+                        <span>Label</span>
+                        <input type="text" data-image-hotspot-label-text value="${escapeHtml(label.text)}">
+                    </label>
+                    <label>
+                        <span>Hint</span>
+                        <input type="text" data-image-hotspot-label-hint value="${escapeHtml(label.hint)}">
+                    </label>
+                    <label>
+                        <span>Color</span>
+                        <input type="color" data-image-hotspot-label-color value="${escapeHtml(label.color)}">
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-image-hotspot-label-required ${label.required ? 'checked' : ''}>
+                        <span>Required</span>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    renderImageHotspotBuilderPrompt(prompt, index, total) {
+        return `
+            <article class="structured-builder-block image-hotspot-builder-prompt" data-image-hotspot-prompt-id="${escapeHtml(prompt.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(`Prompt ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-image-hotspot-delete-prompt ${total <= 0 ? 'disabled' : ''} aria-label="Delete prompt">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields">
+                    <label>
+                        <span>Prompt</span>
+                        <textarea rows="2" data-image-hotspot-prompt-text>${escapeHtml(prompt.prompt)}</textarea>
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-image-hotspot-prompt-required ${prompt.required ? 'checked' : ''}>
+                        <span>Required on submit</span>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    async handleImageHotspotImageUpload(event) {
+        const input = event.target;
+        const file = input.files?.[0];
+        if (!file || !this.activity?.id) return;
+        if (!this.ensureAuthenticated(false)) {
+            notifications.warning('Sign in as a teacher before uploading images.');
+            input.value = '';
+            return;
+        }
+
+        try {
+            this.setActivitySaveStatus('Preparing image...', 'info');
+            this.syncImageHotspotTemplate();
+            const template = normalizeImageHotspotTemplate(
+                this.activity.activityData?.imageHotspotTemplate,
+                this.activity.activityData?.templateId || 'label-image-parts'
+            );
+            const previousPath = template.image.storagePath;
+            const imageData = await compressImageToWebp(file, {
+                maxWidth: 1600,
+                maxHeight: 1200,
+                initialQuality: 0.78,
+                targetBytes: 700 * 1024,
+                maxBytes: 950 * 1024
+            });
+            const path = supabaseService.buildClassroomActivityImagePath({
+                teacherId: this.currentUser?.uid,
+                activityId: this.activity.id,
+                fileName: file.name
+            });
+            const metadata = await supabaseService.uploadClassroomActivityImage({ path, blob: imageData.blob });
+            template.image = {
+                storagePath: metadata.path,
+                width: imageData.width,
+                height: imageData.height,
+                altText: template.image.altText || this.activity.title || 'Activity image',
+                sizeBytes: metadata.sizeBytes,
+                uploadedAt: metadata.updatedAt
+            };
+            this.activity.activityData.imageHotspotTemplate = normalizeImageHotspotTemplate(template, template.templateId);
+            this.activityImageUrlCache.delete(previousPath);
+            this.activityImageUrlCache.delete(metadata.path);
+            this.renderImageHotspotBuilder();
+            this.triggerActivityAutoSave({ readForm: false });
+            this.setActivitySaveStatus('Image uploaded.', 'success');
+
+            if (previousPath && previousPath !== metadata.path) {
+                supabaseService.deleteClassroomActivityImage(previousPath).catch(error => {
+                    console.warn('Could not delete previous classroom activity image:', error);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to upload classroom activity image:', error);
+            notifications.error('Could not upload image.');
+            this.setActivitySaveStatus('Image upload failed.', 'error');
+        } finally {
+            input.value = '';
+        }
+    }
+
+    handleImageHotspotBuilderInput(event) {
+        if (!event.target.closest('.image-hotspot-builder-shell')) return;
+        this.syncImageHotspotTemplate();
+        if (this.activityEditorTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    handleImageHotspotBuilderClick(event) {
+        const root = $('#activity-image-hotspot-root');
+        if (!root) return;
+
+        if (event.target.closest('[data-image-hotspot-add-label]')) {
+            this.syncImageHotspotTemplate();
+            const template = normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, this.activity.activityData?.templateId || 'label-image-parts');
+            if (template.labels.length >= IMAGE_HOTSPOT_MAX_LABELS) {
+                notifications.warning(`Image hotspot activities can have up to ${IMAGE_HOTSPOT_MAX_LABELS} labels.`);
+                return;
+            }
+            template.labels.push(createImageHotspotLabel({
+                text: `Label ${template.labels.length + 1}`,
+                required: true
+            }, template.labels.length));
+            this.activity.activityData.imageHotspotTemplate = normalizeImageHotspotTemplate(template, template.templateId);
+            this.renderImageHotspotBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const labelEl = event.target.closest('[data-image-hotspot-label-id]');
+        if (labelEl && event.target.closest('[data-image-hotspot-delete-label]')) {
+            this.syncImageHotspotTemplate();
+            const template = normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, this.activity.activityData?.templateId || 'label-image-parts');
+            if (template.labels.length <= 1) {
+                notifications.warning('Keep at least one label.');
+                return;
+            }
+            template.labels = template.labels.filter(label => label.id !== labelEl.dataset.imageHotspotLabelId);
+            this.activity.activityData.imageHotspotTemplate = normalizeImageHotspotTemplate(template, template.templateId);
+            this.renderImageHotspotBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-image-hotspot-add-prompt]')) {
+            this.syncImageHotspotTemplate();
+            const template = normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, this.activity.activityData?.templateId || 'label-image-parts');
+            template.reflectionPrompts.push(createImageHotspotPrompt({
+                prompt: `Reflection prompt ${template.reflectionPrompts.length + 1}`
+            }, template.reflectionPrompts.length));
+            this.activity.activityData.imageHotspotTemplate = normalizeImageHotspotTemplate(template, template.templateId);
+            this.renderImageHotspotBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const promptEl = event.target.closest('[data-image-hotspot-prompt-id]');
+        if (promptEl && event.target.closest('[data-image-hotspot-delete-prompt]')) {
+            this.syncImageHotspotTemplate();
+            const template = normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, this.activity.activityData?.templateId || 'label-image-parts');
+            template.reflectionPrompts = template.reflectionPrompts.filter(prompt => prompt.id !== promptEl.dataset.imageHotspotPromptId);
+            this.activity.activityData.imageHotspotTemplate = normalizeImageHotspotTemplate(template, template.templateId);
+            this.renderImageHotspotBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+        }
+    }
+
+    renderSpreadsheetBuilder(root = $('#activity-spreadsheet-root')) {
+        if (!root || !this.activity?.id) return;
+        const template = normalizeSpreadsheetTemplate(
+            this.activity.activityData?.spreadsheetTemplate,
+            this.activity.activityData?.templateId || 'data-table'
+        );
+        this.activity.activityData.spreadsheetTemplate = template;
+        const columnOptions = template.columns.map(column => `
+            <option value="${escapeHtml(column.id)}">${escapeHtml(column.title)}</option>
+        `).join('');
+        const chartTypeOptions = SPREADSHEET_CHART_TYPES.map(type => `
+            <option value="${escapeHtml(type)}" ${template.chart.type === type ? 'selected' : ''}>${escapeHtml(type.replace(/\b\w/g, letter => letter.toUpperCase()))}</option>
+        `).join('');
+
+        root.innerHTML = `
+            <div class="structured-builder-shell spreadsheet-builder-shell">
+                <div class="structured-mode-header">
+                    <div>
+                        <h4>Build Spreadsheet</h4>
+                        <p>${escapeHtml(`${template.columns.length} columns · ${template.minRows}-${template.maxRows} rows`)}</p>
+                    </div>
+                </div>
+
+                <section class="spreadsheet-builder-section">
+                    <div class="card-sort-builder-grid spreadsheet-row-settings">
+                        <label>
+                            <span>Required Rows</span>
+                            <input type="number" min="1" max="${SPREADSHEET_MAX_ROWS}" data-spreadsheet-field="minRows" value="${escapeHtml(template.minRows)}">
+                        </label>
+                        <label>
+                            <span>Maximum Rows</span>
+                            <input type="number" min="1" max="${SPREADSHEET_MAX_ROWS}" data-spreadsheet-field="maxRows" value="${escapeHtml(template.maxRows)}">
+                        </label>
+                        <label class="structured-required-toggle">
+                            <input type="checkbox" data-spreadsheet-field="allowAddRows" ${template.allowAddRows ? 'checked' : ''}>
+                            <span>Students can add rows</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="spreadsheet-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Columns</h4>
+                            <p>Fixed table structure for students.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-spreadsheet-add-column ${template.columns.length >= SPREADSHEET_MAX_COLUMNS ? 'disabled' : ''}>
+                            <i data-lucide="plus"></i>
+                            Add Column
+                        </button>
+                    </div>
+                    <div class="spreadsheet-builder-column-list">
+                        ${template.columns.map((column, index) => this.renderSpreadsheetBuilderColumn(column, index, template.columns.length)).join('')}
+                    </div>
+                </section>
+
+                <section class="spreadsheet-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Starter Rows</h4>
+                            <p>Initial rows students receive.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-spreadsheet-add-seed-row ${template.seedData.length >= template.maxRows ? 'disabled' : ''}>
+                            <i data-lucide="plus"></i>
+                            Add Row
+                        </button>
+                    </div>
+                    <div class="spreadsheet-builder-table-wrap">
+                        <table class="structured-response-table spreadsheet-builder-table">
+                            <thead>
+                                <tr>
+                                    ${template.columns.map(column => `<th scope="col">${escapeHtml(column.title)}</th>`).join('')}
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${template.seedData.map((row, rowIndex) => `
+                                    <tr data-spreadsheet-seed-row="${escapeHtml(rowIndex)}">
+                                        ${template.columns.map((_column, columnIndex) => `
+                                            <td>
+                                                <input type="text" data-spreadsheet-seed-cell="${escapeHtml(columnIndex)}" value="${escapeHtml(row[columnIndex] || '')}">
+                                            </td>
+                                        `).join('')}
+                                        <td>
+                                            <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-spreadsheet-delete-seed-row ${template.seedData.length <= 1 ? 'disabled' : ''} aria-label="Delete starter row">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="spreadsheet-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Chart</h4>
+                            <p>Optional Chart.js chart generated from two columns.</p>
+                        </div>
+                    </div>
+                    <div class="card-sort-builder-grid spreadsheet-chart-settings">
+                        <label class="structured-required-toggle">
+                            <input type="checkbox" data-spreadsheet-chart-enabled ${template.chart.enabled ? 'checked' : ''}>
+                            <span>Enable chart</span>
+                        </label>
+                        <label>
+                            <span>Chart Type</span>
+                            <select data-spreadsheet-chart-type>${chartTypeOptions}</select>
+                        </label>
+                        <label>
+                            <span>Label Column</span>
+                            <select data-spreadsheet-chart-label-column>
+                                ${columnOptions.replace(`value="${escapeHtml(template.chart.labelColumnId)}"`, `value="${escapeHtml(template.chart.labelColumnId)}" selected`)}
+                            </select>
+                        </label>
+                        <label>
+                            <span>Value Column</span>
+                            <select data-spreadsheet-chart-value-column>
+                                ${columnOptions.replace(`value="${escapeHtml(template.chart.valueColumnId)}"`, `value="${escapeHtml(template.chart.valueColumnId)}" selected`)}
+                            </select>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="spreadsheet-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Reflection Prompts</h4>
+                            <p>Short student explanations after table work.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-spreadsheet-add-prompt>
+                            <i data-lucide="plus"></i>
+                            Add Prompt
+                        </button>
+                    </div>
+                    <div class="spreadsheet-builder-prompt-list">
+                        ${template.reflectionPrompts.map((prompt, index) => this.renderSpreadsheetBuilderPrompt(prompt, index, template.reflectionPrompts.length)).join('')}
+                    </div>
+                </section>
+            </div>
+        `;
+
+        root.onclick = event => this.handleSpreadsheetBuilderClick(event);
+        root.oninput = event => this.handleSpreadsheetBuilderInput(event);
+        root.onchange = event => this.handleSpreadsheetBuilderInput(event);
+        this.refreshIcons();
+    }
+
+    renderSpreadsheetBuilderColumn(column, index, total) {
+        const typeOptions = SPREADSHEET_COLUMN_TYPES.map(type => `
+            <option value="${escapeHtml(type)}" ${column.type === type ? 'selected' : ''}>${escapeHtml(type.replace(/\b\w/g, letter => letter.toUpperCase()))}</option>
+        `).join('');
+        return `
+            <article class="structured-builder-block spreadsheet-builder-column" data-spreadsheet-column-id="${escapeHtml(column.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(column.title || `Column ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-spreadsheet-delete-column ${total <= 1 ? 'disabled' : ''} aria-label="Delete column">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields spreadsheet-column-fields">
+                    <label>
+                        <span>Title</span>
+                        <input type="text" data-spreadsheet-column-title value="${escapeHtml(column.title)}">
+                    </label>
+                    <label>
+                        <span>Type</span>
+                        <select data-spreadsheet-column-type>${typeOptions}</select>
+                    </label>
+                    <label>
+                        <span>Width</span>
+                        <input type="number" min="80" max="320" step="10" data-spreadsheet-column-width value="${escapeHtml(column.width || 140)}">
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    renderSpreadsheetBuilderPrompt(prompt, index, total) {
+        return `
+            <article class="structured-builder-block spreadsheet-builder-prompt" data-spreadsheet-prompt-id="${escapeHtml(prompt.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(`Prompt ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-spreadsheet-delete-prompt ${total <= 0 ? 'disabled' : ''} aria-label="Delete prompt">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields">
+                    <label>
+                        <span>Prompt</span>
+                        <textarea rows="2" data-spreadsheet-prompt-text>${escapeHtml(prompt.prompt)}</textarea>
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-spreadsheet-prompt-required ${prompt.required ? 'checked' : ''}>
+                        <span>Required on submit</span>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    handleSpreadsheetBuilderInput(event) {
+        if (!event.target.closest('.spreadsheet-builder-shell')) return;
+        this.syncSpreadsheetTemplate();
+        if (this.activityEditorTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    handleSpreadsheetBuilderClick(event) {
+        const root = $('#activity-spreadsheet-root');
+        if (!root) return;
+
+        if (event.target.closest('[data-spreadsheet-add-column]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            if (template.columns.length >= SPREADSHEET_MAX_COLUMNS) {
+                notifications.warning(`Spreadsheet activities can have up to ${SPREADSHEET_MAX_COLUMNS} columns.`);
+                return;
+            }
+            template.columns.push(createSpreadsheetColumn({ title: `Column ${template.columns.length + 1}` }, template.columns.length));
+            template.seedData = template.seedData.map(row => [...row, '']);
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const columnEl = event.target.closest('[data-spreadsheet-column-id]');
+        if (columnEl && event.target.closest('[data-spreadsheet-delete-column]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            if (template.columns.length <= 1) {
+                notifications.warning('Keep at least one column.');
+                return;
+            }
+            const columnIndex = template.columns.findIndex(column => column.id === columnEl.dataset.spreadsheetColumnId);
+            if (columnIndex < 0) return;
+            template.columns.splice(columnIndex, 1);
+            template.seedData = template.seedData.map(row => row.filter((_cell, index) => index !== columnIndex));
+            if (!template.columns.some(column => column.id === template.chart.labelColumnId)) {
+                template.chart.labelColumnId = template.columns[0]?.id || '';
+            }
+            if (!template.columns.some(column => column.id === template.chart.valueColumnId)) {
+                template.chart.valueColumnId = template.columns[1]?.id || template.columns[0]?.id || '';
+            }
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-spreadsheet-add-seed-row]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            if (template.seedData.length >= template.maxRows) {
+                notifications.warning(`Starter rows cannot exceed the maximum row setting.`);
+                return;
+            }
+            template.seedData.push(template.columns.map(() => ''));
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const seedRow = event.target.closest('[data-spreadsheet-seed-row]');
+        if (seedRow && event.target.closest('[data-spreadsheet-delete-seed-row]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            if (template.seedData.length <= 1) {
+                notifications.warning('Keep at least one starter row.');
+                return;
+            }
+            const rowIndex = Number.parseInt(seedRow.dataset.spreadsheetSeedRow, 10);
+            template.seedData = template.seedData.filter((_row, index) => index !== rowIndex);
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-spreadsheet-add-prompt]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            template.reflectionPrompts.push(createSpreadsheetPrompt({
+                prompt: `Reflection prompt ${template.reflectionPrompts.length + 1}`
+            }, template.reflectionPrompts.length));
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const promptEl = event.target.closest('[data-spreadsheet-prompt-id]');
+        if (promptEl && event.target.closest('[data-spreadsheet-delete-prompt]')) {
+            this.syncSpreadsheetTemplate();
+            const template = normalizeSpreadsheetTemplate(this.activity.activityData?.spreadsheetTemplate, this.activity.activityData?.templateId || 'data-table');
+            template.reflectionPrompts = template.reflectionPrompts.filter(prompt => prompt.id !== promptEl.dataset.spreadsheetPromptId);
+            this.activity.activityData.spreadsheetTemplate = normalizeSpreadsheetTemplate(template, template.templateId);
+            this.renderSpreadsheetBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+        }
+    }
+
+    renderCardSortBuilder(root = $('#activity-card-sort-root')) {
+        if (!root || !this.activity?.id) return;
+        const template = normalizeCardSortTemplate(
+            this.activity.activityData?.cardSortTemplate,
+            this.activity.activityData?.templateId || 'category-sort'
+        );
+        this.activity.activityData.cardSortTemplate = template;
+        const orderModeOptions = CARD_SORT_ORDER_MODES.map(mode => {
+            const label = mode === 'within-categories' ? 'Allow order inside categories' : 'Category only';
+            return `<option value="${escapeHtml(mode)}" ${template.orderMode === mode ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+        }).join('');
+
+        root.innerHTML = `
+            <div class="structured-builder-shell card-sort-builder-shell">
+                <div class="structured-mode-header">
+                    <div>
+                        <h4>Build Card Sort</h4>
+                        <p>${escapeHtml(`${template.categories.length} categories · ${template.cards.length} cards`)}</p>
+                    </div>
+                </div>
+
+                <section class="card-sort-builder-section">
+                    <div class="card-sort-builder-grid">
+                        <label>
+                            <span>Student Prompt</span>
+                            <textarea rows="2" data-card-sort-field="prompt">${escapeHtml(template.prompt)}</textarea>
+                        </label>
+                        <label>
+                            <span>Helper Text</span>
+                            <textarea rows="2" data-card-sort-field="helperText">${escapeHtml(template.helperText)}</textarea>
+                        </label>
+                    </div>
+                    <div class="card-sort-builder-grid card-sort-builder-options">
+                        <label class="structured-required-toggle">
+                            <input type="checkbox" data-card-sort-field="requireAllCards" ${template.requireAllCards ? 'checked' : ''}>
+                            <span>Require all cards before submit</span>
+                        </label>
+                        <label>
+                            <span>Ordering</span>
+                            <select data-card-sort-field="orderMode">${orderModeOptions}</select>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="card-sort-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Categories</h4>
+                            <p>Students sort cards into these lanes.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-card-sort-add-category>
+                            <i data-lucide="plus"></i>
+                            Add Category
+                        </button>
+                    </div>
+                    <div class="card-sort-builder-list">
+                        ${template.categories.map((category, index) => this.renderCardSortBuilderCategory(category, index, template.categories.length)).join('')}
+                    </div>
+                </section>
+
+                <section class="card-sort-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Cards</h4>
+                            <p>Set the expected category and optional order for review.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-card-sort-add-card>
+                            <i data-lucide="plus"></i>
+                            Add Card
+                        </button>
+                    </div>
+                    <div class="card-sort-builder-list">
+                        ${template.cards.map((card, index) => this.renderCardSortBuilderCard(card, index, template)).join('')}
+                    </div>
+                </section>
+            </div>
+        `;
+
+        root.onclick = event => this.handleCardSortBuilderClick(event);
+        root.oninput = event => this.handleCardSortBuilderInput(event);
+        root.onchange = event => this.handleCardSortBuilderInput(event);
+        this.refreshIcons();
+    }
+
+    renderCardSortBuilderCategory(category, index, total) {
+        return `
+            <article class="structured-builder-block card-sort-builder-category" data-card-sort-category-id="${escapeHtml(category.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(category.title || `Category ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-card-sort-delete-category ${total <= 1 ? 'disabled' : ''} aria-label="Delete category">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields">
+                    <label>
+                        <span>Category Name</span>
+                        <input type="text" data-card-sort-category-title value="${escapeHtml(category.title)}">
+                    </label>
+                    <label>
+                        <span>Helper Text</span>
+                        <textarea rows="2" data-card-sort-category-helper>${escapeHtml(category.helperText)}</textarea>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    renderCardSortBuilderCard(card, index, template) {
+        const categoryOptions = template.categories.map(category => `
+            <option value="${escapeHtml(category.id)}" ${card.expectedCategoryId === category.id ? 'selected' : ''}>${escapeHtml(category.title)}</option>
+        `).join('');
+        return `
+            <article class="structured-builder-block card-sort-builder-card" data-card-sort-card-id="${escapeHtml(card.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(card.text || `Card ${index + 1}`)}</strong>
+                    <div class="structured-builder-actions">
+                        <button type="button" class="btn text-btn icon-btn" data-card-sort-duplicate-card aria-label="Duplicate card">
+                            <i data-lucide="copy"></i>
+                        </button>
+                        <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-card-sort-delete-card aria-label="Delete card">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="structured-builder-fields card-sort-card-fields">
+                    <label>
+                        <span>Card Text</span>
+                        <input type="text" data-card-sort-card-text value="${escapeHtml(card.text)}">
+                    </label>
+                    <label>
+                        <span>Helper Text</span>
+                        <textarea rows="2" data-card-sort-card-helper>${escapeHtml(card.helperText)}</textarea>
+                    </label>
+                    <label>
+                        <span>Expected Category</span>
+                        <select data-card-sort-card-category>${categoryOptions}</select>
+                    </label>
+                    <label>
+                        <span>Expected Order</span>
+                        <input type="number" min="1" step="1" data-card-sort-card-order value="${escapeHtml(card.expectedOrder || index + 1)}">
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    handleCardSortBuilderInput(event) {
+        if (!event.target.closest('.card-sort-builder-shell')) return;
+        this.syncCardSortTemplate();
+        if (this.activityEditorTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    handleCardSortBuilderClick(event) {
+        const root = $('#activity-card-sort-root');
+        if (!root) return;
+        if (event.target.closest('[data-card-sort-add-category]')) {
+            this.syncCardSortTemplate();
+            const template = normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, this.activity.activityData?.templateId || 'category-sort');
+            template.categories.push(createCardSortCategory({
+                title: `Category ${template.categories.length + 1}`
+            }));
+            template.cards = template.cards.map(card => ({
+                ...card,
+                expectedCategoryId: template.categories.some(category => category.id === card.expectedCategoryId)
+                    ? card.expectedCategoryId
+                    : template.categories[0]?.id || ''
+            }));
+            this.activity.activityData.cardSortTemplate = normalizeCardSortTemplate(template, template.templateId);
+            this.renderCardSortBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-card-sort-add-card]')) {
+            this.syncCardSortTemplate();
+            const template = normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, this.activity.activityData?.templateId || 'category-sort');
+            template.cards.push(createCardSortCard({
+                text: `Card ${template.cards.length + 1}`,
+                expectedOrder: template.cards.length + 1
+            }, template.categories));
+            this.activity.activityData.cardSortTemplate = normalizeCardSortTemplate(template, template.templateId);
+            this.renderCardSortBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const categoryEl = event.target.closest('[data-card-sort-category-id]');
+        if (categoryEl && event.target.closest('[data-card-sort-delete-category]')) {
+            this.syncCardSortTemplate();
+            const template = normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, this.activity.activityData?.templateId || 'category-sort');
+            if (template.categories.length <= 1) {
+                notifications.warning('Keep at least one category.');
+                return;
+            }
+            const deletedId = categoryEl.dataset.cardSortCategoryId;
+            template.categories = template.categories.filter(category => category.id !== deletedId);
+            const fallbackCategoryId = template.categories[0]?.id || '';
+            template.cards = template.cards.map(card => ({
+                ...card,
+                expectedCategoryId: card.expectedCategoryId === deletedId ? fallbackCategoryId : card.expectedCategoryId
+            }));
+            this.activity.activityData.cardSortTemplate = normalizeCardSortTemplate(template, template.templateId);
+            this.renderCardSortBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const cardEl = event.target.closest('[data-card-sort-card-id]');
+        if (!cardEl) return;
+
+        if (event.target.closest('[data-card-sort-duplicate-card]')) {
+            this.syncCardSortTemplate();
+            const template = normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, this.activity.activityData?.templateId || 'category-sort');
+            const cardIndex = template.cards.findIndex(card => card.id === cardEl.dataset.cardSortCardId);
+            if (cardIndex < 0) return;
+            const clone = {
+                ...JSON.parse(JSON.stringify(template.cards[cardIndex])),
+                id: undefined,
+                text: `${template.cards[cardIndex].text} Copy`,
+                expectedOrder: template.cards.length + 1
+            };
+            template.cards.splice(cardIndex + 1, 0, createCardSortCard(clone, template.categories));
+            this.activity.activityData.cardSortTemplate = normalizeCardSortTemplate(template, template.templateId);
+            this.renderCardSortBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-card-sort-delete-card]')) {
+            this.syncCardSortTemplate();
+            const template = normalizeCardSortTemplate(this.activity.activityData?.cardSortTemplate, this.activity.activityData?.templateId || 'category-sort');
+            if (template.cards.length <= 1) {
+                notifications.warning('Keep at least one card.');
+                return;
+            }
+            template.cards = template.cards.filter(card => card.id !== cardEl.dataset.cardSortCardId);
+            this.activity.activityData.cardSortTemplate = normalizeCardSortTemplate(template, template.templateId);
+            this.renderCardSortBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+        }
     }
 
     renderStructuredResponseBuilder(root = $('#activity-structured-root')) {
@@ -5334,6 +6831,129 @@ class TeacherManager {
         }).join('');
     }
 
+    renderCardSortPreview(template) {
+        const normalized = normalizeCardSortTemplate(template);
+        return `
+            <div class="card-sort-board is-preview">
+                <section class="card-sort-lane card-sort-tray" aria-label="Unsorted cards">
+                    <div class="card-sort-lane-header">
+                        <h4>Unsorted Cards</h4>
+                        <span>${escapeHtml(String(normalized.cards.length))}</span>
+                    </div>
+                    <div class="card-sort-card-list">
+                        ${normalized.cards.map(card => `
+                            <article class="card-sort-card">
+                                <strong>${escapeHtml(card.text)}</strong>
+                                ${card.helperText ? `<p>${escapeHtml(card.helperText)}</p>` : ''}
+                            </article>
+                        `).join('')}
+                    </div>
+                </section>
+                <div class="card-sort-category-grid">
+                    ${normalized.categories.map(category => `
+                        <section class="card-sort-lane">
+                            <div class="card-sort-lane-header">
+                                <h4>${escapeHtml(category.title)}</h4>
+                                <span>0</span>
+                            </div>
+                            ${category.helperText ? `<p>${escapeHtml(category.helperText)}</p>` : ''}
+                            <div class="card-sort-card-list is-empty">Cards students place here</div>
+                        </section>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    renderSpreadsheetPreview(template) {
+        const normalized = normalizeSpreadsheetTemplate(template);
+        const summary = getSpreadsheetCompletionSummary(normalized, { data: normalized.seedData });
+        return `
+            <div class="spreadsheet-preview">
+                <div class="spreadsheet-review-summary">
+                    <div><span>Rows</span><strong>${escapeHtml(summary.requiredRows)} required · ${escapeHtml(summary.maxRows)} max</strong></div>
+                    <div><span>Columns</span><strong>${escapeHtml(summary.columns)}</strong></div>
+                    <div><span>Chart</span><strong>${normalized.chart.enabled ? escapeHtml(normalized.chart.type) : 'Off'}</strong></div>
+                </div>
+                <div class="structured-response-table-wrapper">
+                    <table class="structured-response-table spreadsheet-review-table">
+                        <thead>
+                            <tr>
+                                ${normalized.columns.map(column => `<th scope="col">${escapeHtml(column.title)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${normalized.seedData.slice(0, Math.max(normalized.minRows, 1)).map(row => `
+                                <tr>
+                                    ${normalized.columns.map((_column, columnIndex) => `<td>${escapeHtml(row[columnIndex] || '')}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${normalized.reflectionPrompts.length ? `
+                    <div class="spreadsheet-reflection-review">
+                        ${normalized.reflectionPrompts.map(prompt => `
+                            <article>
+                                <strong>${escapeHtml(prompt.prompt)}${prompt.required ? ' *' : ''}</strong>
+                                <p>Student response</p>
+                            </article>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    renderImageHotspotPreview(template) {
+        const normalized = normalizeImageHotspotTemplate(template);
+        const summary = getImageHotspotCompletionSummary(normalized, { pins: [] });
+        const samplePins = normalized.labels.slice(0, Math.max(1, Math.min(normalized.labels.length, normalized.minPins || 3))).map((label, index, labels) => ({
+            id: `sample_${label.id}`,
+            labelId: label.id,
+            labelText: label.text,
+            xPercent: 22 + ((index % 3) * 25),
+            yPercent: 28 + (Math.floor(index / 3) * 24),
+            note: '',
+            color: label.color,
+            number: index + 1,
+            total: labels.length
+        }));
+        const imagePath = normalized.image.storagePath;
+        return `
+            <div class="image-hotspot-preview" data-image-hotspot-preview>
+                <div class="spreadsheet-review-summary">
+                    <div><span>Labels</span><strong>${escapeHtml(normalized.labels.length)}</strong></div>
+                    <div><span>Pins</span><strong>${escapeHtml(summary.minPins)} required · ${escapeHtml(summary.maxPins)} max</strong></div>
+                    <div><span>Notes</span><strong>${normalized.requireNotes ? 'Required' : 'Optional'}</strong></div>
+                    <div><span>Image</span><strong>${imagePath ? 'Ready' : 'Needed'}</strong></div>
+                </div>
+                <div class="image-hotspot-image-frame is-preview">
+                    ${imagePath ? `
+                        <img class="hidden" data-image-hotspot-src="${escapeHtml(imagePath)}" alt="${escapeHtml(normalized.image.altText || 'Activity image')}">
+                        <div class="image-hotspot-image-placeholder" data-image-hotspot-placeholder="${escapeHtml(imagePath)}">Loading image...</div>
+                    ` : '<div class="image-hotspot-image-placeholder">No image uploaded yet.</div>'}
+                    <div class="image-hotspot-pin-layer">
+                        ${imagePath ? samplePins.map(pin => `
+                            <span class="image-hotspot-pin is-static" style="--pin-x:${pin.xPercent}%; --pin-y:${pin.yPercent}%; --pin-color:${escapeHtml(pin.color)};">
+                                <span>${escapeHtml(pin.number)}</span>
+                            </span>
+                        `).join('') : ''}
+                    </div>
+                </div>
+                <div class="image-hotspot-review-label-list">
+                    ${normalized.labels.map((label, index) => `
+                        <div>
+                            <span class="image-hotspot-label-dot" style="--label-color:${escapeHtml(label.color)};"></span>
+                            <strong>${escapeHtml(index + 1)}. ${escapeHtml(label.text)}${label.required ? ' *' : ''}</strong>
+                            ${label.hint ? `<p>${escapeHtml(label.hint)}</p>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     renderActivityPreviewPanel() {
         const root = $('#activity-preview-root');
         if (!root) return;
@@ -5367,21 +6987,45 @@ class TeacherManager {
             </div>
         `).join('');
 
-        const responsePreview = this.isStructuredActivity(activity)
-            ? `
+        let responsePreview = '';
+        if (this.isStructuredActivity(activity)) {
+            responsePreview = `
                 <section class="activity-preview-section">
                     <h4>Student Response</h4>
                     <div class="structured-preview activity-preview-structured">
                         ${this.renderStructuredResponsePreview(activity.activityData?.responseTemplate)}
                     </div>
                 </section>
-            `
-            : `
+            `;
+        } else if (this.isCardSortActivity(activity)) {
+            responsePreview = `
+                <section class="activity-preview-section">
+                    <h4>Student Card Sort</h4>
+                    ${this.renderCardSortPreview(activity.activityData?.cardSortTemplate)}
+                </section>
+            `;
+        } else if (this.isSpreadsheetActivity(activity)) {
+            responsePreview = `
+                <section class="activity-preview-section">
+                    <h4>Student Spreadsheet</h4>
+                    ${this.renderSpreadsheetPreview(activity.activityData?.spreadsheetTemplate)}
+                </section>
+            `;
+        } else if (this.isImageHotspotActivity(activity)) {
+            responsePreview = `
+                <section class="activity-preview-section">
+                    <h4>Student Image Hotspot</h4>
+                    ${this.renderImageHotspotPreview(activity.activityData?.imageHotspotTemplate)}
+                </section>
+            `;
+        } else {
+            responsePreview = `
                 <section class="activity-preview-section activity-preview-map-note">
                     <h4>Canvas</h4>
                     <p>Students will receive their own editable copy of the map or diagram canvas. Use the Build tab to inspect and edit the template.</p>
                 </section>
             `;
+        }
 
         root.innerHTML = `
             <div class="activity-preview-shell">
@@ -5415,6 +7059,9 @@ class TeacherManager {
                 ${responsePreview}
             </div>
         `;
+        if (this.isImageHotspotActivity(activity)) {
+            this.hydrateImageHotspotImages(root, normalizeImageHotspotTemplate(activity.activityData?.imageHotspotTemplate, activity.activityData?.templateId || 'label-image-parts'));
+        }
         this.refreshIcons();
     }
 
@@ -5701,7 +7348,28 @@ class TeacherManager {
                 templateId: 'worksheet',
                 responseTemplate: createDefaultResponseTemplate('worksheet')
             };
-        } else if (selectedType === DEFAULT_ACTIVITY_TYPE && currentTemplate.type === STRUCTURED_RESPONSE_TYPE) {
+        } else if (selectedType === CARD_SORT_TYPE && currentTemplate.type !== CARD_SORT_TYPE) {
+            this.activity.activityType = CARD_SORT_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: 'category-sort',
+                cardSortTemplate: createDefaultCardSortTemplate('category-sort')
+            };
+        } else if (selectedType === SPREADSHEET_TABLE_TYPE && currentTemplate.type !== SPREADSHEET_TABLE_TYPE) {
+            this.activity.activityType = SPREADSHEET_TABLE_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: 'data-table',
+                spreadsheetTemplate: createDefaultSpreadsheetTemplate('data-table')
+            };
+        } else if (selectedType === IMAGE_HOTSPOT_TYPE && currentTemplate.type !== IMAGE_HOTSPOT_TYPE) {
+            this.activity.activityType = IMAGE_HOTSPOT_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: 'label-image-parts',
+                imageHotspotTemplate: createDefaultImageHotspotTemplate('label-image-parts')
+            };
+        } else if (selectedType === DEFAULT_ACTIVITY_TYPE && currentTemplate.type !== DEFAULT_ACTIVITY_TYPE) {
             this.activity.activityType = DEFAULT_ACTIVITY_TYPE;
             this.activity.activityData = {
                 ...(this.activity.activityData || {}),
@@ -6375,6 +8043,10 @@ class TeacherManager {
         $('#refresh-activity-assignment-review-btn')?.addEventListener('click', () => {
             if (!this.activeActivityAssignment?.id) return;
             this.showActivityAssignmentReview(this.activeActivityAssignment.id, { forceRefresh: true });
+        });
+
+        $('#update-published-activity-assignment-btn')?.addEventListener('click', () => {
+            this.updatePublishedActivityAssignmentFromSource();
         });
 
         $('#activity-review-prev-student-btn')?.addEventListener('click', () => {

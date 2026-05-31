@@ -6,15 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-            }
-        }
-    </script>
 </head>
 
 <body>
@@ -336,6 +327,10 @@
                                 <i data-lucide="cloud-upload"></i>
                                 Save Draft
                             </button>
+                            <button id="student-export-classroom-activity-pdf-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="download"></i>
+                                Export PDF
+                            </button>
                             <button id="student-submit-classroom-activity-btn" class="btn primary-btn" type="button">
                                 <i data-lucide="send"></i>
                                 Submit
@@ -509,6 +504,7 @@
         </div>
     </div>
 
+    <script src="js/icons.js" type="module"></script>
     <script src="js/desktop.js" type="module"></script>
     <script src="js/student.js" type="module"></script>
 </body>

@@ -128,6 +128,8 @@ const DEFAULT_COIN_DATA = {
 export const WORD_HUNT_IMAGE_BUCKET = 'word-hunt-images';
 export const CLASSROOM_SCENE_BUCKET = 'classroom-activity-scenes';
 export const CLASSROOM_SCENE_MAX_BYTES = 1024 * 1024;
+export const CLASSROOM_ACTIVITY_IMAGE_BUCKET = 'classroom-activity-images';
+export const CLASSROOM_ACTIVITY_IMAGE_MAX_BYTES = 1024 * 1024;
 
 const resolveTable = (collectionName) => TABLE_ALIASES[collectionName] || collectionName;
 
@@ -971,6 +973,27 @@ export const supabaseService = {
         ].join('/');
     },
 
+    buildClassroomActivityImagePath({
+        teacherId = this.currentUser?.uid,
+        activityId = 'activity',
+        fileName = 'image'
+    } = {}) {
+        if (!teacherId) {
+            throw new Error('A signed-in teacher is required to save classroom activity images.');
+        }
+
+        const baseName = String(fileName || 'image')
+            .replace(/\.[^.]+$/, '')
+            .trim() || 'image';
+
+        return [
+            teacherId,
+            'classroom-activity-images',
+            slugifyStoragePart(activityId, 'activity'),
+            `${Date.now()}-${slugifyStoragePart(baseName, 'image')}.webp`
+        ].join('/');
+    },
+
     serializeClassroomScene(scene) {
         const text = JSON.stringify(scene || null);
         const blob = new Blob([text], { type: 'application/json' });
@@ -1035,6 +1058,60 @@ export const supabaseService = {
         const { error } = await this.client
             .storage
             .from(CLASSROOM_SCENE_BUCKET)
+            .remove([path]);
+
+        if (error) throw error;
+    },
+
+    async uploadClassroomActivityImage({ path, blob }) {
+        await this.init();
+        if (!this.currentUser) {
+            throw new Error('You must be signed in to upload classroom activity images.');
+        }
+        if (!path) {
+            throw new Error('A Storage path is required for classroom activity image upload.');
+        }
+        if (!blob || blob.size > CLASSROOM_ACTIVITY_IMAGE_MAX_BYTES) {
+            throw new Error('Classroom activity images must be WebP files under 1 MB.');
+        }
+
+        const { data, error } = await this.client
+            .storage
+            .from(CLASSROOM_ACTIVITY_IMAGE_BUCKET)
+            .upload(path, blob, {
+                cacheControl: '3600',
+                contentType: 'image/webp',
+                upsert: true
+            });
+
+        if (error) throw error;
+        return {
+            path: data?.path || path,
+            sizeBytes: blob.size,
+            updatedAt: new Date().toISOString()
+        };
+    },
+
+    async getClassroomActivityImageUrl(path, expiresIn = 60 * 60) {
+        await this.init();
+        if (!path) return '';
+
+        const { data, error } = await this.client
+            .storage
+            .from(CLASSROOM_ACTIVITY_IMAGE_BUCKET)
+            .createSignedUrl(path, expiresIn);
+
+        if (error) throw error;
+        return data?.signedUrl || data?.signedURL || '';
+    },
+
+    async deleteClassroomActivityImage(path) {
+        await this.init();
+        if (!path) return;
+
+        const { error } = await this.client
+            .storage
+            .from(CLASSROOM_ACTIVITY_IMAGE_BUCKET)
             .remove([path]);
 
         if (error) throw error;

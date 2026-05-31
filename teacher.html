@@ -6,15 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Teacher</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-    <script type="importmap">
-        {
-            "imports": {
-                "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
-            }
-        }
-    </script>
 </head>
 
 <body>
@@ -302,6 +293,21 @@
                                             <option value="reflection">Reflection</option>
                                             <option value="checklist">Checklist</option>
                                         </optgroup>
+                                        <optgroup label="Card Sort">
+                                            <option value="category-sort">Category Sort</option>
+                                            <option value="sequence-sort">Sequence Sort</option>
+                                            <option value="process-sort">Process Sort</option>
+                                        </optgroup>
+                                        <optgroup label="Data / Spreadsheet">
+                                            <option value="data-table">Data Table</option>
+                                            <option value="formula-practice">Formula Practice</option>
+                                            <option value="chart-from-table">Chart From Table</option>
+                                        </optgroup>
+                                        <optgroup label="Image / Hotspot">
+                                            <option value="label-image-parts">Label Image Parts</option>
+                                            <option value="screenshot-callouts">Screenshot Callouts</option>
+                                            <option value="hotspot-explanation">Hotspot Explanation</option>
+                                        </optgroup>
                                     </select>
                                 </label>
                                 <button id="create-activity-btn" class="btn primary-btn" type="button">
@@ -424,6 +430,9 @@
                                 <select id="activity-type">
                                     <option value="map-diagram">Map / Diagram</option>
                                     <option value="structured-response">Structured Response</option>
+                                    <option value="card-sort">Card Sort</option>
+                                    <option value="spreadsheet-table">Spreadsheet / Data Table</option>
+                                    <option value="image-hotspot">Image Label / Hotspot</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -483,6 +492,9 @@
                         </div>
                         <div id="activity-excalidraw-root" class="activity-excalidraw-root"></div>
                         <div id="activity-structured-root" class="activity-structured-root hidden"></div>
+                        <div id="activity-card-sort-root" class="activity-card-sort-root hidden"></div>
+                        <div id="activity-spreadsheet-root" class="activity-spreadsheet-root hidden"></div>
+                        <div id="activity-image-hotspot-root" class="activity-image-hotspot-root hidden"></div>
                     </section>
 
                     <section id="activity-preview-panel" class="teacher-panel activity-editor-tab-panel hidden"
@@ -510,6 +522,10 @@
                         <h2 id="activity-assignment-title" style="margin: 0.35rem 0 0 0;">Activity Review</h2>
                     </div>
                     <div class="teacher-toolbar">
+                        <button id="update-published-activity-assignment-btn" class="btn secondary-btn" type="button" disabled>
+                            <i data-lucide="cloud-upload"></i>
+                            Update Published Assignment
+                        </button>
                         <button id="refresh-activity-assignment-review-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="refresh-cw"></i>
                             Refresh
@@ -1622,6 +1638,7 @@
         </div>
     </div>
 
+    <script src="js/icons.js" type="module"></script>
     <script src="js/desktop.js" type="module"></script>
     <script src="js/teacher.js" type="module"></script>
 </body>

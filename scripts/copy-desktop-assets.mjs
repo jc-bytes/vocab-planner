@@ -1,5 +1,5 @@
 import { cp, mkdir, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { basename, extname, join, sep } from 'node:path';
 
 const root = process.cwd();
 const outDir = join(root, 'dist-desktop');
@@ -29,6 +29,20 @@ const packageAssets = [
   }
 ];
 
+function shouldCopyAsset(path) {
+  const normalizedPath = path.split(sep).join('/');
+  const name = basename(path);
+  const extension = extname(path).toLowerCase();
+
+  if (normalizedPath.includes('/node_modules/') || normalizedPath.includes('/.git/')) return false;
+  if (name === '.DS_Store') return false;
+  if (extension === '.zip' || extension === '.map') return false;
+  if (name === 'closure.jar' || name === 'shader_minifier.exe') return false;
+  if (name === 'package-lock.json' && normalizedPath.includes('/js/games/')) return false;
+
+  return true;
+}
+
 await mkdir(outDir, { recursive: true });
 
 for (const entry of entries) {
@@ -39,7 +53,7 @@ for (const entry of entries) {
     await cp(source, target, {
       recursive: true,
       force: true,
-      filter: path => !path.includes('node_modules') && !path.includes('/.git/')
+      filter: shouldCopyAsset
     });
   } catch (error) {
     if (error.code !== 'ENOENT') {

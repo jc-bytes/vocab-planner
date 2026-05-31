@@ -1,17 +1,17 @@
-# Vocabulary Learning Web App
+# Vocabulary Master
 
-A static, client-side vocabulary learning application designed for GitHub Pages.
+A Vite/Tauri vocabulary and classroom practice app for teacher-managed content, student activities, local desktop packaging, and Supabase-backed cloud sync when online.
 
 ## Features
-- **Teacher Mode**: Create, edit, and export vocabulary sets.
-- **Student Mode**: Interactive activities (Matching, Flashcards) and progress tracking.
-- **No Backend**: Runs entirely in the browser using JSON files.
-- **Repo-based Images**: Images are stored in the repository and referenced by path.
+- **Teacher Mode**: Manage vocabulary, classroom activities, quizzes, students, schedules, and exports.
+- **Student Mode**: Practice vocabulary, complete classroom activities, play arcade games, and track progress.
+- **Desktop + Web Build**: Vite builds the shared web app into `dist-desktop`, which Tauri packages for desktop distribution.
+- **Online Sync + Offline Fallbacks**: Supabase powers auth/cloud data while bundled local assets keep the desktop app usable when offline.
 
 ## How to Run Locally
 
 ### Project Helper
-You can use `./planner` for the student/teacher split:
+Use `./planner` for the student/teacher split:
 
 ```bash
 ./planner run student
@@ -24,9 +24,9 @@ You can use `./planner` for the student/teacher split:
 
 `deploy` builds `dist-desktop` and only uploads if `PLANNER_DEPLOY_CMD` is set.
 By default, `run student` uses port 8000 and `run teacher` uses port 8001.
-Local `run` uses Vite so bundled tools like the Activities canvas editor load the same way they will in the desktop and Pages builds.
+Local `run` uses Vite so bundled tools like the activities canvas editor load the same way they will in the desktop and hosted builds.
 
-### Option 1: Using the Launcher (Recommended)
+### Option 1: Using the Launcher
 1.  Double-click `start_app.command` in the project folder.
 2.  This starts the student app with Vite and opens your browser to `http://127.0.0.1:8000/student.html`.
 
@@ -40,6 +40,23 @@ npm install
 ```
 
 *Note: Opening `index.html` directly, or serving the repo with a raw Python server, may cause issues with bundled editor tools and browser security policies.*
+
+## Testing
+
+Run a credential-free smoke test for the basic home, student, and teacher shells:
+
+```bash
+npm run test:ui:smoke
+```
+
+Run the responsive audit when test accounts are available:
+
+```bash
+UI_AUDIT_TEACHER_EMAIL="teacher@example.com" \
+UI_AUDIT_STUDENT_EMAIL="student@example.com" \
+UI_AUDIT_PASSWORD="password" \
+npm run test:ui:responsive
+```
 
 ## Desktop App
 
@@ -63,7 +80,7 @@ npm run desktop:build:mac-dmg
 npm run desktop:build:windows
 ```
 
-The desktop build bundles the app shell and core JavaScript locally, keeps bundled vocabularies as an offline fallback, and syncs cloud content/progress through Supabase when the device is online. See `DESKTOP_RELEASE_CHECKLIST.md` before distributing installers to students.
+The desktop build bundles the app shell, local fonts/icons, core JavaScript, vocabularies, games, and other runtime assets. Cloud content and progress sync through Supabase when the device is online. See `DESKTOP_RELEASE_CHECKLIST.md` before distributing installers to students.
 
 ## Building Games
 
