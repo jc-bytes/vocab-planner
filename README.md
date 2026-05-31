@@ -49,7 +49,33 @@ Run a credential-free smoke test for the basic home, student, and teacher shells
 npm run test:ui:smoke
 ```
 
-Run the responsive audit when test accounts are available:
+Run the same shell smoke against the built desktop web output:
+
+```bash
+npm run test:ui:smoke:dist
+```
+
+Run the local authenticated release smoke. This starts or reuses local Supabase, seeds local-only audit users, points the browser at the local Supabase API, submits seeded classroom activities, and checks teacher review:
+
+```bash
+npm run test:ui:auth-smoke
+```
+
+Local audit users are recreated idempotently:
+
+```text
+Teacher: audit.teacher@aid.edu.pa
+Student: audit.student@aid.edu.pa
+Password: AuditPass123!
+```
+
+Run the responsive audit against the same local seeded users:
+
+```bash
+npm run test:ui:responsive:local
+```
+
+Run the responsive audit against existing hosted test accounts when credentials are available:
 
 ```bash
 UI_AUDIT_TEACHER_EMAIL="teacher@example.com" \
@@ -57,6 +83,14 @@ UI_AUDIT_STUDENT_EMAIL="student@example.com" \
 UI_AUDIT_PASSWORD="password" \
 npm run test:ui:responsive
 ```
+
+Run the release hardening suite:
+
+```bash
+npm run test:release
+```
+
+The release suite runs shell smoke, built-preview smoke, local authenticated smoke, local responsive audit, Supabase lint/advisors, and the desktop web build. It intentionally does not run `npm audit fix`. Current `npm audit --omit=dev` findings are transitive Excalidraw-related advisories through `nanoid`, `lodash-es`, and Mermaid parser dependencies; treat them as known release notes unless a compatible Excalidraw upgrade passes the full release suite.
 
 ## Desktop App
 

@@ -6,6 +6,12 @@ import { chromium } from 'playwright';
 const widths = [320, 360, 390, 430, 768, 1024, 1280];
 const viewportHeight = 900;
 const requiredEnv = ['UI_AUDIT_TEACHER_EMAIL', 'UI_AUDIT_STUDENT_EMAIL', 'UI_AUDIT_PASSWORD'];
+const supabaseOverride = process.env.UI_AUDIT_SUPABASE_URL && process.env.UI_AUDIT_SUPABASE_KEY
+    ? {
+        url: process.env.UI_AUDIT_SUPABASE_URL,
+        publishableKey: process.env.UI_AUDIT_SUPABASE_KEY
+    }
+    : null;
 const allowedScrollableSelectors = [
     '.table-scroll-wrapper',
     '.student-progress-table-wrap',
@@ -75,6 +81,16 @@ async function resolveBaseUrl() {
 async function waitForApp(page) {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(350);
+}
+
+async function applySupabaseOverride(context) {
+    if (!supabaseOverride) return;
+    await context.addInitScript(config => {
+        window.SUPABASE_CONFIG = {
+            url: config.url,
+            publishableKey: config.publishableKey
+        };
+    }, supabaseOverride);
 }
 
 async function loginTeacher(page, baseUrl) {
@@ -532,6 +548,8 @@ async function main() {
         browser = await chromium.launch({ headless: true });
         const teacherContext = await browser.newContext();
         const studentContext = await browser.newContext();
+        await applySupabaseOverride(teacherContext);
+        await applySupabaseOverride(studentContext);
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
 
@@ -591,6 +609,9 @@ async function main() {
                             const status = document.querySelector('#student-classroom-activity-save-status')?.textContent?.trim() || '';
                             return status.includes('Canvas ready')
                                 || status.includes('Response ready')
+                                || status.includes('Card sort ready')
+                                || status.includes('Spreadsheet ready')
+                                || status.includes('Image activity ready')
                                 || status.includes('Draft ready')
                                 || status.includes('Submitted')
                                 || status.includes('Saved locally')
@@ -622,6 +643,6 @@ async function main() {
 }
 
 main().catch(error => {
-    console.error(error.message);
+    console.error(error.stack || error.message);
     process.exit(1);
 });

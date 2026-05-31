@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
     "test:ui:smoke": "node scripts/ui-smoke.mjs",
+    "test:ui:smoke:dist": "node scripts/ui-smoke-dist.mjs",
+    "test:ui:auth-smoke": "node scripts/ui-auth-smoke.mjs",
     "test:ui:responsive": "node scripts/ui-responsive-audit.mjs",
+    "test:ui:responsive:local": "node scripts/ui-responsive-local.mjs",
+    "test:release": "npm run test:ui:smoke && npm run test:ui:smoke:dist && npm run test:ui:auth-smoke && npm run test:ui:responsive:local && supabase db lint --local --fail-on none && supabase db advisors --local --fail-on none --type all && npm run desktop:build:web",
     "desktop:dev": "vite --host 127.0.0.1",
     "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
     "desktop:build": "npm run desktop:build:web && tauri build --bundles app",
