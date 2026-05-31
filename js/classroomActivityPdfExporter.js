@@ -4,7 +4,9 @@ import { createElement, escapeHtml } from './main.js';
 import { STRUCTURED_RESPONSE_TYPE } from './activityStructuredResponse.js';
 import { SPREADSHEET_TABLE_TYPE } from './activitySpreadsheetTable.js';
 import { IMAGE_HOTSPOT_TYPE, normalizeImageHotspotTemplate } from './activityImageHotspot.js';
+import { EXTERNAL_ARTIFACT_TYPE } from './activityExternalArtifact.js';
 import {
+    renderExternalArtifactSubmissionReview,
     renderImageHotspotSubmissionReview,
     renderSpreadsheetSubmissionReview,
     renderStructuredSubmissionReview
@@ -621,6 +623,19 @@ async function renderImageHotspotWork(container, assignment, submission) {
     container.innerHTML = renderImageHotspotSubmissionReview(assignment, submission, imageUrl);
 }
 
+async function renderExternalArtifactWork(container, assignment, submission) {
+    const artifact = submission.responseData?.externalArtifactResponse?.artifact;
+    let artifactUrl = '';
+    if (artifact?.storagePath) {
+        try {
+            artifactUrl = await supabaseService.getExternalArtifactUrl(artifact.storagePath);
+        } catch (error) {
+            console.warn('Could not load external artifact signed URL for PDF:', error);
+        }
+    }
+    container.innerHTML = renderExternalArtifactSubmissionReview(assignment, submission, artifactUrl);
+}
+
 async function waitForImages(container) {
     const images = Array.from(container.querySelectorAll('img'));
     await Promise.all(images.map(image => {
@@ -691,6 +706,8 @@ export async function exportClassroomActivityPdf({
             renderSpreadsheetWork(workBody, assignment, submission);
         } else if (assignment.activityType === IMAGE_HOTSPOT_TYPE) {
             await renderImageHotspotWork(workBody, assignment, submission);
+        } else if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            await renderExternalArtifactWork(workBody, assignment, submission);
         } else {
             await renderCanvasWork(workBody, scene || submission.responseData?.excalidrawScene, objectUrls);
         }

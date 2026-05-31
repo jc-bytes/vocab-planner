@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createDefaultCardSortTemplate } from '../../js/activityCardSort.js';
 import { createDefaultSpreadsheetTemplate } from '../../js/activitySpreadsheetTable.js';
 import { normalizeImageHotspotTemplate } from '../../js/activityImageHotspot.js';
+import { createDefaultExternalArtifactTemplate } from '../../js/activityExternalArtifact.js';
 
 export const AUDIT_PASSWORD = 'AuditPass123!';
 export const AUDIT_TEACHER_EMAIL = 'audit.teacher@aid.edu.pa';
@@ -13,7 +14,8 @@ export const AUDIT_STUDENT_EMAIL = 'audit.student@aid.edu.pa';
 export const AUDIT_ASSIGNMENT_IDS = [
     'audit-card-sort',
     'audit-spreadsheet-table',
-    'audit-image-hotspot'
+    'audit-image-hotspot',
+    'audit-external-artifact'
 ];
 
 const AUDIT_IMAGE_BUCKET = 'classroom-activity-images';
@@ -301,6 +303,20 @@ function buildAuditAssignments({ teacherId, image }) {
             { id: 'evidence', prompt: 'What did you label?', required: true }
         ]
     });
+    const externalArtifactTemplate = {
+        ...createDefaultExternalArtifactTemplate('project-evidence'),
+        prompt: 'Submit local audit evidence.',
+        helperText: 'Upload the tiny audit file and include the audit link.',
+        evidenceMode: 'both',
+        linkLabel: 'Audit evidence link',
+        uploadLabel: 'Audit screenshot or PDF',
+        checklistItems: [
+            { id: 'audit_ready', text: 'My audit evidence is ready.', required: true }
+        ],
+        reflectionPrompts: [
+            { id: 'audit_reflection', prompt: 'What evidence did you submit?', required: true }
+        ]
+    };
 
     const base = {
         source_activity_id: null,
@@ -353,6 +369,16 @@ function buildAuditAssignments({ teacherId, image }) {
                 templateId: 'label-image-parts',
                 imageHotspotTemplate
             }
+        },
+        {
+            ...base,
+            id: 'audit-external-artifact',
+            title: 'Audit External Artifact',
+            activity_type: 'external-artifact',
+            activity_data: {
+                templateId: 'project-evidence',
+                externalArtifactTemplate
+            }
         }
     ];
 }
@@ -367,6 +393,7 @@ export async function resetAuditSubmissions(admin) {
 
 export async function seedLocalAuditData({ resetSubmissions = false } = {}) {
     const status = await readLocalSupabaseStatus();
+    await runCommand('supabase', ['migration', 'up', '--local'], { stdio: 'ignore' });
     const admin = createLocalAdminClient(status);
     const users = await seedAuditUsers(admin);
     const image = await seedAuditImage(admin);

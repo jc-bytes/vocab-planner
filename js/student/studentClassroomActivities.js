@@ -32,6 +32,16 @@ import {
     normalizeImageHotspotTemplate,
     validateImageHotspotResponse
 } from '../activityImageHotspot.js';
+import {
+    EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES,
+    EXTERNAL_ARTIFACT_MAX_BYTES,
+    EXTERNAL_ARTIFACT_TYPE,
+    externalArtifactAcceptsLink,
+    externalArtifactAcceptsUpload,
+    normalizeExternalArtifactResponse,
+    normalizeExternalArtifactTemplate,
+    validateExternalArtifactResponse
+} from '../activityExternalArtifact.js';
 
 const ASSIGNMENT_COLLECTION = 'classroomActivityAssignments';
 const SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
@@ -82,7 +92,9 @@ export class StudentClassroomActivities {
                     ? 'category-sort'
                     : (activityType === SPREADSHEET_TABLE_TYPE
                         ? 'data-table'
-                        : (activityType === IMAGE_HOTSPOT_TYPE ? 'label-image-parts' : DEFAULT_TEMPLATE_ID))));
+                        : (activityType === IMAGE_HOTSPOT_TYPE
+                            ? 'label-image-parts'
+                            : (activityType === EXTERNAL_ARTIFACT_TYPE ? 'project-evidence' : DEFAULT_TEMPLATE_ID)))));
         const normalizedActivityData = {
             ...activityData,
             templateId
@@ -106,6 +118,11 @@ export class StudentClassroomActivities {
         } else if (activityType === IMAGE_HOTSPOT_TYPE) {
             normalizedActivityData.imageHotspotTemplate = normalizeImageHotspotTemplate(
                 activityData.imageHotspotTemplate || activityData.image_hotspot_template,
+                templateId
+            );
+        } else if (activityType === EXTERNAL_ARTIFACT_TYPE) {
+            normalizedActivityData.externalArtifactTemplate = normalizeExternalArtifactTemplate(
+                activityData.externalArtifactTemplate || activityData.external_artifact_template,
                 templateId
             );
         } else {
@@ -244,6 +261,7 @@ export class StudentClassroomActivities {
             || assignment?.activityType === CARD_SORT_TYPE
             || assignment?.activityType === SPREADSHEET_TABLE_TYPE
             || assignment?.activityType === IMAGE_HOTSPOT_TYPE
+            || assignment?.activityType === EXTERNAL_ARTIFACT_TYPE
         ) {
             return prepared;
         }
@@ -480,6 +498,12 @@ export class StudentClassroomActivities {
                 assignment.activityData?.templateId || 'data-table'
             );
             responseData = { spreadsheetResponse: normalizeSpreadsheetResponse(template) };
+        } else if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            const template = normalizeExternalArtifactTemplate(
+                assignment.activityData?.externalArtifactTemplate,
+                assignment.activityData?.templateId || 'project-evidence'
+            );
+            responseData = { externalArtifactResponse: normalizeExternalArtifactResponse(template) };
         } else if (starterScene) {
             responseData = { excalidrawScene: JSON.parse(JSON.stringify(starterScene)) };
         }
@@ -589,14 +613,18 @@ export class StudentClassroomActivities {
                 ? 'Complete the spreadsheet activity.'
                 : (assignment.activityType === IMAGE_HOTSPOT_TYPE
                     ? 'Complete the image labeling activity.'
-                    : 'Complete the canvas activity.'));
+                    : (assignment.activityType === EXTERNAL_ARTIFACT_TYPE
+                        ? 'Submit the requested external project evidence.'
+                        : 'Complete the canvas activity.')));
         const defaultOutput = assignment.activityType === CARD_SORT_TYPE
             ? 'Completed card sort'
             : (assignment.activityType === SPREADSHEET_TABLE_TYPE
                 ? 'Completed table, chart, and reflection'
                 : (assignment.activityType === IMAGE_HOTSPOT_TYPE
                     ? 'Labeled image with pins, notes, and reflection'
-                    : 'Canvas response'));
+                    : (assignment.activityType === EXTERNAL_ARTIFACT_TYPE
+                        ? 'Project link or uploaded evidence with reflection'
+                        : 'Canvas response')));
         setText('#student-classroom-activity-instructions', assignment.studentInstructions || defaultInstruction);
         setText('#student-classroom-activity-materials', assignment.materials || 'No materials listed.');
         setText('#student-classroom-activity-output', assignment.studentOutput || defaultOutput);
@@ -666,7 +694,12 @@ export class StudentClassroomActivities {
             return;
         }
 
-        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
+        if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            await this.mountExternalArtifactResponse(assignment, submission, root);
+            return;
+        }
+
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root');
         this.setSaveStatus('Loading canvas...');
 
         try {
@@ -714,7 +747,7 @@ export class StudentClassroomActivities {
         );
         const responses = submission.responseData?.structuredResponses || {};
         root.classList.add('structured-response-root');
-        root.classList.remove('card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
+        root.classList.remove('card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root');
         root.innerHTML = this.renderStructuredResponseForm(template, responses);
         root.oninput = () => {
             this.syncStructuredResponses();
@@ -744,7 +777,7 @@ export class StudentClassroomActivities {
             cardSortResponse: response
         };
         root.classList.add('card-sort-response-root');
-        root.classList.remove('structured-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
+        root.classList.remove('structured-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root');
         root.innerHTML = this.renderCardSortBoard(template, response);
         root.onchange = event => {
             const select = event.target.closest('[data-card-sort-target-select]');
@@ -796,7 +829,7 @@ export class StudentClassroomActivities {
             spreadsheetResponse: response
         };
         root.classList.add('spreadsheet-table-response-root');
-        root.classList.remove('structured-response-root', 'card-sort-response-root', 'image-hotspot-response-root');
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'image-hotspot-response-root', 'external-artifact-response-root');
         this.setSaveStatus('Loading spreadsheet...');
 
         try {
@@ -844,7 +877,7 @@ export class StudentClassroomActivities {
             imageHotspotResponse: response
         };
         root.classList.add('image-hotspot-response-root');
-        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root');
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'external-artifact-response-root');
         this.setSaveStatus('Loading image activity...');
 
         try {
@@ -883,6 +916,261 @@ export class StudentClassroomActivities {
             `;
             this.setSaveStatus('Image activity unavailable.');
             notifications.error('Could not load the image activity.');
+        }
+    }
+
+    async mountExternalArtifactResponse(assignment, submission, root = $('#student-classroom-excalidraw-root')) {
+        if (!root) return;
+        const template = normalizeExternalArtifactTemplate(
+            assignment.activityData?.externalArtifactTemplate,
+            assignment.activityData?.templateId || 'project-evidence'
+        );
+        const response = normalizeExternalArtifactResponse(template, submission.responseData?.externalArtifactResponse || {});
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            externalArtifactResponse: response
+        };
+        root.classList.add('external-artifact-response-root');
+        root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root');
+        this.setSaveStatus('Loading evidence activity...');
+
+        let artifactUrl = '';
+        if (response.artifact?.storagePath) {
+            try {
+                artifactUrl = await supabaseService.getExternalArtifactUrl(response.artifact.storagePath);
+            } catch (error) {
+                console.warn('Could not load external artifact preview:', error);
+            }
+        }
+
+        root.innerHTML = this.renderExternalArtifactActivity(template, response, artifactUrl);
+        root.oninput = event => this.handleExternalArtifactInput(event);
+        root.onchange = event => this.handleExternalArtifactChange(event);
+        root.onclick = event => this.handleExternalArtifactClick(event);
+        if (window.lucide) window.lucide.createIcons();
+        this.setSaveStatus(submission.source === 'local' ? 'Saved locally. Cloud retry pending.' : 'Evidence activity ready.');
+        clearTimeout(this.editorAutosaveReadyTimeout);
+        this.editorAutosaveReadyTimeout = window.setTimeout(() => {
+            this.editorAutosaveReady = true;
+            this.editorAutosaveReadyTimeout = null;
+        }, 500);
+    }
+
+    renderExternalArtifactActivity(template, response = {}, artifactUrl = '') {
+        const normalized = normalizeExternalArtifactTemplate(template);
+        const normalizedResponse = normalizeExternalArtifactResponse(normalized, response);
+        const validation = validateExternalArtifactResponse(normalized, normalizedResponse);
+        const acceptsLink = externalArtifactAcceptsLink(normalized);
+        const acceptsUpload = externalArtifactAcceptsUpload(normalized);
+        const artifact = normalizedResponse.artifact;
+        const artifactIsImage = artifact?.mimeType?.startsWith('image/');
+        const artifactLabel = artifact
+            ? `${artifact.fileName || 'Uploaded artifact'}${artifact.sizeBytes ? ` · ${Math.round(artifact.sizeBytes / 1024)} KB` : ''}`
+            : 'No file uploaded yet.';
+
+        return `
+            <div class="external-artifact-activity-shell">
+                <div class="spreadsheet-table-toolbar external-artifact-toolbar">
+                    <div>
+                        <strong>${escapeHtml(normalized.evidenceMode.replace(/\b\w/g, letter => letter.toUpperCase()))} evidence</strong>
+                        <span>${validation.valid ? 'Ready to submit' : `${validation.missing.length} item${validation.missing.length === 1 ? '' : 's'} remaining`}</span>
+                    </div>
+                </div>
+
+                <section class="structured-response-block instructions-block">
+                    <h4>${escapeHtml(normalized.prompt)}</h4>
+                    ${normalized.helperText ? `<p>${escapeHtml(normalized.helperText)}</p>` : ''}
+                </section>
+
+                <div class="external-artifact-evidence-grid">
+                    ${acceptsLink ? `
+                        <label class="external-artifact-link-field">
+                            <span>${escapeHtml(normalized.linkLabel)}${['link', 'both'].includes(normalized.evidenceMode) ? ' *' : ''}</span>
+                            <input type="url" data-external-artifact-link value="${escapeHtml(normalizedResponse.linkUrl)}" placeholder="https://...">
+                        </label>
+                    ` : ''}
+
+                    ${acceptsUpload ? `
+                        <section class="external-artifact-upload-panel">
+                            <div class="structured-builder-items-heading">
+                                <div>
+                                    <h4>${escapeHtml(normalized.uploadLabel)}${['upload', 'both'].includes(normalized.evidenceMode) ? ' *' : ''}</h4>
+                                    <p>PNG, JPG, WebP, or PDF up to 5 MB.</p>
+                                </div>
+                                <label class="btn secondary-btn image-hotspot-upload-btn">
+                                    <i data-lucide="upload"></i>
+                                    Upload
+                                    <input type="file" accept="${escapeHtml(EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES.join(','))}" data-external-artifact-upload>
+                                </label>
+                            </div>
+                            <article class="external-artifact-file-card ${artifact ? '' : 'is-empty'}">
+                                ${artifact && artifactIsImage && artifactUrl ? `<img src="${escapeHtml(artifactUrl)}" alt="${escapeHtml(artifact.fileName || 'Uploaded evidence')}">` : '<i data-lucide="file-text"></i>'}
+                                <div>
+                                    <strong>${escapeHtml(artifactLabel)}</strong>
+                                    ${artifact ? `<p>${escapeHtml(artifact.mimeType || 'Unknown file type')}</p>` : '<p>Select a screenshot or PDF from your device.</p>'}
+                                    ${artifactUrl ? `<a href="${escapeHtml(artifactUrl)}" target="_blank" rel="noopener noreferrer">Open artifact</a>` : ''}
+                                </div>
+                                ${artifact ? `
+                                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-external-artifact-delete aria-label="Remove uploaded artifact">
+                                        <i data-lucide="trash-2"></i>
+                                    </button>
+                                ` : ''}
+                            </article>
+                        </section>
+                    ` : ''}
+                </div>
+
+                ${normalized.checklistItems.length ? `
+                    <section class="structured-response-block">
+                        <h4>Checklist</h4>
+                        <div class="structured-response-checklist">
+                            ${normalized.checklistItems.map(item => `
+                                <label>
+                                    <input type="checkbox" data-external-artifact-check="${escapeHtml(item.id)}" ${normalizedResponse.checklist[item.id] ? 'checked' : ''}>
+                                    <span>${escapeHtml(item.text)}${item.required ? ' *' : ''}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </section>
+                ` : ''}
+
+                ${normalized.reflectionPrompts.length ? `
+                    <section class="spreadsheet-reflection-panel external-artifact-reflection-panel">
+                        ${normalized.reflectionPrompts.map(prompt => `
+                            <label class="spreadsheet-reflection-prompt">
+                                <span>${escapeHtml(prompt.prompt)}${prompt.required ? ' *' : ''}</span>
+                                <textarea rows="3" data-external-artifact-reflection="${escapeHtml(prompt.id)}">${escapeHtml(normalizedResponse.reflections[prompt.id] || '')}</textarea>
+                            </label>
+                        `).join('')}
+                    </section>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    getExternalArtifactTemplateAndResponse() {
+        const template = normalizeExternalArtifactTemplate(
+            this.currentAssignment?.activityData?.externalArtifactTemplate,
+            this.currentAssignment?.activityData?.templateId || 'project-evidence'
+        );
+        const response = normalizeExternalArtifactResponse(template, this.currentSubmission?.responseData?.externalArtifactResponse || {});
+        return { template, response };
+    }
+
+    syncExternalArtifactResponse() {
+        if (!this.currentSubmission?.id || this.currentAssignment?.activityType !== EXTERNAL_ARTIFACT_TYPE) return;
+        const { template, response } = this.getExternalArtifactTemplateAndResponse();
+        const root = $('#student-classroom-excalidraw-root');
+        if (root) {
+            response.linkUrl = root.querySelector('[data-external-artifact-link]')?.value || '';
+            root.querySelectorAll('[data-external-artifact-check]').forEach(checkEl => {
+                response.checklist[checkEl.dataset.externalArtifactCheck] = checkEl.checked === true;
+            });
+            root.querySelectorAll('[data-external-artifact-reflection]').forEach(reflectionEl => {
+                response.reflections[reflectionEl.dataset.externalArtifactReflection] = reflectionEl.value || '';
+            });
+        }
+        response.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            externalArtifactResponse: normalizeExternalArtifactResponse(template, response)
+        };
+    }
+
+    handleExternalArtifactInput() {
+        this.syncExternalArtifactResponse();
+        if (this.editorAutosaveReady) this.queueAutosave();
+    }
+
+    handleExternalArtifactChange(event) {
+        if (event.target.matches('[data-external-artifact-upload]')) {
+            this.handleExternalArtifactUpload(event);
+            return;
+        }
+        this.handleExternalArtifactInput(event);
+    }
+
+    handleExternalArtifactClick(event) {
+        if (event.target.closest('[data-external-artifact-delete]')) {
+            this.removeExternalArtifactUpload();
+        }
+    }
+
+    async handleExternalArtifactUpload(event) {
+        const input = event.target;
+        const file = input.files?.[0];
+        if (!file || !this.currentAssignment || !this.currentSubmission) return;
+        this.syncExternalArtifactResponse();
+
+        const mimeType = String(file.type || '').toLowerCase();
+        if (!EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES.includes(mimeType)) {
+            input.value = '';
+            this.setSaveStatus('Upload a PNG, JPG, WebP, or PDF file.');
+            notifications.warning('Evidence must be a PNG, JPG, WebP, or PDF file.');
+            return;
+        }
+        if (file.size > EXTERNAL_ARTIFACT_MAX_BYTES) {
+            input.value = '';
+            this.setSaveStatus('Evidence files must be 5 MB or smaller.');
+            notifications.warning('Evidence files must be 5 MB or smaller.');
+            return;
+        }
+
+        try {
+            this.setSaveStatus('Uploading evidence...');
+            const { template, response } = this.getExternalArtifactTemplateAndResponse();
+            const previousPath = response.artifact?.storagePath || '';
+            const path = supabaseService.buildExternalArtifactPath({
+                studentId: this.currentSubmission.studentId || this.sm.currentUser?.uid,
+                assignmentId: this.currentAssignment.id,
+                submissionId: this.currentSubmission.id,
+                fileName: file.name
+            });
+            const metadata = await supabaseService.uploadExternalArtifact({ path, file });
+            response.artifact = metadata;
+            response.updatedAt = new Date().toISOString();
+            this.currentSubmission.responseData = {
+                ...(this.currentSubmission.responseData || {}),
+                externalArtifactResponse: normalizeExternalArtifactResponse(template, response)
+            };
+            if (previousPath && previousPath !== metadata.storagePath) {
+                supabaseService.deleteExternalArtifact(previousPath).catch(error => {
+                    console.warn('Could not remove previous evidence artifact:', error);
+                });
+            }
+            await this.saveCurrentSubmission({ notifyOnError: false });
+            await this.mountExternalArtifactResponse(this.currentAssignment, this.currentSubmission);
+            this.setSaveStatus('Evidence uploaded.');
+        } catch (error) {
+            console.error('Failed to upload external artifact:', error);
+            this.setSaveStatus('Evidence upload failed.');
+            notifications.error('Could not upload evidence. Check your connection and try again.');
+        } finally {
+            input.value = '';
+        }
+    }
+
+    async removeExternalArtifactUpload() {
+        if (!this.currentAssignment || !this.currentSubmission) return;
+        this.syncExternalArtifactResponse();
+        const { template, response } = this.getExternalArtifactTemplateAndResponse();
+        const previousPath = response.artifact?.storagePath || '';
+        response.artifact = null;
+        response.updatedAt = new Date().toISOString();
+        this.currentSubmission.responseData = {
+            ...(this.currentSubmission.responseData || {}),
+            externalArtifactResponse: normalizeExternalArtifactResponse(template, response)
+        };
+
+        try {
+            if (previousPath) await supabaseService.deleteExternalArtifact(previousPath);
+            await this.saveCurrentSubmission({ notifyOnError: false });
+            await this.mountExternalArtifactResponse(this.currentAssignment, this.currentSubmission);
+            this.setSaveStatus('Evidence removed.');
+        } catch (error) {
+            console.error('Failed to remove external artifact:', error);
+            notifications.error('Could not remove evidence.');
+            this.setSaveStatus('Could not remove evidence.');
         }
     }
 
@@ -1670,6 +1958,11 @@ export class StudentClassroomActivities {
             return;
         }
 
+        if (this.currentAssignment?.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            this.syncExternalArtifactResponse();
+            return;
+        }
+
         const scene = this.editorHandle?.getScene?.();
         if (!scene || !this.currentSubmission?.id) return;
         this.currentSubmission.responseData = {
@@ -1847,6 +2140,22 @@ export class StudentClassroomActivities {
                 const firstMissing = validation.missing[0] || 'required image label evidence';
                 this.setSaveStatus(`Complete: ${firstMissing}`);
                 notifications.warning('Complete the required image labels before submitting.');
+                return;
+            }
+        }
+        if (this.currentAssignment?.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            const template = normalizeExternalArtifactTemplate(
+                this.currentAssignment.activityData?.externalArtifactTemplate,
+                this.currentAssignment.activityData?.templateId || 'project-evidence'
+            );
+            const validation = validateExternalArtifactResponse(
+                template,
+                this.currentSubmission.responseData?.externalArtifactResponse || {}
+            );
+            if (!validation.valid) {
+                const firstMissing = validation.missing[0] || 'required evidence';
+                this.setSaveStatus(`Complete: ${firstMissing}`);
+                notifications.warning('Complete the required evidence before submitting.');
                 return;
             }
         }

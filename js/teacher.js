@@ -80,6 +80,16 @@ import {
     normalizeImageHotspotTemplate
 } from './activityImageHotspot.js';
 import {
+    EXTERNAL_ARTIFACT_MODES,
+    EXTERNAL_ARTIFACT_TYPE,
+    createDefaultExternalArtifactTemplate,
+    createExternalArtifactChecklistItem,
+    createExternalArtifactPrompt,
+    getExternalArtifactCompletionSummary,
+    normalizeExternalArtifactTemplate
+} from './activityExternalArtifact.js';
+import {
+    renderExternalArtifactSubmissionReview as renderSharedExternalArtifactSubmissionReview,
     renderImageHotspotSubmissionReview as renderSharedImageHotspotSubmissionReview,
     renderSpreadsheetSubmissionReview as renderSharedSpreadsheetSubmissionReview,
     renderStructuredSubmissionReview as renderSharedStructuredSubmissionReview
@@ -217,6 +227,24 @@ const ACTIVITY_TEMPLATE_OPTIONS = [
         type: IMAGE_HOTSPOT_TYPE,
         label: 'Hotspot Explanation',
         description: 'Students add explanatory pins and short reflections on an image.'
+    },
+    {
+        id: 'link-evidence',
+        type: EXTERNAL_ARTIFACT_TYPE,
+        label: 'Link Evidence',
+        description: 'Students submit a shareable project link from an external tool.'
+    },
+    {
+        id: 'screenshot-evidence',
+        type: EXTERNAL_ARTIFACT_TYPE,
+        label: 'Screenshot Evidence',
+        description: 'Students upload a screenshot or PDF that shows external work.'
+    },
+    {
+        id: 'project-evidence',
+        type: EXTERNAL_ARTIFACT_TYPE,
+        label: 'Project Evidence',
+        description: 'Students provide a link, upload, checklist, and reflection for external work.'
     }
 ];
 const ACTIVITY_TYPE_LABELS = {
@@ -224,7 +252,8 @@ const ACTIVITY_TYPE_LABELS = {
     [STRUCTURED_RESPONSE_TYPE]: 'Structured Response',
     [CARD_SORT_TYPE]: 'Card Sort',
     [SPREADSHEET_TABLE_TYPE]: 'Spreadsheet / Data Table',
-    [IMAGE_HOTSPOT_TYPE]: 'Image Label / Hotspot'
+    [IMAGE_HOTSPOT_TYPE]: 'Image Label / Hotspot',
+    [EXTERNAL_ARTIFACT_TYPE]: 'External Artifact / Evidence'
 };
 
 class TeacherManager {
@@ -2763,6 +2792,27 @@ class TeacherManager {
                 materials: 'Device, uploaded image, and class notes or reference material if needed.',
                 studentOutput: 'Image with explanatory hotspot pins, notes, and reflection.',
                 makeupInstructions: 'Add the required hotspots independently and explain your most important choice.'
+            },
+            'link-evidence': {
+                teacherInstructions: 'Confirm the external tool is ready and tell students how to share or publish the link before submitting.',
+                studentInstructions: 'Paste the link to your finished project. Check that the link opens before you submit.',
+                materials: 'Device and the external tool or project site.',
+                studentOutput: 'Working project link with checklist and reflection.',
+                makeupInstructions: 'Finish the external project, verify the link opens, and submit it with the reflection.'
+            },
+            'screenshot-evidence': {
+                teacherInstructions: 'Clarify what the screenshot or PDF must show and remind students to preview the file before submitting.',
+                studentInstructions: 'Upload a screenshot or PDF that clearly shows your completed work, then complete the checklist and reflection.',
+                materials: 'Device and a screenshot or PDF from the external tool.',
+                studentOutput: 'Uploaded screenshot or PDF evidence with checklist and reflection.',
+                makeupInstructions: 'Create the required evidence file, upload it, and explain what it shows.'
+            },
+            'project-evidence': {
+                teacherInstructions: 'Tell students whether a link, upload, or both are expected. Use the checklist to name the evidence requirements.',
+                studentInstructions: 'Add a project link or upload evidence of your work, then complete the checklist and reflection.',
+                materials: 'Device, external project tool, and screenshot or PDF if needed.',
+                studentOutput: 'External project evidence with checklist and reflection.',
+                makeupInstructions: 'Complete the external project evidence and submit the required link or file with reflection.'
             }
         };
 
@@ -2791,6 +2841,8 @@ class TeacherManager {
             activityData.spreadsheetTemplate = createDefaultSpreadsheetTemplate(template.id);
         } else if (activityType === IMAGE_HOTSPOT_TYPE) {
             activityData.imageHotspotTemplate = createDefaultImageHotspotTemplate(template.id);
+        } else if (activityType === EXTERNAL_ARTIFACT_TYPE) {
+            activityData.externalArtifactTemplate = createDefaultExternalArtifactTemplate(template.id);
         } else {
             activityData.excalidrawScene = null;
         }
@@ -2836,7 +2888,9 @@ class TeacherManager {
                 ? 'category-sort'
                 : (sourceActivityType === SPREADSHEET_TABLE_TYPE
                     ? 'data-table'
-                    : (sourceActivityType === IMAGE_HOTSPOT_TYPE ? 'label-image-parts' : DEFAULT_ACTIVITY_TEMPLATE_ID)));
+                    : (sourceActivityType === IMAGE_HOTSPOT_TYPE
+                        ? 'label-image-parts'
+                        : (sourceActivityType === EXTERNAL_ARTIFACT_TYPE ? 'project-evidence' : DEFAULT_ACTIVITY_TEMPLATE_ID))));
         const rawTemplateId = activityData.templateId
             || activityData.template_id
             || sourceData.templateId
@@ -2844,7 +2898,7 @@ class TeacherManager {
             || fallbackTemplateId;
         let template = this.getActivityTemplate(rawTemplateId);
         let activityType = sourceActivityType || template.type || DEFAULT_ACTIVITY_TYPE;
-        const knownActivityTypes = new Set([DEFAULT_ACTIVITY_TYPE, STRUCTURED_RESPONSE_TYPE, CARD_SORT_TYPE, SPREADSHEET_TABLE_TYPE, IMAGE_HOTSPOT_TYPE]);
+        const knownActivityTypes = new Set([DEFAULT_ACTIVITY_TYPE, STRUCTURED_RESPONSE_TYPE, CARD_SORT_TYPE, SPREADSHEET_TABLE_TYPE, IMAGE_HOTSPOT_TYPE, EXTERNAL_ARTIFACT_TYPE]);
 
         if (!knownActivityTypes.has(activityType)) {
             activityType = template.type || DEFAULT_ACTIVITY_TYPE;
@@ -2881,6 +2935,11 @@ class TeacherManager {
         } else if (activityType === IMAGE_HOTSPOT_TYPE) {
             normalizedActivityData.imageHotspotTemplate = normalizeImageHotspotTemplate(
                 activityData.imageHotspotTemplate || activityData.image_hotspot_template,
+                template.id
+            );
+        } else if (activityType === EXTERNAL_ARTIFACT_TYPE) {
+            normalizedActivityData.externalArtifactTemplate = normalizeExternalArtifactTemplate(
+                activityData.externalArtifactTemplate || activityData.external_artifact_template,
                 template.id
             );
         } else {
@@ -3036,6 +3095,29 @@ class TeacherManager {
         });
     }
 
+    stableExternalArtifactTemplateSignature(template = {}) {
+        const normalized = normalizeExternalArtifactTemplate(template);
+        return JSON.stringify({
+            templateId: normalized.templateId,
+            prompt: normalized.prompt,
+            helperText: normalized.helperText,
+            evidenceMode: normalized.evidenceMode,
+            linkLabel: normalized.linkLabel,
+            uploadLabel: normalized.uploadLabel,
+            allowedMimeTypes: normalized.allowedMimeTypes,
+            checklistItems: normalized.checklistItems.map(item => ({
+                id: item.id,
+                text: item.text,
+                required: item.required
+            })),
+            reflectionPrompts: normalized.reflectionPrompts.map(prompt => ({
+                id: prompt.id,
+                prompt: prompt.prompt,
+                required: prompt.required
+            }))
+        });
+    }
+
     getActivityDuplicateSignature(activity = {}) {
         const normalized = this.normalizeActivity(activity);
         const activityData = normalized.activityData || {};
@@ -3065,6 +3147,9 @@ class TeacherManager {
                 : '',
             imageHotspotTemplate: normalized.activityType === IMAGE_HOTSPOT_TYPE
                 ? this.stableImageHotspotTemplateSignature(activityData.imageHotspotTemplate)
+                : '',
+            externalArtifactTemplate: normalized.activityType === EXTERNAL_ARTIFACT_TYPE
+                ? this.stableExternalArtifactTemplateSignature(activityData.externalArtifactTemplate)
                 : ''
         });
     }
@@ -3564,6 +3649,13 @@ class TeacherManager {
         return template.image.storagePath ? `${labelText} · ${pinText} · image` : `${labelText} · ${pinText} · needs image`;
     }
 
+    getActivityExternalArtifactSummary(activity = {}) {
+        const template = normalizeExternalArtifactTemplate(activity.activityData?.externalArtifactTemplate, activity.activityData?.templateId || 'project-evidence');
+        const checklistText = template.checklistItems.length === 1 ? '1 checklist item' : `${template.checklistItems.length} checklist items`;
+        const promptText = template.reflectionPrompts.length === 1 ? '1 reflection' : `${template.reflectionPrompts.length} reflections`;
+        return `${template.evidenceMode} evidence · ${checklistText} · ${promptText}`;
+    }
+
     getActivityWorkspaceSummary(activity = {}) {
         if (activity.activityType === STRUCTURED_RESPONSE_TYPE) {
             return this.getActivityResponseSummary(activity);
@@ -3576,6 +3668,9 @@ class TeacherManager {
         }
         if (activity.activityType === IMAGE_HOTSPOT_TYPE) {
             return this.getActivityImageHotspotSummary(activity);
+        }
+        if (activity.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            return this.getActivityExternalArtifactSummary(activity);
         }
         return this.getActivityCanvasSummary(activity);
     }
@@ -4665,7 +4760,7 @@ class TeacherManager {
         const root = $('#activity-review-excalidraw-root');
         const status = $('#activity-review-canvas-status');
         if (root) {
-            root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root');
+            root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root', 'external-artifact-review-root');
             root.innerHTML = message
                 ? `
                     <div class="activity-review-empty-canvas">
@@ -4771,7 +4866,7 @@ class TeacherManager {
         this.activityReviewHandle?.unmount?.();
         this.activityReviewHandle = null;
         root.innerHTML = '';
-        root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root');
+        root.classList.remove('structured-review-root', 'card-sort-review-root', 'spreadsheet-review-root', 'image-hotspot-review-root', 'external-artifact-review-root');
         if (status) {
             status.textContent = assignment.activityType === STRUCTURED_RESPONSE_TYPE
                 ? `Loading ${this.getStudentRosterName(student)} responses...`
@@ -4781,7 +4876,9 @@ class TeacherManager {
                         ? `Loading ${this.getStudentRosterName(student)} table...`
                         : (assignment.activityType === IMAGE_HOTSPOT_TYPE
                             ? `Loading ${this.getStudentRosterName(student)} image labels...`
-                            : `Loading ${this.getStudentRosterName(student)} canvas...`)));
+                            : (assignment.activityType === EXTERNAL_ARTIFACT_TYPE
+                                ? `Loading ${this.getStudentRosterName(student)} evidence...`
+                                : `Loading ${this.getStudentRosterName(student)} canvas...`))));
         }
 
         if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
@@ -4821,6 +4918,24 @@ class TeacherManager {
             return;
         }
 
+        if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
+            root.classList.add('external-artifact-review-root');
+            let artifactUrl = '';
+            const response = submission.responseData?.externalArtifactResponse || {};
+            const path = response.artifact?.storagePath || response.artifact?.storage_path || '';
+            if (path) {
+                try {
+                    artifactUrl = await supabaseService.getExternalArtifactUrl(path);
+                } catch (error) {
+                    console.warn('Could not load external artifact preview:', error);
+                }
+            }
+            root.innerHTML = this.renderExternalArtifactSubmissionReview(assignment, submission, artifactUrl);
+            if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+            this.refreshIcons();
+            return;
+        }
+
         try {
             this.configureExcalidrawAssets();
             const { mountActivityExcalidraw } = await import('./activityExcalidrawEditor.js');
@@ -4850,6 +4965,10 @@ class TeacherManager {
 
     renderImageHotspotSubmissionReview(assignment, submission, imageUrl = '') {
         return renderSharedImageHotspotSubmissionReview(assignment, submission, imageUrl);
+    }
+
+    renderExternalArtifactSubmissionReview(assignment, submission, artifactUrl = '') {
+        return renderSharedExternalArtifactSubmissionReview(assignment, submission, artifactUrl);
     }
 
     renderCardSortSubmissionReview(assignment, submission) {
@@ -5000,7 +5119,7 @@ class TeacherManager {
         const view = $('#teacher-activity-editor-view');
         const label = button.querySelector('span');
         const isFocused = view?.classList.contains('canvas-focus');
-        const focusLabel = (this.isStructuredActivity() || this.isCardSortActivity() || this.isSpreadsheetActivity() || this.isImageHotspotActivity())
+        const focusLabel = (this.isStructuredActivity() || this.isCardSortActivity() || this.isSpreadsheetActivity() || this.isImageHotspotActivity() || this.isExternalArtifactActivity())
             ? 'Focus Builder'
             : 'Focus Canvas';
         button.setAttribute('aria-pressed', isFocused ? 'true' : 'false');
@@ -5128,6 +5247,10 @@ class TeacherManager {
         return (activity?.activityType || activity?.activity_type) === IMAGE_HOTSPOT_TYPE;
     }
 
+    isExternalArtifactActivity(activity = this.activity) {
+        return (activity?.activityType || activity?.activity_type) === EXTERNAL_ARTIFACT_TYPE;
+    }
+
     syncActivityWorkspace() {
         if (this.isStructuredActivity()) {
             this.syncStructuredResponseTemplate();
@@ -5137,6 +5260,8 @@ class TeacherManager {
             this.syncSpreadsheetTemplate();
         } else if (this.isImageHotspotActivity()) {
             this.syncImageHotspotTemplate();
+        } else if (this.isExternalArtifactActivity()) {
+            this.syncExternalArtifactTemplate();
         } else {
             this.syncActivityEditorScene();
         }
@@ -5327,6 +5452,41 @@ class TeacherManager {
         };
     }
 
+    syncExternalArtifactTemplate() {
+        const root = $('#activity-external-artifact-root');
+        if (!root || root.classList.contains('hidden') || !this.activity?.id) return;
+        const currentTemplate = normalizeExternalArtifactTemplate(
+            this.activity.activityData?.externalArtifactTemplate,
+            this.activity.activityData?.templateId || 'project-evidence'
+        );
+        const checklistItems = Array.from(root.querySelectorAll('[data-external-artifact-check-id]')).map((itemEl, index) => ({
+            id: itemEl.dataset.externalArtifactCheckId || `check_${index + 1}`,
+            text: itemEl.querySelector('[data-external-artifact-check-text]')?.value || `Checklist item ${index + 1}`,
+            required: itemEl.querySelector('[data-external-artifact-check-required]')?.checked === true
+        }));
+        const reflectionPrompts = Array.from(root.querySelectorAll('[data-external-artifact-prompt-id]')).map((promptEl, index) => ({
+            id: promptEl.dataset.externalArtifactPromptId || `prompt_${index + 1}`,
+            prompt: promptEl.querySelector('[data-external-artifact-prompt-text]')?.value || `Reflection prompt ${index + 1}`,
+            required: promptEl.querySelector('[data-external-artifact-prompt-required]')?.checked === true
+        }));
+
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            externalArtifactTemplate: normalizeExternalArtifactTemplate({
+                version: 1,
+                templateId: this.activity.activityData?.templateId || 'project-evidence',
+                prompt: root.querySelector('[data-external-artifact-field="prompt"]')?.value || currentTemplate.prompt,
+                helperText: root.querySelector('[data-external-artifact-field="helperText"]')?.value || '',
+                evidenceMode: root.querySelector('[data-external-artifact-field="evidenceMode"]')?.value || currentTemplate.evidenceMode,
+                linkLabel: root.querySelector('[data-external-artifact-field="linkLabel"]')?.value || currentTemplate.linkLabel,
+                uploadLabel: root.querySelector('[data-external-artifact-field="uploadLabel"]')?.value || currentTemplate.uploadLabel,
+                allowedMimeTypes: currentTemplate.allowedMimeTypes,
+                checklistItems,
+                reflectionPrompts
+            }, this.activity.activityData?.templateId || 'project-evidence')
+        };
+    }
+
     configureExcalidrawAssets() {
         if (typeof window === 'undefined' || window.EXCALIDRAW_ASSET_PATH) return;
         const viteEnv = import.meta.env || {};
@@ -5356,6 +5516,11 @@ class TeacherManager {
             return;
         }
 
+        if (this.isExternalArtifactActivity()) {
+            this.mountExternalArtifactActivityEditor();
+            return;
+        }
+
         await this.mountMapActivityEditor();
     }
 
@@ -5365,6 +5530,7 @@ class TeacherManager {
         const cardSortRoot = $('#activity-card-sort-root');
         const spreadsheetRoot = $('#activity-spreadsheet-root');
         const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const externalArtifactRoot = $('#activity-external-artifact-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -5383,6 +5549,8 @@ class TeacherManager {
         if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
         imageHotspotRoot?.classList.add('hidden');
         if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        externalArtifactRoot?.classList.add('hidden');
+        if (externalArtifactRoot) externalArtifactRoot.innerHTML = '';
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Canvas');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Canvas');
         if (status) status.textContent = 'Loading editor...';
@@ -5431,6 +5599,7 @@ class TeacherManager {
         const cardSortRoot = $('#activity-card-sort-root');
         const spreadsheetRoot = $('#activity-spreadsheet-root');
         const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const externalArtifactRoot = $('#activity-external-artifact-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -5447,6 +5616,8 @@ class TeacherManager {
         if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
         imageHotspotRoot?.classList.add('hidden');
         if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        externalArtifactRoot?.classList.add('hidden');
+        if (externalArtifactRoot) externalArtifactRoot.innerHTML = '';
         root.classList.remove('hidden');
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Response Builder');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
@@ -5466,6 +5637,7 @@ class TeacherManager {
         const structuredRoot = $('#activity-structured-root');
         const spreadsheetRoot = $('#activity-spreadsheet-root');
         const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const externalArtifactRoot = $('#activity-external-artifact-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -5482,6 +5654,8 @@ class TeacherManager {
         if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
         imageHotspotRoot?.classList.add('hidden');
         if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        externalArtifactRoot?.classList.add('hidden');
+        if (externalArtifactRoot) externalArtifactRoot.innerHTML = '';
         root.classList.remove('hidden');
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Card Sort Builder');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
@@ -5501,6 +5675,7 @@ class TeacherManager {
         const structuredRoot = $('#activity-structured-root');
         const cardSortRoot = $('#activity-card-sort-root');
         const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const externalArtifactRoot = $('#activity-external-artifact-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -5517,6 +5692,8 @@ class TeacherManager {
         if (cardSortRoot) cardSortRoot.innerHTML = '';
         imageHotspotRoot?.classList.add('hidden');
         if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        externalArtifactRoot?.classList.add('hidden');
+        if (externalArtifactRoot) externalArtifactRoot.innerHTML = '';
         root.classList.remove('hidden');
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Spreadsheet Builder');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
@@ -5536,6 +5713,7 @@ class TeacherManager {
         const structuredRoot = $('#activity-structured-root');
         const cardSortRoot = $('#activity-card-sort-root');
         const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const externalArtifactRoot = $('#activity-external-artifact-root');
         const status = $('#activity-excalidraw-status');
         if (!root) return;
 
@@ -5552,6 +5730,8 @@ class TeacherManager {
         if (cardSortRoot) cardSortRoot.innerHTML = '';
         spreadsheetRoot?.classList.add('hidden');
         if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        externalArtifactRoot?.classList.add('hidden');
+        if (externalArtifactRoot) externalArtifactRoot.innerHTML = '';
         root.classList.remove('hidden');
         $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Image Hotspot Builder');
         $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
@@ -5563,6 +5743,44 @@ class TeacherManager {
             imageHotspotTemplate: normalizeImageHotspotTemplate(this.activity.activityData?.imageHotspotTemplate, templateId)
         };
         this.renderImageHotspotBuilder(root);
+    }
+
+    mountExternalArtifactActivityEditor() {
+        const root = $('#activity-external-artifact-root');
+        const canvasRoot = $('#activity-excalidraw-root');
+        const structuredRoot = $('#activity-structured-root');
+        const cardSortRoot = $('#activity-card-sort-root');
+        const spreadsheetRoot = $('#activity-spreadsheet-root');
+        const imageHotspotRoot = $('#activity-image-hotspot-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = true;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        canvasRoot?.classList.add('hidden');
+        if (canvasRoot) canvasRoot.innerHTML = '';
+        structuredRoot?.classList.add('hidden');
+        if (structuredRoot) structuredRoot.innerHTML = '';
+        cardSortRoot?.classList.add('hidden');
+        if (cardSortRoot) cardSortRoot.innerHTML = '';
+        spreadsheetRoot?.classList.add('hidden');
+        if (spreadsheetRoot) spreadsheetRoot.innerHTML = '';
+        imageHotspotRoot?.classList.add('hidden');
+        if (imageHotspotRoot) imageHotspotRoot.innerHTML = '';
+        root.classList.remove('hidden');
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Evidence Builder');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
+        if (status) status.textContent = 'Builder ready.';
+
+        const templateId = this.activity?.activityData?.templateId || 'project-evidence';
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            externalArtifactTemplate: normalizeExternalArtifactTemplate(this.activity.activityData?.externalArtifactTemplate, templateId)
+        };
+        this.renderExternalArtifactBuilder(root);
     }
 
     async resolveActivityImageUrl(path) {
@@ -5594,6 +5812,209 @@ class TeacherManager {
             .catch(error => {
                 console.warn('Could not load classroom activity image preview:', error);
             });
+    }
+
+    renderExternalArtifactBuilder(root = $('#activity-external-artifact-root')) {
+        if (!root || !this.activity?.id) return;
+        const template = normalizeExternalArtifactTemplate(
+            this.activity.activityData?.externalArtifactTemplate,
+            this.activity.activityData?.templateId || 'project-evidence'
+        );
+        this.activity.activityData.externalArtifactTemplate = template;
+        const checklistText = template.checklistItems.length === 1 ? '1 checklist item' : `${template.checklistItems.length} checklist items`;
+        const promptText = template.reflectionPrompts.length === 1 ? '1 reflection' : `${template.reflectionPrompts.length} reflections`;
+        const modeOptions = EXTERNAL_ARTIFACT_MODES.map(mode => `
+            <option value="${escapeHtml(mode)}" ${template.evidenceMode === mode ? 'selected' : ''}>${escapeHtml(mode.replace(/\b\w/g, letter => letter.toUpperCase()))}</option>
+        `).join('');
+
+        root.innerHTML = `
+            <div class="structured-builder-shell external-artifact-builder-shell">
+                <div class="structured-mode-header external-artifact-mode-header">
+                    <div>
+                        <h4>Build Evidence Upload</h4>
+                        <p>${escapeHtml(`${template.evidenceMode} evidence · ${checklistText} · ${promptText}`)}</p>
+                    </div>
+                </div>
+
+                <section class="card-sort-builder-section external-artifact-builder-section">
+                    <div class="card-sort-builder-grid">
+                        <label>
+                            <span>Prompt</span>
+                            <textarea rows="2" data-external-artifact-field="prompt">${escapeHtml(template.prompt)}</textarea>
+                        </label>
+                        <label>
+                            <span>Helper Text</span>
+                            <textarea rows="2" data-external-artifact-field="helperText">${escapeHtml(template.helperText)}</textarea>
+                        </label>
+                    </div>
+                    <div class="card-sort-builder-grid card-sort-builder-options">
+                        <label>
+                            <span>Evidence Mode</span>
+                            <select data-external-artifact-field="evidenceMode">${modeOptions}</select>
+                        </label>
+                        <label>
+                            <span>Link Label</span>
+                            <input type="text" data-external-artifact-field="linkLabel" value="${escapeHtml(template.linkLabel)}">
+                        </label>
+                        <label>
+                            <span>Upload Label</span>
+                            <input type="text" data-external-artifact-field="uploadLabel" value="${escapeHtml(template.uploadLabel)}">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="card-sort-builder-section external-artifact-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Checklist</h4>
+                            <p>Students check these before submitting their evidence.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-external-artifact-add-check ${template.checklistItems.length >= 12 ? 'disabled' : ''}>
+                            <i data-lucide="plus"></i>
+                            Add Item
+                        </button>
+                    </div>
+                    <div class="card-sort-builder-list external-artifact-builder-list">
+                        ${template.checklistItems.map((item, index) => this.renderExternalArtifactChecklistItem(item, index, template.checklistItems.length)).join('')}
+                    </div>
+                </section>
+
+                <section class="card-sort-builder-section external-artifact-builder-section">
+                    <div class="structured-builder-items-heading">
+                        <div>
+                            <h4>Reflection Prompts</h4>
+                            <p>Short explanations that travel with the submitted evidence.</p>
+                        </div>
+                        <button type="button" class="btn secondary-btn" data-external-artifact-add-prompt ${template.reflectionPrompts.length >= 6 ? 'disabled' : ''}>
+                            <i data-lucide="plus"></i>
+                            Add Prompt
+                        </button>
+                    </div>
+                    <div class="card-sort-builder-list external-artifact-builder-list">
+                        ${template.reflectionPrompts.map((prompt, index) => this.renderExternalArtifactPrompt(prompt, index, template.reflectionPrompts.length)).join('')}
+                    </div>
+                </section>
+            </div>
+        `;
+
+        root.onclick = event => this.handleExternalArtifactBuilderClick(event);
+        root.oninput = event => this.handleExternalArtifactBuilderInput(event);
+        root.onchange = event => this.handleExternalArtifactBuilderInput(event);
+        this.refreshIcons();
+    }
+
+    renderExternalArtifactChecklistItem(item, index, total) {
+        return `
+            <article class="structured-builder-block external-artifact-builder-check" data-external-artifact-check-id="${escapeHtml(item.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(item.text || `Checklist item ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-external-artifact-delete-check ${total <= 1 ? 'disabled' : ''} aria-label="Delete checklist item">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields card-sort-card-fields">
+                    <label>
+                        <span>Item</span>
+                        <input type="text" data-external-artifact-check-text value="${escapeHtml(item.text)}">
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-external-artifact-check-required ${item.required ? 'checked' : ''}>
+                        <span>Required</span>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    renderExternalArtifactPrompt(prompt, index, total) {
+        return `
+            <article class="structured-builder-block external-artifact-builder-prompt" data-external-artifact-prompt-id="${escapeHtml(prompt.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(prompt.prompt || `Reflection prompt ${index + 1}`)}</strong>
+                    <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-external-artifact-delete-prompt ${total <= 0 ? 'disabled' : ''} aria-label="Delete reflection prompt">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div class="structured-builder-fields card-sort-card-fields">
+                    <label>
+                        <span>Prompt</span>
+                        <textarea rows="2" data-external-artifact-prompt-text>${escapeHtml(prompt.prompt)}</textarea>
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-external-artifact-prompt-required ${prompt.required ? 'checked' : ''}>
+                        <span>Required</span>
+                    </label>
+                </div>
+            </article>
+        `;
+    }
+
+    handleExternalArtifactBuilderInput(event) {
+        if (!event.target.closest('.external-artifact-builder-shell')) return;
+        this.syncExternalArtifactTemplate();
+        if (this.activityEditorTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    handleExternalArtifactBuilderClick(event) {
+        const root = $('#activity-external-artifact-root');
+        if (!root) return;
+
+        if (event.target.closest('[data-external-artifact-add-check]')) {
+            this.syncExternalArtifactTemplate();
+            const template = normalizeExternalArtifactTemplate(
+                this.activity.activityData?.externalArtifactTemplate,
+                this.activity.activityData?.templateId || 'project-evidence'
+            );
+            if (template.checklistItems.length < 12) {
+                template.checklistItems.push(createExternalArtifactChecklistItem(template.checklistItems.length));
+            }
+            this.activity.activityData.externalArtifactTemplate = template;
+            this.renderExternalArtifactBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const checkEl = event.target.closest('[data-external-artifact-check-id]');
+        if (checkEl && event.target.closest('[data-external-artifact-delete-check]')) {
+            this.syncExternalArtifactTemplate();
+            const template = normalizeExternalArtifactTemplate(this.activity.activityData?.externalArtifactTemplate);
+            template.checklistItems = template.checklistItems.filter(item => item.id !== checkEl.dataset.externalArtifactCheckId);
+            if (template.checklistItems.length === 0) {
+                template.checklistItems.push(createExternalArtifactChecklistItem(0));
+            }
+            this.activity.activityData.externalArtifactTemplate = template;
+            this.renderExternalArtifactBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-external-artifact-add-prompt]')) {
+            this.syncExternalArtifactTemplate();
+            const template = normalizeExternalArtifactTemplate(
+                this.activity.activityData?.externalArtifactTemplate,
+                this.activity.activityData?.templateId || 'project-evidence'
+            );
+            if (template.reflectionPrompts.length < 6) {
+                template.reflectionPrompts.push(createExternalArtifactPrompt(template.reflectionPrompts.length));
+            }
+            this.activity.activityData.externalArtifactTemplate = template;
+            this.renderExternalArtifactBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const promptEl = event.target.closest('[data-external-artifact-prompt-id]');
+        if (promptEl && event.target.closest('[data-external-artifact-delete-prompt]')) {
+            this.syncExternalArtifactTemplate();
+            const template = normalizeExternalArtifactTemplate(this.activity.activityData?.externalArtifactTemplate);
+            template.reflectionPrompts = template.reflectionPrompts.filter(prompt => prompt.id !== promptEl.dataset.externalArtifactPromptId);
+            this.activity.activityData.externalArtifactTemplate = template;
+            this.renderExternalArtifactBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+        }
     }
 
     renderImageHotspotBuilder(root = $('#activity-image-hotspot-root')) {
@@ -6954,6 +7375,60 @@ class TeacherManager {
         `;
     }
 
+    renderExternalArtifactPreview(template) {
+        const normalized = normalizeExternalArtifactTemplate(template);
+        const summary = getExternalArtifactCompletionSummary(normalized, {});
+        const modeLabel = normalized.evidenceMode.replace(/\b\w/g, letter => letter.toUpperCase());
+        return `
+            <div class="external-artifact-preview">
+                <div class="spreadsheet-review-summary">
+                    <div><span>Mode</span><strong>${escapeHtml(modeLabel)}</strong></div>
+                    <div><span>Checklist</span><strong>${escapeHtml(String(summary.requiredChecks))} required</strong></div>
+                    <div><span>Reflections</span><strong>${escapeHtml(String(summary.requiredPrompts))} required</strong></div>
+                </div>
+                <section class="structured-response-block instructions-block">
+                    <h4>${escapeHtml(normalized.prompt)}</h4>
+                    ${normalized.helperText ? `<p>${escapeHtml(normalized.helperText)}</p>` : ''}
+                </section>
+                <div class="external-artifact-evidence-grid">
+                    ${normalized.evidenceMode !== 'upload' ? `
+                        <label>
+                            <span>${escapeHtml(normalized.linkLabel)}</span>
+                            <input type="url" disabled placeholder="https://...">
+                        </label>
+                    ` : ''}
+                    ${normalized.evidenceMode !== 'link' ? `
+                        <div class="external-artifact-upload-preview">
+                            <i data-lucide="upload"></i>
+                            <strong>${escapeHtml(normalized.uploadLabel)}</strong>
+                            <span>PNG, JPG, WebP, or PDF up to 5 MB</span>
+                        </div>
+                    ` : ''}
+                </div>
+                ${normalized.checklistItems.length ? `
+                    <div class="structured-response-checklist readonly">
+                        ${normalized.checklistItems.map(item => `
+                            <div>
+                                <i data-lucide="square"></i>
+                                <span>${escapeHtml(item.text)}${item.required ? ' *' : ''}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                ${normalized.reflectionPrompts.length ? `
+                    <div class="spreadsheet-reflection-review">
+                        ${normalized.reflectionPrompts.map(prompt => `
+                            <article>
+                                <strong>${escapeHtml(prompt.prompt)}${prompt.required ? ' *' : ''}</strong>
+                                <p>Student response</p>
+                            </article>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
     renderActivityPreviewPanel() {
         const root = $('#activity-preview-root');
         if (!root) return;
@@ -7016,6 +7491,13 @@ class TeacherManager {
                 <section class="activity-preview-section">
                     <h4>Student Image Hotspot</h4>
                     ${this.renderImageHotspotPreview(activity.activityData?.imageHotspotTemplate)}
+                </section>
+            `;
+        } else if (this.isExternalArtifactActivity(activity)) {
+            responsePreview = `
+                <section class="activity-preview-section">
+                    <h4>Student Evidence</h4>
+                    ${this.renderExternalArtifactPreview(activity.activityData?.externalArtifactTemplate)}
                 </section>
             `;
         } else {
@@ -7368,6 +7850,13 @@ class TeacherManager {
                 ...(this.activity.activityData || {}),
                 templateId: 'label-image-parts',
                 imageHotspotTemplate: createDefaultImageHotspotTemplate('label-image-parts')
+            };
+        } else if (selectedType === EXTERNAL_ARTIFACT_TYPE && currentTemplate.type !== EXTERNAL_ARTIFACT_TYPE) {
+            this.activity.activityType = EXTERNAL_ARTIFACT_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: 'project-evidence',
+                externalArtifactTemplate: createDefaultExternalArtifactTemplate('project-evidence')
             };
         } else if (selectedType === DEFAULT_ACTIVITY_TYPE && currentTemplate.type !== DEFAULT_ACTIVITY_TYPE) {
             this.activity.activityType = DEFAULT_ACTIVITY_TYPE;

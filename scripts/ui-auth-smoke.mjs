@@ -181,6 +181,26 @@ async function submitImageHotspot(page) {
     await submitOpenAssignment(page, 'Image hotspot');
 }
 
+async function submitExternalArtifact(page) {
+    await openStudentAssignment(page, 'audit-external-artifact', /Audit External Artifact/, /Evidence activity ready/i);
+    await page.locator('[data-external-artifact-link]').fill('https://example.com/audit-evidence');
+    await page.locator('[data-external-artifact-upload]').setInputFiles({
+        name: 'audit-evidence.png',
+        mimeType: 'image/png',
+        buffer: Buffer.from(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+            'base64'
+        )
+    });
+    await page.waitForFunction(() => {
+        const status = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
+        return /Evidence uploaded|Evidence activity ready|Draft saved|Submission saved/i.test(status);
+    }, null, { timeout: 30000 });
+    await page.locator('[data-external-artifact-check="audit_ready"]').check();
+    await page.locator('[data-external-artifact-reflection="audit_reflection"]').fill('The audit link and file were submitted.');
+    await submitOpenAssignment(page, 'External artifact');
+}
+
 async function waitForSubmitted(admin, assignmentId) {
     const started = Date.now();
     while (Date.now() - started < 15000) {
@@ -215,7 +235,7 @@ async function verifyTeacherEditor(page) {
     await waitForApp(page);
     await page.locator('#activity-type').waitFor({ state: 'visible', timeout: 15000 });
     const values = await page.locator('#activity-type option').evaluateAll(options => options.map(option => option.value));
-    for (const value of ['card-sort', 'spreadsheet-table', 'image-hotspot']) {
+    for (const value of ['card-sort', 'spreadsheet-table', 'image-hotspot', 'external-artifact']) {
         if (!values.includes(value)) throw new Error(`Teacher editor missing activity type option: ${value}`);
     }
 }
@@ -249,10 +269,13 @@ try {
     await waitForSubmitted(seeded.admin, 'audit-spreadsheet-table');
     await submitImageHotspot(studentPage);
     await waitForSubmitted(seeded.admin, 'audit-image-hotspot');
+    await submitExternalArtifact(studentPage);
+    await waitForSubmitted(seeded.admin, 'audit-external-artifact');
 
     await verifyTeacherReview(teacherPage, 'audit-card-sort', /Audit Card Sort/);
     await verifyTeacherReview(teacherPage, 'audit-spreadsheet-table', /Audit Spreadsheet Table/);
     await verifyTeacherReview(teacherPage, 'audit-image-hotspot', /Audit Image Hotspot/);
+    await verifyTeacherReview(teacherPage, 'audit-external-artifact', /Audit External Artifact/);
 
     if (problems.length > 0) {
         throw new Error(`Authenticated UI smoke emitted browser problems:\n${problems.join('\n')}`);

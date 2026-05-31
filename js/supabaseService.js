@@ -130,6 +130,14 @@ export const CLASSROOM_SCENE_BUCKET = 'classroom-activity-scenes';
 export const CLASSROOM_SCENE_MAX_BYTES = 1024 * 1024;
 export const CLASSROOM_ACTIVITY_IMAGE_BUCKET = 'classroom-activity-images';
 export const CLASSROOM_ACTIVITY_IMAGE_MAX_BYTES = 1024 * 1024;
+export const EXTERNAL_ARTIFACT_BUCKET = 'classroom-activity-artifacts';
+export const EXTERNAL_ARTIFACT_MAX_BYTES = 5 * 1024 * 1024;
+export const EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+    'application/pdf'
+];
 
 const resolveTable = (collectionName) => TABLE_ALIASES[collectionName] || collectionName;
 
@@ -994,6 +1002,29 @@ export const supabaseService = {
         ].join('/');
     },
 
+    buildExternalArtifactPath({
+        studentId = this.currentUser?.uid,
+        assignmentId = 'assignment',
+        submissionId = 'submission',
+        fileName = 'artifact'
+    } = {}) {
+        if (!studentId) {
+            throw new Error('A signed-in student is required to upload classroom evidence.');
+        }
+
+        const name = String(fileName || 'artifact').trim() || 'artifact';
+        const extension = name.includes('.') ? name.slice(name.lastIndexOf('.') + 1).toLowerCase() : '';
+        const baseName = name.replace(/\.[^.]+$/, '') || 'artifact';
+        const safeExtension = ['png', 'jpg', 'jpeg', 'webp', 'pdf'].includes(extension) ? extension : 'bin';
+
+        return [
+            studentId,
+            slugifyStoragePart(assignmentId, 'assignment'),
+            slugifyStoragePart(submissionId, 'submission'),
+            `${Date.now()}-${slugifyStoragePart(baseName, 'artifact')}.${safeExtension}`
+        ].join('/');
+    },
+
     serializeClassroomScene(scene) {
         const text = JSON.stringify(scene || null);
         const blob = new Blob([text], { type: 'application/json' });
@@ -1112,6 +1143,66 @@ export const supabaseService = {
         const { error } = await this.client
             .storage
             .from(CLASSROOM_ACTIVITY_IMAGE_BUCKET)
+            .remove([path]);
+
+        if (error) throw error;
+    },
+
+    async uploadExternalArtifact({ path, file }) {
+        await this.init();
+        if (!this.currentUser) {
+            throw new Error('You must be signed in to upload classroom evidence.');
+        }
+        if (!path) {
+            throw new Error('A Storage path is required for classroom evidence upload.');
+        }
+        if (!file || file.size > EXTERNAL_ARTIFACT_MAX_BYTES) {
+            throw new Error('Evidence files must be 5 MB or smaller.');
+        }
+        const mimeType = String(file.type || '').toLowerCase();
+        if (!EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES.includes(mimeType)) {
+            throw new Error('Evidence must be a PNG, JPG, WebP, or PDF file.');
+        }
+
+        const { data, error } = await this.client
+            .storage
+            .from(EXTERNAL_ARTIFACT_BUCKET)
+            .upload(path, file, {
+                cacheControl: '3600',
+                contentType: mimeType,
+                upsert: true
+            });
+
+        if (error) throw error;
+        return {
+            storagePath: data?.path || path,
+            fileName: file.name || 'Uploaded artifact',
+            mimeType,
+            sizeBytes: file.size,
+            uploadedAt: new Date().toISOString()
+        };
+    },
+
+    async getExternalArtifactUrl(path, expiresIn = 60 * 60) {
+        await this.init();
+        if (!path) return '';
+
+        const { data, error } = await this.client
+            .storage
+            .from(EXTERNAL_ARTIFACT_BUCKET)
+            .createSignedUrl(path, expiresIn);
+
+        if (error) throw error;
+        return data?.signedUrl || data?.signedURL || '';
+    },
+
+    async deleteExternalArtifact(path) {
+        await this.init();
+        if (!path) return;
+
+        const { error } = await this.client
+            .storage
+            .from(EXTERNAL_ARTIFACT_BUCKET)
             .remove([path]);
 
         if (error) throw error;

@@ -31,7 +31,7 @@ The app currently has two usable activity lanes.
    - Structured Response: worksheet, reflection, checklist
    - Structured response block types include short answer, long answer, multiple choice, multi-select, dropdown, true/false, rating, number, date, matching, ranking, table/grid, and checklist.
 
-There is also `card-sort` code with category sort, sequence sort, and process sort templates in `js/activityCardSort.js`, and `js/teacher.js` imports it. However, it is not fully wired into the teacher template dropdown, activity type select, student renderer, or Supabase constraints. Treat card sort as a nearly-started new activity type, not a usable classroom activity yet.
+Card Sort / Sequence Sort, Spreadsheet / Data Table, and Image Label / Hotspot are now wired as usable classroom activity types with teacher builders, student renderers, review summaries, and Supabase constraints.
 
 ## Already Good Fits
 
@@ -95,16 +95,15 @@ These can be done now, but the current activity type is not ideal.
   - Better: Image Label / Hotspot Diagram.
 
 - Screenshot or file evidence from Scratch, Google Sites, Google Sheets, Tinkercad, MakeCode, mBot, or micro:bit.
-  - Current workaround: students paste a link or describe the evidence in Structured Response.
-  - Better: External Artifact / Evidence Upload.
+  - Current support: External Artifact / Evidence Upload.
 
 ## New Activity Types Worth Adding
 
 ### 1. Card Sort / Sequence Sort
 
-Priority: highest.
+Status: implemented.
 
-This already has partial app code and would cover a large share of Grade 6 tasks.
+This covers a large share of Grade 6 sorting and sequencing tasks.
 
 Use it for:
 - March: online tools by purpose; public/private examples.
@@ -115,16 +114,11 @@ Use it for:
 - August: mBot Knowledge Card stations and card-to-action matching.
 - November: input/output sorting.
 
-Implementation needs:
-- Add Card Sort to teacher template dropdown and activity type select.
-- Add database constraints for `card-sort`.
-- Add teacher builder UI for categories/cards/correct answers.
-- Add student drag/drop renderer.
-- Add teacher review summary showing correct, misplaced, and unplaced cards.
+Implementation includes teacher builder UI, student drag/drop and select controls, database constraints, and teacher review summary showing correct, misplaced, and unplaced cards.
 
 ### 2. External Artifact / Evidence Upload
 
-Priority: very high.
+Status: implemented.
 
 This would let the app manage activities whose actual creation happens in another tool.
 
@@ -134,13 +128,12 @@ Use it for:
 - September-October: spreadsheet table/chart screenshots or files; Tinkercad/3D model screenshots.
 - November-December: MakeCode/micro:bit screenshots, simulator links, final project evidence.
 
-Suggested fields:
-- File upload or image upload.
+Implemented fields:
 - Link field.
-- Screenshot preview.
+- Private screenshot/PDF upload with preview metadata.
 - Teacher checklist.
 - Student explanation/reflection.
-- Optional late/make-up instructions.
+- Existing late and make-up instructions.
 
 ### 3. Spreadsheet / Data Table / Chart Activity
 
@@ -327,21 +320,16 @@ New type helpful:
 
 ## Recommended Build Order
 
-1. Finish Card Sort / Sequence Sort because it is already partially present and covers many Grade 6 sorting/order checks.
-2. Add External Artifact / Evidence Upload because many Technology activities happen in external tools.
-3. Upgrade Map / Diagram for image labeling or add a dedicated Image Label activity.
-4. Add Spreadsheet / Data Table / Chart activity for September-October.
-5. Add a dedicated Flowchart / Algorithm Builder if route/condition grading needs to be more structured than free drawing.
+1. Add a dedicated Flowchart / Algorithm Builder if route/condition grading needs to be more structured than free drawing.
+2. Consider Peer Feedback / Gallery if students need to review each other's external projects.
+3. Continue release hardening around dependency audit warnings and large editor chunks.
 
 ## Bottom Line
 
 Most Grade 6 planned activities can already be supported by the app as evidence collection, vocabulary practice, reflection, checklist, worksheet, map, diagram, or flowchart activities.
 
 The largest missing pieces are not more vocabulary games. The best next activity types are:
-- Card Sort / Sequence Sort
-- External Artifact / Evidence Upload
-- Image Label / Hotspot Diagram
-- Spreadsheet / Data Table / Chart
 - Flowchart / Algorithm Builder
+- Peer Feedback / Gallery
 
 Those additions would let the app cover almost every Grade 6 monthly-plan activity without replacing the real tools students still need for Scratch, Google Sites, Google Sheets, Tinkercad, mBot, and micro:bit.

@@ -2062,18 +2062,24 @@ select:focus {
 
 .spreadsheet-builder-shell,
 .image-hotspot-builder-shell,
+.external-artifact-builder-shell,
 .spreadsheet-builder-section,
 .image-hotspot-builder-section,
+.external-artifact-builder-section,
 .spreadsheet-builder-column-list,
 .spreadsheet-builder-prompt-list,
 .image-hotspot-builder-label-list,
 .image-hotspot-builder-prompt-list,
+.external-artifact-builder-list,
 .spreadsheet-preview,
 .image-hotspot-preview,
+.external-artifact-preview,
 .spreadsheet-submission-review,
 .image-hotspot-submission-review,
+.external-artifact-submission-review,
 .spreadsheet-activity-shell,
 .image-hotspot-activity-shell,
+.external-artifact-activity-shell,
 .spreadsheet-reflection-panel,
 .spreadsheet-reflection-review {
     display: grid;
@@ -2082,8 +2088,10 @@ select:focus {
 
 .spreadsheet-builder-section,
 .image-hotspot-builder-section,
+.external-artifact-builder-section,
 .spreadsheet-chart-panel,
-.spreadsheet-review-section {
+.spreadsheet-review-section,
+.external-artifact-review-section {
     min-width: 0;
     padding: 0.9rem;
     border: 1px solid rgba(148, 163, 184, 0.18);
@@ -2095,14 +2103,20 @@ select:focus {
 .spreadsheet-builder-section p,
 .image-hotspot-builder-section h4,
 .image-hotspot-builder-section p,
+.external-artifact-builder-section h4,
+.external-artifact-builder-section p,
 .spreadsheet-review-section h4,
-.spreadsheet-review-section p {
+.spreadsheet-review-section p,
+.external-artifact-review-section h4,
+.external-artifact-review-section p {
     margin: 0;
 }
 
 .spreadsheet-builder-section p,
 .image-hotspot-builder-section p,
-.spreadsheet-review-section p {
+.external-artifact-builder-section p,
+.spreadsheet-review-section p,
+.external-artifact-review-section p {
     color: var(--text-muted);
     line-height: 1.45;
 }
@@ -2222,6 +2236,74 @@ select:focus {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+}
+
+.external-artifact-evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    gap: var(--spacing-sm);
+    min-width: 0;
+}
+
+.external-artifact-link-field,
+.external-artifact-upload-panel,
+.external-artifact-upload-preview {
+    min-width: 0;
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.24);
+}
+
+.external-artifact-file-card {
+    display: grid;
+    grid-template-columns: 4.25rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.28);
+}
+
+.external-artifact-file-card.is-empty {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+}
+
+.external-artifact-file-card img {
+    width: 4.25rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: #ffffff;
+}
+
+.external-artifact-file-card>i,
+.external-artifact-upload-preview>i {
+    color: var(--secondary-color);
+}
+
+.external-artifact-file-card strong,
+.external-artifact-file-card p {
+    overflow-wrap: anywhere;
+}
+
+.external-artifact-file-card p,
+.external-artifact-upload-preview span {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+}
+
+.external-artifact-file-card a,
+.external-artifact-review-section a {
+    color: var(--secondary-color);
+    font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
 .spreadsheet-grid-wrap {
@@ -2774,7 +2856,8 @@ select:focus {
 .activity-review-excalidraw-root.structured-review-root,
 .activity-review-excalidraw-root.card-sort-review-root,
 .activity-review-excalidraw-root.spreadsheet-review-root,
-.activity-review-excalidraw-root.image-hotspot-review-root {
+.activity-review-excalidraw-root.image-hotspot-review-root,
+.activity-review-excalidraw-root.external-artifact-review-root {
     height: auto;
     min-height: 420px;
     padding: var(--spacing-sm);
@@ -3204,7 +3287,8 @@ select:focus {
 .student-classroom-excalidraw-root.structured-response-root,
 .student-classroom-excalidraw-root.card-sort-response-root,
 .student-classroom-excalidraw-root.spreadsheet-table-response-root,
-.student-classroom-excalidraw-root.image-hotspot-response-root {
+.student-classroom-excalidraw-root.image-hotspot-response-root,
+.student-classroom-excalidraw-root.external-artifact-response-root {
     height: auto;
     min-height: 0;
     padding: 0;
