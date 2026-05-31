@@ -23,9 +23,11 @@ import {
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
 import { StudentActivities } from './student/studentActivities.js';
+import { StudentClassroomActivities } from './student/studentClassroomActivities.js';
 
 const DEV_AUTH_DISABLED = false;
 const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
+const CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY = 'student_classroom_instructions_collapsed';
 
 class StudentManager {
     constructor() {
@@ -122,6 +124,7 @@ class StudentManager {
         this.auth = new StudentAuth(this);
         this.progress = new StudentProgress(this);
         this.activities = new StudentActivities(this);
+        this.classroomActivities = new StudentClassroomActivities(this);
         this.games = null;
         this.gamesPromise = null;
 
@@ -434,6 +437,10 @@ class StudentManager {
     }
 
     switchView(viewId) {
+        if (viewId !== 'student-classroom-activity-view') {
+            this.classroomActivities?.cleanup?.();
+        }
+
         $$('.view').forEach(el => {
             el.classList.add('hidden');
             el.classList.remove('active');
@@ -446,6 +453,9 @@ class StudentManager {
         }
 
         this.updateStudentNav(viewId);
+        if (viewId === 'student-classroom-activity-view') {
+            this.applyClassroomInstructionsCollapsedState();
+        }
         if (window.lucide) {
             window.lucide.createIcons();
         }
@@ -453,6 +463,10 @@ class StudentManager {
 
     getStudentSectionForView(viewId) {
         if (viewId === 'arcade-view') return 'arcade';
+        if ([
+            'student-classroom-activities-view',
+            'student-classroom-activity-view'
+        ].includes(viewId)) return 'classroom-activities';
         if ([
             'vocab-selection-view',
             'activity-menu-view',
@@ -509,6 +523,44 @@ class StudentManager {
 
         this.setStudentMobileMenu(false);
         if (focusToggle) toggle?.focus({ preventScroll: true });
+    }
+
+    getClassroomInstructionsCollapsed() {
+        return localStorage.getItem(CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY) === '1';
+    }
+
+    applyClassroomInstructionsCollapsedState() {
+        this.setClassroomInstructionsCollapsed(this.getClassroomInstructionsCollapsed(), { persist: false });
+    }
+
+    toggleClassroomInstructions() {
+        this.setClassroomInstructionsCollapsed(!this.getClassroomInstructionsCollapsed());
+    }
+
+    setClassroomInstructionsCollapsed(collapsed, { persist = true } = {}) {
+        const layout = $('#student-classroom-activity-layout');
+        const panel = $('#student-classroom-instructions-panel');
+        const body = $('#student-classroom-instructions-body');
+        const toggle = $('#student-toggle-classroom-instructions-btn');
+        const isCollapsed = Boolean(collapsed);
+
+        layout?.classList.toggle('instructions-collapsed', isCollapsed);
+        panel?.classList.toggle('is-collapsed', isCollapsed);
+        if (panel) panel.hidden = isCollapsed;
+        if (body) body.hidden = false;
+
+        if (toggle) {
+            const label = isCollapsed ? 'Show instructions' : 'Hide instructions';
+            toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+            toggle.setAttribute('aria-label', label);
+            toggle.title = label;
+            toggle.innerHTML = '<i data-lucide="book-open"></i> Instructions';
+        }
+
+        if (persist) {
+            localStorage.setItem(CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY, isCollapsed ? '1' : '0');
+        }
+        if (window.lucide) window.lucide.createIcons();
     }
 
     normalizeStudentProfile(profile = {}) {
@@ -649,6 +701,14 @@ class StudentManager {
             return { view: 'arcade' };
         }
 
+        if (parts.length === 1 && parts[0] === 'classroom-activities') {
+            return { view: 'classroom-activities' };
+        }
+
+        if (parts[0] === 'classroom-activities' && parts[1]) {
+            return { view: 'classroom-activity', assignmentId: parts[1] };
+        }
+
         if (parts[0] === 'unit' && parts[1]) {
             if (parts.length === 2) {
                 return { view: 'unit', unitId: parts[1] };
@@ -688,6 +748,10 @@ class StudentManager {
         if (!route || !route.view) return '#/menu';
 
         if (route.view === 'menu') return '#/menu';
+        if (route.view === 'classroom-activities') return '#/classroom-activities';
+        if (route.view === 'classroom-activity' && route.assignmentId) {
+            return `#/classroom-activities/${encodeURIComponent(route.assignmentId)}`;
+        }
         if (route.view === 'units') {
             const params = new URLSearchParams();
             if (route.all) params.set('all', '1');
@@ -818,6 +882,20 @@ class StudentManager {
                 return;
             }
 
+            if (targetRoute.view === 'classroom-activities') {
+                this.cleanupActivity();
+                this.currentVocab = null;
+                await this.classroomActivities.renderList();
+                return;
+            }
+
+            if (targetRoute.view === 'classroom-activity') {
+                this.cleanupActivity();
+                this.currentVocab = null;
+                await this.classroomActivities.showAssignment(targetRoute.assignmentId);
+                return;
+            }
+
             if (targetRoute.view === 'unit' || targetRoute.view === 'activity') {
                 const vocab = this.findVocabByRouteId(targetRoute.unitId);
                 if (!vocab) {
@@ -907,6 +985,30 @@ class StudentManager {
         this.addListener('#student-tab-vocabulary', 'click', () => {
             this.setStudentVocabularyDrilldownToCurrentTrimester();
             this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
+        });
+
+        this.addListener('#student-tab-classroom-activities', 'click', () => {
+            this.navigateTo({ view: 'classroom-activities' });
+        });
+
+        this.addListener('#back-to-classroom-activities-btn', 'click', () => {
+            this.navigateTo({ view: 'classroom-activities' });
+        });
+
+        this.addListener('#student-save-classroom-activity-btn', 'click', () => {
+            this.classroomActivities.saveCurrentSubmission({ notifyOnError: true });
+        });
+
+        this.addListener('#student-submit-classroom-activity-btn', 'click', () => {
+            this.classroomActivities.submitCurrentActivity();
+        });
+
+        this.addListener('#student-toggle-classroom-instructions-btn', 'click', () => {
+            this.toggleClassroomInstructions();
+        });
+
+        this.addListener('#student-close-classroom-instructions-btn', 'click', () => {
+            this.setClassroomInstructionsCollapsed(true);
         });
 
         // Arcade Navigation

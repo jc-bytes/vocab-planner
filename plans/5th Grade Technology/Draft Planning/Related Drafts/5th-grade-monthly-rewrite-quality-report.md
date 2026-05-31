@@ -72,7 +72,7 @@ Verified Markdown planning files:
 | 2nd | 4 | June | Scenario quiz | 10 web-search questions plus 2 short source-choice explanations |
 | 2nd | 6 | July | Design plan | 6-panel storyboard with title, audience, purpose, captions, and sound/narration notes |
 | 2nd | 8 | July | Product-sharing presentation | Short visual media product with title, 3 visual parts, captions, and 1-minute explanation |
-| 2nd | 9 | August | Debugging check | 6 if-then examples, 4 input-output matches, and 2 simple command errors corrected |
+| 2nd | 11 | August | Interactive Routine STEM Project | Paper, Scratch, or Blockly-style routine with one input, one condition, one output, one test result, and one improvement note |
 | 3rd | 2 | September | Sorting check | 12 data cards, 4 fields, 3 records, sorting/grouping, and 3 data questions |
 | 3rd | 4 | October | Data/chart task | 5 data questions, 2 fields sorted/filtered, 1 chart, and 2 explanation sentences |
 | 3rd | 6 | October | Tool/product check | 8 vector tools/actions plus simple icon with 5 shapes, 2 colors, grouped objects, and 2 explanation sentences |
@@ -84,7 +84,7 @@ Verified Markdown planning files:
 | Trimester | Quiz or Quiz-Style Check | Practice Before Quiz | Presentation, Demo, or Product Sharing |
 | --- | --- | --- | --- |
 | 1st | Week 5 robot communication and sensor scenario quiz | Weeks 2-4 practice robot parts, sensors, motors, controller, input/output, and communication. | Week 8 Worm Robot demo; Week 11 Propeller Aircraft short demo |
-| 2nd | Week 4 web search scenario quiz; Week 9 selection/debugging check | Weeks 3-4 practice search skills; Week 9 Class 1 practices input/output, condition, and simple error correction before the Week 9 check. | Week 8 visual media product-sharing presentation; Week 11 short logic demo |
+| 2nd | Week 4 web search scenario quiz; Week 9 selection/debugging preparation is formative | Weeks 3-4 practice search skills; Weeks 9-10 practice input/output, condition, and simple error correction before the Week 11 project. | Week 8 visual media product-sharing presentation; Week 11 Interactive Routine STEM Project demo |
 | 3rd | Week 9 Scratch selection quiz-style check | Week 9 Class 1 practices conditions, outcomes, and if-then sentences before the check. | Week 8 vector product-sharing presentation |
 
 Balance note:
@@ -116,7 +116,7 @@ Balance note:
 7. Web search scenario quiz and teacher key.
 8. Storyboard design template and rubric.
 9. Visual media product-sharing checklist/rubric.
-10. Selection and debugging check and teacher key.
+10. Interactive Routine STEM Project rubric and formative debugging preparation sheet.
 11. Database card set and sorting checklist.
 12. Database search/chart task and teacher key.
 13. Vector tool labeling sheet and icon rubric.
@@ -158,7 +158,7 @@ Corrections made during third pass:
 - Corrected two grammar issues from `a approved model` to `an approved model`.
 - Corrected December evaluation from `5 summatives by Week 10` to `5 summatives by Week 9`.
 - Clarified December Week 12 evidence workshop wording.
-- Tightened Trimester 2 Week 9 Class 1 so students practice correcting a simple input-output error before the Week 9 selection/debugging check.
+- Reframed Trimester 2 Week 9 selection/debugging work as formative preparation before the Week 11 Interactive Routine STEM Project.
 
 Classroom usability checks:
 - Pre-Activities are short and should fit in 10-15 minutes.

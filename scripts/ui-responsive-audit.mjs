@@ -13,7 +13,9 @@ const allowedScrollableSelectors = [
     '.cw-grid',
     '.modal-body',
     '.modal-content',
-    '#activity-container'
+    '#activity-container',
+    '.activity-excalidraw-root',
+    '.excalidraw'
 ];
 
 for (const key of requiredEnv) {
@@ -57,7 +59,7 @@ async function resolveBaseUrl() {
         return { baseUrl, server: null };
     }
 
-    const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
+    const server = spawn('npx', ['vite', '--host', '127.0.0.1', '--port', String(port)], {
         cwd: process.cwd(),
         stdio: 'ignore'
     });
@@ -122,11 +124,12 @@ async function loginStudent(page, baseUrl) {
     }
 }
 
-async function auditRoute(page, url, label) {
+async function auditRoute(page, url, label, options = {}) {
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
         await page.goto(url, { waitUntil: 'domcontentloaded' });
         await waitForApp(page);
+        await options.beforeAudit?.(page, width);
 
         const result = await page.evaluate(({ allowedScrollableSelectors }) => {
             const isVisible = (element) => {
@@ -166,7 +169,9 @@ async function auditRoute(page, url, label) {
                 'textarea',
                 '[role="button"]',
                 '[role="tab"]'
-            ].join(','))).filter(isVisible);
+            ].join(',')))
+                .filter(isVisible)
+                .filter(element => !allowedScrollableSelectors.some(selector => element.closest(selector)));
 
             const smallControls = controls.map(element => {
                 const rect = element.getBoundingClientRect();
@@ -215,6 +220,15 @@ async function auditRoute(page, url, label) {
             throw new Error(`${label} at ${width}px: ${failures.join('; ')}`);
         }
     }
+}
+
+async function findFirstAssignmentId(page, url, selector) {
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await waitForApp(page);
+    await page.waitForTimeout(500);
+    const cards = page.locator(selector);
+    if ((await cards.count()) === 0) return null;
+    return cards.first().getAttribute('data-assignment-id').catch(() => null);
 }
 
 async function auditTeacherStudentModal(page, baseUrl) {
@@ -325,10 +339,11 @@ async function assertDataSettingsUnifiedTabs(page, baseUrl) {
         const visiblePanels = Array.from(document.querySelectorAll('.data-tab-content'))
             .filter(panel => window.getComputedStyle(panel).display !== 'none')
             .map(panel => panel.id);
-        const tabListRect = document.querySelector('.data-tab-list')?.getBoundingClientRect();
+        const dataView = document.querySelector('#teacher-data-management-view');
+        const tabListRect = dataView?.querySelector('.data-tab-list')?.getBoundingClientRect();
         return {
-            tabCount: document.querySelectorAll('.data-tab-btn').length,
-            selectedTab: document.querySelector('.data-tab-btn[aria-selected="true"]')?.dataset.tab,
+            tabCount: dataView?.querySelectorAll('.data-tab-btn').length || 0,
+            selectedTab: dataView?.querySelector('.data-tab-btn[aria-selected="true"]')?.dataset.tab,
             tabListHeight: Math.round(tabListRect?.height || 0),
             visiblePanels
         };
@@ -527,22 +542,70 @@ async function main() {
             ['Teacher Overview', `${baseUrl}/teacher.html#/teacher/overview`],
             ['Teacher Students', `${baseUrl}/teacher.html#/teacher/students`],
             ['Teacher Vocabulary', `${baseUrl}/teacher.html#/teacher/vocabulary`],
+            ['Teacher Activities', `${baseUrl}/teacher.html#/teacher/activities`],
+            ['Teacher Activity Editor', `${baseUrl}/teacher.html#/teacher/activities/editor`, {
+                beforeAudit: async (page) => {
+                    await page.waitForFunction(() => {
+                        const status = document.querySelector('#activity-excalidraw-status')?.textContent?.trim();
+                        return status === 'Editor ready.'
+                            || status === 'Builder ready.'
+                            || status?.startsWith('Editor unavailable.');
+                    }, null, { timeout: 20000 });
+                }
+            }],
             ['Teacher Quizzes', `${baseUrl}/teacher.html#/teacher/quizzes`],
             ['Teacher Data Settings', `${baseUrl}/teacher.html#/teacher/data-settings`]
         ];
+        const teacherAssignmentId = await findFirstAssignmentId(
+            teacherPage,
+            `${baseUrl}/teacher.html#/teacher/activities`,
+            '.activity-assignment-card[data-assignment-id]'
+        );
+        if (teacherAssignmentId) {
+            teacherRoutes.push([
+                'Teacher Activity Review',
+                `${baseUrl}/teacher.html#/teacher/activities/assignment/${encodeURIComponent(teacherAssignmentId)}`
+            ]);
+        }
+
         const studentRoutes = [
             ['Student Dashboard', `${baseUrl}/student.html#/menu`],
             ['Student Units', `${baseUrl}/student.html#/units?all=1`],
             ['Student Unit Menu', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`],
             ['Student Flashcards', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product/activity/flashcards`],
+            ['Student Classroom Activities', `${baseUrl}/student.html#/classroom-activities`],
             ['Student Arcade', `${baseUrl}/student.html#/arcade`]
         ];
-
-        for (const [label, url] of teacherRoutes) {
-            await auditRoute(teacherPage, url, label);
+        const studentAssignmentId = await findFirstAssignmentId(
+            studentPage,
+            `${baseUrl}/student.html#/classroom-activities`,
+            '.student-classroom-activity-card[data-assignment-id]'
+        );
+        if (studentAssignmentId) {
+            studentRoutes.push([
+                'Student Classroom Activity',
+                `${baseUrl}/student.html#/classroom-activities/${encodeURIComponent(studentAssignmentId)}`,
+                {
+                    beforeAudit: async (page) => {
+                        await page.waitForFunction(() => {
+                            const status = document.querySelector('#student-classroom-activity-save-status')?.textContent?.trim() || '';
+                            return status.includes('Canvas ready')
+                                || status.includes('Response ready')
+                                || status.includes('Draft ready')
+                                || status.includes('Submitted')
+                                || status.includes('Saved locally')
+                                || status.includes('unavailable');
+                        }, null, { timeout: 20000 });
+                    }
+                }
+            ]);
         }
-        for (const [label, url] of studentRoutes) {
-            await auditRoute(studentPage, url, label);
+
+        for (const [label, url, options] of teacherRoutes) {
+            await auditRoute(teacherPage, url, label, options);
+        }
+        for (const [label, url, options] of studentRoutes) {
+            await auditRoute(studentPage, url, label, options);
         }
 
         await auditTeacherStudentModal(teacherPage, baseUrl);

@@ -71,15 +71,16 @@ class NotificationManager {
         toast.innerHTML = `
             <span style="font-size: 1.25rem;">${icons[type] || icons.info}</span>
             <span style="flex: 1;">${message}</span>
-            <button class="toast-close" style="
+            <button class="toast-close" type="button" aria-label="Dismiss notification" style="
                 background: none;
                 border: none;
                 color: white;
                 font-size: 1.25rem;
                 cursor: pointer;
                 padding: 0;
-                width: 24px;
-                height: 24px;
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -166,4 +167,3 @@ class NotificationManager {
 
 // Export singleton instance
 export const notifications = new NotificationManager();
-

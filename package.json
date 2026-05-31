@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "python3 -m http.server 8000",
+    "dev": "vite --host 127.0.0.1 --port 8000",
     "test:ui:responsive": "node scripts/ui-responsive-audit.mjs",
     "desktop:dev": "vite --host 127.0.0.1",
     "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
@@ -17,9 +17,12 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
     "@supabase/supabase-js": "^2.49.8",
     "chart.js": "^4.4.9",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",

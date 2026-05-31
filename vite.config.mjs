@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 export default defineConfig({
   appType: 'mpa',
+  base: './',
   publicDir: false,
   build: {
     outDir: 'dist-desktop',

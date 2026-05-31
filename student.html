@@ -46,6 +46,11 @@
                         <i data-lucide="book-open"></i>
                         <span>Vocabulary</span>
                     </button>
+                    <button class="teacher-tab student-tab" id="student-tab-classroom-activities" type="button" role="tab"
+                        aria-selected="false" data-section="classroom-activities">
+                        <i data-lucide="shapes"></i>
+                        <span>Activities</span>
+                    </button>
                     <button class="teacher-tab student-tab" id="student-tab-arcade" type="button" role="tab"
                         aria-selected="false" data-section="arcade">
                         <i data-lucide="gamepad-2"></i>
@@ -293,6 +298,85 @@
                     <div id="activity-progress-indicator" class="hidden">Progress: 0%</div>
                 </div>
                 <div id="activity-container"></div>
+            </section>
+
+            <!-- View: Classroom Activities -->
+            <section id="student-classroom-activities-view" class="view hidden">
+                <div class="student-dashboard-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Activities</p>
+                        <h2>Classroom Activities</h2>
+                    </div>
+                </div>
+                <div id="student-classroom-activities-list" class="student-classroom-activities-list">
+                    <div class="loading-spinner">Loading activities...</div>
+                </div>
+            </section>
+
+            <!-- View: Classroom Activity Canvas -->
+            <section id="student-classroom-activity-view" class="view hidden">
+                <div class="student-classroom-activity-shell">
+                    <div class="teacher-page-heading student-classroom-activity-heading">
+                        <div>
+                            <button id="back-to-classroom-activities-btn" class="btn text-btn teacher-back-btn" type="button">
+                                <i data-lucide="arrow-left"></i>
+                                Activities
+                            </button>
+                            <p id="student-classroom-activity-meta" class="teacher-eyebrow">Classroom Activity</p>
+                            <h2 id="student-classroom-activity-title">Classroom Activity</h2>
+                        </div>
+                        <div class="teacher-toolbar">
+                            <button id="student-toggle-classroom-instructions-btn" class="btn secondary-btn student-instructions-toggle" type="button"
+                                aria-controls="student-classroom-instructions-panel" aria-expanded="true"
+                                aria-label="Hide instructions" title="Hide instructions">
+                                <i data-lucide="book-open"></i>
+                                Instructions
+                            </button>
+                            <button id="student-save-classroom-activity-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="cloud-upload"></i>
+                                Save Draft
+                            </button>
+                            <button id="student-submit-classroom-activity-btn" class="btn primary-btn" type="button">
+                                <i data-lucide="send"></i>
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="student-classroom-activity-layout" class="student-classroom-activity-layout">
+                        <aside id="student-classroom-instructions-panel" class="teacher-panel student-classroom-instructions">
+                            <div class="teacher-panel-header">
+                                <div class="student-classroom-instructions-heading">
+                                    <h3>Instructions</h3>
+                                    <p id="student-classroom-activity-save-status">Draft not saved yet.</p>
+                                </div>
+                                <button id="student-close-classroom-instructions-btn" class="btn text-btn icon-btn student-instructions-close" type="button"
+                                    aria-label="Close instructions" title="Close instructions">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                            <div id="student-classroom-instructions-body" class="student-classroom-instructions-body">
+                                <p id="student-classroom-activity-description" class="student-classroom-description"></p>
+                                <div class="student-classroom-detail-block">
+                                    <h4>What to do</h4>
+                                    <p id="student-classroom-activity-instructions"></p>
+                                </div>
+                                <div class="student-classroom-detail-block">
+                                    <h4>Materials</h4>
+                                    <p id="student-classroom-activity-materials"></p>
+                                </div>
+                                <div class="student-classroom-detail-block">
+                                    <h4>Turn in</h4>
+                                    <p id="student-classroom-activity-output"></p>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <section class="teacher-panel student-classroom-canvas-panel">
+                            <div id="student-classroom-excalidraw-root" class="activity-excalidraw-root student-classroom-excalidraw-root"></div>
+                        </section>
+                    </div>
+                </div>
             </section>
 
             <!-- View: Arcade -->

@@ -37,6 +37,11 @@
                         <i data-lucide="book-open"></i>
                         Vocabulary
                     </button>
+                    <button class="teacher-tab" id="tab-activities" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-activities-view" data-section="activities">
+                        <i data-lucide="shapes"></i>
+                        Activities
+                    </button>
                     <button class="teacher-tab" id="tab-students" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-progress-view" data-section="students">
                         <i data-lucide="users"></i>
@@ -193,6 +198,10 @@
                                 <i data-lucide="book-open"></i>
                                 <span>Manage vocabulary</span>
                             </button>
+                            <button class="teacher-action-card" id="overview-activities-btn" type="button">
+                                <i data-lucide="shapes"></i>
+                                <span>Build activities</span>
+                            </button>
                             <button class="teacher-action-card" id="overview-quiz-btn" type="button">
                                 <i data-lucide="file-text"></i>
                                 <span>Prepare quiz</span>
@@ -247,6 +256,313 @@
                         <div class="loading-spinner">Loading library...</div>
                     </div>
                 </section>
+            </section>
+
+            <!-- View: Activities -->
+            <section id="teacher-activities-view" class="view hidden" role="tabpanel" aria-labelledby="tab-activities">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Activities</p>
+                        <h2>Classroom Activities</h2>
+                    </div>
+                </div>
+
+                <div class="data-tab-list activity-workflow-tabs" role="tablist" aria-label="Activity workflow">
+                    <button id="activity-tab-assign" class="data-tab-btn activity-workflow-tab active" type="button"
+                        role="tab" aria-selected="true" aria-controls="activity-assign-panel" data-activity-tab="assign">
+                        <i data-lucide="send"></i>
+                        Assign
+                    </button>
+                    <button id="activity-tab-review" class="data-tab-btn activity-workflow-tab" type="button"
+                        role="tab" aria-selected="false" aria-controls="activity-review-panel" data-activity-tab="review">
+                        <i data-lucide="clipboard-check"></i>
+                        Review
+                    </button>
+                </div>
+
+                <div id="activity-assign-panel" class="activity-workflow-panel" role="tabpanel" aria-labelledby="activity-tab-assign">
+                    <section class="teacher-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Activity Library</h3>
+                                <p>Organized by subject and grade so each class has its own activity set.</p>
+                            </div>
+                            <div class="teacher-toolbar">
+                                <label class="teacher-toolbar-select" for="activity-template-select">
+                                    <span>Template</span>
+                                    <select id="activity-template-select">
+                                        <optgroup label="Map / Diagram">
+                                            <option value="blank-map-diagram">Blank Map / Diagram</option>
+                                            <option value="labeled-map">Labeled Map</option>
+                                            <option value="concept-map">Concept Map</option>
+                                            <option value="process-diagram">Process Diagram</option>
+                                        </optgroup>
+                                        <optgroup label="Structured Response">
+                                            <option value="worksheet">Worksheet</option>
+                                            <option value="reflection">Reflection</option>
+                                            <option value="checklist">Checklist</option>
+                                        </optgroup>
+                                    </select>
+                                </label>
+                                <button id="create-activity-btn" class="btn primary-btn" type="button">
+                                    <i data-lucide="plus"></i>
+                                    Create Activity
+                                </button>
+                            </div>
+                        </div>
+                        <div id="activity-library-list" class="teacher-library-browser">
+                            <div class="loading-spinner">Loading activities...</div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="activity-review-panel" class="activity-workflow-panel hidden" role="tabpanel" aria-labelledby="activity-tab-review">
+                    <section class="teacher-panel activity-assignment-panel">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Assigned Activities</h3>
+                                <p>Active student-facing activity assignments and submission status.</p>
+                            </div>
+                        </div>
+                        <div id="activity-assignment-list" class="teacher-library-browser">
+                            <div class="loading-spinner">Loading assigned activities...</div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <!-- View: Activity Editor -->
+            <section id="teacher-activity-editor-view" class="view hidden" role="tabpanel" aria-labelledby="tab-activities">
+                <div class="teacher-page-heading">
+                    <div>
+                        <button id="back-to-activities" class="btn text-btn teacher-back-btn" type="button">
+                            <i data-lucide="arrow-left"></i>
+                            Activities
+                        </button>
+                        <h2 style="margin: 0.35rem 0 0 0;">Activity Editor</h2>
+                        <p id="activity-save-status" class="activity-editor-status">Draft not saved yet.</p>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="activity-canvas-focus-btn" class="btn secondary-btn" type="button" aria-pressed="false">
+                            <i data-lucide="maximize-2"></i>
+                            <span>Focus Canvas</span>
+                        </button>
+                        <button id="assign-activity-toolbar-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="send"></i>
+                            Assign
+                        </button>
+                        <button id="save-activity-update-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="cloud-upload"></i>
+                            Save Update
+                        </button>
+                        <button id="save-activity-new-version-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="copy-plus"></i>
+                            Save as New
+                        </button>
+                        <button id="export-activity-btn" class="btn primary-btn" type="button">
+                            <i data-lucide="download"></i>
+                            Export JSON
+                        </button>
+                    </div>
+                </div>
+
+                <div class="activity-editor-layout">
+                    <div class="data-tab-list activity-editor-tabs" role="tablist" aria-label="Activity editor sections">
+                        <button id="activity-editor-tab-settings" class="data-tab-btn activity-editor-tab active" type="button"
+                            role="tab" aria-selected="true" aria-controls="activity-settings-panel" data-activity-editor-tab="settings">
+                            <i data-lucide="sliders-horizontal"></i>
+                            Settings
+                        </button>
+                        <button id="activity-editor-tab-instructions" class="data-tab-btn activity-editor-tab" type="button"
+                            role="tab" aria-selected="false" aria-controls="activity-instructions-panel" data-activity-editor-tab="instructions">
+                            <i data-lucide="book-open"></i>
+                            Instructions
+                        </button>
+                        <button id="activity-editor-tab-build" class="data-tab-btn activity-editor-tab" type="button"
+                            role="tab" aria-selected="false" aria-controls="activity-build-panel" data-activity-editor-tab="build">
+                            <i data-lucide="wrench"></i>
+                            Build
+                        </button>
+                        <button id="activity-editor-tab-preview" class="data-tab-btn activity-editor-tab" type="button"
+                            role="tab" aria-selected="false" aria-controls="activity-preview-panel" data-activity-editor-tab="preview">
+                            <i data-lucide="eye"></i>
+                            Preview
+                        </button>
+                    </div>
+
+                    <section id="activity-settings-panel" class="teacher-panel activity-editor-tab-panel activity-editor-form"
+                        role="tabpanel" aria-labelledby="activity-editor-tab-settings" data-activity-editor-panel="settings">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Settings</h3>
+                                <p>Class, timing, purpose, and activity type.</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="activity-id">
+
+                        <div class="form-group">
+                            <label for="activity-title">Title</label>
+                            <input type="text" id="activity-title" placeholder="e.g., Community Map">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-description">Description</label>
+                            <textarea id="activity-description" rows="3" placeholder="Brief classroom purpose"></textarea>
+                        </div>
+
+                        <div class="activity-meta-grid">
+                            <div class="form-group">
+                                <label for="activity-subject">Subject *</label>
+                                <select id="activity-subject"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-grades">Grade Levels *</label>
+                                <input type="text" id="activity-grades" placeholder="e.g., 6, 7" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-type">Type</label>
+                                <select id="activity-type">
+                                    <option value="map-diagram">Map / Diagram</option>
+                                    <option value="structured-response">Structured Response</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-assessment-purpose">Purpose</label>
+                                <select id="activity-assessment-purpose">
+                                    <option value="formative">Formative</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="activity-estimated-minutes">Minutes</label>
+                                <input type="number" id="activity-estimated-minutes" min="1" placeholder="45">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="activity-instructions-panel" class="teacher-panel activity-editor-tab-panel hidden"
+                        role="tabpanel" aria-labelledby="activity-editor-tab-instructions" data-activity-editor-panel="instructions">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Instructions</h3>
+                                <p>Teacher guidance, student directions, materials, and makeup work.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="activity-teacher-instructions">Teacher Instructions</label>
+                            <textarea id="activity-teacher-instructions" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-student-instructions">Student Instructions</label>
+                            <textarea id="activity-student-instructions" rows="5"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-materials">Materials</label>
+                            <textarea id="activity-materials" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-student-output">Student Output</label>
+                            <textarea id="activity-student-output" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="activity-makeup-instructions">Makeup Instructions</label>
+                            <textarea id="activity-makeup-instructions" rows="3"></textarea>
+                        </div>
+                    </section>
+
+                    <section id="activity-build-panel" class="teacher-panel activity-editor-tab-panel activity-canvas-panel hidden"
+                        role="tabpanel" aria-labelledby="activity-editor-tab-build" data-activity-editor-panel="build">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3 id="activity-workspace-title">Canvas</h3>
+                                <p id="activity-excalidraw-status">Loading editor...</p>
+                            </div>
+                        </div>
+                        <div id="activity-excalidraw-root" class="activity-excalidraw-root"></div>
+                        <div id="activity-structured-root" class="activity-structured-root hidden"></div>
+                    </section>
+
+                    <section id="activity-preview-panel" class="teacher-panel activity-editor-tab-panel hidden"
+                        role="tabpanel" aria-labelledby="activity-editor-tab-preview" data-activity-editor-panel="preview">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Preview</h3>
+                                <p>Student-facing view of the activity directions and response area.</p>
+                            </div>
+                        </div>
+                        <div id="activity-preview-root" class="activity-preview-root"></div>
+                    </section>
+                </div>
+            </section>
+
+            <!-- View: Activity Assignment Review -->
+            <section id="teacher-activity-assignment-view" class="view hidden" role="tabpanel" aria-labelledby="tab-activities">
+                <div class="teacher-page-heading">
+                    <div>
+                        <button id="back-to-activity-assignments" class="btn text-btn teacher-back-btn" type="button">
+                            <i data-lucide="arrow-left"></i>
+                            Activities
+                        </button>
+                        <p class="teacher-eyebrow">Assigned Activity</p>
+                        <h2 id="activity-assignment-title" style="margin: 0.35rem 0 0 0;">Activity Review</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="refresh-activity-assignment-review-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="refresh-cw"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="activity-review-layout">
+                    <section class="teacher-panel activity-review-brief">
+                        <div class="teacher-panel-header">
+                            <div>
+                                <h3>Assignment Snapshot</h3>
+                                <p id="activity-assignment-summary">Loading assignment...</p>
+                            </div>
+                        </div>
+                        <div id="activity-assignment-stats" class="activity-assignment-stats"></div>
+                    </section>
+
+                    <div class="activity-review-workspace">
+                        <aside class="teacher-panel activity-review-student-panel">
+                            <div class="teacher-panel-header">
+                                <div>
+                                    <h3>Students</h3>
+                                    <p id="activity-submission-summary">No submissions loaded yet.</p>
+                                </div>
+                            </div>
+                            <div id="activity-submission-roster" class="activity-submission-roster">
+                                <div class="loading-spinner">Loading submissions...</div>
+                            </div>
+                        </aside>
+
+                        <section class="teacher-panel activity-review-canvas-panel">
+                            <div class="teacher-panel-header">
+                                <div>
+                                    <h3>Student Work</h3>
+                                    <p id="activity-review-canvas-status">Select a student submission to preview.</p>
+                                </div>
+                                <div class="activity-review-nav-controls" aria-label="Student review navigation">
+                                    <button id="activity-review-prev-student-btn" class="btn secondary-btn icon-btn" type="button"
+                                        aria-label="Previous student" title="Previous student" disabled>
+                                        <i data-lucide="chevron-left"></i>
+                                    </button>
+                                    <span id="activity-review-student-nav-label">No student selected</span>
+                                    <button id="activity-review-next-student-btn" class="btn secondary-btn icon-btn" type="button"
+                                        aria-label="Next student" title="Next student" disabled>
+                                        <i data-lucide="chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="activity-review-excalidraw-root" class="activity-excalidraw-root activity-review-excalidraw-root"></div>
+                        </section>
+                    </div>
+                </div>
             </section>
 
             <!-- View: Student Progress -->
@@ -1186,6 +1502,54 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Activity Assignment Modal -->
+    <div id="activity-assignment-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="activity-assignment-modal-title">
+        <div class="modal-content card" style="max-width: 620px; width: 95%;">
+            <div class="modal-header">
+                <div>
+                    <h3 id="activity-assignment-modal-title">Assign Activity</h3>
+                    <small id="activity-assignment-modal-subtitle" style="color:var(--text-muted);">Choose who should receive this activity.</small>
+                </div>
+                <button id="close-activity-assignment-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close assignment dialog">×</button>
+            </div>
+            <form id="activity-assignment-form">
+                <div class="modal-body">
+                    <input type="hidden" id="assignment-source-activity-id">
+                    <div class="form-group">
+                        <label for="assignment-target-grades">Target Grades</label>
+                        <input type="text" id="assignment-target-grades" placeholder="e.g., 6, 7" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignment-target-sections">Target Sections</label>
+                        <input type="text" id="assignment-target-sections" placeholder="Optional, e.g., A, B">
+                        <small>Leave blank to include all sections in the selected grades.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignment-week-label">Week / Class Window</label>
+                        <input type="text" id="assignment-week-label" placeholder="e.g., Week 3 or Mar 16-20">
+                    </div>
+                    <div class="form-group">
+                        <label for="assignment-available-from">Visible to Students On</label>
+                        <input type="date" id="assignment-available-from">
+                        <small>Students cannot see or open the activity before this date.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignment-due-date">Due Date</label>
+                        <input type="date" id="assignment-due-date">
+                    </div>
+                    <div id="activity-assignment-modal-status" class="activity-assignment-modal-status" role="status" aria-live="polite"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancel-activity-assignment-btn" class="btn secondary-btn">Cancel</button>
+                    <button type="submit" class="btn primary-btn">
+                        <i data-lucide="send"></i>
+                        Assign Activity
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Word Editor Modal -->

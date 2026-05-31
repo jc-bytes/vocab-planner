@@ -146,8 +146,10 @@ Main risks:
 Recommended Trimester 2 correction:
 - Keep the June-July-August content distribution.
 - Add August 31-September 4 as a 2nd-trimester closing week.
-- Add assessment language for the three products: search challenge, video project, physical computing challenge.
-- Use the added week for physical computing final testing, code challenge completion, project demonstrations, notebook evidence, and trimester reflection.
+- Replace the Week 9 counted debugging check with a formative debugging preparation task.
+- Use Summative Activity #5 for a low-risk Interactive Routine STEM Project in Week 11: one input, one condition, one output, one test result, and one improvement note.
+- Use paper, Scratch, or Blockly simulation as the default evidence; hardware is optional only if materials are already ready.
+- Use the added week for STEM project make-up, code challenge completion, notebook evidence, and trimester reflection.
 
 ## Trimester 3 Feasibility
 
@@ -169,7 +171,7 @@ This trimester is coherent. The Scratch quiz receives enough time because Novemb
 Recommended Trimester 3 correction:
 - Keep the overall distribution.
 - Add or generate the missing rubrics/study guides/summatives later.
-- Make sure September's 3-week database plan includes one clear product or evidence item.
+- Reframe September's database product around Interactive Routine STEM Project data cards: input, condition, output, test result, and improvement.
 - Keep December as polish, presentation, and reflection rather than new content.
 
 ## Highest-Priority Fixes
@@ -190,7 +192,7 @@ Do not rebuild all monthly plans yet. First fix the calendar and dosification:
 - March should become a 4-week plan.
 - April should keep 5 weeks but use 2026 dates.
 - May can stay 4 weeks.
-- June-August should become a 13-week Trimester 2 plan by adding August 31-September 4 as the closing/assessment week.
+- June-August should become a 13-week Trimester 2 plan by adding August 31-September 4 as the closing/assessment week and by using Week 11 for the Interactive Routine STEM Project.
 - September-December can stay as the 13-week Trimester 3 plan.
 
 After that, the plan is feasible enough to become the basis for rubrics, study guides, and summative assessments.

@@ -26,8 +26,24 @@ import {
     loadSubjects,
     loadVocabularyFile,
     normalizeSubject,
+    normalizeSubjectSlug,
     normalizeSchoolCalendar
 } from './services/vocabularyApi.js';
+import {
+    STRUCTURED_BLOCK_TYPE_LABELS,
+    STRUCTURED_BLOCK_TYPES,
+    STRUCTURED_RESPONSE_TYPE,
+    canRequireStructuredBlock,
+    createDefaultResponseTemplate,
+    createStructuredBlock,
+    createStructuredId,
+    getStructuredBlockPolicy,
+    normalizeResponseTemplate,
+    normalizeStructuredBlock,
+    structuredBlockUsesGrid,
+    structuredBlockUsesItems,
+    structuredBlockUsesPairs
+} from './activityStructuredResponse.js';
 
 const DEV_AUTH_DISABLED = false;
 const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
@@ -58,6 +74,60 @@ const DEFAULT_REQUIRED_BY_PURPOSE = {
     practice: ['flashcards', 'matching'],
     default: ['flashcards', 'matching']
 };
+const TEACHER_ACTIVITY_LOCAL_KEY = 'teacher_activity_library';
+const ACTIVITY_COLLECTION = 'classroomActivities';
+const ACTIVITY_ASSIGNMENT_COLLECTION = 'classroomActivityAssignments';
+const ACTIVITY_SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
+const DEFAULT_ACTIVITY_TYPE = 'map-diagram';
+const DEFAULT_ACTIVITY_TEMPLATE_ID = 'blank-map-diagram';
+const ACTIVITY_TEMPLATE_OPTIONS = [
+    {
+        id: 'blank-map-diagram',
+        type: 'map-diagram',
+        label: 'Blank Map / Diagram',
+        description: 'Open canvas for a teacher-built map, diagram, or visual organizer.'
+    },
+    {
+        id: 'labeled-map',
+        type: 'map-diagram',
+        label: 'Labeled Map',
+        description: 'Map area with title and legend placeholders.'
+    },
+    {
+        id: 'concept-map',
+        type: 'map-diagram',
+        label: 'Concept Map',
+        description: 'Central idea connected to supporting details.'
+    },
+    {
+        id: 'process-diagram',
+        type: 'map-diagram',
+        label: 'Process Diagram',
+        description: 'Three-step flow for sequencing, systems, or procedures.'
+    },
+    {
+        id: 'worksheet',
+        type: STRUCTURED_RESPONSE_TYPE,
+        label: 'Worksheet',
+        description: 'Structured prompts, checklist items, and written answers.'
+    },
+    {
+        id: 'reflection',
+        type: STRUCTURED_RESPONSE_TYPE,
+        label: 'Reflection',
+        description: 'Guided prompts for students to explain learning, challenges, and improvements.'
+    },
+    {
+        id: 'checklist',
+        type: STRUCTURED_RESPONSE_TYPE,
+        label: 'Checklist',
+        description: 'Completion checklist with optional evidence and teacher notes.'
+    }
+];
+const ACTIVITY_TYPE_LABELS = {
+    'map-diagram': 'Map / Diagram',
+    [STRUCTURED_RESPONSE_TYPE]: 'Structured Response'
+};
 
 class TeacherManager {
     constructor() {
@@ -70,6 +140,7 @@ class TeacherManager {
             activitySettings: {},
             words: []
         };
+        this.activity = this.createDefaultActivity();
         this.currentQuiz = null;
         this.allStudentData = [];
         this.filteredStudentData = [];
@@ -78,7 +149,12 @@ class TeacherManager {
         this.isAuthenticated = this.authDisabled;
         this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
         this.cloudSaveTimeout = null;
+        this.activityCloudSaveTimeout = null;
+        this.activityLocalSaveTimeout = null;
         this.VOCAB_COLLECTION = 'vocabularies';
+        this.ACTIVITY_COLLECTION = ACTIVITY_COLLECTION;
+        this.ACTIVITY_ASSIGNMENT_COLLECTION = ACTIVITY_ASSIGNMENT_COLLECTION;
+        this.ACTIVITY_SUBMISSION_COLLECTION = ACTIVITY_SUBMISSION_COLLECTION;
         this.activeStudentId = null;
         this.currentQuiz = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
@@ -86,11 +162,16 @@ class TeacherManager {
         this.dataViewerInitialized = false;
         this.exportListenersInitialized = false;
         this.libraryItems = [];
+        this.activityLibraryItems = [];
         this.libraryDrilldown = {
             subject: null,
             grade: null,
             trimester: null,
             month: null
+        };
+        this.activityDrilldown = {
+            subject: null,
+            grade: null
         };
         this.quizLibraryItems = [];
         this.quizDrilldown = {
@@ -102,6 +183,18 @@ class TeacherManager {
         this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
+        this.activityLibraryCache = null;
+        this.activityLibraryPromise = null;
+        this.activityLibraryLoaded = false;
+        this.activityAssignmentCache = null;
+        this.activityAssignmentPromise = null;
+        this.activityAssignmentItems = [];
+        this.activityAssignmentsLoaded = false;
+        this.activeActivityAssignment = null;
+        this.activityMode = 'assign';
+        this.activityReviewHandle = null;
+        this.activeActivityReview = null;
+        this.activeActivityReviewSelectionIndex = -1;
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;
         this.studentProgressPromise = null;
@@ -109,6 +202,14 @@ class TeacherManager {
         this.isApplyingRoute = false;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
+        this.lastActivitiesRoute = null;
+        this.activityEditorHandle = null;
+        this.activityEditorMountPromise = null;
+        this.activityEditorAutosaveReady = false;
+        this.activityEditorAutosaveReadyTimeout = null;
+        this.activityEditorTab = 'settings';
+        this.structuredBuilderMode = 'build';
+        this.deletedActivityIds = new Set();
         this.quizMaker = null;
         this.quizMakerVocabKey = null;
         this.quizEditorOpen = false;
@@ -249,6 +350,9 @@ class TeacherManager {
             'teacher-overview-view',
             'teacher-dashboard-view',
             'teacher-editor-view',
+            'teacher-activities-view',
+            'teacher-activity-editor-view',
+            'teacher-activity-assignment-view',
             'teacher-progress-view',
             'teacher-quizzes-view',
             'quiz-maker-view',
@@ -299,6 +403,18 @@ class TeacherManager {
         if (parts[0] !== 'teacher') return null;
         if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
         if (parts[1] === 'students') return { view: 'students' };
+        if (parts[1] === 'activities' && parts[2] === 'assignment' && parts[3]) {
+            return { view: 'activity-assignment', assignmentId: parts[3] };
+        }
+        if (parts[1] === 'activities' && parts[2] === 'editor') return { view: 'activity-editor' };
+        if (parts[1] === 'activities') {
+            return {
+                view: 'activities',
+                subject: params.get('subject') || null,
+                grade: params.get('grade') || null,
+                mode: params.get('mode') === 'review' ? 'review' : 'assign'
+            };
+        }
         if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
         if (parts[1] === 'quizzes') return { view: 'quizzes' };
         if (parts[1] === 'data-settings') return { view: 'data-settings', tab: params.get('tab') || undefined };
@@ -320,6 +436,18 @@ class TeacherManager {
         if (!route || !route.view) return '#/teacher/overview';
         if (route.view === 'overview') return '#/teacher/overview';
         if (route.view === 'students') return '#/teacher/students';
+        if (route.view === 'activities') {
+            const params = new URLSearchParams();
+            if (route.subject) params.set('subject', route.subject);
+            if (route.grade) params.set('grade', route.grade);
+            if (route.mode === 'review') params.set('mode', 'review');
+            const query = params.toString();
+            return `#/teacher/activities${query ? `?${query}` : ''}`;
+        }
+        if (route.view === 'activity-editor') return '#/teacher/activities/editor';
+        if (route.view === 'activity-assignment' && route.assignmentId) {
+            return `#/teacher/activities/assignment/${encodeURIComponent(route.assignmentId)}`;
+        }
         if (route.view === 'quizzes') return '#/teacher/quizzes';
         if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
         if (route.view === 'editor') return '#/teacher/vocabulary/editor';
@@ -352,6 +480,18 @@ class TeacherManager {
             };
         }
         if (viewId === 'teacher-editor-view') return { view: 'editor' };
+        if (viewId === 'teacher-activities-view') {
+            return {
+                view: 'activities',
+                subject: this.activityDrilldown.subject,
+                grade: this.activityDrilldown.grade,
+                mode: this.activityMode
+            };
+        }
+        if (viewId === 'teacher-activity-editor-view') return { view: 'activity-editor' };
+        if (viewId === 'teacher-activity-assignment-view' && this.activeActivityAssignment?.id) {
+            return { view: 'activity-assignment', assignmentId: this.activeActivityAssignment.id };
+        }
         if (viewId === 'teacher-progress-view') return { view: 'students' };
         if (viewId === 'teacher-quizzes-view') return { view: 'quizzes' };
         if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
@@ -382,6 +522,17 @@ class TeacherManager {
             month: this.libraryDrilldown.month
         };
         this.setRoute(this.lastVocabularyRoute, options);
+    }
+
+    updateActivityRoute(options = {}) {
+        if (this.isApplyingRoute || !this.isAuthenticated) return;
+        this.lastActivitiesRoute = {
+            view: 'activities',
+            subject: this.activityDrilldown.subject,
+            grade: this.activityDrilldown.grade,
+            mode: this.activityMode
+        };
+        this.setRoute(this.lastActivitiesRoute, options);
     }
 
     async restoreRouteOrDefault(defaultRoute = { view: 'overview' }) {
@@ -417,6 +568,21 @@ class TeacherManager {
                     break;
                 case 'editor':
                     this.showEditor();
+                    break;
+                case 'activities':
+                    this.activityDrilldown = {
+                        subject: route.subject || null,
+                        grade: route.grade || null
+                    };
+                    this.activityMode = route.mode || 'assign';
+                    this.lastActivitiesRoute = { ...route };
+                    await this.showActivityLibrary();
+                    break;
+                case 'activity-editor':
+                    await this.showActivityEditor();
+                    break;
+                case 'activity-assignment':
+                    await this.showActivityAssignmentReview(route.assignmentId);
                     break;
                 case 'students':
                     await this.showProgressView();
@@ -505,6 +671,7 @@ class TeacherManager {
 
         this.renderSubjectManager();
         this.updateSubjectSelect();
+        this.updateActivitySubjectSelect();
     }
 
     getSubjects() {
@@ -632,9 +799,12 @@ class TeacherManager {
             }
 
             this.invalidateTeacherLibraryCache();
+            this.invalidateActivityLibraryCache();
             this.renderSubjectManager();
             this.updateSubjectSelect();
+            this.updateActivitySubjectSelect();
             this.loadLibrary();
+            this.loadActivityLibrary();
             if (statusEl) statusEl.textContent = 'Subjects saved.';
             notifications.success('Subjects saved.');
         } catch (error) {
@@ -1303,6 +1473,9 @@ class TeacherManager {
             'teacher-overview-view': 'overview',
             'teacher-dashboard-view': 'vocabulary',
             'teacher-editor-view': 'vocabulary',
+            'teacher-activities-view': 'activities',
+            'teacher-activity-editor-view': 'activities',
+            'teacher-activity-assignment-view': 'activities',
             'teacher-progress-view': 'students',
             'teacher-quizzes-view': 'quizzes',
             'quiz-maker-view': 'quizzes',
@@ -1366,6 +1539,13 @@ class TeacherManager {
                     break;
                 }
                 this.showVocabularyLibrary();
+                break;
+            case 'activities':
+                if (options.editor) {
+                    this.showActivityEditor();
+                    break;
+                }
+                this.showActivityLibrary();
                 break;
             case 'students':
                 this.showProgressView();
@@ -2352,6 +2532,3350 @@ class TeacherManager {
         }
     }
 
+    getActivityTemplate(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        return ACTIVITY_TEMPLATE_OPTIONS.find(template => template.id === templateId)
+            || ACTIVITY_TEMPLATE_OPTIONS[0];
+    }
+
+    getActivityTemplateType(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        return this.getActivityTemplate(templateId).type || DEFAULT_ACTIVITY_TYPE;
+    }
+
+    getActivityTemplateLabel(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        return this.getActivityTemplate(templateId).label;
+    }
+
+    getActivityTypeLabel(activityType = DEFAULT_ACTIVITY_TYPE) {
+        return ACTIVITY_TYPE_LABELS[activityType] || 'Activity';
+    }
+
+    getDefaultActivityInstructions(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        const template = this.getActivityTemplate(templateId);
+        const title = template.label;
+        const defaults = {
+            'blank-map-diagram': {
+                teacherInstructions: 'Introduce the topic and model how students should organize their map or diagram before independent work.',
+                studentInstructions: 'Create a clear map or diagram that explains the topic. Add labels, arrows, symbols, or notes where they help your idea make sense.',
+                materials: 'Device or printed copy, class notes, textbook or reference material if needed.',
+                studentOutput: 'Completed map or diagram with labels and a short explanation.',
+                makeupInstructions: 'Complete the map or diagram independently using class notes and submit it during the next class period.'
+            },
+            'labeled-map': {
+                teacherInstructions: 'Choose the place, system, or interface students should map. Clarify the required labels and any legend symbols before students begin.',
+                studentInstructions: 'Label the important parts of the map. Add a title, a legend or key, and short notes that explain what each label means.',
+                materials: 'Map reference, notes, device or printed copy, color pencils if printed.',
+                studentOutput: 'Labeled map with title, legend, and required features.',
+                makeupInstructions: 'Use the reference map and class notes to complete the required labels and legend.'
+            },
+            'concept-map': {
+                teacherInstructions: 'Name the main concept and decide how many supporting ideas students should include. Encourage linking words between ideas.',
+                studentInstructions: 'Place the main idea in the center. Connect supporting ideas around it and add short linking words or phrases.',
+                materials: 'Class notes, vocabulary list, reading passage or reference material.',
+                studentOutput: 'Concept map showing the main idea, supporting details, and relationships.',
+                makeupInstructions: 'Create the concept map from the assigned notes or reading and include at least three supporting ideas.'
+            },
+            'process-diagram': {
+                teacherInstructions: 'Identify the process students should sequence. Review the start point, end point, and expected number of steps.',
+                studentInstructions: 'Show the steps of the process in order. Use arrows, labels, and short explanations so someone else can follow it.',
+                materials: 'Process notes, procedure sheet, device or printed copy.',
+                studentOutput: 'Process diagram with ordered steps and explanations.',
+                makeupInstructions: 'Use the procedure notes to complete the diagram and explain each step in order.'
+            },
+            worksheet: {
+                teacherInstructions: 'Review the prompts and clarify the expected level of detail before students begin.',
+                studentInstructions: 'Answer each prompt carefully. Use class notes, examples, and complete ideas where needed.',
+                materials: 'Device, class notes, reference material if needed.',
+                studentOutput: 'Completed worksheet responses.',
+                makeupInstructions: 'Complete the worksheet independently using class notes and submit it during the next class period.'
+            },
+            reflection: {
+                teacherInstructions: 'Use this as an exit ticket or end-of-activity reflection. Encourage specific examples over one-word answers.',
+                studentInstructions: 'Reflect on what you did, what you learned, what was challenging, and what you would improve next time.',
+                materials: 'Device and completed class work for reference.',
+                studentOutput: 'Completed reflection responses.',
+                makeupInstructions: 'Review the missed activity notes or work sample, then complete the reflection prompts.'
+            },
+            checklist: {
+                teacherInstructions: 'Adjust the checklist items to match the task requirements before assigning.',
+                studentInstructions: 'Check each item after you verify your work. Add any note or evidence requested.',
+                materials: 'Device and the work being checked.',
+                studentOutput: 'Completed checklist and any requested evidence or notes.',
+                makeupInstructions: 'Use the checklist to verify the makeup work before submitting it.'
+            }
+        };
+
+        return defaults[templateId] || {
+            teacherInstructions: `Prepare the ${title.toLowerCase()} activity and clarify the expected student output before work begins.`,
+            studentInstructions: `Complete the ${title.toLowerCase()} activity using labels, notes, and visuals where needed.`,
+            materials: 'Device or printed copy, class notes, reference material if needed.',
+            studentOutput: `Completed ${title.toLowerCase()}.`,
+            makeupInstructions: 'Complete the activity independently using class notes and submit it during the next class period.'
+        };
+    }
+
+    createDefaultActivity(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        const template = this.getActivityTemplate(templateId);
+        const defaults = this.getDefaultActivityInstructions(template.id);
+        const activityType = template.type || DEFAULT_ACTIVITY_TYPE;
+        const activityData = {
+            templateId: template.id
+        };
+
+        if (activityType === STRUCTURED_RESPONSE_TYPE) {
+            activityData.responseTemplate = createDefaultResponseTemplate(template.id);
+        } else {
+            activityData.excalidrawScene = null;
+        }
+
+        return {
+            id: `activity_${Date.now()}`,
+            title: template.label,
+            description: template.description,
+            activityType,
+            subjectSlug: DEFAULT_SUBJECT_SLUG,
+            grades: [],
+            teacherInstructions: defaults.teacherInstructions,
+            studentInstructions: defaults.studentInstructions,
+            materials: defaults.materials,
+            estimatedMinutes: 45,
+            studentOutput: defaults.studentOutput,
+            makeupInstructions: defaults.makeupInstructions,
+            assessmentPurpose: 'formative',
+            activityData
+        };
+    }
+
+    normalizeActivityGrades(activity = {}) {
+        const explicitGrades = Array.isArray(activity.grades)
+            ? activity.grades
+            : [activity.grades, activity.grade, activity.gradeLevel];
+        return explicitGrades
+            .flatMap(grade => {
+                if (grade === null || grade === undefined) return [];
+                return String(grade).split(',');
+            })
+            .map(grade => this.normalizeGradeLabel(grade))
+            .filter(Boolean);
+    }
+
+    normalizeActivity(activity = {}) {
+        const sourceData = activity && typeof activity === 'object' ? activity : {};
+        const activityData = sourceData.activityData || sourceData.activity_data || {};
+        const sourceActivityType = sourceData.activityType || sourceData.activity_type || '';
+        const rawTemplateId = activityData.templateId
+            || activityData.template_id
+            || sourceData.templateId
+            || sourceData.template_id
+            || (sourceActivityType === STRUCTURED_RESPONSE_TYPE ? 'worksheet' : DEFAULT_ACTIVITY_TEMPLATE_ID);
+        let template = this.getActivityTemplate(rawTemplateId);
+        let activityType = sourceActivityType || template.type || DEFAULT_ACTIVITY_TYPE;
+
+        if (activityType === STRUCTURED_RESPONSE_TYPE && template.type !== STRUCTURED_RESPONSE_TYPE) {
+            template = this.getActivityTemplate('worksheet');
+        }
+
+        if (activityType !== STRUCTURED_RESPONSE_TYPE && template.type === STRUCTURED_RESPONSE_TYPE) {
+            template = this.getActivityTemplate(DEFAULT_ACTIVITY_TEMPLATE_ID);
+            activityType = DEFAULT_ACTIVITY_TYPE;
+        }
+
+        const defaults = this.getDefaultActivityInstructions(template.id);
+        const estimatedMinutes = sourceData.estimatedMinutes ?? sourceData.estimated_minutes;
+        const normalizedActivityData = {
+            ...activityData,
+            templateId: template.id
+        };
+
+        if (activityType === STRUCTURED_RESPONSE_TYPE) {
+            normalizedActivityData.responseTemplate = normalizeResponseTemplate(
+                activityData.responseTemplate || activityData.response_template,
+                template.id
+            );
+        } else {
+            normalizedActivityData.excalidrawScene = activityData.excalidrawScene || activityData.excalidraw_scene || null;
+        }
+
+        return {
+            id: String(sourceData.id || `activity_${Date.now()}`),
+            title: String(sourceData.title || template.label || 'Untitled Activity').trim() || 'Untitled Activity',
+            description: String(sourceData.description || template.description || '').trim(),
+            activityType,
+            subjectSlug: normalizeSubjectSlug(sourceData.subjectSlug || sourceData.subject_slug || sourceData.subject),
+            grades: this.normalizeActivityGrades(sourceData),
+            teacherInstructions: String(sourceData.teacherInstructions ?? sourceData.teacher_instructions ?? defaults.teacherInstructions ?? ''),
+            studentInstructions: String(sourceData.studentInstructions ?? sourceData.student_instructions ?? defaults.studentInstructions ?? ''),
+            materials: String(sourceData.materials ?? defaults.materials ?? ''),
+            estimatedMinutes: estimatedMinutes === null || estimatedMinutes === undefined || estimatedMinutes === ''
+                ? ''
+                : Number.parseInt(String(estimatedMinutes), 10) || '',
+            studentOutput: String(sourceData.studentOutput ?? sourceData.student_output ?? defaults.studentOutput ?? ''),
+            makeupInstructions: String(sourceData.makeupInstructions ?? sourceData.makeup_instructions ?? defaults.makeupInstructions ?? ''),
+            assessmentPurpose: sourceData.assessmentPurpose || sourceData.assessment_purpose || 'formative',
+            activityData: normalizedActivityData,
+            source: sourceData.source || sourceData.__source || '',
+            ownerId: sourceData.ownerId || sourceData.owner_id || null,
+            createdAt: sourceData.createdAt || sourceData.created_at,
+            updatedAt: sourceData.updatedAt || sourceData.updated_at
+        };
+    }
+
+    updateActivitySubjectSelect() {
+        const select = $('#activity-subject');
+        if (!select) return;
+        const selected = normalizeSubjectSlug(this.activity?.subjectSlug || DEFAULT_SUBJECT_SLUG);
+        select.innerHTML = this.getSubjectOptionsHtml(selected);
+        select.value = selected;
+    }
+
+    getSubjectForActivity(activity = this.activity) {
+        return getSubjectBySlug(this.getSubjects(), normalizeSubjectSlug(activity?.subjectSlug || DEFAULT_SUBJECT_SLUG));
+    }
+
+    invalidateActivityLibraryCache() {
+        this.activityLibraryCache = null;
+        this.activityLibraryPromise = null;
+        this.activityLibraryLoaded = false;
+        this.activityLibraryItems = [];
+    }
+
+    stableActivitySceneSignature(scene = {}) {
+        if (!scene || !Array.isArray(scene.elements)) return '';
+        const normalizedElements = scene.elements
+            .filter(element => !element?.isDeleted)
+            .map(element => ({
+                type: element.type || '',
+                x: Math.round(Number(element.x) || 0),
+                y: Math.round(Number(element.y) || 0),
+                width: Math.round(Number(element.width) || 0),
+                height: Math.round(Number(element.height) || 0),
+                angle: Math.round((Number(element.angle) || 0) * 1000) / 1000,
+                text: element.text || element.rawText || element.label?.text || '',
+                points: Array.isArray(element.points)
+                    ? element.points.map(point => point.map(value => Math.round(Number(value) || 0)))
+                    : undefined,
+                strokeColor: element.strokeColor || '',
+                backgroundColor: element.backgroundColor || '',
+                fillStyle: element.fillStyle || '',
+                strokeWidth: element.strokeWidth || '',
+                roughness: element.roughness || '',
+                label: element.label?.text || ''
+            }));
+        return JSON.stringify(normalizedElements);
+    }
+
+    stableResponseTemplateSignature(template = {}) {
+        const normalized = normalizeResponseTemplate(template);
+        return JSON.stringify(normalized.blocks.map(block => ({
+            id: block.id,
+            type: block.type,
+            prompt: block.prompt,
+            helperText: block.helperText,
+            required: Boolean(block.required),
+            items: Array.isArray(block.items) ? block.items.map(item => ({ id: item.id, text: item.text })) : []
+        })));
+    }
+
+    getActivityDuplicateSignature(activity = {}) {
+        const normalized = this.normalizeActivity(activity);
+        const activityData = normalized.activityData || {};
+        return JSON.stringify({
+            title: normalized.title,
+            description: normalized.description,
+            activityType: normalized.activityType,
+            subjectSlug: normalized.subjectSlug,
+            grades: normalized.grades,
+            teacherInstructions: normalized.teacherInstructions,
+            studentInstructions: normalized.studentInstructions,
+            materials: normalized.materials,
+            estimatedMinutes: normalized.estimatedMinutes,
+            studentOutput: normalized.studentOutput,
+            makeupInstructions: normalized.makeupInstructions,
+            assessmentPurpose: normalized.assessmentPurpose,
+            templateId: activityData.templateId || DEFAULT_ACTIVITY_TEMPLATE_ID,
+            scene: this.stableActivitySceneSignature(activityData.excalidrawScene),
+            responseTemplate: normalized.activityType === STRUCTURED_RESPONSE_TYPE
+                ? this.stableResponseTemplateSignature(activityData.responseTemplate)
+                : ''
+        });
+    }
+
+    getActivityTimestamp(activity = {}) {
+        const value = activity.updatedAt || activity.updated_at || activity.createdAt || activity.created_at;
+        if (!value) return 0;
+        if (typeof value === 'number') return value;
+        if (typeof value === 'string') {
+            const parsed = Date.parse(value);
+            return Number.isNaN(parsed) ? 0 : parsed;
+        }
+        if (typeof value.toDate === 'function') return value.toDate().getTime();
+        if (value.seconds !== undefined) return Number(value.seconds) * 1000;
+        return 0;
+    }
+
+    collapseDuplicateActivityItems(items = []) {
+        const bySignature = new Map();
+
+        items.forEach(item => {
+            const signature = this.getActivityDuplicateSignature(item.activity);
+            const current = bySignature.get(signature);
+            if (!current) {
+                bySignature.set(signature, item);
+                return;
+            }
+
+            const itemIsCloud = item.type === 'cloud';
+            const currentIsCloud = current.type === 'cloud';
+            const itemTime = this.getActivityTimestamp(item.activity);
+            const currentTime = this.getActivityTimestamp(current.activity);
+
+            if ((itemIsCloud && !currentIsCloud) || (itemIsCloud === currentIsCloud && itemTime >= currentTime)) {
+                bySignature.set(signature, item);
+            }
+        });
+
+        return Array.from(bySignature.values());
+    }
+
+    isActivityCloudSetupPending(error) {
+        const code = String(error?.code || '');
+        const message = String(error?.message || error || '').toLowerCase();
+        return code === 'PGRST205'
+            || (message.includes('classroom_activities') && message.includes('could not find the table'));
+    }
+
+    cancelActivityAutoSave(id = null) {
+        if (id && this.activity?.id && this.activity.id !== id) return;
+        clearTimeout(this.activityLocalSaveTimeout);
+        clearTimeout(this.activityCloudSaveTimeout);
+        this.activityLocalSaveTimeout = null;
+        this.activityCloudSaveTimeout = null;
+    }
+
+    markActivityDeleted(id) {
+        if (!id) return;
+        this.deletedActivityIds.add(id);
+        this.cancelActivityAutoSave(id);
+    }
+
+    isActivityDeleted(id) {
+        return Boolean(id && this.deletedActivityIds.has(id));
+    }
+
+    getLocalActivities() {
+        try {
+            const stored = JSON.parse(localStorage.getItem(TEACHER_ACTIVITY_LOCAL_KEY) || '[]');
+            return Array.isArray(stored)
+                ? stored.map(activity => this.normalizeActivity({ ...activity, source: 'local' }))
+                : [];
+        } catch (error) {
+            console.warn('Could not read local activities:', error);
+            return [];
+        }
+    }
+
+    saveActivityToLocal(activity = this.activity) {
+        if (!activity?.id) return;
+        if (this.isActivityDeleted(activity.id)) return;
+        const { __source, source, ...rest } = this.normalizeActivity(activity);
+        let activities = this.getLocalActivities();
+        const index = activities.findIndex(item => item.id === rest.id);
+
+        if (index >= 0) {
+            activities[index] = rest;
+        } else {
+            activities.push(rest);
+        }
+
+        localStorage.setItem(TEACHER_ACTIVITY_LOCAL_KEY, JSON.stringify(activities));
+        this.invalidateActivityLibraryCache();
+    }
+
+    removeLocalActivity(id) {
+        if (!id) return false;
+        const before = this.getLocalActivities();
+        const after = before.filter(activity => activity.id !== id);
+        if (after.length === before.length) return false;
+        localStorage.setItem(TEACHER_ACTIVITY_LOCAL_KEY, JSON.stringify(after));
+        this.invalidateActivityLibraryCache();
+        return true;
+    }
+
+    async fetchCloudActivities() {
+        if (this.authDisabled) return [];
+        if (!this.ensureAuthenticated(false)) return [];
+
+        try {
+            const db = supabaseService.getDatabase();
+            const snapshot = await getDocs(collection(db, this.ACTIVITY_COLLECTION));
+            this.setCloudStatus('Ready', 'info');
+            return snapshot.docs.map(docSnap => this.normalizeActivity({
+                id: docSnap.id,
+                ...docSnap.data(),
+                source: 'cloud'
+            }));
+        } catch (error) {
+            console.error('Failed to fetch classroom activities:', error);
+            if (this.isActivityCloudSetupPending(error)) {
+                this.setCloudStatus('Activities cloud setup pending', 'muted');
+            } else {
+                this.setCloudStatus('Activity load failed', 'error');
+            }
+            return [];
+        }
+    }
+
+    async getTeacherActivityLibrary({ forceRefresh = false } = {}) {
+        if (!forceRefresh && this.activityLibraryCache) {
+            return this.activityLibraryCache;
+        }
+
+        if (!forceRefresh && this.activityLibraryPromise) {
+            return this.activityLibraryPromise;
+        }
+
+        this.activityLibraryPromise = this.fetchCloudActivities().then(cloudActivities => {
+            const cloudIds = new Set(cloudActivities.map(activity => activity.id).filter(Boolean));
+            const localActivities = this.getLocalActivities().filter(activity => !cloudIds.has(activity.id));
+            const rawItems = [
+                ...cloudActivities.map(activity => ({ activity, type: 'cloud' })),
+                ...localActivities.map(activity => ({ activity, type: 'local' }))
+            ];
+            const items = this.collapseDuplicateActivityItems(rawItems);
+            const visibleCloudActivities = items
+                .filter(item => item.type === 'cloud')
+                .map(item => item.activity);
+            const visibleLocalActivities = items
+                .filter(item => item.type === 'local')
+                .map(item => item.activity);
+
+            this.activityLibraryCache = {
+                cloudActivities: visibleCloudActivities,
+                localActivities: visibleLocalActivities,
+                items,
+                loadedAt: Date.now()
+            };
+            return this.activityLibraryCache;
+        }).finally(() => {
+            this.activityLibraryPromise = null;
+        });
+
+        return this.activityLibraryPromise;
+    }
+
+    async showActivityLibrary() {
+        if (!this.ensureAuthenticated(false)) return;
+        this.lastActivitiesRoute = {
+            view: 'activities',
+            subject: this.activityDrilldown.subject,
+            grade: this.activityDrilldown.grade,
+            mode: this.activityMode
+        };
+        this.switchView('teacher-activities-view');
+        this.setActivityWorkflowTab(this.activityMode || 'assign');
+        await this.loadActivityLibrary();
+        await this.loadActivityAssignments();
+    }
+
+    setActivityWorkflowTab(mode = 'assign', options = {}) {
+        const nextMode = mode === 'review' ? 'review' : 'assign';
+        this.activityMode = nextMode;
+
+        $$('.activity-workflow-tab').forEach(tab => {
+            const active = tab.dataset.activityTab === nextMode;
+            tab.classList.toggle('active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab.tabIndex = active ? 0 : -1;
+        });
+
+        const assignPanel = $('#activity-assign-panel');
+        const reviewPanel = $('#activity-review-panel');
+        assignPanel?.classList.toggle('hidden', nextMode !== 'assign');
+        reviewPanel?.classList.toggle('hidden', nextMode !== 'review');
+
+        if (nextMode === 'assign' && this.activityLibraryLoaded) {
+            const list = $('#activity-library-list');
+            if (list && this.activityLibraryItems.length === 0) {
+                list.innerHTML = '<p class="teacher-empty-state">No classroom activities yet.</p>';
+            } else {
+                this.renderActivityLibraryBrowser();
+            }
+        }
+        if (nextMode === 'review' && this.activityAssignmentsLoaded) {
+            const list = $('#activity-assignment-list');
+            if (list && this.activityAssignmentItems.length === 0) {
+                list.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
+            } else {
+                this.renderActivityAssignmentBrowser();
+            }
+        }
+
+        if (options.updateRoute !== false) {
+            this.updateActivityRoute({ replace: true });
+        }
+    }
+
+    async loadActivityLibrary() {
+        const list = $('#activity-library-list');
+        if (!list) return;
+
+        if (!this.authDisabled && !this.isAuthenticated) {
+            list.innerHTML = '<p>Please sign in to view activities.</p>';
+            return;
+        }
+
+        list.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
+
+        try {
+            const { cloudActivities, localActivities, items } = await this.getTeacherActivityLibrary();
+            list.innerHTML = '';
+            this.activityLibraryItems = items;
+            this.activityLibraryLoaded = true;
+
+            if (cloudActivities.length === 0 && localActivities.length === 0) {
+                if (this.activityMode === 'assign') {
+                    list.innerHTML = '<p class="teacher-empty-state">No classroom activities yet.</p>';
+                }
+                return;
+            }
+
+            if (this.activityMode === 'assign') {
+                this.renderActivityLibraryBrowser(list);
+            }
+            this.refreshIcons();
+        } catch (error) {
+            console.error('Failed to load classroom activities:', error);
+            list.innerHTML = '<p class="teacher-empty-state">Could not load classroom activities.</p>';
+        }
+    }
+
+    resetActivityLibraryDrilldown() {
+        this.activityDrilldown = {
+            subject: null,
+            grade: null
+        };
+    }
+
+    formatActivityCount(count) {
+        return `${count} ${count === 1 ? 'activity' : 'activities'}`;
+    }
+
+    getActivityGroupGrades(activity = {}) {
+        const grades = this.normalizeActivityGrades(activity);
+        return grades.length ? grades : ['needs-grade'];
+    }
+
+    formatActivityGroupGradeLabel(grade) {
+        return grade === 'needs-grade' ? 'Needs Grade' : this.formatGradeLabel(grade);
+    }
+
+    compareActivityGroupGrades(gradeA, gradeB) {
+        if (gradeA === 'needs-grade' && gradeB !== 'needs-grade') return 1;
+        if (gradeB === 'needs-grade' && gradeA !== 'needs-grade') return -1;
+        return this.compareGradeLabels(gradeA, gradeB);
+    }
+
+    buildActivityLibraryGroups(items = this.activityLibraryItems) {
+        const subjectGroups = new Map();
+
+        items.forEach(({ activity, type }) => {
+            const normalized = this.normalizeActivity(activity);
+            const subjectSlug = normalizeSubjectSlug(normalized.subjectSlug || DEFAULT_SUBJECT_SLUG);
+
+            if (!subjectGroups.has(subjectSlug)) {
+                subjectGroups.set(subjectSlug, new Map());
+            }
+
+            const gradeGroups = subjectGroups.get(subjectSlug);
+            this.getActivityGroupGrades(normalized).forEach(grade => {
+                if (!gradeGroups.has(grade)) {
+                    gradeGroups.set(grade, []);
+                }
+                gradeGroups.get(grade).push({ activity: normalized, type });
+            });
+        });
+
+        return subjectGroups;
+    }
+
+    renderActivityLibraryBrowser(container = $('#activity-library-list')) {
+        if (!container) return;
+
+        container.classList.remove('vocab-grid');
+        container.classList.add('teacher-library-browser');
+        container.innerHTML = '';
+
+        const subjectGroups = this.buildActivityLibraryGroups();
+        const selectedSubject = this.activityDrilldown.subject;
+        const selectedGrade = this.activityDrilldown.grade;
+
+        if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
+            this.resetActivityLibraryDrilldown();
+            this.renderActivitySubjectPicker(container, subjectGroups);
+            return;
+        }
+
+        const gradeGroups = subjectGroups.get(selectedSubject);
+        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+            this.activityDrilldown.grade = null;
+            this.renderActivityGradePicker(container, selectedSubject, gradeGroups);
+            return;
+        }
+
+        this.renderActivityClassBrowser(container, selectedSubject, selectedGrade, gradeGroups.get(selectedGrade));
+    }
+
+    renderActivityLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null) {
+        const nav = createElement('div', 'teacher-library-breadcrumb');
+
+        const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
+            this.resetActivityLibraryDrilldown();
+            this.updateActivityRoute();
+            this.renderActivityLibraryBrowser();
+            this.refreshIcons();
+        });
+        nav.appendChild(subjectsButton);
+
+        if (selectedSubject) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            const subjectNode = selectedGrade
+                ? this.createLibraryBreadcrumbButton(subject.name, () => {
+                    this.activityDrilldown = { subject: selectedSubject, grade: null };
+                    this.updateActivityRoute();
+                    this.renderActivityLibraryBrowser();
+                    this.refreshIcons();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+            nav.appendChild(subjectNode);
+        }
+
+        if (selectedGrade) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            nav.appendChild(createElement(
+                'span',
+                'teacher-library-breadcrumb-current',
+                `${this.formatActivityGroupGradeLabel(selectedGrade)} ${subject.name}`
+            ));
+        }
+
+        container.appendChild(nav);
+    }
+
+    formatActivityTemplateSummary(activityItems = []) {
+        const counts = new Map();
+        activityItems.forEach(({ activity }) => {
+            const label = this.getActivityTemplateLabel(activity?.activityData?.templateId);
+            counts.set(label, (counts.get(label) || 0) + 1);
+        });
+        return Array.from(counts.entries())
+            .sort(([labelA], [labelB]) => labelA.localeCompare(labelB))
+            .map(([label, count]) => `${label}: ${count}`)
+            .join(' · ');
+    }
+
+    renderActivitySubjectPicker(container, subjectGroups) {
+        this.renderActivityLibraryBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(subjectGroups.entries())
+            .sort(([subjectA], [subjectB]) => {
+                const metaA = getSubjectBySlug(this.getSubjects(), subjectA);
+                const metaB = getSubjectBySlug(this.getSubjects(), subjectB);
+                if (metaA.sortOrder !== metaB.sortOrder) return metaA.sortOrder - metaB.sortOrder;
+                return metaA.name.localeCompare(metaB.name);
+            })
+            .forEach(([subjectSlug, gradeGroups]) => {
+                const subject = getSubjectBySlug(this.getSubjects(), subjectSlug);
+                const activityItems = Array.from(gradeGroups.values()).flat();
+                const gradeSummary = Array.from(gradeGroups.keys())
+                    .sort((gradeA, gradeB) => this.compareActivityGroupGrades(gradeA, gradeB))
+                    .map(grade => this.formatActivityGroupGradeLabel(grade))
+                    .join(' · ');
+                const card = this.createLibraryChoiceCard({
+                    title: subject.name,
+                    count: this.formatActivityCount(activityItems.length),
+                    meta: gradeSummary,
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.activityDrilldown = { subject: subjectSlug, grade: null };
+                    this.updateActivityRoute();
+                    this.renderActivityLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderActivityGradePicker(container, selectedSubject, gradeGroups) {
+        this.renderActivityLibraryBreadcrumb(container, selectedSubject);
+
+        const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(gradeGroups.entries())
+            .sort(([gradeA], [gradeB]) => this.compareActivityGroupGrades(gradeA, gradeB))
+            .forEach(([grade, activityItems]) => {
+                const card = this.createLibraryChoiceCard({
+                    title: `${this.formatActivityGroupGradeLabel(grade)} ${subject.name}`,
+                    count: this.formatActivityCount(activityItems.length),
+                    meta: this.formatActivityTemplateSummary(activityItems),
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.activityDrilldown = { subject: selectedSubject, grade };
+                    this.updateActivityRoute();
+                    this.renderActivityLibraryBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderActivityClassBrowser(container, selectedSubject, selectedGrade, activityItems) {
+        this.renderActivityLibraryBreadcrumb(container, selectedSubject, selectedGrade);
+
+        const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid');
+        activityItems
+            .sort((itemA, itemB) => this.getActivitySortName(itemA.activity).localeCompare(this.getActivitySortName(itemB.activity)))
+            .forEach(({ activity, type }) => this.createActivityCard(grid, activity, type));
+
+        container.appendChild(grid);
+    }
+
+    getActivitySortName(activity) {
+        return String(activity?.title || activity?.id || '').toLocaleLowerCase();
+    }
+
+    getActivityCanvasElementCount(activity = {}) {
+        const elements = activity.activityData?.excalidrawScene?.elements;
+        if (!Array.isArray(elements)) return 0;
+        return elements.filter(element => !element?.isDeleted).length;
+    }
+
+    getActivityCanvasSummary(activity = {}) {
+        const count = this.getActivityCanvasElementCount(activity);
+        if (count === 0) return 'Blank canvas';
+        return count === 1 ? '1 canvas item' : `${count} canvas items`;
+    }
+
+    getActivityResponseSummary(activity = {}) {
+        const template = normalizeResponseTemplate(activity.activityData?.responseTemplate, activity.activityData?.templateId || 'worksheet');
+        const responseBlocks = template.blocks.filter(block => block.type !== 'instructions');
+        const checklistCount = template.blocks.filter(block => block.type === 'checklist').length;
+        const blockLabel = responseBlocks.length === 1 ? '1 response block' : `${responseBlocks.length} response blocks`;
+        return checklistCount ? `${blockLabel} · ${checklistCount} checklist` : blockLabel;
+    }
+
+    getActivityWorkspaceSummary(activity = {}) {
+        return activity.activityType === STRUCTURED_RESPONSE_TYPE
+            ? this.getActivityResponseSummary(activity)
+            : this.getActivityCanvasSummary(activity);
+    }
+
+    formatActivityUpdatedLabel(activity = {}) {
+        const timestamp = this.getActivityTimestamp(activity);
+        if (!timestamp) return '';
+        return new Date(timestamp).toLocaleString(undefined, {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+
+    createActivityCard(container, activity, type) {
+        const normalized = this.normalizeActivity({ ...activity, source: type });
+        const card = createElement('div', 'card teacher-vocab-card teacher-activity-card');
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `Open ${normalized.title || normalized.id || 'activity'}`);
+
+        const badgeStyles = {
+            local: { color: 'var(--accent-color)', text: 'Draft' },
+            cloud: { color: 'var(--primary-hover)', text: 'Cloud' }
+        };
+        const badge = badgeStyles[type] || badgeStyles.local;
+        const subject = this.getSubjectForActivity(normalized);
+        const grades = normalized.grades.length
+            ? normalized.grades.map(grade => this.formatGradeLabel(grade)).join(', ')
+            : 'Needs grade';
+        const classLabel = `${grades} · ${subject.name}`;
+        const templateLabel = this.getActivityTemplateLabel(normalized.activityData?.templateId);
+        const canvasSummary = this.getActivityWorkspaceSummary(normalized);
+        const updatedLabel = this.formatActivityUpdatedLabel(normalized);
+        const canvasMeta = updatedLabel ? `${canvasSummary} · Updated ${updatedLabel}` : canvasSummary;
+
+        const assignBtnHtml = `
+            <button class="assign-activity-btn" type="button" title="Assign Activity" aria-label="Assign ${escapeHtml(normalized.title || 'activity')}">
+                <i data-lucide="send"></i>
+                <span>Assign</span>
+            </button>
+        `;
+        let deleteBtnHtml = '';
+        if (type === 'local' || type === 'cloud') {
+            const label = type === 'cloud' ? 'Delete Cloud Activity' : 'Delete Draft Activity';
+            deleteBtnHtml = `<button class="delete-activity-btn" title="${label}" aria-label="${label}"><i data-lucide="trash-2"></i></button>`;
+        }
+
+        card.innerHTML = `
+            <div class="badge" style="background:${badge.color};">${badge.text}</div>
+            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+            <h3>${escapeHtml(normalized.title || 'Untitled Activity')}</h3>
+            <small style="color:var(--text-muted)">${escapeHtml(classLabel)}</small>
+            <small style="color:var(--text-muted)">${escapeHtml(this.getActivityTypeLabel(normalized.activityType))} · ${escapeHtml(templateLabel)}</small>
+            <small style="color:var(--text-muted)">${escapeHtml(canvasMeta)}</small>
+            <small style="color:var(--text-muted)">${normalized.estimatedMinutes ? `${escapeHtml(String(normalized.estimatedMinutes))} min` : 'No time estimate'}</small>
+            ${assignBtnHtml}
+            ${deleteBtnHtml}
+        `;
+
+        card.addEventListener('click', (event) => {
+            if (event.target.closest('.delete-activity-btn, .assign-activity-btn')) return;
+            this.loadActivityObject(normalized, type);
+        });
+        card.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            card.click();
+        });
+
+        if (type === 'local' || type === 'cloud') {
+            card.querySelector('.assign-activity-btn')?.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openActivityAssignmentModal(normalized);
+            });
+
+            const deleteBtn = card.querySelector('.delete-activity-btn');
+            deleteBtn?.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                const label = type === 'cloud' ? 'cloud' : 'draft';
+                if (!confirm(`Delete ${label} activity "${normalized.title}"? This cannot be undone.`)) return;
+                if (type === 'cloud') {
+                    await this.deleteCloudActivity(normalized.id);
+                } else {
+                    this.deleteLocalActivity(normalized.id);
+                }
+                await this.loadActivityLibrary();
+            });
+        }
+
+        container.appendChild(card);
+    }
+
+    normalizeTargetList(value, { uppercase = false } = {}) {
+        const source = Array.isArray(value) ? value : String(value || '').split(',');
+        const items = source
+            .flatMap(item => {
+                if (item === null || item === undefined) return [];
+                return String(item).split(',');
+            })
+            .map(item => {
+                const text = item.trim();
+                return uppercase ? text.toUpperCase() : text;
+            })
+            .filter(Boolean);
+        return Array.from(new Set(items));
+    }
+
+    normalizeActivityAssignment(assignment = {}) {
+        const source = assignment && typeof assignment === 'object' ? assignment : {};
+        const activitySnapshot = this.normalizeActivity({
+            id: source.sourceActivityId || source.source_activity_id || source.id || '',
+            title: source.title,
+            description: source.description,
+            activityType: source.activityType || source.activity_type,
+            subjectSlug: source.subjectSlug || source.subject_slug,
+            grades: source.grades,
+            teacherInstructions: source.teacherInstructions || source.teacher_instructions,
+            studentInstructions: source.studentInstructions || source.student_instructions,
+            materials: source.materials,
+            estimatedMinutes: source.estimatedMinutes ?? source.estimated_minutes,
+            studentOutput: source.studentOutput || source.student_output,
+            makeupInstructions: source.makeupInstructions || source.makeup_instructions,
+            assessmentPurpose: source.assessmentPurpose || source.assessment_purpose,
+            activityData: source.activityData || source.activity_data
+        });
+
+        return {
+            ...activitySnapshot,
+            id: String(source.id || `assignment_${Date.now()}`),
+            sourceActivityId: String(source.sourceActivityId || source.source_activity_id || ''),
+            targetGrades: this.normalizeTargetList(source.targetGrades || source.target_grades),
+            targetSections: this.normalizeTargetList(source.targetSections || source.target_sections, { uppercase: true }),
+            availableFrom: source.availableFrom || source.available_from || '',
+            dueDate: source.dueDate || source.due_date || '',
+            weekLabel: String(source.weekLabel || source.week_label || '').trim(),
+            status: source.status || 'active',
+            assignedBy: source.assignedBy || source.assigned_by || null,
+            createdAt: source.createdAt || source.created_at,
+            updatedAt: source.updatedAt || source.updated_at
+        };
+    }
+
+    normalizeActivitySubmission(submission = {}) {
+        const source = submission && typeof submission === 'object' ? submission : {};
+        return {
+            id: String(source.id || ''),
+            assignmentId: String(source.assignmentId || source.assignment_id || ''),
+            studentId: String(source.studentId || source.student_id || ''),
+            studentProfile: source.studentProfile || source.student_profile || {},
+            status: source.status || 'draft',
+            responseData: source.responseData || source.response_data || {},
+            responseDataStoragePath: String(source.responseDataStoragePath || source.response_data_storage_path || ''),
+            responseDataStorageSizeBytes: source.responseDataStorageSizeBytes ?? source.response_data_storage_size_bytes ?? null,
+            responseDataStorageUpdatedAt: source.responseDataStorageUpdatedAt || source.response_data_storage_updated_at,
+            startedAt: source.startedAt || source.started_at,
+            submittedAt: source.submittedAt || source.submitted_at,
+            lateOverride: Boolean(source.lateOverride || source.late_override),
+            lateOverrideReason: String(source.lateOverrideReason || source.late_override_reason || '').trim(),
+            lateOverrideBy: source.lateOverrideBy || source.late_override_by || null,
+            lateOverrideAt: source.lateOverrideAt || source.late_override_at,
+            createdAt: source.createdAt || source.created_at,
+            updatedAt: source.updatedAt || source.updated_at
+        };
+    }
+
+    createActivityAssignmentSnapshot(activity = this.activity) {
+        if (activity?.id && this.activity?.id === activity.id) {
+            this.syncActivityWorkspace();
+            this.readActivityFormIntoModel();
+            activity = this.activity;
+        }
+
+        return this.normalizeActivity(activity);
+    }
+
+    openActivityAssignmentModal(activity = this.activity) {
+        if (!this.ensureAuthenticated()) return;
+        const snapshot = this.createActivityAssignmentSnapshot(activity);
+        if (!snapshot?.id) {
+            notifications.warning('Open or save an activity before assigning it.');
+            return;
+        }
+        try {
+            this.validateActivityClass(snapshot);
+        } catch (error) {
+            notifications.warning(error.message);
+            this.setActivitySaveStatus(error.message, 'error');
+            return;
+        }
+
+        this.pendingActivityAssignmentActivity = snapshot;
+        const setValue = (selector, value) => {
+            const field = $(selector);
+            if (field) field.value = value ?? '';
+        };
+
+        setValue('#assignment-source-activity-id', snapshot.id);
+        setValue('#assignment-target-grades', snapshot.grades.join(', '));
+        setValue('#assignment-target-sections', '');
+        setValue('#assignment-week-label', '');
+        setValue('#assignment-available-from', this.getLocalDateInputValue());
+        setValue('#assignment-due-date', '');
+        const subtitle = $('#activity-assignment-modal-subtitle');
+        if (subtitle) subtitle.textContent = snapshot.title || 'Choose who should receive this activity.';
+        this.setActivityAssignmentModalStatus('');
+        openModal('#activity-assignment-modal', { initialFocus: '#assignment-target-grades' });
+    }
+
+    getLocalDateInputValue(date = new Date()) {
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 10);
+    }
+
+    setActivityAssignmentModalStatus(text, state = 'muted') {
+        const el = $('#activity-assignment-modal-status');
+        if (!el) return;
+        el.textContent = text || '';
+        const colors = {
+            success: 'var(--success-color)',
+            error: 'var(--danger-color)',
+            info: 'var(--secondary-color)',
+            muted: 'var(--text-muted)'
+        };
+        el.style.color = colors[state] || colors.muted;
+    }
+
+    readActivityAssignmentForm() {
+        const targetGrades = this.normalizeTargetList($('#assignment-target-grades')?.value || '')
+            .map(grade => this.normalizeGradeLabel(grade))
+            .filter(Boolean);
+        const targetSections = this.normalizeTargetList($('#assignment-target-sections')?.value || '', { uppercase: true });
+        const weekLabel = String($('#assignment-week-label')?.value || '').trim();
+        const availableFrom = $('#assignment-available-from')?.value || '';
+        const dueDate = $('#assignment-due-date')?.value || '';
+
+        if (targetGrades.length === 0) {
+            throw new Error('Enter at least one target grade.');
+        }
+
+        if (availableFrom && dueDate && dueDate < availableFrom) {
+            throw new Error('Due date cannot be before the visible date.');
+        }
+
+        return { targetGrades, targetSections, weekLabel, availableFrom, dueDate };
+    }
+
+    createActivityAssignmentId(activity = {}) {
+        const title = this.slugifyVocabPart(activity.title || 'activity');
+        const suffix = Math.random().toString(36).slice(2, 8);
+        return `assignment_${this.slugifyVocabPart(activity.subjectSlug) || DEFAULT_SUBJECT_SLUG}_${title}_${Date.now()}_${suffix}`;
+    }
+
+    async saveActivityAssignment(event) {
+        event?.preventDefault?.();
+        if (!this.ensureAuthenticated()) return;
+
+        let targets;
+        try {
+            targets = this.readActivityAssignmentForm();
+        } catch (error) {
+            this.setActivityAssignmentModalStatus(error.message, 'error');
+            notifications.warning(error.message);
+            return;
+        }
+
+        const snapshot = this.createActivityAssignmentSnapshot(this.pendingActivityAssignmentActivity || this.activity);
+        const assignmentId = this.createActivityAssignmentId(snapshot);
+        const payload = {
+            id: assignmentId,
+            sourceActivityId: snapshot.id,
+            title: snapshot.title,
+            description: snapshot.description,
+            activityType: snapshot.activityType,
+            subjectSlug: snapshot.subjectSlug,
+            grades: snapshot.grades,
+            teacherInstructions: snapshot.teacherInstructions,
+            studentInstructions: snapshot.studentInstructions,
+            materials: snapshot.materials,
+            estimatedMinutes: snapshot.estimatedMinutes,
+            studentOutput: snapshot.studentOutput,
+            makeupInstructions: snapshot.makeupInstructions,
+            assessmentPurpose: snapshot.assessmentPurpose,
+            activityData: snapshot.activityData,
+            targetGrades: targets.targetGrades,
+            targetSections: targets.targetSections,
+            availableFrom: targets.availableFrom || null,
+            dueDate: targets.dueDate || null,
+            weekLabel: targets.weekLabel,
+            status: 'active',
+            assignedBy: this.currentUser?.uid || null,
+            updatedAt: serverTimestamp()
+        };
+
+        this.setActivityAssignmentModalStatus('Assigning activity...', 'info');
+        try {
+            const db = supabaseService.getDatabase();
+            await setDoc(doc(db, this.ACTIVITY_ASSIGNMENT_COLLECTION, assignmentId), payload);
+            this.invalidateActivityAssignmentCache();
+            closeDialog('#activity-assignment-modal');
+            notifications.success('Activity assigned.');
+            if ($('#teacher-activities-view')?.classList.contains('hidden') === false) {
+                this.setActivityWorkflowTab('review');
+            } else {
+                this.activityMode = 'review';
+            }
+            await this.loadActivityAssignments();
+        } catch (error) {
+            console.error('Failed to assign classroom activity:', error);
+            this.setActivityAssignmentModalStatus('Could not assign activity. Check cloud setup and try again.', 'error');
+            notifications.error('Could not assign activity.');
+        }
+    }
+
+    invalidateActivityAssignmentCache() {
+        this.activityAssignmentCache = null;
+        this.activityAssignmentPromise = null;
+        this.activityAssignmentsLoaded = false;
+        this.activityAssignmentItems = [];
+    }
+
+    isActivityAssignmentCloudSetupPending(error) {
+        const code = String(error?.code || '');
+        const message = String(error?.message || error || '').toLowerCase();
+        return code === 'PGRST205'
+            || (message.includes('classroom_activity_assignments') && message.includes('could not find the table'))
+            || (message.includes('classroom_activity_submissions') && message.includes('could not find the table'));
+    }
+
+    async fetchActivityAssignments() {
+        if (this.authDisabled) return [];
+        if (!this.ensureAuthenticated(false)) return [];
+
+        try {
+            const db = supabaseService.getDatabase();
+            const snapshot = await getDocs(collection(db, this.ACTIVITY_ASSIGNMENT_COLLECTION));
+            return snapshot.docs.map(docSnap => this.normalizeActivityAssignment({
+                id: docSnap.id,
+                ...docSnap.data()
+            }));
+        } catch (error) {
+            console.error('Failed to fetch activity assignments:', error);
+            if (!this.isActivityAssignmentCloudSetupPending(error)) {
+                notifications.warning('Could not load assigned activities.');
+            }
+            return [];
+        }
+    }
+
+    async getActivityAssignments({ forceRefresh = false } = {}) {
+        if (!forceRefresh && this.activityAssignmentCache) {
+            return this.activityAssignmentCache;
+        }
+        if (!forceRefresh && this.activityAssignmentPromise) {
+            return this.activityAssignmentPromise;
+        }
+
+        this.activityAssignmentPromise = this.fetchActivityAssignments()
+            .then(assignments => {
+                this.activityAssignmentCache = assignments;
+                return assignments;
+            })
+            .finally(() => {
+                this.activityAssignmentPromise = null;
+            });
+
+        return this.activityAssignmentPromise;
+    }
+
+    async loadActivityAssignments() {
+        const list = $('#activity-assignment-list');
+        if (!list) return;
+        list.innerHTML = '<div class="loading-spinner">Loading assigned activities...</div>';
+
+        try {
+            const assignments = await this.getActivityAssignments();
+            list.innerHTML = '';
+            this.activityAssignmentItems = assignments;
+            this.activityAssignmentsLoaded = true;
+            if (assignments.length === 0) {
+                if (this.activityMode === 'review') {
+                    list.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
+                }
+                return;
+            }
+
+            if (this.activityMode === 'review') {
+                this.renderActivityAssignmentBrowser(list);
+            }
+            this.refreshIcons();
+        } catch (error) {
+            console.error('Failed to render activity assignments:', error);
+            list.innerHTML = '<p class="teacher-empty-state">Could not load assigned activities.</p>';
+        }
+    }
+
+    formatActivityAssignmentCount(count) {
+        return `${count} ${count === 1 ? 'assignment' : 'assignments'}`;
+    }
+
+    getActivityAssignmentGroupGrades(assignment = {}) {
+        const targetGrades = this.normalizeTargetList(assignment.targetGrades || assignment.target_grades)
+            .map(grade => this.normalizeGradeLabel(grade))
+            .filter(Boolean);
+        if (targetGrades.length) return targetGrades;
+        return this.getActivityGroupGrades(assignment);
+    }
+
+    buildActivityAssignmentGroups(assignments = this.activityAssignmentItems) {
+        const subjectGroups = new Map();
+
+        assignments.forEach(assignment => {
+            const normalized = this.normalizeActivityAssignment(assignment);
+            const subjectSlug = normalizeSubjectSlug(normalized.subjectSlug || DEFAULT_SUBJECT_SLUG);
+
+            if (!subjectGroups.has(subjectSlug)) {
+                subjectGroups.set(subjectSlug, new Map());
+            }
+
+            const gradeGroups = subjectGroups.get(subjectSlug);
+            this.getActivityAssignmentGroupGrades(normalized).forEach(grade => {
+                if (!gradeGroups.has(grade)) {
+                    gradeGroups.set(grade, []);
+                }
+                gradeGroups.get(grade).push(normalized);
+            });
+        });
+
+        return subjectGroups;
+    }
+
+    renderActivityAssignmentBrowser(container = $('#activity-assignment-list')) {
+        if (!container) return;
+
+        container.classList.remove('vocab-grid');
+        container.classList.add('teacher-library-browser');
+        container.innerHTML = '';
+
+        const subjectGroups = this.buildActivityAssignmentGroups();
+        if (subjectGroups.size === 0) {
+            container.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
+            return;
+        }
+
+        const selectedSubject = this.activityDrilldown.subject;
+        const selectedGrade = this.activityDrilldown.grade;
+
+        if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
+            this.resetActivityLibraryDrilldown();
+            this.renderActivityAssignmentSubjectPicker(container, subjectGroups);
+            return;
+        }
+
+        const gradeGroups = subjectGroups.get(selectedSubject);
+        if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+            this.activityDrilldown.grade = null;
+            this.renderActivityAssignmentGradePicker(container, selectedSubject, gradeGroups);
+            return;
+        }
+
+        this.renderActivityAssignmentClassBrowser(container, selectedSubject, selectedGrade, gradeGroups.get(selectedGrade));
+    }
+
+    renderActivityAssignmentBreadcrumb(container, selectedSubject = null, selectedGrade = null) {
+        const nav = createElement('div', 'teacher-library-breadcrumb');
+
+        const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
+            this.resetActivityLibraryDrilldown();
+            this.updateActivityRoute();
+            this.renderActivityAssignmentBrowser();
+            this.refreshIcons();
+        });
+        nav.appendChild(subjectsButton);
+
+        if (selectedSubject) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            const subjectNode = selectedGrade
+                ? this.createLibraryBreadcrumbButton(subject.name, () => {
+                    this.activityDrilldown = { subject: selectedSubject, grade: null };
+                    this.updateActivityRoute();
+                    this.renderActivityAssignmentBrowser();
+                    this.refreshIcons();
+                })
+                : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+            nav.appendChild(subjectNode);
+        }
+
+        if (selectedGrade) {
+            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+            nav.appendChild(createElement(
+                'span',
+                'teacher-library-breadcrumb-current',
+                `${this.formatActivityGroupGradeLabel(selectedGrade)} ${subject.name}`
+            ));
+        }
+
+        container.appendChild(nav);
+    }
+
+    formatAssignmentReviewSummary(assignments = []) {
+        const normalized = assignments.map(assignment => this.normalizeActivityAssignment(assignment));
+        const scheduledCount = normalized.filter(assignment => this.isAssignmentScheduled(assignment)).length;
+        const weekLabels = Array.from(new Set(normalized.map(assignment => assignment.weekLabel).filter(Boolean)));
+
+        if (weekLabels.length) {
+            const visibleLabels = weekLabels.slice(0, 3).join(' · ');
+            return weekLabels.length > 3 ? `${visibleLabels} · +${weekLabels.length - 3} more` : visibleLabels;
+        }
+
+        return scheduledCount ? `${scheduledCount} scheduled` : 'Ready to review';
+    }
+
+    renderActivityAssignmentSubjectPicker(container, subjectGroups) {
+        this.renderActivityAssignmentBreadcrumb(container);
+
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(subjectGroups.entries())
+            .sort(([subjectA], [subjectB]) => {
+                const metaA = getSubjectBySlug(this.getSubjects(), subjectA);
+                const metaB = getSubjectBySlug(this.getSubjects(), subjectB);
+                if (metaA.sortOrder !== metaB.sortOrder) return metaA.sortOrder - metaB.sortOrder;
+                return metaA.name.localeCompare(metaB.name);
+            })
+            .forEach(([subjectSlug, gradeGroups]) => {
+                const subject = getSubjectBySlug(this.getSubjects(), subjectSlug);
+                const assignments = Array.from(gradeGroups.values()).flat();
+                const gradeSummary = Array.from(gradeGroups.keys())
+                    .sort((gradeA, gradeB) => this.compareActivityGroupGrades(gradeA, gradeB))
+                    .map(grade => this.formatActivityGroupGradeLabel(grade))
+                    .join(' · ');
+                const card = this.createLibraryChoiceCard({
+                    title: subject.name,
+                    count: this.formatActivityAssignmentCount(assignments.length),
+                    meta: gradeSummary,
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.activityDrilldown = { subject: subjectSlug, grade: null };
+                    this.updateActivityRoute();
+                    this.renderActivityAssignmentBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderActivityAssignmentGradePicker(container, selectedSubject, gradeGroups) {
+        this.renderActivityAssignmentBreadcrumb(container, selectedSubject);
+
+        const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
+        const grid = createElement('div', 'teacher-library-choice-grid');
+        Array.from(gradeGroups.entries())
+            .sort(([gradeA], [gradeB]) => this.compareActivityGroupGrades(gradeA, gradeB))
+            .forEach(([grade, assignments]) => {
+                const card = this.createLibraryChoiceCard({
+                    title: `${this.formatActivityGroupGradeLabel(grade)} ${subject.name}`,
+                    count: this.formatActivityAssignmentCount(assignments.length),
+                    meta: this.formatAssignmentReviewSummary(assignments),
+                    icon: 'chevron-right',
+                    color: subject.color
+                });
+                card.addEventListener('click', () => {
+                    this.activityDrilldown = { subject: selectedSubject, grade };
+                    this.updateActivityRoute();
+                    this.renderActivityAssignmentBrowser();
+                    this.refreshIcons();
+                });
+                grid.appendChild(card);
+            });
+
+        container.appendChild(grid);
+    }
+
+    renderActivityAssignmentClassBrowser(container, selectedSubject, selectedGrade, assignments) {
+        this.renderActivityAssignmentBreadcrumb(container, selectedSubject, selectedGrade);
+
+        const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid compact-vocab-grid');
+        assignments
+            .slice()
+            .sort((a, b) => this.getActivityAssignmentSortValue(b) - this.getActivityAssignmentSortValue(a))
+            .forEach(assignment => this.createActivityAssignmentCard(grid, assignment));
+
+        container.appendChild(grid);
+    }
+
+    getActivityAssignmentSortValue(assignment = {}) {
+        const value = assignment.updatedAt || assignment.createdAt || assignment.dueDate;
+        if (!value) return 0;
+        if (typeof value === 'number') return value;
+        if (typeof value.toDate === 'function') return value.toDate().getTime();
+        if (value.seconds !== undefined) return Number(value.seconds) * 1000;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    createActivityAssignmentCard(container, assignment) {
+        const normalized = this.normalizeActivityAssignment(assignment);
+        const card = createElement('div', 'card teacher-vocab-card teacher-activity-card activity-assignment-card');
+        card.dataset.assignmentId = normalized.id;
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `Review ${normalized.title || 'assigned activity'}`);
+
+        const subject = this.getSubjectForActivity(normalized);
+        const target = this.formatAssignmentTarget(normalized);
+        const schedule = this.formatAssignmentWindow(normalized);
+        const statusLabel = normalized.status === 'archived' ? 'Archived' : 'Active';
+        const isScheduled = this.isAssignmentScheduled(normalized);
+        card.classList.toggle('is-scheduled', isScheduled);
+
+        card.innerHTML = `
+            <div class="badge" style="background:${normalized.status === 'archived' ? 'var(--text-muted)' : 'var(--success-color)'};">${escapeHtml(statusLabel)}</div>
+            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+            <h3>${escapeHtml(normalized.title || 'Untitled Assignment')}</h3>
+            <small style="color:var(--text-muted)">${escapeHtml(target)}</small>
+            <small style="color:var(--text-muted)">${escapeHtml(schedule)}</small>
+            ${isScheduled ? '<small style="color:#c7d2fe;font-weight:900;">Not visible to students yet</small>' : ''}
+            <span class="teacher-pick-action"><i data-lucide="clipboard-check"></i> Review</span>
+            <button class="delete-activity-assignment-btn" type="button" title="Delete Assignment" aria-label="Delete ${escapeHtml(normalized.title || 'assignment')}"><i data-lucide="trash-2"></i></button>
+        `;
+
+        card.addEventListener('click', (event) => {
+            if (event.target.closest('.delete-activity-assignment-btn')) return;
+            this.showActivityAssignmentReview(normalized.id);
+        });
+        card.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            card.click();
+        });
+        card.querySelector('.delete-activity-assignment-btn')?.addEventListener('click', async (event) => {
+            event.stopPropagation();
+            if (!confirm(`Delete assignment "${normalized.title}" and its submissions? This cannot be undone.`)) return;
+            await this.deleteActivityAssignment(normalized.id);
+        });
+
+        container.appendChild(card);
+    }
+
+    async deleteActivityAssignment(id) {
+        if (!this.ensureAuthenticated()) return;
+        try {
+            const db = supabaseService.getDatabase();
+            await deleteDoc(doc(db, this.ACTIVITY_ASSIGNMENT_COLLECTION, id));
+            this.invalidateActivityAssignmentCache();
+            notifications.success('Assignment deleted.');
+            await this.loadActivityAssignments();
+        } catch (error) {
+            console.error('Failed to delete activity assignment:', error);
+            notifications.error('Could not delete assignment.');
+        }
+    }
+
+    formatAssignmentTarget(assignment = {}) {
+        const grades = this.normalizeTargetList(assignment.targetGrades || assignment.target_grades)
+            .map(grade => this.formatGradeLabel(grade))
+            .join(', ');
+        const sections = this.normalizeTargetList(assignment.targetSections || assignment.target_sections, { uppercase: true });
+        const sectionLabel = sections.length ? `Sections ${sections.join(', ')}` : 'All sections';
+        return `${grades || 'No grades'} · ${sectionLabel}`;
+    }
+
+    formatDueDate(value) {
+        if (!value) return 'No due date';
+        return `Due ${this.formatDateOnly(value)}`;
+    }
+
+    formatDateOnly(value) {
+        if (!value) return '';
+        const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    formatAvailableDate(value) {
+        if (!value) return 'Visible now';
+        const dateLabel = this.formatDateOnly(value);
+        if (!dateLabel) return 'Visible now';
+        return `Visible ${dateLabel}`;
+    }
+
+    formatAssignmentWindow(assignment = {}) {
+        const parts = [];
+        if (assignment.weekLabel) parts.push(assignment.weekLabel);
+        parts.push(this.formatAvailableDate(assignment.availableFrom || assignment.available_from));
+        parts.push(this.formatDueDate(assignment.dueDate || assignment.due_date));
+        return parts.filter(Boolean).join(' · ');
+    }
+
+    timestampToMillis(value) {
+        if (!value) return 0;
+        if (typeof value === 'number') return value;
+        if (typeof value.toDate === 'function') return value.toDate().getTime();
+        if (value.seconds !== undefined) return Number(value.seconds) * 1000;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    dueDateEndMillis(value) {
+        if (!value) return 0;
+        const parsed = Date.parse(`${String(value).slice(0, 10)}T23:59:59`);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    isAssignmentScheduled(assignment = {}) {
+        const release = assignment.availableFrom || assignment.available_from;
+        if (!release) return false;
+        const start = Date.parse(`${String(release).slice(0, 10)}T00:00:00`);
+        return Number.isFinite(start) && start > Date.now();
+    }
+
+    getActivityLateState(assignment = {}, submission = null) {
+        const dueMillis = this.dueDateEndMillis(assignment.dueDate || assignment.due_date);
+        if (!dueMillis) {
+            return { isLate: false, isExcused: false, label: 'On time', className: '' };
+        }
+
+        const submittedMillis = this.timestampToMillis(submission?.submittedAt || submission?.submitted_at);
+        const isSubmittedLate = submittedMillis > 0 && submittedMillis > dueMillis;
+        const isOpenLate = !submittedMillis && Date.now() > dueMillis;
+        const isLate = isSubmittedLate || isOpenLate;
+        const isExcused = Boolean(submission?.lateOverride || submission?.late_override);
+
+        if (isExcused) {
+            return {
+                isLate,
+                isExcused: true,
+                label: 'Excused',
+                className: 'is-excused',
+                reason: submission?.lateOverrideReason || submission?.late_override_reason || ''
+            };
+        }
+
+        return {
+            isLate,
+            isExcused: false,
+            label: isLate ? 'Late' : 'On time',
+            className: isLate ? 'is-late' : ''
+        };
+    }
+
+    activityAssignmentMatchesStudent(assignment = {}, student = {}) {
+        const profile = student.studentProfile || {};
+        const grade = String(profile.grade || student.grade || '').trim();
+        const section = String(profile.group || profile.sectionLetter || student.group || '').trim().toUpperCase();
+        const targetGrades = this.normalizeTargetList(assignment.targetGrades || assignment.target_grades);
+        const targetSections = this.normalizeTargetList(assignment.targetSections || assignment.target_sections, { uppercase: true });
+
+        if (!grade || !targetGrades.includes(grade)) return false;
+        return targetSections.length === 0 || targetSections.includes(section);
+    }
+
+    getStudentRosterName(student = {}) {
+        const profile = student.studentProfile || {};
+        const name = profile.firstName && profile.lastName
+            ? `${profile.firstName} ${profile.lastName}`
+            : profile.name || student.name || student.email || 'Student';
+        return String(name).trim();
+    }
+
+    getStudentRosterMeta(student = {}) {
+        const profile = student.studentProfile || {};
+        const grade = profile.grade ? this.formatGradeLabel(profile.grade) : 'No grade';
+        const section = profile.group || profile.sectionLetter ? `Section ${profile.group || profile.sectionLetter}` : 'No section';
+        return `${grade} · ${section}`;
+    }
+
+    async fetchActivitySubmissions(assignmentId) {
+        if (!assignmentId || this.authDisabled) return [];
+        const db = supabaseService.getDatabase();
+        const snapshot = await getDocs(query(
+            collection(db, this.ACTIVITY_SUBMISSION_COLLECTION),
+            where('assignmentId', '==', assignmentId)
+        ));
+        return snapshot.docs.map(docSnap => this.normalizeActivitySubmission({
+            id: docSnap.id,
+            ...docSnap.data()
+        }));
+    }
+
+    async showActivityAssignmentReview(assignmentId, options = {}) {
+        if (!this.ensureAuthenticated(false)) return;
+        this.activeActivityAssignment = assignmentId ? { id: assignmentId } : null;
+        this.activeActivityReview = null;
+        this.activeActivityReviewSelectionIndex = -1;
+        this.activityReviewHandle?.unmount?.();
+        this.activityReviewHandle = null;
+        $('#activity-review-excalidraw-root') && ($('#activity-review-excalidraw-root').innerHTML = '');
+        $('#activity-review-canvas-status') && ($('#activity-review-canvas-status').textContent = 'Select a student submission to preview.');
+        $('#activity-review-student-nav-label') && ($('#activity-review-student-nav-label').textContent = 'No student selected');
+        $('#activity-review-prev-student-btn') && ($('#activity-review-prev-student-btn').disabled = true);
+        $('#activity-review-next-student-btn') && ($('#activity-review-next-student-btn').disabled = true);
+        this.switchView('teacher-activity-assignment-view');
+
+        const titleEl = $('#activity-assignment-title');
+        const summaryEl = $('#activity-assignment-summary');
+        const statsEl = $('#activity-assignment-stats');
+        const rosterEl = $('#activity-submission-roster');
+        const submissionSummaryEl = $('#activity-submission-summary');
+        if (titleEl) titleEl.textContent = 'Activity Review';
+        if (summaryEl) summaryEl.textContent = 'Loading assignment...';
+        if (statsEl) statsEl.innerHTML = '';
+        if (rosterEl) rosterEl.innerHTML = '<div class="loading-spinner">Loading submissions...</div>';
+        if (submissionSummaryEl) submissionSummaryEl.textContent = 'Loading submissions...';
+
+        try {
+            let assignments = await this.getActivityAssignments({ forceRefresh: options.forceRefresh });
+            let assignment = assignments.find(item => item.id === assignmentId);
+            if (!assignment && assignmentId) {
+                const db = supabaseService.getDatabase();
+                const snap = await getDoc(doc(db, this.ACTIVITY_ASSIGNMENT_COLLECTION, assignmentId));
+                if (snap.exists()) assignment = this.normalizeActivityAssignment({ id: snap.id, ...snap.data() });
+            }
+
+            if (!assignment) {
+                if (summaryEl) summaryEl.textContent = 'Assignment not found.';
+                if (rosterEl) rosterEl.innerHTML = '<p class="teacher-empty-state">This assignment could not be loaded.</p>';
+                return;
+            }
+
+            this.activeActivityAssignment = assignment;
+            if (titleEl) titleEl.textContent = assignment.title || 'Activity Review';
+            if (summaryEl) {
+                summaryEl.textContent = `${this.formatAssignmentTarget(assignment)} · ${this.formatAssignmentWindow(assignment)}`;
+            }
+
+            const [submissions, students] = await Promise.all([
+                this.fetchActivitySubmissions(assignment.id),
+                this.getStudentProgressData({ showError: false })
+            ]);
+            this.renderActivityAssignmentReview(assignment, submissions, students);
+            this.setRoute({ view: 'activity-assignment', assignmentId: assignment.id }, { replace: true });
+        } catch (error) {
+            console.error('Failed to load assignment review:', error);
+            if (summaryEl) summaryEl.textContent = 'Could not load assignment review.';
+            if (rosterEl) rosterEl.innerHTML = '<p class="teacher-empty-state">Could not load assignment submissions.</p>';
+            notifications.error('Could not load assignment review.');
+        }
+    }
+
+    renderActivityAssignmentReview(assignment, submissions = [], students = []) {
+        const statsEl = $('#activity-assignment-stats');
+        const rosterEl = $('#activity-submission-roster');
+        const submissionSummaryEl = $('#activity-submission-summary');
+        const submissionsByStudent = new Map(submissions.map(submission => [submission.studentId, submission]));
+        const roster = (students || [])
+            .filter(student => this.activityAssignmentMatchesStudent(assignment, student))
+            .sort((a, b) => this.getStudentRosterName(a).localeCompare(this.getStudentRosterName(b)));
+        this.activeActivityReview = { assignment, roster, submissionsByStudent };
+        this.activeActivityReviewSelectionIndex = -1;
+
+        const counts = roster.reduce((acc, student) => {
+            const submission = submissionsByStudent.get(student.id || student.userId);
+            const status = submission?.status || 'not-started';
+            const lateState = this.getActivityLateState(assignment, submission);
+            acc[status] = (acc[status] || 0) + 1;
+            if (lateState.isLate && !lateState.isExcused) acc.late += 1;
+            if (lateState.isExcused) acc.excused += 1;
+            return acc;
+        }, { 'not-started': 0, draft: 0, submitted: 0, late: 0, excused: 0 });
+
+        if (statsEl) {
+            statsEl.innerHTML = `
+                <div><strong>${roster.length}</strong><span>Students</span></div>
+                <div><strong>${counts.submitted || 0}</strong><span>Submitted</span></div>
+                <div><strong>${counts.draft || 0}</strong><span>Drafts</span></div>
+                <div><strong>${counts['not-started'] || 0}</strong><span>Not Started</span></div>
+                <div><strong>${counts.late || 0}</strong><span>Late</span></div>
+            `;
+        }
+
+        if (submissionSummaryEl) {
+            const excusedText = counts.excused ? ` · ${counts.excused} excused` : '';
+            submissionSummaryEl.textContent = `${counts.submitted || 0} submitted · ${counts.draft || 0} draft · ${counts['not-started'] || 0} not started · ${counts.late || 0} late${excusedText}`;
+        }
+
+        if (!rosterEl) return;
+        if (roster.length === 0) {
+            rosterEl.innerHTML = '<p class="teacher-empty-state">No students match this assignment target.</p>';
+            this.updateActivityReviewNavigation();
+            return;
+        }
+
+        rosterEl.innerHTML = '';
+        roster.forEach((student, index) => {
+            const studentId = student.id || student.userId;
+            const submission = submissionsByStudent.get(studentId);
+            const status = submission?.status || 'not-started';
+            const lateState = this.getActivityLateState(assignment, submission);
+            const row = createElement('div', `activity-submission-row status-${status} ${lateState.className}`);
+            row.dataset.studentId = studentId || '';
+            row.dataset.reviewIndex = String(index);
+            row.tabIndex = 0;
+            row.setAttribute('role', 'button');
+            row.setAttribute('aria-label', `Review ${this.getStudentRosterName(student)}`);
+            const excuseTitle = submission?.lateOverride
+                ? 'Clear late excuse'
+                : 'Mark late work excused';
+            const excuseButton = submission && (lateState.isLate || lateState.isExcused)
+                ? `
+                    <button class="btn secondary-btn icon-btn activity-excuse-btn" type="button" title="${escapeHtml(excuseTitle)}" aria-label="${escapeHtml(excuseTitle)}">
+                        <i data-lucide="${submission.lateOverride ? 'rotate-ccw' : 'shield-check'}"></i>
+                    </button>
+                `
+                : '';
+            row.innerHTML = `
+                <div class="activity-submission-row-main">
+                    <strong>${escapeHtml(this.getStudentRosterName(student))}</strong>
+                    <small>${escapeHtml(this.getStudentRosterMeta(student))}</small>
+                </div>
+                <div class="activity-submission-row-actions">
+                    <button class="btn secondary-btn icon-btn activity-submission-preview-btn" type="button" title="Preview student work" aria-label="Preview ${escapeHtml(this.getStudentRosterName(student))}"${submission ? '' : ' disabled'}>
+                        <i data-lucide="eye"></i>
+                    </button>
+                    ${excuseButton}
+                </div>
+                <div class="activity-submission-row-statuses">
+                    <span class="activity-submission-status">${escapeHtml(status === 'not-started' ? 'Not started' : status)}</span>
+                    <span class="activity-late-status ${escapeHtml(lateState.className)}" title="${escapeHtml(lateState.reason || '')}">${escapeHtml(lateState.label)}</span>
+                </div>
+            `;
+            row.querySelector('.activity-submission-preview-btn')?.addEventListener('click', () => {
+                this.selectActivityReviewStudent(index);
+            });
+            row.querySelector('.activity-excuse-btn')?.addEventListener('click', () => {
+                if (submission) this.toggleActivityLateOverride(assignment, submission, student);
+            });
+            row.addEventListener('click', (event) => {
+                if (event.target.closest('button')) return;
+                this.selectActivityReviewStudent(index);
+            });
+            row.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                this.selectActivityReviewStudent(index);
+            });
+            rosterEl.appendChild(row);
+        });
+
+        const firstSubmittedIndex = roster.findIndex(student => {
+            const studentId = student.id || student.userId;
+            return submissionsByStudent.get(studentId)?.status === 'submitted';
+        });
+        const firstStartedIndex = roster.findIndex(student => {
+            const studentId = student.id || student.userId;
+            return Boolean(submissionsByStudent.get(studentId));
+        });
+        this.selectActivityReviewStudent(firstSubmittedIndex >= 0 ? firstSubmittedIndex : firstStartedIndex >= 0 ? firstStartedIndex : 0);
+        this.refreshIcons();
+    }
+
+    getActivityReviewStudentId(student = {}) {
+        return String(student.id || student.userId || '');
+    }
+
+    updateActivityReviewNavigation() {
+        const review = this.activeActivityReview;
+        const roster = review?.roster || [];
+        const index = this.activeActivityReviewSelectionIndex;
+        const hasSelection = roster.length > 0 && index >= 0 && index < roster.length;
+        const prevBtn = $('#activity-review-prev-student-btn');
+        const nextBtn = $('#activity-review-next-student-btn');
+        const label = $('#activity-review-student-nav-label');
+
+        if (prevBtn) prevBtn.disabled = !hasSelection || index <= 0;
+        if (nextBtn) nextBtn.disabled = !hasSelection || index >= roster.length - 1;
+        if (label) label.textContent = hasSelection ? `${index + 1} of ${roster.length}` : 'No student selected';
+
+        $$('#activity-submission-roster .activity-submission-row').forEach(row => {
+            row.classList.toggle('is-selected', hasSelection && Number(row.dataset.reviewIndex) === index);
+        });
+    }
+
+    clearActivityReviewCanvas(message = 'Select a student submission to preview.') {
+        this.activityReviewHandle?.unmount?.();
+        this.activityReviewHandle = null;
+        const root = $('#activity-review-excalidraw-root');
+        const status = $('#activity-review-canvas-status');
+        if (root) {
+            root.classList.remove('structured-review-root');
+            root.innerHTML = message
+                ? `
+                    <div class="activity-review-empty-canvas">
+                        <strong>No work to preview</strong>
+                        <span>${escapeHtml(message)}</span>
+                    </div>
+                `
+                : '';
+        }
+        if (status) status.textContent = message;
+    }
+
+    selectActivityReviewStudent(index) {
+        const review = this.activeActivityReview;
+        const roster = review?.roster || [];
+        if (!review || index < 0 || index >= roster.length) {
+            this.activeActivityReviewSelectionIndex = -1;
+            this.clearActivityReviewCanvas();
+            this.updateActivityReviewNavigation();
+            return;
+        }
+
+        this.activeActivityReviewSelectionIndex = index;
+        this.updateActivityReviewNavigation();
+
+        const student = roster[index];
+        const studentId = this.getActivityReviewStudentId(student);
+        const submission = review.submissionsByStudent.get(studentId);
+        if (!submission) {
+            this.clearActivityReviewCanvas(`${this.getStudentRosterName(student)} · no submission yet`);
+            return;
+        }
+
+        this.openActivitySubmissionReview(review.assignment, submission, student);
+    }
+
+    showAdjacentActivityReviewStudent(delta) {
+        const review = this.activeActivityReview;
+        if (!review?.roster?.length) return;
+        const currentIndex = this.activeActivityReviewSelectionIndex < 0 ? 0 : this.activeActivityReviewSelectionIndex;
+        const nextIndex = Math.min(Math.max(currentIndex + delta, 0), review.roster.length - 1);
+        this.selectActivityReviewStudent(nextIndex);
+    }
+
+    async toggleActivityLateOverride(assignment, submission, student = {}) {
+        if (!submission?.id || !this.ensureAuthenticated(false)) return;
+
+        const clearing = Boolean(submission.lateOverride);
+        let reason = '';
+        if (!clearing) {
+            reason = window.prompt(
+                `Excuse note for ${this.getStudentRosterName(student)}`,
+                submission.lateOverrideReason || 'Excuse received'
+            );
+            if (reason === null) return;
+            reason = reason.trim() || 'Excuse received';
+        }
+
+        try {
+            const now = new Date().toISOString();
+            const { error } = await supabaseService.getClient()
+                .from('classroom_activity_submissions')
+                .update({
+                    late_override: !clearing,
+                    late_override_reason: clearing ? '' : reason,
+                    late_override_by: clearing ? null : this.currentUser?.uid || null,
+                    late_override_at: clearing ? null : now,
+                    updated_at: now
+                })
+                .eq('id', submission.id);
+
+            if (error) throw error;
+
+            this.invalidateActivityAssignmentCache();
+            notifications.success(clearing ? 'Late excuse cleared.' : 'Late work marked excused.');
+            await this.showActivityAssignmentReview(assignment.id, { forceRefresh: true });
+        } catch (error) {
+            console.error('Failed to update late override:', error);
+            notifications.error('Could not update late excuse.');
+        }
+    }
+
+    async resolveActivitySubmissionScene(assignment, submission) {
+        if (submission?.responseDataStoragePath) {
+            try {
+                const scene = await supabaseService.downloadClassroomScene(submission.responseDataStoragePath);
+                if (scene) return scene;
+            } catch (error) {
+                console.warn('Could not load stored classroom activity scene:', error);
+            }
+        }
+
+        return submission?.responseData?.excalidrawScene
+            || assignment?.activityData?.excalidrawScene
+            || null;
+    }
+
+    async openActivitySubmissionReview(assignment, submission, student = {}) {
+        const root = $('#activity-review-excalidraw-root');
+        const status = $('#activity-review-canvas-status');
+        if (!root) return;
+
+        this.activityReviewHandle?.unmount?.();
+        this.activityReviewHandle = null;
+        root.innerHTML = '';
+        root.classList.remove('structured-review-root');
+        if (status) status.textContent = assignment.activityType === STRUCTURED_RESPONSE_TYPE
+            ? `Loading ${this.getStudentRosterName(student)} responses...`
+            : `Loading ${this.getStudentRosterName(student)} canvas...`;
+
+        if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
+            root.classList.add('structured-review-root');
+            root.innerHTML = this.renderStructuredSubmissionReview(assignment, submission);
+            if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+            this.refreshIcons();
+            return;
+        }
+
+        try {
+            this.configureExcalidrawAssets();
+            const { mountActivityExcalidraw } = await import('./activityExcalidrawEditor.js');
+            const scene = await this.resolveActivitySubmissionScene(assignment, submission);
+            this.activityReviewHandle = mountActivityExcalidraw(root, {
+                scene,
+                templateId: assignment.activityData?.templateId || DEFAULT_ACTIVITY_TEMPLATE_ID,
+                readOnly: true,
+                onReady: () => {
+                    if (status) status.textContent = `${this.getStudentRosterName(student)} · ${submission.status}`;
+                }
+            });
+        } catch (error) {
+            console.error('Failed to open submission canvas:', error);
+            this.renderActivityEditorLoadError(root);
+            if (status) status.textContent = 'Could not load this canvas.';
+        }
+    }
+
+    renderStructuredSubmissionReview(assignment, submission) {
+        const template = normalizeResponseTemplate(
+            assignment.activityData?.responseTemplate,
+            assignment.activityData?.templateId || 'worksheet'
+        );
+        const responses = submission.responseData?.structuredResponses || {};
+
+        return `
+            <div class="structured-submission-review">
+                ${template.blocks.map(block => {
+                    const helper = block.helperText ? `<p>${escapeHtml(block.helperText)}</p>` : '';
+                    if (block.type === 'instructions') {
+                        return `
+                            <section class="structured-response-block instructions-block">
+                                <h4>${escapeHtml(block.prompt)}</h4>
+                                ${helper}
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'checklist') {
+                        const checkedItems = responses[block.id]?.checkedItems || {};
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-response-checklist readonly">
+                                    ${block.items.map(item => `
+                                        <div class="${checkedItems[item.id] ? 'is-checked' : ''}">
+                                            <i data-lucide="${checkedItems[item.id] ? 'check-square' : 'square'}"></i>
+                                            <span>${escapeHtml(item.text)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'multiple-choice' || block.type === 'multi-select') {
+                        const response = responses[block.id] || {};
+                        const selectedItemIds = block.type === 'multiple-choice'
+                            ? { [response.selectedItemId]: Boolean(response.selectedItemId) }
+                            : (Array.isArray(response.selectedItemIds)
+                                ? Object.fromEntries(response.selectedItemIds.map(itemId => [itemId, true]))
+                                : response.selectedItemIds || {});
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-response-checklist structured-response-options readonly">
+                                    ${block.items.map(item => {
+                                        const isSelected = selectedItemIds[item.id] === true;
+                                        const icon = block.type === 'multiple-choice'
+                                            ? (isSelected ? 'circle-dot' : 'circle')
+                                            : (isSelected ? 'check-square' : 'square');
+                                        return `
+                                            <div class="${isSelected ? 'is-checked' : ''}">
+                                                <i data-lucide="${icon}"></i>
+                                                <span>${escapeHtml(item.text)}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'select') {
+                        const response = responses[block.id] || {};
+                        const selectedItem = block.items.find(item => item.id === response.selectedItemId);
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-answer-readonly">${escapeHtml(selectedItem?.text || 'No response yet.')}</div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'true-false') {
+                        const answer = responses[block.id]?.selectedItemId;
+                        const display = answer === 'true' ? 'True' : (answer === 'false' ? 'False' : 'No response yet.');
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-answer-readonly">${escapeHtml(display)}</div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'rating-scale' || block.type === 'number' || block.type === 'date') {
+                        const response = responses[block.id] || {};
+                        const answer = block.type === 'rating-scale'
+                            ? response.rating
+                            : (block.type === 'number' ? response.number : response.date);
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-answer-readonly">${escapeHtml(String(answer ?? '').trim() || 'No response yet.')}</div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'matching') {
+                        const matches = responses[block.id]?.matches || {};
+                        const matchMap = Object.fromEntries(block.items.map(item => [item.id, item.matchText]));
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-response-matching readonly">
+                                    ${block.items.map(item => `
+                                        <div class="structured-response-matching-row">
+                                            <span>${escapeHtml(item.text)}</span>
+                                            <strong>${escapeHtml(matchMap[matches[item.id]] || 'No match selected.')}</strong>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'ranking') {
+                        const ranks = responses[block.id]?.ranks || {};
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-response-ranking readonly">
+                                    ${block.items.map(item => `
+                                        <div>
+                                            <strong>${escapeHtml(ranks[item.id] || '-')}</strong>
+                                            <span>${escapeHtml(item.text)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </section>
+                        `;
+                    }
+
+                    if (block.type === 'table-grid') {
+                        const cells = responses[block.id]?.cells || {};
+                        return `
+                            <section class="structured-response-block">
+                                <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                                ${helper}
+                                <div class="structured-response-table-wrapper">
+                                    <table class="structured-response-table readonly">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col"></th>
+                                                ${block.columns.map(column => `<th scope="col">${escapeHtml(column.text)}</th>`).join('')}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${block.rows.map(row => `
+                                                <tr>
+                                                    <th scope="row">${escapeHtml(row.text)}</th>
+                                                    ${block.columns.map(column => `<td>${escapeHtml(cells[row.id]?.[column.id] || '')}</td>`).join('')}
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        `;
+                    }
+
+                    const answer = String(responses[block.id]?.text || '').trim();
+                    return `
+                        <section class="structured-response-block">
+                            <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                            ${helper}
+                            <div class="structured-answer-readonly">${escapeHtml(answer || 'No response yet.')}</div>
+                        </section>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    deleteLocalActivity(id) {
+        this.markActivityDeleted(id);
+        this.removeLocalActivity(id);
+    }
+
+    async deleteCloudActivity(id) {
+        if (!this.ensureAuthenticated()) return;
+        this.markActivityDeleted(id);
+        try {
+            const db = supabaseService.getDatabase();
+            const ref = doc(db, this.ACTIVITY_COLLECTION, id);
+            await deleteDoc(ref);
+            this.removeLocalActivity(id);
+            this.invalidateActivityLibraryCache();
+            notifications.success('Activity deleted.');
+        } catch (error) {
+            this.deletedActivityIds.delete(id);
+            console.error('Failed to delete classroom activity:', error);
+            notifications.error('Could not delete classroom activity.');
+        }
+    }
+
+    loadActivityObject(activity, type = activity?.source || 'local') {
+        if (!this.ensureAuthenticated()) return;
+        this.activity = this.normalizeActivity({ ...activity, source: type });
+        this.deletedActivityIds.delete(this.activity.id);
+        this.showActivityEditor();
+    }
+
+    getSelectedActivityClassContext() {
+        const subjectSlug = this.activityDrilldown.subject
+            ? normalizeSubjectSlug(this.activityDrilldown.subject)
+            : DEFAULT_SUBJECT_SLUG;
+        const grade = this.activityDrilldown.grade && this.activityDrilldown.grade !== 'needs-grade'
+            ? this.normalizeGradeLabel(this.activityDrilldown.grade)
+            : '';
+        return { subjectSlug, grade };
+    }
+
+    async startNewActivity(templateId = DEFAULT_ACTIVITY_TEMPLATE_ID) {
+        if (!this.ensureAuthenticated()) return;
+        this.activity = this.createDefaultActivity(templateId);
+        this.activityEditorTab = 'settings';
+        this.structuredBuilderMode = 'build';
+        const classContext = this.getSelectedActivityClassContext();
+        this.activity.subjectSlug = classContext.subjectSlug;
+        this.activity.grades = classContext.grade ? [classContext.grade] : [];
+        this.activity.source = 'local';
+        this.deletedActivityIds.delete(this.activity.id);
+        this.saveActivityToLocal(this.activity);
+        this.setActivitySaveStatus('Draft saved locally.', 'success');
+        await this.showActivityEditor();
+    }
+
+    async showActivityEditor() {
+        if (!this.ensureAuthenticated(false)) return;
+        if (!this.activity?.id) {
+            this.activity = this.createDefaultActivity();
+        }
+        this.activity = this.normalizeActivity(this.activity);
+        this.setActivityCanvasFocus(false);
+        this.switchView('teacher-activity-editor-view');
+        this.updateActivityFormUI();
+        await this.mountActivityEditor();
+        this.setActivityEditorTab(this.activityEditorTab || 'settings', { sync: false });
+    }
+
+    getActivityEditorTab(tab = this.activityEditorTab) {
+        const allowedTabs = ['settings', 'instructions', 'build', 'preview'];
+        return allowedTabs.includes(tab) ? tab : 'settings';
+    }
+
+    updateActivityFocusButtonLabel() {
+        const button = $('#activity-canvas-focus-btn');
+        if (!button) return;
+        const view = $('#teacher-activity-editor-view');
+        const label = button.querySelector('span');
+        const isFocused = view?.classList.contains('canvas-focus');
+        const focusLabel = this.isStructuredActivity() ? 'Focus Builder' : 'Focus Canvas';
+        button.setAttribute('aria-pressed', isFocused ? 'true' : 'false');
+        if (label) label.textContent = isFocused ? 'Show Tabs' : focusLabel;
+    }
+
+    setActivityEditorTab(tab = 'settings', options = {}) {
+        const activeTab = this.getActivityEditorTab(tab);
+
+        if (options.sync !== false && this.activity?.id) {
+            this.syncActivityWorkspace();
+            this.readActivityFormIntoModel();
+        }
+
+        this.activityEditorTab = activeTab;
+
+        $$('.activity-editor-tab').forEach(button => {
+            const isActive = button.dataset.activityEditorTab === activeTab;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.tabIndex = isActive ? 0 : -1;
+        });
+
+        $$('[data-activity-editor-panel]').forEach(panel => {
+            const isActive = panel.dataset.activityEditorPanel === activeTab;
+            panel.classList.toggle('hidden', !isActive);
+            panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        });
+
+        const view = $('#teacher-activity-editor-view');
+        if (activeTab !== 'build') {
+            view?.classList.remove('canvas-focus');
+        }
+
+        if (activeTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+
+        this.updateActivityFocusButtonLabel();
+
+        if (activeTab === 'build') {
+            window.requestAnimationFrame(() => {
+                window.dispatchEvent(new Event('resize'));
+            });
+        }
+    }
+
+    updateActivityFormUI() {
+        if (!this.activity?.id) return;
+        const activity = this.normalizeActivity(this.activity);
+        this.activity = activity;
+        const setValue = (selector, value) => {
+            const field = $(selector);
+            if (field) field.value = value ?? '';
+        };
+
+        setValue('#activity-id', activity.id);
+        setValue('#activity-title', activity.title);
+        setValue('#activity-description', activity.description);
+        this.updateActivitySubjectSelect();
+        setValue('#activity-grades', activity.grades.join(', '));
+        setValue('#activity-type', activity.activityType);
+        setValue('#activity-assessment-purpose', activity.assessmentPurpose);
+        setValue('#activity-estimated-minutes', activity.estimatedMinutes);
+        setValue('#activity-teacher-instructions', activity.teacherInstructions);
+        setValue('#activity-student-instructions', activity.studentInstructions);
+        setValue('#activity-materials', activity.materials);
+        setValue('#activity-student-output', activity.studentOutput);
+        setValue('#activity-makeup-instructions', activity.makeupInstructions);
+        this.setActivitySaveStatus(activity.source === 'cloud' ? 'Loaded from cloud.' : 'Draft saved locally.', 'muted');
+    }
+
+    readActivityFormIntoModel() {
+        if (!this.activity?.id) return;
+        const valueOf = (selector) => $(selector)?.value ?? '';
+        const grades = valueOf('#activity-grades')
+            .split(',')
+            .map(grade => this.normalizeGradeLabel(grade))
+            .filter(Boolean);
+        const estimated = valueOf('#activity-estimated-minutes');
+
+        this.activity = this.normalizeActivity({
+            ...this.activity,
+            id: valueOf('#activity-id') || this.activity.id,
+            title: valueOf('#activity-title') || 'Untitled Activity',
+            description: valueOf('#activity-description'),
+            activityType: valueOf('#activity-type') || DEFAULT_ACTIVITY_TYPE,
+            subjectSlug: normalizeSubjectSlug(valueOf('#activity-subject') || DEFAULT_SUBJECT_SLUG),
+            grades,
+            teacherInstructions: valueOf('#activity-teacher-instructions'),
+            studentInstructions: valueOf('#activity-student-instructions'),
+            materials: valueOf('#activity-materials'),
+            estimatedMinutes: estimated === '' ? '' : Number.parseInt(String(estimated), 10) || '',
+            studentOutput: valueOf('#activity-student-output'),
+            makeupInstructions: valueOf('#activity-makeup-instructions'),
+            assessmentPurpose: valueOf('#activity-assessment-purpose') || 'formative',
+            activityData: this.activity.activityData || {}
+        });
+    }
+
+    validateActivityClass(activity = this.activity) {
+        const normalized = this.normalizeActivity(activity);
+        if (!normalized.subjectSlug) {
+            throw new Error('Choose a subject before saving this activity.');
+        }
+        if (normalized.grades.length === 0) {
+            throw new Error('Enter at least one grade level before saving this activity.');
+        }
+        return normalized;
+    }
+
+    isStructuredActivity(activity = this.activity) {
+        return (activity?.activityType || activity?.activity_type) === STRUCTURED_RESPONSE_TYPE;
+    }
+
+    syncActivityWorkspace() {
+        if (this.isStructuredActivity()) {
+            this.syncStructuredResponseTemplate();
+        } else {
+            this.syncActivityEditorScene();
+        }
+    }
+
+    syncActivityEditorScene() {
+        const scene = this.activityEditorHandle?.getScene?.();
+        if (!scene || !this.activity?.id) return;
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            excalidrawScene: scene
+        };
+    }
+
+    syncStructuredResponseTemplate() {
+        const root = $('#activity-structured-root');
+        if (!root || root.classList.contains('hidden') || !this.activity?.id) return;
+        const blocks = Array.from(root.querySelectorAll('.structured-builder-block')).map((blockEl, index) => {
+            const type = blockEl.querySelector('[data-structured-field="type"]')?.value || 'short-text';
+            const block = {
+                id: blockEl.dataset.blockId || `block_${index + 1}`,
+                type,
+                prompt: blockEl.querySelector('[data-structured-field="prompt"]')?.value || '',
+                helperText: blockEl.querySelector('[data-structured-field="helperText"]')?.value || '',
+                required: blockEl.querySelector('[data-structured-field="required"]')?.checked === true
+            };
+
+            if (structuredBlockUsesItems(type)) {
+                block.items = Array.from(blockEl.querySelectorAll('.structured-builder-item')).map((itemEl, itemIndex) => ({
+                    id: itemEl.dataset.itemId || `item_${itemIndex + 1}`,
+                    text: itemEl.querySelector('[data-structured-item-text]')?.value || ''
+                }));
+            }
+
+            if (structuredBlockUsesPairs(type)) {
+                block.items = Array.from(blockEl.querySelectorAll('.structured-builder-match-item')).map((itemEl, itemIndex) => ({
+                    id: itemEl.dataset.itemId || `match_${itemIndex + 1}`,
+                    text: itemEl.querySelector('[data-structured-match-text]')?.value || '',
+                    matchText: itemEl.querySelector('[data-structured-match-answer]')?.value || ''
+                }));
+            }
+
+            if (structuredBlockUsesGrid(type)) {
+                block.rows = Array.from(blockEl.querySelectorAll('.structured-builder-grid-row')).map((itemEl, itemIndex) => ({
+                    id: itemEl.dataset.itemId || `row_${itemIndex + 1}`,
+                    text: itemEl.querySelector('[data-structured-grid-text]')?.value || ''
+                }));
+                block.columns = Array.from(blockEl.querySelectorAll('.structured-builder-grid-column')).map((itemEl, itemIndex) => ({
+                    id: itemEl.dataset.itemId || `column_${itemIndex + 1}`,
+                    text: itemEl.querySelector('[data-structured-grid-text]')?.value || ''
+                }));
+            }
+
+            if (type === 'rating-scale') {
+                block.scaleMin = Number(blockEl.querySelector('[data-structured-scale-min]')?.value || 1);
+                block.scaleMax = Number(blockEl.querySelector('[data-structured-scale-max]')?.value || 5);
+            }
+
+            return normalizeStructuredBlock(block, index);
+        });
+
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            responseTemplate: normalizeResponseTemplate({
+                version: 1,
+                templateId: this.activity.activityData?.templateId || 'worksheet',
+                blocks
+            }, this.activity.activityData?.templateId || 'worksheet')
+        };
+    }
+
+    configureExcalidrawAssets() {
+        if (typeof window === 'undefined' || window.EXCALIDRAW_ASSET_PATH) return;
+        const viteEnv = import.meta.env || {};
+        window.EXCALIDRAW_ASSET_PATH = viteEnv.DEV
+            ? '/node_modules/@excalidraw/excalidraw/dist/dev/'
+            : new URL('./', window.location.href).href;
+    }
+
+    async mountActivityEditor() {
+        if (this.isStructuredActivity()) {
+            this.mountStructuredActivityEditor();
+            return;
+        }
+
+        await this.mountMapActivityEditor();
+    }
+
+    async mountMapActivityEditor() {
+        const root = $('#activity-excalidraw-root');
+        const structuredRoot = $('#activity-structured-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = false;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        root.innerHTML = '';
+        root.classList.remove('hidden');
+        structuredRoot?.classList.add('hidden');
+        if (structuredRoot) structuredRoot.innerHTML = '';
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Canvas');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Canvas');
+        if (status) status.textContent = 'Loading editor...';
+
+        try {
+            this.configureExcalidrawAssets();
+            const { mountActivityExcalidraw } = await import('./activityExcalidrawEditor.js');
+            const templateId = this.activity?.activityData?.templateId || DEFAULT_ACTIVITY_TEMPLATE_ID;
+            this.activityEditorHandle = mountActivityExcalidraw(root, {
+                scene: this.activity?.activityData?.excalidrawScene,
+                templateId,
+                onChange: (scene) => {
+                    if (!this.activity?.id) return;
+                    this.activity.activityData = {
+                        ...(this.activity.activityData || {}),
+                        templateId,
+                        excalidrawScene: scene
+                    };
+                    if (this.activityEditorAutosaveReady) {
+                        this.triggerActivityAutoSave({ readForm: false });
+                    }
+                },
+                onReady: () => {
+                    if (status) status.textContent = 'Editor ready.';
+                    clearTimeout(this.activityEditorAutosaveReadyTimeout);
+                    this.activityEditorAutosaveReadyTimeout = window.setTimeout(() => {
+                        this.activityEditorAutosaveReady = true;
+                        this.activityEditorAutosaveReadyTimeout = null;
+                    }, 500);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to load activity editor:', error);
+            this.activityEditorAutosaveReady = false;
+            clearTimeout(this.activityEditorAutosaveReadyTimeout);
+            this.activityEditorAutosaveReadyTimeout = null;
+            this.renderActivityEditorLoadError(root);
+            if (status) status.textContent = 'Editor unavailable. Try again or refresh this page.';
+            notifications.warning('Canvas editor did not load. Try again or refresh the page.');
+        }
+    }
+
+    mountStructuredActivityEditor() {
+        const root = $('#activity-structured-root');
+        const canvasRoot = $('#activity-excalidraw-root');
+        const status = $('#activity-excalidraw-status');
+        if (!root) return;
+
+        this.activityEditorHandle?.unmount?.();
+        this.activityEditorHandle = null;
+        this.activityEditorAutosaveReady = true;
+        clearTimeout(this.activityEditorAutosaveReadyTimeout);
+        this.activityEditorAutosaveReadyTimeout = null;
+        canvasRoot?.classList.add('hidden');
+        if (canvasRoot) canvasRoot.innerHTML = '';
+        root.classList.remove('hidden');
+        $('#activity-workspace-title') && ($('#activity-workspace-title').textContent = 'Response Builder');
+        $('#activity-canvas-focus-btn span') && ($('#activity-canvas-focus-btn span').textContent = 'Focus Builder');
+        if (status) status.textContent = 'Builder ready.';
+
+        const templateId = this.activity?.activityData?.templateId || 'worksheet';
+        this.activity.activityData = {
+            ...(this.activity.activityData || {}),
+            responseTemplate: normalizeResponseTemplate(this.activity.activityData?.responseTemplate, templateId)
+        };
+        this.renderStructuredResponseBuilder(root);
+    }
+
+    renderStructuredResponseBuilder(root = $('#activity-structured-root')) {
+        if (!root || !this.activity?.id) return;
+        const template = normalizeResponseTemplate(
+            this.activity.activityData?.responseTemplate,
+            this.activity.activityData?.templateId || 'worksheet'
+        );
+        this.activity.activityData.responseTemplate = template;
+        const blockCount = template.blocks.length;
+        const responseCount = template.blocks.filter(block => block.type !== 'instructions').length;
+
+        root.innerHTML = `
+            <div class="structured-builder-shell" data-structured-mode="build">
+                <div class="structured-mode-header">
+                    <div>
+                        <h4>Build Response Form</h4>
+                        <p>${escapeHtml(`${blockCount} blocks · ${responseCount} student response prompts`)}</p>
+                    </div>
+                </div>
+
+                <section class="structured-builder-build" data-structured-build-panel>
+                    <div class="structured-builder-toolbar">
+                        <label class="teacher-toolbar-select" for="structured-add-block-type">
+                            <span>Add block</span>
+                            <select id="structured-add-block-type" data-structured-add-type>
+                                ${STRUCTURED_BLOCK_TYPES.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(STRUCTURED_BLOCK_TYPE_LABELS[type])}</option>`).join('')}
+                            </select>
+                        </label>
+                        <button type="button" class="btn secondary-btn" data-structured-add-block>
+                            <i data-lucide="plus"></i>
+                            Add Block
+                        </button>
+                    </div>
+                    <div class="structured-builder-list">
+                        ${template.blocks.map((block, index) => this.renderStructuredBuilderBlock(block, index, template.blocks.length)).join('')}
+                    </div>
+                </section>
+            </div>
+        `;
+
+        root.onclick = event => this.handleStructuredBuilderClick(event);
+        root.oninput = event => this.handleStructuredBuilderInput(event);
+        root.onchange = event => this.handleStructuredBuilderInput(event);
+        this.refreshIcons();
+    }
+
+    renderStructuredBuilderBlock(block, index, total) {
+        const typeOptions = STRUCTURED_BLOCK_TYPES
+            .map(type => `<option value="${escapeHtml(type)}" ${block.type === type ? 'selected' : ''}>${escapeHtml(STRUCTURED_BLOCK_TYPE_LABELS[type])}</option>`)
+            .join('');
+        const blockPolicy = getStructuredBlockPolicy(block.type);
+        const canBeRequired = canRequireStructuredBlock(block.type);
+        const requiredLabel = canBeRequired ? 'Required on submit' : blockPolicy.lockedRequiredLabel || 'Not required';
+        const itemCopy = {
+            checklist: ['Checklist Items', 'Checklist item', 'Add Item'],
+            ranking: ['Ranking Items', 'Ranking item', 'Add Item'],
+            select: ['Dropdown Choices', 'Dropdown choice', 'Add Choice'],
+            'multiple-choice': ['Answer Choices', 'Answer choice', 'Add Choice'],
+            'multi-select': ['Answer Choices', 'Answer choice', 'Add Choice']
+        };
+        const [itemsLabel, itemInputLabel, addItemLabel] = itemCopy[block.type] || ['Answer Choices', 'Answer choice', 'Add Choice'];
+        const itemsHtml = structuredBlockUsesItems(block.type)
+            ? `
+                <div class="structured-builder-items">
+                    <div class="structured-builder-items-heading">
+                        <strong>${escapeHtml(itemsLabel)}</strong>
+                        <button type="button" class="btn text-btn" data-structured-add-item="${escapeHtml(block.id)}">
+                            <i data-lucide="plus"></i>
+                            ${escapeHtml(addItemLabel)}
+                        </button>
+                    </div>
+                    ${block.items.map(item => `
+                        <div class="structured-builder-item" data-item-id="${escapeHtml(item.id)}">
+                            <input type="text" data-structured-item-text value="${escapeHtml(item.text)}" aria-label="${escapeHtml(itemInputLabel)}">
+                            <button type="button" class="btn text-btn icon-btn" data-structured-delete-item="${escapeHtml(item.id)}" aria-label="Delete ${escapeHtml(itemInputLabel.toLowerCase())}">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `
+            : '';
+        const matchingHtml = structuredBlockUsesPairs(block.type)
+            ? `
+                <div class="structured-builder-items">
+                    <div class="structured-builder-items-heading">
+                        <strong>Matching Pairs</strong>
+                        <button type="button" class="btn text-btn" data-structured-add-match="${escapeHtml(block.id)}">
+                            <i data-lucide="plus"></i>
+                            Add Pair
+                        </button>
+                    </div>
+                    ${block.items.map(item => `
+                        <div class="structured-builder-item structured-builder-match-item" data-item-id="${escapeHtml(item.id)}">
+                            <label>
+                                <span>Item</span>
+                                <input type="text" data-structured-match-text value="${escapeHtml(item.text)}" aria-label="Matching item">
+                            </label>
+                            <label>
+                                <span>Correct match</span>
+                                <input type="text" data-structured-match-answer value="${escapeHtml(item.matchText)}" aria-label="Matching answer">
+                            </label>
+                            <button type="button" class="btn text-btn icon-btn" data-structured-delete-match="${escapeHtml(item.id)}" aria-label="Delete matching pair">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            `
+            : '';
+        const ratingHtml = block.type === 'rating-scale'
+            ? `
+                <div class="structured-builder-scale">
+                    <label>
+                        <span>Lowest rating</span>
+                        <input type="number" min="0" max="9" step="1" data-structured-scale-min value="${escapeHtml(block.scaleMin ?? 1)}">
+                    </label>
+                    <label>
+                        <span>Highest rating</span>
+                        <input type="number" min="1" max="10" step="1" data-structured-scale-max value="${escapeHtml(block.scaleMax ?? 5)}">
+                    </label>
+                </div>
+            `
+            : '';
+        const tableGridHtml = structuredBlockUsesGrid(block.type)
+            ? `
+                <div class="structured-builder-grid-config">
+                    <div class="structured-builder-items">
+                        <div class="structured-builder-items-heading">
+                            <strong>Rows</strong>
+                            <button type="button" class="btn text-btn" data-structured-add-grid-row="${escapeHtml(block.id)}">
+                                <i data-lucide="plus"></i>
+                                Add Row
+                            </button>
+                        </div>
+                        ${block.rows.map(row => `
+                            <div class="structured-builder-item structured-builder-grid-row" data-item-id="${escapeHtml(row.id)}">
+                                <input type="text" data-structured-grid-text value="${escapeHtml(row.text)}" aria-label="Table row label">
+                                <button type="button" class="btn text-btn icon-btn" data-structured-delete-grid-row="${escapeHtml(row.id)}" aria-label="Delete row">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="structured-builder-items">
+                        <div class="structured-builder-items-heading">
+                            <strong>Columns</strong>
+                            <button type="button" class="btn text-btn" data-structured-add-grid-column="${escapeHtml(block.id)}">
+                                <i data-lucide="plus"></i>
+                                Add Column
+                            </button>
+                        </div>
+                        ${block.columns.map(column => `
+                            <div class="structured-builder-item structured-builder-grid-column" data-item-id="${escapeHtml(column.id)}">
+                                <input type="text" data-structured-grid-text value="${escapeHtml(column.text)}" aria-label="Table column label">
+                                <button type="button" class="btn text-btn icon-btn" data-structured-delete-grid-column="${escapeHtml(column.id)}" aria-label="Delete column">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `
+            : '';
+
+        return `
+            <article class="structured-builder-block" data-block-id="${escapeHtml(block.id)}">
+                <div class="structured-builder-block-header">
+                    <strong>${escapeHtml(STRUCTURED_BLOCK_TYPE_LABELS[block.type] || 'Block')}</strong>
+                    <div class="structured-builder-actions">
+                        <button type="button" class="btn text-btn icon-btn" data-structured-move="up" ${index === 0 ? 'disabled' : ''} aria-label="Move block up">
+                            <i data-lucide="arrow-up"></i>
+                        </button>
+                        <button type="button" class="btn text-btn icon-btn" data-structured-move="down" ${index === total - 1 ? 'disabled' : ''} aria-label="Move block down">
+                            <i data-lucide="arrow-down"></i>
+                        </button>
+                        <button type="button" class="btn text-btn icon-btn" data-structured-duplicate-block aria-label="Duplicate block">
+                            <i data-lucide="copy"></i>
+                        </button>
+                        <button type="button" class="btn text-btn icon-btn danger-icon-btn" data-structured-delete-block aria-label="Delete block">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="structured-builder-fields">
+                    <label>
+                        <span>Block Type</span>
+                        <select data-structured-field="type">${typeOptions}</select>
+                    </label>
+                    <label>
+                        <span>Prompt</span>
+                        <textarea rows="2" data-structured-field="prompt">${escapeHtml(block.prompt)}</textarea>
+                    </label>
+                    <label>
+                        <span>Helper Text</span>
+                        <textarea rows="2" data-structured-field="helperText">${escapeHtml(block.helperText)}</textarea>
+                    </label>
+                    <label class="structured-required-toggle">
+                        <input type="checkbox" data-structured-field="required" ${block.required ? 'checked' : ''} ${canBeRequired ? '' : 'disabled'}>
+                        <span>${escapeHtml(requiredLabel)}</span>
+                    </label>
+                    ${itemsHtml}
+                    ${matchingHtml}
+                    ${ratingHtml}
+                    ${tableGridHtml}
+                </div>
+            </article>
+        `;
+    }
+
+    renderStructuredResponsePreview(template) {
+        const normalized = normalizeResponseTemplate(template);
+        return normalized.blocks.map(block => {
+            const helper = block.helperText ? `<p>${escapeHtml(block.helperText)}</p>` : '';
+            if (block.type === 'instructions') {
+                return `
+                    <section class="structured-response-block instructions-block">
+                        <h4>${escapeHtml(block.prompt)}</h4>
+                        ${helper}
+                    </section>
+                `;
+            }
+            if (block.type === 'checklist') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-checklist">
+                            ${block.items.map(item => `
+                                <label>
+                                    <input type="checkbox" disabled>
+                                    <span>${escapeHtml(item.text)}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'multiple-choice' || block.type === 'multi-select') {
+                const inputType = block.type === 'multiple-choice' ? 'radio' : 'checkbox';
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-checklist structured-response-options">
+                            ${block.items.map(item => `
+                                <label>
+                                    <input type="${inputType}" disabled>
+                                    <span>${escapeHtml(item.text)}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'select') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <select disabled>
+                            <option>Choose an option</option>
+                            ${block.items.map(item => `<option>${escapeHtml(item.text)}</option>`).join('')}
+                        </select>
+                    </section>
+                `;
+            }
+            if (block.type === 'true-false') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-checklist structured-response-options">
+                            <label>
+                                <input type="radio" disabled>
+                                <span>True</span>
+                            </label>
+                            <label>
+                                <input type="radio" disabled>
+                                <span>False</span>
+                            </label>
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'rating-scale') {
+                const scaleValues = Array.from(
+                    { length: Math.max(1, Math.min(10, Number(block.scaleMax || 5) - Number(block.scaleMin || 1) + 1)) },
+                    (_, scaleIndex) => Number(block.scaleMin || 1) + scaleIndex
+                );
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-rating">
+                            ${scaleValues.map(value => `
+                                <label>
+                                    <input type="radio" disabled>
+                                    <span>${escapeHtml(value)}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'number' || block.type === 'date') {
+                const inputType = block.type === 'number' ? 'number' : 'date';
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <input type="${inputType}" disabled>
+                    </section>
+                `;
+            }
+            if (block.type === 'matching') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-matching">
+                            ${block.items.map(item => `
+                                <div class="structured-response-matching-row">
+                                    <span>${escapeHtml(item.text)}</span>
+                                    <select disabled>
+                                        <option>${escapeHtml(item.matchText)}</option>
+                                    </select>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'ranking') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-ranking">
+                            ${block.items.map((item, itemIndex) => `
+                                <label>
+                                    <input type="number" min="1" max="${escapeHtml(block.items.length)}" value="${escapeHtml(itemIndex + 1)}" disabled>
+                                    <span>${escapeHtml(item.text)}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </section>
+                `;
+            }
+            if (block.type === 'table-grid') {
+                return `
+                    <section class="structured-response-block">
+                        <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                        ${helper}
+                        <div class="structured-response-table-wrapper">
+                            <table class="structured-response-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        ${block.columns.map(column => `<th scope="col">${escapeHtml(column.text)}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${block.rows.map(row => `
+                                        <tr>
+                                            <th scope="row">${escapeHtml(row.text)}</th>
+                                            ${block.columns.map(() => '<td><input type="text" disabled></td>').join('')}
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                `;
+            }
+            const field = block.type === 'long-text'
+                ? '<textarea rows="4" disabled></textarea>'
+                : '<input type="text" disabled>';
+            return `
+                <section class="structured-response-block">
+                    <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
+                    ${helper}
+                    ${field}
+                </section>
+            `;
+        }).join('');
+    }
+
+    renderActivityPreviewPanel() {
+        const root = $('#activity-preview-root');
+        if (!root) return;
+
+        if (!this.activity?.id) {
+            root.innerHTML = '<div class="teacher-empty-state">Open or create an activity to preview it.</div>';
+            return;
+        }
+
+        this.syncActivityWorkspace();
+        this.readActivityFormIntoModel();
+        const activity = this.normalizeActivity(this.activity);
+        const subjectMeta = getSubjectBySlug(this.getSubjects(), activity.subjectSlug);
+        const subject = subjectMeta?.name || activity.subjectSlug || 'No subject selected';
+        const grades = activity.grades.length ? activity.grades.join(', ') : 'No grade selected';
+        const minutes = activity.estimatedMinutes ? `${activity.estimatedMinutes} min` : 'No time set';
+        const purpose = String(activity.assessmentPurpose || 'formative')
+            .replace(/[-_]+/g, ' ')
+            .replace(/\b\w/g, letter => letter.toUpperCase());
+        const maybeText = (value, fallback = 'Not added yet.') => escapeHtml(String(value || '').trim() || fallback);
+        const detailCards = [
+            ['Subject', subject],
+            ['Grades', grades],
+            ['Type', this.getActivityTypeLabel(activity.activityType)],
+            ['Purpose', purpose],
+            ['Time', minutes]
+        ].map(([label, value]) => `
+            <div class="activity-preview-detail">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(value)}</strong>
+            </div>
+        `).join('');
+
+        const responsePreview = this.isStructuredActivity(activity)
+            ? `
+                <section class="activity-preview-section">
+                    <h4>Student Response</h4>
+                    <div class="structured-preview activity-preview-structured">
+                        ${this.renderStructuredResponsePreview(activity.activityData?.responseTemplate)}
+                    </div>
+                </section>
+            `
+            : `
+                <section class="activity-preview-section activity-preview-map-note">
+                    <h4>Canvas</h4>
+                    <p>Students will receive their own editable copy of the map or diagram canvas. Use the Build tab to inspect and edit the template.</p>
+                </section>
+            `;
+
+        root.innerHTML = `
+            <div class="activity-preview-shell">
+                <section class="activity-preview-hero">
+                    <div>
+                        <span>${escapeHtml(this.getActivityTypeLabel(activity.activityType))}</span>
+                        <h3>${maybeText(activity.title, 'Untitled Activity')}</h3>
+                        <p>${maybeText(activity.description, 'No description added yet.')}</p>
+                    </div>
+                    <div class="activity-preview-detail-grid">
+                        ${detailCards}
+                    </div>
+                </section>
+
+                <section class="activity-preview-section">
+                    <h4>Student Instructions</h4>
+                    <p>${maybeText(activity.studentInstructions)}</p>
+                </section>
+
+                <div class="activity-preview-two-column">
+                    <section class="activity-preview-section">
+                        <h4>Materials</h4>
+                        <p>${maybeText(activity.materials)}</p>
+                    </section>
+                    <section class="activity-preview-section">
+                        <h4>Expected Output</h4>
+                        <p>${maybeText(activity.studentOutput)}</p>
+                    </section>
+                </div>
+
+                ${responsePreview}
+            </div>
+        `;
+        this.refreshIcons();
+    }
+
+    refreshStructuredResponsePreview() {
+        const preview = $('#activity-structured-root [data-structured-preview-body]');
+        if (!preview) return;
+        this.syncStructuredResponseTemplate();
+        preview.innerHTML = this.renderStructuredResponsePreview(this.activity.activityData?.responseTemplate);
+    }
+
+    handleStructuredBuilderInput(event) {
+        if (!event.target.closest('.structured-builder-shell')) return;
+        this.syncStructuredResponseTemplate();
+        if (event.target.matches('[data-structured-field="type"]')) {
+            this.renderStructuredResponseBuilder();
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+        if (this.activityEditorTab === 'preview') {
+            this.renderActivityPreviewPanel();
+        }
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    handleStructuredBuilderClick(event) {
+        const root = $('#activity-structured-root');
+        if (!root) return;
+        const blockEl = event.target.closest('.structured-builder-block');
+
+        if (event.target.closest('[data-structured-add-block]')) {
+            this.syncStructuredResponseTemplate();
+            const type = root.querySelector('[data-structured-add-type]')?.value || 'short-text';
+            const template = normalizeResponseTemplate(this.activity.activityData?.responseTemplate, this.activity.activityData?.templateId || 'worksheet');
+            template.blocks.push(createStructuredBlock(type));
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (!blockEl) return;
+        this.syncStructuredResponseTemplate();
+        const template = normalizeResponseTemplate(this.activity.activityData?.responseTemplate, this.activity.activityData?.templateId || 'worksheet');
+        const blockIndex = template.blocks.findIndex(block => block.id === blockEl.dataset.blockId);
+        if (blockIndex < 0) return;
+
+        const moveButton = event.target.closest('[data-structured-move]');
+        if (moveButton) {
+            const direction = moveButton.dataset.structuredMove;
+            const targetIndex = direction === 'up' ? blockIndex - 1 : blockIndex + 1;
+            if (targetIndex >= 0 && targetIndex < template.blocks.length) {
+                const [block] = template.blocks.splice(blockIndex, 1);
+                template.blocks.splice(targetIndex, 0, block);
+            }
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-duplicate-block]')) {
+            const clone = JSON.parse(JSON.stringify(template.blocks[blockIndex]));
+            clone.id = createStructuredId(clone.type.replace(/[^a-z0-9]+/g, '_'));
+            if (Array.isArray(clone.items)) {
+                clone.items = clone.items.map(item => ({ ...item, id: createStructuredId('item') }));
+            }
+            if (Array.isArray(clone.rows)) {
+                clone.rows = clone.rows.map(row => ({ ...row, id: createStructuredId('row') }));
+            }
+            if (Array.isArray(clone.columns)) {
+                clone.columns = clone.columns.map(column => ({ ...column, id: createStructuredId('column') }));
+            }
+            template.blocks.splice(blockIndex + 1, 0, normalizeStructuredBlock(clone, blockIndex + 1));
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-delete-block]')) {
+            if (template.blocks.length <= 1) {
+                notifications.warning('Keep at least one block in the activity.');
+                return;
+            }
+            template.blocks.splice(blockIndex, 1);
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-add-item]')) {
+            const block = template.blocks[blockIndex];
+            block.items = Array.isArray(block.items) ? block.items : [];
+            block.items.push({
+                id: createStructuredId('item'),
+                text: block.type === 'checklist'
+                    ? 'Checklist item'
+                    : (block.type === 'ranking' ? `Ranking item ${block.items.length + 1}` : `Option ${block.items.length + 1}`)
+            });
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-add-match]')) {
+            const block = template.blocks[blockIndex];
+            block.items = Array.isArray(block.items) ? block.items : [];
+            block.items.push({
+                id: createStructuredId('match'),
+                text: `Item ${block.items.length + 1}`,
+                matchText: `Match ${block.items.length + 1}`
+            });
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const deleteMatchButton = event.target.closest('[data-structured-delete-match]');
+        if (deleteMatchButton) {
+            const block = template.blocks[blockIndex];
+            block.items = (block.items || []).filter(item => item.id !== deleteMatchButton.dataset.structuredDeleteMatch);
+            if (block.items.length === 0) {
+                block.items.push({
+                    id: createStructuredId('match'),
+                    text: 'Item 1',
+                    matchText: 'Match 1'
+                });
+            }
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-add-grid-row]')) {
+            const block = template.blocks[blockIndex];
+            block.rows = Array.isArray(block.rows) ? block.rows : [];
+            block.rows.push({
+                id: createStructuredId('row'),
+                text: `Row ${block.rows.length + 1}`
+            });
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        if (event.target.closest('[data-structured-add-grid-column]')) {
+            const block = template.blocks[blockIndex];
+            block.columns = Array.isArray(block.columns) ? block.columns : [];
+            block.columns.push({
+                id: createStructuredId('column'),
+                text: `Column ${block.columns.length + 1}`
+            });
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const deleteGridRowButton = event.target.closest('[data-structured-delete-grid-row]');
+        if (deleteGridRowButton) {
+            const block = template.blocks[blockIndex];
+            block.rows = (block.rows || []).filter(row => row.id !== deleteGridRowButton.dataset.structuredDeleteGridRow);
+            if (block.rows.length === 0) {
+                block.rows.push({ id: createStructuredId('row'), text: 'Row 1' });
+            }
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const deleteGridColumnButton = event.target.closest('[data-structured-delete-grid-column]');
+        if (deleteGridColumnButton) {
+            const block = template.blocks[blockIndex];
+            block.columns = (block.columns || []).filter(column => column.id !== deleteGridColumnButton.dataset.structuredDeleteGridColumn);
+            if (block.columns.length === 0) {
+                block.columns.push({ id: createStructuredId('column'), text: 'Column 1' });
+            }
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+
+        const deleteItemButton = event.target.closest('[data-structured-delete-item]');
+        if (deleteItemButton) {
+            const block = template.blocks[blockIndex];
+            block.items = (block.items || []).filter(item => item.id !== deleteItemButton.dataset.structuredDeleteItem);
+            if (block.items.length === 0) {
+                block.items.push({
+                    id: createStructuredId('item'),
+                    text: block.type === 'checklist'
+                        ? 'Checklist item'
+                        : (block.type === 'ranking' ? 'Ranking item 1' : 'Option 1')
+                });
+            }
+            this.activity.activityData.responseTemplate = template;
+            this.renderStructuredResponseBuilder(root);
+            this.triggerActivityAutoSave({ readForm: false });
+            return;
+        }
+    }
+
+    renderActivityEditorLoadError(root) {
+        root.innerHTML = `
+            <div class="activity-editor-error" role="status">
+                <h3>Map editor unavailable</h3>
+                <p>The canvas assets did not finish loading.</p>
+                <div class="activity-editor-error-actions">
+                    <button type="button" class="btn secondary-btn" data-activity-editor-retry>Retry</button>
+                    <button type="button" class="btn text-btn" data-activity-editor-refresh>Refresh Page</button>
+                </div>
+            </div>
+        `;
+
+        root.querySelector('[data-activity-editor-retry]')?.addEventListener('click', () => {
+            this.mountActivityEditor();
+        });
+
+        root.querySelector('[data-activity-editor-refresh]')?.addEventListener('click', () => {
+            this.readActivityFormIntoModel();
+            this.saveActivityToLocal(this.activity);
+            window.location.reload();
+        });
+    }
+
+    setActivitySaveStatus(text, state = 'muted') {
+        const status = $('#activity-save-status');
+        if (!status) return;
+        status.textContent = text;
+        const colors = {
+            success: 'var(--success-color)',
+            error: 'var(--danger-color)',
+            info: 'var(--secondary-color)',
+            muted: 'var(--text-muted)'
+        };
+        status.style.color = colors[state] || colors.muted;
+    }
+
+    setActivityCanvasFocus(isFocused) {
+        const view = $('#teacher-activity-editor-view');
+        if (!view) return;
+
+        if (isFocused && this.activityEditorTab !== 'build') {
+            this.setActivityEditorTab('build');
+        }
+
+        view.classList.toggle('canvas-focus', Boolean(isFocused));
+        this.updateActivityFocusButtonLabel();
+
+        window.requestAnimationFrame(() => {
+            window.dispatchEvent(new Event('resize'));
+        });
+    }
+
+    toggleActivityCanvasFocus() {
+        const view = $('#teacher-activity-editor-view');
+        if (!view) return;
+
+        if (!view.classList.contains('canvas-focus')) {
+            this.syncActivityWorkspace();
+            this.readActivityFormIntoModel();
+        }
+
+        this.setActivityCanvasFocus(!view.classList.contains('canvas-focus'));
+    }
+
+    async handleActivityTypeSelectChange() {
+        const selectedType = $('#activity-type')?.value || DEFAULT_ACTIVITY_TYPE;
+        const currentEditorTab = this.activityEditorTab;
+        this.syncActivityWorkspace();
+        this.readActivityFormIntoModel();
+
+        const currentTemplate = this.getActivityTemplate(this.activity.activityData?.templateId || DEFAULT_ACTIVITY_TEMPLATE_ID);
+        if (selectedType === STRUCTURED_RESPONSE_TYPE && currentTemplate.type !== STRUCTURED_RESPONSE_TYPE) {
+            this.activity.activityType = STRUCTURED_RESPONSE_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: 'worksheet',
+                responseTemplate: createDefaultResponseTemplate('worksheet')
+            };
+        } else if (selectedType === DEFAULT_ACTIVITY_TYPE && currentTemplate.type === STRUCTURED_RESPONSE_TYPE) {
+            this.activity.activityType = DEFAULT_ACTIVITY_TYPE;
+            this.activity.activityData = {
+                ...(this.activity.activityData || {}),
+                templateId: DEFAULT_ACTIVITY_TEMPLATE_ID,
+                excalidrawScene: null
+            };
+        } else {
+            this.activity.activityType = selectedType;
+        }
+
+        this.activity = this.normalizeActivity(this.activity);
+        this.updateActivityFormUI();
+        await this.mountActivityEditor();
+        this.setActivityEditorTab(currentEditorTab, { sync: false });
+        this.triggerActivityAutoSave({ readForm: false });
+    }
+
+    triggerActivityAutoSave(options = {}) {
+        if (!this.activity?.id) return;
+        if (this.isActivityDeleted(this.activity.id)) return;
+        if (options.syncEditor) this.syncActivityWorkspace();
+        if (options.readForm !== false) this.readActivityFormIntoModel();
+
+        if (this.authDisabled) {
+            this.queueActivityLocalSave();
+            this.setCloudStatus('Saved locally', 'success');
+            return;
+        }
+
+        if (this.activity.source !== 'cloud') {
+            this.queueActivityLocalSave();
+            this.setCloudStatus('Draft saved locally', 'success');
+            return;
+        }
+
+        this.queueActivityCloudSave();
+    }
+
+    queueActivityLocalSave() {
+        clearTimeout(this.activityLocalSaveTimeout);
+        this.activityLocalSaveTimeout = setTimeout(() => {
+            if (this.isActivityDeleted(this.activity?.id)) return;
+            this.saveActivityToLocal(this.activity);
+            this.setActivitySaveStatus('Draft saved locally.', 'success');
+        }, 500);
+    }
+
+    queueActivityCloudSave() {
+        if (this.authDisabled) return;
+        if (!this.isAuthenticated || !this.activity?.id) return;
+        clearTimeout(this.activityCloudSaveTimeout);
+        this.setCloudStatus('Saving...', 'info');
+        this.setActivitySaveStatus('Saving activity...', 'info');
+        this.activityCloudSaveTimeout = setTimeout(() => {
+            if (this.isActivityDeleted(this.activity?.id)) return;
+            this.saveActivityToCloud({ notifyOnError: false });
+        }, 1200);
+    }
+
+    async saveActivityToCloud(options = {}) {
+        if (this.authDisabled) return false;
+        if (!this.ensureAuthenticated(false)) return false;
+        if (!this.activity?.id) return false;
+        if (this.isActivityDeleted(this.activity.id)) return false;
+
+        this.syncActivityWorkspace();
+        this.readActivityFormIntoModel();
+        if (this.isActivityDeleted(this.activity.id)) return false;
+
+        try {
+            this.validateActivityClass(this.activity);
+        } catch (error) {
+            this.saveActivityToLocal(this.activity);
+            this.setCloudStatus('Activity needs class', 'muted');
+            this.setActivitySaveStatus(`${error.message} Draft saved locally.`, 'error');
+            if (options.notifyOnError !== false) {
+                notifications.warning(error.message);
+            }
+            return false;
+        }
+
+        try {
+            const db = supabaseService.getDatabase();
+            const docRef = doc(db, this.ACTIVITY_COLLECTION, this.activity.id);
+            const { __source, source, ...rest } = this.activity;
+            const payload = {
+                ...rest,
+                ownerId: this.currentUser ? this.currentUser.uid : null,
+                updatedAt: serverTimestamp()
+            };
+            await setDoc(docRef, payload);
+            this.activity.source = 'cloud';
+            this.removeLocalActivity(this.activity.id);
+            this.invalidateActivityLibraryCache();
+            this.setCloudStatus('Saved to cloud', 'success');
+            this.setActivitySaveStatus('Saved to cloud.', 'success');
+            setTimeout(() => this.setCloudStatus('Ready', 'info'), 1500);
+            return true;
+        } catch (error) {
+            console.error('Failed to save classroom activity:', error);
+            if (!this.isActivityDeleted(this.activity?.id)) {
+                this.saveActivityToLocal(this.activity);
+                if (this.isActivityCloudSetupPending(error)) {
+                    this.setCloudStatus('Activities cloud setup pending', 'muted');
+                    this.setActivitySaveStatus('Draft saved locally. Cloud sync pending setup.', 'info');
+                } else {
+                    this.setCloudStatus('Activity save failed', 'error');
+                    this.setActivitySaveStatus('Cloud save failed. Draft saved locally.', 'error');
+                }
+            }
+            if (options.notifyOnError !== false) {
+                if (this.isActivityCloudSetupPending(error)) {
+                    notifications.info('Activity draft saved locally. Cloud sync will work after setup.');
+                } else {
+                    notifications.error('Cloud save failed. Activity draft saved locally.');
+                }
+            }
+            return false;
+        }
+    }
+
+    createActivityIdSuggestion(activity = this.activity) {
+        const normalized = this.normalizeActivity(activity);
+        const grade = normalized.grades[0] || 'custom';
+        const title = this.slugifyVocabPart(normalized.title || 'activity');
+        const parts = [
+            'activity',
+            this.slugifyVocabPart(normalized.subjectSlug) || DEFAULT_SUBJECT_SLUG,
+            `grade${this.slugifyVocabPart(grade) || 'custom'}`,
+            this.slugifyVocabPart(normalized.activityType) || 'map',
+            title
+        ].filter(Boolean);
+        return parts.join('_') || `activity_${Date.now()}`;
+    }
+
+    async publishActivity({ asNew = false } = {}) {
+        if (!this.ensureAuthenticated()) return;
+        this.syncActivityWorkspace();
+        this.readActivityFormIntoModel();
+
+        if (asNew) {
+            const suggestedId = this.createActivityIdSuggestion();
+            const newId = prompt('New activity ID', suggestedId);
+            if (!newId) return;
+            this.activity.id = this.slugifyVocabPart(newId) || suggestedId;
+            $('#activity-id').value = this.activity.id;
+            this.deletedActivityIds.delete(this.activity.id);
+            delete this.activity.source;
+        }
+
+        const saved = await this.saveActivityToCloud({ notifyOnError: true });
+
+        if (saved) {
+            notifications.success(asNew ? 'Saved as a new activity.' : 'Activity update saved.');
+            await this.loadActivityLibrary();
+        } else {
+            this.saveActivityToLocal(this.activity);
+        }
+    }
+
+    exportActivityJson() {
+        if (!this.ensureAuthenticated()) return;
+        this.syncActivityWorkspace();
+        this.readActivityFormIntoModel();
+        const activity = this.normalizeActivity(this.activity);
+        const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(activity, null, 2))}`;
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute('href', dataStr);
+        downloadAnchorNode.setAttribute('download', `${activity.id || 'classroom-activity'}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
     loadLocalVocabulary(vocab) {
         if (!this.ensureAuthenticated()) return;
         this.loadVocabularyObject(vocab);
@@ -2721,6 +6245,7 @@ class TeacherManager {
             }
         });
         setupModal('#quiz-modal', { dismissible: true });
+        setupModal('#activity-assignment-modal', { dismissible: true });
 
         if (!this.authDisabled) {
             $('#teacher-login-form')?.addEventListener('submit', (event) => this.handleTeacherLogin(event));
@@ -2779,6 +6304,7 @@ class TeacherManager {
         $('#overview-create-vocab-btn')?.addEventListener('click', () => this.startNewVocab());
         $('#overview-students-btn')?.addEventListener('click', () => this.showTeacherSection('students'));
         $('#overview-vocabulary-btn')?.addEventListener('click', () => this.showTeacherSection('vocabulary'));
+        $('#overview-activities-btn')?.addEventListener('click', () => this.showTeacherSection('activities'));
         $('#overview-quiz-btn')?.addEventListener('click', () => this.showTeacherSection('quizzes'));
         $('#overview-settings-btn')?.addEventListener('click', () => this.showTeacherSection('data-settings'));
         $('#overview-export-btn')?.addEventListener('click', () => {
@@ -2788,6 +6314,132 @@ class TeacherManager {
         // Dashboard Actions
         $('#create-new-btn').addEventListener('click', () => {
             this.startNewVocab();
+        });
+
+        $('#create-activity-btn')?.addEventListener('click', () => {
+            const templateId = $('#activity-template-select')?.value || DEFAULT_ACTIVITY_TEMPLATE_ID;
+            this.startNewActivity(templateId);
+        });
+
+        $$('.activity-workflow-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.setActivityWorkflowTab(tab.dataset.activityTab || 'assign');
+            });
+            tab.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                const tabs = Array.from($$('.activity-workflow-tab'));
+                const currentIndex = tabs.indexOf(tab);
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                tabs[nextIndex]?.focus();
+                this.setActivityWorkflowTab(tabs[nextIndex]?.dataset.activityTab || 'assign');
+            });
+        });
+
+        $$('.activity-editor-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.setActivityEditorTab(tab.dataset.activityEditorTab || 'settings');
+            });
+            tab.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+                const tabs = Array.from($$('.activity-editor-tab'));
+                const currentIndex = tabs.indexOf(tab);
+                let nextIndex = currentIndex;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = tabs.length - 1;
+                event.preventDefault();
+                tabs[nextIndex]?.focus();
+                this.setActivityEditorTab(tabs[nextIndex]?.dataset.activityEditorTab || 'settings');
+            });
+        });
+
+        $('#back-to-activities')?.addEventListener('click', () => {
+            if (!this.ensureAuthenticated(false)) return;
+            this.triggerActivityAutoSave({ syncEditor: true });
+            this.activityMode = 'assign';
+            this.showActivityLibrary();
+        });
+
+        $('#back-to-activity-assignments')?.addEventListener('click', () => {
+            if (!this.ensureAuthenticated(false)) return;
+            this.activityMode = 'review';
+            this.showActivityLibrary();
+        });
+
+        $('#refresh-activity-assignment-review-btn')?.addEventListener('click', () => {
+            if (!this.activeActivityAssignment?.id) return;
+            this.showActivityAssignmentReview(this.activeActivityAssignment.id, { forceRefresh: true });
+        });
+
+        $('#activity-review-prev-student-btn')?.addEventListener('click', () => {
+            this.showAdjacentActivityReviewStudent(-1);
+        });
+
+        $('#activity-review-next-student-btn')?.addEventListener('click', () => {
+            this.showAdjacentActivityReviewStudent(1);
+        });
+
+        $('#assign-activity-toolbar-btn')?.addEventListener('click', () => {
+            this.openActivityAssignmentModal(this.activity);
+        });
+
+        $('#activity-assignment-form')?.addEventListener('submit', (event) => {
+            this.saveActivityAssignment(event);
+        });
+
+        $('#cancel-activity-assignment-btn')?.addEventListener('click', () => {
+            closeDialog('#activity-assignment-modal');
+        });
+
+        $('#close-activity-assignment-modal')?.addEventListener('click', () => {
+            closeDialog('#activity-assignment-modal');
+        });
+
+        $('#save-activity-update-btn')?.addEventListener('click', () => {
+            this.publishActivity({ asNew: false });
+        });
+
+        $('#save-activity-new-version-btn')?.addEventListener('click', () => {
+            this.publishActivity({ asNew: true });
+        });
+
+        $('#activity-canvas-focus-btn')?.addEventListener('click', () => {
+            this.toggleActivityCanvasFocus();
+        });
+
+        $('#export-activity-btn')?.addEventListener('click', () => {
+            this.exportActivityJson();
+        });
+
+        [
+            '#activity-title',
+            '#activity-description',
+            '#activity-grades',
+            '#activity-estimated-minutes',
+            '#activity-teacher-instructions',
+            '#activity-student-instructions',
+            '#activity-materials',
+            '#activity-student-output',
+            '#activity-makeup-instructions'
+        ].forEach(selector => {
+            $(selector)?.addEventListener('input', () => this.triggerActivityAutoSave());
+        });
+
+        [
+            '#activity-subject',
+            '#activity-assessment-purpose'
+        ].forEach(selector => {
+            $(selector)?.addEventListener('change', () => this.triggerActivityAutoSave());
+        });
+
+        $('#activity-type')?.addEventListener('change', () => {
+            this.handleActivityTypeSelectChange();
         });
 
         $('#view-progress-btn')?.addEventListener('click', () => {

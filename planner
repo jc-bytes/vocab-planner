@@ -92,11 +92,9 @@ run_target() {
   page="$(page_for_target "$target")"
   local url="http://${DEFAULT_HOST}:${port}/${page}"
 
-  command -v python3 >/dev/null 2>&1 || die "python3 is required for local static serving"
-
-  echo "Starting ${target} at ${url}"
+  echo "Starting ${target} with Vite at ${url}"
   open_url "$url"
-  python3 -m http.server "$port" --bind "$DEFAULT_HOST"
+  npx vite --host "$DEFAULT_HOST" --port "$port"
 }
 
 build_target() {

@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
 # Get the directory where the script is located
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -6,14 +7,21 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Change to that directory
 cd "$DIR"
 
-# Check if python3 is available
-if command -v python3 &>/dev/null; then
-    echo "Starting local server with Python 3..."
-    # Open browser after a slight delay
-    (sleep 1 && open "http://localhost:8000") &
-    # Start server
-    python3 -m http.server 8000
+if ! command -v npm &>/dev/null; then
+    echo "npm is not installed. Install Node.js/npm to run the app with the bundled Activities canvas editor."
+    read -n 1 -s -r -p "Press any key to exit..."
+    exit 1
+fi
+
+if [[ ! -d "node_modules" ]]; then
+    echo "Installing app dependencies..."
+    npm install
+fi
+
+if [[ -x "./planner" ]]; then
+    echo "Starting student app with Vite so Excalidraw assets load correctly..."
+    ./planner run student
 else
-    echo "Python 3 is not installed. Please install Python 3 to run this local server."
-    read -p "Press any key to exit..."
+    echo "Starting student app with Vite so Excalidraw assets load correctly..."
+    npx vite --host 127.0.0.1 --port 8000 --open /student.html
 fi

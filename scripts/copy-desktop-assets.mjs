@@ -18,6 +18,17 @@ const entries = [
   'format example.pdf'
 ];
 
+const packageAssets = [
+  {
+    source: 'node_modules/@excalidraw/excalidraw/dist/prod/fonts',
+    target: 'fonts'
+  },
+  {
+    source: 'node_modules/@excalidraw/excalidraw/dist/prod/fonts',
+    target: 'assets/fonts'
+  }
+];
+
 await mkdir(outDir, { recursive: true });
 
 for (const entry of entries) {
@@ -29,6 +40,22 @@ for (const entry of entries) {
       recursive: true,
       force: true,
       filter: path => !path.includes('node_modules') && !path.includes('/.git/')
+    });
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      throw error;
+    }
+  }
+}
+
+for (const entry of packageAssets) {
+  const source = join(root, entry.source);
+  const target = join(outDir, entry.target);
+  try {
+    await stat(source);
+    await cp(source, target, {
+      recursive: true,
+      force: true
     });
   } catch (error) {
     if (error.code !== 'ENOENT') {

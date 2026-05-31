@@ -20,7 +20,7 @@ Reviewed files:
 1. Corrected `a approved model` to `an approved model` in April and May.
 2. Corrected December evaluation from `5 summatives by Week 10` to `5 summatives by Week 9`.
 3. Clarified the December Week 12 evidence workshop so students choose one missing item to finish or one weak item to improve.
-4. Tightened Trimester 2 Week 9 Class 1 so students practice correcting a simple input-output error before the Week 9 selection/debugging check.
+4. Reframed Trimester 2 Week 9 selection/debugging work as formative preparation before the Week 11 Interactive Routine STEM Project.
 
 ## 1. Classroom Flow Check
 
@@ -81,7 +81,7 @@ I am treating the 5 labeled summative activities as the 5 daily/summative grades
 | 2nd | 4 | Summative #2 | Web search scenario quiz with explanations | Quiz sheet or Google Form and answer key |
 | 2nd | 6 | Summative #3 | 6-panel storyboard with title, audience, purpose, captions, and sound/narration notes | Storyboard template and rubric |
 | 2nd | 8 | Summative #4 | Short visual media product and 1-minute explanation | Product checklist and presentation rubric |
-| 2nd | 9 | Summative #5 | Selection/debugging check with if-then examples and corrected errors | Debugging worksheet and answer key |
+| 2nd | 11 | Summative #5 | Interactive Routine STEM Project with one input, one condition, one output, one test result, and one improvement note | STEM project checklist/rubric and paper/Scratch/Blockly evidence |
 | 3rd | 2 | Summative #1 | 12 data cards, 4 fields, 3 records, sorting/grouping, and 3 answers | Data-card set and answer key |
 | 3rd | 4 | Summative #2 | Data answers, sort/filter task, chart, and 2 explanation sentences | Data task sheet and chart rubric |
 | 3rd | 6 | Summative #3 | Vector tool labels and simple icon with design explanation | Tool sheet and icon rubric |
@@ -98,7 +98,7 @@ Gradeability result:
 | Trimester | Vocabulary/Concepts | Planning/Design | Practical Building | Debugging/Testing | Presentation/Reflection | Balance Result |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1st | Robot parts, communication quiz | Path map, Worm Robot plan | Kit and mechanism work | Clamp testing, troubleshooting ideas | Worm/aircraft demos | Balanced, with strong hands-on robotics |
-| 2nd | Systems and search quiz | Storyboard plan | Visual product | Selection/debugging check | Media sharing and logic demo | Balanced, but depends on computers/internet |
+| 2nd | Systems and search quiz | Storyboard plan | Visual product plus simulated logic routine | Formative selection/debugging practice and STEM project testing | Media sharing and Interactive Routine STEM Project demo | Balanced, with hardware optional |
 | 3rd | Database/vector/selection checks | Icon/product design | Digital drawing/product work | Selection quiz-style check | Vector product sharing | Balanced, but needs tool confirmation |
 
 Appreciation-grade suggestion, not additional summative grades:
@@ -132,7 +132,7 @@ Readiness result:
 | Trimester | Quiz or Quiz-Style Check | Practice Before Quiz | Presentation, Demo, or Product Sharing | Connection | Timing Result |
 | --- | --- | --- | --- | --- | --- |
 | 1st | Week 5 communication and sensor scenario quiz | Weeks 2-4 cover robot parts, sensors, motors, controller, input/output, and robot communication; Week 5 Class 1 reviews communication before the quiz. | Week 8 Worm Robot demo; Week 11 Propeller Aircraft short demo | Students show a robot/model movement and explain what happened. | Good. Quiz and first demo happen before exam buffer. |
-| 2nd | Week 4 web search scenario quiz; Week 9 selection/debugging check | Search is practiced in Weeks 3-4 before the quiz. Input/output, condition, and simple error correction are practiced before the Week 9 check. | Week 8 visual media product-sharing presentation; Week 11 short logic demo | Students share a visual product or explain a simple routine. | Good. Main presentation is before exam buffer; Week 11 demo is formative. |
+| 2nd | Week 4 web search scenario quiz; Week 9 selection/debugging preparation is formative | Search is practiced in Weeks 3-4 before the quiz. Input/output, condition, and simple error correction are practiced in Weeks 9-10 before the Week 11 project. | Week 8 visual media product-sharing presentation; Week 11 Interactive Routine STEM Project demo | Students share a visual product or explain a simulated logic routine. | Good. Main presentation is before exam buffer; Week 11 project uses the existing fifth summative slot. |
 | 3rd | Week 9 selection quiz-style check | Week 9 Class 1 practices conditions, outcomes, and if-then sentences before the check. | Week 8 vector product-sharing presentation | Students show a vector product/icon and explain tools, design choice, and improvement. | Good. Presentation and quiz happen before exam buffer. |
 
 Balance result:
@@ -150,7 +150,7 @@ Balance result:
 | May | Telescopic Clamp parts or approved model, clamp testing checklist, Propeller Aircraft parts or approved model, safety checklist, Scratch or Blockly access, paper command-tracing fallback, Trimester 1 evidence checklist. |
 | June | Input-process-output sorting cards, system diagram worksheet, search result screenshots/cards, web search scenario quiz or Google Form, computers if live search is used, internet access, projector/screen. |
 | July | Sample posters/slides, media feature cards, storyboard template, visual media checklist, presentation rubric, computers or approved slide/drawing tool, projector/screen. |
-| August | Input-output-condition cards, if-then worksheets, selection/debugging check, Scratch/Blockly or paper command cards, review game/cards, Trimester 2 evidence checklist. |
+| August | Input-output-condition cards, if-then worksheets, formative selection/debugging preparation, Scratch/Blockly or paper command cards, Interactive Routine STEM Project checklist/rubric, review game/cards, Trimester 2 evidence checklist. |
 | September | Paper form template, data cards, field/record examples, sorting cards, sample table, approved spreadsheet/database tool if used, database checklist. |
 | October | Data/chart task sheet, chart example, vector drawing app, vector tool cards, paper shape models, icon rubric/checklist, projector/screen. |
 | November | Vector product checklist, presentation rubric, Scratch/Blockly or paper logic diagrams, selection quiz-style check, evidence checklist. |

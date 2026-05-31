@@ -24,19 +24,22 @@ You can use `./planner` for the student/teacher split:
 
 `deploy` builds `dist-desktop` and only uploads if `PLANNER_DEPLOY_CMD` is set.
 By default, `run student` uses port 8000 and `run teacher` uses port 8001.
+Local `run` uses Vite so bundled tools like the Activities canvas editor load the same way they will in the desktop and Pages builds.
 
 ### Option 1: Using the Launcher (Recommended)
 1.  Double-click `start_app.command` in the project folder.
-2.  This will start a local server and open your browser to `http://localhost:8000`.
+2.  This starts the student app with Vite and opens your browser to `http://127.0.0.1:8000/student.html`.
 
 ### Option 2: Manual Server
 If you prefer the terminal:
 ```bash
-python3 -m http.server 8000
-# Then open http://localhost:8000
+npm install
+./planner run student
+./planner run teacher
+# Then open http://127.0.0.1:8001/teacher.html
 ```
 
-*Note: Opening `index.html` directly may cause issues with loading vocabulary files due to browser security policies (CORS).*
+*Note: Opening `index.html` directly, or serving the repo with a raw Python server, may cause issues with bundled editor tools and browser security policies.*
 
 ## Desktop App
 
@@ -103,5 +106,6 @@ If games fail to build, they will show a helpful error message when you try to p
 ### Publishing
 1.  Push this code to a GitHub repository.
 2.  Go to **Settings > Pages**.
-3.  Select `main` branch as the source.
-4.  Your site will be live at `https://<username>.github.io/<repo-name>/`.
+3.  Set the source to **GitHub Actions**.
+4.  The included Pages workflow builds `dist-desktop` and publishes that output.
+5.  Your site will be live at `https://<username>.github.io/<repo-name>/`.

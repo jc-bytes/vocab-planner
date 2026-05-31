@@ -20,7 +20,7 @@ Use this checklist when revising each month:
 - Year/trimester/date consistency: all monthly plans should match 2026 and the correct trimester.
 - Naming and spelling: file names, month names, topic titles, and repeated section labels should be consistent.
 - Placeholder cleanup: no empty `Topic`, `Book pages`, `Competences`, `Learning Objectives`, or `Learning Outcomes` sections should remain.
-- Language consistency: avoid mixing STEM/STEAM unless intentional and explained.
+- Language consistency: use STEM consistently unless an official document explicitly requires another term.
 - Group feasibility: projects should specify whether students work individually, in pairs, or groups, and how groups are assessed.
 
 ## High Priority Findings
@@ -138,7 +138,7 @@ Recommended fix:
 - Replace K96131/Worm Robot lessons with mBot assembly/setup, movement, sensors, and challenge lessons.
 - Keep robotics vocabulary only when it connects to the mBot kit students will use.
 
-### 5. Third trimester monthly plans shift into STEM/STEAM projects not described in the annual plan
+### 5. Third trimester monthly plans shift into STEM projects not described in the annual plan
 
 Files:
 
@@ -149,27 +149,27 @@ Files:
 
 Issue:
 
-The annual third trimester is organized around spreadsheets, 3D modelling, and micro:bit sensing movement. The monthly plans use a broad STEM/STEAM project/logbook structure. That can work, but the annual plan should explicitly say that spreadsheets, 3D modelling, and micro:bit are applied through a STEM/STEAM project cycle.
+The annual third trimester is organized around spreadsheets, 3D modelling, and micro:bit sensing movement. The monthly plans use a broad STEM project/logbook structure. That can work, but the annual plan should explicitly say that spreadsheets, 3D modelling, and micro:bit are applied through a STEM project cycle.
 
 Recommended fix:
 
 Add an annual third-trimester strand such as:
 
-> Integrated STEM/STEAM project cycle: students document a project in a digital logbook, organize project data with spreadsheets, design or prototype parts using 3D modelling, test and improve their solution, present their work, and reflect on results.
+> Integrated STEM project cycle: students document a project in a digital logbook, organize project data with spreadsheets, design or prototype parts using 3D modelling, test and improve their solution, present their work, and reflect on results.
 
-Then revise September-November so every STEM/STEAM project lesson names the annual skill it is practicing.
+Then revise September-November so every STEM project lesson names the annual skill it is practicing.
 
-### 6. November and December repeat STEAM competences while teaching micro:bit
+### 6. November and December repeat STEM competences while teaching micro:bit
 
 Issue:
 
-November and December include STEAM-focused competences/objectives/outcomes, but the actual late November and December lessons are micro:bit programming, inputs, LEDs, variables, sensors, conditionals, sound, and final interactive projects.
+November and December include STEM-focused competences/objectives/outcomes, but the actual late November and December lessons are micro:bit programming, inputs, LEDs, variables, sensors, conditionals, sound, and final interactive projects.
 
 Recommended fix:
 
 Rewrite the monthly competences/objectives/outcomes to include both:
 
-- STEAM project presentation/reflection, if kept.
+- STEM project presentation/reflection, if kept.
 - Micro:bit programming with inputs, outputs, variables, conditionals, sensors, and testing.
 
 ### 7. December shows the wrong trimester
@@ -348,14 +348,14 @@ Recommended fix:
 
 ### November
 
-November contains STEAM project completion/presentation/reflection, then micro:bit introduction and variables.
+November contains STEM project completion/presentation/reflection, then micro:bit introduction and variables.
 
 Concerns:
 
 - It starts with a blank placeholder cell.
-- Competences/objectives/outcomes focus on STEAM, while the later lessons teach micro:bit.
+- Competences/objectives/outcomes focus on STEM, while the later lessons teach micro:bit.
 - Micro:bit content aligns with annual third trimester, but it arrives late if December is only three weeks.
-- `STEM` and `STEAM` are both used.
+- Use `STEM` consistently.
 
 Recommended fix:
 
@@ -370,7 +370,7 @@ December has 2 lesson blocks despite saying 3 weeks.
 Concerns:
 
 - Header says Trimester 2 and Year 2024.
-- Competences/objectives/outcomes focus on STEAM, but lessons teach micro:bit sensors, conditionals, sound, and final interactive project.
+- Competences/objectives/outcomes focus on STEM, but lessons teach micro:bit sensors, conditionals, sound, and final interactive project.
 - Annual plan includes specific topics that are not fully represented: `Go with the flow`, `Sensing inputs`, `Finding your way`, `Designing a step counter`, `Making a step counter`.
 - The final interactive project may be too open unless students already practiced inputs, variables, conditionals, sensors, and testing.
 
@@ -396,7 +396,7 @@ Add these only if they are intentional parts of the year:
 
 - Internet Day.
 - Recycling, e-waste, and environmental responsibility in technology use.
-- STEM/STEAM project cycle and digital logbook.
+- STEM project cycle and digital logbook.
 - Spreadsheet database for project roles and planning.
 - mBot robotics platform.
 - mBot Knowledge Cards Part 1 as a robotics resource.
@@ -419,7 +419,7 @@ Vocabulary to reconsider or reduce:
 - March: keep DNS, IP address, packet, header, payload, protocol. Remove or delay unrelated robotics/lab kit terms.
 - April: keep copyright, fair use, hyperlink, navigation, variable, value, set, change, event, algorithm. Avoid repeating web page/media terms every lesson unless used.
 - July: reduce advanced robotics vocabulary unless students handle those exact parts. Consider removing Wi-Fi/Bluetooth/IR/gyroscope/accelerometer if the kit does not use them.
-- September-November: choose STEM or STEAM and use consistently. Keep project vocabulary only if it appears in logbooks or rubrics.
+- September-November: use STEM consistently. Keep project vocabulary only if it appears in logbooks or rubrics.
 - December: use micro:bit vocabulary: input, output, LED, variable, condition, sensor, temperature, light level, sound, test, debug.
 
 ## Suggested Revision Order
