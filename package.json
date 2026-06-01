@@ -25,6 +25,7 @@
     "@excalidraw/excalidraw": "^0.18.1",
     "@fontsource/inter": "^5.2.8",
     "@supabase/supabase-js": "^2.49.8",
+    "@xyflow/react": "^12.10.2",
     "chart.js": "^4.4.9",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",

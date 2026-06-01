@@ -7,6 +7,7 @@ import { createDefaultCardSortTemplate } from '../../js/activityCardSort.js';
 import { createDefaultSpreadsheetTemplate } from '../../js/activitySpreadsheetTable.js';
 import { normalizeImageHotspotTemplate } from '../../js/activityImageHotspot.js';
 import { createDefaultExternalArtifactTemplate } from '../../js/activityExternalArtifact.js';
+import { createDefaultFlowchartTemplate } from '../../js/activityFlowchartAlgorithm.js';
 
 export const AUDIT_PASSWORD = 'AuditPass123!';
 export const AUDIT_TEACHER_EMAIL = 'audit.teacher@aid.edu.pa';
@@ -15,7 +16,8 @@ export const AUDIT_ASSIGNMENT_IDS = [
     'audit-card-sort',
     'audit-spreadsheet-table',
     'audit-image-hotspot',
-    'audit-external-artifact'
+    'audit-external-artifact',
+    'audit-flowchart-algorithm'
 ];
 
 const AUDIT_IMAGE_BUCKET = 'classroom-activity-images';
@@ -174,6 +176,12 @@ function auditStudentProfile() {
     };
 }
 
+function auditVisibleFromDate() {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() - 1);
+    return date.toISOString().slice(0, 10);
+}
+
 async function seedAuditUsers(admin) {
     await admin
         .from('teacher_allowlist')
@@ -317,6 +325,17 @@ function buildAuditAssignments({ teacherId, image }) {
             { id: 'audit_reflection', prompt: 'What evidence did you submit?', required: true }
         ]
     };
+    const flowchartTemplate = {
+        ...createDefaultFlowchartTemplate('sensor-response'),
+        prompt: 'Build the local audit sensor-response algorithm.',
+        helperText: 'Confirm the starter nodes and explain the audit condition.',
+        checklistItems: [
+            { id: 'audit_flow_ready', text: 'My audit flowchart has input, condition, output, and end.', required: true }
+        ],
+        reflectionPrompts: [
+            { id: 'audit_flow_reflection', prompt: 'What does the audit flowchart check?', required: true }
+        ]
+    };
 
     const base = {
         source_activity_id: null,
@@ -332,7 +351,7 @@ function buildAuditAssignments({ teacherId, image }) {
         assessment_purpose: 'formative',
         target_grades: ['6'],
         target_sections: ['A'],
-        available_from: new Date().toISOString().slice(0, 10),
+        available_from: auditVisibleFromDate(),
         due_date: null,
         week_label: 'Local release audit',
         status: 'active',
@@ -378,6 +397,16 @@ function buildAuditAssignments({ teacherId, image }) {
             activity_data: {
                 templateId: 'project-evidence',
                 externalArtifactTemplate
+            }
+        },
+        {
+            ...base,
+            id: 'audit-flowchart-algorithm',
+            title: 'Audit Flowchart Algorithm',
+            activity_type: 'flowchart-algorithm',
+            activity_data: {
+                templateId: 'sensor-response',
+                flowchartTemplate
             }
         }
     ];

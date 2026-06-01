@@ -276,7 +276,7 @@
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>Activity Library</h3>
-                                <p>Organized by subject and grade so each class has its own activity set.</p>
+                                <p>Organized by subject, grade, month, and week so each class has its own activity set.</p>
                             </div>
                             <div class="teacher-toolbar">
                                 <label class="teacher-toolbar-select" for="activity-template-select">
@@ -307,6 +307,11 @@
                                             <option value="label-image-parts">Label Image Parts</option>
                                             <option value="screenshot-callouts">Screenshot Callouts</option>
                                             <option value="hotspot-explanation">Hotspot Explanation</option>
+                                        </optgroup>
+                                        <optgroup label="Flowchart / Algorithm">
+                                            <option value="sequence-algorithm">Sequence Algorithm</option>
+                                            <option value="if-then-condition">If/Then Condition</option>
+                                            <option value="sensor-response">Sensor Response</option>
                                         </optgroup>
                                     </select>
                                 </label>
@@ -434,6 +439,7 @@
                                     <option value="spreadsheet-table">Spreadsheet / Data Table</option>
                                     <option value="image-hotspot">Image Label / Hotspot</option>
                                     <option value="external-artifact">External Artifact / Evidence</option>
+                                    <option value="flowchart-algorithm">Flowchart / Algorithm</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -497,6 +503,7 @@
                         <div id="activity-spreadsheet-root" class="activity-spreadsheet-root hidden"></div>
                         <div id="activity-image-hotspot-root" class="activity-image-hotspot-root hidden"></div>
                         <div id="activity-external-artifact-root" class="activity-external-artifact-root hidden"></div>
+                        <div id="activity-flowchart-root" class="activity-flowchart-root hidden"></div>
                     </section>
 
                     <section id="activity-preview-panel" class="teacher-panel activity-editor-tab-panel hidden"

@@ -31,7 +31,7 @@ The app currently has two usable activity lanes.
    - Structured Response: worksheet, reflection, checklist
    - Structured response block types include short answer, long answer, multiple choice, multi-select, dropdown, true/false, rating, number, date, matching, ranking, table/grid, and checklist.
 
-Card Sort / Sequence Sort, Spreadsheet / Data Table, and Image Label / Hotspot are now wired as usable classroom activity types with teacher builders, student renderers, review summaries, and Supabase constraints.
+Card Sort / Sequence Sort, Spreadsheet / Data Table, Image Label / Hotspot, External Artifact / Evidence Upload, and Flowchart / Algorithm Builder are now wired as usable classroom activity types with teacher builders, student renderers, review summaries, and Supabase constraints.
 
 ## Already Good Fits
 
@@ -137,18 +137,18 @@ Implemented fields:
 
 ### 3. Spreadsheet / Data Table / Chart Activity
 
-Priority: high for September and October.
+Status: implemented.
 
 Use it for:
 - September mBot STEM data table.
 - September formula practice.
 - October chart creation and 3-question conclusion task.
 
-Current Structured Response table/grid is enough for simple entry, but it does not calculate formulas or create charts. A dedicated data activity could include typed rows, numeric validation, simple formulas, and chart output.
+Implementation includes typed rows, safe simple formulas, chart generation, reflection prompts, student validation, PDF export, and teacher review summaries.
 
 ### 4. Image Label / Hotspot Diagram
 
-Priority: medium-high.
+Status: implemented.
 
 Use it for:
 - Website feature annotation.
@@ -156,11 +156,11 @@ Use it for:
 - micro:bit parts diagram.
 - 3D model shape labels.
 
-This could be built as either a new type or as an upgrade to Map / Diagram with locked background images and required labels.
+Implementation includes teacher image upload, required labels, student pin placement, reflection prompts, PDF export, and teacher review summaries.
 
 ### 5. Flowchart / Algorithm Builder
 
-Priority: medium.
+Status: implemented.
 
 Use it for:
 - Packet routes.
@@ -168,7 +168,7 @@ Use it for:
 - micro:bit sensor response conditions.
 - Scratch and MakeCode planning.
 
-Current Map / Diagram can handle this, but a dedicated builder would make grading easier because nodes could have types: input, condition, true action, false action, output, explanation.
+Implementation uses typed flowchart nodes, labeled connectors, Yes/No branch validation for condition nodes, checklist/reflection responses, PDF export, and teacher review summaries.
 
 ### 6. Peer Feedback / Gallery
 
@@ -245,14 +245,13 @@ Already doable:
 - Route map and command plan through Map / Diagram plus Structured Response.
 - Loop explanation through Structured Response.
 - Sensor observation notes through Structured Response.
-- If/then flowchart through Map / Diagram.
+- If/then flowchart through Flowchart / Algorithm Builder.
 - Mini-challenge plan/reflection through Structured Response.
 
 New type helpful:
 - Route command cards through Sequence Sort.
 - Sensor condition/response matching through Card Sort.
 - Robot test logs and screenshots through External Artifact / Evidence Upload.
-- Dedicated Flowchart / Algorithm Builder for the mBot condition grade.
 
 ### August
 
@@ -310,26 +309,24 @@ New type helpful:
 
 Already doable:
 - Sensors/conditions vocabulary through vocabulary games.
-- Sensor-condition flowchart through Map / Diagram.
+- Sensor-condition flowchart through Flowchart / Algorithm Builder.
 - Final project plan, explanation notes, and final reflection through Structured Response.
 
 New type helpful:
-- Dedicated Flowchart / Algorithm Builder for if/then conditions.
 - MakeCode/micro:bit screenshot or link evidence through External Artifact / Evidence Upload.
 - Demo feedback through Peer Feedback / Gallery.
 
 ## Recommended Build Order
 
-1. Add a dedicated Flowchart / Algorithm Builder if route/condition grading needs to be more structured than free drawing.
-2. Consider Peer Feedback / Gallery if students need to review each other's external projects.
-3. Continue release hardening around dependency audit warnings and large editor chunks.
+1. Consider Peer Feedback / Gallery if students need to review each other's external projects.
+2. Continue release hardening around dependency audit warnings and large editor chunks.
+3. Keep classroom activity checks seeded in local Supabase before each release.
 
 ## Bottom Line
 
 Most Grade 6 planned activities can already be supported by the app as evidence collection, vocabulary practice, reflection, checklist, worksheet, map, diagram, or flowchart activities.
 
-The largest missing pieces are not more vocabulary games. The best next activity types are:
-- Flowchart / Algorithm Builder
+The largest missing piece is not more vocabulary games. The best next activity workflow is:
 - Peer Feedback / Gallery
 
-Those additions would let the app cover almost every Grade 6 monthly-plan activity without replacing the real tools students still need for Scratch, Google Sites, Google Sheets, Tinkercad, mBot, and micro:bit.
+That workflow would let the app cover almost every Grade 6 monthly-plan activity without replacing the real tools students still need for Scratch, Google Sites, Google Sheets, Tinkercad, mBot, and micro:bit.

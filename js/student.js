@@ -101,6 +101,12 @@ class StudentManager {
             trimester: null,
             month: null
         };
+        this.studentClassroomActivityDrilldown = {
+            section: null,
+            trimester: null,
+            month: null,
+            week: null
+        };
         this.cloudSaveTimeout = null;
         this.unitImages = {};
         this.routeReady = false;
@@ -702,7 +708,14 @@ class StudentManager {
         }
 
         if (parts.length === 1 && parts[0] === 'classroom-activities') {
-            return { view: 'classroom-activities' };
+            const params = new URLSearchParams(rawQuery);
+            return {
+                view: 'classroom-activities',
+                section: params.get('section') || null,
+                trimester: params.get('trimester') || null,
+                month: params.get('month') || null,
+                week: params.get('week') || null
+            };
         }
 
         if (parts[0] === 'classroom-activities' && parts[1]) {
@@ -748,7 +761,15 @@ class StudentManager {
         if (!route || !route.view) return '#/menu';
 
         if (route.view === 'menu') return '#/menu';
-        if (route.view === 'classroom-activities') return '#/classroom-activities';
+        if (route.view === 'classroom-activities') {
+            const params = new URLSearchParams();
+            if (route.section) params.set('section', route.section);
+            if (route.trimester) params.set('trimester', route.trimester);
+            if (route.month) params.set('month', route.month);
+            if (route.week) params.set('week', route.week);
+            const query = params.toString();
+            return query ? `#/classroom-activities?${query}` : '#/classroom-activities';
+        }
         if (route.view === 'classroom-activity' && route.assignmentId) {
             return `#/classroom-activities/${encodeURIComponent(route.assignmentId)}`;
         }
@@ -885,7 +906,7 @@ class StudentManager {
             if (targetRoute.view === 'classroom-activities') {
                 this.cleanupActivity();
                 this.currentVocab = null;
-                await this.classroomActivities.renderList();
+                await this.classroomActivities.renderList(targetRoute);
                 return;
             }
 
@@ -992,7 +1013,10 @@ class StudentManager {
         });
 
         this.addListener('#back-to-classroom-activities-btn', 'click', () => {
-            this.navigateTo({ view: 'classroom-activities' });
+            this.navigateTo({
+                view: 'classroom-activities',
+                ...this.studentClassroomActivityDrilldown
+            });
         });
 
         this.addListener('#student-save-classroom-activity-btn', 'click', () => {

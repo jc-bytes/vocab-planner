@@ -201,6 +201,14 @@ async function submitExternalArtifact(page) {
     await submitOpenAssignment(page, 'External artifact');
 }
 
+async function submitFlowchart(page) {
+    await openStudentAssignment(page, 'audit-flowchart-algorithm', /Audit Flowchart Algorithm/, /Flowchart ready/i);
+    await page.locator('[data-flowchart-editor] .react-flow').waitFor({ state: 'visible', timeout: 15000 });
+    await page.locator('[data-flowchart-check="audit_flow_ready"]').check();
+    await page.locator('[data-flowchart-reflection="audit_flow_reflection"]').fill('The audit flowchart checks an input and chooses an output.');
+    await submitOpenAssignment(page, 'Flowchart');
+}
+
 async function waitForSubmitted(admin, assignmentId) {
     const started = Date.now();
     while (Date.now() - started < 15000) {
@@ -235,7 +243,7 @@ async function verifyTeacherEditor(page) {
     await waitForApp(page);
     await page.locator('#activity-type').waitFor({ state: 'visible', timeout: 15000 });
     const values = await page.locator('#activity-type option').evaluateAll(options => options.map(option => option.value));
-    for (const value of ['card-sort', 'spreadsheet-table', 'image-hotspot', 'external-artifact']) {
+    for (const value of ['card-sort', 'spreadsheet-table', 'image-hotspot', 'external-artifact', 'flowchart-algorithm']) {
         if (!values.includes(value)) throw new Error(`Teacher editor missing activity type option: ${value}`);
     }
 }
@@ -271,11 +279,14 @@ try {
     await waitForSubmitted(seeded.admin, 'audit-image-hotspot');
     await submitExternalArtifact(studentPage);
     await waitForSubmitted(seeded.admin, 'audit-external-artifact');
+    await submitFlowchart(studentPage);
+    await waitForSubmitted(seeded.admin, 'audit-flowchart-algorithm');
 
     await verifyTeacherReview(teacherPage, 'audit-card-sort', /Audit Card Sort/);
     await verifyTeacherReview(teacherPage, 'audit-spreadsheet-table', /Audit Spreadsheet Table/);
     await verifyTeacherReview(teacherPage, 'audit-image-hotspot', /Audit Image Hotspot/);
     await verifyTeacherReview(teacherPage, 'audit-external-artifact', /Audit External Artifact/);
+    await verifyTeacherReview(teacherPage, 'audit-flowchart-algorithm', /Audit Flowchart Algorithm/);
 
     if (problems.length > 0) {
         throw new Error(`Authenticated UI smoke emitted browser problems:\n${problems.join('\n')}`);

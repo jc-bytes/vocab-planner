@@ -1,0 +1,13 @@
+import { installStudentClassroomActivityCardSpreadsheetResponseMethods } from './studentClassroomActivityCardSpreadsheetResponse.js';
+import { installStudentClassroomActivityExternalArtifactResponseMethods } from './studentClassroomActivityExternalArtifactResponse.js';
+import { installStudentClassroomActivityFlowchartResponseMethods } from './studentClassroomActivityFlowchartResponse.js';
+import { installStudentClassroomActivityImageHotspotResponseMethods } from './studentClassroomActivityImageHotspotResponse.js';
+import { installStudentClassroomActivityStructuredResponseMethods } from './studentClassroomActivityStructuredResponse.js';
+
+export function installStudentClassroomActivityResponseMethods(StudentClassroomActivities) {
+    installStudentClassroomActivityFlowchartResponseMethods(StudentClassroomActivities);
+    installStudentClassroomActivityExternalArtifactResponseMethods(StudentClassroomActivities);
+    installStudentClassroomActivityImageHotspotResponseMethods(StudentClassroomActivities);
+    installStudentClassroomActivityStructuredResponseMethods(StudentClassroomActivities);
+    installStudentClassroomActivityCardSpreadsheetResponseMethods(StudentClassroomActivities);
+}

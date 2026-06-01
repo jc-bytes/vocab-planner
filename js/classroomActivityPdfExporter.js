@@ -5,12 +5,18 @@ import { STRUCTURED_RESPONSE_TYPE } from './activityStructuredResponse.js';
 import { SPREADSHEET_TABLE_TYPE } from './activitySpreadsheetTable.js';
 import { IMAGE_HOTSPOT_TYPE, normalizeImageHotspotTemplate } from './activityImageHotspot.js';
 import { EXTERNAL_ARTIFACT_TYPE } from './activityExternalArtifact.js';
+import { FLOWCHART_ALGORITHM_TYPE } from './activityFlowchartAlgorithm.js';
 import {
     renderExternalArtifactSubmissionReview,
+    renderFlowchartSubmissionReview,
     renderImageHotspotSubmissionReview,
     renderSpreadsheetSubmissionReview,
     renderStructuredSubmissionReview
 } from './classroomActivityRenderers.js';
+import {
+    activityUsesCanvas,
+    getActivityTypeConfig
+} from './classroomActivityRegistry.js';
 import { ReportGenerator } from './reportGenerator.js';
 import { supabaseService } from './supabaseService.js';
 
@@ -490,6 +496,82 @@ function getDocumentStyles() {
             font-size: 11px;
             font-weight: 900;
         }
+
+        .classroom-pdf-export .flowchart-submission-review {
+            display: grid;
+            gap: 12px;
+        }
+
+        .classroom-pdf-export .flowchart-static-canvas {
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f8fafc;
+            break-inside: avoid;
+        }
+
+        .classroom-pdf-export .flowchart-static-inner {
+            position: relative;
+        }
+
+        .classroom-pdf-export .flowchart-static-inner svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .classroom-pdf-export .flowchart-static-inner path {
+            fill: none;
+            stroke: #64748b;
+            stroke-width: 2;
+        }
+
+        .classroom-pdf-export .flowchart-static-node {
+            position: absolute;
+            width: 156px;
+            min-height: 74px;
+            padding: 9px 10px;
+            border: 2px solid var(--flowchart-node-color, #2563eb);
+            border-radius: 8px;
+            background: #ffffff;
+            color: #111827;
+            font-size: 11px;
+        }
+
+        .classroom-pdf-export .flowchart-static-node span {
+            display: block;
+            color: var(--flowchart-node-color, #2563eb);
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .classroom-pdf-export .flowchart-static-node strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        .classroom-pdf-export .flowchart-static-node small {
+            display: block;
+            margin-top: 4px;
+            color: #4b5563;
+        }
+
+        .classroom-pdf-export .flowchart-static-edge-label {
+            position: absolute;
+            padding: 2px 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #334155;
+            font-size: 10px;
+            font-weight: 800;
+            transform: translate(-50%, -50%);
+        }
     `;
 }
 
@@ -603,6 +685,10 @@ function renderStructuredWork(container, assignment, submission) {
     container.innerHTML = renderStructuredSubmissionReview(assignment, submission);
 }
 
+function renderFlowchartWork(container, assignment, submission) {
+    container.innerHTML = renderFlowchartSubmissionReview(assignment, submission);
+}
+
 function renderSpreadsheetWork(container, assignment, submission) {
     container.innerHTML = renderSpreadsheetSubmissionReview(assignment, submission);
 }
@@ -635,6 +721,22 @@ async function renderExternalArtifactWork(container, assignment, submission) {
     }
     container.innerHTML = renderExternalArtifactSubmissionReview(assignment, submission, artifactUrl);
 }
+
+const PDF_WORK_RENDERERS = {
+    [STRUCTURED_RESPONSE_TYPE]: async (container, assignment, submission) => {
+        renderStructuredWork(container, assignment, submission);
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+    },
+    [SPREADSHEET_TABLE_TYPE]: async (container, assignment, submission) => {
+        renderSpreadsheetWork(container, assignment, submission);
+    },
+    [IMAGE_HOTSPOT_TYPE]: renderImageHotspotWork,
+    [EXTERNAL_ARTIFACT_TYPE]: renderExternalArtifactWork,
+    [FLOWCHART_ALGORITHM_TYPE]: async (container, assignment, submission) => {
+        renderFlowchartWork(container, assignment, submission);
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+    }
+};
 
 async function waitForImages(container) {
     const images = Array.from(container.querySelectorAll('img'));
@@ -699,16 +801,11 @@ export async function exportClassroomActivityPdf({
 
     try {
         const workBody = report.querySelector('[data-pdf-work-body]');
-        if (assignment.activityType === STRUCTURED_RESPONSE_TYPE) {
-            renderStructuredWork(workBody, assignment, submission);
-            if (window.lucide?.createIcons) window.lucide.createIcons();
-        } else if (assignment.activityType === SPREADSHEET_TABLE_TYPE) {
-            renderSpreadsheetWork(workBody, assignment, submission);
-        } else if (assignment.activityType === IMAGE_HOTSPOT_TYPE) {
-            await renderImageHotspotWork(workBody, assignment, submission);
-        } else if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
-            await renderExternalArtifactWork(workBody, assignment, submission);
-        } else {
+        const config = getActivityTypeConfig(assignment.activityType);
+        const renderWork = PDF_WORK_RENDERERS[config.type];
+        if (renderWork) {
+            await renderWork(workBody, assignment, submission);
+        } else if (activityUsesCanvas(config.type)) {
             await renderCanvasWork(workBody, scene || submission.responseData?.excalidrawScene, objectUrls);
         }
 
