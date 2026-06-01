@@ -132,8 +132,7 @@ export async function saveTeacherActivityAssignment(manager, event) {
 export function invalidateTeacherActivityAssignmentCache(manager) {
     manager.activityAssignmentCache = null;
     manager.activityAssignmentPromise = null;
-    manager.activityAssignmentsLoaded = false;
-    manager.activityAssignmentItems = [];
+    manager.activityAssignmentStale = true;
 }
 
 export function isTeacherActivityAssignmentCloudSetupPending(error) {
@@ -145,6 +144,7 @@ export function isTeacherActivityAssignmentCloudSetupPending(error) {
 }
 
 export async function fetchTeacherActivityAssignments(manager) {
+    manager.activityAssignmentLastFetchFailed = false;
     if (manager.authDisabled) return [];
     if (!manager.ensureAuthenticated(false)) return [];
 
@@ -157,6 +157,7 @@ export async function fetchTeacherActivityAssignments(manager) {
         }));
     } catch (error) {
         console.error('Failed to fetch activity assignments:', error);
+        manager.activityAssignmentLastFetchFailed = true;
         if (!manager.isActivityAssignmentCloudSetupPending(error)) {
             notifications.warning('Could not load assigned activities.');
         }
@@ -187,27 +188,58 @@ export async function getTeacherActivityAssignments(manager, { forceRefresh = fa
 export async function loadTeacherActivityAssignments(manager) {
     const list = $('#activity-assignment-list');
     if (!list) return;
-    list.innerHTML = '<div class="loading-spinner">Loading assigned activities...</div>';
+    const renderActiveList = manager.activityMode === 'review';
+    const hasUsableContent = renderActiveList
+        && manager.activityAssignmentItems.length > 0
+        && Boolean(list.textContent.trim())
+        && !list.querySelector('.loading-spinner');
+
+    manager.activityAssignmentRefreshing = true;
+    if (renderActiveList && !hasUsableContent) {
+        list.innerHTML = '<div class="loading-spinner">Loading assigned activities...</div>';
+    } else if (renderActiveList) {
+        list.setAttribute('aria-busy', 'true');
+    }
 
     try {
         const assignments = await manager.getActivityAssignments();
-        list.innerHTML = '';
+        manager.activityAssignmentRefreshing = false;
+
+        if (manager.activityAssignmentLastFetchFailed && manager.activityAssignmentItems.length > 0) {
+            manager.activityAssignmentCache = null;
+            manager.activityAssignmentStale = true;
+            list.removeAttribute('aria-busy');
+            manager.refreshIcons();
+            return;
+        }
+
+        if (renderActiveList) {
+            list.innerHTML = '';
+        }
         manager.activityAssignmentItems = assignments;
         manager.activityAssignmentsLoaded = true;
+        manager.activityAssignmentStale = false;
         if (assignments.length === 0) {
             if (manager.activityMode === 'review') {
                 list.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
             }
+            list.removeAttribute('aria-busy');
             return;
         }
 
         if (manager.activityMode === 'review') {
             manager.renderActivityAssignmentBrowser(list);
         }
+        list.removeAttribute('aria-busy');
         manager.refreshIcons();
     } catch (error) {
         console.error('Failed to render activity assignments:', error);
-        list.innerHTML = '<p class="teacher-empty-state">Could not load assigned activities.</p>';
+        manager.activityAssignmentRefreshing = false;
+        manager.activityAssignmentStale = manager.activityAssignmentItems.length > 0;
+        list.removeAttribute('aria-busy');
+        if (!hasUsableContent) {
+            list.innerHTML = '<p class="teacher-empty-state">Could not load assigned activities.</p>';
+        }
     }
 }
 

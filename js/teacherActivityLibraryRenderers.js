@@ -2,6 +2,11 @@ import { $, createElement, escapeHtml } from './main.js';
 import { getSubjectBySlug } from './services/vocabularyApi.js';
 import { getTeacherActivityWorkspaceSummary } from './teacherActivitySummaries.js';
 
+function renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek) {
+    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+    container.appendChild(createElement('div', 'loading-spinner', 'Loading activities...'));
+}
+
 export function renderTeacherActivityLibraryBrowser(manager, container = $('#activity-library-list')) {
     if (!container) return;
 
@@ -14,8 +19,15 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
     const selectedGrade = manager.activityDrilldown.grade;
     const selectedMonth = manager.activityDrilldown.month;
     const selectedWeek = manager.activityDrilldown.week;
+    const isWaitingForFreshData = manager.activityLibraryRefreshing
+        || manager.activityLibraryStale
+        || !manager.activityLibraryLoaded;
 
     if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
+        if (selectedSubject && isWaitingForFreshData) {
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            return;
+        }
         manager.resetActivityLibraryDrilldown();
         renderTeacherActivitySubjectPicker(manager, container, subjectGroups);
         return;
@@ -23,6 +35,10 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
 
     const gradeGroups = subjectGroups.get(selectedSubject);
     if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
+        if (selectedGrade && isWaitingForFreshData) {
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            return;
+        }
         manager.activityDrilldown.grade = null;
         manager.activityDrilldown.month = null;
         manager.activityDrilldown.week = null;
@@ -32,6 +48,10 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
 
     const monthGroups = manager.buildActivityMonthWeekGroups(gradeGroups.get(selectedGrade));
     if (!selectedMonth || !monthGroups.has(selectedMonth)) {
+        if (selectedMonth && isWaitingForFreshData) {
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            return;
+        }
         manager.activityDrilldown.month = null;
         manager.activityDrilldown.week = null;
         renderTeacherActivityMonthPicker(manager, container, selectedSubject, selectedGrade, monthGroups);
@@ -40,6 +60,10 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
 
     const weekGroups = monthGroups.get(selectedMonth);
     if (!selectedWeek || !weekGroups.has(selectedWeek)) {
+        if (selectedWeek && isWaitingForFreshData) {
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            return;
+        }
         manager.activityDrilldown.week = null;
         renderTeacherActivityWeekPicker(manager, container, selectedSubject, selectedGrade, selectedMonth, weekGroups);
         return;
@@ -271,7 +295,7 @@ export function createTeacherActivityCard(manager, container, activity, type) {
     const templateLabel = manager.getActivityTemplateLabel(normalized.activityData?.templateId);
     const canvasSummary = getTeacherActivityWorkspaceSummary(normalized);
     const updatedLabel = manager.formatActivityUpdatedLabel(normalized);
-    const canvasMeta = updatedLabel ? `${canvasSummary} · Updated ${updatedLabel}` : canvasSummary;
+    const updatedMeta = updatedLabel ? `Updated ${updatedLabel}` : 'No update recorded';
 
     const assignBtnHtml = `
         <button class="assign-activity-btn" type="button" title="Assign Activity" aria-label="Assign ${escapeHtml(normalized.title || 'activity')}">
@@ -279,32 +303,55 @@ export function createTeacherActivityCard(manager, container, activity, type) {
             <span>Assign</span>
         </button>
     `;
-    let deleteBtnHtml = '';
+    let deleteActionHtml = '';
     if (type === 'local' || type === 'cloud') {
         const label = type === 'cloud' ? 'Delete Cloud Activity' : 'Delete Draft Activity';
-        deleteBtnHtml = `<button class="delete-activity-btn" title="${label}" aria-label="${label}"><i data-lucide="trash-2"></i></button>`;
+        deleteActionHtml = `
+            <button class="delete-activity-btn teacher-card-danger-action" type="button" title="${label}" aria-label="${label}">
+                <i data-lucide="trash-2"></i>
+                <span>Delete</span>
+            </button>
+        `;
     }
 
     card.innerHTML = `
-        <div class="badge" style="background:${badge.color};">${badge.text}</div>
-        <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+        <div class="teacher-card-badge-row">
+            <div class="badge" style="background:${badge.color};">${badge.text}</div>
+            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+        </div>
         <h3>${escapeHtml(normalized.title || 'Untitled Activity')}</h3>
-        <small style="color:var(--text-muted)">${escapeHtml(classLabel)}</small>
-        <small style="color:var(--text-muted)">${escapeHtml(manager.getActivityTypeLabel(normalized.activityType))} · ${escapeHtml(templateLabel)}</small>
-        <small style="color:var(--text-muted)">${escapeHtml(canvasMeta)}</small>
-        <small style="color:var(--text-muted)">${normalized.estimatedMinutes ? `${escapeHtml(String(normalized.estimatedMinutes))} min` : 'No time estimate'}</small>
-        ${assignBtnHtml}
-        ${deleteBtnHtml}
+        <small class="teacher-card-primary-meta">${escapeHtml(classLabel)}</small>
+        <small class="teacher-card-type-meta">${escapeHtml(manager.getActivityTypeLabel(normalized.activityType))} · ${escapeHtml(templateLabel)}</small>
+        <div class="teacher-card-actions">
+            <span class="teacher-pick-action"><i data-lucide="arrow-right"></i> Open</span>
+            ${assignBtnHtml}
+        </div>
+        <details class="teacher-card-details">
+            <summary>Details</summary>
+            <div class="teacher-card-detail-list">
+                <span>${escapeHtml(canvasSummary)}</span>
+                <span>${escapeHtml(updatedMeta)}</span>
+                <span>${normalized.estimatedMinutes ? `${escapeHtml(String(normalized.estimatedMinutes))} min estimate` : 'No time estimate'}</span>
+                ${deleteActionHtml}
+            </div>
+        </details>
     `;
 
     card.addEventListener('click', (event) => {
-        if (event.target.closest('.delete-activity-btn, .assign-activity-btn')) return;
+        if (event.target.closest('.delete-activity-btn, .assign-activity-btn, .teacher-card-details')) return;
         manager.loadActivityObject(normalized, type);
     });
     card.addEventListener('keydown', (event) => {
+        if (event.target.closest('button, summary, .teacher-card-details')) return;
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
         card.click();
+    });
+    card.querySelector('.teacher-card-details')?.addEventListener('click', event => {
+        event.stopPropagation();
+    });
+    card.querySelector('.teacher-card-details')?.addEventListener('keydown', event => {
+        event.stopPropagation();
     });
 
     if (type === 'local' || type === 'cloud') {

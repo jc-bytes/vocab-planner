@@ -77,6 +77,7 @@ export function removeLocalTeacherActivity(manager, id) {
 }
 
 export async function fetchCloudTeacherActivities(manager) {
+    manager.activityLibraryLastFetchFailed = false;
     if (manager.authDisabled) return [];
     if (!manager.ensureAuthenticated(false)) return [];
 
@@ -84,6 +85,7 @@ export async function fetchCloudTeacherActivities(manager) {
         const db = supabaseService.getDatabase();
         const snapshot = await getDocs(collection(db, manager.ACTIVITY_COLLECTION));
         manager.setCloudStatus('Ready', 'info');
+        manager.activityLibraryLastFetchFailed = false;
         return snapshot.docs.map(docSnap => manager.normalizeActivity({
             id: docSnap.id,
             ...docSnap.data(),
@@ -91,6 +93,7 @@ export async function fetchCloudTeacherActivities(manager) {
         }));
     } catch (error) {
         console.error('Failed to fetch classroom activities:', error);
+        manager.activityLibraryLastFetchFailed = true;
         if (manager.isActivityCloudSetupPending(error)) {
             manager.setCloudStatus('Activities cloud setup pending', 'muted');
         } else {

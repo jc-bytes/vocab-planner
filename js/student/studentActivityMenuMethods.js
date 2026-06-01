@@ -28,13 +28,16 @@ class StudentActivityMenuMethods {
                 isComplete = scoreData.isComplete || (progress >= 100);
             }
 
-            // Remove existing badges
-            const existingBadge = card.querySelector('.progress-badge');
-            if (existingBadge) existingBadge.remove();
-            const existingCoverage = card.querySelector('.coverage-badge');
-            if (existingCoverage) existingCoverage.remove();
-            const existingPlays = card.querySelector('.plays-badge');
-            if (existingPlays) existingPlays.remove();
+            card.querySelector('.progress-badge')?.remove();
+            card.querySelector('.coverage-badge')?.remove();
+            card.querySelector('.plays-badge')?.remove();
+            card.querySelector('.next-activity-label')?.remove();
+            card.classList.remove('next-activity-card', 'activity-flow-card-compact');
+            card.dataset.activityTitle = card.querySelector('h3')?.textContent?.trim() || type;
+            card.dataset.activityDescription = card.querySelector('p')?.textContent?.trim() || '';
+            card.dataset.activityProgressSummary = 'Not started';
+            card.dataset.activityPlaysSummary = '';
+            card.dataset.activityCoverageSummary = '';
 
             if (scoreData) {
                 const badge = createElement('div', 'progress-badge');
@@ -42,12 +45,12 @@ class StudentActivityMenuMethods {
                 badge.textContent = nonReplayable.includes(type) ? `${progress}%` : `Best ${progress}%`;
                 if (isComplete) badge.classList.add('complete');
                 card.appendChild(badge);
+                card.dataset.activityProgressSummary = isComplete
+                    ? `${badge.textContent} complete`
+                    : badge.textContent;
 
-                // Show plays count for replayable activities
                 if (!nonReplayable.includes(type) && scoreData.plays > 0) {
-                    const playsBadge = createElement('div', 'plays-badge');
-                    playsBadge.textContent = scoreData.plays === 1 ? '1 play' : `${scoreData.plays} plays`;
-                    card.appendChild(playsBadge);
+                    card.dataset.activityPlaysSummary = scoreData.plays === 1 ? '1 play' : `${scoreData.plays} plays`;
                 }
             }
 
@@ -55,11 +58,10 @@ class StudentActivityMenuMethods {
             if (coverageStats && coverageStats[type] && !['flashcards', 'illustration'].includes(type)) {
                 const coverage = coverageStats[type];
                 if (coverage.practiced > 0) {
-                    const coverageBadge = createElement('div', 'coverage-badge');
                     const allSeen = coverage.practiced >= coverage.total;
-                    coverageBadge.textContent = allSeen ? `All ${coverage.total} seen` : `${coverage.practiced} seen`;
-                    coverageBadge.title = `${coverage.practiced} of ${coverage.total} unit words have appeared in this activity. New rounds rotate through less-practiced words.`;
-                    card.appendChild(coverageBadge);
+                    card.dataset.activityCoverageSummary = allSeen
+                        ? `All ${coverage.total} words seen`
+                        : `${coverage.practiced}/${coverage.total} words seen`;
                 }
             }
         });

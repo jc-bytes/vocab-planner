@@ -177,61 +177,71 @@ export function installTeacherRoutingMethods(TeacherManager) {
         },
 
         async applyRoute(route) {
-            if (!route || this.isApplyingRoute) return;
+            if (!route) return;
+            if (this.isApplyingRoute) {
+                this.pendingTeacherRoute = route;
+                return;
+            }
             this.isApplyingRoute = true;
+            let routeToApply = route;
             try {
-                switch (route.view) {
-                    case 'vocabulary':
-                        this.libraryDrilldown = {
-                            subject: route.subject || null,
-                            grade: route.grade || null,
-                            trimester: route.trimester || null,
-                            month: route.month || null
-                        };
-                        this.lastVocabularyRoute = { ...route };
-                        this.switchView('teacher-dashboard-view');
-                        await this.loadLibrary();
-                        break;
-                    case 'editor':
-                        this.showEditor();
-                        break;
-                    case 'activities':
-                        this.activityDrilldown = {
-                            subject: route.subject || null,
-                            grade: route.grade || null,
-                            month: route.month ? this.normalizeTeacherMonth(route.month) : null,
-                            week: route.week ? this.normalizeActivityWeekKey(route.week) : null
-                        };
-                        this.activityMode = route.mode || 'assign';
-                        this.lastActivitiesRoute = { ...route };
-                        await this.showActivityLibrary();
-                        break;
-                    case 'activity-editor':
-                        await this.showActivityEditor();
-                        break;
-                    case 'activity-assignment':
-                        await this.showActivityAssignmentReview(route.assignmentId);
-                        break;
-                    case 'students':
-                        await this.showProgressView();
-                        break;
-                    case 'quizzes':
-                        await this.showQuizzesView();
-                        break;
-                    case 'quiz-editor':
-                        await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });
-                        break;
-                    case 'data-settings':
-                        await this.showDataManagementView({ tab: route.tab });
-                        break;
-                    case 'overview':
-                    default:
-                        this.switchView('teacher-overview-view');
-                        this.loadTeacherOverview();
-                        break;
+                while (routeToApply) {
+                    this.pendingTeacherRoute = null;
+                    switch (routeToApply.view) {
+                        case 'vocabulary':
+                            this.libraryDrilldown = {
+                                subject: routeToApply.subject || null,
+                                grade: routeToApply.grade || null,
+                                trimester: routeToApply.trimester || null,
+                                month: routeToApply.month || null
+                            };
+                            this.lastVocabularyRoute = { ...routeToApply };
+                            this.switchView('teacher-dashboard-view');
+                            await this.loadLibrary();
+                            break;
+                        case 'editor':
+                            this.showEditor();
+                            break;
+                        case 'activities':
+                            this.activityDrilldown = {
+                                subject: routeToApply.subject || null,
+                                grade: routeToApply.grade || null,
+                                month: routeToApply.month ? this.normalizeTeacherMonth(routeToApply.month) : null,
+                                week: routeToApply.week ? this.normalizeActivityWeekKey(routeToApply.week) : null
+                            };
+                            this.activityMode = routeToApply.mode || 'assign';
+                            this.lastActivitiesRoute = { ...routeToApply };
+                            await this.showActivityLibrary();
+                            break;
+                        case 'activity-editor':
+                            await this.showActivityEditor();
+                            break;
+                        case 'activity-assignment':
+                            await this.showActivityAssignmentReview(routeToApply.assignmentId);
+                            break;
+                        case 'students':
+                            await this.showProgressView();
+                            break;
+                        case 'quizzes':
+                            await this.showQuizzesView();
+                            break;
+                        case 'quiz-editor':
+                            await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });
+                            break;
+                        case 'data-settings':
+                            await this.showDataManagementView({ tab: routeToApply.tab });
+                            break;
+                        case 'overview':
+                        default:
+                            this.switchView('teacher-overview-view');
+                            this.loadTeacherOverview();
+                            break;
+                    }
+                    routeToApply = this.pendingTeacherRoute;
                 }
             } finally {
                 this.isApplyingRoute = false;
+                this.pendingTeacherRoute = null;
             }
         }
     });

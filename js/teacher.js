@@ -77,10 +77,16 @@ class TeacherManager {
         this.activityLibraryCache = null;
         this.activityLibraryPromise = null;
         this.activityLibraryLoaded = false;
+        this.activityLibraryRefreshing = false;
+        this.activityLibraryStale = false;
+        this.activityLibraryLastFetchFailed = false;
         this.activityAssignmentCache = null;
         this.activityAssignmentPromise = null;
         this.activityAssignmentItems = [];
         this.activityAssignmentsLoaded = false;
+        this.activityAssignmentRefreshing = false;
+        this.activityAssignmentStale = false;
+        this.activityAssignmentLastFetchFailed = false;
         this.activeActivityAssignment = null;
         this.activityMode = 'assign';
         this.activityReviewHandle = null;
@@ -91,6 +97,7 @@ class TeacherManager {
         this.studentProgressPromise = null;
         this.overviewStudentLoadScheduled = false;
         this.isApplyingRoute = false;
+        this.pendingTeacherRoute = null;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
         this.lastActivitiesRoute = null;

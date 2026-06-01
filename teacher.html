@@ -711,7 +711,7 @@
                                 <div class="mini-stat-value" id="detail-password-flag">No</div>
                             </div>
                         </div>
-                        <div class="card" style="margin-bottom:1.25rem;">
+                        <section class="student-detail-section">
                             <h4 style="margin-bottom:0.5rem;">Adjust Coins</h4>
                             <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                                 <input type="number" id="coin-adjust-input" value="10" min="1" style="width:90px;">
@@ -724,17 +724,17 @@
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="10">+10</button>
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="25">+25</button>
                             </div>
-                        </div>
-                        <div class="card" style="margin-bottom:1.25rem;">
+                        </section>
+                        <section class="student-detail-section">
                             <h4 style="margin-bottom:0.5rem;">Password Reset</h4>
                             <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
                                 <button id="reset-student-password-btn" class="btn secondary-btn" style="padding:0.5rem 1rem;">Reset Password</button>
                                 <div id="reset-password-status" style="font-size:0.85rem; color:var(--text-muted);"></div>
                             </div>
-                            <div id="temporary-password-output" style="display:none; margin-top:0.75rem; padding:0.75rem; border:1px solid var(--border-color); border-radius:8px; font-family:monospace; font-size:1rem; color:var(--text-color); background:rgba(15, 23, 42, 0.35);"></div>
-                        </div>
+                            <div id="temporary-password-output" style="display:none; margin-top:0.75rem; padding:0.75rem 0; border-top:1px solid rgba(255,255,255,0.1); font-family:monospace; font-size:1rem; color:var(--text-color);"></div>
+                        </section>
                         <h3>Activity Progress</h3>
-                        <div id="detail-activity-list" style="display: grid; gap: 1rem; margin-top: 1rem;">
+                        <div id="detail-activity-list" style="display: grid; gap: 0; margin-top: 1rem;">
                             <!-- Activity details populated here -->
                         </div>
                     </div>
@@ -962,7 +962,7 @@
             <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="tab-quizzes">
                 <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
                     <!-- Sidebar -->
-                    <aside class="quiz-sidebar card"
+                    <aside class="quiz-sidebar"
                         style="width: 360px; display: flex; flex-direction: column; overflow-y: auto;">
                         <div class="quiz-maker-header">
                             <button id="quiz-maker-back-btn" class="btn text-btn" type="button">
@@ -1067,7 +1067,7 @@
                     </aside>
 
                     <!-- Main Canvas -->
-                    <main class="quiz-canvas card"
+                    <main class="quiz-canvas"
                         style="flex: 1; overflow-y: auto; background: #f3f4f6; padding: 2rem;">
                         <div id="quiz-questions-list" class="quiz-list" style="max-width: 800px; margin: 0 auto;">
                             <!-- Questions injected here -->
@@ -1246,7 +1246,7 @@
                                 Visual insights into student progress, activity completion, and engagement metrics.
                             </p>
                         </div>
-                        <div class="card data-grade-filter-card">
+                        <div class="data-grade-filter-card">
                             <label for="dashboard-grade-filter" style="font-weight: 500; white-space: nowrap; color: var(--text-main);">Filter by Grade:</label>
                             <select id="dashboard-grade-filter" style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg, rgba(15,23,42,0.6)); color: var(--text-color); min-width: 150px;">
                                 <option value="">All Grades</option>
@@ -1256,22 +1256,22 @@
 
                     <!-- Summary Cards -->
                     <div class="data-summary-grid">
-                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                        <div class="data-summary-stat">
                             <i data-lucide="users" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-total-students">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Total Students</div>
                         </div>
-                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                        <div class="data-summary-stat">
                             <i data-lucide="activity" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);" id="dashboard-active-students">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Active (7 days)</div>
                         </div>
-                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                        <div class="data-summary-stat">
                             <i data-lucide="coins" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-avg-coins">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Coins</div>
                         </div>
-                        <div class="card" style="text-align: center; padding: 1.5rem;">
+                        <div class="data-summary-stat">
                             <i data-lucide="book-open" class="teacher-stat-icon"></i>
                             <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-vocab-count">--</div>
                             <div style="color: var(--text-muted); font-size: 0.9rem;">Vocabularies</div>
@@ -1281,7 +1281,7 @@
                     <!-- Charts Grid -->
                     <div class="data-chart-grid">
                         <!-- Activity Completion Chart -->
-                        <div class="card data-chart-card">
+                        <div class="data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Activity Completion</h4>
                             <div class="data-chart-frame">
                                 <canvas id="activity-chart"></canvas>
@@ -1289,7 +1289,7 @@
                         </div>
 
                         <!-- Progress by Grade Chart -->
-                        <div class="card data-chart-card">
+                        <div class="data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Progress by Grade</h4>
                             <div class="data-chart-frame">
                                 <canvas id="grade-progress-chart"></canvas>
@@ -1297,7 +1297,7 @@
                         </div>
 
                         <!-- Coin Distribution Chart -->
-                        <div class="card data-chart-card">
+                        <div class="data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Coin Distribution</h4>
                             <div class="data-chart-frame">
                                 <canvas id="coin-distribution-chart"></canvas>
@@ -1305,7 +1305,7 @@
                         </div>
 
                         <!-- Activity Usage Chart -->
-                        <div class="card data-chart-card">
+                        <div class="data-chart-card">
                             <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Most Used Activities</h4>
                             <div class="data-chart-frame">
                                 <canvas id="activity-usage-chart"></canvas>
@@ -1314,7 +1314,7 @@
                     </div>
 
                     <!-- Recent Activity Table -->
-                    <div class="card data-recent-card">
+                    <div class="data-recent-card">
                         <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Recent Activity</h4>
                         <div id="recent-activity-table" class="table-scroll-wrapper data-table-region">
                             <div class="loading-spinner">Loading activity data...</div>
@@ -1531,7 +1531,7 @@
 
     <!-- Activity Assignment Modal -->
     <div id="activity-assignment-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="activity-assignment-modal-title">
-        <div class="modal-content card" style="max-width: 620px; width: 95%;">
+        <div class="modal-content" style="max-width: 620px; width: 95%;">
             <div class="modal-header">
                 <div>
                     <h3 id="activity-assignment-modal-title">Assign Activity</h3>
@@ -1579,7 +1579,7 @@
 
     <!-- Word Editor Modal -->
     <div id="word-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div class="modal-content card">
+        <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modal-title">Edit Word</h3>
                 <button class="close-modal" aria-label="Close word editor">×</button>
@@ -1631,7 +1631,7 @@
 
     <!-- Quiz Preview Modal -->
     <div id="quiz-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quiz-modal-title">
-        <div class="modal-content card" style="max-width: 900px; width: 95%; max-height: 90vh; overflow: auto;">
+        <div class="modal-content" style="max-width: 900px; width: 95%; max-height: 90vh; overflow: auto;">
             <div class="modal-header">
                 <div>
                     <h3 id="quiz-modal-title" style="margin-bottom:0.25rem;">Summative Quiz Preview</h3>

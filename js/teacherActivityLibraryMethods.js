@@ -109,8 +109,7 @@ const teacherActivityLibraryMethods = {
         invalidateActivityLibraryCache() {
             this.activityLibraryCache = null;
             this.activityLibraryPromise = null;
-            this.activityLibraryLoaded = false;
-            this.activityLibraryItems = [];
+            this.activityLibraryStale = true;
         },
 
         getActivityDuplicateSignature(activity = {}) {
@@ -224,28 +223,59 @@ const teacherActivityLibraryMethods = {
                 return;
             }
 
-            list.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
+            const renderActiveList = this.activityMode === 'assign';
+            const hasUsableContent = renderActiveList
+                && this.activityLibraryItems.length > 0
+                && Boolean(list.textContent.trim())
+                && !list.querySelector('.loading-spinner');
+
+            this.activityLibraryRefreshing = true;
+            if (renderActiveList && !hasUsableContent) {
+                list.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
+            } else if (renderActiveList) {
+                list.setAttribute('aria-busy', 'true');
+            }
 
             try {
                 const { cloudActivities, localActivities, items } = await this.getTeacherActivityLibrary();
-                list.innerHTML = '';
+                this.activityLibraryRefreshing = false;
+
+                if (this.activityLibraryLastFetchFailed && this.activityLibraryItems.length > 0) {
+                    this.activityLibraryCache = null;
+                    this.activityLibraryStale = true;
+                    list.removeAttribute('aria-busy');
+                    this.refreshIcons();
+                    return;
+                }
+
+                if (renderActiveList) {
+                    list.innerHTML = '';
+                }
                 this.activityLibraryItems = items;
                 this.activityLibraryLoaded = true;
+                this.activityLibraryStale = false;
 
                 if (cloudActivities.length === 0 && localActivities.length === 0) {
                     if (this.activityMode === 'assign') {
                         list.innerHTML = '<p class="teacher-empty-state">No classroom activities yet.</p>';
                     }
+                    list.removeAttribute('aria-busy');
                     return;
                 }
 
                 if (this.activityMode === 'assign') {
                     this.renderActivityLibraryBrowser(list);
                 }
+                list.removeAttribute('aria-busy');
                 this.refreshIcons();
             } catch (error) {
                 console.error('Failed to load classroom activities:', error);
-                list.innerHTML = '<p class="teacher-empty-state">Could not load classroom activities.</p>';
+                this.activityLibraryRefreshing = false;
+                this.activityLibraryStale = this.activityLibraryItems.length > 0;
+                list.removeAttribute('aria-busy');
+                if (!hasUsableContent) {
+                    list.innerHTML = '<p class="teacher-empty-state">Could not load classroom activities.</p>';
+                }
             }
         },
 

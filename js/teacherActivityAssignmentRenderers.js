@@ -147,6 +147,27 @@ export function renderTeacherActivityAssignmentClassBrowser(manager, container, 
     container.appendChild(grid);
 }
 
+function getTeacherAssignmentCueItems(manager, assignment, isScheduled) {
+    const cues = [];
+    const dueMillis = manager.dueDateEndMillis(assignment.dueDate || assignment.due_date);
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    if (isScheduled) {
+        cues.push({ label: 'Not visible yet', className: 'teacher-card-cue-scheduled' });
+    }
+
+    if (dueMillis && dueMillis < now) {
+        cues.push({ label: 'Past due', className: 'teacher-card-cue-danger' });
+    } else if (dueMillis && dueMillis - now <= dayMs) {
+        cues.push({ label: 'Due today', className: 'teacher-card-cue-warning' });
+    } else if (dueMillis && dueMillis - now <= 3 * dayMs) {
+        cues.push({ label: 'Due soon', className: 'teacher-card-cue-warning' });
+    }
+
+    return cues;
+}
+
 export function createTeacherActivityAssignmentCard(manager, container, assignment) {
     const normalized = manager.normalizeActivityAssignment(assignment);
     const card = createElement('div', 'card teacher-vocab-card teacher-activity-card activity-assignment-card');
@@ -160,27 +181,53 @@ export function createTeacherActivityAssignmentCard(manager, container, assignme
     const schedule = manager.formatAssignmentWindow(normalized);
     const statusLabel = normalized.status === 'archived' ? 'Archived' : 'Active';
     const isScheduled = manager.isAssignmentScheduled(normalized);
+    const cueItems = getTeacherAssignmentCueItems(manager, normalized, isScheduled);
+    const cueHtml = cueItems.length
+        ? `<div class="teacher-card-cue-row">${cueItems.map(cue => (
+            `<span class="teacher-card-cue ${cue.className}">${escapeHtml(cue.label)}</span>`
+        )).join('')}</div>`
+        : '';
     card.classList.toggle('is-scheduled', isScheduled);
 
     card.innerHTML = `
-        <div class="badge" style="background:${normalized.status === 'archived' ? 'var(--text-muted)' : 'var(--success-color)'};">${escapeHtml(statusLabel)}</div>
-        <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
+        <div class="teacher-card-badge-row">
+            <div class="badge" style="background:${normalized.status === 'archived' ? 'var(--text-muted)' : 'var(--success-color)'};">${escapeHtml(statusLabel)}</div>
+        </div>
         <h3>${escapeHtml(normalized.title || 'Untitled Assignment')}</h3>
-        <small style="color:var(--text-muted)">${escapeHtml(target)}</small>
-        <small style="color:var(--text-muted)">${escapeHtml(schedule)}</small>
-        ${isScheduled ? '<small style="color:#c7d2fe;font-weight:900;">Not visible to students yet</small>' : ''}
-        <span class="teacher-pick-action"><i data-lucide="clipboard-check"></i> Review</span>
-        <button class="delete-activity-assignment-btn" type="button" title="Delete Assignment" aria-label="Delete ${escapeHtml(normalized.title || 'assignment')}"><i data-lucide="trash-2"></i></button>
+        <small class="teacher-card-primary-meta">${escapeHtml(target)}</small>
+        ${cueHtml}
+        <div class="teacher-card-actions">
+            <span class="teacher-pick-action"><i data-lucide="clipboard-check"></i> Review</span>
+        </div>
+        <details class="teacher-card-details">
+            <summary>Details</summary>
+            <div class="teacher-card-detail-list">
+                <span>${escapeHtml(schedule)}</span>
+                <span>${escapeHtml(subject.name)}</span>
+                ${isScheduled ? '<span class="teacher-card-warning">Not visible to students yet</span>' : ''}
+                <button class="delete-activity-assignment-btn teacher-card-danger-action" type="button" title="Delete Assignment" aria-label="Delete ${escapeHtml(normalized.title || 'assignment')}">
+                    <i data-lucide="trash-2"></i>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </details>
     `;
 
     card.addEventListener('click', (event) => {
-        if (event.target.closest('.delete-activity-assignment-btn')) return;
+        if (event.target.closest('.delete-activity-assignment-btn, .teacher-card-details')) return;
         manager.showActivityAssignmentReview(normalized.id);
     });
     card.addEventListener('keydown', (event) => {
+        if (event.target.closest('button, summary, .teacher-card-details')) return;
         if (event.key !== 'Enter' && event.key !== ' ') return;
         event.preventDefault();
         card.click();
+    });
+    card.querySelector('.teacher-card-details')?.addEventListener('click', event => {
+        event.stopPropagation();
+    });
+    card.querySelector('.teacher-card-details')?.addEventListener('keydown', event => {
+        event.stopPropagation();
     });
     card.querySelector('.delete-activity-assignment-btn')?.addEventListener('click', async (event) => {
         event.stopPropagation();

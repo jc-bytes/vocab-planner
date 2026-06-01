@@ -199,8 +199,7 @@ class TeacherStudentProgressRenderMethods {
             list.innerHTML = '<p style="color: var(--text-muted);">No activity data recorded.</p>';
         } else {
             for (const [unitName, unitData] of Object.entries(units)) {
-                const card = createElement('div', 'card');
-                card.style.padding = '1rem';
+                const card = createElement('div', 'student-detail-activity-row');
 
                 let scoresHtml = '';
                 if (unitData.scores) {
