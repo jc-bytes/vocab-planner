@@ -1,6 +1,24 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
+import {
+    studentApi as supabaseService,
+    collection,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    where
+} from '../services/studentApi.js';
 import { MONTH_INDEX } from './studentActivityConstants.js';
+
+const SPARK_COLLECTION = 'weeklySparks';
+const SPARK_TYPE_LABELS = {
+    cool_fact: 'Cool Fact',
+    trivia: 'Trivia',
+    good_news: 'Good News',
+    reflection: 'Reflection',
+    debate: 'Debate'
+};
 
 class StudentActivityHomeMethods {
     getUnitProgressSummary(vocab) {
@@ -38,13 +56,17 @@ class StudentActivityHomeMethods {
 
         this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
+        const sparkHost = createElement('div', 'student-spark-host');
+        container.appendChild(sparkHost);
+        this.loadAndRenderCurrentSpark(sparkHost);
+
         const { vocabs, message } = this.getVisibleVocabularyList({
             availableOnly: true,
             currentTrimesterOnly: true
         });
 
         if (vocabs.length === 0) {
-            container.innerHTML = `<p class="teacher-empty-state">${message}</p>`;
+            container.appendChild(createElement('p', 'teacher-empty-state', message));
             return;
         }
 
@@ -142,6 +164,83 @@ class StudentActivityHomeMethods {
         if (window.lucide) {
             window.lucide.createIcons();
         }
+    }
+
+    normalizeSpark(spark = {}) {
+        const source = spark && typeof spark === 'object' ? spark : {};
+        const sparkType = SPARK_TYPE_LABELS[source.sparkType || source.spark_type]
+            ? (source.sparkType || source.spark_type)
+            : 'cool_fact';
+        return {
+            id: String(source.id || ''),
+            sparkType,
+            title: String(source.title || '').trim(),
+            sparkText: String(source.sparkText ?? source.spark_text ?? '').trim(),
+            whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
+            question: String(source.question || '').trim(),
+            sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
+            sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
+            subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? 'technology').trim() || 'technology',
+            scheduledDate: String(source.scheduledDate ?? source.scheduled_date ?? '').trim()
+        };
+    }
+
+    async fetchCurrentSpark() {
+        if (this.sm.authDisabled || !this.sm.currentUser) return null;
+        const db = supabaseService.getDatabase();
+        const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
+        const snapshot = await getDocs(query(
+            collection(db, SPARK_COLLECTION),
+            where('subjectSlug', '==', subjectSlug),
+            where('status', '==', 'scheduled'),
+            orderBy('scheduledDate', 'desc'),
+            limit(1)
+        ));
+        const first = snapshot.docs[0];
+        return first ? this.normalizeSpark({ id: first.id, ...first.data() }) : null;
+    }
+
+    async loadAndRenderCurrentSpark(host) {
+        if (!host) return;
+        try {
+            const spark = await this.fetchCurrentSpark();
+            if (!spark?.id) {
+                host.remove();
+                return;
+            }
+            host.replaceChildren(this.createStudentSparkCard(spark));
+            if (window.lucide) window.lucide.createIcons();
+        } catch {
+            host.remove();
+        }
+    }
+
+    createStudentSparkCard(spark) {
+        const card = createElement('section', 'student-spark-card');
+        card.setAttribute('aria-label', 'Spark of the Week');
+        const sourceHtml = spark.sourceUrl
+            ? `<a href="${escapeHtml(spark.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
+            : '';
+        card.innerHTML = `
+            <div class="student-spark-heading">
+                <span class="student-spark-badge"><i data-lucide="sparkles"></i> Spark of the Week</span>
+                <span>${escapeHtml(SPARK_TYPE_LABELS[spark.sparkType] || 'Spark')}</span>
+            </div>
+            <h3>${escapeHtml(spark.title || 'Technology Spark')}</h3>
+            <p>${escapeHtml(spark.sparkText)}</p>
+            ${spark.whyItMatters ? `
+                <div class="student-spark-detail">
+                    <strong>Why it matters</strong>
+                    <span>${escapeHtml(spark.whyItMatters)}</span>
+                </div>
+            ` : ''}
+            <div class="student-spark-question">
+                <i data-lucide="message-circle-question"></i>
+                <span>${escapeHtml(spark.question)}</span>
+            </div>
+            ${sourceHtml ? `<div class="student-spark-source">${sourceHtml}</div>` : ''}
+        `;
+        return card;
     }
 
     bindHomePanelTabs(container) {

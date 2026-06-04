@@ -121,8 +121,8 @@ function bindVocabularyModalListeners(manager) {
     });
 
     $$('.close-modal').forEach(btn => {
-        btn.addEventListener('click', () => {
-            closeDialog('#word-modal');
+        btn.addEventListener('click', (event) => {
+            closeDialog(event.currentTarget.closest('.modal') || '#word-modal');
         });
     });
     $('#close-quiz-modal').addEventListener('click', () => {

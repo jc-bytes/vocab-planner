@@ -4652,6 +4652,203 @@ select:focus {
     font-weight: 700;
 }
 
+.spark-library {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.spark-section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+.spark-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.spark-card {
+    display: grid;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.spark-card.is-current {
+    border-color: rgba(52, 211, 153, 0.56);
+    background: rgba(20, 83, 45, 0.22);
+}
+
+.spark-card-topline,
+.spark-card-footer,
+.spark-card-actions,
+.spark-type-pill,
+.spark-status-pill,
+.student-spark-heading,
+.student-spark-badge {
+    display: flex;
+    align-items: center;
+}
+
+.spark-card-topline,
+.spark-card-footer {
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.spark-type-pill,
+.spark-status-pill,
+.student-spark-badge {
+    gap: 0.35rem;
+    min-height: 28px;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 900;
+}
+
+.spark-type-pill,
+.student-spark-badge {
+    background: rgba(14, 165, 233, 0.16);
+    color: #bae6fd;
+}
+
+.spark-status-pill {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+}
+
+.spark-card h4,
+.student-spark-card h3 {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.spark-card p,
+.spark-detail span,
+.spark-question span,
+.student-spark-card p,
+.student-spark-detail span,
+.student-spark-question span {
+    overflow-wrap: anywhere;
+}
+
+.spark-card p,
+.student-spark-card p {
+    margin: 0;
+    color: var(--text-main);
+}
+
+.spark-detail,
+.student-spark-detail {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.spark-detail strong,
+.student-spark-detail strong {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.spark-detail span,
+.spark-card-meta,
+.student-spark-detail span {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+}
+
+.spark-question,
+.student-spark-question {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: start;
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    background: rgba(249, 115, 22, 0.12);
+}
+
+.spark-question svg,
+.student-spark-question svg,
+.spark-type-pill svg,
+.student-spark-badge svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.spark-card-meta {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.spark-card-meta a,
+.student-spark-source a {
+    color: #7dd3fc;
+    overflow-wrap: anywhere;
+}
+
+.spark-card-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+
+.spark-card-action {
+    min-height: var(--touch-target);
+}
+
+.spark-modal-content {
+    max-width: 780px;
+}
+
+.student-spark-host {
+    grid-column: 1 / -1;
+}
+
+.student-spark-host:empty {
+    display: none;
+}
+
+.student-spark-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: var(--spacing-sm);
+    border: 1px solid rgba(14, 165, 233, 0.34);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(249, 115, 22, 0.09)),
+        rgba(15, 23, 42, 0.5);
+}
+
+.student-spark-heading {
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+.student-spark-source {
+    font-size: 0.85rem;
+}
+
 .student-home-dashboard {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -8805,6 +9002,20 @@ button.activity-card {
 
     .teacher-panel {
         padding: var(--spacing-sm);
+    }
+
+    .spark-card-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .spark-card-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .student-spark-host {
+        margin-bottom: 0.75rem;
     }
 
     .data-tab-list {

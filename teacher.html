@@ -33,6 +33,11 @@
                         <i data-lucide="shapes"></i>
                         Activities
                     </button>
+                    <button class="teacher-tab" id="tab-sparks" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-sparks-view" data-section="sparks">
+                        <i data-lucide="sparkles"></i>
+                        Sparks
+                    </button>
                     <button class="teacher-tab" id="tab-students" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-progress-view" data-section="students">
                         <i data-lucide="users"></i>
@@ -192,6 +197,10 @@
                             <button class="teacher-action-card" id="overview-activities-btn" type="button">
                                 <i data-lucide="shapes"></i>
                                 <span>Build activities</span>
+                            </button>
+                            <button class="teacher-action-card" id="overview-sparks-btn" type="button">
+                                <i data-lucide="sparkles"></i>
+                                <span>Manage Sparks</span>
                             </button>
                             <button class="teacher-action-card" id="overview-quiz-btn" type="button">
                                 <i data-lucide="file-text"></i>
@@ -587,6 +596,26 @@
                             <div id="activity-review-excalidraw-root" class="activity-excalidraw-root activity-review-excalidraw-root"></div>
                         </section>
                     </div>
+                </div>
+            </section>
+
+            <!-- View: Sparks -->
+            <section id="teacher-sparks-view" class="view hidden" role="tabpanel" aria-labelledby="tab-sparks">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Spark of the Week</p>
+                        <h2>Sparks</h2>
+                    </div>
+                    <div class="teacher-toolbar">
+                        <button id="add-spark-btn" class="btn primary-btn" type="button">
+                            <i data-lucide="plus"></i>
+                            Add Spark
+                        </button>
+                    </div>
+                </div>
+
+                <div id="spark-library-list" class="spark-library">
+                    <div class="loading-spinner">Loading Sparks...</div>
                 </div>
             </section>
 
@@ -1667,6 +1696,83 @@
                     <button type="submit" class="btn primary-btn">
                         <i data-lucide="send"></i>
                         Assign Activity
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Spark Modal -->
+    <div id="spark-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="spark-modal-title">
+        <div class="modal-content spark-modal-content">
+            <form id="spark-form">
+                <div class="modal-header">
+                    <h3 id="spark-modal-title">Add Spark</h3>
+                    <button class="close-modal" type="button" aria-label="Close Spark editor">×</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="spark-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="spark-type">Type</label>
+                            <select id="spark-type">
+                                <option value="cool_fact">Cool Fact</option>
+                                <option value="trivia">Trivia</option>
+                                <option value="good_news">Good News</option>
+                                <option value="reflection">Reflection</option>
+                                <option value="debate">Debate</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="spark-status-input">Status</label>
+                            <select id="spark-status-input">
+                                <option value="draft">Draft</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="spark-scheduled-date-input">Scheduled Date</label>
+                            <input type="date" id="spark-scheduled-date-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="spark-title-input">Title</label>
+                        <input type="text" id="spark-title-input" maxlength="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="spark-text-input">Spark Text</label>
+                        <textarea id="spark-text-input" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="spark-why-input">Why It Matters</label>
+                        <textarea id="spark-why-input" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="spark-question-input">Quick Question</label>
+                        <textarea id="spark-question-input" rows="2" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="spark-source-title-input">Source Title</label>
+                            <input type="text" id="spark-source-title-input" maxlength="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="spark-source-url-input">Source URL</label>
+                            <input type="url" id="spark-source-url-input" placeholder="https://">
+                        </div>
+                    </div>
+                    <div id="spark-modal-status" class="teacher-inline-status" role="status" aria-live="polite"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary-btn close-modal" type="button">Cancel</button>
+                    <button id="save-spark-draft-btn" class="btn secondary-btn" type="button">
+                        <i data-lucide="save"></i>
+                        Save Draft
+                    </button>
+                    <button id="schedule-spark-btn" class="btn primary-btn" type="button">
+                        <i data-lucide="calendar-check"></i>
+                        Schedule Spark
                     </button>
                 </div>
             </form>

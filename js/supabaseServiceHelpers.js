@@ -5,6 +5,7 @@ export const TABLE_ALIASES = {
     classroomActivities: 'classroom_activities',
     exportLogs: 'export_logs',
     studentProgress: 'student_progress',
+    weeklySparks: 'weekly_sparks',
     userRoles: 'profiles'
 };
 
@@ -18,7 +19,8 @@ export const PRIMARY_KEYS = {
     scores: 'id',
     student_progress: 'user_id',
     subjects: 'slug',
-    vocabularies: 'id'
+    vocabularies: 'id',
+    weekly_sparks: 'id'
 };
 
 export const FIELD_ALIASES = {
@@ -112,6 +114,17 @@ export const FIELD_ALIASES = {
         ownerId: 'owner_id',
         subjectSlug: 'subject_slug',
         updatedAt: 'updated_at'
+    },
+    weekly_sparks: {
+        ownerId: 'owner_id',
+        scheduledDate: 'scheduled_date',
+        sourceTitle: 'source_title',
+        sourceUrl: 'source_url',
+        sparkText: 'spark_text',
+        sparkType: 'spark_type',
+        subjectSlug: 'subject_slug',
+        updatedAt: 'updated_at',
+        whyItMatters: 'why_it_matters'
     }
 };
 
@@ -399,6 +412,25 @@ export const toClientRow = (tableName, row) => {
         };
     }
 
+    if (tableName === 'weekly_sparks') {
+        return {
+            id: row.id,
+            sparkType: row.spark_type || 'cool_fact',
+            title: row.title || '',
+            sparkText: row.spark_text || '',
+            whyItMatters: row.why_it_matters || '',
+            question: row.question || '',
+            sourceTitle: row.source_title || '',
+            sourceUrl: row.source_url || '',
+            subjectSlug: row.subject_slug || 'technology',
+            scheduledDate: row.scheduled_date || '',
+            status: row.status || 'draft',
+            ownerId: row.owner_id || null,
+            createdAt: toTimestamp(row.created_at),
+            updatedAt: toTimestamp(row.updated_at)
+        };
+    }
+
     if (tableName === 'scores') {
         return {
             id: row.id,
@@ -594,6 +626,24 @@ export const fromClientPayload = (tableName, payload = {}, id = null) => {
         });
     }
 
+    if (tableName === 'weekly_sparks') {
+        return cleanUndefined({
+            id: id || payload.id,
+            spark_type: payload.sparkType || payload.spark_type || 'cool_fact',
+            title: payload.title,
+            spark_text: payload.sparkText ?? payload.spark_text,
+            why_it_matters: payload.whyItMatters ?? payload.why_it_matters,
+            question: payload.question,
+            source_title: payload.sourceTitle ?? payload.source_title ?? '',
+            source_url: payload.sourceUrl ?? payload.source_url ?? '',
+            subject_slug: payload.subjectSlug || payload.subject_slug || 'technology',
+            scheduled_date: (payload.scheduledDate ?? payload.scheduled_date) || null,
+            status: payload.status || 'draft',
+            owner_id: payload.ownerId || payload.owner_id || null,
+            updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
+        });
+    }
+
     if (tableName === 'scores') {
         return cleanUndefined({
             id: id || payload.id,
@@ -672,4 +722,3 @@ export const applyConstraints = (builder, tableName, constraints = []) => {
 
     return currentBuilder;
 };
-

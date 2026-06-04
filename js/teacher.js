@@ -10,6 +10,7 @@ import { installTeacherQuizMethods } from './teacherQuiz.js';
 import { installTeacherRoutingMethods } from './teacherRouting.js';
 import { installTeacherSettingsMethods } from './teacherSettings.js';
 import { installTeacherShellMethods } from './teacherShell.js';
+import { installTeacherSparkMethods } from './teacherSparks.js';
 import { installTeacherStudentProgressMethods } from './teacherStudentProgress.js';
 import { installTeacherVocabularyMethods } from './teacherVocabulary.js';
 import { initTeacherListeners } from './teacherListeners.js';
@@ -83,6 +84,12 @@ class TeacherManager {
         this.activityAssignmentCache = null;
         this.activityAssignmentPromise = null;
         this.activityAssignmentItems = [];
+        this.weeklySparkItems = [];
+        this.weeklySparkCache = null;
+        this.weeklySparkPromise = null;
+        this.weeklySparkRefreshing = false;
+        this.editingSparkId = null;
+        this.sparkModalMode = 'create';
         this.activityAssignmentsLoaded = false;
         this.activityAssignmentRefreshing = false;
         this.activityAssignmentStale = false;
@@ -143,6 +150,7 @@ installTeacherQuizMethods(TeacherManager);
 installTeacherRoutingMethods(TeacherManager);
 installTeacherSettingsMethods(TeacherManager);
 installTeacherShellMethods(TeacherManager);
+installTeacherSparkMethods(TeacherManager);
 installTeacherStudentProgressMethods(TeacherManager);
 installTeacherVocabularyMethods(TeacherManager);
 

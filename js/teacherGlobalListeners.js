@@ -92,6 +92,14 @@ export function initTeacherGlobalListeners(manager) {
     });
     setupModal('#quiz-modal', { dismissible: true });
     setupModal('#activity-assignment-modal', { dismissible: true });
+    setupModal('#spark-modal', {
+        dismissible: true,
+        onClose: () => {
+            manager.editingSparkId = null;
+            manager.sparkModalMode = 'create';
+            manager.setSparkModalStatus?.('');
+        }
+    });
 
     bindTeacherAuthListeners(manager);
     bindTeacherMobileMenu(manager);

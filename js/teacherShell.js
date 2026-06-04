@@ -11,6 +11,7 @@ class TeacherShellMethods {
             'teacher-activities-view',
             'teacher-activity-editor-view',
             'teacher-activity-assignment-view',
+            'teacher-sparks-view',
             'teacher-progress-view',
             'teacher-quizzes-view',
             'quiz-maker-view',
@@ -87,6 +88,7 @@ class TeacherShellMethods {
             'teacher-activities-view': 'activities',
             'teacher-activity-editor-view': 'activities',
             'teacher-activity-assignment-view': 'activities',
+            'teacher-sparks-view': 'sparks',
             'teacher-progress-view': 'students',
             'teacher-quizzes-view': 'quizzes',
             'quiz-maker-view': 'quizzes',
@@ -157,6 +159,9 @@ class TeacherShellMethods {
                     break;
                 }
                 this.showActivityLibrary();
+                break;
+            case 'sparks':
+                this.showSparksView();
                 break;
             case 'students':
                 this.showProgressView();
