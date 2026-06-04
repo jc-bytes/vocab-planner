@@ -263,6 +263,24 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return data;
     },
 
+    async createStudentAccount(profile, password) {
+        await this.init();
+        const normalized = normalizeProfile(profile);
+        const { data, error } = await this.client.functions.invoke('create-student-account', {
+            body: {
+                firstName: normalized.firstName,
+                lastName: normalized.lastName,
+                email: normalized.email,
+                grade: normalized.grade,
+                section: normalized.group,
+                password
+            }
+        });
+        if (error) throw error;
+        if (data?.error) throw new Error(data.error);
+        return data;
+    },
+
     async signOut() {
         await this.init();
         await this.client.auth.signOut({ scope: 'local' });

@@ -11,9 +11,9 @@ export const DEFAULT_SUBJECTS = Object.freeze([
     { slug: 'science', name: 'Science', color: '#16a34a', sortOrder: 20, active: true }
 ]);
 
-const MANIFEST_CACHE_KEY = 'vocab_manifest_cache_v1';
+const MANIFEST_CACHE_KEY = 'vocab_manifest_cache_v4';
 const MANIFEST_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-const VOCAB_FILE_CACHE_KEY = 'vocab_file_cache_v1';
+const VOCAB_FILE_CACHE_KEY = 'vocab_file_cache_v2';
 const VOCAB_FILE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const vocabFileRequests = new Map();
 const MONTH_KEYS = [
@@ -31,6 +31,15 @@ const MONTH_KEYS = [
     'december'
 ];
 const SUBJECT_COLORS = ['#2563eb', '#16a34a', '#db2777', '#f59e0b', '#7c3aed', '#0891b2'];
+const DEFAULT_SCHOOL_CALENDARS = Object.freeze({
+    '2026': Object.freeze({
+        trimesters: Object.freeze({
+            IT: Object.freeze({ startDate: '2026-03-02', endDate: '2026-05-29', weekCount: 13 }),
+            IIT: Object.freeze({ startDate: '2026-06-08', endDate: '2026-09-04', weekCount: 13 }),
+            IIIT: Object.freeze({ startDate: '2026-09-14', endDate: '2026-12-11', weekCount: 13 })
+        })
+    })
+});
 
 export function normalizeSubjectSlug(value, fallback = DEFAULT_SUBJECT_SLUG) {
     const normalized = String(value || '')
@@ -145,41 +154,98 @@ function toDateOnly(value) {
     return date.toISOString().slice(0, 10);
 }
 
+function addDaysDateOnly(date, days) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+    const result = new Date(date.getTime());
+    result.setUTCDate(result.getUTCDate() + Number(days || 0));
+    return result.toISOString().slice(0, 10);
+}
+
+function normalizeWeekCount(value) {
+    const weekCount = Number.parseInt(String(value || ''), 10);
+    return Number.isInteger(weekCount) && weekCount > 0 ? weekCount : '';
+}
+
 export function getMonthKeyFromDate(value) {
     const date = parseDateOnly(value);
     return date ? MONTH_KEYS[date.getUTCMonth()] : '';
 }
 
-export function getDefaultSchoolCalendar(date = new Date()) {
+export function calculateCalendarEndDateFromWeekCount(startDate, weekCount) {
+    const start = parseDateOnly(startDate);
+    const weeks = normalizeWeekCount(weekCount);
+    if (!start || !weeks) return '';
+    return addDaysDateOnly(start, ((weeks - 1) * 7) + 4);
+}
+
+export function calculateCalendarWeekCount(startDate, endDate) {
+    const start = parseDateOnly(startDate);
+    const end = parseDateOnly(endDate);
+    if (!start || !end || end < start) return '';
+
+    const daysSinceStart = Math.floor((end.getTime() - start.getTime()) / 86400000);
+    return Math.floor(daysSinceStart / 7) + 1;
+}
+
+export function calculateCalendarWeekRange(startDate, weekNumber) {
+    const start = parseDateOnly(startDate);
+    const week = normalizeWeekCount(weekNumber);
+    if (!start || !week) return { startDate: '', endDate: '' };
+
+    const weekStartDate = addDaysDateOnly(start, (week - 1) * 7);
+    const weekStart = parseDateOnly(weekStartDate);
     return {
-        schoolYear: getCurrentSchoolYear(date),
+        startDate: weekStartDate,
+        endDate: addDaysDateOnly(weekStart, 4)
+    };
+}
+
+export function getDefaultSchoolCalendar(date = new Date()) {
+    const schoolYear = getCurrentSchoolYear(date);
+    const defaults = DEFAULT_SCHOOL_CALENDARS[schoolYear]?.trimesters || {};
+
+    return {
+        schoolYear,
         trimesters: {
-            IT: { startDate: '', endDate: '' },
-            IIT: { startDate: '', endDate: '' },
-            IIIT: { startDate: '', endDate: '' }
+            IT: { startDate: defaults.IT?.startDate || '', endDate: defaults.IT?.endDate || '', weekCount: defaults.IT?.weekCount || '' },
+            IIT: { startDate: defaults.IIT?.startDate || '', endDate: defaults.IIT?.endDate || '', weekCount: defaults.IIT?.weekCount || '' },
+            IIIT: { startDate: defaults.IIIT?.startDate || '', endDate: defaults.IIIT?.endDate || '', weekCount: defaults.IIIT?.weekCount || '' }
         }
     };
 }
 
+function normalizeTrimesterRange(sourceRange = {}, fallbackRange = {}) {
+    const startDate = toDateOnly(sourceRange.startDate) || fallbackRange.startDate || '';
+    const sourceWeekCount = normalizeWeekCount(sourceRange.weekCount || sourceRange.weeks);
+    const endDate = toDateOnly(sourceRange.endDate)
+        || calculateCalendarEndDateFromWeekCount(startDate, sourceWeekCount)
+        || fallbackRange.endDate
+        || '';
+    const weekCount = sourceWeekCount
+        || calculateCalendarWeekCount(startDate, endDate)
+        || fallbackRange.weekCount
+        || '';
+
+    return { startDate, endDate, weekCount };
+}
+
 export function normalizeSchoolCalendar(calendar, fallbackDate = new Date()) {
-    const fallback = getDefaultSchoolCalendar(fallbackDate);
     const source = calendar && typeof calendar === 'object' ? calendar : {};
+    const schoolYear = String(source.schoolYear || getCurrentSchoolYear(fallbackDate));
+    const fallbackYear = /^\d{4}$/.test(schoolYear)
+        ? Number(schoolYear)
+        : Number(getCurrentSchoolYear(fallbackDate));
+    const fallback = getDefaultSchoolCalendar(new Date(fallbackYear, 0, 1, 12));
+    const sourceTrimesters = source.trimesters && typeof source.trimesters === 'object'
+        ? source.trimesters
+        : {};
 
     return {
-        schoolYear: String(source.schoolYear || fallback.schoolYear),
+        schoolYear,
         trimesters: {
-            IT: {
-                startDate: toDateOnly(source.trimesters?.IT?.startDate),
-                endDate: toDateOnly(source.trimesters?.IT?.endDate)
-            },
-            IIT: {
-                startDate: toDateOnly(source.trimesters?.IIT?.startDate),
-                endDate: toDateOnly(source.trimesters?.IIT?.endDate)
-            },
-            IIIT: {
-                startDate: toDateOnly(source.trimesters?.IIIT?.startDate),
-                endDate: toDateOnly(source.trimesters?.IIIT?.endDate)
-            }
+            IT: normalizeTrimesterRange(sourceTrimesters.IT, fallback.trimesters.IT),
+            IIT: normalizeTrimesterRange(sourceTrimesters.IIT, fallback.trimesters.IIT),
+            IIIT: normalizeTrimesterRange(sourceTrimesters.IIIT, fallback.trimesters.IIIT)
         }
     };
 }

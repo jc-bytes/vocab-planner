@@ -25,7 +25,7 @@
     {
       "word": "HTML",
       "definition": "Markup used to structure a web page.",
-      "example": "Students used HTML during the class activity.",
+      "example": "HTML created the structure of the portfolio page.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "head",
       "definition": "The part of HTML with page information.",
-      "example": "Students used head during the class activity.",
+      "example": "The head included the page title for the browser tab.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "body",
       "definition": "The part of HTML shown on the page.",
-      "example": "Students used body during the class activity.",
+      "example": "The body showed the heading, paragraph, image, and link.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "heading",
       "definition": "A title for a page or section.",
-      "example": "Students used heading during the class activity.",
+      "example": "The heading named the campaign at the top of the page.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "paragraph",
       "definition": "A group of sentences about one idea.",
-      "example": "Students used paragraph during the class activity.",
+      "example": "The paragraph explained the purpose of the campaign.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "list",
       "definition": "A group of related items stored together.",
-      "example": "Students used list during the class activity.",
+      "example": "The list showed three safety tips in order.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "link",
       "definition": "A way to open a web page or file.",
-      "example": "Students used link during the class activity.",
+      "example": "The link opened the source used for the research.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "CSS",
       "definition": "Code used to style a web page.",
-      "example": "Students used CSS during the class activity.",
+      "example": "CSS changed the colors and spacing of the homepage.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +89,7 @@
     {
       "word": "selector",
       "definition": "CSS code that chooses what to style.",
-      "example": "Students used selector during the class activity.",
+      "example": "The selector chose which heading to style.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +97,7 @@
     {
       "word": "value",
       "definition": "Information stored in a variable, cell, or program.",
-      "example": "Students used value during the class activity.",
+      "example": "The color value changed the text from black to blue.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

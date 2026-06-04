@@ -25,7 +25,7 @@
     {
       "word": "data cleaning",
       "definition": "Fixing or removing unclear data.",
-      "example": "Students used data cleaning during the class activity.",
+      "example": "Data cleaning changed blank answers into a clear no response category.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "messy data",
       "definition": "Data with mistakes or unclear values.",
-      "example": "Students used messy data during the class activity.",
+      "example": "The messy data had repeated answers, misspelled words, and empty cells.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "change log",
       "definition": "A record of changes made.",
-      "example": "Students used change log during the class activity.",
+      "example": "The change log recorded each correction made to the dataset.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "Tinkercad",
       "definition": "An online tool for making simple 3D models.",
-      "example": "Students used Tinkercad during the class activity.",
+      "example": "The student used Tinkercad to model a simple data collection device.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "model",
       "definition": "A simple version or representation of something.",
-      "example": "Students used model during the class activity.",
+      "example": "The model showed how the sensor box would sit on the desk.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "shape",
       "definition": "A basic form such as a circle, box, or triangle.",
-      "example": "Students used shape during the class activity.",
+      "example": "The Tinkercad design used a box shape for the base.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "label",
       "definition": "A name or short description.",
-      "example": "Students used label during the class activity.",
+      "example": "The student added a label to identify the sensor opening.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

@@ -25,7 +25,7 @@
     {
       "word": "user needs",
       "definition": "What users need from a product.",
-      "example": "Students used user needs during the class activity.",
+      "example": "User needs showed that players wanted clear instructions.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "audience",
       "definition": "The people who will see or use something.",
-      "example": "Students used audience during the class activity.",
+      "example": "The audience was students who would try the app in class.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "feature",
       "definition": "A useful part of an app or product.",
-      "example": "Students used feature during the class activity.",
+      "example": "A restart button was added as a useful feature.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "success criteria",
       "definition": "Rules that show whether something works well.",
-      "example": "Students used success criteria during the class activity.",
+      "example": "Success criteria said the app needed clear controls and working scoring.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "event map",
       "definition": "A diagram showing events and screen flow.",
-      "example": "Students used event map during the class activity.",
+      "example": "The event map connected the start, play, and results screens.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "test case",
       "definition": "A planned test with expected behavior.",
-      "example": "Students used test case during the class activity.",
+      "example": "The test case checked what happened after a wrong answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "wireframe",
       "definition": "A simple layout plan for a screen.",
-      "example": "Students used wireframe during the class activity.",
+      "example": "The wireframe planned the layout before the app was built.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

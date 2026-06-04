@@ -25,7 +25,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem in code.",
-      "example": "Students used debug during the project.",
+      "example": "The pair debugged the script after the score did not change.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "trace",
       "definition": "To follow code step by step.",
-      "example": "Students used trace during the project.",
+      "example": "The navigator traced the blocks from top to bottom.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "bug",
       "definition": "A mistake in a program.",
-      "example": "Students used bug during the project.",
+      "example": "The bug made the sprite jump to the wrong place.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "driver",
       "definition": "The partner controlling the computer during pair work.",
-      "example": "Students used driver during the project.",
+      "example": "The driver controlled the mouse and changed the blocks.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "navigator",
       "definition": "The partner who guides and checks the work during pair work.",
-      "example": "Students used navigator during the project.",
+      "example": "The navigator read the checklist and watched for mistakes.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "feedback",
       "definition": "Helpful comments about how to improve.",
-      "example": "Students used feedback during the project.",
+      "example": "Feedback helped the pair improve the game controls.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

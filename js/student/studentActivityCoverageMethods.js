@@ -117,11 +117,16 @@ class StudentActivityCoverageMethods {
         
         if (!coverageIndicator) {
             // Create the indicator if it doesn't exist
-            const header = document.querySelector('#activity-menu-view .section-header');
-            if (header) {
+            const summary = document.querySelector('#required-activities-status');
+            if (summary) {
+                coverageIndicator = createElement('div', 'activity-menu-summary-card overall-coverage');
+                coverageIndicator.id = 'overall-coverage-indicator';
+                summary.appendChild(coverageIndicator);
+            } else {
+                const header = document.querySelector('#activity-menu-view .section-header');
+                if (!header) return;
                 coverageIndicator = createElement('div', 'overall-coverage');
                 coverageIndicator.id = 'overall-coverage-indicator';
-                coverageIndicator.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text-muted); margin-left: auto;';
                 header.appendChild(coverageIndicator);
             }
         }
@@ -129,9 +134,11 @@ class StudentActivityCoverageMethods {
         if (coverageIndicator && coverageStats?.overall) {
             const { practiced, total, percentage } = coverageStats.overall;
             coverageIndicator.innerHTML = `
-                <span title="Words practiced across all activities">📖 Word Coverage: ${practiced}/${total} (${percentage}%)</span>
-                <div style="width: 60px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;">
-                    <div style="width: ${percentage}%; height: 100%; background: var(--primary-color, #6366f1); transition: width 0.3s;"></div>
+                <span class="activity-menu-summary-label">Word coverage</span>
+                <strong>${practiced}/${total} words</strong>
+                <small>${percentage}% practiced</small>
+                <div class="activity-menu-summary-meter" aria-hidden="true">
+                    <div style="width: ${percentage}%;"></div>
                 </div>
             `;
         }

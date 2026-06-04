@@ -25,7 +25,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem.",
-      "example": "Students used debug during the class activity.",
+      "example": "The student debugged the game by reading each error message.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "colon",
       "definition": "The two-dot punctuation mark used in Python blocks.",
-      "example": "Students used colon during the class activity.",
+      "example": "The missing colon stopped the if block from running.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "indentation",
       "definition": "Spaces at the start of a code line.",
-      "example": "Students used indentation during the class activity.",
+      "example": "Indentation showed which lines belonged inside the loop.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "comparison",
       "definition": "Checking how two values are related.",
-      "example": "Students used comparison during the class activity.",
+      "example": "The comparison checked whether the guess equaled the secret number.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "variable name",
       "definition": "The name used for a value in code.",
-      "example": "Students used variable name during the class activity.",
+      "example": "The variable name had to match everywhere in the program.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "error",
       "definition": "A problem that stops code or makes it wrong.",
-      "example": "Students used error during the class activity.",
+      "example": "The error appeared because the input was treated as text.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "fix",
       "definition": "A change that solves a problem.",
-      "example": "Students used fix during the class activity.",
+      "example": "The fix converted the input to a number before comparing it.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

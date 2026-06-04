@@ -14,6 +14,7 @@ export function initTeacherSettingsListeners(manager) {
             manager.saveSchoolCalendarSettings();
         });
     }
+    manager.bindSchoolCalendarInputs?.();
 
     $('#add-subject-btn')?.addEventListener('click', () => manager.addSubjectFromForm());
     $('#save-subjects-btn')?.addEventListener('click', () => manager.saveSubjectSettings());

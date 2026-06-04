@@ -25,7 +25,7 @@
     {
       "word": "power",
       "definition": "Electricity used to run a circuit.",
-      "example": "Students used power during the class activity.",
+      "example": "The power wire supplied electricity to the breadboard.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "ground",
       "definition": "The return path for electricity in a circuit.",
-      "example": "Students used ground during the class activity.",
+      "example": "Ground completed the circuit path back to the Arduino.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "resistor",
       "definition": "A part that limits electric current.",
-      "example": "Students used resistor during the class activity.",
+      "example": "The resistor protected the LED from too much current.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "direction",
       "definition": "The way something faces or moves.",
-      "example": "Students used direction during the class activity.",
+      "example": "The LED direction mattered because the longer leg went to power.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "checklist",
       "definition": "A list used to make sure steps are done.",
-      "example": "Students used checklist during the class activity.",
+      "example": "The checklist helped the group verify each wire.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "builder",
       "definition": "The person who builds the physical parts.",
-      "example": "Students used builder during the class activity.",
+      "example": "The builder placed the components on the breadboard.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "coder",
       "definition": "The person who works on the code.",
-      "example": "Students used coder during the class activity.",
+      "example": "The coder updated the Arduino sketch after each test.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "recorder",
       "definition": "The person who writes notes or evidence.",
-      "example": "Students used recorder during the class activity.",
+      "example": "The recorder wrote the problem and fix in the log.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

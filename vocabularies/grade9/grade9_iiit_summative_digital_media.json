@@ -7,6 +7,8 @@
     "9"
   ],
   "trimester": "IIIT",
+  "month": "september",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "STEM",
       "definition": "Science, technology, engineering, and math used to solve problems.",
-      "example": "Students used STEM during the class activity.",
+      "example": "The STEM project combined sensors, data, and a digital media explanation.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "pixel",
       "definition": "One tiny dot in a digital image or display.",
-      "example": "Students used pixel during the class activity.",
+      "example": "The student zoomed in until individual pixels were visible.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "resolution",
       "definition": "The amount of detail in an image.",
-      "example": "Students used resolution during the class activity.",
+      "example": "The higher resolution image looked sharper in the presentation.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "color depth",
       "definition": "How many colors an image can store.",
-      "example": "Students used color depth during the class activity.",
+      "example": "Increasing color depth allowed the image to show more color detail.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "sample",
       "definition": "A small piece of sound or data used for measurement.",
-      "example": "Students used sample during the class activity.",
+      "example": "The audio sample captured a short piece of the recorded sound.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "sensor",
       "definition": "A part that detects information from the environment.",
-      "example": "Students used sensor during the class activity.",
+      "example": "The sensor collected light data for the media project.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "file size",
       "definition": "How much storage a file uses.",
-      "example": "Students used file size during the class activity.",
+      "example": "The file size became smaller after the student compressed the image.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "quality",
       "definition": "How good or clear something is.",
-      "example": "Students used quality during the class activity.",
+      "example": "The video quality dropped when the file was compressed too much.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "compression",
       "definition": "Making a file smaller, sometimes with less quality.",
-      "example": "Students used compression during the class activity.",
+      "example": "Compression reduced the image file size before submission.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "RGB",
       "definition": "Red, green, and blue colors used to make other colors.",
-      "example": "Students used RGB during the class activity.",
+      "example": "The RGB values changed the color of the digital image.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

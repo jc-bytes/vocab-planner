@@ -25,7 +25,7 @@
     {
       "word": "speed",
       "definition": "How fast something moves.",
-      "example": "Students used speed during the project.",
+      "example": "The team lowered the speed so the robot would not overshoot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "time",
       "definition": "How long something happens.",
-      "example": "Students used time during the project.",
+      "example": "Changing the time helped the robot stop closer to the line.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "distance",
       "definition": "How far apart two things are.",
-      "example": "Students used distance during the project.",
+      "example": "The robot measured the distance between two checkpoints.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "direction",
       "definition": "The way something moves or points.",
-      "example": "Students used direction during the project.",
+      "example": "The robot changed direction at the corner.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "calibration",
       "definition": "Adjusting something so it works more accurately.",
-      "example": "Students used calibration during the project.",
+      "example": "Calibration adjusted the movement until the robot reached the target.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "accuracy",
       "definition": "How close a result is to what was expected.",
-      "example": "Students used accuracy during the project.",
+      "example": "Accuracy improved when the robot stopped near the same mark twice.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

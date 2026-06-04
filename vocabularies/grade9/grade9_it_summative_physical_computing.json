@@ -7,6 +7,8 @@
     "9"
   ],
   "trimester": "IT",
+  "month": "march",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the class activity.",
+      "example": "The button press was the input that started the LED pattern.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
-      "example": "Students used process during the class activity.",
+      "example": "The code process checked the sensor value before choosing an output.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the class activity.",
+      "example": "The buzzer sound was the output after the distance was too low.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "system",
       "definition": "Parts that work together.",
-      "example": "Students used system during the class activity.",
+      "example": "The sensor, code, and LED worked together as one system.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "device",
       "definition": "A tool or machine that does a task.",
-      "example": "Students used device during the class activity.",
+      "example": "The Arduino device controlled the light and buzzer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "circuit",
       "definition": "A path that electricity can follow.",
-      "example": "Students used circuit during the class activity.",
+      "example": "The circuit connected the sensor, resistor, LED, power, and ground.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "sketch",
       "definition": "An Arduino program.",
-      "example": "Students uploaded a sketch to the Arduino board.",
+      "example": "The sketch told the Arduino when to turn the LED on.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "upload",
       "definition": "To send a program to a device.",
-      "example": "Students used upload during the class activity.",
+      "example": "The student clicked upload to send the sketch to the Arduino board.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem.",
-      "example": "Students used debug during the class activity.",
+      "example": "The team debugged the circuit after the LED stayed off.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "test",
       "definition": "To try something and check what happens.",
-      "example": "Students used test during the class activity.",
+      "example": "The student ran a test by pressing the button three times.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

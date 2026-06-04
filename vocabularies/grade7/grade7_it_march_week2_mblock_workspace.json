@@ -25,7 +25,7 @@
     {
       "word": "mBlock",
       "definition": "A block coding tool used to program the mBot.",
-      "example": "Students used mBlock during the project.",
+      "example": "The student opened mBlock to program the mBot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "workspace",
       "definition": "The area in a program where you do your work.",
-      "example": "Students used workspace during the project.",
+      "example": "The movement blocks were arranged in the workspace.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "sprite",
       "definition": "A character or object in a Scratch or mBlock project.",
-      "example": "Students used sprite during the project.",
+      "example": "The sprite on the screen copied the robot movement.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "block",
       "definition": "A coding command that snaps into a program.",
-      "example": "Students used block during the project.",
+      "example": "The forward block made the robot drive ahead.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "script",
       "definition": "A group of connected blocks that run together.",
-      "example": "Students used script during the project.",
+      "example": "The script connected start, move, and stop blocks.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "upload",
       "definition": "To send a program from the computer to the robot.",
-      "example": "Students used upload during the project.",
+      "example": "Upload sent the finished program to the mBot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "interface",
       "definition": "The screen and tools used to work with a program.",
-      "example": "Students used interface during the project.",
+      "example": "The interface showed the blocks, stage, and device connection.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

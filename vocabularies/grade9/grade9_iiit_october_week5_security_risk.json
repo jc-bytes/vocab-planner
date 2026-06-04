@@ -25,7 +25,7 @@
     {
       "word": "brute force",
       "definition": "Trying many passwords until one works.",
-      "example": "Students used brute force during the class activity.",
+      "example": "A brute force attack tried many password combinations until one worked.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "DDoS",
       "definition": "An attack that overloads a service with too much traffic.",
-      "example": "Students used DDoS during the class activity.",
+      "example": "The DDoS example overloaded a website with too many requests.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,15 +41,15 @@
     {
       "word": "firewall",
       "definition": "A tool that helps block unsafe network traffic.",
-      "example": "Students used firewall during the class activity.",
+      "example": "The firewall blocked the unsafe connection in the scenario.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
     },
     {
       "word": "update",
-      "definition": "A change made during a loop or process.",
-      "example": "Students used update during the class activity.",
+      "definition": "A software change that fixes problems or improves security.",
+      "example": "The update fixed a security weakness in the app.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "scenario",
       "definition": "A short situation used for practice.",
-      "example": "Students used scenario during the class activity.",
+      "example": "The scenario described a student receiving a suspicious login message.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "protection",
       "definition": "A way to reduce risk or harm.",
-      "example": "Students used protection during the class activity.",
+      "example": "Two-factor authentication was the protection chosen for the account.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "risk",
       "definition": "A possible problem or danger.",
-      "example": "Students used risk during the class activity.",
+      "example": "Sharing the class link publicly created a risk for the meeting.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

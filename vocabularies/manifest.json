@@ -9,6 +9,8 @@
         "6"
       ],
       "trimester": "1",
+      "month": "march",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade6/grade6_t1_summative_core_vocabulary.json"
     },
@@ -141,6 +143,8 @@
         "6"
       ],
       "trimester": "2",
+      "month": "june",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade6/grade6_t2_summative_robotics_vocabulary.json"
     },
@@ -153,6 +157,8 @@
         "6"
       ],
       "trimester": "2",
+      "month": "june",
+      "week": 2,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_june_week2_movement_instructions.json"
     },
@@ -165,6 +171,8 @@
         "6"
       ],
       "trimester": "2",
+      "month": "june",
+      "week": 3,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_june_week3_debugging_paths.json"
     },
@@ -177,114 +185,134 @@
         "6"
       ],
       "trimester": "2",
+      "month": "june",
+      "week": 4,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_june_week4_robot_outputs.json"
     },
     {
       "id": "grade6_t2_july_week1_route_accuracy",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: July Week 1 - Route Accuracy",
+      "name": "Grade 6 T2 Practice: July Week 5 - Route Accuracy",
       "description": "Practice words for route maps and accurate movement.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "july",
+      "week": 5,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_july_week1_route_accuracy.json"
     },
     {
       "id": "grade6_t2_july_week2_repeat_patterns",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: July Week 2 - Repeat Patterns",
+      "name": "Grade 6 T2 Practice: July Week 6 - Repeat Patterns",
       "description": "Practice words for loops and repeated movement patterns.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "july",
+      "week": 6,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_july_week2_repeat_patterns.json"
     },
     {
       "id": "grade6_t2_july_week3_sensor_detection",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: July Week 3 - Sensor Detection",
+      "name": "Grade 6 T2 Practice: July Week 7 - Sensor Detection",
       "description": "Practice words for sensors, inputs, and responses.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "july",
+      "week": 7,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_july_week3_sensor_detection.json"
     },
     {
       "id": "grade6_t2_july_week4_conditions_flowcharts",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: July Week 4 - Conditions and Flowcharts",
+      "name": "Grade 6 T2 Practice: July Week 8 - Conditions and Flowcharts",
       "description": "Practice words for simple conditions and robot responses.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "july",
+      "week": 8,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_july_week4_conditions_flowcharts.json"
     },
     {
       "id": "grade6_t2_july_week5_mini_challenge_plan",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: July Week 5 - Mini-Challenge Plan",
+      "name": "Grade 6 T2 Practice: July Week 9 - Mini-Challenge Plan",
       "description": "Practice words for planning a small mBot challenge.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "july",
+      "week": 9,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_july_week5_mini_challenge_plan.json"
     },
     {
       "id": "grade6_t2_august_week1_knowledge_cards",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: August Week 1 - Knowledge Cards",
+      "name": "Grade 6 T2 Practice: August Week 9 - Knowledge Cards",
       "description": "Practice words for mBot card stations and actions.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "august",
+      "week": 9,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_august_week1_knowledge_cards.json"
     },
     {
       "id": "grade6_t2_august_week2_final_challenge_plan",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: August Week 2 - Final Challenge Plan",
+      "name": "Grade 6 T2 Practice: August Week 10 - Final Challenge Plan",
       "description": "Practice words for planning and improving the final mBot challenge.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "august",
+      "week": 10,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_august_week2_final_challenge_plan.json"
     },
     {
       "id": "grade6_t2_august_week3_demo_reflection",
       "subjectSlug": "technology",
-      "name": "Grade 6 T2 Practice: August Week 3 - Demo Reflection",
+      "name": "Grade 6 T2 Practice: August Week 11 - Demo Reflection",
       "description": "Practice words for testing, explaining, and reflecting on the final robotics challenge.",
       "grades": [
         "6"
       ],
       "trimester": "2",
+      "month": "august",
+      "week": 11,
       "purpose": "practice",
       "path": "vocabularies/grade6/grade6_t2_august_week3_demo_reflection.json"
     },
     {
       "id": "grade6_t3_summative_spreadsheet_vocabulary",
       "subjectSlug": "technology",
-      "name": "Grade 6 T3 Summative: Spreadsheet Vocabulary",
-      "description": "Ten core third-trimester words for the Grade 6 spreadsheet summative vocabulary table.",
+      "name": "Grade 6 T3 Summative: IIIT Vocabulary",
+      "description": "Ten core third-trimester words for the Grade 6 IIIT summative vocabulary table.",
       "grades": [
         "6"
       ],
       "trimester": "3",
+      "month": "september",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade6/grade6_t3_summative_spreadsheet_vocabulary.json"
     },
@@ -429,6 +457,8 @@
         "7"
       ],
       "trimester": "IT",
+      "month": "march",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade7/grade7_it_summative_robotics_parts.json"
     },
@@ -573,6 +603,8 @@
         "7"
       ],
       "trimester": "IIT",
+      "month": "june",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade7/grade7_iit_summative_poster_media_design.json"
     },
@@ -717,6 +749,8 @@
         "7"
       ],
       "trimester": "IIIT",
+      "month": "september",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade7/grade7_iiit_summative_spreadsheets.json"
     },
@@ -861,6 +895,8 @@
         "8"
       ],
       "trimester": "IT",
+      "month": "march",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade8/grade8_it_summative_vector_graphics.json"
     },
@@ -1017,6 +1053,8 @@
         "8"
       ],
       "trimester": "IIT",
+      "month": "june",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade8/grade8_iit_summative_arduino_basics.json"
     },
@@ -1173,6 +1211,8 @@
         "8"
       ],
       "trimester": "IIIT",
+      "month": "september",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade8/grade8_iiit_summative_app_design.json"
     },
@@ -1317,6 +1357,8 @@
         "9"
       ],
       "trimester": "IT",
+      "month": "march",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade9/grade9_it_summative_physical_computing.json"
     },
@@ -1347,12 +1389,14 @@
     {
       "id": "grade9_it_april_week4_button_toggle",
       "subjectSlug": "technology",
-      "name": "Grade 9 IT Practice: April Week 4 - Button Toggle",
+      "name": "Grade 9 IT Practice: March Week 4 - Button Toggle",
       "description": "Practice words for Grade 9 first-trimester physical computing work.",
       "grades": [
         "9"
       ],
       "trimester": "IT",
+      "month": "march",
+      "week": 4,
       "purpose": "practice",
       "path": "vocabularies/grade9/grade9_it_april_week4_button_toggle.json"
     },
@@ -1473,6 +1517,8 @@
         "9"
       ],
       "trimester": "IIT",
+      "month": "june",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade9/grade9_iit_summative_python_data.json"
     },
@@ -1617,6 +1663,8 @@
         "9"
       ],
       "trimester": "IIIT",
+      "month": "september",
+      "week": 1,
       "purpose": "summative",
       "path": "vocabularies/grade9/grade9_iiit_summative_digital_media.json"
     },

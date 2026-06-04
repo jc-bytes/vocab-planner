@@ -25,7 +25,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem in code.",
-      "example": "Students used debug during the project.",
+      "example": "The team debugged the code after the signal did not appear.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "retest",
       "definition": "To test again after making a change.",
-      "example": "Students used retest during the project.",
+      "example": "The team retested after changing the threshold.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "stable",
       "definition": "Working in a steady and dependable way.",
-      "example": "Students used stable during the project.",
+      "example": "The system was stable when it worked three times in a row.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "unstable",
       "definition": "Not working in a steady or dependable way.",
-      "example": "Students used unstable during the project.",
+      "example": "The system was unstable when the signal changed randomly.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "adjustment",
       "definition": "A small change made to improve something.",
-      "example": "Students used adjustment during the project.",
+      "example": "A small adjustment made the threshold more accurate.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "logbook",
       "definition": "A record of tests, changes, and notes.",
-      "example": "Students used logbook during the project.",
+      "example": "The logbook recorded the problem, change, and retest result.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

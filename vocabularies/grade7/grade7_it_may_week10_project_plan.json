@@ -25,7 +25,7 @@
     {
       "word": "goal",
       "definition": "What you are trying to achieve.",
-      "example": "Students used goal during the project.",
+      "example": "The goal was to make the robot finish the maze safely.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "sensor",
       "definition": "A part that detects information from the environment.",
-      "example": "Students used sensor during the project.",
+      "example": "The sensor detected when the robot was near a wall.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "sequence",
       "definition": "Steps in the correct order.",
-      "example": "Students used sequence during the project.",
+      "example": "The sequence showed the order of movements.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "teamwork",
       "definition": "Working together with others.",
-      "example": "Students used teamwork during the project.",
+      "example": "Teamwork helped one student code while another measured.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "responsibility",
       "definition": "Taking care of your part of the work.",
-      "example": "Students used responsibility during the project.",
+      "example": "Each member had responsibility for coding, testing, or notes.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "evidence",
       "definition": "Information that shows what happened or supports an idea.",
-      "example": "Students used evidence during the project.",
+      "example": "The evidence included a video of the robot completing the route.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

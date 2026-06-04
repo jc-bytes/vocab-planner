@@ -25,7 +25,7 @@
     {
       "word": "state",
       "definition": "The current condition of something.",
-      "example": "Students used state during the class activity.",
+      "example": "The state changed from off to on after the button press.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "serial",
       "definition": "A way for a device and computer to send messages.",
-      "example": "Students used serial during the class activity.",
+      "example": "Serial messages showed the button state on the computer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "send",
       "definition": "To move information to another place.",
-      "example": "Students used send during the class activity.",
+      "example": "The Arduino sent a message when the button changed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "receive",
       "definition": "To get information from another place.",
-      "example": "Students used receive during the class activity.",
+      "example": "The computer received the serial message from the board.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "monitor",
       "definition": "A screen or tool used to watch information.",
-      "example": "Students used monitor during the class activity.",
+      "example": "The serial monitor displayed each test reading.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "baud rate",
       "definition": "The speed used for serial messages.",
-      "example": "Students used baud rate during the class activity.",
+      "example": "The baud rate matched the speed set in the code.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "message",
       "definition": "Information sent or shown.",
-      "example": "Students used message during the class activity.",
+      "example": "The message said whether the LED was on or off.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem.",
-      "example": "Students used debug during the class activity.",
+      "example": "Debugging showed that the button wire was in the wrong row.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

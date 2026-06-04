@@ -25,7 +25,7 @@
     {
       "word": "maze",
       "definition": "A path challenge with turns and obstacles.",
-      "example": "Students used maze during the project.",
+      "example": "The maze had turns, walls, and checkpoints for the robot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "route",
       "definition": "The planned path to follow.",
-      "example": "Students used route during the project.",
+      "example": "The route avoided the obstacle and reached the finish.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "checkpoint",
       "definition": "A place used to check progress on a route.",
-      "example": "Students used checkpoint during the project.",
+      "example": "Each checkpoint helped the team test part of the maze.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "obstacle",
       "definition": "Something that blocks the way.",
-      "example": "Students used obstacle during the project.",
+      "example": "The obstacle showed where the robot needed to turn.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "prototype",
       "definition": "An early version used for testing.",
-      "example": "Students used prototype during the project.",
+      "example": "The prototype maze used tape lines on the floor.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "algorithm",
       "definition": "A clear set of steps to solve a problem.",
-      "example": "Students used algorithm during the project.",
+      "example": "The algorithm listed the exact moves to finish the maze.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

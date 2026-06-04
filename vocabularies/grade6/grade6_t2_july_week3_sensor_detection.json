@@ -1,7 +1,7 @@
 {
   "id": "grade6_t2_july_week3_sensor_detection",
   "subjectSlug": "technology",
-  "name": "Grade 6 T2 Practice: July Week 3 - Sensor Detection",
+  "name": "Grade 6 T2 Practice: July Week 7 - Sensor Detection",
   "description": "Practice words for sensors, inputs, and responses.",
   "grades": [
     "6"
@@ -70,5 +70,7 @@
       "synonyms": [],
       "antonyms": []
     }
-  ]
+  ],
+  "month": "july",
+  "week": 7
 }

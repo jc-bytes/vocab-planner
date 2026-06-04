@@ -5,6 +5,14 @@ import { IMAGE_HOTSPOT_TYPE } from '../activityImageHotspot.js';
 import { EXTERNAL_ARTIFACT_TYPE } from '../activityExternalArtifact.js';
 import { FLOWCHART_ALGORITHM_TYPE } from '../activityFlowchartAlgorithm.js';
 
+const TASK_SUMMARY_LIMIT = 150;
+
+function getCompactTaskSummary(value = '', fallback = '') {
+    const text = String(value || fallback || '').trim();
+    if (text.length <= TASK_SUMMARY_LIMIT) return text;
+    return `${text.slice(0, TASK_SUMMARY_LIMIT - 3).trim()}...`;
+}
+
 export const studentClassroomActivityMountDetailsMethods = {
     async showAssignment(assignmentId) {
         this.sm.cleanupActivity();
@@ -37,17 +45,6 @@ export const studentClassroomActivityMountDetailsMethods = {
             if (el) el.textContent = text || '';
         };
 
-        const lateState = this.getLateState(assignment, submission);
-        const metaParts = [
-            assignment.weekLabel,
-            this.formatAvailableDate(assignment.availableFrom),
-            this.formatDueDate(assignment.dueDate),
-            assignment.estimatedMinutes ? `${assignment.estimatedMinutes} min` : ''
-        ].filter(Boolean);
-
-        setText('#student-classroom-activity-title', assignment.title);
-        setText('#student-classroom-activity-meta', metaParts.join(' · '));
-        setText('#student-classroom-activity-description', assignment.description);
         const defaultInstruction = assignment.activityType === CARD_SORT_TYPE
             ? 'Complete the card sort activity.'
             : (assignment.activityType === SPREADSHEET_TABLE_TYPE
@@ -70,9 +67,36 @@ export const studentClassroomActivityMountDetailsMethods = {
                         : (assignment.activityType === FLOWCHART_ALGORITHM_TYPE
                             ? 'Completed flowchart with checklist and reflection'
                             : 'Canvas response'))));
+        const lateState = this.getLateState(assignment, submission);
+        const statusLabel = submission.status === 'submitted' ? 'Submitted' : 'Draft ready';
+        const metaParts = [
+            this.formatDueDate(assignment.dueDate),
+            lateState.label || statusLabel,
+            assignment.weekLabel
+        ].filter(Boolean);
+        const timingParts = [
+            assignment.weekLabel,
+            this.formatAvailableDate(assignment.availableFrom),
+            this.formatDueDate(assignment.dueDate),
+            assignment.estimatedMinutes ? `${assignment.estimatedMinutes} min` : ''
+        ].filter(Boolean);
+        const taskSummary = getCompactTaskSummary(
+            assignment.description || assignment.studentInstructions,
+            defaultInstruction
+        );
+
+        setText('#student-classroom-activity-title', assignment.title);
+        setText('#student-classroom-activity-meta', metaParts.join(' · '));
+        setText('#student-classroom-activity-task-summary', taskSummary);
+        setText('#student-classroom-activity-timing', timingParts.join(' · '));
+        setText('#student-classroom-activity-description', assignment.description || 'No description provided.');
         setText('#student-classroom-activity-instructions', assignment.studentInstructions || defaultInstruction);
         setText('#student-classroom-activity-materials', assignment.materials || 'No materials listed.');
         setText('#student-classroom-activity-output', assignment.studentOutput || defaultOutput);
+        const timingBlock = $('#student-classroom-activity-timing-block');
+        if (timingBlock) timingBlock.hidden = timingParts.length === 0;
+        const details = $('.student-classroom-details-disclosure');
+        if (details) details.open = false;
         this.renderLateBanner(lateState);
         this.setSaveStatus(submission.status === 'submitted'
             ? `${lateState.label ? `${lateState.label}. ` : ''}Submitted. You can still edit and resubmit.`

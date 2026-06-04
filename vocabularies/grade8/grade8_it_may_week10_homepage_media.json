@@ -25,7 +25,7 @@
     {
       "word": "homepage",
       "definition": "The main page of a website.",
-      "example": "Students used homepage during the class activity.",
+      "example": "The homepage introduced the project and linked to the evidence.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "title",
       "definition": "The name of a page or project.",
-      "example": "Students used title during the class activity.",
+      "example": "The title told visitors the name of the campaign.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "purpose",
       "definition": "The reason something is made.",
-      "example": "Students used purpose during the class activity.",
+      "example": "The purpose explained why the website was made.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "caption",
       "definition": "Short text that explains an image.",
-      "example": "Students used caption during the class activity.",
+      "example": "The caption explained what the screenshot showed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "media",
       "definition": "Images, video, sound, or other digital content.",
-      "example": "Students used media during the class activity.",
+      "example": "The media section included an image and a short video.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "video",
       "definition": "Moving images with or without sound.",
-      "example": "Students used video during the class activity.",
+      "example": "The video showed the project steps in order.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "accessibility",
       "definition": "Making something usable by more people.",
-      "example": "Students used accessibility during the class activity.",
+      "example": "Alt text improved accessibility for the campaign image.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []

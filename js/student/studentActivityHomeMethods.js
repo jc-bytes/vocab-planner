@@ -38,7 +38,10 @@ class StudentActivityHomeMethods {
 
         this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
-        const { vocabs, message } = this.getVisibleVocabularyList({ currentTrimesterOnly: true });
+        const { vocabs, message } = this.getVisibleVocabularyList({
+            availableOnly: true,
+            currentTrimesterOnly: true
+        });
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p class="teacher-empty-state">${message}</p>`;

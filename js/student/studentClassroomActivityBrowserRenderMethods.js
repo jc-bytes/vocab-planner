@@ -1,6 +1,27 @@
 import { createElement, escapeHtml } from '../main.js';
 import { THIS_WEEK_SECTION } from './studentClassroomActivityBrowserConstants.js';
 
+const CLASSROOM_CARD_TEXT_LIMIT = 160;
+
+function getStudentAssignmentStatusLabel(status = '') {
+    if (status === 'not-started') return 'Not started';
+    if (status === 'draft') return 'In progress';
+    if (status === 'submitted') return 'Submitted';
+    return String(status || 'Not started').replace(/-/g, ' ');
+}
+
+function getStudentAssignmentActionLabel(status = '') {
+    if (status === 'submitted') return 'Review';
+    if (status === 'draft') return 'Continue';
+    return 'Start';
+}
+
+function getCompactClassroomText(value = '', fallback = '') {
+    const text = String(value || fallback || '').trim();
+    if (text.length <= CLASSROOM_CARD_TEXT_LIMIT) return text;
+    return `${text.slice(0, CLASSROOM_CARD_TEXT_LIMIT - 3).trim()}...`;
+}
+
 export const studentClassroomActivityBrowserRenderMethods = {
     createClassroomBreadcrumbButton(label, onClick) {
         const button = createElement('button', 'teacher-library-crumb-btn', label);
@@ -62,7 +83,10 @@ export const studentClassroomActivityBrowserRenderMethods = {
         const text = createElement('span', 'teacher-library-choice-text');
         text.appendChild(createElement('strong', null, title));
         text.appendChild(createElement('span', 'teacher-library-choice-count', count));
-        if (meta) text.appendChild(createElement('small', null, meta));
+        if (meta) {
+            text.appendChild(createElement('small', 'student-classroom-folder-meta', meta));
+            card.title = meta;
+        }
         card.appendChild(text);
 
         if (icon) {
@@ -77,8 +101,9 @@ export const studentClassroomActivityBrowserRenderMethods = {
     renderClassroomOverview(container, assignments) {
         this.renderClassroomBreadcrumb(container);
 
-        const thisWeekAssignments = this.getThisWeekAssignments(assignments);
-        const trimesterGroups = this.buildClassroomTrimesterGroups(assignments);
+        const visibleAssignments = this.filterClassroomAssignmentsForCurrentWindow(assignments);
+        const thisWeekAssignments = this.getThisWeekAssignments(visibleAssignments);
+        const trimesterGroups = this.buildClassroomTrimesterGroups(visibleAssignments);
         const grid = createElement('div', 'teacher-library-choice-grid');
 
         const thisWeekCard = this.createClassroomChoiceCard({
@@ -191,28 +216,47 @@ export const studentClassroomActivityBrowserRenderMethods = {
         container.classList.add('teacher-library-browser');
         container.innerHTML = '';
 
+        const visibleAssignments = this.filterClassroomAssignmentsForCurrentWindow(assignments);
         const drilldown = this.normalizeClassroomDrilldown(route);
         this.sm.studentClassroomActivityDrilldown = drilldown;
+
+        if (visibleAssignments.length === 0) {
+            this.renderClassroomBreadcrumb(container);
+            container.appendChild(createElement('p', 'student-empty-state', 'No current activities are available yet.'));
+            return;
+        }
 
         if (drilldown.section === THIS_WEEK_SECTION) {
             this.renderClassroomBreadcrumb(container, drilldown);
             this.renderClassroomAssignmentGrid(
                 container,
-                this.getThisWeekAssignments(assignments),
+                this.getThisWeekAssignments(visibleAssignments),
                 'No activities for this week.'
             );
             return;
         }
 
-        const trimesterGroups = this.buildClassroomTrimesterGroups(assignments);
+        const trimesterGroups = this.buildClassroomTrimesterGroups(visibleAssignments);
         if (!drilldown.trimester || !trimesterGroups.has(drilldown.trimester)) {
+            const currentTrimester = this.getCurrentClassroomWindow().trimester;
+            if (trimesterGroups.has(currentTrimester)) {
+                this.sm.studentClassroomActivityDrilldown = {
+                    section: null,
+                    trimester: currentTrimester,
+                    month: null,
+                    week: null
+                };
+                this.renderClassroomMonthPicker(container, currentTrimester, trimesterGroups.get(currentTrimester));
+                return;
+            }
+
             this.sm.studentClassroomActivityDrilldown = {
                 section: null,
                 trimester: null,
                 month: null,
                 week: null
             };
-            this.renderClassroomOverview(container, assignments);
+            this.renderClassroomOverview(container, visibleAssignments);
             return;
         }
 
@@ -251,21 +295,53 @@ export const studentClassroomActivityBrowserRenderMethods = {
         const submission = savedSubmission?.id ? savedSubmission : null;
         const status = submission?.status || 'not-started';
         const lateState = this.getLateState(assignment, submission);
-        const card = createElement('button', `card student-classroom-activity-card status-${status} ${lateState.className}`);
-        card.type = 'button';
+        const statusLabel = getStudentAssignmentStatusLabel(status);
+        const actionLabel = getStudentAssignmentActionLabel(status);
+        const dueLabel = this.formatDueDate(assignment.dueDate);
+        const contextLabel = assignment.weekLabel || 'Classroom activity';
+        const fallbackDetail = assignment.description || assignment.studentInstructions || 'Open the classroom activity.';
+        const description = getCompactClassroomText(assignment.description, fallbackDetail);
+        const instructions = getCompactClassroomText(assignment.studentInstructions, fallbackDetail);
+        const hasDescription = Boolean(assignment.description);
+        const hasInstructions = Boolean(assignment.studentInstructions);
+        const card = createElement('article', `card student-classroom-activity-card status-${status} ${lateState.className}`);
         card.dataset.assignmentId = assignment.id;
         card.innerHTML = `
-            <span class="student-activity-status">${escapeHtml(status === 'not-started' ? 'Not started' : status)}</span>
-            <h3>${escapeHtml(assignment.title)}</h3>
-            <p>${escapeHtml(assignment.description || assignment.studentInstructions || 'Open the canvas activity.')}</p>
-            <span class="student-activity-date-stack">
-                ${assignment.weekLabel ? `<small>${escapeHtml(assignment.weekLabel)}</small>` : ''}
-                <small>${escapeHtml(this.formatDueDate(assignment.dueDate))}</small>
-                ${lateState.label ? `<span class="student-activity-late-label ${escapeHtml(lateState.className)}">${escapeHtml(lateState.label)}</span>` : ''}
-            </span>
+            <div class="student-classroom-card-main">
+                <span class="student-activity-card-topline">
+                    <span class="student-activity-status">${escapeHtml(statusLabel)}</span>
+                    <span class="student-activity-due-chip">${escapeHtml(dueLabel)}</span>
+                    ${lateState.label ? `<span class="student-activity-late-label ${escapeHtml(lateState.className)}">${escapeHtml(lateState.label)}</span>` : ''}
+                </span>
+                <h3>${escapeHtml(assignment.title)}</h3>
+                <small class="student-activity-context">${escapeHtml(contextLabel)}</small>
+                <button class="student-classroom-card-open" type="button">${escapeHtml(actionLabel)}</button>
+            </div>
+            <details class="student-classroom-card-details">
+                <summary>Details</summary>
+                <div class="student-classroom-card-detail-copy">
+                    ${hasDescription ? `<span><strong>Description</strong>${escapeHtml(description)}</span>` : ''}
+                    ${hasInstructions ? `<span><strong>Instructions</strong>${escapeHtml(instructions)}</span>` : ''}
+                    ${!hasDescription && !hasInstructions ? `<span>${escapeHtml(fallbackDetail)}</span>` : ''}
+                </div>
+            </details>
         `;
-        card.addEventListener('click', () => {
+        const openAssignment = () => {
             this.sm.navigateTo({ view: 'classroom-activity', assignmentId: assignment.id });
+        };
+        card.querySelector('.student-classroom-card-open')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openAssignment();
+        });
+        card.querySelector('.student-classroom-card-details')?.addEventListener('click', event => {
+            event.stopPropagation();
+        });
+        card.querySelector('.student-classroom-card-details')?.addEventListener('keydown', event => {
+            event.stopPropagation();
+        });
+        card.addEventListener('click', (event) => {
+            if (event.target.closest('.student-classroom-card-details, .student-classroom-card-open')) return;
+            openAssignment();
         });
         container.appendChild(card);
     }

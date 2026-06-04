@@ -7,6 +7,8 @@
     "9"
   ],
   "trimester": "IIT",
+  "month": "june",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "Python",
       "definition": "A programming language used for coding.",
-      "example": "Students used Python during the class activity.",
+      "example": "The student wrote a Python program to store and print class data.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "list",
       "definition": "A group of related items stored together.",
-      "example": "Students used list during the class activity.",
+      "example": "The list stored the names of the project materials.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "item",
       "definition": "One thing in a list.",
-      "example": "Students used item during the class activity.",
+      "example": "Each item in the list represented one survey answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "index",
       "definition": "A position number in a list.",
-      "example": "Students used index during the class activity.",
+      "example": "The student used index 0 to get the first item in the list.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "string",
       "definition": "Text stored in a program.",
-      "example": "Students used string during the class activity.",
+      "example": "The student's name was stored as a string in the program.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "loop",
       "definition": "Code that repeats.",
-      "example": "Students used loop during the class activity.",
+      "example": "The loop printed each value from the data list.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "condition",
       "definition": "A rule that can be true or false.",
-      "example": "Students used condition during the class activity.",
+      "example": "The condition checked whether the score was greater than 70.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "data",
       "definition": "Facts or values that can be used or studied.",
-      "example": "Students used data during the class activity.",
+      "example": "The program used survey data to count how many students chose each option.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "value",
       "definition": "Information stored in a variable, cell, or program.",
-      "example": "Students used value during the class activity.",
+      "example": "The variable stored the value entered by the user.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the class activity.",
+      "example": "The output showed the final count on the screen.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

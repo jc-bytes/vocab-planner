@@ -94,6 +94,93 @@ export const studentClassroomActivityPlanningMethods = {
         };
     },
 
+    getCurrentClassroomWindow(date = new Date()) {
+        const currentDate = date instanceof Date && !Number.isNaN(date.getTime())
+            ? date
+            : new Date();
+        const month = Object.entries(MONTH_ORDER)
+            .find(([, order]) => order === currentDate.getMonth() + 1)?.[0] || 'unscheduled';
+        const trimester = this.sm.activities?.getCurrentTrimesterKey?.(currentDate)
+            || MONTH_TRIMESTER[month]
+            || 'other';
+
+        return {
+            date: currentDate,
+            trimester,
+            month,
+            monthOrder: currentDate.getMonth() + 1
+        };
+    },
+
+    getDateOnlyStart(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+    },
+
+    getClassroomAssignmentStartDate(assignment = {}, date = new Date()) {
+        const placement = this.getAssignmentPlanningPlacement(assignment);
+        const weekNumber = Number.parseInt(placement.weekOrder, 10);
+        const firstPlacementMonth = String(placement.month || '').split('-')[0];
+        const monthIndex = (MONTH_ORDER[firstPlacementMonth] || 0) - 1;
+        const activities = this.sm.activities;
+
+        if (
+            placement.trimester === 'other'
+            || !Number.isFinite(weekNumber)
+            || weekNumber <= 0
+            || !Number.isFinite(monthIndex)
+            || monthIndex < 0
+        ) {
+            return null;
+        }
+
+        const trimesterDate = activities?.getTrimesterWeekStartDate?.(placement.trimester, weekNumber, date);
+        const alignedTrimesterDate = activities?.alignDateToLabelMonth?.(trimesterDate, firstPlacementMonth) || trimesterDate;
+        if (
+            alignedTrimesterDate instanceof Date
+            && !Number.isNaN(alignedTrimesterDate.getTime())
+            && alignedTrimesterDate.getMonth() === monthIndex
+        ) {
+            return alignedTrimesterDate;
+        }
+
+        const monthWeekDate = activities?.getMonthWeekStartDate?.(firstPlacementMonth, weekNumber, placement.trimester, date);
+        if (monthWeekDate instanceof Date && !Number.isNaN(monthWeekDate.getTime())) {
+            return monthWeekDate;
+        }
+
+        return new Date(date.getFullYear(), monthIndex, 1 + ((weekNumber - 1) * 7), 12);
+    },
+
+    isAssignmentInCurrentClassroomWindow(assignment = {}, date = new Date()) {
+        const window = this.getCurrentClassroomWindow(date);
+        const placement = this.getAssignmentPlanningPlacement(assignment);
+
+        if (placement.trimester === 'other') return true;
+        if (placement.trimester !== window.trimester) return false;
+
+        const scheduledStart = this.getClassroomAssignmentStartDate(assignment, date);
+        if (scheduledStart) {
+            const assignmentStart = this.getDateOnlyStart(scheduledStart);
+            const currentStart = this.getDateOnlyStart(window.date);
+            if (assignmentStart && currentStart) {
+                return assignmentStart <= currentStart;
+            }
+        }
+
+        const firstPlacementMonth = String(placement.month || '').split('-')[0];
+        const assignmentMonthOrder = MONTH_ORDER[firstPlacementMonth] || this.getMonthOrder(placement.month);
+        if (!Number.isFinite(assignmentMonthOrder) || assignmentMonthOrder >= 99) {
+            return true;
+        }
+
+        return assignmentMonthOrder <= window.monthOrder;
+    },
+
+    filterClassroomAssignmentsForCurrentWindow(assignments = [], date = new Date()) {
+        return assignments.filter(assignment => this.isAssignmentInCurrentClassroomWindow(assignment, date));
+    },
+
     buildClassroomTrimesterGroups(assignments = []) {
         return assignments.reduce((groups, assignment) => {
             const placement = this.getAssignmentPlanningPlacement(assignment);

@@ -25,7 +25,7 @@
     {
       "word": "random",
       "definition": "Chosen without a fixed pattern.",
-      "example": "Students used random during the class activity.",
+      "example": "The random choice selected a new question each round.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "import",
       "definition": "To bring a code tool into a program.",
-      "example": "Students used import during the class activity.",
+      "example": "The import line added the random tool to the program.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "elif",
       "definition": "A Python choice used after if and before else.",
-      "example": "Students used elif during the class activity.",
+      "example": "The elif branch checked the second possible answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "branch",
       "definition": "One possible path in a program.",
-      "example": "Students used branch during the class activity.",
+      "example": "Each branch showed a different message.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "loop",
       "definition": "Code that repeats.",
-      "example": "Students used loop during the class activity.",
+      "example": "The loop repeated until the player chose to stop.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "counter",
       "definition": "A variable used to count.",
-      "example": "Students used counter during the class activity.",
+      "example": "The counter tracked how many questions were answered.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "update",
       "definition": "A change made during a loop or process.",
-      "example": "Students used update during the class activity.",
+      "example": "The update added one point after a correct answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "while",
       "definition": "A loop that repeats while a condition is true.",
-      "example": "Students used while during the class activity.",
+      "example": "The while loop kept the quiz running while play was true.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

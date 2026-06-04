@@ -7,6 +7,8 @@
     "6"
   ],
   "trimester": "2",
+  "month": "june",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "robot",
       "definition": "A machine that can follow instructions to do a task.",
-      "example": "The robot moved across the floor.",
+      "example": "The robot followed the taped path across the classroom floor.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "mBot",
       "definition": "A small classroom robot used for coding and testing.",
-      "example": "The mBot followed the route on the tape.",
+      "example": "The team programmed the mBot to stop at the finish marker.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "program",
       "definition": "A set of instructions a computer or robot follows.",
-      "example": "The program told the robot to turn.",
+      "example": "The program made the robot move forward, turn, and stop.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "instruction",
       "definition": "One step that tells a computer or robot what to do.",
-      "example": "The first instruction made the robot move forward.",
+      "example": "The first instruction told the robot to move forward for two seconds.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "safety",
       "definition": "Acting in a way that protects people and materials.",
-      "example": "Safety rules help us use robots carefully.",
+      "example": "The group followed safety rules by keeping hands away from the moving wheels.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "motor",
       "definition": "A part that makes something move.",
-      "example": "The motor turns the wheel.",
+      "example": "The motor turned the left wheel during the robot test.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "wheel",
       "definition": "A round part that helps a robot move.",
-      "example": "The wheel rolled on the floor.",
+      "example": "The wheel slipped, so the team lowered the robot speed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "sensor",
       "definition": "A part that detects something around it.",
-      "example": "The sensor detected an object.",
+      "example": "The sensor detected a box in front of the robot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "LED",
       "definition": "A small light on a device or robot.",
-      "example": "The LED turned red when the program started.",
+      "example": "The LED turned red when the robot reached the warning zone.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "buzzer",
       "definition": "A small part that makes a sound.",
-      "example": "The buzzer made a short beep.",
+      "example": "The buzzer made a short beep after the robot finished the route.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

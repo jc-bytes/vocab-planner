@@ -25,7 +25,7 @@
     {
       "word": "robot goal",
       "definition": "What the robot should do.",
-      "example": "Students used robot goal during the class activity.",
+      "example": "The robot goal was to detect an object and give a warning signal.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "component list",
       "definition": "A list of parts needed for a project.",
-      "example": "Students used component list during the class activity.",
+      "example": "The component list included the sensor, LED, resistor, and buzzer.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "state chart",
       "definition": "A table or diagram showing states and actions.",
-      "example": "Students used state chart during the class activity.",
+      "example": "The state chart showed what the robot should do when the sensor changed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "design plan",
       "definition": "A plan for building and testing a project.",
-      "example": "Students used design plan during the class activity.",
+      "example": "The design plan explained the inputs, outputs, and test steps.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "test step",
       "definition": "One action used to check if something works.",
-      "example": "Students used test step during the class activity.",
+      "example": "The first test step checked whether the sensor reading appeared.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "feedback",
       "definition": "Helpful comments about how to improve.",
-      "example": "Students used feedback during the class activity.",
+      "example": "Peer feedback helped the team simplify the robot goal.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

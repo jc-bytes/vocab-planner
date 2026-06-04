@@ -71,7 +71,7 @@ class TeacherStudentProgressRenderMethods {
                     </div>
                     <div class="student-card-meta">
                         <span>Grade<strong>${details.grade}</strong></span>
-                        <span>Group<strong>${details.group}</strong></span>
+                        <span>Section<strong>${details.group}</strong></span>
                         <span>Coins<strong>${details.coins}</strong></span>
                         <span>Last Active<strong>${details.lastActive}</strong></span>
                     </div>

@@ -83,6 +83,7 @@ export function initTeacherGlobalListeners(manager) {
             manager.activeStudentId = null;
         }
     });
+    setupModal('#add-student-modal', { dismissible: true });
     setupModal('#word-modal', {
         dismissible: true,
         onClose: () => {

@@ -25,7 +25,7 @@
     {
       "word": "addressable LED",
       "definition": "A light that can be controlled separately in a strip or group.",
-      "example": "Students used addressable LED during the class activity.",
+      "example": "The addressable LED strip let the team control one pixel at a time.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "pixel",
       "definition": "One tiny dot in a digital image or display.",
-      "example": "Students used pixel during the class activity.",
+      "example": "The first pixel turned blue while the rest stayed off.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "animation",
       "definition": "A sequence of images or changes that looks like movement.",
-      "example": "Students used animation during the class activity.",
+      "example": "The animation moved a light pattern across the LED strip.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "pattern",
       "definition": "Something that repeats or has a clear order.",
-      "example": "Students used pattern during the class activity.",
+      "example": "The team created a red-blue-red pattern for the warning signal.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "speed",
       "definition": "How fast something happens or moves.",
-      "example": "Students used speed during the class activity.",
+      "example": "The animation speed changed when the delay value changed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "builder",
       "definition": "The person who builds the physical parts.",
-      "example": "Students used builder during the class activity.",
+      "example": "The builder connected the LED strip and checked the wiring.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "coder",
       "definition": "The person who works on the code.",
-      "example": "Students used coder during the class activity.",
+      "example": "The coder edited the loop that controlled the LED pattern.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "tester",
       "definition": "The person who checks if it works.",
-      "example": "Students used tester during the class activity.",
+      "example": "The tester ran the program and recorded what worked.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +89,7 @@
     {
       "word": "recorder",
       "definition": "The person who writes notes or evidence.",
-      "example": "Students used recorder during the class activity.",
+      "example": "The recorder wrote the test result in the project log.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

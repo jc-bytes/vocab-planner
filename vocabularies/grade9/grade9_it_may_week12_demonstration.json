@@ -25,7 +25,7 @@
     {
       "word": "demonstration",
       "definition": "Showing how something works.",
-      "example": "Students used demonstration during the class activity.",
+      "example": "The demonstration showed the sensor triggering the LED and buzzer.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "reflection",
       "definition": "Thinking about what happened and what you learned.",
-      "example": "Students used reflection during the class activity.",
+      "example": "The reflection explained what the team would improve with more time.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "testing evidence",
       "definition": "Proof from tests that shows what happened.",
-      "example": "Students used testing evidence during the class activity.",
+      "example": "The testing evidence included a table with three successful trials.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "state logic",
       "definition": "Rules for how a system changes between states.",
-      "example": "Students used state logic during the class activity.",
+      "example": "The state logic moved the prototype from standby to warning mode.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "project log",
       "definition": "A record of project work and tests.",
-      "example": "Students used project log during the class activity.",
+      "example": "The project log showed each build day and the problem solved.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "presentation",
       "definition": "Sharing work or ideas with others.",
-      "example": "Students used presentation during the class activity.",
+      "example": "The presentation explained the circuit, code, tests, and final result.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

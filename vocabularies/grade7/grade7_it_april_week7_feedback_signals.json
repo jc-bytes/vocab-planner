@@ -25,7 +25,7 @@
     {
       "word": "LED",
       "definition": "A small light that a program can control.",
-      "example": "Students used LED during the project.",
+      "example": "The LED turned on when the robot reached the checkpoint.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "buzzer",
       "definition": "A part that makes a sound.",
-      "example": "Students used buzzer during the project.",
+      "example": "The buzzer sounded after the robot completed the route.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "state",
       "definition": "The current condition of something.",
-      "example": "Students used state during the project.",
+      "example": "The robot state changed from moving to stopped.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "event",
       "definition": "Something that starts an action in a program.",
-      "example": "Students used event during the project.",
+      "example": "Touching the sensor was the event that started the sound.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "signal",
       "definition": "A sign or message sent to show information.",
-      "example": "Students used signal during the project.",
+      "example": "The blinking light was a signal that the robot was ready.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "pattern",
       "definition": "Something that repeats or has a clear order.",
-      "example": "Students used pattern during the project.",
+      "example": "The LED pattern blinked twice before the robot moved.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

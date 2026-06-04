@@ -25,7 +25,7 @@
     {
       "word": "system",
       "definition": "Parts that work together.",
-      "example": "Students used system during the project.",
+      "example": "The robot system used sensors, motors, and code together.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the project.",
+      "example": "The button press was input for the robot program.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
-      "example": "Students used process during the project.",
+      "example": "The process checked the command and chose a movement.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the project.",
+      "example": "The motor movement was the output from the robot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "sequence",
       "definition": "Steps in the correct order.",
-      "example": "Students used sequence during the project.",
+      "example": "The sequence moved forward, turned, and stopped.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem in code.",
-      "example": "Students used debug during the project.",
+      "example": "The team debugged the code when the robot turned too far.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

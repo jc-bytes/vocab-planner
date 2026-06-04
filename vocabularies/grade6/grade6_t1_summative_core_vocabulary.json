@@ -5,6 +5,8 @@
   "description": "Ten core first-trimester words for the Grade 6 summative vocabulary table.",
   "grades": ["6"],
   "trimester": "1",
+  "month": "march",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -23,7 +25,7 @@
     {
       "word": "internet",
       "definition": "A worldwide system that lets computers and people share information.",
-      "example": "We use the internet to visit websites and send messages.",
+      "example": "Students used the internet to open the school website and send a class message.",
       "difficulty": 1,
       "synonyms": ["online network"],
       "antonyms": ["offline"]
@@ -31,7 +33,7 @@
     {
       "word": "website",
       "definition": "A place online with pages of information.",
-      "example": "The class opened a website about recycling.",
+      "example": "The class opened a recycling website and identified its title, menu, and images.",
       "difficulty": 1,
       "synonyms": ["site"],
       "antonyms": []
@@ -39,7 +41,7 @@
     {
       "word": "browser",
       "definition": "An app used to open websites.",
-      "example": "A browser shows the web page on the screen.",
+      "example": "The student used a browser to open the class web page.",
       "difficulty": 1,
       "synonyms": ["web browser"],
       "antonyms": []
@@ -47,7 +49,7 @@
     {
       "word": "address",
       "definition": "A name or number that helps find a place online.",
-      "example": "A website address tells the browser where to go.",
+      "example": "Typing the website address sent the browser to the correct page.",
       "difficulty": 1,
       "synonyms": ["location"],
       "antonyms": []
@@ -55,7 +57,7 @@
     {
       "word": "domain name",
       "definition": "The readable name of a website.",
-      "example": "example.com is a domain name.",
+      "example": "In www.example.com, example.com is the readable domain name.",
       "difficulty": 1,
       "synonyms": ["website name"],
       "antonyms": []
@@ -63,7 +65,7 @@
     {
       "word": "DNS",
       "definition": "A system that helps match a website name to its online address.",
-      "example": "DNS helps the browser find a website.",
+      "example": "DNS matched the domain name to the website server address.",
       "difficulty": 2,
       "synonyms": ["domain name system"],
       "antonyms": []
@@ -71,7 +73,7 @@
     {
       "word": "IP address",
       "definition": "A number address used by computers on a network.",
-      "example": "A website server has an IP address.",
+      "example": "The browser used an IP address to find the computer hosting the website.",
       "difficulty": 2,
       "synonyms": ["number address"],
       "antonyms": []
@@ -79,7 +81,7 @@
     {
       "word": "packet",
       "definition": "A small part of a message sent online.",
-      "example": "A long message can travel as many packets.",
+      "example": "The class message was split into packets before it traveled online.",
       "difficulty": 1,
       "synonyms": ["message part"],
       "antonyms": []
@@ -87,7 +89,7 @@
     {
       "word": "message",
       "definition": "Information sent from one person or place to another.",
-      "example": "The student sent a message to the group.",
+      "example": "The student wrote a message asking the group to check the shared file.",
       "difficulty": 1,
       "synonyms": ["note"],
       "antonyms": []
@@ -95,7 +97,7 @@
     {
       "word": "network",
       "definition": "A group of connected devices that can share information.",
-      "example": "The school network connects computers.",
+      "example": "The school network let the classroom computers share the same printer.",
       "difficulty": 1,
       "synonyms": ["connected devices"],
       "antonyms": []

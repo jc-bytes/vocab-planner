@@ -30,6 +30,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PLANS_ROOT = ROOT / "plans"
 GENERATED_ROOT = PLANS_ROOT / "Generated Assessment Docs 2026"
 GENERATED_RUBRICS_ROOT = PLANS_ROOT / "Generated Rubrics 2026"
+RUBRIC_TEMPLATE = PLANS_ROOT / "Templates" / "Xth grade - XT - Week X - Rubric for Summative X.docx"
+LOGO_PATH = ROOT / "logo.jpeg"
 RENDER_DOCX = (
     Path.home()
     / ".codex/plugins/cache/openai-primary-runtime/documents/26.521.10419/skills/documents/render_docx.py"
@@ -58,6 +60,8 @@ class AppreciationDoc:
     evidence: str
     criteria: tuple[str, ...]
     reflection: str
+    special_form: str = ""
+    template_criteria: tuple[tuple[str, str, str, str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -130,16 +134,17 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
         "IIT",
         6,
         1,
-        "Peer Feedback",
-        "Peer feedback checklist during Scratch loop and variable practice.",
+        "Countdown Program and Constructive Peer Feedback",
+        "Create and submit a Scratch countdown or rhythm-timing program, then evaluate a classmate's program with evidence.",
         (
-            "Gave respectful comments that helped a partner improve.",
-            "Included at least one specific suggestion, not only praise.",
-            "Participated actively in the programming task.",
-            "Responded to feedback by making or planning one improvement.",
-            "Saved or submitted evidence on time.",
+            "Use of class time",
+            "Organization and readiness",
+            "Scratch practice evidence",
+            "Constructive classmate feedback",
+            "Participation and response to feedback",
         ),
-        "What feedback did you use, and what did it help you improve?",
+        "What value did you adjust, and what specific feedback did you give your classmate?",
+        "constructive_peer_feedback",
     ),
     AppreciationDoc(
         "7th",
@@ -147,15 +152,16 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
         8,
         2,
         "Pair Programming Responsibility",
-        "Pair-programming self-reflection from Scratch Dance Game preparation.",
+        "Complete a pair-programming self-reflection, then build a practice dance move with a partner as evidence.",
         (
-            "Used driver and navigator roles fairly.",
-            "Communicated clearly while building or testing a Scratch feature.",
-            "Stayed organized with files, screenshots, or notes.",
-            "Worked with effort during debugging and testing.",
-            "Responded to feedback before project work began.",
+            "Use of class time",
+            "Organization and readiness",
+            "Driver/navigator roles",
+            "Scratch dance practice evidence",
+            "Communication and response to feedback",
         ),
         "Which pair-programming role helped you most, and why?",
+        "pair_programming_reflection",
     ),
     AppreciationDoc(
         "7th",
@@ -236,6 +242,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Returned parts and left the workstation ready.",
         ),
         "What safe build habit prevented or fixed a problem?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Safe material use",
+                "Handles kit, parts, wiring, power and ground, and LED direction safely.",
+                "Uses materials safely with one minor reminder.",
+                "Needs reminders for handling, wiring, or testing.",
+                "Unsafe handling or no safe build evidence.",
+            ),
+            (
+                "Teamwork and roles",
+                "Shares build, code, test, and recorder roles responsibly.",
+                "Usually shares roles and communicates respectfully.",
+                "Roles are uneven or need several reminders.",
+                "Does not participate responsibly.",
+            ),
+            (
+                "Build challenge evidence",
+                "LED or button build is tested and documented with a diagram or photo.",
+                "Build evidence is mostly complete.",
+                "Build evidence is partial or hard to check.",
+                "Build evidence is missing.",
+            ),
+            (
+                "Organization and perseverance",
+                "Keeps parts organized, troubleshoots, and leaves station ready.",
+                "Mostly organized and keeps trying.",
+                "Organization or perseverance needs support.",
+                "Workspace or troubleshooting evidence is poor.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "8th",
@@ -252,6 +289,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Worked safely and respectfully with materials and partners.",
         ),
         "What Arduino problem did you keep working on, and what changed?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Perseverance during testing",
+                "Keeps trying through wiring, code, or upload issues and records result.",
+                "Usually keeps trying and records result.",
+                "Needs support to keep testing or explain.",
+                "Stops without useful testing evidence.",
+            ),
+            (
+                "Organization of evidence",
+                "Diagrams, code, photos, notes, or tests are organized.",
+                "Evidence is mostly organized.",
+                "Evidence is partial or hard to check.",
+                "Evidence is missing.",
+            ),
+            (
+                "Feedback and improvement",
+                "Uses feedback or a checklist to improve build or code.",
+                "Uses feedback for a basic improvement.",
+                "Feedback or improvement is unclear.",
+                "No feedback response or improvement.",
+            ),
+            (
+                "Integrated practice challenge",
+                "Builds and tests one challenge with one input and one output.",
+                "Challenge mostly works.",
+                "Input, output, or test result is incomplete.",
+                "Challenge evidence is missing.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "8th",
@@ -300,6 +368,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Persisted through one test or fix and recorded evidence.",
         ),
         "What lab safety habit should you keep using next class?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Preparation and setup",
+                "Arrives prepared and sets up materials, board, wires, and workspace correctly.",
+                "Usually prepared with one minor setup issue.",
+                "Needs reminders for materials or setup.",
+                "Not prepared or setup cannot be checked.",
+            ),
+            (
+                "Careful material use",
+                "Handles electronics, wires, boards, and workspace safely and carefully.",
+                "Uses materials safely with one minor reminder.",
+                "Needs reminders for careful handling or safety.",
+                "Unsafe material use or no safety evidence.",
+            ),
+            (
+                "Instructions and cleanup",
+                "Follows build instructions and cleans up/returns materials correctly.",
+                "Usually follows instructions and cleans up.",
+                "Needs reminders for instructions or cleanup.",
+                "Does not follow instructions or clean up.",
+            ),
+            (
+                "Persistence and evidence",
+                "Persists through one test or fix and records useful evidence.",
+                "Keeps trying and records basic evidence.",
+                "Testing or fix evidence is incomplete.",
+                "No useful test or fix evidence.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "9th",
@@ -316,14 +415,45 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Used feedback to improve a light, sound, or robotics system.",
         ),
         "What feedback changed your team project or test result?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Communication",
+                "Communicates respectfully during robotics practice and testing.",
+                "Usually communicates respectfully.",
+                "Needs reminders for respectful communication.",
+                "Communication blocks teamwork.",
+            ),
+            (
+                "Shared responsibility",
+                "Shares builder, coder, tester, or recorder roles fairly.",
+                "Usually shares roles fairly.",
+                "Roles are uneven or unclear.",
+                "Does not share team responsibility.",
+            ),
+            (
+                "Testing evidence",
+                "Tests carefully and records useful evidence for the light, sound, or robotics system.",
+                "Testing evidence is mostly complete.",
+                "Testing evidence is partial or unclear.",
+                "Testing evidence is missing.",
+            ),
+            (
+                "Feedback and improvement",
+                "Uses feedback to improve the system or explain a better test result.",
+                "Uses feedback for a basic improvement.",
+                "Feedback response is unclear.",
+                "No feedback response or improvement.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "9th",
         "IIT",
         6,
         1,
-        "Data Collaboration and Care",
-        "Checklist about responsibility, communication, shared work, data care, and persistence during data cleaning.",
+        "Data Cleaning Collaboration and Care",
+        "Checklist about responsibility, communication, shared work, data care, and persistence during data cleaning and change-log work.",
         (
             "Handled data responsibly and avoided careless changes.",
             "Communicated clearly during data cleaning or review.",
@@ -332,14 +462,45 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Persisted through errors, missing values, or unclear results.",
         ),
         "What data-care choice made the dataset more trustworthy?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Responsible data handling",
+                "Handles data carefully and avoids careless or harmful changes.",
+                "Usually handles data responsibly.",
+                "Needs reminders for data care.",
+                "Data handling is careless or unsafe.",
+            ),
+            (
+                "Data-cleaning collaboration",
+                "Communicates clearly and shares data-cleaning work fairly.",
+                "Usually communicates and shares work fairly.",
+                "Shared work or communication is uneven.",
+                "Does not collaborate responsibly.",
+            ),
+            (
+                "Data-cleaning evidence",
+                "Records at least three cleaned values or clear change-log evidence.",
+                "Records most required change evidence.",
+                "Change evidence is partial or hard to check.",
+                "Change evidence is missing.",
+            ),
+            (
+                "Organization and persistence",
+                "Keeps dataset, chart, notes, or model evidence organized while solving errors.",
+                "Mostly organized and keeps trying.",
+                "Organization or persistence needs support.",
+                "Evidence is disorganized or incomplete.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "9th",
         "IIT",
         9,
         2,
-        "Effort and Organization",
-        "Self-reflection about effort, organization, responsible data use, deadlines, and response to feedback.",
+        "Data Project Readiness and Planning",
+        "Self-reflection about effort, organization, responsible data use, deadlines, and response to feedback during data project planning.",
         (
             "Used class time well during the data unit.",
             "Kept files, datasets, charts, and notes organized.",
@@ -348,6 +509,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Responded to feedback before the data exam project.",
         ),
         "What organization habit will help your data project most?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Data project planning effort",
+                "Uses class time well and stays focused during data project planning.",
+                "Usually focused and productive.",
+                "Needs reminders to use time well.",
+                "Does not use class time productively.",
+            ),
+            (
+                "Project evidence organization",
+                "Files, datasets, charts, notes, and project plan are organized.",
+                "Evidence is mostly organized.",
+                "Organization is partial or hard to check.",
+                "Organization evidence is missing.",
+            ),
+            (
+                "Responsible data use",
+                "Uses data responsibly, protects privacy, and names dataset source.",
+                "Mostly responsible data use.",
+                "Needs reminders for source or privacy care.",
+                "Data use is irresponsible or unclear.",
+            ),
+            (
+                "Deadlines, feedback, and plan",
+                "Project plan meets deadlines and uses feedback before the data exam project.",
+                "Mostly on time and responds to feedback.",
+                "Deadline or feedback response is incomplete.",
+                "No project plan, deadline plan, or feedback response.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "9th",
@@ -364,6 +556,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Used feedback to improve a comparison, checklist, or plan.",
         ),
         "Which digital responsibility habit protects people or data?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Respectful communication",
+                "Communicates respectfully during cybersecurity and STEM work.",
+                "Usually communicates respectfully.",
+                "Needs reminders for respectful communication.",
+                "Communication is unsafe or disrespectful.",
+            ),
+            (
+                "Source care",
+                "Handles sources and online information responsibly and checks credibility.",
+                "Mostly responsible with sources.",
+                "Source care is partial or unclear.",
+                "Source care evidence is missing.",
+            ),
+            (
+                "Privacy and account safety",
+                "Protects privacy and uses accounts safely during class tasks.",
+                "Mostly protects privacy and accounts.",
+                "Needs reminders for privacy or account safety.",
+                "Unsafe account or privacy behavior.",
+            ),
+            (
+                "Participation and improvement",
+                "Participates actively and uses feedback to improve work.",
+                "Usually participates and responds to feedback.",
+                "Participation or feedback response is incomplete.",
+                "No useful participation or improvement evidence.",
+            ),
+        ),
     ),
     AppreciationDoc(
         "9th",
@@ -380,6 +603,37 @@ APPRECIATION_DOCS: tuple[AppreciationDoc, ...] = (
             "Responded to feedback before project building.",
         ),
         "What STEM project habit will you focus on during the build?",
+        special_form="official_appreciation_template",
+        template_criteria=(
+            (
+                "Effort and planning",
+                "Shows effort and completes task list, team roles, build schedule, and outline.",
+                "Planning evidence is mostly complete.",
+                "Planning evidence is partial or unclear.",
+                "Planning evidence is missing.",
+            ),
+            (
+                "Organization",
+                "Keeps logbook, files, materials, or project evidence organized.",
+                "Evidence is mostly organized.",
+                "Organization is inconsistent.",
+                "Evidence is missing or disorganized.",
+            ),
+            (
+                "Safe material/tool use",
+                "Uses project materials, tools, or approved software safely.",
+                "Mostly uses materials/tools safely.",
+                "Needs reminders for safe tool use.",
+                "Unsafe material or tool use.",
+            ),
+            (
+                "Perseverance and feedback",
+                "Persists through design difficulty and responds to feedback before building.",
+                "Usually keeps trying and uses feedback.",
+                "Perseverance or feedback response is incomplete.",
+                "No useful feedback response or persistence evidence.",
+            ),
+        ),
     ),
 )
 
@@ -662,12 +916,34 @@ RUBRIC_DOC = RubricDoc(
     "Arduino Basics Vocabulary Table",
     "Vocabulary table with definitions, illustrations, and example sentences for Arduino, Freenove, microcontroller, circuit, breadboard, pin, power, ground, resistor, and LED.",
     (
-        ("Definitions", "Definitions are accurate and student-friendly.", "Most definitions are accurate.", "Some definitions are incomplete or unclear.", "Definitions are missing or mostly incorrect."),
-        ("Illustrations", "Illustrations or diagrams match the words clearly.", "Most illustrations match.", "Some illustrations are missing or unclear.", "Illustrations are missing or unrelated."),
-        ("Example sentences", "Sentences use each word correctly in context.", "Most sentences use the words correctly.", "Some sentences are incomplete or vague.", "Sentences are missing or incorrect."),
-        ("Arduino/Freenove accuracy", "Board, circuit, power, ground, resistor, and LED ideas are correct.", "Most hardware ideas are correct.", "Some hardware ideas are confused.", "Hardware ideas are mostly incorrect."),
-        ("Organization and submission", "Table is complete, readable, organized, and on time.", "Table is mostly complete and readable.", "Table is hard to read or missing parts.", "Table is not submitted or cannot be checked."),
-        ("Readiness and responsibility", "Student is prepared, focused, and safe.", "Student is usually prepared.", "Student needs reminders.", "Student is not prepared or focused."),
+        (
+            "Vocabulary completion and definitions",
+            "All 10 words have accurate, student-friendly definitions.",
+            "Most definitions are accurate.",
+            "Some definitions are missing or unclear.",
+            "Definitions are mostly missing or incorrect.",
+        ),
+        (
+            "Illustrations or diagrams",
+            "Each word has a relevant illustration or diagram.",
+            "Most illustrations match the words.",
+            "Some illustrations are missing or unclear.",
+            "Illustrations are mostly missing or unrelated.",
+        ),
+        (
+            "Example sentences",
+            "Sentences use each word in a clear Arduino or Freenove context.",
+            "Most sentences use the words correctly.",
+            "Some sentences are incomplete or vague.",
+            "Sentences are mostly missing or incorrect.",
+        ),
+        (
+            "Hardware accuracy",
+            "Board, circuit, breadboard, pin, power, ground, resistor, and LED ideas are correct.",
+            "Most hardware ideas are correct.",
+            "Some hardware ideas are confused.",
+            "Hardware ideas are mostly incorrect.",
+        ),
     ),
 )
 
@@ -723,6 +999,61 @@ def set_cell_text(cell, text: str, bold: bool = False, size: int = 12) -> None:
     cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
 
 
+def set_cell_lines(cell, lines: Iterable[str], bold: bool = False, align: int | None = None) -> None:
+    cell.text = ""
+    paragraphs = cell.paragraphs
+    for index, line in enumerate(lines):
+        paragraph = paragraphs[0] if index == 0 else cell.add_paragraph()
+        if align is not None:
+            paragraph.alignment = align
+        run = paragraph.add_run(line)
+        run.bold = bold
+        run.font.name = "Arial"
+        run.font.size = Pt(12)
+        paragraph.paragraph_format.space_after = Pt(0)
+    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+
+def set_template_rubric_row(row, values: tuple[str, str, str, str, str]) -> None:
+    # The official template merges duplicate 7-point and 5-point cells.
+    for cell_index, value in zip((0, 1, 2, 4, 6), values):
+        set_cell_text(row.cells[cell_index], value)
+
+
+def set_template_punctuality_row(row) -> None:
+    set_cell_lines(row.cells[0], ("Punctuality,", "Readiness &", "Respect"), bold=True, align=WD_ALIGN_PARAGRAPH.CENTER)
+    set_cell_text(row.cells[1], "On time, prepared, and has needed resources.")
+    set_cell_text(row.cells[3], "Submitted, but late/incomplete or missing a needed resource.")
+    set_cell_text(row.cells[5], "Not submitted on time or not prepared.")
+
+
+def enforce_arial_12(doc: Document) -> None:
+    blocks = list(doc.paragraphs)
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                blocks.extend(cell.paragraphs)
+    for paragraph in blocks:
+        paragraph.paragraph_format.space_after = Pt(0)
+        for run in paragraph.runs:
+            if not run.text:
+                continue
+            run.font.name = "Arial"
+            run.font.size = Pt(12)
+            run_properties = run._element.get_or_add_rPr()
+            run_fonts = run_properties.find(qn("w:rFonts"))
+            if run_fonts is None:
+                run_fonts = OxmlElement("w:rFonts")
+                run_properties.append(run_fonts)
+            for key in ("w:ascii", "w:hAnsi", "w:cs"):
+                run_fonts.set(qn(key), "Arial")
+            size_cs = run_properties.find(qn("w:szCs"))
+            if size_cs is None:
+                size_cs = OxmlElement("w:szCs")
+                run_properties.append(size_cs)
+            size_cs.set(qn("w:val"), "24")
+
+
 def format_document(doc: Document, *, landscape: bool = False) -> None:
     section = doc.sections[0]
     if landscape:
@@ -775,6 +1106,12 @@ def add_bullets(doc: Document, items: Iterable[str]) -> None:
 
 
 def add_header_block(doc: Document, title: str, grade: str, trimester: str, subtitle: str, score: str) -> None:
+    if LOGO_PATH.exists():
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_after = Pt(0)
+        run = p.add_run()
+        run.add_picture(str(LOGO_PATH), width=Inches(0.42))
     add_heading(doc, "Academia Internacional David", 13)
     add_heading(doc, "Robotics and Technology", 12)
     add_heading(doc, title, 14)
@@ -821,12 +1158,207 @@ def add_appreciation_table(doc: Document, criteria: tuple[str, ...]) -> None:
             set_cell_text(cell, value)
 
 
+def add_constructive_feedback_appreciation_rubric(doc: Document) -> None:
+    add_section_heading(doc, "Rubric")
+    table = doc.add_table(rows=1, cols=5)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = True
+    headers = ["Criteria", "4 pts", "3 pts", "2 pts", "1 pt"]
+    for cell, header in zip(table.rows[0].cells, headers):
+        set_cell_text(cell, header, bold=True)
+        set_cell_shading(cell, "D9EAF7")
+
+    rows = [
+        (
+            "Use of class time",
+            "Starts promptly, stays focused, and uses coding and feedback time responsibly.",
+            "Usually focused and uses time well, with only one small reminder.",
+            "Needs several reminders; some class time is not used for the assigned work.",
+            "Often off task or does not complete the assigned work during class.",
+        ),
+        (
+            "Organization and readiness",
+            "Materials, login, Scratch file, and evidence are ready, saved, and easy to check.",
+            "Mostly prepared and organized, with one minor file, material, or submission issue.",
+            "Organization issues make evidence harder to check or require teacher support.",
+            "Missing readiness, organization, or submission evidence.",
+        ),
+        (
+            "Scratch practice evidence",
+            "Program evidence shows a loop, variable, timing test, and one adjusted value.",
+            "Program shows most required parts, with one minor missing or unclear detail.",
+            "Program is started, but loop, variable, test, or adjustment evidence is incomplete.",
+            "Program evidence is missing or too unclear to support the grade.",
+        ),
+        (
+            "Constructive classmate feedback",
+            "Feedback names an observed strength and a specific suggestion in a respectful tone.",
+            "Feedback is respectful and useful but needs more specific evidence or explanation.",
+            "Feedback is mostly general praise or unclear advice with limited evidence.",
+            "Feedback is missing, disrespectful, or does not help the classmate improve.",
+        ),
+        (
+            "Participation and response to feedback",
+            "Actively evaluates a classmate and records the response, change, or next step.",
+            "Completes the evaluation and records a basic response, change, or next step.",
+            "Evaluation or response is incomplete and needs teacher support.",
+            "Does not complete the peer-evaluation process.",
+        ),
+    ]
+    for values in rows:
+        row = table.add_row()
+        for cell, value in zip(row.cells, values):
+            set_cell_text(cell, value)
+
+
+def add_constructive_feedback_questions(doc: Document) -> None:
+    doc.add_page_break()
+    add_heading(doc, "Constructive Peer Feedback Questions", 14)
+    p = doc.add_paragraph(
+        "Constructive criticism is specific, respectful, and useful. Use evidence from the program, then give one clear suggestion."
+    )
+    p.runs[0].font.name = "Arial"
+    p.runs[0].font.size = Pt(12)
+
+    table = doc.add_table(rows=8, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = True
+    rows = [
+        ("Reviewer", "Name: ________________________________"),
+        ("Classmate evaluated", "Name: ________________________________"),
+        ("My program evidence", "Link/screenshot: ____________________  Value adjusted: ____________________"),
+        ("Code evidence observed", "[ ] loop  [ ] variable  [ ] timing test  [ ] adjusted value"),
+        ("Specific strength", "I noticed that ______________________________________________________________"),
+        ("Helpful suggestion", "I suggest __________________________________________________ because ______________________________"),
+        ("Constructive question", "Have you tried ______________________________________________________________?"),
+        ("Classmate response/change", "After the feedback, my classmate ____________________________________________"),
+    ]
+    for row, (label, prompt) in zip(table.rows, rows):
+        set_cell_text(row.cells[0], label, bold=True)
+        set_cell_shading(row.cells[0], "D9EAF7")
+        set_cell_text(row.cells[1], prompt)
+
+
+def add_pair_programming_appreciation_rubric(doc: Document) -> None:
+    add_section_heading(doc, "Rubric")
+    table = doc.add_table(rows=1, cols=5)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = True
+    headers = ["Criteria", "4 pts", "3 pts", "2 pts", "1 pt"]
+    for cell, header in zip(table.rows[0].cells, headers):
+        set_cell_text(cell, header, bold=True)
+        set_cell_shading(cell, "D9EAF7")
+
+    rows = [
+        (
+            "Use of class time",
+            "Starts promptly, stays focused, and uses coding and reflection time responsibly.",
+            "Usually focused and uses time well, with only one small reminder.",
+            "Needs several reminders; some class time is not used for the assigned work.",
+            "Often off task or does not complete the assigned work during class.",
+        ),
+        (
+            "Organization and readiness",
+            "Login, Scratch file, screenshot, and reflection evidence are ready and easy to check.",
+            "Mostly prepared and organized, with one minor file, material, or submission issue.",
+            "Organization issues make evidence harder to check or require teacher support.",
+            "Missing readiness, organization, or submission evidence.",
+        ),
+        (
+            "Driver/navigator roles",
+            "Uses driver and navigator roles fairly and explains personal contribution clearly.",
+            "Uses roles mostly fairly, with only a small imbalance or unclear detail.",
+            "Roles are attempted, but one partner does most of the work or the evidence is unclear.",
+            "Roles are not used responsibly or cannot be explained.",
+        ),
+        (
+            "Scratch dance practice evidence",
+            "Feature shows one key press, costume change, sound, movement, and success/failure response.",
+            "Feature shows most required parts, with one minor missing or unclear detail.",
+            "Feature is started, but several required parts are missing or hard to check.",
+            "Practice feature is missing or too incomplete to support the grade.",
+        ),
+        (
+            "Communication and response to feedback",
+            "Communicates respectfully, listens, and records feedback or a next improvement step.",
+            "Communicates respectfully and records a basic feedback response or next step.",
+            "Communication or feedback response is incomplete and needs teacher support.",
+            "Does not show respectful communication or a feedback response.",
+        ),
+    ]
+    for values in rows:
+        row = table.add_row()
+        for cell, value in zip(row.cells, values):
+            set_cell_text(cell, value)
+
+
+def add_pair_programming_reflection_questions(doc: Document) -> None:
+    doc.add_page_break()
+    add_heading(doc, "Pair-Programming Self-Reflection Questions", 14)
+    p = doc.add_paragraph(
+        "Use evidence from the Scratch practice feature and your partner work. Your answers should support the appreciation grade."
+    )
+    p.runs[0].font.name = "Arial"
+    p.runs[0].font.size = Pt(12)
+
+    table = doc.add_table(rows=9, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = True
+    rows = [
+        ("Student", "Name: ________________________________"),
+        ("Partner", "Name: ________________________________"),
+        ("Roles used", "I was: [ ] driver  [ ] navigator  [ ] both. Evidence: ______________________________"),
+        ("Practice feature evidence", "[ ] key press  [ ] costume change  [ ] sound  [ ] movement  [ ] success/failure response"),
+        ("My contribution", "I helped by ______________________________________________________________"),
+        ("Partner contribution", "My partner helped by ______________________________________________________"),
+        ("Communication", "One respectful communication habit we used was ______________________________"),
+        ("Organization", "Our file/screenshot/reflection evidence is saved here: ________________________"),
+        ("Feedback and next step", "Feedback we used or will use next: _________________________________________"),
+    ]
+    for row, (label, prompt) in zip(table.rows, rows):
+        set_cell_text(row.cells[0], label, bold=True)
+        set_cell_shading(row.cells[0], "D9EAF7")
+        set_cell_text(row.cells[1], prompt)
+
+
 def save_doc(doc: Document, path: Path) -> None:
     ensure_parent(path)
     doc.save(str(path))
 
 
+def create_official_appreciation_template_doc(spec: AppreciationDoc, path: Path) -> None:
+    if len(spec.template_criteria) != 4:
+        raise ValueError(f"Official appreciation template requires exactly 4 criteria: {spec.title}")
+    doc = Document(str(RUBRIC_TEMPLATE))
+    table = doc.tables[0]
+    set_cell_lines(
+        table.rows[0].cells[0],
+        (
+            "Academia Internacional David",
+            "Robotics and Technology",
+            f"{trimester_label(spec.trimester)}",
+            f"Appreciation Summative # {spec.number}",
+            f"{spec.grade} A & B",
+            f"Name: ________________________________      Date: __________________",
+            f"Group: {grade_number(spec.grade)}° A B",
+            "Teacher: Porfirio Rios                               Score: _____ / 40pts",
+            spec.title,
+        ),
+        bold=True,
+        align=WD_ALIGN_PARAGRAPH.CENTER,
+    )
+    for row_index, criterion in enumerate(spec.template_criteria, start=2):
+        set_template_rubric_row(table.rows[row_index], criterion)
+    set_template_punctuality_row(table.rows[7])
+    enforce_arial_12(doc)
+    save_doc(doc, path)
+
+
 def create_appreciation_doc(spec: AppreciationDoc, path: Path) -> None:
+    if spec.special_form == "official_appreciation_template":
+        create_official_appreciation_template_doc(spec, path)
+        return
+
     doc = Document()
     format_document(doc, landscape=True)
     add_header_block(
@@ -841,15 +1373,22 @@ def create_appreciation_doc(spec: AppreciationDoc, path: Path) -> None:
     p = doc.add_paragraph(spec.evidence)
     p.runs[0].font.name = "Arial"
     p.runs[0].font.size = Pt(12)
-    add_section_heading(doc, "Checklist")
-    add_appreciation_table(doc, spec.criteria)
-    add_section_heading(doc, "Short Reflection")
-    p = doc.add_paragraph(spec.reflection)
-    p.runs[0].font.name = "Arial"
-    p.runs[0].font.size = Pt(12)
-    p = doc.add_paragraph("Response: __________________________________________________________________________________")
-    p.runs[0].font.name = "Arial"
-    p.runs[0].font.size = Pt(12)
+    if spec.special_form == "constructive_peer_feedback":
+        add_constructive_feedback_appreciation_rubric(doc)
+        add_constructive_feedback_questions(doc)
+    elif spec.special_form == "pair_programming_reflection":
+        add_pair_programming_appreciation_rubric(doc)
+        add_pair_programming_reflection_questions(doc)
+    else:
+        add_section_heading(doc, "Checklist")
+        add_appreciation_table(doc, spec.criteria)
+        add_section_heading(doc, "Short Reflection")
+        p = doc.add_paragraph(spec.reflection)
+        p.runs[0].font.name = "Arial"
+        p.runs[0].font.size = Pt(12)
+        p = doc.add_paragraph("Response: __________________________________________________________________________________")
+        p.runs[0].font.name = "Arial"
+        p.runs[0].font.size = Pt(12)
     save_doc(doc, path)
 
 
@@ -894,38 +1433,29 @@ def create_exam_doc(spec: ExamDoc, path: Path) -> None:
     save_doc(doc, path)
 
 
-def add_standard_rubric_table(doc: Document, spec: RubricDoc) -> None:
-    table = doc.add_table(rows=1, cols=5)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    table.autofit = True
-    headers = ["Criteria", "Full Credit", "Proficient", "Developing", "Needs Support"]
-    for cell, header in zip(table.rows[0].cells, headers):
-        set_cell_text(cell, header, bold=True)
-        set_cell_shading(cell, "D9EAF7")
-    for criterion, full, proficient, developing, needs in spec.criteria:
-        row = table.add_row()
-        values = [criterion, full, proficient, developing, needs]
-        for cell, value in zip(row.cells, values):
-            set_cell_text(cell, value)
-
-
 def create_rubric_doc(spec: RubricDoc, path: Path) -> None:
-    doc = Document()
-    format_document(doc, landscape=True)
-    add_header_block(
-        doc,
-        spec.title,
-        spec.grade,
-        spec.trimester,
-        f"Week {spec.week} - Rubric for Summative #{spec.summative}",
-        "____ / 40 pts",
+    doc = Document(str(RUBRIC_TEMPLATE))
+    table = doc.tables[0]
+    set_cell_lines(
+        table.rows[0].cells[0],
+        (
+            "Academia Internacional David",
+            "Robotics and Technology",
+            f"{trimester_label(spec.trimester)}",
+            f"Summative # {spec.summative}",
+            f"{spec.grade} A & B",
+            f"Name: ________________________________      Date: __________________",
+            f"Group: {grade_number(spec.grade)}° A B",
+            "Teacher: Porfirio Rios                               Score: _____ / 40pts",
+            spec.title,
+        ),
+        bold=True,
+        align=WD_ALIGN_PARAGRAPH.CENTER,
     )
-    add_section_heading(doc, "Student Product / Evidence")
-    p = doc.add_paragraph(spec.evidence)
-    p.runs[0].font.name = "Arial"
-    p.runs[0].font.size = Pt(12)
-    add_section_heading(doc, "Rubric")
-    add_standard_rubric_table(doc, spec)
+    for row_index, criterion in enumerate(spec.criteria, start=2):
+        set_template_rubric_row(table.rows[row_index], criterion)
+    set_template_punctuality_row(table.rows[7])
+    enforce_arial_12(doc)
     save_doc(doc, path)
 
 
@@ -1139,7 +1669,7 @@ def write_report(records: list[OutputRecord], render_results: dict[Path, str] | 
             "",
             "- 6th grade counted summatives were already covered and were not changed.",
             "- Optional 8th grade quiz-style checks were not generated.",
-            "- Appreciation grades use a compact 20-point checklist format.",
+            "- Appreciation grades normally use a compact 20-point checklist format; 8th grade IIT and all 9th grade appreciation summatives use the official 40-point rubric template.",
             "- Exam projects use a 90-point project packet and rubric format.",
         ]
     )

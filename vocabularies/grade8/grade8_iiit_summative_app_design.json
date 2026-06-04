@@ -7,6 +7,8 @@
     "8"
   ],
   "trimester": "IIIT",
+  "month": "september",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "decomposition",
       "definition": "Breaking a big task into smaller parts.",
-      "example": "Students used decomposition during the class activity.",
+      "example": "The team used decomposition to split the app into screens, buttons, and events.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "user",
       "definition": "A person who uses a product or system.",
-      "example": "Students used user during the class activity.",
+      "example": "The user needed a clear button to submit the form.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "screen",
       "definition": "One view or page in an app.",
-      "example": "Students used screen during the class activity.",
+      "example": "The app changed to the results screen after the quiz ended.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "event",
       "definition": "Something that starts an action in a program.",
-      "example": "Students used event during the class activity.",
+      "example": "A click event started the timer in the app.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the class activity.",
+      "example": "The text typed by the user became the app input.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the class activity.",
+      "example": "The score message was the app output after the user answered.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "app",
       "definition": "A program designed for a user task.",
-      "example": "Students used app during the class activity.",
+      "example": "The app helped users practice vocabulary with buttons and feedback.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "button",
       "definition": "A part the user can press.",
-      "example": "Students used button during the class activity.",
+      "example": "The button moved the user from the start screen to the game screen.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "variable",
       "definition": "A value that can change in a program.",
-      "example": "Students used variable during the class activity.",
+      "example": "The score variable increased after each correct answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "feedback",
       "definition": "Helpful comments about how to improve.",
-      "example": "Students used feedback during the class activity.",
+      "example": "The app gave feedback by showing Correct or Try again.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

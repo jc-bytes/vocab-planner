@@ -1,12 +1,14 @@
 {
   "id": "grade6_t3_summative_spreadsheet_vocabulary",
   "subjectSlug": "technology",
-  "name": "Grade 6 T3 Summative: Spreadsheet Vocabulary",
-  "description": "Ten core third-trimester words for the Grade 6 spreadsheet summative vocabulary table.",
+  "name": "Grade 6 T3 Summative: IIIT Vocabulary",
+  "description": "Ten core third-trimester words for the Grade 6 IIIT summative vocabulary table.",
   "grades": [
     "6"
   ],
   "trimester": "3",
+  "month": "september",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -23,49 +25,9 @@
   },
   "words": [
     {
-      "word": "spreadsheet",
-      "definition": "A digital table used to organize and calculate information.",
-      "example": "We used a spreadsheet for class data.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
       "word": "data",
       "definition": "Facts or values that can be collected.",
-      "example": "Favorite colors are class data.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "information",
-      "definition": "Data that has meaning or is useful.",
-      "example": "The chart turned data into information.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "row",
-      "definition": "A line of cells that goes across a table.",
-      "example": "One row showed one student response.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "column",
-      "definition": "A line of cells that goes down a table.",
-      "example": "The column listed the item costs.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "cell",
-      "definition": "One box in a spreadsheet table.",
-      "example": "The cell held one number.",
+      "example": "Students collected class data about favorite colors in a spreadsheet.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,15 +35,7 @@
     {
       "word": "table",
       "definition": "Information arranged in rows and columns.",
-      "example": "The table showed items and prices.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "header",
-      "definition": "A label at the top of a column or section.",
-      "example": "The header said Total Cost.",
+      "example": "The table listed each project material, quantity, and price.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +43,7 @@
     {
       "word": "formula",
       "definition": "A rule or calculation used by a spreadsheet.",
-      "example": "The formula added the costs.",
+      "example": "The formula added the material costs to find the total budget.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +51,55 @@
     {
       "word": "chart",
       "definition": "A visual way to show data.",
-      "example": "The chart compared the totals.",
+      "example": "The chart compared the cost of each group project.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "3D",
+      "definition": "Having height, width, and depth.",
+      "example": "The student used a cube as the base of a 3D model.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "shape",
+      "definition": "A form such as a cube, sphere, or cylinder.",
+      "example": "The model started with one shape and then added a roof.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "model",
+      "definition": "A simple version or design of something.",
+      "example": "The 3D model showed the student's desk organizer idea.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "micro:bit",
+      "definition": "A tiny computer used to learn coding.",
+      "example": "The micro:bit showed a heart icon after the button was pressed.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "input",
+      "definition": "Information or an action that goes into a device or program.",
+      "example": "A button press was the input that changed the micro:bit display.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "output",
+      "definition": "What a device does or shows after a program runs.",
+      "example": "The icon on the LED display was the micro:bit output.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

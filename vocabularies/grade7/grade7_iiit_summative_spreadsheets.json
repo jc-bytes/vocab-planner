@@ -7,6 +7,8 @@
     "7"
   ],
   "trimester": "IIIT",
+  "month": "september",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "spreadsheet",
       "definition": "A tool that organizes information in rows and columns.",
-      "example": "Students used spreadsheet during the project.",
+      "example": "The student used a spreadsheet to organize survey results.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "sheet",
       "definition": "One page or tab in a spreadsheet file.",
-      "example": "Students used sheet during the project.",
+      "example": "The first sheet stored the class data, and the second sheet showed the chart.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "row",
       "definition": "A horizontal line of cells.",
-      "example": "Students used row during the project.",
+      "example": "Each row recorded one student's survey answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "column",
       "definition": "A vertical line of cells.",
-      "example": "Students used column during the project.",
+      "example": "The column labeled Score contained every group's points.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "cell",
       "definition": "One box in a spreadsheet.",
-      "example": "Students used cell during the project.",
+      "example": "The student typed the total in the highlighted cell.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "cell reference",
       "definition": "The name of a cell, such as A1.",
-      "example": "Students used cell reference during the project.",
+      "example": "The formula used the cell reference B2 to add the first value.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "formula",
       "definition": "A rule that calculates a value.",
-      "example": "Students used formula during the project.",
+      "example": "The formula calculated the total number of recycled items.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "function",
       "definition": "A built-in formula tool, such as AVERAGE.",
-      "example": "Students used function during the project.",
+      "example": "The SUM function added all the numbers in the column.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "average",
       "definition": "A number found by adding values and dividing by how many values there are.",
-      "example": "Students used average during the project.",
+      "example": "The class found the average score for the spreadsheet challenge.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "chart",
       "definition": "A visual way to show data.",
-      "example": "Students used chart during the project.",
+      "example": "The chart made the survey results easier to compare.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

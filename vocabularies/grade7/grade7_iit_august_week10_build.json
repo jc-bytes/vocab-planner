@@ -25,7 +25,7 @@
     {
       "word": "subroutine",
       "definition": "A smaller named part of a program that can be reused.",
-      "example": "Students used subroutine during the project.",
+      "example": "The jump subroutine reused the same movement blocks.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the project.",
+      "example": "A key press was the input that started the action.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "condition",
       "definition": "A rule that can be true or false.",
-      "example": "Students used condition during the project.",
+      "example": "The condition checked whether the sprite touched the goal.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "feedback",
       "definition": "Helpful comments about how to improve.",
-      "example": "Students used feedback during the project.",
+      "example": "Peer feedback helped the student improve the start screen.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "testing",
       "definition": "Trying something to see if it works.",
-      "example": "Students used testing during the project.",
+      "example": "Testing found that the timer was too short.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "bug",
       "definition": "A mistake in a program.",
-      "example": "Students used bug during the project.",
+      "example": "The bug made the score reset during the game.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

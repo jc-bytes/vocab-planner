@@ -25,7 +25,7 @@
     {
       "word": "movement",
       "definition": "A change in position.",
-      "example": "Students used movement during the project.",
+      "example": "The robot's movement started after the green flag.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "forward",
       "definition": "Moving toward the front.",
-      "example": "Students used forward during the project.",
+      "example": "Forward made the mBot drive toward the first marker.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "backward",
       "definition": "Moving toward the back.",
-      "example": "Students used backward during the project.",
+      "example": "Backward moved the robot away from the wall.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "turn",
       "definition": "To change direction.",
-      "example": "Students used turn during the project.",
+      "example": "The turn block changed the robot's direction.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "speed",
       "definition": "How fast something moves.",
-      "example": "Students used speed during the project.",
+      "example": "Lower speed helped the robot stay on the path.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "time",
       "definition": "How long something happens.",
-      "example": "Students used time during the project.",
+      "example": "The time setting controlled how long the motors ran.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "stop",
       "definition": "To end movement or action.",
-      "example": "Students used stop during the project.",
+      "example": "Stop ended the robot movement at the checkpoint.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

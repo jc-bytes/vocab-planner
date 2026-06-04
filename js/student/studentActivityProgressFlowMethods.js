@@ -1,6 +1,10 @@
 import { $, createElement } from '../main.js';
 import { getCurrentSchoolYear, getVocabSubjectSlug } from '../services/vocabularyApi.js';
-import { DEFAULT_REQUIRED_BY_PURPOSE, VOCAB_ACTIVITY_IDS } from './studentActivityConstants.js';
+import {
+    DEFAULT_PRACTICE_REQUIRED_ROTATION,
+    DEFAULT_REQUIRED_BY_PURPOSE,
+    VOCAB_ACTIVITY_IDS
+} from './studentActivityConstants.js';
 
 class StudentActivityProgressFlowMethods {
     getUnitGrade(vocab = this.sm.currentVocab) {
@@ -81,7 +85,33 @@ class StudentActivityProgressFlowMethods {
 
     getDefaultRequiredActivities(vocab = this.sm.currentVocab) {
         const purpose = String(vocab?.purpose || '').trim().toLowerCase();
+        if (purpose === 'practice') {
+            const rotationIndex = this.getPracticeRequiredRotationIndex(vocab);
+            return DEFAULT_PRACTICE_REQUIRED_ROTATION[rotationIndex] || DEFAULT_REQUIRED_BY_PURPOSE.practice;
+        }
         return DEFAULT_REQUIRED_BY_PURPOSE[purpose] || DEFAULT_REQUIRED_BY_PURPOSE.default;
+    }
+
+    getPracticeRequiredRotationIndex(vocab = this.sm.currentVocab) {
+        const rotationLength = DEFAULT_PRACTICE_REQUIRED_ROTATION.length;
+        if (rotationLength === 0) return 0;
+
+        const week = Number(vocab?.week);
+        if (Number.isFinite(week) && week > 0) {
+            return (Math.floor(week) - 1) % rotationLength;
+        }
+
+        const unitKey = String(vocab?.id || vocab?.name || '');
+        const weekMatch = unitKey.match(/week[_-]?(\d+)/i);
+        if (weekMatch) {
+            return (Number(weekMatch[1]) - 1) % rotationLength;
+        }
+
+        let hash = 0;
+        for (let index = 0; index < unitKey.length; index += 1) {
+            hash = ((hash << 5) - hash + unitKey.charCodeAt(index)) | 0;
+        }
+        return Math.abs(hash) % rotationLength;
     }
 
     getActivityFlowConfig(vocab = this.sm.currentVocab) {
@@ -99,6 +129,7 @@ class StudentActivityProgressFlowMethods {
             : VOCAB_ACTIVITY_IDS.filter(id => !requiredSet.has(id));
         const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])
             .filter(id => validIds.has(id) && !requiredSet.has(id));
+        const uniqueAdditional = [...new Set(additional)];
 
         if (uniqueRequired.length === 0) {
             uniqueRequired.push('flashcards');
@@ -106,7 +137,8 @@ class StudentActivityProgressFlowMethods {
 
         return {
             required: uniqueRequired,
-            additional: [...new Set(additional)]
+            additional: uniqueAdditional,
+            hidden: VOCAB_ACTIVITY_IDS.filter(id => !uniqueRequired.includes(id) && !uniqueAdditional.includes(id))
         };
     }
 
@@ -151,12 +183,38 @@ class StudentActivityProgressFlowMethods {
             status.id = 'required-activities-status';
             grid.parentNode.insertBefore(status, grid);
         }
-        status.textContent = completion.isComplete
-            ? `Required activities: ${completion.completed}/${completion.total} complete · Extra practice unlocked`
-            : `Required activities: ${completion.completed}/${completion.total} complete · Next: ${nextActivityTitle}`;
+        status.className = 'required-activities-status activity-menu-summary';
+        status.innerHTML = '';
+
+        const staleHeaderCoverage = document.querySelector('#activity-menu-view .section-header #overall-coverage-indicator');
+        if (staleHeaderCoverage) staleHeaderCoverage.remove();
+
+        const createSummaryCard = (label, value, hint, className = '') => {
+            const card = createElement('div', `activity-menu-summary-card ${className}`.trim());
+            card.appendChild(createElement('span', 'activity-menu-summary-label', label));
+            card.appendChild(createElement('strong', null, value));
+            if (hint) card.appendChild(createElement('small', null, hint));
+            return card;
+        };
+
+        status.appendChild(createSummaryCard(
+            'Next step',
+            completion.isComplete ? 'Choose extra practice' : nextActivityTitle,
+            completion.isComplete ? 'Required work is complete.' : 'Start here first.',
+            'is-next'
+        ));
+        status.appendChild(createSummaryCard(
+            'Required',
+            `${completion.completed}/${completion.total} complete`,
+            completion.isComplete ? 'Extra practice is unlocked.' : 'Complete these to unlock more games.',
+            'is-required'
+        ));
+        const coverageCard = createElement('div', 'activity-menu-summary-card overall-coverage');
+        coverageCard.id = 'overall-coverage-indicator';
+        status.appendChild(coverageCard);
 
         allCards.forEach(card => card.remove());
-        grid.querySelectorAll('.activity-flow-section, .activity-hidden-holder').forEach(section => section.remove());
+        grid.querySelectorAll('.activity-flow-section').forEach(section => section.remove());
         grid.style.display = 'block';
 
         const createSection = (title, className) => {
@@ -172,6 +230,7 @@ class StudentActivityProgressFlowMethods {
 
         const requiredGrid = createSection('Required Activities', 'required-activity-section');
         const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure');
+        additionalDetails.open = true;
         const additionalSummary = createElement(
             'summary',
             null,
@@ -189,21 +248,47 @@ class StudentActivityProgressFlowMethods {
             ));
         }
         additionalDetails.appendChild(additionalGrid);
-        const hiddenHolder = createElement('div', 'activity-hidden-holder');
-        hiddenHolder.style.display = 'none';
-        grid.appendChild(hiddenHolder);
+
+        const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure');
+        unavailableDetails.open = true;
+        const unavailableSummary = createElement('summary', null, `Not Required (${flow.hidden.length})`);
+        const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
+        unavailableDetails.appendChild(unavailableSummary);
+        unavailableDetails.appendChild(createElement(
+            'p',
+            'activity-disclosure-note',
+            'These activities are visible for reference but are not part of this vocabulary unit.'
+        ));
+        unavailableDetails.appendChild(unavailableGrid);
 
         const prepareCard = (card) => {
             if (!card) return;
             const activityType = card.dataset.activity;
-            card.classList.toggle('required-activity-card', flow.required.includes(activityType));
-            card.classList.toggle('additional-activity-card', flow.additional.includes(activityType));
+            const isRequired = flow.required.includes(activityType);
+            const isAdditional = flow.additional.includes(activityType);
+            const isHidden = flow.hidden.includes(activityType);
+            const isLockedAdditional = isAdditional && !completion.isComplete;
+            card.classList.toggle('required-activity-card', isRequired);
+            card.classList.toggle('additional-activity-card', isAdditional);
+            card.classList.toggle('activity-locked-card', isLockedAdditional);
+            card.classList.toggle('activity-unavailable-card', isHidden);
             const isNext = activityType === nextActivityType;
             card.classList.toggle('next-activity-card', isNext);
             card.classList.toggle('activity-flow-card-compact', !isNext);
+            card.disabled = isHidden;
+            card.setAttribute('aria-disabled', isHidden ? 'true' : 'false');
+            card.title = isHidden
+                ? 'Not required for this vocabulary unit.'
+                : (isLockedAdditional ? 'Finish the required activities to unlock this practice.' : '');
 
             if (isNext && !card.querySelector('.next-activity-label')) {
                 card.prepend(createElement('span', 'next-activity-label', 'Next'));
+            }
+            if (isHidden && !card.querySelector('.activity-unavailable-label')) {
+                card.prepend(createElement('span', 'activity-unavailable-label', 'Not required'));
+            }
+            if (isLockedAdditional && !card.querySelector('.activity-lock-label')) {
+                card.prepend(createElement('span', 'activity-lock-label', 'Locked'));
             }
         };
 
@@ -221,37 +306,13 @@ class StudentActivityProgressFlowMethods {
 
         if (flow.additional.length > 0) grid.appendChild(additionalDetails);
 
-        allCards
-            .filter(card => !flow.required.includes(card.dataset.activity) && !flow.additional.includes(card.dataset.activity))
-            .forEach(card => hiddenHolder.appendChild(card));
-
-        const detailPanel = createElement('details', 'activity-flow-section activity-progress-details activity-secondary-disclosure');
-        detailPanel.appendChild(createElement('summary', null, 'Progress details'));
-        const detailList = createElement('div', 'activity-detail-list');
-        const orderedDetailTypes = [...flow.required, ...flow.additional]
-            .filter((activityType, index, list) => list.indexOf(activityType) === index);
-        orderedDetailTypes.forEach(activityType => {
+        flow.hidden.forEach(activityType => {
             const card = cardByType.get(activityType);
-            if (!card) return;
-            const row = createElement('div', 'activity-detail-row');
-            const copy = createElement('div', 'activity-detail-copy');
-            copy.appendChild(createElement('strong', null, card.dataset.activityTitle || activityType));
-            if (card.dataset.activityDescription) {
-                copy.appendChild(createElement('span', null, card.dataset.activityDescription));
-            }
-            const meta = createElement('div', 'activity-detail-meta');
-            const groupLabel = flow.required.includes(activityType) ? 'Required' : 'Practice';
-            [
-                groupLabel,
-                card.dataset.activityProgressSummary,
-                card.dataset.activityPlaysSummary,
-                card.dataset.activityCoverageSummary
-            ].filter(Boolean).forEach(item => meta.appendChild(createElement('span', null, item)));
-            row.append(copy, meta);
-            detailList.appendChild(row);
+            prepareCard(card);
+            if (card) unavailableGrid.appendChild(card);
         });
-        detailPanel.appendChild(detailList);
-        grid.appendChild(detailPanel);
+
+        if (flow.hidden.length > 0) grid.appendChild(unavailableDetails);
     }
 
     getNextActivityPreloadType(flow = this.getActivityFlowConfig()) {

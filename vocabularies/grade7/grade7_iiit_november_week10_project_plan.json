@@ -25,7 +25,7 @@
     {
       "word": "purpose",
       "definition": "The reason something is made.",
-      "example": "Students used purpose during the project.",
+      "example": "The purpose was to warn users when an object was too close.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "parts",
       "definition": "Pieces that make up a system or object.",
-      "example": "Students used parts during the project.",
+      "example": "The parts included a sensor, microbit, code, and display.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "diagram",
       "definition": "A simple drawing that shows parts or ideas.",
-      "example": "Students used diagram during the project.",
+      "example": "The diagram showed where each part belonged.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "threshold rule",
       "definition": "A rule that uses a limit to decide what happens.",
-      "example": "Students used threshold rule during the project.",
+      "example": "The threshold rule started the alert below 15 centimeters.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "code plan",
       "definition": "A plan for the blocks or steps a program needs.",
-      "example": "Students used code plan during the project.",
+      "example": "The code plan listed the blocks needed for input and output.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "test plan",
       "definition": "A plan for how to check if something works.",
-      "example": "Students used test plan during the project.",
+      "example": "The test plan checked close, medium, and far distances.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

@@ -25,7 +25,7 @@
     {
       "word": "click",
       "definition": "To press with a mouse or trackpad.",
-      "example": "Students used click during the class activity.",
+      "example": "A click on the start button opened the first game screen.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "tap",
       "definition": "To touch a screen briefly.",
-      "example": "Students used tap during the class activity.",
+      "example": "A tap on the mobile screen selected the answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "start",
       "definition": "To begin.",
-      "example": "Students used start during the class activity.",
+      "example": "The start event reset the score to zero.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "submit",
       "definition": "To turn in or send work.",
-      "example": "Students used submit during the class activity.",
+      "example": "Submit sent the finished prototype link to the teacher.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "screen change",
       "definition": "Moving from one app screen to another.",
-      "example": "Students used screen change during the class activity.",
+      "example": "The screen change moved from the menu to the game.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "timer",
       "definition": "A tool or variable that tracks time.",
-      "example": "Students used timer during the class activity.",
+      "example": "The timer counted down during the challenge round.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "score",
       "definition": "A number that tracks points or progress.",
-      "example": "Students used score during the class activity.",
+      "example": "The score increased when the player chose the correct answer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "bug",
       "definition": "A mistake in a program.",
-      "example": "Students used bug during the class activity.",
+      "example": "The bug made the score increase twice for one click.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

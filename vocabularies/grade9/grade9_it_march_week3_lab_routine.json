@@ -25,7 +25,7 @@
     {
       "word": "safety",
       "definition": "Careful actions that prevent harm or damage.",
-      "example": "Students used safety during the class activity.",
+      "example": "The group followed safety rules before connecting power to the board.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "checklist",
       "definition": "A list used to make sure steps are done.",
-      "example": "Students used checklist during the class activity.",
+      "example": "The checklist reminded the team to check wiring before uploading code.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "material",
       "definition": "An item or part used for work.",
-      "example": "Students used material during the class activity.",
+      "example": "The materials tray included wires, a resistor, an LED, and the Arduino.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "persistence",
       "definition": "Continuing to try when something is difficult.",
-      "example": "Students used persistence during the class activity.",
+      "example": "Persistence helped the team keep testing after the first circuit failed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "instruction",
       "definition": "A step that tells what to do.",
-      "example": "Students used instruction during the class activity.",
+      "example": "The student followed the instruction to connect ground before testing.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "fix",
       "definition": "A change that solves a problem.",
-      "example": "Students used fix during the class activity.",
+      "example": "The team fixed the circuit by moving the LED to the correct row.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

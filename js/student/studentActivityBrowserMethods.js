@@ -9,7 +9,7 @@ class StudentActivityBrowserMethods {
         container.className = 'vocab-groups';
         this.sm.availableVocabs = [];
 
-        const { vocabs, message } = this.getVisibleVocabularyList();
+        const { vocabs, message } = this.getVisibleVocabularyList({ availableOnly: true });
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p>${message}</p>`;
@@ -27,13 +27,22 @@ class StudentActivityBrowserMethods {
         container.classList.add('teacher-library-browser');
         container.innerHTML = '';
 
-        const visibleVocabs = Array.isArray(vocabs) ? vocabs : this.getVisibleVocabularyList().vocabs;
+        const visibleVocabs = Array.isArray(vocabs)
+            ? this.filterStudentAvailableVocabulary(vocabs)
+            : this.getVisibleVocabularyList({ availableOnly: true }).vocabs;
         const drilldown = this.sm.studentVocabularyDrilldown || { trimester: null, month: null };
         const trimesterGroups = this.buildVocabularyTrimesterGroups(visibleVocabs);
         const selectedTrimester = drilldown.trimester;
         const selectedMonth = drilldown.month;
 
         if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
+            const currentTrimester = this.getCurrentTrimesterKey();
+            if (trimesterGroups.has(currentTrimester)) {
+                this.sm.studentVocabularyDrilldown = { trimester: currentTrimester, month: null };
+                this.renderStudentMonthPicker(container, currentTrimester, this.buildVocabularyMonthGroups(trimesterGroups.get(currentTrimester)));
+                return;
+            }
+
             this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
             this.renderStudentTrimesterPicker(container, trimesterGroups);
             return;
@@ -146,6 +155,7 @@ class StudentActivityBrowserMethods {
 
         container.appendChild(grid);
         this.scheduleFirstVocabularyPreload(container);
+        this.refreshIcons();
     }
 
     createStudentLibraryChoiceCard({ title, count, meta, icon }) {
@@ -174,7 +184,8 @@ class StudentActivityBrowserMethods {
     }
 
     renderVocabularyGroups(container, vocabs) {
-        const grouped = vocabs.reduce((groups, vocab) => {
+        const visibleVocabs = this.filterStudentAvailableVocabulary(vocabs);
+        const grouped = visibleVocabs.reduce((groups, vocab) => {
             const key = this.getVocabTrimesterKey(vocab);
             if (!groups[key]) groups[key] = [];
             groups[key].push(vocab);
@@ -218,24 +229,39 @@ class StudentActivityBrowserMethods {
             group.appendChild(monthList);
             container.appendChild(group);
         });
+        this.refreshIcons();
     }
 
     createVocabularyCard(vocab) {
-        const card = createElement('div', 'card option-card');
+        const card = createElement('button', 'card option-card student-vocab-card');
+        card.type = 'button';
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
-        const sourceLabel = vocab.__source === 'cloud'
-            ? 'Cloud'
-            : vocab.__source === 'local'
-                ? 'Local'
-                : 'Repo';
+        const title = this.formatVocabularyCardTitle(vocab);
+        const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
+        const scheduleLabel = this.formatVocabularyScheduleLabel(vocab);
+        const description = this.formatVocabularyCardDescription(vocab, title);
+        const iconName = String(vocab.purpose || '').toLowerCase() === 'summative'
+            ? 'clipboard-check'
+            : 'book-open';
+
+        card.style.setProperty('--subject-color', subject.color);
 
         card.innerHTML = `
-            <div class="icon">${vocab.__source === 'cloud' ? '☁️' : '📚'}</div>
-            <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
-            <h3>${escapeHtml(vocab.name)}</h3>
-            <p>${escapeHtml(vocab.description || '')}</p>
-            ${vocab.grades ? `<small>Grade: ${escapeHtml(vocab.grades.join(', '))}</small>` : ''}
-            <small style="color:var(--text-muted); display:block; margin-top:0.5rem;">${sourceLabel}</small>
+            <div class="student-vocab-topline">
+                <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+                <span class="student-vocab-schedule">${escapeHtml(scheduleLabel)}</span>
+            </div>
+            <div class="student-vocab-card-main">
+                <span class="student-vocab-icon" aria-hidden="true"><i data-lucide="${iconName}"></i></span>
+                <div class="student-vocab-copy">
+                    <h3>${escapeHtml(title)}</h3>
+                    <p data-vocab-description>${escapeHtml(description)}</p>
+                </div>
+            </div>
+            <span class="student-vocab-action">
+                Start unit
+                <i data-lucide="arrow-right"></i>
+            </span>
         `;
         if (vocab.path) {
             card.dataset.vocabPath = vocab.path;
@@ -245,6 +271,52 @@ class StudentActivityBrowserMethods {
         }
         card.addEventListener('click', () => this.loadVocabulary(vocab));
         return card;
+    }
+
+    formatVocabularyCardTitle(vocab) {
+        let title = String(vocab?.name || 'Vocabulary Unit').trim();
+        title = title.replace(/^Grade\s+\d+\s+(?:I{1,3}T|T\d)\s+/i, '');
+        title = title.replace(/^(Practice|Summative)\s*:\s*/i, '');
+        title = title.replace(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+Week\s+\d{1,2}\s*[-:]\s*/i, '');
+        return title || 'Vocabulary Unit';
+    }
+
+    formatVocabularyPurpose(purpose) {
+        const normalized = String(purpose || '').trim().toLowerCase();
+        if (normalized === 'summative') return 'Summative';
+        if (normalized === 'practice') return 'Practice';
+        return normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Unit';
+    }
+
+    getVocabularyPurposeClass(purpose) {
+        const normalized = String(purpose || 'unit')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        return `is-${normalized || 'unit'}`;
+    }
+
+    formatVocabularyScheduleLabel(vocab) {
+        const schedule = this.getVocabSchedule(vocab);
+        return schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab));
+    }
+
+    formatVocabularyCardDescription(vocab, title) {
+        const raw = String(vocab?.description || '').trim();
+        if (!raw) {
+            return `Practice the key terms for ${title.toLowerCase()}.`;
+        }
+
+        if (/^practice words for grade \d+ second-trimester python and data work\.?$/i.test(raw)) {
+            return `Practice the terms you need for ${title.toLowerCase()} activities.`;
+        }
+
+        if (/^ten core second-trimester words for the grade \d+ python and data vocabulary table\.?$/i.test(raw)) {
+            return 'Review the core Python and data terms for the second-trimester vocabulary check.';
+        }
+
+        return raw;
     }
 
     scheduleFirstVocabularyPreload(container) {

@@ -25,7 +25,7 @@
     {
       "word": "game",
       "definition": "An interactive activity with rules or goals.",
-      "example": "Students used game during the project.",
+      "example": "The game asked players to copy the dance pattern.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "costume",
       "definition": "A sprite appearance in Scratch.",
-      "example": "Students used costume during the project.",
+      "example": "The sprite costume changed for each dance step.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "sound",
       "definition": "Audio used in a project.",
-      "example": "Students used sound during the project.",
+      "example": "The sound played when the player pressed the correct key.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the project.",
+      "example": "The arrow key was input for the dance move.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "timing",
       "definition": "When actions happen and how long they last.",
-      "example": "Students used timing during the project.",
+      "example": "The timing made the costume change match the music.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "feedback",
       "definition": "Helpful comments about how to improve.",
-      "example": "Students used feedback during the project.",
+      "example": "Feedback showed that the dance instructions needed to be shorter.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

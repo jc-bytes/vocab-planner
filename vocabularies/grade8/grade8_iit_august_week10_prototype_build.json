@@ -25,7 +25,7 @@
     {
       "word": "starter sketch",
       "definition": "A beginning Arduino program.",
-      "example": "Students used starter sketch during the class activity.",
+      "example": "The starter sketch gave the group a working first test.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "sensor",
       "definition": "A part that detects information from the environment.",
-      "example": "Students used sensor during the class activity.",
+      "example": "The sensor detected the hand near the project.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the class activity.",
+      "example": "The sensor value became the input for the code.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
-      "example": "Students used process during the class activity.",
+      "example": "The process compared the reading to the threshold.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the class activity.",
+      "example": "The output turned on the buzzer when the object was close.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem.",
-      "example": "Students used debug during the class activity.",
+      "example": "The team debugged the sketch by checking one line at a time.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "condition",
       "definition": "A rule that can be true or false.",
-      "example": "Students used condition during the class activity.",
+      "example": "The condition controlled when the warning light appeared.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

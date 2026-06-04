@@ -1,7 +1,7 @@
 {
   "id": "grade6_t2_july_week1_route_accuracy",
   "subjectSlug": "technology",
-  "name": "Grade 6 T2 Practice: July Week 1 - Route Accuracy",
+  "name": "Grade 6 T2 Practice: July Week 5 - Route Accuracy",
   "description": "Practice words for route maps and accurate movement.",
   "grades": [
     "6"
@@ -78,5 +78,7 @@
       "synonyms": [],
       "antonyms": []
     }
-  ]
+  ],
+  "month": "july",
+  "week": 5
 }

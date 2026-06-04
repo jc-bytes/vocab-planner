@@ -7,6 +7,8 @@
     "7"
   ],
   "trimester": "IT",
+  "month": "march",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "mBot",
       "definition": "A small robot used to learn robotics and coding.",
-      "example": "Students used mBot during the project.",
+      "example": "The team programmed the mBot to drive through the maze.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "hardware",
       "definition": "The physical parts of a computer or robot.",
-      "example": "Students used hardware during the project.",
+      "example": "The wheels, sensors, and control board were the robot hardware.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "software",
       "definition": "Programs that tell a computer or robot what to do.",
-      "example": "Students used software during the project.",
+      "example": "The mBlock software sent the movement program to the robot.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "chassis",
       "definition": "The frame that holds robot parts together.",
-      "example": "Students used chassis during the project.",
+      "example": "The chassis held the wheels, motor, and control board together.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "motor",
       "definition": "A part that makes movement by turning or spinning.",
-      "example": "Students used motor during the project.",
+      "example": "The motor turned faster when the student increased the speed value.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "sensor",
       "definition": "A part that detects information from the environment.",
-      "example": "Students used sensor during the project.",
+      "example": "The ultrasonic sensor helped the robot notice an obstacle.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "LED",
       "definition": "A small light that a program can control.",
-      "example": "Students used LED during the project.",
+      "example": "The LED flashed green when the robot reached a checkpoint.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "buzzer",
       "definition": "A part that makes a sound.",
-      "example": "Students used buzzer during the project.",
+      "example": "The buzzer played a short sound after the robot completed the route.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "controller",
       "definition": "The board that controls the robot parts.",
-      "example": "Students used controller during the project.",
+      "example": "The controller received the uploaded instructions from the computer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "control board",
       "definition": "The main board that connects and controls robot parts.",
-      "example": "Students used control board during the project.",
+      "example": "The control board connected the sensor, motor, LED, and buzzer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

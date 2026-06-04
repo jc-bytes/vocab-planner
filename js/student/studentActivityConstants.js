@@ -14,10 +14,23 @@ export const VOCAB_ACTIVITY_IDS = [
 ];
 
 export const DEFAULT_REQUIRED_BY_PURPOSE = {
-    summative: ['flashcards', 'matching', 'quiz'],
+    summative: ['flashcards', 'illustration'],
     practice: ['flashcards', 'matching'],
     default: ['flashcards', 'matching']
 };
+
+export const DEFAULT_PRACTICE_REQUIRED_ROTATION = [
+    ['flashcards', 'matching'],
+    ['matching', 'fill-in-blank'],
+    ['flashcards', 'word-search'],
+    ['quiz', 'scramble'],
+    ['matching', 'speed-match'],
+    ['flashcards', 'wordle'],
+    ['crossword', 'hangman'],
+    ['matching', 'quiz'],
+    ['scramble', 'fill-in-blank'],
+    ['word-search', 'speed-match']
+];
 
 export const ACTIVITY_MODULES = {
     matching: () => import('../activities/matching.js'),

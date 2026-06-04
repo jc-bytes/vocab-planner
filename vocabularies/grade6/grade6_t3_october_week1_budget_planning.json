@@ -57,7 +57,7 @@
     {
       "word": "item",
       "definition": "One thing in a list.",
-      "example": "Each item had a price.",
+      "example": "Each item in the materials list had a price and quantity.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

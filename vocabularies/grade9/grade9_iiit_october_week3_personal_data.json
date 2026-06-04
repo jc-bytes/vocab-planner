@@ -25,7 +25,7 @@
     {
       "word": "personal data",
       "definition": "Information about a person.",
-      "example": "Students used personal data during the class activity.",
+      "example": "A home address is personal data because it identifies a person.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "public data",
       "definition": "Information that is okay for many people to see.",
-      "example": "Students used public data during the class activity.",
+      "example": "The event schedule was public data because everyone could see it.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "sensitive data",
       "definition": "Information that needs extra protection.",
-      "example": "Students used sensitive data during the class activity.",
+      "example": "A password is sensitive data and should not be shared in a form.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "online service",
       "definition": "A website or app that provides a tool online.",
-      "example": "Students used online service during the class activity.",
+      "example": "The online service asked for an email before creating the account.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "safer choice",
       "definition": "An action that better protects people or data.",
-      "example": "Students used safer choice during the class activity.",
+      "example": "Using initials instead of a full name was the safer choice for the profile.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "privacy",
       "definition": "Keeping personal information protected.",
-      "example": "Students used privacy during the class activity.",
+      "example": "Privacy improved when the student removed the phone number from the post.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

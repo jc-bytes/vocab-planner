@@ -14,7 +14,11 @@ class StudentActivityLauncherMethods {
         }
 
         if (!this.isActivityUnlocked(type)) {
-            notifications.warning('Finish the required activities first to unlock additional practice.');
+            const flow = this.getActivityFlowConfig();
+            const warning = flow.hidden?.includes(type)
+                ? 'This activity is not required for this vocabulary unit.'
+                : 'Finish the required activities first to unlock additional practice.';
+            notifications.warning(warning);
             const unitId = this.sm.getCurrentVocabRouteId();
             if (unitId) {
                 this.sm.setRoute({ view: 'unit', unitId }, { replace: true });

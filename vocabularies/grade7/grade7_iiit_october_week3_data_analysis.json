@@ -25,7 +25,7 @@
     {
       "word": "sort",
       "definition": "To arrange data in order.",
-      "example": "Students used sort during the project.",
+      "example": "Sort arranged the scores from highest to lowest.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "filter",
       "definition": "To show only data that matches a rule.",
-      "example": "Students used filter during the project.",
+      "example": "The filter showed only students who completed the task.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "COUNTIF",
       "definition": "A spreadsheet function that counts items matching a condition.",
-      "example": "Students used COUNTIF during the project.",
+      "example": "COUNTIF counted how many scores were 80 or higher.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "formatting",
       "definition": "Changing how text or data looks.",
-      "example": "Students used formatting during the project.",
+      "example": "Formatting made the header bold and the totals easy to see.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "pattern",
       "definition": "Something that repeats or has a clear order.",
-      "example": "Students used pattern during the project.",
+      "example": "The pattern showed that scores rose after extra practice.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "condition",
       "definition": "A rule that can be true or false.",
-      "example": "Students used condition during the project.",
+      "example": "The condition counted only values above the passing score.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

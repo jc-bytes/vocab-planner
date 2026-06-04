@@ -25,7 +25,7 @@
     {
       "word": "path",
       "definition": "The way from one place to another.",
-      "example": "Students used path during the project.",
+      "example": "The path showed where the robot should travel.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "route",
       "definition": "The planned path to follow.",
-      "example": "Students used route during the project.",
+      "example": "The route included two turns and one checkpoint.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "checkpoint",
       "definition": "A place used to check progress on a route.",
-      "example": "Students used checkpoint during the project.",
+      "example": "The checkpoint confirmed the robot reached the middle of the maze.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "obstacle",
       "definition": "Something that blocks the way.",
-      "example": "Students used obstacle during the project.",
+      "example": "The obstacle forced the robot to turn left.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "plan",
       "definition": "A set of steps for what to do.",
-      "example": "Students used plan during the project.",
+      "example": "The plan listed each movement before coding began.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "improve",
       "definition": "To make something better.",
-      "example": "Students used improve during the project.",
+      "example": "The team improved the route after the robot hit the wall.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

@@ -25,7 +25,7 @@
     {
       "word": "hardware",
       "definition": "The physical parts of a computer or device.",
-      "example": "Students used hardware during the class activity.",
+      "example": "The keyboard was hardware because the student could touch it.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "software",
       "definition": "Programs that tell hardware what to do.",
-      "example": "Students used software during the class activity.",
+      "example": "The browser software opened the portfolio webpage.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "input",
       "definition": "Information that goes into a system or program.",
-      "example": "Students used input during the class activity.",
+      "example": "Typing a keyword was input for the search engine.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "output",
       "definition": "What a system or program produces.",
-      "example": "Students used output during the class activity.",
+      "example": "The search results were output from the system.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "processor",
       "definition": "The part that carries out instructions.",
-      "example": "Students used processor during the class activity.",
+      "example": "The processor carried out the instructions in the program.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "memory",
       "definition": "Short-term storage used while a computer works.",
-      "example": "Students used memory during the class activity.",
+      "example": "Memory held the open tabs while the computer was working.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "storage",
       "definition": "Long-term space for files and programs.",
-      "example": "Students used storage during the class activity.",
+      "example": "Storage kept the saved portfolio files after class.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "operating system",
       "definition": "Software that manages a computer.",
-      "example": "Students used operating system during the class activity.",
+      "example": "The operating system managed the files, apps, and screen.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +89,7 @@
     {
       "word": "program",
       "definition": "Instructions a computer can run.",
-      "example": "Students used program during the class activity.",
+      "example": "The drawing program helped the student edit the poster.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

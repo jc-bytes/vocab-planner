@@ -25,7 +25,7 @@
     {
       "word": "subsystem",
       "definition": "One smaller part of a larger system.",
-      "example": "Students used subsystem during the class activity.",
+      "example": "The sensor subsystem collected input before the LED subsystem responded.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "wiring",
       "definition": "How electronic parts are connected.",
-      "example": "Students used wiring during the class activity.",
+      "example": "The team checked the wiring after the buzzer did not sound.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "code logic",
       "definition": "The rules and order used in code.",
-      "example": "Students used code logic during the class activity.",
+      "example": "The code logic turned the warning light on only when the sensor value was low.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "documentation",
       "definition": "Notes or records that explain work.",
-      "example": "Students used documentation during the class activity.",
+      "example": "The documentation included a photo of the circuit and notes about the code.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "test result",
       "definition": "What happened during a test.",
-      "example": "Students used test result during the class activity.",
+      "example": "The test result showed that the LED worked but the buzzer was too quiet.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "debug",
       "definition": "To find and fix a problem.",
-      "example": "Students used debug during the class activity.",
+      "example": "The group debugged the project by testing one subsystem at a time.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

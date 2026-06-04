@@ -1,4 +1,0 @@
-- **Vector Graphic:** An image made up of mathematical equations that define lines and shapes, allowing for scalability without loss of quality.
-- **Fill**: The color or pattern that fills the inside of a shape.
-- **Stroke**: The outline of a shape, defined by its color, thickness, and style.
-- **Z-order:** The order in which objects are stacked on top of each other, determining their visibility.

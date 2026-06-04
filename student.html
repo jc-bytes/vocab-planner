@@ -209,12 +209,27 @@
             <section id="activity-menu-view" class="view hidden">
                 <div class="section-header">
                     <button id="back-to-vocab" class="btn text-btn">← Back to Units</button>
-                    <div>
+                    <div class="activity-menu-title-block">
                         <div id="current-unit-subject" class="unit-subject-label"></div>
                         <h2 id="current-unit-title">Unit Title</h2>
                     </div>
-                    <button id="download-word-hunt-btn" class="btn secondary-btn">Download Word Hunt</button>
-                    <button id="generate-final-report-btn" class="btn accent-btn">📜 Final Report</button>
+                    <details id="student-vocab-export-menu" class="student-export-menu">
+                        <summary class="btn accent-btn">
+                            <i data-lucide="download"></i>
+                            <span>Export</span>
+                            <i data-lucide="chevron-down"></i>
+                        </summary>
+                        <div class="student-export-menu-panel" role="menu" aria-label="Export options">
+                            <button id="download-word-hunt-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                <i data-lucide="file-down"></i>
+                                <span>Word Hunt</span>
+                            </button>
+                            <button id="generate-final-report-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                <i data-lucide="file-text"></i>
+                                <span>Final Report</span>
+                            </button>
+                        </div>
+                    </details>
                 </div>
                 <div class="activities-grid">
                     <!-- Activity cards -->
@@ -351,19 +366,30 @@
                                 </button>
                             </div>
                             <div id="student-classroom-instructions-body" class="student-classroom-instructions-body">
-                                <p id="student-classroom-activity-description" class="student-classroom-description"></p>
-                                <div class="student-classroom-detail-block">
-                                    <h4>What to do</h4>
-                                    <p id="student-classroom-activity-instructions"></p>
-                                </div>
-                                <div class="student-classroom-detail-block">
-                                    <h4>Materials</h4>
-                                    <p id="student-classroom-activity-materials"></p>
-                                </div>
-                                <div class="student-classroom-detail-block">
-                                    <h4>Turn in</h4>
-                                    <p id="student-classroom-activity-output"></p>
-                                </div>
+                                <p id="student-classroom-activity-task-summary" class="student-classroom-task-summary"></p>
+                                <details class="student-classroom-details-disclosure">
+                                    <summary>Activity details</summary>
+                                    <div id="student-classroom-activity-timing-block" class="student-classroom-detail-block">
+                                        <h4>Timing</h4>
+                                        <p id="student-classroom-activity-timing"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Description</h4>
+                                        <p id="student-classroom-activity-description" class="student-classroom-description"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>What to do</h4>
+                                        <p id="student-classroom-activity-instructions"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Materials</h4>
+                                        <p id="student-classroom-activity-materials"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Turn in</h4>
+                                        <p id="student-classroom-activity-output"></p>
+                                    </div>
+                                </details>
                             </div>
                         </aside>
 

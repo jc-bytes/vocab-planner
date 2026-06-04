@@ -32,7 +32,19 @@ class StudentActivityMenuMethods {
             card.querySelector('.coverage-badge')?.remove();
             card.querySelector('.plays-badge')?.remove();
             card.querySelector('.next-activity-label')?.remove();
-            card.classList.remove('next-activity-card', 'activity-flow-card-compact');
+            card.querySelector('.activity-lock-label')?.remove();
+            card.querySelector('.activity-unavailable-label')?.remove();
+            card.classList.remove(
+                'next-activity-card',
+                'activity-flow-card-compact',
+                'activity-locked-card',
+                'activity-unavailable-card',
+                'required-activity-card',
+                'additional-activity-card'
+            );
+            card.disabled = false;
+            card.removeAttribute('aria-disabled');
+            card.removeAttribute('title');
             card.dataset.activityTitle = card.querySelector('h3')?.textContent?.trim() || type;
             card.dataset.activityDescription = card.querySelector('p')?.textContent?.trim() || '';
             card.dataset.activityProgressSummary = 'Not started';

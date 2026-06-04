@@ -20,6 +20,25 @@ export function initTeacherProgressListeners(manager) {
     $('#open-data-management-btn')?.addEventListener('click', () => {
         manager.showDataManagementView();
     });
+    $('#open-add-student-modal-btn')?.addEventListener('click', () => {
+        manager.showAddStudentModal();
+    });
+    $('#import-student-csv-btn')?.addEventListener('click', () => {
+        manager.showStudentCsvPicker();
+    });
+    $('#student-csv-input')?.addEventListener('change', (event) => {
+        manager.handleStudentCsvImportFiles(event.target.files);
+        event.target.value = '';
+    });
+    $('#close-add-student-modal')?.addEventListener('click', () => {
+        closeDialog('#add-student-modal');
+    });
+    $('#cancel-add-student-btn')?.addEventListener('click', () => {
+        closeDialog('#add-student-modal');
+    });
+    $('#add-student-form')?.addEventListener('submit', (event) => {
+        manager.handleAddStudentSubmit(event);
+    });
 
     $('#back-to-progress-from-data')?.addEventListener('click', () => {
         manager.showProgressView();

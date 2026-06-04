@@ -84,7 +84,7 @@ class StudentActivityVocabularyDataMethods {
     }
 
     getVisibleVocabularyList(options = {}) {
-        const { currentTrimesterOnly = false } = options;
+        const { availableOnly = false, currentTrimesterOnly = false } = options;
         let vocabs = this.getAllVocabularySources();
 
         if (vocabs.length === 0) {
@@ -133,6 +133,18 @@ class StudentActivityVocabularyDataMethods {
                 return {
                     vocabs: [],
                     message: `No ${selectedSubject.name} ${this.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
+                };
+            }
+        }
+
+        if (availableOnly) {
+            vocabs = this.filterStudentAvailableVocabulary(vocabs);
+
+            if (vocabs.length === 0) {
+                const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
+                return {
+                    vocabs: [],
+                    message: `No ${selectedSubject.name} vocabularies are available yet${gradeContext}.`
                 };
             }
         }

@@ -25,7 +25,7 @@
     {
       "word": "SVG",
       "definition": "A file format for vector graphics.",
-      "example": "Students used SVG during the class activity.",
+      "example": "The SVG stayed sharp when the student resized the icon.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "markup",
       "definition": "Text that describes structure or design.",
-      "example": "Students used markup during the class activity.",
+      "example": "The markup described the circle, rectangle, and text.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "tag",
       "definition": "A markup label inside angle brackets.",
-      "example": "Students used tag during the class activity.",
+      "example": "The circle tag created one shape in the SVG.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "attribute",
       "definition": "Extra information inside a tag.",
-      "example": "Students used attribute during the class activity.",
+      "example": "The fill attribute changed the icon color.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "scalable",
       "definition": "Able to change size without losing quality.",
-      "example": "Students used scalable during the class activity.",
+      "example": "The scalable graphic looked clear on both small and large screens.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "property",
       "definition": "A style or setting that can be changed.",
-      "example": "Students used property during the class activity.",
+      "example": "The width property controlled the size of the rectangle.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

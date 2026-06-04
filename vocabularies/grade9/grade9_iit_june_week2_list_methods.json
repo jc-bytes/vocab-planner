@@ -25,7 +25,7 @@
     {
       "word": "method",
       "definition": "A command that performs an action on data.",
-      "example": "Students used method during the class activity.",
+      "example": "The student used the append method to add a new item to a Python list.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "add",
       "definition": "To put something in.",
-      "example": "Students used add during the class activity.",
+      "example": "The program added a new survey answer to the end of the list.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "remove",
       "definition": "To take something out.",
-      "example": "Students used remove during the class activity.",
+      "example": "The student removed the incorrect item before sorting the data.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "sort",
       "definition": "To arrange data in order.",
-      "example": "Students used sort during the class activity.",
+      "example": "The list was sorted so the scores appeared from lowest to highest.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "display",
       "definition": "To show information.",
-      "example": "Students used display during the class activity.",
+      "example": "The program displayed each list item on a separate line.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "while loop",
       "definition": "A loop that repeats while a condition is true.",
-      "example": "Students used while loop during the class activity.",
+      "example": "The while loop kept asking for input until the user typed stop.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "stopping point",
       "definition": "The condition that makes a loop end.",
-      "example": "Students used stopping point during the class activity.",
+      "example": "The word stop became the stopping point for the loop.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []

@@ -598,12 +598,22 @@
                         <h2>Progress</h2>
                     </div>
                     <div class="teacher-toolbar">
+                        <button id="open-add-student-modal-btn" class="btn primary-btn">
+                            <i data-lucide="user-plus"></i>
+                            Add Student
+                        </button>
+                        <button id="import-student-csv-btn" class="btn secondary-btn">
+                            <i data-lucide="file-up"></i>
+                            Import CSV
+                        </button>
+                        <input type="file" id="student-csv-input" accept=".csv,text/csv" multiple hidden>
                         <button id="open-data-management-btn" class="btn secondary-btn">
                             <i data-lucide="chart-no-axes-combined"></i>
                             Analytics
                         </button>
                     </div>
                 </div>
+                <div id="student-roster-import-status" class="teacher-inline-status"></div>
 
                 <div class="card student-filter-card">
                     <div class="student-filter-grid">
@@ -614,9 +624,9 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="filter-group" style="font-size: 0.8rem;">Group</label>
+                            <label for="filter-group" style="font-size: 0.8rem;">Section</label>
                             <select id="filter-group" style="width: 100%; padding: 0.5rem;">
-                                <option value="">All Groups</option>
+                                <option value="">All Sections</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -644,7 +654,7 @@
                                     <th style="padding: 1rem;">Name</th>
                                     <th style="padding: 1rem;">Email</th>
                                     <th style="padding: 1rem;">Grade</th>
-                                    <th style="padding: 1rem;">Group</th>
+                                    <th style="padding: 1rem;">Section</th>
                                     <th style="padding: 1rem;">Coins</th>
                                     <th style="padding: 1rem;">Last Active</th>
                                     <th style="padding: 1rem;">Actions</th>
@@ -673,6 +683,77 @@
                 </div>
             </section>
 
+            <!-- Modal: Add Student -->
+            <div id="add-student-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-student-modal-title">
+                <div class="modal-content" style="max-width: 620px; width: 92%;">
+                    <div class="modal-header">
+                        <h2 id="add-student-modal-title">Add Student</h2>
+                        <button id="close-add-student-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close add student">&times;</button>
+                    </div>
+                    <form id="add-student-form">
+                        <div class="modal-body">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="add-student-first-name">First Name</label>
+                                    <input type="text" id="add-student-first-name" autocomplete="off" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="add-student-last-name">Last Name</label>
+                                    <input type="text" id="add-student-last-name" autocomplete="off" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="add-student-email">School Email</label>
+                                <input type="email" id="add-student-email" autocomplete="off" required>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="add-student-grade">Grade</label>
+                                    <select id="add-student-grade" required>
+                                        <option value="">Select</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="add-student-section">Section</label>
+                                    <input type="text" id="add-student-section" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" required>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="add-student-password">Password</label>
+                                    <div class="password-field">
+                                        <input type="password" id="add-student-password" autocomplete="new-password" minlength="6" required>
+                                        <button type="button" class="password-toggle" aria-label="Show password"
+                                            aria-controls="add-student-password" title="Show password">
+                                            <i data-lucide="eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="add-student-confirm-password">Confirm Password</label>
+                                    <div class="password-field">
+                                        <input type="password" id="add-student-confirm-password" autocomplete="new-password" minlength="6" required>
+                                        <button type="button" class="password-toggle" aria-label="Show password"
+                                            aria-controls="add-student-confirm-password" title="Show password">
+                                            <i data-lucide="eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="add-student-status" role="status" aria-live="polite" style="font-size:0.9rem; color:var(--text-muted);"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="cancel-add-student-btn" type="button" class="btn secondary-btn">Cancel</button>
+                            <button id="create-student-account-btn" type="submit" class="btn primary-btn">Create Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Modal: Student Details -->
             <div id="student-detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detail-student-name">
                 <div class="modal-content" style="max-width: 800px; width: 90%;">
@@ -687,7 +768,7 @@
                                 <div class="mini-stat-value" id="detail-student-grade">-</div>
                             </div>
                             <div class="mini-stat">
-                                <div class="mini-stat-label">Group</div>
+                                <div class="mini-stat-label">Section</div>
                                 <div class="mini-stat-value" id="detail-student-group">-</div>
                             </div>
                             <div class="mini-stat">
@@ -1196,7 +1277,7 @@
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>School Calendar</h3>
-                                <p>Set trimester date ranges for vocabulary weeks.</p>
+                                <p>Set trimester starts, week counts, and generated vocabulary week ranges.</p>
                             </div>
                             <button id="save-school-calendar-btn" class="btn primary-btn">
                                 <i data-lucide="calendar-check"></i>
@@ -1213,25 +1294,40 @@
                                 <input type="date" id="calendar-it-start">
                             </div>
                             <div class="form-group">
+                                <label for="calendar-it-weeks">IT Weeks</label>
+                                <input type="number" id="calendar-it-weeks" min="1" max="52" placeholder="13">
+                            </div>
+                            <div class="form-group">
                                 <label for="calendar-it-end">IT End</label>
                                 <input type="date" id="calendar-it-end">
                             </div>
+                            <div class="calendar-range-preview" id="calendar-it-range"></div>
                             <div class="form-group">
                                 <label for="calendar-iit-start">IIT Start</label>
                                 <input type="date" id="calendar-iit-start">
                             </div>
                             <div class="form-group">
+                                <label for="calendar-iit-weeks">IIT Weeks</label>
+                                <input type="number" id="calendar-iit-weeks" min="1" max="52" placeholder="13">
+                            </div>
+                            <div class="form-group">
                                 <label for="calendar-iit-end">IIT End</label>
                                 <input type="date" id="calendar-iit-end">
                             </div>
+                            <div class="calendar-range-preview" id="calendar-iit-range"></div>
                             <div class="form-group">
                                 <label for="calendar-iiit-start">IIIT Start</label>
                                 <input type="date" id="calendar-iiit-start">
                             </div>
                             <div class="form-group">
+                                <label for="calendar-iiit-weeks">IIIT Weeks</label>
+                                <input type="number" id="calendar-iiit-weeks" min="1" max="52" placeholder="13">
+                            </div>
+                            <div class="form-group">
                                 <label for="calendar-iiit-end">IIIT End</label>
                                 <input type="date" id="calendar-iiit-end">
                             </div>
+                            <div class="calendar-range-preview" id="calendar-iiit-range"></div>
                         </div>
                         <div id="school-calendar-save-status" class="teacher-inline-status"></div>
                     </section>

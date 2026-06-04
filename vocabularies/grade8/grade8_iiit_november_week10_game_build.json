@@ -25,7 +25,7 @@
     {
       "word": "game shell",
       "definition": "The basic starting structure of a game.",
-      "example": "Students used game shell during the class activity.",
+      "example": "The game shell included the start screen and score variable.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "background",
       "definition": "The scene behind sprites.",
-      "example": "Students used background during the class activity.",
+      "example": "The background showed the scene behind the player sprite.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "motion",
       "definition": "Movement in a program.",
-      "example": "Students used motion during the class activity.",
+      "example": "Motion made the sprite move across the stage.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "game loop",
       "definition": "The repeated actions that keep a game running.",
-      "example": "Students used game loop during the class activity.",
+      "example": "The game loop checked controls and obstacles again and again.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "score",
       "definition": "A number that tracks points or progress.",
-      "example": "Students used score during the class activity.",
+      "example": "The score increased when the player collected an item.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "obstacle",
       "definition": "Something that blocks or challenges the player.",
-      "example": "Students used obstacle during the class activity.",
+      "example": "The obstacle made the player lose a point.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "control",
       "definition": "A way the player makes something happen.",
-      "example": "Students used control during the class activity.",
+      "example": "Keyboard control moved the sprite left and right.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

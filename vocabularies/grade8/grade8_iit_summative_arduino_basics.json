@@ -7,6 +7,8 @@
     "8"
   ],
   "trimester": "IIT",
+  "month": "june",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "Arduino",
       "definition": "A board and tool used for physical computing.",
-      "example": "Students used Arduino during the class activity.",
+      "example": "The Arduino ran the sketch that blinked the LED.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "Freenove",
       "definition": "A kit used to learn Arduino-style electronics.",
-      "example": "Students used Freenove during the class activity.",
+      "example": "The Freenove kit provided the breadboard, wires, resistor, and LED.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "microcontroller",
       "definition": "A small computer board that controls electronics.",
-      "example": "Students used microcontroller during the class activity.",
+      "example": "The microcontroller read the button input and controlled the LED.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "circuit",
       "definition": "A path that electricity can follow.",
-      "example": "Students used circuit during the class activity.",
+      "example": "The circuit connected power, ground, a resistor, and an LED.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "breadboard",
       "definition": "A board used to build circuits without soldering.",
-      "example": "Students used breadboard during the class activity.",
+      "example": "The student placed the resistor and LED on the breadboard before testing.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "pin",
       "definition": "A connection point on a board.",
-      "example": "Students used pin during the class activity.",
+      "example": "The LED wire was connected to digital pin 13.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "power",
       "definition": "Electricity used to run a circuit.",
-      "example": "Students used power during the class activity.",
+      "example": "The power wire carried electricity from the board to the circuit.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "ground",
       "definition": "The return path for electricity in a circuit.",
-      "example": "Students used ground during the class activity.",
+      "example": "The ground wire completed the circuit back to the Arduino.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "resistor",
       "definition": "A part that limits electric current.",
-      "example": "Students used resistor during the class activity.",
+      "example": "The resistor protected the LED from too much current.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "LED",
       "definition": "A small light that a program can control.",
-      "example": "Students used LED during the class activity.",
+      "example": "The LED turned on when the output pin was HIGH.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

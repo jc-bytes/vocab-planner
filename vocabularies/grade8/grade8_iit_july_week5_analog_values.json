@@ -25,7 +25,7 @@
     {
       "word": "digital",
       "definition": "Using clear separate values, like on or off.",
-      "example": "Students used digital during the class activity.",
+      "example": "The digital button reading was either HIGH or LOW.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "analog",
       "definition": "Using values that can change smoothly.",
-      "example": "Students used analog during the class activity.",
+      "example": "The analog knob reading changed gradually from low to high.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "potentiometer",
       "definition": "A knob that changes an analog value.",
-      "example": "Students used potentiometer during the class activity.",
+      "example": "The potentiometer controlled the brightness value.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "ADC",
       "definition": "A part that changes an analog signal into a number.",
-      "example": "Students used ADC during the class activity.",
+      "example": "The ADC changed the knob signal into a number.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "variable",
       "definition": "A value that can change in a program.",
-      "example": "Students used variable during the class activity.",
+      "example": "The variable stored the sensor reading in the sketch.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "PWM",
       "definition": "A fast on/off signal used to control brightness or speed.",
-      "example": "Students used PWM during the class activity.",
+      "example": "PWM made the LED look dimmer without turning fully off.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "brightness",
       "definition": "How light or dark something is.",
-      "example": "Students used brightness during the class activity.",
+      "example": "Brightness increased when the PWM value went up.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +81,7 @@
     {
       "word": "reading",
       "definition": "A value measured by a sensor.",
-      "example": "Students used reading during the class activity.",
+      "example": "The reading changed when the student turned the knob.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

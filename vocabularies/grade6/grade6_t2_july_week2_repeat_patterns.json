@@ -1,7 +1,7 @@
 {
   "id": "grade6_t2_july_week2_repeat_patterns",
   "subjectSlug": "technology",
-  "name": "Grade 6 T2 Practice: July Week 2 - Repeat Patterns",
+  "name": "Grade 6 T2 Practice: July Week 6 - Repeat Patterns",
   "description": "Practice words for loops and repeated movement patterns.",
   "grades": [
     "6"
@@ -70,5 +70,7 @@
       "synonyms": [],
       "antonyms": []
     }
-  ]
+  ],
+  "month": "july",
+  "week": 6
 }

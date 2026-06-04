@@ -25,7 +25,7 @@
     {
       "word": "Scratch",
       "definition": "A block coding tool for making programs and games.",
-      "example": "Students used Scratch during the project.",
+      "example": "The student opened Scratch to build the first game scene.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "sprite",
       "definition": "A character or object in a Scratch or mBlock project.",
-      "example": "Students used sprite during the project.",
+      "example": "The sprite moved when the player pressed an arrow key.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "script",
       "definition": "A group of connected blocks that run together.",
-      "example": "Students used script during the project.",
+      "example": "The script made the sprite say a message.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "event",
       "definition": "Something that starts an action in a program.",
-      "example": "Students used event during the project.",
+      "example": "The green flag event started the project.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "block",
       "definition": "A coding command that snaps into a program.",
-      "example": "Students used block during the project.",
+      "example": "The motion block moved the sprite ten steps.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "sequence",
       "definition": "Steps in the correct order.",
-      "example": "Students used sequence during the project.",
+      "example": "The sequence played a sound, moved, and changed costume.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

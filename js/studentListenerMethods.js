@@ -21,10 +21,20 @@ class StudentListenerMethods {
         document.addEventListener('click', (event) => {
             const shell = $('#student-tab-shell');
             if (shell && !shell.contains(event.target)) this.closeStudentMobileMenu();
+
+            const exportMenu = $('#student-vocab-export-menu');
+            if (exportMenu && !exportMenu.contains(event.target)) exportMenu.open = false;
         });
 
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') this.closeStudentMobileMenu({ focusToggle: true });
+            if (event.key === 'Escape') {
+                this.closeStudentMobileMenu({ focusToggle: true });
+                const exportMenu = $('#student-vocab-export-menu');
+                if (exportMenu?.open) {
+                    exportMenu.open = false;
+                    exportMenu.querySelector('summary')?.focus({ preventScroll: true });
+                }
+            }
         });
 
         this.addListener('#back-to-vocab', 'click', () => {
@@ -201,10 +211,12 @@ class StudentListenerMethods {
 
         // Generate Final Report
         this.addListener('#download-word-hunt-btn', 'click', () => {
+            $('#student-vocab-export-menu')?.removeAttribute('open');
             this.activities.downloadWordHuntSubmission();
         });
 
         this.addListener('#generate-final-report-btn', 'click', async () => {
+            $('#student-vocab-export-menu')?.removeAttribute('open');
             if (this.currentVocab) {
                 // First, save the current activity's score if there's one active
                 if (this.activityInstance && typeof this.activityInstance.getScore === 'function' && this.currentActivityType) {

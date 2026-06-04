@@ -7,6 +7,8 @@
     "8"
   ],
   "trimester": "IT",
+  "month": "march",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "vector graphic",
       "definition": "An image made from shapes and paths that can scale cleanly.",
-      "example": "Students used vector graphic during the class activity.",
+      "example": "The logo stayed sharp because it was made as a vector graphic.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "bitmap",
       "definition": "An image made from pixels.",
-      "example": "Students used bitmap during the class activity.",
+      "example": "The bitmap looked blurry after the student enlarged the image.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "fill",
       "definition": "The color inside a shape.",
-      "example": "Students used fill during the class activity.",
+      "example": "The student changed the fill color of the circle to blue.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "stroke",
       "definition": "The outline of a shape or path.",
-      "example": "Students used stroke during the class activity.",
+      "example": "The designer made the stroke thicker around the icon.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "z-order",
       "definition": "The front-to-back order of objects.",
-      "example": "Students used z-order during the class activity.",
+      "example": "The student changed the z-order so the title appeared in front of the shape.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "shape",
       "definition": "A basic form such as a circle, box, or triangle.",
-      "example": "Students used shape during the class activity.",
+      "example": "The poster icon was built from a circle, rectangle, and triangle shape.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "layer",
       "definition": "A level used to organize objects in a design.",
-      "example": "Students used layer during the class activity.",
+      "example": "The background layer stayed behind the logo and text.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "object",
       "definition": "One separate item in a design.",
-      "example": "Students used object during the class activity.",
+      "example": "The student selected one object before resizing it.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "path",
       "definition": "A line or shape made from points.",
-      "example": "Students used path during the class activity.",
+      "example": "The curved path formed the outline of the custom icon.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "node",
       "definition": "A point that controls part of a path.",
-      "example": "Students used node during the class activity.",
+      "example": "Moving one node changed the curve of the path.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

@@ -7,6 +7,8 @@
     "7"
   ],
   "trimester": "IIT",
+  "month": "june",
+  "week": 1,
   "purpose": "summative",
   "activitySettings": {
     "matching": 10,
@@ -25,7 +27,7 @@
     {
       "word": "audience",
       "definition": "The people who will see or use something.",
-      "example": "Students used audience during the project.",
+      "example": "The poster audience was Grade 6 students learning about e-waste.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +35,7 @@
     {
       "word": "purpose",
       "definition": "The reason something is made.",
-      "example": "Students used purpose during the project.",
+      "example": "The purpose of the poster was to convince students to recycle batteries safely.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +43,7 @@
     {
       "word": "poster",
       "definition": "A visual message with text and images.",
-      "example": "Students used poster during the project.",
+      "example": "The student created a poster with one clear title, image, and call to action.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +51,7 @@
     {
       "word": "Canva",
       "definition": "An online tool for making designs.",
-      "example": "Students used Canva during the project.",
+      "example": "The group used Canva to arrange the poster text, image, and logo.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +59,7 @@
     {
       "word": "contrast",
       "definition": "A clear difference that helps things stand out.",
-      "example": "Students used contrast during the project.",
+      "example": "The student improved contrast by placing dark text on a light background.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +67,7 @@
     {
       "word": "alignment",
       "definition": "How text and objects line up.",
-      "example": "Students used alignment during the project.",
+      "example": "The designer used alignment so the title, image, and text lined up neatly.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +75,7 @@
     {
       "word": "readability",
       "definition": "How easy text is to read.",
-      "example": "Students used readability during the project.",
+      "example": "The poster had good readability because the font was large and clear.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -81,7 +83,7 @@
     {
       "word": "copyright-free",
       "definition": "Allowed to use without breaking copyright rules.",
-      "example": "Students used copyright-free during the project.",
+      "example": "The student chose a copyright-free image for the environmental poster.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -89,7 +91,7 @@
     {
       "word": "Creative Commons",
       "definition": "A license that explains how work may be used.",
-      "example": "Students used Creative Commons during the project.",
+      "example": "The group used a Creative Commons image and checked the license rules.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -97,7 +99,7 @@
     {
       "word": "credit",
       "definition": "A note that says who made or provided something.",
-      "example": "Students used credit during the project.",
+      "example": "The image credit was placed at the bottom of the poster.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

@@ -25,7 +25,7 @@
     {
       "word": "ultrasonic",
       "definition": "Using sound waves to measure distance.",
-      "example": "Students used ultrasonic during the project.",
+      "example": "The ultrasonic sensor checked how close the wall was.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -33,7 +33,7 @@
     {
       "word": "reading",
       "definition": "A value measured by a sensor.",
-      "example": "Students used reading during the project.",
+      "example": "The reading changed when the robot moved closer.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -41,7 +41,7 @@
     {
       "word": "threshold",
       "definition": "A limit where an action changes.",
-      "example": "Students used threshold during the project.",
+      "example": "The threshold told the robot when to stop.",
       "difficulty": 2,
       "synonyms": [],
       "antonyms": []
@@ -49,7 +49,7 @@
     {
       "word": "condition",
       "definition": "A rule that can be true or false.",
-      "example": "Students used condition during the project.",
+      "example": "The condition checked if the distance was less than 10 centimeters.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -57,7 +57,7 @@
     {
       "word": "if",
       "definition": "A code word used to check a condition.",
-      "example": "Students used if during the project.",
+      "example": "The if block stopped the robot near the wall.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -65,7 +65,7 @@
     {
       "word": "else",
       "definition": "A code word for what happens when an if condition is false.",
-      "example": "Students used else during the project.",
+      "example": "The else block kept the robot moving when the path was clear.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -73,7 +73,7 @@
     {
       "word": "reactive",
       "definition": "Able to respond when something changes.",
-      "example": "Students used reactive during the project.",
+      "example": "The reactive robot changed behavior when the sensor reading changed.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
