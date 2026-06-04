@@ -4657,6 +4657,252 @@ select:focus {
     gap: var(--spacing-md);
 }
 
+.spark-command-strip {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(360px, 0.9fr);
+    gap: var(--spacing-sm);
+    align-items: stretch;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.spark-command-main {
+    display: grid;
+    align-content: center;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.spark-command-main strong {
+    overflow-wrap: anywhere;
+    font-size: 1.05rem;
+}
+
+.spark-command-main span:last-child {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.spark-command-kicker {
+    color: #fbbf24;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.spark-command-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.spark-command-stat {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.15rem 0.45rem;
+    align-items: center;
+    min-width: 0;
+    padding: 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.spark-command-stat svg {
+    grid-row: span 2;
+    width: 1rem;
+    height: 1rem;
+    color: #7dd3fc;
+}
+
+.spark-command-stat span {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.spark-command-stat strong {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.spark-view-tabs {
+    margin-bottom: 0;
+}
+
+.spark-view-tab {
+    gap: 0.45rem;
+}
+
+.spark-tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.35rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.spark-library-body,
+.spark-view-panel {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.spark-month-toolbar,
+.spark-type-tabs,
+.spark-spotlight-actions {
+    display: flex;
+    align-items: center;
+}
+
+.spark-month-toolbar {
+    gap: 0.5rem;
+    justify-content: flex-start;
+}
+
+.spark-month-select-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.spark-month-select-label span {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.spark-month-select-label select {
+    min-height: var(--touch-target);
+}
+
+.spark-type-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.spark-type-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: var(--touch-target);
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.spark-type-tab.active {
+    border-color: rgba(14, 165, 233, 0.55);
+    background: rgba(14, 165, 233, 0.16);
+    color: var(--text-main);
+}
+
+.spark-type-tab svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.spark-type-tab span:last-child {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    padding: 0 0.3rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+.spark-spotlight {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-sm);
+    align-items: start;
+    padding: var(--spacing-sm);
+    border: 1px solid rgba(249, 191, 36, 0.36);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(135deg, rgba(249, 115, 22, 0.14), rgba(14, 165, 233, 0.1)),
+        rgba(15, 23, 42, 0.52);
+}
+
+.spark-spotlight.is-current {
+    border-color: rgba(52, 211, 153, 0.56);
+}
+
+.spark-spotlight-copy {
+    display: grid;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.spark-spotlight-copy h3,
+.spark-spotlight-copy p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.spark-spotlight-copy h3 {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+.spark-spotlight-copy p {
+    color: var(--text-main);
+}
+
+.spark-spotlight-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem;
+}
+
+.spark-section {
+    display: grid;
+    gap: var(--spacing-sm);
+    padding-block: 0.25rem;
+}
+
+.spark-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.spark-section-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.spark-section-header p {
+    margin: 0.1rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+}
+
 .spark-section-count {
     display: inline-flex;
     align-items: center;
@@ -4812,6 +5058,11 @@ select:focus {
 
 .spark-card-action {
     min-height: var(--touch-target);
+}
+
+.spark-empty-panel {
+    grid-column: 1 / -1;
+    margin: 0;
 }
 
 .spark-modal-content {
@@ -9004,6 +9255,43 @@ button.activity-card {
         padding: var(--spacing-sm);
     }
 
+    .spark-command-strip,
+    .spark-spotlight {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .spark-command-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .spark-view-tabs {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+
+    .spark-view-tab {
+        flex: 1 1 145px;
+        justify-content: center;
+    }
+
+    .spark-month-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .spark-month-select-label {
+        flex: 1 1 220px;
+    }
+
+    .spark-month-select-label select {
+        width: 100%;
+    }
+
+    .spark-spotlight-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
     .spark-card-footer {
         align-items: flex-start;
         flex-direction: column;
@@ -9040,6 +9328,17 @@ button.activity-card {
     .data-tab-btn.active {
         border-color: rgba(99, 102, 241, 0.75);
         background: rgba(99, 102, 241, 0.18);
+    }
+
+    .data-tab-list.spark-view-tabs {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+
+    .data-tab-list.spark-view-tabs .spark-view-tab {
+        flex: 1 1 145px;
+        justify-content: center;
     }
 
     .data-dashboard-header,

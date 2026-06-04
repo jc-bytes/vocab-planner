@@ -12,7 +12,7 @@ import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 const SPARK_COLLECTION = 'weeklySparks';
 
 const SPARK_TYPE_META = {
-    cool_fact: { label: 'Cool Fact', icon: 'lightbulb' },
+    cool_fact: { label: 'Fact', pluralLabel: 'Facts', icon: 'lightbulb' },
     trivia: { label: 'Trivia', icon: 'circle-help' },
     good_news: { label: 'Good News', icon: 'badge-check' },
     reflection: { label: 'Reflection', icon: 'message-circle-question' },
@@ -20,6 +20,20 @@ const SPARK_TYPE_META = {
 };
 
 const SPARK_STATUSES = new Set(['draft', 'scheduled', 'archived']);
+const SPARK_VIEW_TABS = [
+    { id: 'week', label: 'This Week', icon: 'calendar-days' },
+    { id: 'month', label: 'This Month', icon: 'calendar-range' },
+    { id: 'types', label: 'By Type', icon: 'list-filter' },
+    { id: 'planning', label: 'Planning', icon: 'archive' }
+];
+const SPARK_TYPE_FILTERS = [
+    { id: 'all', label: 'All', icon: 'layout-grid' },
+    ...Object.entries(SPARK_TYPE_META).map(([id, meta]) => ({
+        id,
+        label: meta.pluralLabel || meta.label,
+        icon: meta.icon
+    }))
+];
 
 function getPanamaDateValue(date = new Date()) {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -49,6 +63,71 @@ function compareSparkSchedule(a, b) {
     const dateCompare = String(b.scheduledDate || '').localeCompare(String(a.scheduledDate || ''));
     if (dateCompare !== 0) return dateCompare;
     return timestampMillis(b.updatedAt) - timestampMillis(a.updatedAt);
+}
+
+function compareSparkScheduleAscending(a, b) {
+    const dateCompare = String(a.scheduledDate || '9999-12-31').localeCompare(String(b.scheduledDate || '9999-12-31'));
+    if (dateCompare !== 0) return dateCompare;
+    return timestampMillis(b.updatedAt) - timestampMillis(a.updatedAt);
+}
+
+function parseDateValue(value) {
+    const normalized = normalizeSparkDate(value);
+    if (!normalized) return null;
+    const [year, month, day] = normalized.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+}
+
+function toDateValue(date) {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function addDays(value, days) {
+    const date = parseDateValue(value);
+    if (!date) return '';
+    date.setUTCDate(date.getUTCDate() + days);
+    return toDateValue(date);
+}
+
+function getWeekBounds(value) {
+    const date = parseDateValue(value);
+    if (!date) return { start: '', end: '' };
+    const day = date.getUTCDay() || 7;
+    const start = toDateValue(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - day + 1)));
+    return { start, end: addDays(start, 6) };
+}
+
+function getMonthValue(value) {
+    return normalizeSparkDate(value).slice(0, 7);
+}
+
+function formatShortDate(value) {
+    const date = parseDateValue(value);
+    if (!date) return 'No date';
+    return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'UTC',
+        month: 'short',
+        day: 'numeric'
+    }).format(date);
+}
+
+function formatMonthLabel(value) {
+    const monthValue = String(value || '').trim();
+    if (!/^\d{4}-\d{2}$/.test(monthValue)) return 'No month';
+    const [year, month] = monthValue.split('-').map(Number);
+    return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'UTC',
+        month: 'long',
+        year: 'numeric'
+    }).format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
+function isInDateRange(value, start, end) {
+    const normalized = normalizeSparkDate(value);
+    return normalized && normalized >= start && normalized <= end;
 }
 
 function isDuplicateScheduledDateError(error) {
@@ -160,24 +239,73 @@ class TeacherSparkMethods {
         }
     }
 
-    groupWeeklySparks() {
+    getSparkLibraryData() {
         const today = getPanamaDateValue();
         const scheduled = this.weeklySparkItems
             .filter(spark => spark.status === 'scheduled')
+            .sort(compareSparkScheduleAscending);
+        const currentAndPrevious = scheduled
+            .filter(spark => spark.scheduledDate && spark.scheduledDate <= today)
             .sort(compareSparkSchedule);
-        const currentAndPrevious = scheduled.filter(spark => spark.scheduledDate && spark.scheduledDate <= today);
-        const upcoming = scheduled.filter(spark => spark.scheduledDate && spark.scheduledDate > today);
+        const currentSpark = currentAndPrevious[0] || null;
+        const currentId = currentSpark?.id || '';
+        const weekBounds = getWeekBounds(today);
+        const weekSparks = scheduled.filter(spark => isInDateRange(spark.scheduledDate, weekBounds.start, weekBounds.end));
+        const nextSparks = scheduled
+            .filter(spark => spark.scheduledDate && spark.scheduledDate > today)
+            .slice(0, 4);
+        const drafts = this.weeklySparkItems
+            .filter(spark => spark.status === 'draft')
+            .sort((a, b) => timestampMillis(b.updatedAt) - timestampMillis(a.updatedAt));
+        const archived = this.weeklySparkItems
+            .filter(spark => spark.status === 'archived')
+            .sort(compareSparkSchedule);
+        const activeSparks = this.weeklySparkItems
+            .filter(spark => spark.status !== 'archived')
+            .sort(compareSparkScheduleAscending);
+        const monthOptions = Array.from(new Set(scheduled
+            .map(spark => getMonthValue(spark.scheduledDate))
+            .filter(Boolean)))
+            .sort();
+        const todayMonth = getMonthValue(today);
+        if (!monthOptions.includes(this.weeklySparkMonth)) {
+            const nextMonth = monthOptions.find(month => month >= todayMonth);
+            this.weeklySparkMonth = monthOptions.includes(todayMonth)
+                ? todayMonth
+                : nextMonth || getMonthValue(currentSpark?.scheduledDate) || monthOptions[0] || todayMonth;
+        }
+        if (!SPARK_TYPE_FILTERS.some(type => type.id === this.weeklySparkTypeFilter)) {
+            this.weeklySparkTypeFilter = 'all';
+        }
+        if (!SPARK_VIEW_TABS.some(tab => tab.id === this.weeklySparkActiveView)) {
+            this.weeklySparkActiveView = 'week';
+        }
+
+        const selectedMonthSparks = scheduled.filter(spark => getMonthValue(spark.scheduledDate) === this.weeklySparkMonth);
+        const sparkOfMonth = selectedMonthSparks.find(spark => spark.id === currentId)
+            || selectedMonthSparks.find(spark => spark.scheduledDate >= today)
+            || selectedMonthSparks[0]
+            || null;
+        const typeCounts = activeSparks.reduce((counts, spark) => {
+            counts[spark.sparkType] = (counts[spark.sparkType] || 0) + 1;
+            return counts;
+        }, {});
 
         return {
-            currentAndPrevious,
-            currentId: currentAndPrevious[0]?.id || '',
-            upcoming,
-            drafts: this.weeklySparkItems
-                .filter(spark => spark.status === 'draft')
-                .sort((a, b) => timestampMillis(b.updatedAt) - timestampMillis(a.updatedAt)),
-            archived: this.weeklySparkItems
-                .filter(spark => spark.status === 'archived')
-                .sort(compareSparkSchedule)
+            today,
+            weekBounds,
+            scheduled,
+            currentSpark,
+            currentId,
+            weekSparks,
+            nextSparks,
+            drafts,
+            archived,
+            activeSparks,
+            monthOptions,
+            selectedMonthSparks,
+            sparkOfMonth,
+            typeCounts
         };
     }
 
@@ -191,41 +319,285 @@ class TeacherSparkMethods {
             return;
         }
 
-        const groups = this.groupWeeklySparks();
-        this.renderSparkSection(list, {
-            title: 'Current',
-            description: 'The latest scheduled Spark whose date has arrived.',
-            items: groups.currentAndPrevious,
-            emptyText: 'No current Spark is scheduled yet.',
-            currentId: groups.currentId
+        const data = this.getSparkLibraryData();
+        list.appendChild(this.createSparkOverview(data));
+        list.appendChild(this.createSparkViewTabs(data));
+
+        const body = createElement('div', 'spark-library-body');
+        if (this.weeklySparkActiveView === 'month') {
+            this.renderSparkMonthView(body, data);
+        } else if (this.weeklySparkActiveView === 'types') {
+            this.renderSparkTypeView(body, data);
+        } else if (this.weeklySparkActiveView === 'planning') {
+            this.renderSparkPlanningView(body, data);
+        } else {
+            this.renderSparkWeekView(body, data);
+        }
+        list.appendChild(body);
+    }
+
+    createSparkOverview(data) {
+        const overview = createElement('section', 'spark-command-strip');
+        const currentTitle = data.currentSpark?.title || 'No current Spark';
+        const currentMeta = data.currentSpark
+            ? `${formatShortDate(data.currentSpark.scheduledDate)} · ${this.getSparkTypeLabel(data.currentSpark.sparkType)}`
+            : 'Schedule a Spark to make it student-visible.';
+        overview.innerHTML = `
+            <div class="spark-command-main">
+                <span class="spark-command-kicker">Current Spark</span>
+                <strong>${escapeHtml(currentTitle)}</strong>
+                <span>${escapeHtml(currentMeta)}</span>
+            </div>
+            <div class="spark-command-stats" aria-label="Spark summary">
+                ${this.createSparkStatHtml('This week', data.weekSparks.length, 'calendar-days')}
+                ${this.createSparkStatHtml(formatMonthLabel(this.weeklySparkMonth), data.selectedMonthSparks.length, 'calendar-range')}
+                ${this.createSparkStatHtml('Drafts', data.drafts.length, 'file-pen-line')}
+                ${this.createSparkStatHtml('Archived', data.archived.length, 'archive')}
+            </div>
+        `;
+        return overview;
+    }
+
+    createSparkStatHtml(label, value, icon) {
+        return `
+            <div class="spark-command-stat">
+                <i data-lucide="${icon}"></i>
+                <span>${escapeHtml(label)}</span>
+                <strong>${Number(value) || 0}</strong>
+            </div>
+        `;
+    }
+
+    createSparkViewTabs(data) {
+        const counts = {
+            week: data.weekSparks.length,
+            month: data.selectedMonthSparks.length,
+            types: data.activeSparks.length,
+            planning: data.drafts.length + data.archived.length
+        };
+        const tabs = createElement('div', 'data-tab-list spark-view-tabs');
+        tabs.setAttribute('role', 'tablist');
+        tabs.setAttribute('aria-label', 'Spark library views');
+        tabs.innerHTML = SPARK_VIEW_TABS.map(tab => {
+            const active = tab.id === this.weeklySparkActiveView;
+            return `
+                <button class="data-tab-btn spark-view-tab${active ? ' active' : ''}" type="button"
+                    role="tab" aria-selected="${active ? 'true' : 'false'}" data-spark-view="${escapeHtml(tab.id)}">
+                    <i data-lucide="${tab.icon}"></i>
+                    <span>${escapeHtml(tab.label)}</span>
+                    <span class="spark-tab-count">${counts[tab.id] || 0}</span>
+                </button>
+            `;
+        }).join('');
+        return tabs;
+    }
+
+    renderSparkWeekView(container, data) {
+        const panel = createElement('div', 'spark-view-panel');
+        if (data.currentSpark) {
+            panel.appendChild(this.createSparkSpotlight(data.currentSpark, {
+                eyebrow: 'Spark of the Week',
+                currentId: data.currentId
+            }));
+        }
+        this.renderSparkSection(panel, {
+            title: 'Week Lineup',
+            description: `${formatShortDate(data.weekBounds.start)} - ${formatShortDate(data.weekBounds.end)}`,
+            items: data.weekSparks,
+            emptyText: 'No Sparks are scheduled for this calendar week.',
+            currentId: data.currentId
         });
-        this.renderSparkSection(list, {
-            title: 'Upcoming',
-            description: 'Scheduled Sparks waiting for their start date.',
-            items: groups.upcoming,
-            emptyText: 'No upcoming Sparks.',
-            currentId: groups.currentId
+        this.renderSparkSection(panel, {
+            title: 'Up Next',
+            description: 'Next scheduled Sparks',
+            items: data.nextSparks,
+            emptyText: 'No future Sparks are scheduled.',
+            currentId: data.currentId
         });
-        this.renderSparkSection(list, {
+        container.appendChild(panel);
+    }
+
+    renderSparkMonthView(container, data) {
+        const panel = createElement('div', 'spark-view-panel');
+        panel.appendChild(this.createSparkMonthToolbar(data));
+        if (data.sparkOfMonth) {
+            panel.appendChild(this.createSparkSpotlight(data.sparkOfMonth, {
+                eyebrow: 'Spark of the Month',
+                currentId: data.currentId
+            }));
+        }
+
+        const weekGroups = this.groupSparksByWeek(data.selectedMonthSparks);
+        if (weekGroups.length === 0) {
+            panel.appendChild(this.createSparkEmptyPanel('No Sparks are scheduled for this month.'));
+        } else {
+            weekGroups.forEach(group => {
+                this.renderSparkSection(panel, {
+                    title: `Week of ${formatShortDate(group.start)}`,
+                    description: `${formatShortDate(group.start)} - ${formatShortDate(group.end)}`,
+                    items: group.items,
+                    emptyText: '',
+                    currentId: data.currentId
+                });
+            });
+        }
+        container.appendChild(panel);
+    }
+
+    createSparkMonthToolbar(data) {
+        const toolbar = createElement('div', 'spark-month-toolbar');
+        const selectedIndex = data.monthOptions.indexOf(this.weeklySparkMonth);
+        const previousDisabled = selectedIndex <= 0;
+        const nextDisabled = selectedIndex < 0 || selectedIndex >= data.monthOptions.length - 1;
+        const options = data.monthOptions.length
+            ? data.monthOptions
+            : [this.weeklySparkMonth || getMonthValue(getPanamaDateValue())];
+        toolbar.innerHTML = `
+            <button class="btn secondary-btn icon-btn" type="button" data-spark-month-shift="-1"
+                aria-label="Previous Spark month" title="Previous Spark month"${previousDisabled ? ' disabled' : ''}>
+                <i data-lucide="chevron-left"></i>
+            </button>
+            <label class="spark-month-select-label">
+                <span>Month</span>
+                <select data-spark-month-select>
+                    ${options.map(month => `
+                        <option value="${escapeHtml(month)}"${month === this.weeklySparkMonth ? ' selected' : ''}>
+                            ${escapeHtml(formatMonthLabel(month))}
+                        </option>
+                    `).join('')}
+                </select>
+            </label>
+            <button class="btn secondary-btn icon-btn" type="button" data-spark-month-shift="1"
+                aria-label="Next Spark month" title="Next Spark month"${nextDisabled ? ' disabled' : ''}>
+                <i data-lucide="chevron-right"></i>
+            </button>
+        `;
+        return toolbar;
+    }
+
+    groupSparksByWeek(sparks) {
+        const groups = new Map();
+        sparks.forEach(spark => {
+            const bounds = getWeekBounds(spark.scheduledDate);
+            const key = bounds.start || 'unscheduled';
+            if (!groups.has(key)) {
+                groups.set(key, { ...bounds, items: [] });
+            }
+            groups.get(key).items.push(spark);
+        });
+        return Array.from(groups.values())
+            .map(group => ({
+                ...group,
+                items: group.items.sort(compareSparkScheduleAscending)
+            }))
+            .sort((a, b) => String(a.start || '').localeCompare(String(b.start || '')));
+    }
+
+    renderSparkTypeView(container, data) {
+        const panel = createElement('div', 'spark-view-panel');
+        panel.appendChild(this.createSparkTypeTabs(data));
+        if (this.weeklySparkTypeFilter === 'all') {
+            SPARK_TYPE_FILTERS
+                .filter(type => type.id !== 'all')
+                .forEach(type => {
+                    const items = data.activeSparks.filter(spark => spark.sparkType === type.id);
+                    this.renderSparkSection(panel, {
+                        title: type.label,
+                        description: `${items.length} active`,
+                        items,
+                        emptyText: `No ${type.label.toLowerCase()} Sparks yet.`,
+                        currentId: data.currentId
+                    });
+                });
+        } else {
+            const type = SPARK_TYPE_FILTERS.find(item => item.id === this.weeklySparkTypeFilter) || SPARK_TYPE_FILTERS[0];
+            const items = data.activeSparks.filter(spark => spark.sparkType === type.id);
+            this.renderSparkSection(panel, {
+                title: type.label,
+                description: `${items.length} active`,
+                items,
+                emptyText: `No ${type.label.toLowerCase()} Sparks yet.`,
+                currentId: data.currentId
+            });
+        }
+        container.appendChild(panel);
+    }
+
+    createSparkTypeTabs(data) {
+        const tabs = createElement('div', 'spark-type-tabs');
+        tabs.setAttribute('role', 'tablist');
+        tabs.setAttribute('aria-label', 'Spark type filters');
+        tabs.innerHTML = SPARK_TYPE_FILTERS.map(type => {
+            const active = type.id === this.weeklySparkTypeFilter;
+            const count = type.id === 'all' ? data.activeSparks.length : data.typeCounts[type.id] || 0;
+            return `
+                <button class="spark-type-tab${active ? ' active' : ''}" type="button"
+                    role="tab" aria-selected="${active ? 'true' : 'false'}" data-spark-type-filter="${escapeHtml(type.id)}">
+                    <i data-lucide="${type.icon}"></i>
+                    <span>${escapeHtml(type.label)}</span>
+                    <span>${count}</span>
+                </button>
+            `;
+        }).join('');
+        return tabs;
+    }
+
+    renderSparkPlanningView(container, data) {
+        const panel = createElement('div', 'spark-view-panel');
+        this.renderSparkSection(panel, {
             title: 'Drafts',
-            description: 'Ideas that are not student-visible.',
-            items: groups.drafts,
+            description: 'Not student-visible',
+            items: data.drafts,
             emptyText: 'No draft Sparks.',
-            currentId: groups.currentId
+            currentId: data.currentId
         });
-        this.renderSparkSection(list, {
+        this.renderSparkSection(panel, {
             title: 'Archived',
-            description: 'Stored Sparks that are no longer active.',
-            items: groups.archived,
+            description: 'Stored for reference',
+            items: data.archived,
             emptyText: 'No archived Sparks.',
-            currentId: groups.currentId
+            currentId: data.currentId
         });
+        container.appendChild(panel);
+    }
+
+    createSparkSpotlight(spark, { eyebrow, currentId }) {
+        const meta = SPARK_TYPE_META[spark.sparkType] || SPARK_TYPE_META.cool_fact;
+        const spotlight = createElement('section', `spark-spotlight${spark.id === currentId ? ' is-current' : ''}`);
+        spotlight.innerHTML = `
+            <div class="spark-spotlight-copy">
+                <span class="spark-command-kicker">${escapeHtml(eyebrow)}</span>
+                <div class="spark-card-topline">
+                    <span class="spark-type-pill"><i data-lucide="${meta.icon}"></i>${escapeHtml(meta.label)}</span>
+                    <span class="spark-status-pill">${escapeHtml(this.formatSparkDateLabel(spark))}</span>
+                </div>
+                <h3>${escapeHtml(spark.title || 'Untitled Spark')}</h3>
+                <p>${escapeHtml(spark.sparkText || 'No Spark text yet.')}</p>
+                ${spark.question ? `
+                    <div class="spark-question">
+                        <i data-lucide="message-circle-question"></i>
+                        <span>${escapeHtml(spark.question)}</span>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="spark-spotlight-actions">
+                <button class="btn secondary-btn spark-card-action" type="button" data-spark-action="edit" data-spark-id="${escapeHtml(spark.id)}">
+                    <i data-lucide="pencil"></i>
+                    Edit
+                </button>
+                <button class="btn secondary-btn spark-card-action" type="button" data-spark-action="duplicate" data-spark-id="${escapeHtml(spark.id)}">
+                    <i data-lucide="copy"></i>
+                    Duplicate
+                </button>
+            </div>
+        `;
+        return spotlight;
     }
 
     renderSparkSection(container, { title, description, items, emptyText, currentId }) {
-        const section = createElement('section', 'teacher-panel spark-section');
+        const section = createElement('section', 'spark-section');
         section.innerHTML = `
-            <div class="teacher-panel-header">
+            <div class="spark-section-header">
                 <div>
                     <h3>${escapeHtml(title)}</h3>
                     <p>${escapeHtml(description)}</p>
@@ -236,12 +608,18 @@ class TeacherSparkMethods {
 
         const grid = createElement('div', 'spark-card-grid');
         if (items.length === 0) {
-            grid.innerHTML = `<p class="teacher-empty-state">${escapeHtml(emptyText)}</p>`;
+            grid.appendChild(this.createSparkEmptyPanel(emptyText));
         } else {
             items.forEach(spark => grid.appendChild(this.createSparkCard(spark, { currentId })));
         }
         section.appendChild(grid);
         container.appendChild(section);
+    }
+
+    createSparkEmptyPanel(text) {
+        const empty = createElement('p', 'teacher-empty-state spark-empty-panel');
+        empty.textContent = text || 'No Sparks here yet.';
+        return empty;
     }
 
     createSparkCard(spark, { currentId = '' } = {}) {
@@ -309,7 +687,46 @@ class TeacherSparkMethods {
 
     formatSparkDateLabel(spark) {
         if (!spark.scheduledDate) return 'No scheduled date';
-        return `Starts ${spark.scheduledDate}`;
+        return `Starts ${formatShortDate(spark.scheduledDate)}`;
+    }
+
+    getSparkTypeLabel(sparkType) {
+        return (SPARK_TYPE_META[sparkType] || SPARK_TYPE_META.cool_fact).label;
+    }
+
+    refreshSparkLibrarySurface() {
+        this.renderSparkLibrary();
+        this.refreshIcons();
+    }
+
+    selectSparkView(view) {
+        if (!SPARK_VIEW_TABS.some(tab => tab.id === view)) return;
+        this.weeklySparkActiveView = view;
+        this.refreshSparkLibrarySurface();
+    }
+
+    selectSparkTypeFilter(type) {
+        if (!SPARK_TYPE_FILTERS.some(item => item.id === type)) return;
+        this.weeklySparkTypeFilter = type;
+        this.weeklySparkActiveView = 'types';
+        this.refreshSparkLibrarySurface();
+    }
+
+    selectSparkMonth(month) {
+        if (!/^\d{4}-\d{2}$/.test(String(month || ''))) return;
+        this.weeklySparkMonth = month;
+        this.weeklySparkActiveView = 'month';
+        this.refreshSparkLibrarySurface();
+    }
+
+    shiftSparkMonth(offset) {
+        const data = this.getSparkLibraryData();
+        if (data.monthOptions.length === 0) return;
+        const currentIndex = Math.max(0, data.monthOptions.indexOf(this.weeklySparkMonth));
+        const nextIndex = Math.min(data.monthOptions.length - 1, Math.max(0, currentIndex + offset));
+        this.weeklySparkMonth = data.monthOptions[nextIndex];
+        this.weeklySparkActiveView = 'month';
+        this.refreshSparkLibrarySurface();
     }
 
     findSparkById(id) {
@@ -467,6 +884,24 @@ export function initTeacherSparksListeners(manager) {
     });
 
     $('#spark-library-list')?.addEventListener('click', (event) => {
+        const viewButton = event.target.closest('[data-spark-view]');
+        if (viewButton) {
+            manager.selectSparkView(viewButton.dataset.sparkView);
+            return;
+        }
+
+        const typeButton = event.target.closest('[data-spark-type-filter]');
+        if (typeButton) {
+            manager.selectSparkTypeFilter(typeButton.dataset.sparkTypeFilter);
+            return;
+        }
+
+        const monthButton = event.target.closest('[data-spark-month-shift]');
+        if (monthButton) {
+            manager.shiftSparkMonth(Number(monthButton.dataset.sparkMonthShift) || 0);
+            return;
+        }
+
         const button = event.target.closest('[data-spark-action]');
         if (!button) return;
         const id = button.dataset.sparkId;
@@ -481,5 +916,11 @@ export function initTeacherSparksListeners(manager) {
         } else if (action === 'archive') {
             manager.archiveSpark(id);
         }
+    });
+
+    $('#spark-library-list')?.addEventListener('change', (event) => {
+        const select = event.target.closest('[data-spark-month-select]');
+        if (!select) return;
+        manager.selectSparkMonth(select.value);
     });
 }

@@ -88,6 +88,9 @@ class TeacherManager {
         this.weeklySparkCache = null;
         this.weeklySparkPromise = null;
         this.weeklySparkRefreshing = false;
+        this.weeklySparkActiveView = 'week';
+        this.weeklySparkTypeFilter = 'all';
+        this.weeklySparkMonth = null;
         this.editingSparkId = null;
         this.sparkModalMode = 'create';
         this.activityAssignmentsLoaded = false;
