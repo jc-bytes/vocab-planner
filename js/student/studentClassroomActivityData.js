@@ -104,7 +104,7 @@ class StudentClassroomActivityDataMethods {
         if (typeof window === 'undefined' || window.EXCALIDRAW_ASSET_PATH) return;
         const viteEnv = import.meta.env || {};
         window.EXCALIDRAW_ASSET_PATH = viteEnv.DEV
-            ? '/node_modules/@excalidraw/excalidraw/dist/dev/'
+            ? '/node_modules/@excalidraw/excalidraw/dist/'
             : new URL('./', window.location.href).href;
     }
 

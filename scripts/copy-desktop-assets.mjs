@@ -20,12 +20,12 @@ const entries = [
 
 const packageAssets = [
   {
-    source: 'node_modules/@excalidraw/excalidraw/dist/prod/fonts',
-    target: 'fonts'
+    source: 'node_modules/@excalidraw/excalidraw/dist/excalidraw-assets',
+    target: 'excalidraw-assets'
   },
   {
-    source: 'node_modules/@excalidraw/excalidraw/dist/prod/fonts',
-    target: 'assets/fonts'
+    source: 'node_modules/@excalidraw/excalidraw/dist/excalidraw-assets',
+    target: 'dist/excalidraw-assets'
   }
 ];
 
