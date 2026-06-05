@@ -46,7 +46,9 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     define: {
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.1.0')
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.1.0'),
+      'process.env.IS_PREACT': JSON.stringify('false'),
+      'process.env.NODE_ENV': JSON.stringify(mode === 'production' ? 'production' : 'development')
     }
   };
 });
