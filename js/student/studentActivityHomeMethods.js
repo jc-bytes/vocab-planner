@@ -86,11 +86,6 @@ class StudentActivityHomeMethods {
             currentTrimesterOnly: true
         });
 
-        if (vocabs.length === 0) {
-            container.appendChild(createElement('p', 'teacher-empty-state', message));
-            return;
-        }
-
         const today = new Date();
         const currentMonth = today.getMonth();
         const currentWeek = Math.floor((today.getDate() - 1) / 7) + 1;
@@ -141,7 +136,7 @@ class StudentActivityHomeMethods {
                 title: 'Pending',
                 subtitle: 'Due this trimester',
                 items: dueItems,
-                emptyText: 'No pending units due yet.'
+                emptyText: message || 'No pending units due yet.'
             },
             {
                 key: 'recent',
