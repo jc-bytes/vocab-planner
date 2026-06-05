@@ -340,7 +340,12 @@ export class CrosswordActivity {
         this.placedWords.forEach(w => {
             const item = createElement('div', 'cw-clue-item');
             item.dataset.wordNumber = w.number;
-            item.innerHTML = `<strong>${w.number}.</strong> ${w.definition} <span class="cw-clue-length">(${w.word.length})</span>`;
+            const number = document.createElement('strong');
+            number.textContent = `${w.number}.`;
+            const length = document.createElement('span');
+            length.className = 'cw-clue-length';
+            length.textContent = `(${w.word.length})`;
+            item.append(number, ` ${w.definition || ''} `, length);
             item.addEventListener('click', () => this.setActiveWord(w, true));
 
             if (w.direction === 'across') {

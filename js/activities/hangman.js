@@ -209,7 +209,10 @@ export class HangmanActivity {
 
         // Hint
         const hint = createElement('div', 'hangman-hint');
-        hint.innerHTML = `<strong>Hint:</strong> ${this.currentWord.definition}`;
+        const hintLabel = document.createElement('strong');
+        hintLabel.textContent = 'Hint:';
+        hint.appendChild(hintLabel);
+        hint.append(` ${this.currentWord.definition || ''}`);
         wrapper.appendChild(hint);
 
         // Keyboard

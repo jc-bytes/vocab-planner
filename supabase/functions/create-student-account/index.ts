@@ -211,22 +211,13 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: "Could not save the student profile." }, 500);
   }
 
-  const { error: progressError } = await adminClient
-    .from("student_progress")
-    .upsert({
-      user_id: studentId,
-      student_profile: studentProfile,
-      coins: 0,
-      coin_data: {
-        balance: 0,
-        giftCoins: 0,
-        totalEarned: 0,
-        totalSpent: 0,
-        totalGifted: 0,
-      },
-      coin_history: [],
-      units: {},
-    }, { onConflict: "user_id" });
+  const { error: progressError } = await adminClient.rpc(
+    "provision_student_progress_for_account",
+    {
+      p_student_id: studentId,
+      p_student_profile: studentProfile,
+    },
+  );
 
   if (progressError) {
     await adminClient.auth.admin.deleteUser(studentId);

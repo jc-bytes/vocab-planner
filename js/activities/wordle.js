@@ -265,7 +265,10 @@ export class WordleActivity {
         wrapper.appendChild(header);
 
         const hint = createElement('div', 'wordle-hint');
-        hint.innerHTML = `<strong>Definition:</strong> ${target.definition}`;
+        const hintLabel = document.createElement('strong');
+        hintLabel.textContent = 'Definition:';
+        hint.appendChild(hintLabel);
+        hint.append(` ${target.definition || ''}`);
         wrapper.appendChild(hint);
 
         const board = createElement('div', 'wordle-board');

@@ -1,21 +1,12 @@
-import { loadScript } from './main.js';
-
-const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+let chartModulePromise = null;
 
 const teacherDataDashboardChartMethods = {
     async ensureChartLibrary() {
         if (window.Chart) return window.Chart;
 
-        if (window.__TAURI_INTERNALS__ || window.__TAURI__) {
-            const module = await import('chart.js/auto');
-            window.Chart = window.Chart || module.default;
-            return window.Chart;
-        }
-
-        await loadScript(CHART_JS_CDN);
-        if (!window.Chart) {
-            throw new Error('Chart.js library not loaded');
-        }
+        chartModulePromise = chartModulePromise || import('chart.js/auto');
+        const module = await chartModulePromise;
+        window.Chart = window.Chart || module.default;
 
         return window.Chart;
     },

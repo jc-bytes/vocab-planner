@@ -228,39 +228,6 @@ export async function fetchJSON(path, options = {}) {
     }
 }
 
-const loadedScripts = new Map();
-
-export function loadScript(src) {
-    if (loadedScripts.has(src)) return loadedScripts.get(src);
-
-    const promise = new Promise((resolve, reject) => {
-        const existing = document.querySelector(`script[src="${src}"]`);
-        if (existing) {
-            if (existing.dataset.loaded === 'true') {
-                resolve();
-                return;
-            }
-            existing.addEventListener('load', resolve, { once: true });
-            existing.addEventListener('error', reject, { once: true });
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        script.dataset.loaded = 'false';
-        script.addEventListener('load', () => {
-            script.dataset.loaded = 'true';
-            resolve();
-        }, { once: true });
-        script.addEventListener('error', reject, { once: true });
-        document.head.appendChild(script);
-    });
-
-    loadedScripts.set(src, promise);
-    return promise;
-}
-
 function refreshLucideIcons() {
     if (window.lucide?.createIcons) {
         window.lucide.createIcons();
