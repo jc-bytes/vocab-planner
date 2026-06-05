@@ -5046,6 +5046,9 @@ select:focus {
 
 .spark-card-meta a,
 .student-spark-source a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-target);
     color: #7dd3fc;
     overflow-wrap: anywhere;
 }
