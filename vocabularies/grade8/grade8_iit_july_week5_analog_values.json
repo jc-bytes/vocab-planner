@@ -27,23 +27,33 @@
       "definition": "Using clear separate values, like on or off.",
       "example": "The digital button reading was either HIGH or LOW.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "on-off"
+      ],
+      "antonyms": [
+        "analog"
+      ]
     },
     {
       "word": "analog",
       "definition": "Using values that can change smoothly.",
       "example": "The analog knob reading changed gradually from low to high.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "smooth value"
+      ],
+      "antonyms": [
+        "digital"
+      ]
     },
     {
       "word": "potentiometer",
       "definition": "A knob that changes an analog value.",
       "example": "The potentiometer controlled the brightness value.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "knob"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "A value that can change in a program.",
       "example": "The variable stored the sensor reading in the sketch.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "changing value"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "How light or dark something is.",
       "example": "Brightness increased when the PWM value went up.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light level"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +97,10 @@
       "definition": "A value measured by a sensor.",
       "example": "The reading changed when the student turned the knob.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "measurement",
+        "value"
+      ],
       "antonyms": []
     }
   ]

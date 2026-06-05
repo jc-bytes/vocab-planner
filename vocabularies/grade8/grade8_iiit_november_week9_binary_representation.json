@@ -27,7 +27,9 @@
       "definition": "A way to show information.",
       "example": "Binary was a representation of numbers using only 0 and 1.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "way to show"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A mark or picture that stands for something.",
       "example": "Each symbol stood for one part of the message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mark"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A single binary digit, 0 or 1.",
       "example": "One bit stored either 0 or 1.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "binary digit"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A number system using only 0 and 1.",
       "example": "The binary number 1010 represented ten.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "base-two"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,9 @@
       "definition": "A group of 8 bits.",
       "example": "A byte held eight bits in the activity.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "eight bits"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "Instructions or symbols used by a computer.",
       "example": "The code used symbols to represent a message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "The number system using digits 0 through 9.",
       "example": "The decimal value was converted into binary.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "base-ten"
+      ],
       "antonyms": []
     }
   ]

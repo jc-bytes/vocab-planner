@@ -27,7 +27,9 @@
       "definition": "Trying many passwords until one works.",
       "example": "A brute force attack tried many password combinations until one worked.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "password guessing"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "A tool that helps block unsafe network traffic.",
       "example": "The firewall blocked the unsafe connection in the scenario.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "traffic filter"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +55,10 @@
       "definition": "A software change that fixes problems or improves security.",
       "example": "The update fixed a security weakness in the app.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "change",
+        "revision"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +66,9 @@
       "definition": "A short situation used for practice.",
       "example": "The scenario described a student receiving a suspicious login message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "situation"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +76,9 @@
       "definition": "A way to reduce risk or harm.",
       "example": "Two-factor authentication was the protection chosen for the account.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "safety measure"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +86,9 @@
       "definition": "A possible problem or danger.",
       "example": "Sharing the class link publicly created a risk for the meeting.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "danger"
+      ],
       "antonyms": []
     }
   ]

@@ -24,10 +24,12 @@
   "words": [
     {
       "word": "speed",
-      "definition": "How fast something moves.",
+      "definition": "A movement value adjusted during calibration to improve accuracy.",
       "example": "The team lowered the speed so the robot would not overshoot.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pace"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How long something happens.",
       "example": "Changing the time helped the robot stop closer to the line.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "duration"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "How far apart two things are.",
       "example": "The robot measured the distance between two checkpoints.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "space apart"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "The way something moves or points.",
       "example": "The robot changed direction at the corner.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "way"
+      ],
       "antonyms": []
     },
     {

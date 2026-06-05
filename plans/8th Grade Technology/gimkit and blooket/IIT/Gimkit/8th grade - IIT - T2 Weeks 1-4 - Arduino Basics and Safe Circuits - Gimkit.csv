@@ -1,0 +1,26 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+"Before connecting power, what should you check?",Inspect parts and check connections safely,Force wires into random holes,Remove resistors from the circuit,Touch components roughly
+What is a microcontroller?,A small computer board that controls electronics,A poster tool,A spreadsheet chart,A Scratch costume
+Why use a resistor with an LED?,To limit current and protect the LED,To make the breadboard heavier,To store code,To replace ground
+The LED does not turn on. Which check should come early?,"Power, ground, LED direction, resistor, pin, and code",Poster contrast,Image credit,Project reflection
+What is a circuit?,A path electricity can follow,A visual message,A data question,A dance move
+What does ground do?,Provides the return path for electricity,Makes the poster readable,Stores a Python list,Names the sprite
+What does a digital output pin control?,An output such as an LED,A source credit,A chart title,A Scratch costume
+What does delay change in an LED pattern?,How long the program pauses,The image source,The project name,The board name
+A button is pressed and the LED changes. What model is shown?,Input-process-output,Audience-purpose-poster,Route-marker-loop,Question-chart-conclusion only
+What does HIGH usually mean in an Arduino circuit?,On or high signal,Hidden answer,Wrong source,No power ever
+What does LOW usually mean?,Off or low signal,A colorful poster,A data product,A robot path
+Why use the Serial Monitor?,To observe messages or values while testing,To choose a logo,To clean the workstation only,To replace wiring
+What is baud rate?,The speed used for serial messages,The brightness of a poster,The size of a dataset,The length of a route
+Serial shows button pressed three times. What helps?,Debugging and confirming the input is read,Choosing image credit,Writing a reflection only,Drawing a route map
+Which team role writes build notes?,Recorder,Ground,Pin,LED
+Which team role focuses on code?,Coder,Resistor,Button,Source
+Which team role builds the physical parts?,Builder,Credit,Loop,Audience
+Why use a checklist during a build challenge?,To verify steps and reduce missed mistakes,To avoid responsibility,To hide mistakes,To remove all tests
+What is safe material use?,"Careful handling, organization, and returning parts",Leaving wires scattered,Forcing components,Skipping cleanup
+What should you include for your button-controlled LED check?,"Labeled photo or diagram, IPO sentence, and observations",Only a poster,Only a Scratch file,Only a data chart
+What is a breadboard used for?,Building circuits without soldering,Making slide layouts,Writing Python strings,Creating image credit
+Why label a circuit diagram?,To show how parts connect and what they do,To hide the circuit,To replace the build,To remove observations
+Which mistake could stop an LED circuit from working?,LED facing the wrong direction,Title aligned correctly,Image credit included,Dataset cleaned
+What should you do after solving a circuit problem?,Record the debugging step that helped,Erase your notes,Change unrelated files,Hide the diagram

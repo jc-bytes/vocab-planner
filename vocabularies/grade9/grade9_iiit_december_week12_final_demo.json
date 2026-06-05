@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "demonstration",
-      "definition": "Showing how something works.",
+      "definition": "Showing the final product and explaining how it solves the user problem.",
       "example": "The demonstration showed how the product helps users avoid a security mistake.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "showing"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A decision made while designing.",
       "example": "The blue color was a design choice because it made the warning look calm.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "design decision"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "Proof from tests that shows what happened.",
       "example": "Testing evidence showed that classmates understood the instructions.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "test proof"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "A final note about learning and improvement.",
       "example": "The final reflection explained what changed after feedback.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "final review"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +68,20 @@
       "definition": "Something created for a project.",
       "example": "The product combined the model, labels, screenshots, and explanation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "finished work"
+      ],
       "antonyms": []
     },
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "A final explanation of the problem, product, evidence, and result.",
       "example": "The presentation shared the problem, solution, evidence, and final result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     }
   ]

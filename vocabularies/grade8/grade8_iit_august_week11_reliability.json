@@ -27,7 +27,9 @@
       "definition": "How electronic parts are connected.",
       "example": "Loose wiring caused the LED to turn off during the test.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "connections"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "Instructions or symbols used by a computer.",
       "example": "The code stored the threshold and controlled the buzzer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "The reason a problem probably happened.",
       "example": "The likely cause was a wire placed in the wrong breadboard row.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "probable reason"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,10 @@
       "definition": "A way to solve a problem.",
       "example": "The solution was to reconnect the ground wire.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "answer",
+        "fix"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +68,10 @@
       "definition": "Notes or records that explain work.",
       "example": "Documentation showed the wiring change and the test result.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "records",
+        "notes"
+      ],
       "antonyms": []
     },
     {
@@ -67,15 +79,19 @@
       "definition": "How dependably something works.",
       "example": "Reliability improved after the team secured the jumper wires.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "dependability"
+      ],
       "antonyms": []
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Photos, notes, and repeated test results that prove reliability.",
       "example": "The evidence included a photo and a successful test note.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     }
   ]

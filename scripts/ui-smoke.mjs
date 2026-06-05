@@ -114,7 +114,14 @@ const problems = [];
 try {
     server = await resolveServer();
     browser = await chromium.launch();
-    const page = await browser.newPage();
+    const context = await browser.newContext();
+    await context.addInitScript(() => {
+        window.SUPABASE_CONFIG = {
+            url: 'http://127.0.0.1:54321',
+            publishableKey: 'ui-smoke-placeholder-key'
+        };
+    });
+    const page = await context.newPage();
 
     page.on('console', (message) => {
         const text = message.text();

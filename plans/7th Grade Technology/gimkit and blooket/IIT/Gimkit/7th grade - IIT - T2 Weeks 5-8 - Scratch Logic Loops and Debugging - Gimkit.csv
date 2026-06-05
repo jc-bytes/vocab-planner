@@ -1,0 +1,26 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What does a comparison operator help Scratch do?,Check how two values are related,Choose a poster image source,Move a robot wheel,Format a spreadsheet
+Which condition is true if score is 8?,score > 5,score < 3,score = 0,score is blank
+A quiz gives correct or wrong feedback. Which concept is used?,Selection,Copyright,Alignment,Ground
+Why use if/else in a Scratch quiz?,To choose between two responses,To remove all questions,To make the sprite ignore input,To store a poster credit
+What is a loop?,Code that repeats an action,A symbol for image credit,A sensor wire,A poster layout
+Which action should be placed in a repeat loop?,A dance step that happens four times,A one-time project title,A source citation,A final reflection
+What is one iteration?,One repeat of a loop,One poster image,One Arduino pin,One data source
+"A countdown should show 5, 4, 3, 2, 1. Which concept helps?",Loop with changing variable,Image credit,Brand palette,Breadboard ground
+A loop never stops. What should you check?,The condition or stopping point,The poster title,The logo color,The file folder
+What does debug mean?,Find and fix a problem in code,Add random blocks,Hide the script,Delete all sprites
+What does trace mean?,Follow code step by step,Draw a new logo,Choose image credit,Charge a battery
+Which debugging note is strongest?,Score did not change; I added the missing variable block.,It was broken,The game is bad,I fixed something
+"In pair programming, what does the driver do?",Controls the computer,Only watches silently,Writes image credit,Chooses a random backdrop
+"In pair programming, what does the navigator do?",Guides and checks the work,Deletes the script,Ignores bugs,Changes the poster palette
+Which feedback is most helpful for a Scratch practice feature?,"The key press works, but the success sound starts too late",It is weird,Make it better,I like games
+Which practice feature prepares you for the dance game?,"Key press, costume change, sound, movement, and feedback",Only a blank sprite,Only a poster image,Only a file name
+Why test with a partner?,Your partner may notice timing or logic problems,Your partner hides the project,Testing is not needed,The game fixes itself
+Which is an example of logic?,"If the answer is correct, increase score",Use a green poster,Add a logo credit,Open a folder
+Game responds only when touching a sprite. What should you use?,Condition,Image source,Typography,Circuit ground
+Which bug is common in Scratch loops?,Repeating too many times or never stopping,Image is copyright-free,Text is readable,Logo is aligned
+What should you do before the graded debugging check?,Practice identifying likely errors and planning fixes,Memorize only the file name,Delete the starter file,Ignore the feedback
+Which concept helps a rhythm-timing program?,Loop and variable,Poster alignment,Arduino resistor,Data privacy
+What does response mean in a Scratch game?,What happens after input or an event,The image source note,The color palette,The project folder
+What should you include for Weeks 5-8?,"Condition screenshot, loop practice, debug note, dance prep",Only a poster title,Only a robot route,Only a dataset

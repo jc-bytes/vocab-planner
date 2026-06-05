@@ -1,7 +1,9 @@
 export const SUPABASE_CONFIG = {
-    url: 'https://ifofhiypzffruzhiukst.supabase.co',
-    publishableKey: 'sb_publishable_xsZ8dNhTjAwDra48jyOujA_Kd2oztMh'
+    url: import.meta.env.VITE_SUPABASE_URL || '',
+    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 };
+
+export const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co';
 
 export const isSupabaseConfigured = () => {
     const config = window.SUPABASE_CONFIG || SUPABASE_CONFIG;

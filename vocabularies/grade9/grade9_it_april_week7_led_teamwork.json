@@ -35,7 +35,9 @@
       "definition": "One tiny dot in a digital image or display.",
       "example": "The first pixel turned blue while the rest stayed off.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "picture dot"
+      ],
       "antonyms": []
     },
     {
@@ -48,18 +50,24 @@
     },
     {
       "word": "pattern",
-      "definition": "Something that repeats or has a clear order.",
+      "definition": "A planned LED color or blink sequence used as a warning signal.",
       "example": "The team created a red-blue-red pattern for the warning signal.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
     },
     {
       "word": "speed",
       "definition": "How fast something happens or moves.",
       "example": "The animation speed changed when the delay value changed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pace"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +75,9 @@
       "definition": "The person who builds the physical parts.",
       "example": "The builder connected the LED strip and checked the wiring.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "maker"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +85,9 @@
       "definition": "The person who works on the code.",
       "example": "The coder edited the loop that controlled the LED pattern.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "programmer"
+      ],
       "antonyms": []
     },
     {
@@ -91,7 +103,9 @@
       "definition": "The person who writes notes or evidence.",
       "example": "The recorder wrote the test result in the project log.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "note taker"
+      ],
       "antonyms": []
     }
   ]

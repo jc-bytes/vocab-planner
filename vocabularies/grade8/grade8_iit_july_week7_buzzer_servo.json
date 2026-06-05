@@ -27,7 +27,10 @@
       "definition": "A part that makes sound.",
       "example": "The buzzer played a sound when the distance was too short.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A sound with a certain pitch.",
       "example": "The tone became higher during the warning test.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pitch sound"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "How fast something repeats, often for sound.",
       "example": "The frequency changed the pitch of the buzzer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat rate"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "How long something lasts.",
       "example": "The duration controlled how long the sound played.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "length of time"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +68,9 @@
       "definition": "A motor that moves to an angle.",
       "example": "The servo turned the pointer toward the warning label.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "angle motor"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A measurement of a turn.",
       "example": "The angle set the servo position to 90 degrees.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "turn measure"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +88,9 @@
       "definition": "A wire that carries a control signal.",
       "example": "The signal wire connected the servo to the control pin.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "control wire"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +98,9 @@
       "definition": "A smooth movement from one side to another.",
       "example": "The sweep moved the servo smoothly from left to right.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "smooth movement"
+      ],
       "antonyms": []
     }
   ]

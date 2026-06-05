@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What is a maze in the robot project?,A path challenge with turns and obstacles,A website title,A Scratch costume,A private message
+Why sketch the maze route first?,"To plan turns, checkpoints, and possible sensor checks",To avoid all testing,To hide the route,To remove sensors
+What is a prototype?,A test version used before the final build,A random color,A deleted program,A web page source
+What is an algorithm?,A clear set of steps to solve a problem,A loose screw,A poster background,A missing file
+What should your project plan include?,"Route, sensors, sequence, checkpoints, and team roles",Only a robot name,Only a website link,Only one color
+What is the goal of a maze navigator?,Move through the maze using planned movement and checks,Delete the maze,Stay still forever,Hide the program
+Which sensor can help detect walls or obstacles?,Ultrasonic sensor,Website header,Image source,Folder icon
+Why assign team responsibilities?,"So each person knows what to build, test, or record",So nobody helps,So the route disappears,So the robot cannot move
+What should you document during a trial?,"What happened, what failed, and what changed",Only the desk number,Only a random sound,Only a private password
+What is a trial?,One test attempt,A web page section,A robot part,A source note
+What is an improvement?,A change based on test results,A hidden program,A random route,A deleted checkpoint
+What does performance mean?,How well the robot works,How colorful a poster is,How private a message is,How long a title is
+Why use a debugging checklist?,"To fix movement, sensor, or sequence issues step by step",To skip the maze,To hide mistakes,To remove checkpoints
+Your robot misses a turn. What should you check?,"Turn time, speed, and command order",Image credit only,Website audience only,Page title only
+Robot stops too late near an obstacle. What should you check?,Sensor threshold and reading,Vector fill color,Scratch score,Folder name
+What should final testing show?,The robot can follow the route or explain needed fixes,The route is hidden,The program was never tested,Only the robot color
+What is a demonstration?,Showing how the robot route or sensor response works,Closing every file,Choosing a random link,Drawing one shape
+What should your maze explanation include?,"Route plan, code logic, sensor use, challenge, and solution",Only a title,Only a private password,Only a color
+What is a solution?,A way to solve a problem,A missing sensor,A broken link,A random icon
+What is a challenge?,The difficult part you had to solve,The easiest color,The hidden menu,The page title
+Why save code screenshots or notes?,So you can explain what the robot did and changed,So the route disappears,So the robot resets forever,So the maze is deleted
+Which final reflection sounds useful?,"The robot turned late, so we reduced turn time.",Everything was perfect with no test.,I do not know what changed.,The color was nice.
+What should you do before presenting the maze?,Test the robot and practice the explanation,Delete the program,Hide the route,Remove the sensor
+Which result is strongest?,The robot reached checkpoints and you can explain the fixes,The robot never moved,The route was guessed,The sensor was ignored
+Why is teamwork important in the maze project?,"Building, coding, testing, and notes all need attention",Only one person can see the robot,It removes responsibility,It makes testing unnecessary

@@ -24,11 +24,16 @@
   "words": [
     {
       "word": "debug",
-      "definition": "To find and fix a problem in code.",
-      "example": "The team debugged the robot after it missed the turn.",
+      "definition": "To use trial results to find and fix a robot route problem.",
+      "example": "The team can debug the robot after it misses the turn.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "trial",
@@ -40,11 +45,16 @@
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A change based on trial results that improves robot movement.",
       "example": "The improvement made the turn shorter.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     },
     {
       "word": "performance",
@@ -59,15 +69,21 @@
       "definition": "Notes or records that explain the work.",
       "example": "Documentation recorded the speed, time, and result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "records",
+        "notes"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A note explaining what testing showed and what the team changed.",
       "example": "The reflection explained what the team would change next time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

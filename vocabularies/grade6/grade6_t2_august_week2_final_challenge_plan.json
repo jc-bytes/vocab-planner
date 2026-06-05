@@ -27,7 +27,10 @@
       "definition": "What you are trying to do.",
       "example": "The goal was to follow the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "target",
+        "aim"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A simple rule that says when the task is complete.",
       "example": "The success rule was to stop inside the box.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "completion rule"
+      ],
       "antonyms": []
     },
     {
@@ -43,23 +48,33 @@
       "definition": "The space where a project is tried safely.",
       "example": "We put tape in the test area.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "safe test space"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A change that helps the robot reach the marker more accurately.",
       "example": "The improvement made the robot stop closer to the marker.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     },
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "The final robot task that combines movement, testing, and improvement.",
       "example": "The challenge was to reach the finish marker.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +82,9 @@
       "definition": "Pieces that make up a device.",
       "example": "The robot parts include wheels and sensors.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pieces"
+      ],
       "antonyms": []
     }
   ],

@@ -43,7 +43,10 @@
       "definition": "Facts or values that can be used or studied.",
       "example": "The class used data examples to compare correct and incorrect results.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "facts",
+        "values"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +62,10 @@
       "definition": "Trying something to see if it works.",
       "example": "Testing checked whether the model made a reasonable prediction.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking",
+        "trial"
+      ],
       "antonyms": []
     },
     {
@@ -75,15 +81,21 @@
       "definition": "A simple version or representation of something.",
       "example": "The model gave different results when the training data changed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "version",
+        "representation"
+      ],
       "antonyms": []
     },
     {
       "word": "limitation",
-      "definition": "Something that makes results less complete or certain.",
+      "definition": "A reason an AI result may be incomplete, biased, or unreliable.",
       "example": "One limitation was that the model confused similar images.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "constraint",
+        "weakness"
+      ],
       "antonyms": []
     }
   ]

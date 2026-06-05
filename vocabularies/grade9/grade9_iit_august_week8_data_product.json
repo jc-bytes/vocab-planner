@@ -35,7 +35,10 @@
       "definition": "Advice about what should be done.",
       "example": "The recommendation suggested adding more practice charts to the lesson.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "advice",
+        "suggestion"
+      ],
       "antonyms": []
     },
     {
@@ -51,31 +54,43 @@
       "definition": "A visual product that explains information.",
       "example": "The infographic summarized the survey result with icons and one chart.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "information visual"
+      ],
       "antonyms": []
     },
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test version of the data product layout or chart flow.",
       "example": "The prototype showed the first layout of the data product.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "limitation",
-      "definition": "Something that makes results less complete or certain.",
+      "definition": "A weakness in the dataset or method that affects the conclusion.",
       "example": "The student listed a limitation because only one class answered the survey.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "constraint",
+        "weakness"
+      ],
       "antonyms": []
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "A chart, result, or data pattern that supports the recommendation.",
       "example": "The chart was evidence for the group's recommendation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     }
   ]

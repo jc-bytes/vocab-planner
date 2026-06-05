@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
+    "test": "npm run test:ui:smoke",
     "test:ui:smoke": "node scripts/ui-smoke.mjs",
     "test:ui:smoke:dist": "node scripts/ui-smoke-dist.mjs",
     "test:ui:auth-smoke": "node scripts/ui-auth-smoke.mjs",
@@ -22,11 +23,12 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "^0.18.1",
+    "@excalidraw/excalidraw": "^0.17.6",
     "@fontsource/inter": "^5.2.8",
     "@supabase/supabase-js": "^2.49.8",
     "@xyflow/react": "^12.10.2",
     "chart.js": "^4.4.9",
+    "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",
     "lucide": "^1.17.0",

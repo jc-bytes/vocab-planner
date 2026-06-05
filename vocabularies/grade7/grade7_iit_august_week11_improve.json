@@ -24,10 +24,12 @@
   "words": [
     {
       "word": "score",
-      "definition": "A number that tracks points or progress.",
+      "definition": "The visible game counter players use to track progress.",
       "example": "The score display moved to the top corner.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "points"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "A tool or variable that tracks time.",
       "example": "The timer gave players thirty seconds to finish.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clock",
+        "counter"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,10 @@
       "definition": "Keeping work clear and easy to follow.",
       "example": "Organization kept the scripts grouped by sprite.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "structure"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +67,20 @@
       "definition": "A real use for a skill or project.",
       "example": "The application showed how loops and variables can make a game.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "real use"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A note explaining how the Scratch project became more functional.",
       "example": "The reflection explained which block was hardest to use.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

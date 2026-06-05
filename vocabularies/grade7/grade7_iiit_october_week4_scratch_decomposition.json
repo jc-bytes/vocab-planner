@@ -27,7 +27,9 @@
       "definition": "Breaking a big task into smaller parts.",
       "example": "Decomposition split the game into start, play, and finish parts.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "breaking apart"
+      ],
       "antonyms": []
     },
     {
@@ -35,13 +37,16 @@
       "definition": "A smaller named part of a program that can be reused.",
       "example": "The jump subroutine was reused by two sprites.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reusable block",
+        "helper routine"
+      ],
       "antonyms": []
     },
     {
       "word": "call",
       "definition": "To run a subroutine from another part of a program.",
-      "example": "The main program called the dance subroutine.",
+      "example": "The main program can call the dance subroutine.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -59,15 +64,22 @@
       "definition": "To use something again instead of rebuilding it.",
       "example": "Reuse saved time because the same blocks worked twice.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "use again"
+      ],
+      "antonyms": [
+        "discard"
+      ]
     },
     {
       "word": "loop",
-      "definition": "Code that repeats.",
+      "definition": "A reusable repeat block used inside a decomposed Scratch task.",
       "example": "The loop repeated the animation until the song ended.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     }
   ]

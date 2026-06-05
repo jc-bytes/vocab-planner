@@ -19,6 +19,10 @@ export const AUDIT_ASSIGNMENT_IDS = [
     'audit-external-artifact',
     'audit-flowchart-algorithm'
 ];
+export const AUDIT_SPARK_IDS = [
+    'audit-current-spark',
+    'audit-future-spark'
+];
 
 const AUDIT_IMAGE_BUCKET = 'classroom-activity-images';
 const AUDIT_IMAGE_PATH = 'audit/release-hardening.webp';
@@ -412,6 +416,37 @@ function buildAuditAssignments({ teacherId, image }) {
     ];
 }
 
+function buildAuditSparks({ teacherId }) {
+    return [
+        {
+            id: 'audit-current-spark',
+            spark_type: 'cool_fact',
+            title: 'Audit Spark',
+            spark_text: 'Technology can help a class turn one small idea into something everyone can test.',
+            why_it_matters: 'Students practice noticing how tools solve real classroom problems.',
+            question: 'What classroom problem could technology help us improve this week?',
+            source_title: 'Local audit seed',
+            source_url: '',
+            scheduled_date: auditVisibleFromDate(),
+            status: 'scheduled',
+            owner_id: teacherId
+        },
+        {
+            id: 'audit-future-spark',
+            spark_type: 'trivia',
+            title: 'Future Audit Spark',
+            spark_text: 'This Spark should stay hidden until its scheduled date arrives.',
+            why_it_matters: 'Future scheduled Sparks should not appear early for students.',
+            question: 'Why is scheduling useful for classroom routines?',
+            source_title: 'Local audit seed',
+            source_url: '',
+            scheduled_date: '2099-01-01',
+            status: 'scheduled',
+            owner_id: teacherId
+        }
+    ];
+}
+
 export async function resetAuditSubmissions(admin) {
     await admin
         .from('classroom_activity_submissions')
@@ -430,6 +465,11 @@ export async function seedLocalAuditData({ resetSubmissions = false } = {}) {
     await admin
         .from('classroom_activity_assignments')
         .upsert(buildAuditAssignments({ teacherId: users.teacher.id, image }), { onConflict: 'id' })
+        .throwOnError();
+
+    await admin
+        .from('weekly_sparks')
+        .upsert(buildAuditSparks({ teacherId: users.teacher.id }), { onConflict: 'id' })
         .throwOnError();
 
     if (resetSubmissions) await resetAuditSubmissions(admin);

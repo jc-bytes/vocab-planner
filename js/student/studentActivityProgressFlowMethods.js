@@ -114,17 +114,100 @@ class StudentActivityProgressFlowMethods {
         return Math.abs(hash) % rotationLength;
     }
 
+    getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
+        const words = Array.isArray(vocab?.words) ? vocab.words : [];
+        switch (activityType) {
+            case 'matching':
+                return words.filter(word => String(word.word || '').length >= 2).length;
+            case 'synonym-antonym':
+                return words.filter(word => (
+                    word.synonyms?.length > 0 || word.antonyms?.length > 0
+                )).length;
+            case 'word-search':
+                return words.filter(word => String(word.word || '').length >= 4).length;
+            case 'crossword':
+                return words.filter(word => (
+                    String(word.word || '').length > 1 &&
+                    /^[a-zA-Z]+$/.test(String(word.word || ''))
+                )).length;
+            case 'wordle':
+                return words.filter(word => {
+                    const label = String(word.word || '');
+                    const cleanWord = label.replace(/[^a-zA-Z]/g, '');
+                    return /^[a-zA-Z\s-]+$/.test(label) && cleanWord.length >= 3 && cleanWord.length <= 10;
+                }).length;
+            case 'fill-in-blank':
+                return words.filter(word => word.example).length;
+            case 'flashcards':
+            case 'quiz':
+            case 'illustration':
+            case 'hangman':
+            case 'scramble':
+            case 'speed-match':
+                return words.length;
+            default:
+                return 0;
+        }
+    }
+
+    getRequiredActivityMinimum(vocab = this.sm.currentVocab) {
+        const wordCount = Array.isArray(vocab?.words) ? vocab.words.length : 0;
+        return Math.min(4, wordCount);
+    }
+
+    isActivitySuitableForRequired(activityType, vocab = this.sm.currentVocab) {
+        const minimum = this.getRequiredActivityMinimum(vocab);
+        if (minimum <= 0) return activityType === 'flashcards';
+        return this.getActivityPlayableCount(activityType, vocab) >= minimum;
+    }
+
+    replaceUnsuitableRequiredActivities(requiredActivities, vocab = this.sm.currentVocab, validIds = new Set(VOCAB_ACTIVITY_IDS)) {
+        const replacementOrder = [
+            'word-search',
+            'matching',
+            'scramble',
+            'hangman',
+            'quiz',
+            'speed-match',
+            'synonym-antonym',
+            'fill-in-blank',
+            'flashcards'
+        ].filter(activityType => validIds.has(activityType));
+        const selected = [];
+
+        requiredActivities.forEach(activityType => {
+            if (this.isActivitySuitableForRequired(activityType, vocab) && !selected.includes(activityType)) {
+                selected.push(activityType);
+                return;
+            }
+
+            const replacement = replacementOrder.find(candidate => (
+                !selected.includes(candidate) &&
+                !requiredActivities.includes(candidate) &&
+                this.isActivitySuitableForRequired(candidate, vocab)
+            ));
+
+            selected.push(replacement || activityType);
+        });
+
+        return [...new Set(selected)];
+    }
+
     getActivityFlowConfig(vocab = this.sm.currentVocab) {
         const settings = vocab?.activitySettings || {};
         const validIds = new Set(VOCAB_ACTIVITY_IDS);
-        const hasExplicitFlow = Array.isArray(settings.requiredActivities) || Array.isArray(settings.additionalActivities);
+        const hasExplicitRequired = Array.isArray(settings.requiredActivities);
+        const hasExplicitAdditional = Array.isArray(settings.additionalActivities);
         const defaultRequired = this.getDefaultRequiredActivities(vocab).filter(id => validIds.has(id));
-        const requestedRequired = hasExplicitFlow ? settings.requiredActivities : defaultRequired;
+        const requestedRequired = hasExplicitRequired ? settings.requiredActivities : defaultRequired;
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
-        const uniqueRequired = [...new Set(required)];
+        let uniqueRequired = [...new Set(required)];
+        if (!hasExplicitRequired) {
+            uniqueRequired = this.replaceUnsuitableRequiredActivities(uniqueRequired, vocab, validIds);
+        }
         const requiredSet = new Set(uniqueRequired);
-        const requestedAdditional = hasExplicitFlow
+        const requestedAdditional = hasExplicitAdditional
             ? settings.additionalActivities
             : VOCAB_ACTIVITY_IDS.filter(id => !requiredSet.has(id));
         const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])

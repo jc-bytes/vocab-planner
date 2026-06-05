@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A data visual used to compare values and support a conclusion.",
       "example": "The chart showed how many students chose each lunch option.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A chart that compares values using bars.",
       "example": "The bar chart compared the number of answers in each category.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "bar graph"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "A chart that shows change or trends.",
       "example": "The line chart showed how temperature changed during the week.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "line graph"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +58,31 @@
       "definition": "A chart that shows points for two values.",
       "example": "The scatter plot compared screen time and homework time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "point chart"
+      ],
       "antonyms": []
     },
     {
       "word": "pattern",
-      "definition": "Something that repeats or has a clear order.",
+      "definition": "A relationship or trend noticed in the data.",
       "example": "The student noticed a pattern where higher practice time led to higher scores.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
     },
     {
       "word": "outlier",
       "definition": "A value that is very different from the others.",
       "example": "One outlier showed a very high score with very little practice time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "unusual value"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +90,9 @@
       "definition": "A relationship where two things seem to change together.",
       "example": "The chart suggested a correlation between sleep hours and focus rating.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "relationship"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +100,9 @@
       "definition": "A final idea based on evidence.",
       "example": "The conclusion explained what the chart pattern probably meant.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "finding"
+      ],
       "antonyms": []
     }
   ]

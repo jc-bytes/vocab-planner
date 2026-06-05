@@ -32,26 +32,38 @@
     },
     {
       "word": "input",
-      "definition": "Information or an action that goes into a device or program.",
+      "definition": "A button press or sensor action that tells the micro:bit what to do.",
       "example": "A button press is an input.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
+      "definition": "What the micro:bit shows or does after the program runs.",
       "example": "A sound can be an output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "LED",
-      "definition": "A small light on a device or robot.",
+      "definition": "A tiny light in the micro:bit display.",
       "example": "The LED turned red when the program started.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +71,9 @@
       "definition": "A part you press to give input.",
       "example": "Button A made the number increase.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "control"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +81,9 @@
       "definition": "A screen or lights that show output.",
       "example": "The display showed a smile.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "show"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +91,9 @@
       "definition": "A small picture or symbol.",
       "example": "The icon appeared on the LED display.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     }
   ]

@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What should a robot goal explain?,What the robot should do,Only the team name,Only a website link,Only a vector color,20,1
+2,What belongs in a component list?,Random files,Parts needed for the project,Only a title,Only a search query,20,2
+3,What is a state chart?,A folder icon,A campaign poster,A table or diagram showing states and actions,A browser tab,20,3
+4,What should a design plan include?,Only a board photo,Only a password,Only a color palette,"Goal, inputs, outputs, state chart, parts, risks, and tests",20,4
+5,What is a test step?,One action used to check if something works,A hidden source,A deleted wire,A web page section,20,1
+6,Why get peer feedback on a design plan?,To remove testing,"To refine the goal, tests, or build idea",To hide weak points,To delete the plan,20,2
+7,What is a subsystem?,One unrelated picture,A private message,One smaller part of a larger system,A vector fill,20,3
+8,What is wiring?,The text on a website,The name of a folder,The style of a logo,How electronic parts are connected,20,4
+9,What is code logic?,The rules and order used in code,Only wire color,Only page navigation,Only image credit,20,1
+10,Why build one feature first?,To skip the project,To test a smaller part before the whole project,To hide the circuit,To remove every input,20,2
+11,What should project notes record?,Only a team joke,Only a page title,"Input, output, state, and expected response",Only a random image,20,3
+12,What is documentation?,A loose button,A hidden password,A browser color,Notes or records that explain work,20,4
+13,What is a test result?,What happened during a test,A missing wire,A deleted source,A logo shape,20,1
+14,What does debug mean?,Ignore every problem,Isolate and fix a problem before retesting,Close the file forever,Randomly swap all wires,20,2
+15,Why test each subsystem?,To make the project harder to explain,To avoid notes,To find which part needs a fix,To hide output,20,3
+16,What is reliability?,How bright the title is,How secret the link is,How many files are hidden,How dependably something works,20,4
+17,What is a controlled test?,A test where conditions are carefully chosen,A random guess,A hidden circuit,A deleted sketch,20,1
+18,What does pass/fail mean?,The file color,Whether the test worked or did not work,The website title,The shape outline,20,2
+19,What is a weak point?,The strongest feature only,A private password,The part that needs the most improvement,A random icon,20,3
+20,Why add code comments?,To hide the logic,To remove all variables,To change wire color only,To explain important parts of the code,20,4
+21,What should your one-minute explanation include?,"Goal, inputs, outputs, logic, tests, and improvement",Only the board name,Only a color,Only a folder,20,1
+22,Why rehearse the demonstration?,To make the output fail,To show the project clearly and safely,To delete the code,To hide the test notes,20,2
+23,What is a reflection?,Only a private password,Only a loose wire,"A note about what worked, changed, and could improve",Only a page title,20,3
+24,What should the final demonstration show?,Only a hidden folder,Only a random LED color,Only a copied diagram,"Circuit, code behavior, tests, and final result",20,4
+25,What should you do if the final build partly works?,"Explain what works, what was tested, and what needs improvement",Say nothing changed,Hide the circuit,Delete all notes,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

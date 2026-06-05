@@ -27,7 +27,10 @@
       "definition": "A rule that calculates a value.",
       "example": "The formula added the weekly practice scores.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "calculation",
+        "rule"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A built-in formula tool, such as AVERAGE.",
       "example": "The AVERAGE function found the class mean.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "built-in formula"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "A number found by adding values and dividing by how many values there are.",
       "example": "The average showed the typical score for the group.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mean"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +58,34 @@
       "definition": "The smallest value.",
       "example": "The minimum showed the lowest typing score.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "smallest"
+      ],
+      "antonyms": [
+        "maximum"
+      ]
     },
     {
       "word": "maximum",
       "definition": "The largest value.",
       "example": "The maximum showed the highest quiz score.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "largest"
+      ],
+      "antonyms": [
+        "minimum"
+      ]
     },
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A visual that helps explain spreadsheet results.",
       "example": "The chart compared scores across the class.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     },
     {

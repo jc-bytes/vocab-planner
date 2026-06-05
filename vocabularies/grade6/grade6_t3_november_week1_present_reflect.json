@@ -27,31 +27,45 @@
       "definition": "To show and explain work to others.",
       "example": "Students present their projects.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "show",
+        "share"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about work.",
+      "definition": "Audience comments about what was clear and what could improve.",
       "example": "The feedback helped me improve the model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
-      "example": "We improve the route after testing.",
+      "definition": "To use feedback or reflection to make the project better.",
+      "example": "We can improve the model after feedback.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     },
     {
       "word": "goal",
       "definition": "What you are trying to do.",
       "example": "The goal was to follow the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "target",
+        "aim"
+      ],
       "antonyms": []
     },
     {
@@ -64,10 +78,13 @@
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what worked and what to improve.",
-      "example": "The reflection described one debugging step.",
+      "definition": "A short explanation of what changed, what worked, and what the student learned.",
+      "example": "The reflection described one change made after feedback.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

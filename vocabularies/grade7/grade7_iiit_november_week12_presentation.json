@@ -32,10 +32,12 @@
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Test tables, screenshots, or notes that prove what happened.",
       "example": "The evidence included the test table and screenshots.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     },
     {
@@ -43,31 +45,44 @@
       "definition": "What happens at the end of a task or test.",
       "example": "The result showed the alert worked at the chosen distance.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outcome"
+      ],
       "antonyms": []
     },
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "The difficult sensor or Bluetooth problem explained in the final presentation.",
       "example": "The challenge was keeping the Bluetooth connection stable.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A change that makes the sensor signal clearer or more dependable.",
       "example": "The improvement made the signal easier to see.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A final explanation of what the sensor-system test showed and what improved.",
       "example": "The reflection explained what the group learned from testing.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

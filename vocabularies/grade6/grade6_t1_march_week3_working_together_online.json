@@ -3,7 +3,9 @@
   "subjectSlug": "technology",
   "name": "Grade 6 T1 Practice: March Week 3 - Working Together Online",
   "description": "Practice words for online collaboration and shared work.",
-  "grades": ["6"],
+  "grades": [
+    "6"
+  ],
   "trimester": "1",
   "purpose": "practice",
   "activitySettings": {
@@ -20,13 +22,97 @@
     "fillInBlank": 8
   },
   "words": [
-    {"word": "communicate", "definition": "To share ideas or information.", "example": "Students communicate when they explain their ideas.", "difficulty": 1, "synonyms": ["share"], "antonyms": ["ignore"]},
-    {"word": "collaborate", "definition": "To work together.", "example": "The group collaborated on one slide.", "difficulty": 1, "synonyms": ["work together"], "antonyms": ["work alone"]},
-    {"word": "share", "definition": "To let others see or use something.", "example": "The student shared the file with the group.", "difficulty": 1, "synonyms": ["give access"], "antonyms": ["hide"]},
-    {"word": "shared file", "definition": "A file more than one person can use.", "example": "A shared file lets the team add ideas.", "difficulty": 1, "synonyms": ["team file"], "antonyms": ["private file"]},
-    {"word": "chat", "definition": "A short online conversation.", "example": "The team used chat to ask a question.", "difficulty": 1, "synonyms": ["conversation"], "antonyms": []},
-    {"word": "comment", "definition": "A note or response.", "example": "The teacher left a comment on the document.", "difficulty": 1, "synonyms": ["note"], "antonyms": []},
-    {"word": "respectful", "definition": "Kind and appropriate.", "example": "A respectful comment helps without being rude.", "difficulty": 1, "synonyms": ["kind"], "antonyms": ["rude"]},
-    {"word": "help", "definition": "To make a task easier for someone.", "example": "A clear comment can help a classmate improve.", "difficulty": 1, "synonyms": ["support"], "antonyms": ["harm"]}
+    {
+      "word": "communicate",
+      "definition": "To share ideas or information.",
+      "example": "Students communicate when they explain their ideas.",
+      "difficulty": 1,
+      "synonyms": [
+        "share"
+      ],
+      "antonyms": [
+        "ignore"
+      ]
+    },
+    {
+      "word": "collaborate",
+      "definition": "To work together.",
+      "example": "The group can collaborate on one slide.",
+      "difficulty": 1,
+      "synonyms": [
+        "work together"
+      ],
+      "antonyms": [
+        "work alone"
+      ]
+    },
+    {
+      "word": "share",
+      "definition": "To let others see or use something.",
+      "example": "The student can share the file with the group.",
+      "difficulty": 1,
+      "synonyms": [
+        "give access"
+      ],
+      "antonyms": [
+        "hide"
+      ]
+    },
+    {
+      "word": "shared file",
+      "definition": "A file more than one person can use.",
+      "example": "A shared file lets the team add ideas.",
+      "difficulty": 1,
+      "synonyms": [
+        "team file"
+      ],
+      "antonyms": [
+        "private file"
+      ]
+    },
+    {
+      "word": "chat",
+      "definition": "A short online conversation.",
+      "example": "The team used chat to ask a question.",
+      "difficulty": 1,
+      "synonyms": [
+        "conversation"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "comment",
+      "definition": "A note or response.",
+      "example": "The teacher left a comment on the document.",
+      "difficulty": 1,
+      "synonyms": [
+        "note"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "respectful",
+      "definition": "Kind and appropriate.",
+      "example": "A respectful comment helps without being rude.",
+      "difficulty": 1,
+      "synonyms": [
+        "kind"
+      ],
+      "antonyms": [
+        "rude"
+      ]
+    },
+    {
+      "word": "help",
+      "definition": "To make a task easier for someone.",
+      "example": "A clear comment can help a classmate improve.",
+      "difficulty": 1,
+      "synonyms": [
+        "support"
+      ],
+      "antonyms": [
+        "harm"
+      ]
+    }
   ]
 }

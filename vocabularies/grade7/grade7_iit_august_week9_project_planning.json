@@ -24,18 +24,25 @@
   "words": [
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test version of one game level or feature.",
       "example": "The prototype tested one level before the full game was built.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "rubric",
       "definition": "A guide that explains how work will be graded.",
       "example": "The rubric listed score, timer, and clear instructions.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "grading guide"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +50,10 @@
       "definition": "What you are trying to achieve.",
       "example": "The goal was to make a playable dance game.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "target",
+        "aim"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +61,10 @@
       "definition": "A smaller named part of a program that can be reused.",
       "example": "The subroutine repeated the same dance move when called.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reusable block",
+        "helper routine"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +72,20 @@
       "definition": "A tool or variable that tracks time.",
       "example": "The timer counted how long the player had to finish.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clock",
+        "counter"
+      ],
       "antonyms": []
     },
     {
       "word": "score",
-      "definition": "A number that tracks points or progress.",
+      "definition": "A planned game variable used to track correct moves or points.",
       "example": "The score showed how many correct moves the player made.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "points"
+      ],
       "antonyms": []
     }
   ]

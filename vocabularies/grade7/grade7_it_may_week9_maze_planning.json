@@ -35,7 +35,9 @@
       "definition": "The planned path to follow.",
       "example": "The route avoided the obstacle and reached the finish.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "path"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "A place used to check progress on a route.",
       "example": "Each checkpoint helped the team test part of the maze.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "progress point"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +55,32 @@
       "definition": "Something that blocks the way.",
       "example": "The obstacle showed where the robot needed to turn.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "barrier"
+      ],
       "antonyms": []
     },
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test version of the maze route used before final coding.",
       "example": "The prototype maze used tape lines on the floor.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "algorithm",
       "definition": "A clear set of steps to solve a problem.",
       "example": "The algorithm listed the exact moves to finish the maze.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "step-by-step plan"
+      ],
       "antonyms": []
     }
   ]

@@ -1,0 +1,26 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What is the difference between digital and analog values?,Digital has clear states; analog can change smoothly,Digital is always a poster; analog is always a robot,They mean exactly the same thing,Analog values cannot be measured
+What does a potentiometer provide?,An analog input that changes as the knob turns,A fixed poster title,A Scratch sprite,A source credit
+What does ADC help do?,Convert an analog signal into a number,Make a logo,Delete a circuit,Format a reflection
+Why record potentiometer readings and LED brightness?,To see the relationship between input and output,To avoid using data,To replace the circuit,To hide the result
+What can PWM control?,Brightness or speed using fast on/off signals,Image copyright,A project deadline,A chart title
+What does a photoresistor detect?,Light level,Sound pitch,Keyboard input,Poster alignment
+Why choose a threshold for light readings?,To decide when the output should change,To avoid testing the sensor,To remove the LED,To skip data recording
+Which condition is useful for a light sensor?,"If the reading is below the threshold, turn on a warning color","If the poster is finished, erase code","If the button is missing, ignore ground","If the class is loud, hide the circuit"
+What is RGB?,"Red, green, and blue values used to make colors",A route map format,A source citation,A Python list method
+Your buzzer alert is too hard to notice. What can you adjust?,Tone or duration,Image credit,Poster audience,Dataset privacy
+What does frequency affect in a buzzer?,Pitch of the sound,Slide alignment,Button shape,File name
+What does a servo control?,Movement to an angle,Image copyright,String length,Poster readability
+"Why label signal wire, power, and ground on a servo diagram?",To show the control and electrical connections clearly,To make the diagram confusing,To replace the code,To skip testing
+What should an integrated Arduino challenge combine?,"Input, condition, output, and testing",Only a title,Only a logo,No test notes
+Which project uses input and output?,A potentiometer changes LED brightness,A poster has a title,A file has a name,A team has roles
+What is perseverance during Arduino work?,Continuing to test and improve when the circuit is difficult,Giving up after one failed upload,Blaming the board only,Deleting the plan
+Which test result is most useful?,At reading 180 the LED was dim; at 800 it was bright,It worked somehow,The desk was messy,My partner clicked
+What should you do if a threshold does not work well?,Try a different value and record the result,Remove the sensor,Skip the output,Hide the data
+Which output could communicate a warning?,"Red LED, buzzer tone, or servo movement",Image credit,A blank slide,A hidden source
+Why compare several sensor readings?,To choose a reliable threshold,To make the chart blank,To avoid testing,To replace the circuit
+What is a challenge in this unit?,A task that combines circuit parts and code,A poster draft,A robot route only,A vocabulary title only
+What should you include for Weeks 5-8?,"Data chart, circuit diagram, code notes, and challenge result",Only a blog draft,Only a dance game,Only a route map
+Why explain input-process-output?,It shows how the system reacts to information,It hides the circuit,It replaces all diagrams,It removes responsibility
+Which improvement makes an alert clearer?,Choose a threshold and output that users can notice,Make the buzzer random,Remove all labels,Ignore sensor readings

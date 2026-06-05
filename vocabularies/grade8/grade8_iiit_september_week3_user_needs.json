@@ -27,15 +27,20 @@
       "definition": "What users need from a product.",
       "example": "User needs showed that players wanted clear instructions.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "user requirements"
+      ],
       "antonyms": []
     },
     {
       "word": "audience",
-      "definition": "The people who will see or use something.",
+      "definition": "The users or classmates who will try the app and give feedback.",
       "example": "The audience was students who would try the app in class.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "A useful part of an app or product.",
       "example": "A restart button was added as a useful feature.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "useful part"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "Rules that show whether something works well.",
       "example": "Success criteria said the app needed clear controls and working scoring.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "success rules"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +68,9 @@
       "definition": "A diagram showing events and screen flow.",
       "example": "The event map connected the start, play, and results screens.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "flow diagram"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A planned test with expected behavior.",
       "example": "The test case checked what happened after a wrong answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "planned test"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +88,9 @@
       "definition": "A simple layout plan for a screen.",
       "example": "The wireframe planned the layout before the app was built.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen plan"
+      ],
       "antonyms": []
     }
   ]

@@ -27,7 +27,10 @@
       "definition": "The reason something is made.",
       "example": "The purpose was to warn users when an object was too close.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reason",
+        "goal"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "Pieces that make up a system or object.",
       "example": "The parts included a sensor, microbit, code, and display.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pieces"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,10 @@
       "definition": "A simple drawing that shows parts or ideas.",
       "example": "The diagram showed where each part belonged.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "drawing",
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +59,9 @@
       "definition": "A rule that uses a limit to decide what happens.",
       "example": "The threshold rule started the alert below 15 centimeters.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "limit rule"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "A plan for the blocks or steps a program needs.",
       "example": "The code plan listed the blocks needed for input and output.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "coding plan"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +79,9 @@
       "definition": "A plan for how to check if something works.",
       "example": "The test plan checked close, medium, and far distances.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking plan"
+      ],
       "antonyms": []
     }
   ]

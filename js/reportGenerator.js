@@ -1,19 +1,17 @@
-import { createElement, $, loadScript } from './main.js';
+import { createElement, $ } from './main.js';
 import { imageDB } from './db.js';
 
-const HTML2CANVAS_SRC = 'js/libs/html2canvas.min.js';
+const WORD_HUNT_TEXT_RULES = {
+    definition: { minChars: 12, minWords: 3 },
+    example: { minChars: 18, minWords: 4 }
+};
 
 export class ReportGenerator {
     static async ensureHtml2Canvas() {
         if (typeof window.html2canvas === 'function') return window.html2canvas;
 
-        await loadScript(HTML2CANVAS_SRC);
-
-        if (typeof window.html2canvas !== 'function') {
-            throw new Error('html2canvas library not loaded');
-        }
-
-        return window.html2canvas;
+        const module = await import('html2canvas');
+        return module.default || module;
     }
 
     static getStudentInfo(studentProfile = {}) {
@@ -56,6 +54,25 @@ export class ReportGenerator {
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '') || 'word-hunt';
+    }
+
+    static hasMeaningfulWordHuntText(value, rules = WORD_HUNT_TEXT_RULES.definition) {
+        const text = String(value || '').trim();
+        if (text.length < rules.minChars) return false;
+        return text.split(/\s+/).filter(Boolean).length >= rules.minWords;
+    }
+
+    static getWordHuntQuality(entry = {}) {
+        const quality = {
+            definition: this.hasMeaningfulWordHuntText(entry.definition, WORD_HUNT_TEXT_RULES.definition),
+            image: Boolean(entry.hasImage || entry.imagePath),
+            examples: (
+                this.hasMeaningfulWordHuntText(entry.exampleOne, WORD_HUNT_TEXT_RULES.example) &&
+                this.hasMeaningfulWordHuntText(entry.exampleTwo, WORD_HUNT_TEXT_RULES.example)
+            )
+        };
+        quality.complete = Object.values(quality).every(Boolean);
+        return quality;
     }
 
     static async generateReport(studentProfile, vocabOrName, scores, options = {}) {
@@ -370,9 +387,9 @@ export class ReportGenerator {
             thead.innerHTML = `
                 <tr style="background: #f3f4f6;">
                     <th style="width: 16%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Word</th>
-                    <th style="width: 31%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Definition</th>
+                    <th style="width: 40%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Evidence</th>
                     <th style="width: 22%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Image</th>
-                    <th style="width: 31%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Examples</th>
+                    <th style="width: 22%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Quality Check</th>
                 </tr>
             `;
             table.appendChild(thead);
@@ -404,14 +421,80 @@ export class ReportGenerator {
         return cell;
     }
 
+    static createEvidenceBlock(label, value, fallback = 'Not provided') {
+        const block = document.createElement('div');
+        block.style.marginBottom = '0.65rem';
+
+        const labelEl = document.createElement('div');
+        labelEl.textContent = label;
+        labelEl.style.fontSize = '0.72rem';
+        labelEl.style.fontWeight = '800';
+        labelEl.style.letterSpacing = '0.03em';
+        labelEl.style.textTransform = 'uppercase';
+        labelEl.style.color = '#6b7280';
+        labelEl.style.marginBottom = '0.2rem';
+
+        const textEl = document.createElement('p');
+        const text = String(value || '').trim();
+        textEl.textContent = text || fallback;
+        textEl.style.margin = '0';
+        textEl.style.lineHeight = '1.35';
+        textEl.style.whiteSpace = 'pre-wrap';
+        textEl.style.overflowWrap = 'anywhere';
+        if (!text) {
+            textEl.style.color = '#9ca3af';
+            textEl.style.fontStyle = 'italic';
+        }
+
+        block.appendChild(labelEl);
+        block.appendChild(textEl);
+        return block;
+    }
+
+    static createQualityItem(label, done) {
+        const item = document.createElement('div');
+        item.style.display = 'flex';
+        item.style.alignItems = 'center';
+        item.style.justifyContent = 'space-between';
+        item.style.gap = '0.5rem';
+        item.style.marginBottom = '0.35rem';
+
+        const labelEl = document.createElement('span');
+        labelEl.textContent = label;
+        labelEl.style.color = '#374151';
+
+        const badge = document.createElement('span');
+        badge.textContent = done ? 'Done' : 'Review';
+        badge.style.flex = '0 0 auto';
+        badge.style.borderRadius = '999px';
+        badge.style.padding = '0.15rem 0.5rem';
+        badge.style.fontSize = '0.72rem';
+        badge.style.fontWeight = '700';
+        badge.style.background = done ? '#d1fae5' : '#fee2e2';
+        badge.style.color = done ? '#065f46' : '#991b1b';
+
+        item.appendChild(labelEl);
+        item.appendChild(badge);
+        return item;
+    }
+
     static async createWordHuntRow(vocabName, word, entry, options = {}) {
         const row = document.createElement('tr');
-        row.style.minHeight = '110px';
+        row.style.minHeight = '160px';
 
         const wordCell = this.createCell(word);
         wordCell.style.fontWeight = '700';
+        wordCell.style.overflowWrap = 'anywhere';
         row.appendChild(wordCell);
-        row.appendChild(this.createCell(entry.definition || ''));
+
+        const evidence = document.createElement('div');
+        const examples = [
+            entry.exampleOne ? `1. ${entry.exampleOne}` : '',
+            entry.exampleTwo ? `2. ${entry.exampleTwo}` : ''
+        ].filter(Boolean).join('\n');
+        evidence.appendChild(this.createEvidenceBlock('Definition', entry.definition, 'Missing definition'));
+        evidence.appendChild(this.createEvidenceBlock('Examples', examples, 'Missing two examples'));
+        row.appendChild(this.createCell(evidence));
 
         const imageCell = this.createCell();
         imageCell.style.textAlign = 'center';
@@ -434,16 +517,32 @@ export class ReportGenerator {
         }
         row.appendChild(imageCell);
 
-        const examples = document.createElement('div');
-        const exampleOne = document.createElement('p');
-        exampleOne.textContent = entry.exampleOne ? `1. ${entry.exampleOne}` : '1. ';
-        exampleOne.style.margin = '0 0 0.5rem 0';
-        const exampleTwo = document.createElement('p');
-        exampleTwo.textContent = entry.exampleTwo ? `2. ${entry.exampleTwo}` : '2. ';
-        exampleTwo.style.margin = '0';
-        examples.appendChild(exampleOne);
-        examples.appendChild(exampleTwo);
-        row.appendChild(this.createCell(examples));
+        const quality = this.getWordHuntQuality(entry);
+        quality.image = Boolean(imageBlob);
+        quality.complete = quality.definition &&
+            quality.image &&
+            quality.examples;
+
+        const status = document.createElement('div');
+        const statusBadge = document.createElement('div');
+        statusBadge.textContent = quality.complete ? 'Complete' : 'Needs review';
+        statusBadge.style.display = 'inline-flex';
+        statusBadge.style.marginBottom = '0.65rem';
+        statusBadge.style.borderRadius = '999px';
+        statusBadge.style.padding = '0.25rem 0.65rem';
+        statusBadge.style.fontWeight = '800';
+        statusBadge.style.fontSize = '0.78rem';
+        statusBadge.style.background = quality.complete ? '#d1fae5' : '#fef3c7';
+        statusBadge.style.color = quality.complete ? '#065f46' : '#92400e';
+        status.appendChild(statusBadge);
+        [
+            ['Definition', quality.definition],
+            ['Image', quality.image],
+            ['Two examples', quality.examples]
+        ].forEach(([label, done]) => {
+            status.appendChild(this.createQualityItem(label, done));
+        });
+        row.appendChild(this.createCell(status));
 
         return row;
     }

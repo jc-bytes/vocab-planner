@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is the difference between digital and analog values?,Digital has clear states; analog can change smoothly,Digital is always a poster; analog is always a robot,They mean exactly the same thing,Analog values cannot be measured,20,1
+2,What does a potentiometer provide?,A fixed poster title,An analog input that changes as the knob turns,A Scratch sprite,A source credit,20,2
+3,What does ADC help do?,Make a logo,Delete a circuit,Convert an analog signal into a number,Format a reflection,20,3
+4,Why record potentiometer readings and LED brightness?,To avoid using data,To replace the circuit,To hide the result,To see the relationship between input and output,20,4
+5,What can PWM control?,Brightness or speed using fast on/off signals,Image copyright,A project deadline,A chart title,20,1
+6,What does a photoresistor detect?,Sound pitch,Light level,Keyboard input,Poster alignment,20,2
+7,Why choose a threshold for light readings?,To avoid testing the sensor,To remove the LED,To decide when the output should change,To skip data recording,20,3
+8,Which condition is useful for a light sensor?,"If the poster is finished, erase code","If the button is missing, ignore ground","If the class is loud, hide the circuit","If the reading is below the threshold, turn on a warning color",20,4
+9,What is RGB?,"Red, green, and blue values used to make colors",A route map format,A source citation,A Python list method,20,1
+10,Your buzzer alert is too hard to notice. What can you adjust?,Image credit,Tone or duration,Poster audience,Dataset privacy,20,2
+11,What does frequency affect in a buzzer?,Slide alignment,Button shape,Pitch of the sound,File name,20,3
+12,What does a servo control?,Image copyright,String length,Poster readability,Movement to an angle,20,4
+13,"Why label signal wire, power, and ground on a servo diagram?",To show the control and electrical connections clearly,To make the diagram confusing,To replace the code,To skip testing,20,1
+14,What should an integrated Arduino challenge combine?,Only a title,"Input, condition, output, and testing",Only a logo,No test notes,20,2
+15,Which project uses input and output?,A poster has a title,A file has a name,A potentiometer changes LED brightness,A team has roles,20,3
+16,What is perseverance during Arduino work?,Giving up after one failed upload,Blaming the board only,Deleting the plan,Continuing to test and improve when the circuit is difficult,20,4
+17,Which test result is most useful?,At reading 180 the LED was dim; at 800 it was bright,It worked somehow,The desk was messy,My partner clicked,20,1
+18,What should you do if a threshold does not work well?,Remove the sensor,Try a different value and record the result,Skip the output,Hide the data,20,2
+19,Which output could communicate a warning?,Image credit,A blank slide,"Red LED, buzzer tone, or servo movement",A hidden source,20,3
+20,Why compare several sensor readings?,To make the chart blank,To avoid testing,To replace the circuit,To choose a reliable threshold,20,4
+21,What is a challenge in this unit?,A task that combines circuit parts and code,A poster draft,A robot route only,A vocabulary title only,20,1
+22,What should you include for Weeks 5-8?,Only a blog draft,"Data chart, circuit diagram, code notes, and challenge result",Only a dance game,Only a route map,20,2
+23,Why explain input-process-output?,It hides the circuit,It replaces all diagrams,It shows how the system reacts to information,It removes responsibility,20,3
+24,Which improvement makes an alert clearer?,Make the buzzer random,Remove all labels,Ignore sensor readings,Choose a threshold and output that users can notice,20,4
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

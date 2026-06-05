@@ -1,0 +1,22 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What does print do in Python?,Displays text or output,Deletes code,Hides the screen,Opens a private message
+What is a variable in Python?,A name that stores a value,A fixed picture only,A hidden folder,A binary digit only
+What does input ask for?,Information from the user,Only a background color,Only a file name,Only a robot sensor
+Why use labeled output?,So the result is clear to read,So the result is hidden,So numbers disappear,So comments stop working
+What is a comment?,A note in code that explains something,A command that always runs,A deleted file,A hidden value
+What does if/else do?,Chooses between actions based on a condition,Repeats forever only,Deletes variables,Changes the keyboard
+Which condition checks if age is at least 12?,age >= 12,age = blue,age +,print age only
+What does a multi-branch choice use?,Several conditions or messages,Only one hidden value,No decisions,A folder color
+What is a loop?,Code that repeats,A one-time title,A hidden variable,A file link
+What is a counter?,A value used to count repeats,A private password,A screen title,A sensor cable
+Why test a loop carefully?,A small mistake can repeat the wrong action,Loops never have problems,Testing removes code,A loop is only a picture
+What is debugging?,Finding and fixing code problems,Hiding the error,Deleting all code,Changing random colors
+Which issue is a syntax error?,A missing colon after if,A clear variable name,A useful comment,A working print line
+Which issue is a logic error?,The code runs but gives the wrong result,The file opens,The comment is clear,The output is labeled
+What should you submit after fixing code?,Corrected code and a list of fixes,Only a random screenshot,Only a private note,Only a title
+What is representation?,How information is shown or stored,A hidden project,A deleted variable,A screen color
+What is binary?,A number system using 0 and 1,A Scratch button,A private folder,A Python comment only
+Which binary digit is valid?,1,2,8,A
+What is a micro:bit input?,A button press or sensor value,Only an icon output,Only a Python print,Only a file name
+What should a Scratch plus micro:bit setup test?,Whether the micro:bit input controls the planned action,Only the page title,Only the folder color,Only a deleted sprite

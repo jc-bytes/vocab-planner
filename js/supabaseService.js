@@ -1,6 +1,7 @@
 import { createSupabaseFirestoreAdapter } from './supabaseFirestoreAdapter.js';
 import { installSupabaseAuthProfileMethods } from './supabaseAuthProfileMethods.js';
 import { installSupabaseRealtimeMethods } from './supabaseRealtimeMethods.js';
+import { installSupabaseStudentWriteMethods } from './supabaseStudentWriteMethods.js';
 import { installSupabaseStorageMethods } from './supabaseStorageMethods.js';
 
 export {
@@ -24,6 +25,7 @@ export const supabaseService = {
 
 installSupabaseAuthProfileMethods(supabaseService);
 installSupabaseRealtimeMethods(supabaseService);
+installSupabaseStudentWriteMethods(supabaseService);
 installSupabaseStorageMethods(supabaseService);
 
 const firestoreAdapter = createSupabaseFirestoreAdapter(supabaseService);

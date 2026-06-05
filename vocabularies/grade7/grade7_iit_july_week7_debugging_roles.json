@@ -24,18 +24,25 @@
   "words": [
     {
       "word": "debug",
-      "definition": "To find and fix a problem in code.",
-      "example": "The pair debugged the script after the score did not change.",
+      "definition": "To trace a Scratch script with a partner and fix the bug.",
+      "example": "The pair can debug the script after the score does not change.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "trace",
       "definition": "To follow code step by step.",
-      "example": "The navigator traced the blocks from top to bottom.",
+      "example": "The navigator can trace the blocks from top to bottom.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "follow step by step"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +50,10 @@
       "definition": "A mistake in a program.",
       "example": "The bug made the sprite jump to the wrong place.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mistake",
+        "error"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +61,9 @@
       "definition": "The partner controlling the computer during pair work.",
       "example": "The driver controlled the mouse and changed the blocks.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "computer controller"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +71,20 @@
       "definition": "The partner who guides and checks the work during pair work.",
       "example": "The navigator read the checklist and watched for mistakes.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "guide partner"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Partner comments about what works in the script and what needs revision.",
       "example": "Feedback helped the pair improve the game controls.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     }
   ]

@@ -27,23 +27,31 @@
       "definition": "What you are trying to achieve.",
       "example": "The goal was to make the robot finish the maze safely.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "target",
+        "aim"
+      ],
       "antonyms": []
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A robot part chosen to detect walls, obstacles, or distance.",
       "example": "The sensor detected when the robot was near a wall.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "sequence",
-      "definition": "Steps in the correct order.",
+      "definition": "The planned order of robot actions for the project.",
       "example": "The sequence showed the order of movements.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
@@ -64,10 +72,12 @@
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Video, notes, or test results that show the robot completed the route.",
       "example": "The evidence included a video of the robot completing the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     }
   ]

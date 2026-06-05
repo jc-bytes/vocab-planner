@@ -27,39 +27,54 @@
       "definition": "A command that performs an action on data.",
       "example": "The student used the append method to add a new item to a Python list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command",
+        "procedure"
+      ],
       "antonyms": []
     },
     {
       "word": "add",
       "definition": "To put something in.",
-      "example": "The program added a new survey answer to the end of the list.",
+      "example": "The program can add a new survey answer to the end of the list.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "insert"
+      ],
+      "antonyms": [
+        "remove"
+      ]
     },
     {
       "word": "remove",
       "definition": "To take something out.",
-      "example": "The student removed the incorrect item before sorting the data.",
+      "example": "The student can remove the incorrect item before sorting the data.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "delete"
+      ],
+      "antonyms": [
+        "add"
+      ]
     },
     {
       "word": "sort",
       "definition": "To arrange data in order.",
-      "example": "The list was sorted so the scores appeared from lowest to highest.",
+      "example": "The program can sort the scores from lowest to highest.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "arrange"
+      ],
       "antonyms": []
     },
     {
       "word": "display",
       "definition": "To show information.",
-      "example": "The program displayed each list item on a separate line.",
+      "example": "The program can display each list item on a separate line.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "show"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +82,9 @@
       "definition": "A loop that repeats while a condition is true.",
       "example": "The while loop kept asking for input until the user typed stop.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "conditional repeat"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +92,9 @@
       "definition": "The condition that makes a loop end.",
       "example": "The word stop became the stopping point for the loop.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "end point"
+      ],
       "antonyms": []
     }
   ]

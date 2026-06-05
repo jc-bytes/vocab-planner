@@ -1,6 +1,7 @@
 import { escapeHtml } from './main.js';
 import {
     getExternalArtifactCompletionSummary,
+    isValidExternalArtifactUrl,
     normalizeExternalArtifactResponse,
     normalizeExternalArtifactTemplate
 } from './activityExternalArtifact.js';
@@ -14,6 +15,7 @@ export function renderExternalArtifactSubmissionReview(assignment = {}, submissi
     const summary = getExternalArtifactCompletionSummary(template, response);
     const artifact = response.artifact;
     const artifactIsImage = artifact?.mimeType?.startsWith('image/');
+    const safeLinkUrl = isValidExternalArtifactUrl(response.linkUrl) ? response.linkUrl : '';
     const artifactLabel = artifact
         ? `${artifact.fileName || 'Uploaded artifact'}${artifact.sizeBytes ? ` · ${Math.round(artifact.sizeBytes / 1024)} KB` : ''}`
         : 'No file uploaded.';
@@ -35,8 +37,8 @@ export function renderExternalArtifactSubmissionReview(assignment = {}, submissi
 
             <section class="spreadsheet-review-section external-artifact-review-section">
                 <h4>${escapeHtml(template.linkLabel)}</h4>
-                ${response.linkUrl ? `
-                    <a href="${escapeHtml(response.linkUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(response.linkUrl)}</a>
+                ${safeLinkUrl ? `
+                    <a href="${escapeHtml(safeLinkUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(safeLinkUrl)}</a>
                 ` : '<p class="spreadsheet-review-empty">No link submitted.</p>'}
             </section>
 

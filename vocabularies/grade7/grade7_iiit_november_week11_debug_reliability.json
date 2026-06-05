@@ -24,16 +24,21 @@
   "words": [
     {
       "word": "debug",
-      "definition": "To find and fix a problem in code.",
-      "example": "The team debugged the code after the signal did not appear.",
+      "definition": "To use retest results to find and fix a sensor-system problem.",
+      "example": "The team can debug the code after the signal does not appear.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "retest",
       "definition": "To test again after making a change.",
-      "example": "The team retested after changing the threshold.",
+      "example": "The team can retest after changing the threshold.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -43,16 +48,24 @@
       "definition": "Working in a steady and dependable way.",
       "example": "The system was stable when it worked three times in a row.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "steady"
+      ],
+      "antonyms": [
+        "unstable"
+      ]
     },
     {
       "word": "unstable",
       "definition": "Not working in a steady or dependable way.",
       "example": "The system was unstable when the signal changed randomly.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "not steady"
+      ],
+      "antonyms": [
+        "stable"
+      ]
     },
     {
       "word": "adjustment",
@@ -67,7 +80,9 @@
       "definition": "A record of tests, changes, and notes.",
       "example": "The logbook recorded the problem, change, and retest result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "project record"
+      ],
       "antonyms": []
     }
   ]

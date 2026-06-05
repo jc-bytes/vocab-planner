@@ -24,18 +24,23 @@
   "words": [
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "An explanation and demo of the game, code, testing, and revisions.",
       "example": "The presentation showed the game, code, testing, and changes.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     },
     {
       "word": "demonstrate",
       "definition": "To show how something works.",
-      "example": "The student demonstrated how the player earned points.",
+      "example": "The student can demonstrate how the player earns points.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "show"
+      ],
       "antonyms": []
     },
     {
@@ -48,18 +53,24 @@
     },
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "The game design or control problem explained during the presentation.",
       "example": "The challenge was making the controls respond smoothly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A project note explaining how user testing changed the game.",
       "example": "The reflection explained what changed after user testing.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "An image of what is on the screen.",
       "example": "The screenshot captured the final game screen.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen capture"
+      ],
       "antonyms": []
     }
   ]

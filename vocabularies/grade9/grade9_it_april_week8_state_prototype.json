@@ -35,7 +35,9 @@
       "definition": "An input that starts a response.",
       "example": "The button press was the input trigger that started the prototype.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "starting input"
+      ],
       "antonyms": []
     },
     {
@@ -43,32 +45,46 @@
       "definition": "What the system does after an input.",
       "example": "The output response was a blinking light and short buzzer sound.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "resulting output"
+      ],
       "antonyms": []
     },
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test version of one physical-computing feature before the full build.",
       "example": "The prototype tested one feature before the full project build.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "project log",
       "definition": "A record of project work and tests.",
       "example": "The project log recorded the wiring change and test result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work record"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A design or code change that makes the prototype clearer or more reliable.",
       "example": "The improvement made the warning light easier to see.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     }
   ]
 }

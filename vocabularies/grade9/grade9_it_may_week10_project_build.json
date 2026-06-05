@@ -35,7 +35,9 @@
       "definition": "How electronic parts are connected.",
       "example": "The team checked the wiring after the buzzer did not sound.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "connections"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +53,10 @@
       "definition": "Notes or records that explain work.",
       "example": "The documentation included a photo of the circuit and notes about the code.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "records",
+        "notes"
+      ],
       "antonyms": []
     },
     {
@@ -59,16 +64,23 @@
       "definition": "What happened during a test.",
       "example": "The test result showed that the LED worked but the buzzer was too quiet.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outcome"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem.",
-      "example": "The group debugged the project by testing one subsystem at a time.",
+      "definition": "To isolate and fix a problem in one project subsystem before retesting the whole build.",
+      "example": "The group can debug the project by testing one subsystem at a time.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

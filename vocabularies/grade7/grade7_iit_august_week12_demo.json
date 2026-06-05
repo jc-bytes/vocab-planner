@@ -32,18 +32,23 @@
     },
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "A short explanation and demo of the game rules, controls, and result.",
       "example": "The presentation explained the game rules and controls.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     },
     {
       "word": "application",
       "definition": "A real use for a skill or project.",
-      "example": "The student described how variables applied to the score.",
+      "example": "The application of variables helped explain the score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "real use"
+      ],
       "antonyms": []
     },
     {
@@ -51,24 +56,34 @@
       "definition": "A guide that explains how work will be graded.",
       "example": "The rubric helped the group check missing features.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "grading guide"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A short explanation of the bug fixed, improvement made, and skill learned.",
       "example": "The reflection named one bug and how it was fixed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A change that makes the game clearer or easier for players.",
       "example": "The improvement made the instructions clearer for players.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     }
   ]
 }

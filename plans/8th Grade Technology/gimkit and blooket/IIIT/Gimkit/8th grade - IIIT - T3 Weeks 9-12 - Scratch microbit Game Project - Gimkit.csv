@@ -1,0 +1,22 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What should a game concept plan include?,"Purpose, player goal, input, response, scoring, and challenge",Only a title,Only a private password,Only a random sprite
+What is a player goal?,What the player is trying to do,A hidden folder,A binary number,A Python syntax mark
+What is a success condition?,How the game knows the player succeeded,A deleted sprite,A random sound,A secret file
+What should a final game plan include?,"Title, roles, goal, controls, scoring, sprites, and test cases",Only a backdrop,Only a password,Only the date
+Why map one micro:bit input to a sprite action first?,To test the main control before adding more,To hide the input,To delete the sprite,To skip testing
+What is a game shell?,"Starter title, sprite, background, and first control",The final perfect game,A hidden file,A binary conversion
+What should the main game loop do?,Keep important game actions running,Delete the project,Hide the player,Stop all inputs
+What is sensor-controlled movement?,Movement changed by a micro:bit input or reading,Movement with no input,A copied screenshot,A private message
+Why add scoring or a win condition?,So the player knows progress or success,To hide all results,To remove the player goal,To break controls
+What is an obstacle in a game?,A challenge the player must avoid or solve,A folder name,A Python comment,A binary digit
+What should peer testing feedback include?,"Control issue, clarity issue, and positive feature",Only use blue,Only a joke,Only a password
+Why collect user testing feedback?,"To improve controls, clarity, and play experience",To hide the game,To avoid revision,To remove all sprites
+What is documentation for a game?,"Notes, screenshots, and explanation of how it works",A deleted folder,A secret code,A random icon
+What should presentation notes include?,"Goal, controls, scoring, challenge, tests, and improvement",Only the file name,Only a color,Only a private note
+Why rehearse the game presentation?,To explain and demonstrate the project clearly,To hide controls,To skip the demo,To delete evidence
+What should you test before presenting?,"Start, controls, scoring, challenge, and ending",Only the title,Only the folder,Only the binary number
+What is a useful improvement after testing?,Make controls clearer or fix a confusing rule,Remove all instructions,Hide the score,Break the input
+What should your reflection discuss?,"What worked, what changed, and what you would improve",Only the date,Only the file size,Only a password
+Which game result is strongest?,The input controls the sprite and the rules are clear,The sprite never moves,The controls are secret,The game has no goal
+What should you submit with the final game?,"Project, reflection, screenshots or demo proof",Only a hidden folder,Only a blank page,Only a random file

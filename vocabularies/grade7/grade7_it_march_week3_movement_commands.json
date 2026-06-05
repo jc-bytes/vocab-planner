@@ -27,7 +27,9 @@
       "definition": "A change in position.",
       "example": "The robot's movement started after the green flag.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "motion"
+      ],
       "antonyms": []
     },
     {
@@ -35,31 +37,44 @@
       "definition": "Moving toward the front.",
       "example": "Forward made the mBot drive toward the first marker.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "ahead"
+      ],
+      "antonyms": [
+        "backward"
+      ]
     },
     {
       "word": "backward",
       "definition": "Moving toward the back.",
       "example": "Backward moved the robot away from the wall.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "back"
+      ],
+      "antonyms": [
+        "forward"
+      ]
     },
     {
       "word": "turn",
       "definition": "To change direction.",
       "example": "The turn block changed the robot's direction.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rotate",
+        "change direction"
+      ],
       "antonyms": []
     },
     {
       "word": "speed",
-      "definition": "How fast something moves.",
+      "definition": "The motor setting that controls how quickly the robot travels.",
       "example": "Lower speed helped the robot stay on the path.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pace"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +82,9 @@
       "definition": "How long something happens.",
       "example": "The time setting controlled how long the motors ran.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "duration"
+      ],
       "antonyms": []
     },
     {
@@ -75,8 +92,13 @@
       "definition": "To end movement or action.",
       "example": "Stop ended the robot movement at the checkpoint.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "end",
+        "halt"
+      ],
+      "antonyms": [
+        "start"
+      ]
     }
   ]
 }

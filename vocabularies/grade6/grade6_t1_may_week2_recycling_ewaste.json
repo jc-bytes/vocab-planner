@@ -3,7 +3,9 @@
   "subjectSlug": "technology",
   "name": "Grade 6 T1 Practice: May Week 2 - Recycling and E-Waste",
   "description": "Practice words for responsible technology waste choices.",
-  "grades": ["6"],
+  "grades": [
+    "6"
+  ],
   "trimester": "1",
   "purpose": "practice",
   "activitySettings": {
@@ -20,15 +22,113 @@
     "fillInBlank": 10
   },
   "words": [
-    {"word": "recycle", "definition": "To turn used materials into something useful again.", "example": "Some old devices can be recycled.", "difficulty": 1, "synonyms": ["process again"], "antonyms": ["throw away"]},
-    {"word": "reuse", "definition": "To use something again.", "example": "A working mouse can be reused by another student.", "difficulty": 1, "synonyms": ["use again"], "antonyms": ["throw away"]},
-    {"word": "repair", "definition": "To fix something so it works again.", "example": "Repairing a cable can reduce waste.", "difficulty": 1, "synonyms": ["fix"], "antonyms": ["break"]},
-    {"word": "e-waste", "definition": "Old or broken electronic items.", "example": "A broken phone can become e-waste.", "difficulty": 1, "synonyms": ["electronic waste"], "antonyms": []},
-    {"word": "device", "definition": "A piece of technology.", "example": "The class sorted each broken device before choosing recycle or repair.", "difficulty": 1, "synonyms": ["machine"], "antonyms": []},
-    {"word": "battery", "definition": "A part that stores power for a device.", "example": "A battery should be handled carefully.", "difficulty": 1, "synonyms": ["power cell"], "antonyms": []},
-    {"word": "trash", "definition": "Things people throw away.", "example": "Old batteries should not go in regular trash.", "difficulty": 1, "synonyms": ["garbage"], "antonyms": []},
-    {"word": "sorting", "definition": "Putting things into groups.", "example": "The class practiced sorting devices and batteries.", "difficulty": 1, "synonyms": ["grouping"], "antonyms": ["mixing"]},
-    {"word": "waste", "definition": "Material that is thrown away or used carelessly.", "example": "Reusing a charger can reduce waste.", "difficulty": 1, "synonyms": ["trash"], "antonyms": []},
-    {"word": "environment", "definition": "The world around us, including air, water, land, and living things.", "example": "Recycling can help the environment.", "difficulty": 1, "synonyms": ["natural world"], "antonyms": []}
+    {
+      "word": "recycle",
+      "definition": "To turn used materials into something useful again.",
+      "example": "Students can recycle old devices at the correct collection point.",
+      "difficulty": 1,
+      "synonyms": [
+        "process again"
+      ],
+      "antonyms": [
+        "throw away"
+      ]
+    },
+    {
+      "word": "reuse",
+      "definition": "To use something again.",
+      "example": "Another student can reuse a working mouse.",
+      "difficulty": 1,
+      "synonyms": [
+        "use again"
+      ],
+      "antonyms": [
+        "throw away"
+      ]
+    },
+    {
+      "word": "repair",
+      "definition": "To fix something so it works again.",
+      "example": "Students can repair a cable to reduce waste.",
+      "difficulty": 1,
+      "synonyms": [
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
+    },
+    {
+      "word": "e-waste",
+      "definition": "Old or broken electronic items.",
+      "example": "A broken phone can become e-waste.",
+      "difficulty": 1,
+      "synonyms": [
+        "electronic waste"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "device",
+      "definition": "A piece of technology.",
+      "example": "The class sorted each broken device before choosing recycle or repair.",
+      "difficulty": 1,
+      "synonyms": [
+        "machine"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "battery",
+      "definition": "A part that stores power for a device.",
+      "example": "A battery should be handled carefully.",
+      "difficulty": 1,
+      "synonyms": [
+        "power cell"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "trash",
+      "definition": "Things people throw away.",
+      "example": "Old batteries should not go in regular trash.",
+      "difficulty": 1,
+      "synonyms": [
+        "garbage"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "sorting",
+      "definition": "Putting things into groups.",
+      "example": "The class practiced sorting devices and batteries.",
+      "difficulty": 1,
+      "synonyms": [
+        "grouping"
+      ],
+      "antonyms": [
+        "mixing"
+      ]
+    },
+    {
+      "word": "waste",
+      "definition": "Material that is thrown away or used carelessly.",
+      "example": "Reusing a charger can reduce waste.",
+      "difficulty": 1,
+      "synonyms": [
+        "trash"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "environment",
+      "definition": "The world around us, including air, water, land, and living things.",
+      "example": "Recycling can help the environment.",
+      "difficulty": 1,
+      "synonyms": [
+        "natural world"
+      ],
+      "antonyms": []
+    }
   ]
 }

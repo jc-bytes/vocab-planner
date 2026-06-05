@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What does Serial Monitor show?,Messages and values from a program,Only vector shapes,A private password,A website menu,20,1
+2,What is baud rate?,The color of an LED,The speed used for serial messages,The size of a logo,The number of website pages,20,2
+3,Why print sensor values?,To hide the reading,To skip testing,To support debugging and understand readings,To remove the circuit,20,3
+4,What is analog input?,Only on or off,A campaign title,A source credit,A changing value read by a board,20,4
+5,What does a potentiometer do?,Changes an analog value when turned,Stores a website,Moves a robot wheel,Deletes the sketch,20,1
+6,What is brightness?,The speed of serial messages,How light or dark an output is,A folder name,A search keyword,20,2
+7,How can a potentiometer control an LED?,It writes the page title,It makes a vector path,Its value can change LED brightness,It deletes the output,20,3
+8,What is a sensor?,A private message,A search engine,A graphic layer,A part that measures a value for the program,20,4
+9,What is a threshold?,A value limit that decides when output changes,A random color name,A folder password,A broken link,20,1
+10,How do you choose a reliable threshold?,Pick the first random number,Compare several readings and pick a useful limit,Use no readings,Copy a page title,20,2
+11,What is expected output?,A deleted result,A hidden note,What you think the system should produce,A vector shape,20,3
+12,What does RGB mean?,"Route, goal, battery","Read, group, browse","Resize, grid, button","Red, green, and blue",20,4
+13,What is a color channel?,One part of a color or signal,A robot wheel,A private folder,A web page section,20,1
+14,What is an alert?,A hidden source,A warning signal,A blank page,A broken route,20,2
+15,Which state color might show warning?,Invisible only,No output,Yellow or red,Random gray only,20,3
+16,What is an addressable LED?,A website address,A deleted circuit,A hidden password,A light that can be controlled separately,20,4
+17,What is a pixel in an LED strip?,One controllable light point,A robot motor,A search result,A file folder,20,1
+18,What is animation?,A still hidden file,A sequence of changes that looks like movement,A single frozen value,A deleted sketch,20,2
+19,Why use team roles during a build?,Nobody needs notes,The circuit fixes itself,"Builder, coder, tester, and recorder tasks stay clear",The code disappears,20,3
+20,What should a recorder write?,Only a private password,Only the page color,Only a random icon,"Values, test notes, and changes",20,4
+21,What is state logic?,Rules for how a system changes between states,A search query,A vector outline,A hidden image,20,1
+22,What is an input trigger?,A deleted output,An input that starts a response,A page caption,A folder color,20,2
+23,What is an output response?,A private address,A campaign title,What the system does after an input,A loose wire only,20,3
+24,What is a prototype?,The final file deleted,A random search result,A graphic copied without changes,A test version of one feature before the full build,20,4
+25,What should prototype test notes include?,"Input, output, state, result, and next change",Only the color blue,Only a page title,Only the board brand,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

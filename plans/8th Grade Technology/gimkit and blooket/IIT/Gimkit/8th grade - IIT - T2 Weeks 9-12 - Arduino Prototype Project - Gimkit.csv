@@ -1,0 +1,26 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What should an Arduino prototype project solve?,A clear purpose or problem using an input and output,Only a random decoration,Only a poster title,Only a file name
+What does an ultrasonic sensor measure?,Distance using sound,Image brightness in Canva,Python string length,Scratch score
+Why record at least five distance readings?,To choose a reliable near/far threshold,To avoid the sensor,To replace the circuit,To skip the test plan
+What is a test case?,A planned test with expected behavior,A random guess,A poster image,A hidden answer
+Which test case is specific?,"At 10 cm, buzzer turns on; at 40 cm, buzzer stays off",Test it,Try something,Make it work
+What is a starter sketch?,A beginning Arduino program used to start the prototype,A final reflection,A poster draft,A data source
+What should a project design plan include?,"Purpose, role, input, output, diagram, behavior, tests, materials",Only the title,Only a team name,No test notes
+"Why label input, process, and output in notes?",To explain how the prototype works as a system,To hide the code,To replace the build,To avoid responsibility
+A prototype does not react to the sensor. What should you check?,"Wiring, pin numbers, sensor readings, condition, and output code",Poster palette,Scratch costume,Image credit
+What is a likely cause?,The reason a problem probably happened,A guaranteed score,A decoration,A class folder
+What is a solution?,A way to solve the identified problem,A missing wire,An unrelated image,A blank note
+Why document debugging?,"It shows the problem, likely cause, fix, and result",It hides mistakes,It replaces testing,It deletes the project
+What does reliability mean?,The prototype works dependably across repeated tests,It works once by luck,It has many colors only,The folder is empty
+What best shows your prototype is reliable?,Repeated test results and notes,Only a final photo,Only a title,Only a class list
+Which diagram is most useful?,A labeled circuit diagram showing parts and connections,A blank box,A poster thumbnail,A Python list
+What should your code screenshot show?,The sketch or screen that explains the prototype behavior,Only the classroom number,Only an unrelated file,Only a hidden link
+What belongs in a final demonstration?,"Circuit, sensor trigger, code screenshot, result, and improvement",Only a sound effect,Only a blank breadboard,Only a team name
+Why rehearse the demonstration?,"To explain input, output, code decision, and test result",To avoid showing the prototype,To remove all diagrams,To skip the reflection
+Which reflection is strongest?,The first threshold was too sensitive so I changed it,It was fun,The circuit is done,I liked the LED
+What should you do if the circuit partly works?,"Keep the working part, isolate the problem, and test one fix",Rebuild randomly,Delete all code,Hide the issue
+Why use a materials list?,To confirm required components before building,To replace the project goal,To hide missing parts,To skip testing
+Which project idea fits this window?,Distance alert with ultrasonic sensor and buzzer,Environmental poster only,Scratch dance game only,Python string quiz only
+What is the safest final setup?,"Stable circuit, clear wires, safe power, organized workspace",Loose parts everywhere,Unlabeled wires near movement,Forcing components into place
+What should you submit with your final project?,"Diagram, code notes, testing notes, reflection, and demo result",Only one unlabeled photo,Only a title,Only a missing link

@@ -152,14 +152,38 @@ export const studentClassroomActivityPlanningMethods = {
         return new Date(date.getFullYear(), monthIndex, 1 + ((weekNumber - 1) * 7), 12);
     },
 
+    getAssignmentCalendarPlacement(assignment = {}, date = new Date()) {
+        const placement = this.getAssignmentPlanningPlacement(assignment);
+        const scheduledStart = this.getClassroomAssignmentStartDate(assignment, date);
+        const calendarMonth = this.sm.activities?.getSchoolWeekMajorityMonth?.(scheduledStart);
+        const month = calendarMonth && calendarMonth !== 'other'
+            ? calendarMonth
+            : placement.month;
+        const firstMonth = String(month || '').split('-')[0];
+
+        return {
+            ...placement,
+            sourceMonth: placement.month,
+            month,
+            trimester: MONTH_TRIMESTER[firstMonth] || placement.trimester,
+            scheduledStart
+        };
+    },
+
     isAssignmentInCurrentClassroomWindow(assignment = {}, date = new Date()) {
         const window = this.getCurrentClassroomWindow(date);
-        const placement = this.getAssignmentPlanningPlacement(assignment);
+        const placement = this.getAssignmentCalendarPlacement(assignment, date);
 
         if (placement.trimester === 'other') return true;
         if (placement.trimester !== window.trimester) return false;
 
-        const scheduledStart = this.getClassroomAssignmentStartDate(assignment, date);
+        const firstPlacementMonth = String(placement.month || '').split('-')[0];
+        const assignmentMonthOrder = MONTH_ORDER[firstPlacementMonth] || this.getMonthOrder(placement.month);
+        if (Number.isFinite(assignmentMonthOrder) && assignmentMonthOrder < 99 && assignmentMonthOrder > window.monthOrder) {
+            return false;
+        }
+
+        const scheduledStart = placement.scheduledStart;
         if (scheduledStart) {
             const assignmentStart = this.getDateOnlyStart(scheduledStart);
             const currentStart = this.getDateOnlyStart(window.date);
@@ -168,8 +192,6 @@ export const studentClassroomActivityPlanningMethods = {
             }
         }
 
-        const firstPlacementMonth = String(placement.month || '').split('-')[0];
-        const assignmentMonthOrder = MONTH_ORDER[firstPlacementMonth] || this.getMonthOrder(placement.month);
         if (!Number.isFinite(assignmentMonthOrder) || assignmentMonthOrder >= 99) {
             return true;
         }
@@ -183,7 +205,7 @@ export const studentClassroomActivityPlanningMethods = {
 
     buildClassroomTrimesterGroups(assignments = []) {
         return assignments.reduce((groups, assignment) => {
-            const placement = this.getAssignmentPlanningPlacement(assignment);
+            const placement = this.getAssignmentCalendarPlacement(assignment);
             if (!groups.has(placement.trimester)) groups.set(placement.trimester, []);
             groups.get(placement.trimester).push(assignment);
             return groups;
@@ -192,7 +214,7 @@ export const studentClassroomActivityPlanningMethods = {
 
     buildClassroomMonthGroups(assignments = []) {
         return assignments.reduce((groups, assignment) => {
-            const placement = this.getAssignmentPlanningPlacement(assignment);
+            const placement = this.getAssignmentCalendarPlacement(assignment);
             if (!groups.has(placement.month)) groups.set(placement.month, []);
             groups.get(placement.month).push(assignment);
             return groups;
@@ -201,7 +223,7 @@ export const studentClassroomActivityPlanningMethods = {
 
     buildClassroomWeekGroups(assignments = []) {
         return assignments.reduce((groups, assignment) => {
-            const placement = this.getAssignmentPlanningPlacement(assignment);
+            const placement = this.getAssignmentCalendarPlacement(assignment);
             if (!groups.has(placement.week)) groups.set(placement.week, []);
             groups.get(placement.week).push(assignment);
             return groups;
@@ -219,8 +241,8 @@ export const studentClassroomActivityPlanningMethods = {
     formatClassroomWeekSummary(weekGroups) {
         const labels = Array.from(weekGroups.keys())
             .sort((weekA, weekB) => {
-                const placementA = this.getAssignmentPlanningPlacement(weekGroups.get(weekA)?.[0]);
-                const placementB = this.getAssignmentPlanningPlacement(weekGroups.get(weekB)?.[0]);
+                const placementA = this.getAssignmentCalendarPlacement(weekGroups.get(weekA)?.[0]);
+                const placementB = this.getAssignmentCalendarPlacement(weekGroups.get(weekB)?.[0]);
                 return placementA.weekOrder - placementB.weekOrder;
             })
             .map(week => this.formatWeekLabelFromKey(week));

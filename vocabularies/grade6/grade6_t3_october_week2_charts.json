@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A visual made from spreadsheet data to compare totals.",
       "example": "The chart compared the totals.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,10 @@
       "definition": "The name of a page, chart, or project.",
       "example": "The chart title explained the data.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "heading",
+        "name"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +49,9 @@
       "definition": "A word or short phrase that names something.",
       "example": "The label showed what the column meant.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tag"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +83,9 @@
       "definition": "An idea you decide after looking at evidence.",
       "example": "The conclusion explained which item cost more.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "finding"
+      ],
       "antonyms": []
     }
   ]

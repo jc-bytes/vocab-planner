@@ -2,6 +2,11 @@ import { createElement, $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { compressImageToWebp } from '../imageUtils.js';
 
+const WORD_HUNT_TEXT_RULES = {
+    definition: { minChars: 12, minWords: 3 },
+    example: { minChars: 18, minWords: 4 }
+};
+
 export class IllustrationActivity {
     constructor(container, words, vocabName, onProgress, onWordHuntSave, initialData = null, options = {}) {
         this.container = container;
@@ -98,13 +103,28 @@ export class IllustrationActivity {
         return this.entries[word];
     }
 
+    hasMeaningfulText(value, rules = WORD_HUNT_TEXT_RULES.definition) {
+        const text = String(value || '').trim();
+        if (text.length < rules.minChars) return false;
+        return text.split(/\s+/).filter(Boolean).length >= rules.minWords;
+    }
+
+    getEntryQuality(entry = {}) {
+        const normalized = this.normalizeEntry(entry);
+        const quality = {
+            definition: this.hasMeaningfulText(normalized.definition, WORD_HUNT_TEXT_RULES.definition),
+            image: Boolean(normalized.hasImage),
+            examples: (
+                this.hasMeaningfulText(normalized.exampleOne, WORD_HUNT_TEXT_RULES.example) &&
+                this.hasMeaningfulText(normalized.exampleTwo, WORD_HUNT_TEXT_RULES.example)
+            )
+        };
+        quality.complete = Object.values(quality).every(Boolean);
+        return quality;
+    }
+
     isEntryComplete(entry) {
-        return Boolean(
-            entry?.hasImage &&
-            entry.definition?.trim() &&
-            entry.exampleOne?.trim() &&
-            entry.exampleTwo?.trim()
-        );
+        return this.getEntryQuality(entry).complete;
     }
 
     getCompletedCount() {
@@ -247,8 +267,9 @@ export class IllustrationActivity {
             id: 'word-hunt-definition',
             label: 'Definition',
             value: entry.definition,
-            placeholder: `Write a definition for ${word.word}`,
-            field: 'definition'
+            placeholder: `Write a clear definition for ${word.word}`,
+            field: 'definition',
+            helper: 'Use a student-friendly definition that matches the word.'
         }));
 
         grid.appendChild(this.createImagePanel(entry));
@@ -258,7 +279,8 @@ export class IllustrationActivity {
             label: 'Example 1',
             value: entry.exampleOne,
             placeholder: `Use ${word.word} in a sentence`,
-            field: 'exampleOne'
+            field: 'exampleOne',
+            helper: 'Show how the word is used in a real technology context.'
         }));
 
         grid.appendChild(this.createTextField({
@@ -266,13 +288,14 @@ export class IllustrationActivity {
             label: 'Example 2',
             value: entry.exampleTwo,
             placeholder: `Write a second example with ${word.word}`,
-            field: 'exampleTwo'
+            field: 'exampleTwo',
+            helper: 'Make this example different from the first one.'
         }));
 
         return grid;
     }
 
-    createTextField({ id, label, value, placeholder, field }) {
+    createTextField({ id, label, value, placeholder, field, helper = '' }) {
         const group = createElement('div', 'word-hunt-field');
         const labelEl = document.createElement('label');
         labelEl.setAttribute('for', id);
@@ -287,6 +310,10 @@ export class IllustrationActivity {
 
         group.appendChild(labelEl);
         group.appendChild(textarea);
+        if (helper) {
+            const helperText = createElement('p', 'word-hunt-field-helper', helper);
+            group.appendChild(helperText);
+        }
         return group;
     }
 
@@ -331,16 +358,16 @@ export class IllustrationActivity {
     createStatusPanel(entry) {
         const status = createElement('div', 'word-hunt-status');
         const completed = this.getCompletedCount();
+        const quality = this.getEntryQuality(entry);
         const progress = createElement('strong');
         progress.textContent = `${completed}/${this.words.length} words complete`;
         status.appendChild(progress);
 
         const requirements = createElement('div', 'word-hunt-requirements');
         [
-            ['definition', 'Definition', Boolean(entry.definition?.trim())],
-            ['image', 'Image', Boolean(entry.hasImage)],
-            ['example-one', 'Example 1', Boolean(entry.exampleOne?.trim())],
-            ['example-two', 'Example 2', Boolean(entry.exampleTwo?.trim())]
+            ['definition', 'Definition', quality.definition],
+            ['image', 'Image', quality.image],
+            ['examples', 'Two examples', quality.examples]
         ].forEach(([key, label, done]) => {
             const item = createElement('span', `word-hunt-requirement ${done ? 'complete' : ''}`);
             item.dataset.requirement = key;
@@ -370,11 +397,11 @@ export class IllustrationActivity {
             nextButton.disabled = !this.isEntryComplete(entry);
         }
 
+        const quality = this.getEntryQuality(entry);
         const fields = {
-            definition: Boolean(entry.definition.trim()),
-            image: Boolean(entry.hasImage),
-            'example-one': Boolean(entry.exampleOne.trim()),
-            'example-two': Boolean(entry.exampleTwo.trim())
+            definition: quality.definition,
+            image: quality.image,
+            examples: quality.examples
         };
 
         Object.entries(fields).forEach(([key, done]) => {

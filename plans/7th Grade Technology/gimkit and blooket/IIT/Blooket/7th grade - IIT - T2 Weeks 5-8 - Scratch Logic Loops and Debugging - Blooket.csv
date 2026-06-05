@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What does a comparison operator help Scratch do?,Check how two values are related,Choose a poster image source,Move a robot wheel,Format a spreadsheet,20,1
+2,Which condition is true if score is 8?,score < 3,score > 5,score = 0,score is blank,20,2
+3,A quiz gives correct or wrong feedback. Which concept is used?,Copyright,Alignment,Selection,Ground,20,3
+4,Why use if/else in a Scratch quiz?,To remove all questions,To make the sprite ignore input,To store a poster credit,To choose between two responses,20,4
+5,What is a loop?,Code that repeats an action,A symbol for image credit,A sensor wire,A poster layout,20,1
+6,Which action should be placed in a repeat loop?,A one-time project title,A dance step that happens four times,A source citation,A final reflection,20,2
+7,What is one iteration?,One poster image,One Arduino pin,One repeat of a loop,One data source,20,3
+8,"A countdown should show 5, 4, 3, 2, 1. Which concept helps?",Image credit,Brand palette,Breadboard ground,Loop with changing variable,20,4
+9,A loop never stops. What should you check?,The condition or stopping point,The poster title,The logo color,The file folder,20,1
+10,What does debug mean?,Add random blocks,Find and fix a problem in code,Hide the script,Delete all sprites,20,2
+11,What does trace mean?,Draw a new logo,Choose image credit,Follow code step by step,Charge a battery,20,3
+12,Which debugging note is strongest?,It was broken,The game is bad,I fixed something,Score did not change; I added the missing variable block.,20,4
+13,"In pair programming, what does the driver do?",Controls the computer,Only watches silently,Writes image credit,Chooses a random backdrop,20,1
+14,"In pair programming, what does the navigator do?",Deletes the script,Guides and checks the work,Ignores bugs,Changes the poster palette,20,2
+15,Which feedback is most helpful for a Scratch practice feature?,It is weird,Make it better,"The key press works, but the success sound starts too late",I like games,20,3
+16,Which practice feature prepares you for the dance game?,Only a blank sprite,Only a poster image,Only a file name,"Key press, costume change, sound, movement, and feedback",20,4
+17,Why test with a partner?,Your partner may notice timing or logic problems,Your partner hides the project,Testing is not needed,The game fixes itself,20,1
+18,Which is an example of logic?,Use a green poster,"If the answer is correct, increase score",Add a logo credit,Open a folder,20,2
+19,Game responds only when touching a sprite. What should you use?,Image source,Typography,Condition,Circuit ground,20,3
+20,Which bug is common in Scratch loops?,Image is copyright-free,Text is readable,Logo is aligned,Repeating too many times or never stopping,20,4
+21,What should you do before the graded debugging check?,Practice identifying likely errors and planning fixes,Memorize only the file name,Delete the starter file,Ignore the feedback,20,1
+22,Which concept helps a rhythm-timing program?,Poster alignment,Loop and variable,Arduino resistor,Data privacy,20,2
+23,What does response mean in a Scratch game?,The image source note,The color palette,What happens after input or an event,The project folder,20,3
+24,What should you include for Weeks 5-8?,Only a poster title,Only a robot route,Only a dataset,"Condition screenshot, loop practice, debug note, dance prep",20,4
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

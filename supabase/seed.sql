@@ -103,10 +103,10 @@ with grade6_classroom_activities as (
             "helperText": "Choose one option.",
             "required": true,
             "items": [
-              { "id": "a", "text": "A" },
-              { "id": "b", "text": "B" },
-              { "id": "c", "text": "C" },
-              { "id": "d", "text": "D" }
+              { "id": "a", "text": "A - Random social media photo with no author or permission information" },
+              { "id": "b", "text": "B - Water-drop icon from a classroom-safe image site with credit required" },
+              { "id": "c", "text": "C - News article photo marked all rights reserved" },
+              { "id": "d", "text": "D - Classmate drawing allowed only if the classmate's name is included" }
             ]
           },
           {
@@ -169,51 +169,15 @@ with grade6_classroom_activities as (
   },
   {
     "id": "grade6_t1_summative_4_scratch_score_task",
-    "title": "G6 T1 Summative 4 - Scratch Score Task Evidence",
-    "description": "Students submit evidence of a Scratch score task with one variable and two clickable sprites that change the score by different amounts. Slot: April Week 4, 90-minute class.",
-    "activity_type": "external-artifact",
-    "teacher_instructions": "Use this formal evidence upload after students build the Scratch score task. Check the link or screenshot before grading the checklist and reflections.",
-    "student_instructions": "Submit a Scratch link or screenshot that shows your score task. Complete the checklist and explain what each sprite does to the score.",
-    "materials": "Scratch project, device, screenshot tool if needed.",
-    "estimated_minutes": 45,
-    "student_output": "Scratch project link or screenshot with checklist and explanation.",
-    "makeup_instructions": "Finish the Scratch score task, submit a working link or screenshot, and answer the reflection prompts.",
-    "assessment_purpose": "formal",
-    "activity_data": {
-      "templateId": "project-evidence",
-      "externalArtifactTemplate": {
-        "version": 1,
-        "templateId": "project-evidence",
-        "prompt": "Submit evidence of your Scratch score task.",
-        "helperText": "Use a project link, screenshot, or PDF that clearly shows the variable and clickable sprites.",
-        "evidenceMode": "either",
-        "linkLabel": "Scratch project link",
-        "uploadLabel": "Scratch screenshot or PDF",
-        "allowedMimeTypes": ["image/png", "image/jpeg", "image/webp", "application/pdf"],
-        "checklistItems": [
-          { "id": "one_variable", "text": "My Scratch task has one score variable.", "required": true },
-          { "id": "two_sprites", "text": "My task has two clickable sprites.", "required": true },
-          { "id": "different_amounts", "text": "The two sprites change the score by different amounts.", "required": true },
-          { "id": "tested_fixed", "text": "I tested the task and fixed or explained one problem.", "required": true }
-        ],
-        "reflectionPrompts": [
-          { "id": "sprite_effects", "prompt": "What does each sprite do to the score?", "required": true },
-          { "id": "debug_step", "prompt": "What problem did you test, fix, or explain?", "required": true }
-        ]
-      }
-    }
-  },
-  {
-    "id": "grade6_t1_summative_5_recycling_ewaste_sorting",
-    "title": "G6 T1 Summative 5 - Recycling and E-Waste Sorting Check",
-    "description": "Students sort 10 technology-waste items and explain responsible choices. Slot: May Week 2, 90-minute class.",
+    "title": "G6 T1 Summative 4 - Scratch Score Task Classroom Check",
+    "description": "Students confirm their Scratch score task was sent through Classroom, then explain the score variable, sprite actions, and one test or fix. Slot: April Week 4, 90-minute class.",
     "activity_type": "structured-response",
-    "teacher_instructions": "Use this formal check after students practice reuse, repair, recycle, and e-waste decisions. Accept reasonable alternate categories when explanations show responsible thinking.",
-    "student_instructions": "Choose the best category for each item, then explain responsible choices and one realistic school action.",
-    "materials": "Device and class notes about reuse, repair, recycle, e-waste, batteries, and responsible disposal.",
+    "teacher_instructions": "Grade the Scratch project evidence from Classroom. Use this in-app check only to confirm submission, capture the readiness checklist, and collect the short explanation.",
+    "student_instructions": "Send your Scratch project evidence in Classroom. Then complete this in-app check to confirm your submission and explain how your score task works.",
+    "materials": "Scratch project, device, and Classroom assignment.",
     "estimated_minutes": 45,
-    "student_output": "Completed sorting table, explanations, and school action step.",
-    "makeup_instructions": "Complete the sorting check independently using class notes.",
+    "student_output": "Classroom submission confirmation, Scratch readiness checklist, and score-task explanation.",
+    "makeup_instructions": "Finish the Scratch score task, send the required evidence in Classroom, and complete this in-app check independently.",
     "assessment_purpose": "formal",
     "activity_data": {
       "templateId": "worksheet",
@@ -222,45 +186,89 @@ with grade6_classroom_activities as (
         "templateId": "worksheet",
         "blocks": [
           {
-            "id": "sorting_table",
-            "type": "table-grid",
-            "prompt": "Part A - Sort each item into reuse, repair, recycle, or e-waste.",
-            "helperText": "Choose the best answer for the situation, not just the fastest answer.",
+            "id": "classroom_directions",
+            "type": "instructions",
+            "prompt": "Your Scratch project evidence must be sent in Classroom.",
+            "helperText": "This app check does not collect the Scratch file, screenshot, or link."
+          },
+          {
+            "id": "classroom_status",
+            "type": "select",
+            "prompt": "What is your Classroom submission status?",
             "required": true,
-            "rows": [
-              { "id": "keyboard", "text": "1. Working keyboard that the classroom no longer needs" },
-              { "id": "battery", "text": "2. Broken phone battery" },
-              { "id": "cardboard", "text": "3. Empty cardboard box from a new monitor" },
-              { "id": "laptop", "text": "4. Old laptop that works slowly but turns on" },
-              { "id": "tablet", "text": "5. Cracked tablet screen" },
-              { "id": "paper", "text": "6. Used printer paper with one blank side" },
-              { "id": "headphones", "text": "7. Broken headphones with exposed wire" },
-              { "id": "bottle", "text": "8. Plastic bottle from the computer lab" },
-              { "id": "charger", "text": "9. Old charger that still works" },
-              { "id": "circuit_board", "text": "10. Damaged circuit board from a device" }
-            ],
-            "columns": [
-              { "id": "category", "text": "Best category" }
+            "items": [
+              { "id": "submitted_classroom", "text": "I sent the Scratch evidence in Classroom." },
+              { "id": "teacher_checked", "text": "My teacher checked the Scratch project during class." },
+              { "id": "need_help", "text": "I still need help sending the evidence in Classroom." }
             ]
           },
           {
-            "id": "explain_choice_1",
+            "id": "scratch_checklist",
+            "type": "checklist",
+            "prompt": "Scratch score-task checklist",
+            "helperText": "Use this to check your Classroom evidence before submitting.",
+            "required": false,
+            "items": [
+              { "id": "one_variable", "text": "My Scratch task has one score variable." },
+              { "id": "two_sprites", "text": "My task has two clickable sprites." },
+              { "id": "different_amounts", "text": "The two sprites change the score by different amounts." },
+              { "id": "tested_fixed", "text": "I tested the task and fixed or explained one problem." }
+            ]
+          },
+          {
+            "id": "sprite_effects",
             "type": "long-text",
-            "prompt": "Choose one item from Part A. Explain why your category is the responsible choice.",
+            "prompt": "What does each sprite do to the score?",
             "required": true
           },
           {
-            "id": "explain_choice_2",
-            "type": "long-text",
-            "prompt": "Choose a second item from Part A. Explain why your category is the responsible choice.",
-            "required": true
-          },
-          {
-            "id": "school_action",
-            "type": "long-text",
-            "prompt": "Write one realistic action our school could take to reduce technology waste. Explain why it would help.",
+            "id": "debug_step",
+            "type": "short-text",
+            "prompt": "What problem did you test, fix, or explain?",
             "required": true
           }
+        ]
+      }
+    }
+  },
+  {
+    "id": "grade6_t1_summative_5_recycling_ewaste_sorting",
+    "title": "G6 T1 Summative 5 - Recycling and E-Waste Sorting Check",
+    "description": "Students sort 10 technology-waste item cards into reuse, repair, recycle, or e-waste. Slot: May Week 2, 90-minute class.",
+    "activity_type": "card-sort",
+    "teacher_instructions": "Use this formal card sort after students practice reuse, repair, recycle, and e-waste decisions. Review misplaced cards and ask students to explain two choices orally or in class notes when needed.",
+    "student_instructions": "Move each technology-waste card into the best category: reuse, repair, recycle, or e-waste.",
+    "materials": "Device and class notes about reuse, repair, recycle, e-waste, batteries, and responsible disposal.",
+    "estimated_minutes": 45,
+    "student_output": "Completed technology-waste card sort.",
+    "makeup_instructions": "Complete the card sort independently using class notes.",
+    "assessment_purpose": "formal",
+    "activity_data": {
+      "templateId": "category-sort",
+      "cardSortTemplate": {
+        "version": 1,
+        "templateId": "category-sort",
+        "prompt": "Sort each technology-waste item into the best responsible category.",
+        "helperText": "Use the condition of the item to decide. Place every card before submitting.",
+        "requireAllCards": true,
+        "orderMode": "none",
+        "categories": [
+          { "id": "reuse", "title": "Reuse", "helperText": "Still works and can be used again." },
+          { "id": "repair", "title": "Repair", "helperText": "Could be fixed safely before reuse." },
+          { "id": "recycle", "title": "Recycle", "helperText": "Common recyclable material, not electronic waste." },
+          { "id": "ewaste", "title": "E-Waste", "helperText": "Electronic waste or unsafe electronic part that needs special handling." }
+        ],
+        "cards": [
+          { "id": "working_keyboard", "text": "Working keyboard the classroom no longer needs", "helperText": "It still works.", "expectedCategoryId": "reuse", "expectedOrder": 1 },
+          { "id": "broken_phone_battery", "text": "Broken phone battery that cannot be used safely", "helperText": "Batteries need special handling.", "expectedCategoryId": "ewaste", "expectedOrder": 1 },
+          { "id": "monitor_cardboard_box", "text": "Clean cardboard box from a new monitor", "helperText": "Packaging material, not an electronic part.", "expectedCategoryId": "recycle", "expectedOrder": 1 },
+          { "id": "slow_laptop", "text": "Old laptop that turns on but needs cleanup or a small fix", "helperText": "It may work better after repair.", "expectedCategoryId": "repair", "expectedOrder": 1 },
+          { "id": "cracked_tablet_screen", "text": "Tablet with a cracked screen that can be replaced", "helperText": "One damaged part can be fixed.", "expectedCategoryId": "repair", "expectedOrder": 2 },
+          { "id": "one_sided_paper", "text": "Printer paper with one blank side", "helperText": "It can be used again before recycling.", "expectedCategoryId": "reuse", "expectedOrder": 2 },
+          { "id": "unsafe_headphones", "text": "Broken headphones with exposed wire", "helperText": "Unsafe small electronic accessory.", "expectedCategoryId": "ewaste", "expectedOrder": 2 },
+          { "id": "plastic_bottle", "text": "Plastic bottle from the computer lab", "helperText": "Regular recyclable material.", "expectedCategoryId": "recycle", "expectedOrder": 2 },
+          { "id": "working_charger", "text": "Old charger that still works safely", "helperText": "It can still be used.", "expectedCategoryId": "reuse", "expectedOrder": 3 },
+          { "id": "damaged_circuit_board", "text": "Damaged circuit board from a device", "helperText": "Electronic part that needs special handling.", "expectedCategoryId": "ewaste", "expectedOrder": 3 }
         ]
       }
     }
@@ -386,38 +394,66 @@ with grade6_classroom_activities as (
   },
   {
     "id": "grade6_t2_summative_5_mbot_stem_challenge_demo",
-    "title": "G6 T2 Summative 5 - mBot STEM Challenge Demonstration",
-    "description": "Students submit mBot STEM challenge evidence and explain the goal, behavior, robot action, output or sensor, test result, and one improvement. Slot: August Week 12, 90-minute class.",
-    "activity_type": "external-artifact",
-    "teacher_instructions": "Use this formal evidence task for the final mBot STEM challenge demonstration. Students may submit code screenshots, route/test data, or a short evidence file.",
-    "student_instructions": "Submit evidence of your mBot STEM challenge. Complete the checklist and explain how your robot behaved and improved.",
-    "materials": "mBot, mBlock or code screenshot, route/test data, challenge sheet, readiness checklist.",
+    "title": "G6 T2 Summative 5 - mBot STEM Challenge Classroom Check",
+    "description": "Students confirm their mBot STEM challenge evidence or demonstration was handled through Classroom or teacher observation, then explain goal, behavior, test result, and one improvement. Slot: August Week 12, 90-minute class.",
+    "activity_type": "structured-response",
+    "teacher_instructions": "Grade the mBot challenge evidence, demonstration, code screenshots, or route/test data from Classroom and class observation. Use this in-app check only for confirmation, readiness, and student explanation.",
+    "student_instructions": "Send your mBot challenge evidence in Classroom or complete the teacher-observed demonstration as instructed. Then complete this in-app check.",
+    "materials": "mBot, mBlock or code screenshot, route/test data, challenge sheet, readiness checklist, and Classroom assignment.",
     "estimated_minutes": 45,
-    "student_output": "Project evidence, demonstration checklist, and reflection.",
-    "makeup_instructions": "Submit saved code/screenshot evidence and complete the reflection and readiness checklist independently.",
+    "student_output": "Classroom/demo confirmation, readiness checklist, and mBot explanation.",
+    "makeup_instructions": "Send saved code/screenshot evidence in Classroom or arrange the teacher-observed make-up demonstration, then complete this in-app check independently.",
     "assessment_purpose": "formal",
     "activity_data": {
-      "templateId": "project-evidence",
-      "externalArtifactTemplate": {
+      "templateId": "worksheet",
+      "responseTemplate": {
         "version": 1,
-        "templateId": "project-evidence",
-        "prompt": "Submit evidence for your mBot STEM Challenge Project.",
-        "helperText": "Use a screenshot, PDF, or link that helps your teacher verify the robot challenge.",
-        "evidenceMode": "either",
-        "linkLabel": "Optional project or evidence link",
-        "uploadLabel": "Code, route, or test evidence screenshot/PDF",
-        "allowedMimeTypes": ["image/png", "image/jpeg", "image/webp", "application/pdf"],
-        "checklistItems": [
-          { "id": "goal", "text": "I can explain the challenge goal.", "required": true },
-          { "id": "behavior", "text": "My evidence shows the route or robot behavior.", "required": true },
-          { "id": "robot_action", "text": "I named the main robot action.", "required": true },
-          { "id": "output_sensor", "text": "I included one output or sensor.", "required": true },
-          { "id": "test_result", "text": "I recorded a test result.", "required": true },
-          { "id": "readiness", "text": "I completed the readiness check: numbered kit, charged battery, challenge sheet, route/test data, and notes.", "required": true }
-        ],
-        "reflectionPrompts": [
-          { "id": "improvement", "prompt": "What was one problem and one improvement from testing?", "required": true },
-          { "id": "explain_behavior", "prompt": "Explain what your robot did during the demonstration.", "required": true }
+        "templateId": "worksheet",
+        "blocks": [
+          {
+            "id": "classroom_directions",
+            "type": "instructions",
+            "prompt": "Your mBot challenge evidence is handled in Classroom or by teacher observation.",
+            "helperText": "This app check does not collect code files, screenshots, routes, or videos."
+          },
+          {
+            "id": "classroom_status",
+            "type": "select",
+            "prompt": "How was your mBot evidence or demonstration submitted?",
+            "required": true,
+            "items": [
+              { "id": "submitted_classroom", "text": "I sent the evidence in Classroom." },
+              { "id": "teacher_observed", "text": "My teacher observed the demonstration in class." },
+              { "id": "need_makeup", "text": "I need a make-up submission or demonstration." }
+            ]
+          },
+          {
+            "id": "mbot_readiness",
+            "type": "checklist",
+            "prompt": "mBot challenge readiness checklist",
+            "helperText": "Use this to check your work before the grade is finalized.",
+            "required": false,
+            "items": [
+              { "id": "goal", "text": "I can explain the challenge goal." },
+              { "id": "behavior", "text": "My Classroom evidence or demo shows the route or robot behavior." },
+              { "id": "robot_action", "text": "I named the main robot action." },
+              { "id": "output_sensor", "text": "I included one output or sensor." },
+              { "id": "test_result", "text": "I recorded a test result." },
+              { "id": "readiness", "text": "My kit, battery, challenge sheet, route/test data, and notes are ready." }
+            ]
+          },
+          {
+            "id": "improvement",
+            "type": "long-text",
+            "prompt": "What was one problem and one improvement from testing?",
+            "required": true
+          },
+          {
+            "id": "explain_behavior",
+            "type": "long-text",
+            "prompt": "Explain what your robot did during the demonstration.",
+            "required": true
+          }
         ]
       }
     }
@@ -499,9 +535,9 @@ with grade6_classroom_activities as (
         "allowAddRows": true,
         "chart": { "enabled": true, "type": "bar", "labelColumnId": "category", "valueColumnId": "value" },
         "reflectionPrompts": [
-          { "id": "question_1", "prompt": "Answer chart question 1 using evidence from the chart.", "required": true },
-          { "id": "question_2", "prompt": "Answer chart question 2 using evidence from the chart.", "required": true },
-          { "id": "question_3", "prompt": "Answer chart question 3 using evidence from the chart.", "required": true },
+          { "id": "highest_value", "prompt": "Which chart category has the highest value? Include the value from your chart.", "required": true },
+          { "id": "lowest_value", "prompt": "Which chart category has the lowest value, and what does that show?", "required": true },
+          { "id": "category_comparison", "prompt": "Compare two chart categories. What is different or similar about them?", "required": true },
           { "id": "conclusion", "prompt": "Write one conclusion sentence that explains what the chart shows.", "required": true }
         ]
       }
@@ -509,51 +545,15 @@ with grade6_classroom_activities as (
   },
   {
     "id": "grade6_t3_summative_3_3d_model_design_plan",
-    "title": "G6 T3 Summative 3 - 3D Model Design Plan",
-    "description": "Students submit a 3D model design plan with sketch evidence, at least 3 labeled shapes, model purpose, and one planned improvement. Slot: October Week 4, 90-minute class.",
-    "activity_type": "external-artifact",
-    "teacher_instructions": "Use this formal design-plan evidence task after students practice 3D shapes, moving, resizing, rotating, duplicating, grouping, and improving a model.",
-    "student_instructions": "Submit your 3D model design evidence. Make sure your sketch or screenshot shows at least 3 labeled shapes, the model purpose, and one planned improvement.",
-    "materials": "3D modelling tool, sketch/design plan, screenshot or PDF evidence.",
-    "estimated_minutes": 45,
-    "student_output": "Uploaded or linked 3D model design evidence with checklist and reflection.",
-    "makeup_instructions": "Submit a screenshot/PDF or link showing your model design evidence and complete the reflection prompts.",
-    "assessment_purpose": "formal",
-    "activity_data": {
-      "templateId": "project-evidence",
-      "externalArtifactTemplate": {
-        "version": 1,
-        "templateId": "project-evidence",
-        "prompt": "Submit your 3D model design plan evidence.",
-        "helperText": "Upload or link evidence that shows the sketch/model, labels, purpose, and planned improvement.",
-        "evidenceMode": "either",
-        "linkLabel": "Optional model/design link",
-        "uploadLabel": "Sketch or model screenshot/PDF",
-        "allowedMimeTypes": ["image/png", "image/jpeg", "image/webp", "application/pdf"],
-        "checklistItems": [
-          { "id": "sketch", "text": "My evidence includes a clear sketch or model view.", "required": true },
-          { "id": "three_shapes", "text": "I labeled at least 3 shapes.", "required": true },
-          { "id": "purpose", "text": "I included the purpose of the model.", "required": true },
-          { "id": "improvement", "text": "I included one planned improvement.", "required": true }
-        ],
-        "reflectionPrompts": [
-          { "id": "model_purpose", "prompt": "What is the purpose of your model?", "required": true },
-          { "id": "planned_improvement", "prompt": "What is one planned improvement and why?", "required": true }
-        ]
-      }
-    }
-  },
-  {
-    "id": "grade6_t3_summative_4_microbit_parts_input_output",
-    "title": "G6 T3 Summative 4 - micro:bit Parts and Input/Output Check",
-    "description": "Students label 5 micro:bit parts, sort 8 examples into input/output, and answer short application questions. Slot: November Week 2, 90-minute class.",
+    "title": "G6 T3 Summative 3 - 3D Model Design Classroom Check",
+    "description": "Students confirm their 3D model design evidence was sent through Classroom, then explain labeled shapes, model purpose, and one planned improvement. Slot: October Week 4, 90-minute class.",
     "activity_type": "structured-response",
-    "teacher_instructions": "Use this formal check after students practice micro:bit parts, input, output, LED display, buttons, sensors, and variables.",
-    "student_instructions": "Complete each part of the check. Use input/output words carefully and answer in complete ideas.",
-    "materials": "Device, class notes, micro:bit reference image or physical micro:bit.",
+    "teacher_instructions": "Grade the 3D model sketch, screenshot, or design evidence from Classroom. Use this in-app check only for confirmation, checklist review, and student explanation.",
+    "student_instructions": "Send your 3D model design evidence in Classroom. Then complete this in-app check to confirm your submission and explain your design.",
+    "materials": "3D modelling tool, sketch/design plan, screenshot or PDF evidence, and Classroom assignment.",
     "estimated_minutes": 45,
-    "student_output": "Completed micro:bit parts, input/output, and application responses.",
-    "makeup_instructions": "Complete the same check independently using class notes and a micro:bit reference image.",
+    "student_output": "Classroom submission confirmation, 3D design checklist, and design explanation.",
+    "makeup_instructions": "Send the required 3D model evidence in Classroom, then complete this in-app check independently.",
     "assessment_purpose": "formal",
     "activity_data": {
       "templateId": "worksheet",
@@ -562,70 +562,95 @@ with grade6_classroom_activities as (
         "templateId": "worksheet",
         "blocks": [
           {
-            "id": "part_labels",
-            "type": "table-grid",
-            "prompt": "Part A - Label these 5 micro:bit parts: LED display, Button A, Button B, USB port, battery connector.",
+            "id": "classroom_directions",
+            "type": "instructions",
+            "prompt": "Your 3D model design evidence must be sent in Classroom.",
+            "helperText": "This app check does not collect the sketch, screenshot, PDF, or model link."
+          },
+          {
+            "id": "classroom_status",
+            "type": "select",
+            "prompt": "What is your Classroom submission status?",
             "required": true,
-            "rows": [
-              { "id": "part_1", "text": "Part 1" },
-              { "id": "part_2", "text": "Part 2" },
-              { "id": "part_3", "text": "Part 3" },
-              { "id": "part_4", "text": "Part 4" },
-              { "id": "part_5", "text": "Part 5" }
-            ],
-            "columns": [
-              { "id": "part_name", "text": "Part name" }
+            "items": [
+              { "id": "submitted_classroom", "text": "I sent the 3D design evidence in Classroom." },
+              { "id": "teacher_checked", "text": "My teacher checked the design evidence during class." },
+              { "id": "need_help", "text": "I still need help sending the evidence in Classroom." }
             ]
           },
           {
-            "id": "input_output_sort",
-            "type": "table-grid",
-            "prompt": "Part B - Sort each example as input or output.",
-            "required": true,
-            "rows": [
-              { "id": "button_a", "text": "1. Pressing Button A" },
-              { "id": "heart_icon", "text": "2. Showing a heart icon" },
-              { "id": "light_sensor", "text": "3. Light sensor reading" },
-              { "id": "speaker_sound", "text": "4. Playing a sound on a connected speaker" },
-              { "id": "temperature", "text": "5. Temperature reading" },
-              { "id": "led_number", "text": "6. Showing a number on the LEDs" },
-              { "id": "shake", "text": "7. Shaking the micro:bit" },
-              { "id": "radio_received", "text": "8. Radio message received from another micro:bit" }
-            ],
-            "columns": [
-              { "id": "input_output", "text": "Input or output?" }
+            "id": "design_checklist",
+            "type": "checklist",
+            "prompt": "3D design evidence checklist",
+            "helperText": "Use this to check your Classroom evidence before submitting.",
+            "required": false,
+            "items": [
+              { "id": "sketch", "text": "My Classroom evidence includes a clear sketch or model view." },
+              { "id": "three_shapes", "text": "I labeled at least 3 shapes." },
+              { "id": "purpose", "text": "I included the purpose of the model." },
+              { "id": "improvement", "text": "I included one planned improvement." }
             ]
           },
           {
-            "id": "button_smile",
-            "type": "short-text",
-            "prompt": "A program shows a smile when Button A is pressed. What is the input and what is the output?",
-            "required": true
-          },
-          {
-            "id": "hot_sensor",
-            "type": "short-text",
-            "prompt": "A program shows HOT when the temperature is high. What sensor input is used?",
-            "required": true
-          },
-          {
-            "id": "counter_changes",
-            "type": "short-text",
-            "prompt": "A counter increases when Button B is pressed. What changes in the program?",
-            "required": true
-          },
-          {
-            "id": "needs_both",
+            "id": "model_purpose",
             "type": "long-text",
-            "prompt": "Why does a micro:bit project need both input and output?",
+            "prompt": "What is the purpose of your model?",
             "required": true
           },
           {
-            "id": "one_sentence",
-            "type": "short-text",
-            "prompt": "Explain the difference between input and output in one sentence.",
+            "id": "planned_improvement",
+            "type": "long-text",
+            "prompt": "What is one planned improvement and why?",
             "required": true
           }
+        ]
+      }
+    }
+  },
+  {
+    "id": "grade6_t3_summative_4_microbit_parts_input_output",
+    "title": "G6 T3 Summative 4 - micro:bit Parts and Input/Output Sort",
+    "description": "Students sort micro:bit part clues and examples into the correct part, input, or output categories. Slot: November Week 2, 90-minute class.",
+    "activity_type": "card-sort",
+    "teacher_instructions": "Use this formal card sort after students practice micro:bit parts, input, output, LED display, buttons, sensors, and variables. Review misplaced cards and ask follow-up questions if a student confuses parts with input/output behavior.",
+    "student_instructions": "Move each card into the correct micro:bit part, input, or output category.",
+    "materials": "Device, class notes, micro:bit reference image or physical micro:bit.",
+    "estimated_minutes": 45,
+    "student_output": "Completed micro:bit parts and input/output card sort.",
+    "makeup_instructions": "Complete the card sort independently using class notes and a micro:bit reference image.",
+    "assessment_purpose": "formal",
+    "activity_data": {
+      "templateId": "category-sort",
+      "cardSortTemplate": {
+        "version": 1,
+        "templateId": "category-sort",
+        "prompt": "Sort each micro:bit card into the correct part, input, or output category.",
+        "helperText": "Some cards are physical part clues. Other cards describe actions or program behavior.",
+        "requireAllCards": true,
+        "orderMode": "none",
+        "categories": [
+          { "id": "led_display", "title": "LED Display", "helperText": "The 5x5 light grid." },
+          { "id": "button_a", "title": "Button A", "helperText": "The left front button." },
+          { "id": "button_b", "title": "Button B", "helperText": "The right front button." },
+          { "id": "usb_port", "title": "USB Port", "helperText": "The cable connector for power and programming." },
+          { "id": "battery_connector", "title": "Battery Connector", "helperText": "The connector for the external battery pack." },
+          { "id": "input", "title": "Input", "helperText": "Information or action going into the program." },
+          { "id": "output", "title": "Output", "helperText": "What the device shows, plays, or does." }
+        ],
+        "cards": [
+          { "id": "part_led_grid", "text": "5x5 light grid in the center that shows icons, numbers, or text", "expectedCategoryId": "led_display", "expectedOrder": 1 },
+          { "id": "part_left_a", "text": "Front button on the left marked A", "expectedCategoryId": "button_a", "expectedOrder": 1 },
+          { "id": "part_right_b", "text": "Front button on the right marked B", "expectedCategoryId": "button_b", "expectedOrder": 1 },
+          { "id": "part_usb", "text": "Top cable connector used for power and programming", "expectedCategoryId": "usb_port", "expectedOrder": 1 },
+          { "id": "part_battery", "text": "Back connector used for the external battery pack", "expectedCategoryId": "battery_connector", "expectedOrder": 1 },
+          { "id": "press_button_a", "text": "Pressing Button A", "expectedCategoryId": "input", "expectedOrder": 1 },
+          { "id": "show_heart", "text": "Showing a heart icon", "expectedCategoryId": "output", "expectedOrder": 1 },
+          { "id": "light_sensor_reading", "text": "Light sensor reading", "expectedCategoryId": "input", "expectedOrder": 2 },
+          { "id": "speaker_sound", "text": "Playing a sound on a connected speaker", "expectedCategoryId": "output", "expectedOrder": 2 },
+          { "id": "temperature_reading", "text": "Temperature reading", "expectedCategoryId": "input", "expectedOrder": 3 },
+          { "id": "show_number", "text": "Showing a number on the LEDs", "expectedCategoryId": "output", "expectedOrder": 3 },
+          { "id": "shake_microbit", "text": "Shaking the micro:bit", "expectedCategoryId": "input", "expectedOrder": 4 },
+          { "id": "radio_received", "text": "Radio message received from another micro:bit", "expectedCategoryId": "input", "expectedOrder": 5 }
         ]
       }
     }

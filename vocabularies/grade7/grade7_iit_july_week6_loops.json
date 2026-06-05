@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "loop",
-      "definition": "Code that repeats.",
+      "definition": "A Scratch block group that repeats an animation or action.",
       "example": "The loop kept the character dancing until the music stopped.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "One repeat of a loop.",
       "example": "Each iteration changed the costume once.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "one repeat"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "To do something again.",
       "example": "The repeat block made the sprite clap four times.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "do again"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "Counting backward to a final number.",
       "example": "The countdown went from three to one before the game started.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "backward count"
+      ],
       "antonyms": []
     },
     {
@@ -59,16 +68,23 @@
       "definition": "A repeated beat or timing pattern.",
       "example": "The rhythm matched the sprite movement to the beat.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "beat"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem in code.",
-      "example": "The student debugged the loop when the dance never stopped.",
+      "definition": "To find why a Scratch loop repeats incorrectly and fix it.",
+      "example": "The student can debug the loop when the dance never stops.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

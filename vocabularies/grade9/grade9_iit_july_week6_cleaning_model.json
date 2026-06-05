@@ -27,7 +27,9 @@
       "definition": "Fixing or removing unclear data.",
       "example": "Data cleaning changed blank answers into a clear no response category.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "data fixing"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "Data with mistakes or unclear values.",
       "example": "The messy data had repeated answers, misspelled words, and empty cells.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "unclean data"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A record of changes made.",
       "example": "The change log recorded each correction made to the dataset.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "revision record"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +65,10 @@
       "definition": "A simple version or representation of something.",
       "example": "The model showed how the sensor box would sit on the desk.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "version",
+        "representation"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +76,9 @@
       "definition": "A basic form such as a circle, box, or triangle.",
       "example": "The Tinkercad design used a box shape for the base.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "form"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +86,9 @@
       "definition": "A name or short description.",
       "example": "The student added a label to identify the sensor opening.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tag"
+      ],
       "antonyms": []
     }
   ]

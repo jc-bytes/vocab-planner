@@ -9,27 +9,23 @@ with grade8_raw_activities as (
 [
   {
     "id": "grade8_t1_daily_2_campaign_icon_logo_draft",
-    "title": "G8 T1 Daily Grade 2 - Campaign Icon or Logo Draft",
+    "title": "G8 T1 Daily Grade 2 - Campaign Icon or Logo Classroom Check",
     "class_slot": "March Week 3, 90-minute class",
-    "description": "Students submit an original Inkscape campaign icon or logo draft with vector technique evidence and a campaign message.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the Inkscape campaign icon or logo evidence sent through Classroom and complete a vector-technique self-check.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #2 after campaign graphic planning.",
-    "student_instructions": "Submit a screenshot, exported image, or file link for your campaign icon or logo and complete the checklist.",
-    "student_output": "Campaign icon/logo evidence, checklist, and message.",
-    "materials": "Inkscape file, planning sketch, rubric, and upload or screenshot tool.",
-    "checklist": [
-      {"id":"objects","text":"My design has at least 8 vector objects.", "required": true},
-      {"id":"fill_stroke","text":"My design uses intentional fill and stroke choices.", "required": true},
-      {"id":"grouped","text":"My design has at least 2 grouped parts.", "required": true},
-      {"id":"edited_path","text":"My design includes at least 1 edited path.", "required": true}
-    ],
-    "reflections": [
-      {"id":"message","prompt":"Write the one-sentence campaign message for this icon or logo.", "required": true},
-      {"id":"improve","prompt":"What is one improvement goal for next class?", "required": true}
+    "student_instructions": "Confirm your icon/logo evidence was sent in Classroom or checked by the teacher, then complete the self-check and reflection.",
+    "student_output": "Classroom submission confirmation, vector self-check, and message.",
+    "materials": "Inkscape file, planning sketch, rubric, and Classroom submission.",
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload evidence in this app. Submit the screenshot, exported image, or file link in Classroom, or have the teacher check it during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked it during class."},{"id":"need_help","text":"I need help or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Campaign icon/logo self-check", "items":[{"id":"objects","text":"My design has at least 8 vector objects."},{"id":"fill_stroke","text":"My design uses intentional fill and stroke choices."},{"id":"grouped","text":"My design has at least 2 grouped parts."},{"id":"edited_path","text":"My design includes at least 1 edited path."}]},
+      {"id":"message","type":"short-text","prompt":"Write the one-sentence campaign message for this icon or logo."},
+      {"id":"improve","type":"long-text","prompt":"What is one improvement goal for next class?"}
     ]
   },
   {
@@ -48,27 +44,22 @@ with grade8_raw_activities as (
   },
   {
     "id": "grade8_t1_daily_4_html_css_campaign_page",
-    "title": "G8 T1 Daily Grade 4 - HTML/CSS Campaign Page",
+    "title": "G8 T1 Daily Grade 4 - HTML/CSS Campaign Page Classroom Check",
     "class_slot": "April Week 7, 90-minute class",
-    "description": "Students submit one campaign web page using HTML and CSS with required structure, style, image, link, and credit evidence.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the HTML/CSS campaign page evidence sent through Classroom and complete a web-page self-check.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 40,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #4 during the HTML/CSS campaign page task.",
-    "student_instructions": "Submit your web page evidence and complete the HTML/CSS checklist.",
-    "student_output": "HTML/CSS page link or screenshot with checklist and reflection.",
-    "materials": "Text editor, browser, campaign images, source credit, and HTML/CSS files.",
-    "checklist": [
-      {"id":"title_sections","text":"The page has a title and two sections.", "required": true},
-      {"id":"image_alt","text":"The page includes one image with alt text.", "required": true},
-      {"id":"list_link","text":"The page includes one list and one link.", "required": true},
-      {"id":"css_rules","text":"The page has at least three CSS style rules.", "required": true},
-      {"id":"credit","text":"The page includes a short source credit.", "required": true}
-    ],
-    "reflections": [
-      {"id":"tag_issue","prompt":"What tag or CSS issue did you fix or review?", "required": true}
+    "student_instructions": "Confirm your web page evidence was sent in Classroom or checked by the teacher, then complete the HTML/CSS self-check.",
+    "student_output": "Classroom submission confirmation, HTML/CSS checklist, and reflection.",
+    "materials": "Text editor, browser, campaign images, source credit, HTML/CSS files, and Classroom submission.",
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload a page link or screenshot in this app. Submit the required web page evidence in Classroom or show it to the teacher during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked it during class."},{"id":"need_help","text":"I need help or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"HTML/CSS page self-check", "items":[{"id":"title_sections","text":"The page has a title and two sections."},{"id":"image_alt","text":"The page includes one image with alt text."},{"id":"list_link","text":"The page includes one list and one link."},{"id":"css_rules","text":"The page has at least three CSS style rules."},{"id":"credit","text":"The page includes a short source credit."}]},
+      {"id":"tag_issue","type":"long-text","prompt":"What tag or CSS issue did you fix or review?"}
     ]
   },
   {
@@ -132,53 +123,44 @@ with grade8_raw_activities as (
   },
   {
     "id": "grade8_t1_exam_google_sites_environmental_portfolio",
-    "title": "G8 T1 Exam Project - Google Sites Environmental Campaign Portfolio",
+    "title": "G8 T1 Exam Project - Google Sites Environmental Campaign Portfolio Classroom Check",
     "class_slot": "May Weeks 10-12 exam project",
-    "description": "Students submit the final Google Sites portfolio with campaign purpose, vector graphics, environmental video, source credits, reflection, and presentation evidence.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the final Google Sites portfolio evidence sent through Classroom and complete the project self-check and reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "link-evidence",
-    "evidence_mode": "link",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the May Google Sites portfolio.",
-    "student_instructions": "Submit the final site link and complete the project checklist and reflection prompts.",
-    "student_output": "Published or preview site link, checklist, and reflection.",
+    "student_instructions": "Confirm your final site link was sent in Classroom or checked by the teacher, then complete the project checklist and reflections.",
+    "student_output": "Classroom link confirmation, project checklist, and reflection.",
     "materials": "Google Sites portfolio, vector graphics, environmental video, source credits, and rubric.",
-    "checklist": [
-      {"id":"pages","text":"The site has the required pages and clear navigation.", "required": true},
-      {"id":"graphics","text":"The site includes at least 3 original vector graphics.", "required": true},
-      {"id":"video","text":"The site includes the required environmental video or teacher-approved video evidence.", "required": true},
-      {"id":"credits","text":"The site includes research or media source credits.", "required": true},
-      {"id":"reflection","text":"The site includes a project reflection.", "required": true}
-    ],
-    "reflections": [
-      {"id":"audience","prompt":"How does your site support the campaign audience?", "required": true},
-      {"id":"techniques","prompt":"What vector or web design techniques did you use?", "required": true},
-      {"id":"challenge","prompt":"What challenge did you solve during the project?", "required": true}
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not submit the Google Sites link in this app. Submit the final link in Classroom or have the teacher verify the published/preview site during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the site evidence status?", "items":[{"id":"classroom_link_sent","text":"I sent the final site link in Classroom."},{"id":"teacher_verified","text":"The teacher verified the site during class."},{"id":"need_publish_help","text":"I need help publishing or resubmitting."}]},
+      {"id":"checklist","type":"checklist","prompt":"Google Sites portfolio self-check", "items":[{"id":"pages","text":"The site has the required pages and clear navigation."},{"id":"graphics","text":"The site includes at least 3 original vector graphics."},{"id":"video","text":"The site includes the required environmental video or teacher-approved video evidence."},{"id":"credits","text":"The site includes research or media source credits."},{"id":"reflection","text":"The site includes a project reflection."}]},
+      {"id":"audience","type":"long-text","prompt":"How does your site support the campaign audience?"},
+      {"id":"techniques","type":"long-text","prompt":"What vector or web design techniques did you use?"},
+      {"id":"challenge","type":"long-text","prompt":"What challenge did you solve during the project?"}
     ]
   },
   {
     "id": "grade8_t2_daily_2_button_led_build",
-    "title": "G8 T2 Daily Grade 2 - Button-Controlled LED Build",
+    "title": "G8 T2 Daily Grade 2 - Button-Controlled LED Build Classroom Check",
     "class_slot": "June Week 3, 90-minute class",
-    "description": "Students submit evidence of a button-controlled LED circuit and explain input, process, and output.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the button-controlled LED circuit evidence sent through Classroom or observed by the teacher and explain input, process, and output.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #2 during Serial Monitor basics.",
-    "student_instructions": "Submit your labeled circuit evidence and complete the checklist.",
-    "student_output": "Labeled circuit evidence and input-process-output explanation.",
-    "materials": "Arduino/Freenove kit, LED, resistor, button, breadboard, code, and screenshot/photo tool.",
-    "checklist": [
-      {"id":"button","text":"The circuit uses a button as input.", "required": true},
-      {"id":"led","text":"The circuit uses an LED as output.", "required": true},
-      {"id":"state","text":"The LED changes state when the button is pressed.", "required": true},
-      {"id":"labeled","text":"The evidence labels the circuit or diagram.", "required": true}
-    ],
-    "reflections": [
-      {"id":"ipo","prompt":"Explain the input, process, and output in one or two sentences.", "required": true}
+    "student_instructions": "Confirm your circuit evidence was sent in Classroom or observed by the teacher, then complete the checklist and explanation.",
+    "student_output": "Classroom or teacher-observation confirmation and input-process-output explanation.",
+    "materials": "Arduino/Freenove kit, LED, resistor, button, breadboard, code, and Classroom evidence.",
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload circuit evidence in this app. Submit it in Classroom or demonstrate it for the teacher during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the circuit evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the working circuit."},{"id":"need_retest","text":"I need retest or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Button-controlled LED self-check", "items":[{"id":"button","text":"The circuit uses a button as input."},{"id":"led","text":"The circuit uses an LED as output."},{"id":"state","text":"The LED changes state when the button is pressed."},{"id":"labeled","text":"The evidence labels the circuit or diagram."}]},
+      {"id":"ipo","type":"long-text","prompt":"Explain the input, process, and output in one or two sentences."}
     ]
   },
   {
@@ -208,26 +190,22 @@ with grade8_raw_activities as (
   },
   {
     "id": "grade8_t2_daily_4_servo_buzzer_input_control",
-    "title": "G8 T2 Daily Grade 4 - Servo or Buzzer Controlled by Input",
+    "title": "G8 T2 Daily Grade 4 - Servo or Buzzer Input-Control Classroom Check",
     "class_slot": "July Week 7, 90-minute class",
-    "description": "Students submit evidence of a servo and buzzer system controlled by a button, potentiometer, or sensor.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the servo, buzzer, RGB LED, or LED input-control evidence sent through Classroom or observed by the teacher.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #4 during servo control.",
-    "student_instructions": "Submit the circuit evidence, identify the input and output behavior, and explain how control works.",
-    "student_output": "Circuit evidence, labeled diagram, and control explanation.",
-    "materials": "Arduino/Freenove kit, servo or buzzer, input component, diagram, and code notes.",
-    "checklist": [
-      {"id":"input","text":"The system uses a button, potentiometer, or sensor as input.", "required": true},
-      {"id":"output","text":"The system controls a servo, buzzer, RGB LED, or LED output.", "required": true},
-      {"id":"diagram","text":"The evidence includes a labeled circuit diagram or photo.", "required": true},
-      {"id":"explanation","text":"I explained how the input controls the output.", "required": true}
-    ],
-    "reflections": [
-      {"id":"smooth","prompt":"What improvement would make control smoother or clearer?", "required": true}
+    "student_instructions": "Confirm your circuit evidence was sent in Classroom or observed by the teacher, then complete the control-system self-check.",
+    "student_output": "Classroom or teacher-observation confirmation, control checklist, and reflection.",
+    "materials": "Arduino/Freenove kit, servo or buzzer, input component, diagram, code notes, and Classroom evidence.",
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload circuit evidence in this app. Submit it in Classroom or demonstrate it for the teacher during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the control-system evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the working system."},{"id":"need_retest","text":"I need retest or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Input-control self-check", "items":[{"id":"input","text":"The system uses a button, potentiometer, or sensor as input."},{"id":"output","text":"The system controls a servo, buzzer, RGB LED, or LED output."},{"id":"diagram","text":"The evidence includes a labeled circuit diagram or photo."},{"id":"explanation","text":"I explained how the input controls the output."}]},
+      {"id":"smooth","type":"long-text","prompt":"What improvement would make control smoother or clearer?"}
     ]
   },
   {
@@ -248,7 +226,7 @@ with grade8_raw_activities as (
       {"id":"role","type":"short-text","prompt":"What is your individual or pair role?"},
       {"id":"components","type":"table-grid","prompt":"Plan the input and output system.", "rows":[{"id":"input","text":"Input component"},{"id":"output","text":"Output component"},{"id":"process","text":"Process/code idea"},{"id":"materials","text":"Materials list"}], "columns":[{"id":"plan","text":"Your plan"}]},
       {"id":"behavior","type":"long-text","prompt":"Describe the expected behavior."},
-      {"id":"tests","type":"table-grid","prompt":"Write 3 test cases.", "rows":[{"id":"test_1","text":"Test case 1"},{"id":"test_2","text":"Test case 2"},{"id":"test_3","text":"Test case 3"}], "columns":[{"id":"condition","text":"Condition/input"},{"id":"expected","text":"Expected output"}]}
+      {"id":"tests","type":"table-grid","prompt":"Write 3 test cases.", "rows":[{"id":"normal_input","text":"Normal input or sensor value"},{"id":"boundary_input","text":"Boundary or threshold value"},{"id":"failure_recovery","text":"Failure or reset condition"}], "columns":[{"id":"condition","text":"Condition/input"},{"id":"expected","text":"Expected output"}]}
     ]
   },
   {
@@ -291,29 +269,24 @@ with grade8_raw_activities as (
   },
   {
     "id": "grade8_t2_exam_arduino_freenove_prototype",
-    "title": "G8 T2 Exam Project - Arduino/Freenove Integrated Prototype",
+    "title": "G8 T2 Exam Project - Arduino/Freenove Integrated Prototype Classroom Check",
     "class_slot": "August Weeks 10-12 exam project",
-    "description": "Students submit Arduino/Freenove prototype evidence with circuit, code, testing, improvement, explanation, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm Arduino/Freenove prototype evidence sent through Classroom or observed by the teacher and complete project reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "both",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the August Arduino/Freenove prototype.",
-    "student_instructions": "Submit prototype evidence and complete the project checklist and reflections.",
-    "student_output": "Prototype evidence, checklist, testing notes, and reflection.",
+    "student_instructions": "Confirm your prototype evidence was sent in Classroom or observed by the teacher, then complete the project checklist and reflections.",
+    "student_output": "Classroom or teacher-observation confirmation, project checklist, testing notes, and reflection.",
     "materials": "Arduino/Freenove prototype, circuit diagram, code evidence, testing notes, and rubric.",
-    "checklist": [
-      {"id":"purpose","text":"My evidence explains the prototype purpose.", "required": true},
-      {"id":"circuit","text":"My evidence includes a labeled circuit diagram or photo.", "required": true},
-      {"id":"code","text":"My evidence includes code or code screenshots.", "required": true},
-      {"id":"testing","text":"My evidence includes testing notes or results.", "required": true},
-      {"id":"improvement","text":"My evidence explains an improvement or debug step.", "required": true}
-    ],
-    "reflections": [
-      {"id":"logic","prompt":"Explain how the input, code/process, and output work together.", "required": true},
-      {"id":"debug","prompt":"What wiring, code, or design issue did you fix?", "required": true},
-      {"id":"future","prompt":"What future improvement would make the prototype more reliable?", "required": true}
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload prototype evidence in this app. Submit required files/screenshots in Classroom, or demonstrate the prototype and code for the teacher."},
+      {"id":"submission_status","type":"select","prompt":"What is the prototype evidence status?", "items":[{"id":"classroom_sent","text":"I sent the required evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the prototype and code."},{"id":"need_retest","text":"I need retest or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Arduino prototype self-check", "items":[{"id":"purpose","text":"My evidence explains the prototype purpose."},{"id":"circuit","text":"My evidence includes a labeled circuit diagram or photo."},{"id":"code","text":"My evidence includes code or code screenshots."},{"id":"testing","text":"My evidence includes testing notes or results."},{"id":"improvement","text":"My evidence explains an improvement or debug step."}]},
+      {"id":"logic","type":"long-text","prompt":"Explain how the input, code/process, and output work together."},
+      {"id":"debug","type":"long-text","prompt":"What wiring, code, or design issue did you fix?"},
+      {"id":"future","type":"long-text","prompt":"What future improvement would make the prototype more reliable?"}
     ]
   },
   {
@@ -330,34 +303,30 @@ with grade8_raw_activities as (
     "student_output": "App screen plan and event map.",
     "materials": "App planning checklist, wireframe notes, and event examples.",
     "fields": [
-      {"id":"screens","type":"table-grid","prompt":"Plan at least 3 app screens.", "rows":[{"id":"screen_1","text":"Screen 1"},{"id":"screen_2","text":"Screen 2"},{"id":"screen_3","text":"Screen 3"}], "columns":[{"id":"purpose","text":"Purpose"},{"id":"elements","text":"Interface elements"}]},
-      {"id":"events","type":"table-grid","prompt":"Plan at least 4 events.", "rows":[{"id":"event_1","text":"Event 1"},{"id":"event_2","text":"Event 2"},{"id":"event_3","text":"Event 3"},{"id":"event_4","text":"Event 4"}], "columns":[{"id":"trigger","text":"Trigger"},{"id":"result","text":"Result/screen flow"}]},
+      {"id":"screens","type":"table-grid","prompt":"Plan at least 3 app screens.", "rows":[{"id":"home_screen","text":"Home or start screen"},{"id":"input_screen","text":"Input or gameplay screen"},{"id":"result_screen","text":"Result or feedback screen"}], "columns":[{"id":"purpose","text":"Purpose"},{"id":"elements","text":"Interface elements"}]},
+      {"id":"events","type":"table-grid","prompt":"Plan at least 4 events.", "rows":[{"id":"setup_event","text":"Start or setup event"},{"id":"tap_event","text":"Button or tap event"},{"id":"input_event","text":"Input or value-change event"},{"id":"result_event","text":"Result, score, or reset event"}], "columns":[{"id":"trigger","text":"Trigger"},{"id":"result","text":"Result/screen flow"}]},
       {"id":"variable","type":"short-text","prompt":"What variable or user input will the app use?"},
       {"id":"tests","type":"long-text","prompt":"Write 3 test cases."}
     ]
   },
   {
     "id": "grade8_t3_daily_3_python_input_output_variable_task",
-    "title": "G8 T3 Daily Grade 3 - Python Input/Output and Variable Task",
+    "title": "G8 T3 Daily Grade 3 - Python Input/Output and Variable Task Classroom Check",
     "class_slot": "October Week 5, 90-minute class",
-    "description": "Students submit Python code that asks for two numbers, calculates at least 3 results, displays labeled output, and includes a purpose comment.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm Python code evidence sent through Classroom and complete an input/output and variable self-check.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #3 during selection with if/else.",
-    "student_instructions": "Submit your Python code or screenshot and complete the checklist.",
-    "student_output": "Python code evidence and test reflection.",
-    "materials": "Python environment and code screenshot or file.",
-    "checklist": [
-      {"id":"inputs","text":"The program asks for two numbers.", "required": true},
-      {"id":"calculations","text":"The program calculates at least 3 results.", "required": true},
-      {"id":"labels","text":"The output is clearly labeled.", "required": true},
-      {"id":"comment","text":"The code includes one purpose comment.", "required": true}
-    ],
-    "reflections": [
-      {"id":"test","prompt":"Write one test input that proved your program worked.", "required": true}
+    "student_instructions": "Confirm your Python code evidence was sent in Classroom or checked by the teacher, then complete the checklist and test reflection.",
+    "student_output": "Classroom submission confirmation, Python self-check, and test reflection.",
+    "materials": "Python environment, code screenshot or file, and Classroom submission.",
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload code or screenshots in this app. Submit the code evidence in Classroom or show it to the teacher during class."},
+      {"id":"submission_status","type":"select","prompt":"What is the code evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked it during class."},{"id":"need_help","text":"I need help or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Python input/output self-check", "items":[{"id":"inputs","text":"The program asks for two numbers."},{"id":"calculations","text":"The program calculates at least 3 results."},{"id":"labels","text":"The output is clearly labeled."},{"id":"comment","text":"The code includes one purpose comment."}]},
+      {"id":"test","type":"long-text","prompt":"Write one test input that proved your program worked."}
     ]
   },
   {
@@ -374,7 +343,7 @@ with grade8_raw_activities as (
     "student_output": "Python debugging table and corrected-code note.",
     "materials": "Python starter/debugging file.",
     "fields": [
-      {"id":"debug_table","type":"table-grid","prompt":"Complete the debugging table.", "rows":[{"id":"error_1","text":"Error 1"},{"id":"error_2","text":"Error 2"},{"id":"error_3","text":"Error 3"},{"id":"error_4","text":"Error 4"},{"id":"error_5","text":"Error 5"}], "columns":[{"id":"problem","text":"Problem/error type"},{"id":"fix","text":"Fix"},{"id":"result","text":"Result"}]},
+      {"id":"debug_table","type":"table-grid","prompt":"Complete the debugging table.", "rows":[{"id":"variable_name","text":"Variable name mismatch"},{"id":"number_conversion","text":"Input not converted to a number"},{"id":"condition_logic","text":"If/else condition is backwards"},{"id":"loop_update","text":"Loop counter or update is missing"},{"id":"output_message","text":"Output label is unclear or missing"}], "columns":[{"id":"problem","text":"Problem/error type"},{"id":"fix","text":"Fix"},{"id":"result","text":"Result"}]},
       {"id":"best_fix","type":"long-text","prompt":"Which fix was most important? Explain why."}
     ]
   },
@@ -393,7 +362,7 @@ with grade8_raw_activities as (
     "materials": "Binary and representation notes.",
     "fields": [
       {"id":"matches","type":"matching","prompt":"Match each term to the correct meaning.", "items":[{"id":"representation","text":"representation","matchText":"A way to show information."},{"id":"symbol","text":"symbol","matchText":"A mark or picture that stands for something."},{"id":"bit","text":"bit","matchText":"A single binary digit."},{"id":"binary","text":"binary","matchText":"A number system using 0 and 1."},{"id":"byte","text":"byte","matchText":"A group of 8 bits."},{"id":"decimal","text":"decimal","matchText":"The number system using digits 0 through 9."}]},
-      {"id":"conversions","type":"table-grid","prompt":"Complete 6 small conversions.", "rows":[{"id":"c1","text":"Conversion 1"},{"id":"c2","text":"Conversion 2"},{"id":"c3","text":"Conversion 3"},{"id":"c4","text":"Conversion 4"},{"id":"c5","text":"Conversion 5"},{"id":"c6","text":"Conversion 6"}], "columns":[{"id":"given","text":"Given value"},{"id":"converted","text":"Converted value"}]},
+      {"id":"conversions","type":"table-grid","prompt":"Complete 6 small conversions.", "rows":[{"id":"decimal_3","text":"Decimal 3 to binary"},{"id":"decimal_5","text":"Decimal 5 to binary"},{"id":"decimal_9","text":"Decimal 9 to binary"},{"id":"binary_10","text":"Binary 10 to decimal"},{"id":"binary_101","text":"Binary 101 to decimal"},{"id":"binary_1000","text":"Binary 1000 to decimal"}], "columns":[{"id":"given","text":"Given value"},{"id":"converted","text":"Converted value"}]},
       {"id":"examples","type":"long-text","prompt":"Write 2 short examples of how devices represent information."}
     ]
   },
@@ -437,29 +406,24 @@ with grade8_raw_activities as (
   },
   {
     "id": "grade8_t3_exam_scratch_microbit_game",
-    "title": "G8 T3 Exam Project - Scratch + Micro:bit Interactive Game",
+    "title": "G8 T3 Exam Project - Scratch + Micro:bit Interactive Game Classroom Check",
     "class_slot": "November Weeks 10-12 exam project",
-    "description": "Students submit the final Scratch + Micro:bit game evidence with sensor input, game logic, testing, challenge, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the final Scratch + Micro:bit game evidence sent through Classroom or observed by the teacher and complete project reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "link-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the Scratch + Micro:bit final project.",
-    "student_instructions": "Submit the Scratch project link or screenshot evidence and complete the project checklist and reflections.",
-    "student_output": "Scratch project evidence, checklist, and reflection.",
+    "student_instructions": "Confirm your Scratch project evidence was sent in Classroom or observed by the teacher, then complete the project checklist and reflections.",
+    "student_output": "Classroom or teacher-observation confirmation, project checklist, and reflection.",
     "materials": "Scratch project, Micro:bit or simulator, screenshots, test notes, and rubric.",
-    "checklist": [
-      {"id":"game_shell","text":"The project has a game title, sprite, and background.", "required": true},
-      {"id":"microbit_input","text":"The game uses Micro:bit input or a clearly labeled simulation.", "required": true},
-      {"id":"logic","text":"The game includes game logic such as motion, score, obstacle, or win condition.", "required": true},
-      {"id":"testing","text":"The evidence includes user testing or debugging notes.", "required": true},
-      {"id":"presentation","text":"I prepared a game explanation or presentation notes.", "required": true}
-    ],
-    "reflections": [
-      {"id":"controls","prompt":"How does the Micro:bit input control the game?", "required": true},
-      {"id":"challenge","prompt":"What challenge or bug did you solve?", "required": true},
-      {"id":"learned","prompt":"What did you learn from testing and presenting?", "required": true}
+    "fields": [
+      {"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload Scratch links or screenshots in this app. Submit the project evidence in Classroom, or demonstrate the game and Micro:bit/simulation for the teacher."},
+      {"id":"submission_status","type":"select","prompt":"What is the game evidence status?", "items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the game or simulation."},{"id":"need_retest","text":"I need retest or makeup time."}]},
+      {"id":"checklist","type":"checklist","prompt":"Scratch + Micro:bit game self-check", "items":[{"id":"game_shell","text":"The project has a game title, sprite, and background."},{"id":"microbit_input","text":"The game uses Micro:bit input or a clearly labeled simulation."},{"id":"logic","text":"The game includes game logic such as motion, score, obstacle, or win condition."},{"id":"testing","text":"The evidence includes user testing or debugging notes."},{"id":"presentation","text":"I prepared a game explanation or presentation notes."}]},
+      {"id":"controls","type":"long-text","prompt":"How does the Micro:bit input control the game?"},
+      {"id":"challenge","type":"long-text","prompt":"What challenge or bug did you solve?"},
+      {"id":"learned","type":"long-text","prompt":"What did you learn from testing and presenting?"}
     ]
   },
   {
@@ -631,7 +595,7 @@ with grade8_raw_activities as (
     "student_output": "Source and credit notes.",
     "materials": "Approved image or resource sources.",
     "fields": [
-      {"id":"source_table","type":"table-grid","prompt":"Record two source/credit notes.", "rows":[{"id":"source_1","text":"Source 1"},{"id":"source_2","text":"Source 2"}], "columns":[{"id":"title","text":"Title/resource"},{"id":"creator","text":"Creator/source"},{"id":"link","text":"Link"},{"id":"permission","text":"Permission note"}]},
+      {"id":"source_table","type":"table-grid","prompt":"Record two source/credit notes.", "rows":[{"id":"main_visual","text":"Main campaign image or graphic"},{"id":"supporting_resource","text":"Supporting fact, video, or media source"}], "columns":[{"id":"title","text":"Title/resource"},{"id":"creator","text":"Creator/source"},{"id":"link","text":"Link"},{"id":"permission","text":"Permission note"}]},
       {"id":"why_credit","type":"long-text","prompt":"Why does credit matter when using online resources?"}
     ]
   },
@@ -1133,7 +1097,7 @@ with grade8_raw_activities as (
     "student_output": "Variable input test log.",
     "materials": "Python input program.",
     "fields": [
-      {"id":"tests","type":"table-grid","prompt":"Record three test inputs.", "rows":[{"id":"test_1","text":"Test 1"},{"id":"test_2","text":"Test 2"},{"id":"test_3","text":"Test 3"}], "columns":[{"id":"input","text":"Input"},{"id":"output","text":"Output"}]},
+      {"id":"tests","type":"table-grid","prompt":"Record three test inputs.", "rows":[{"id":"normal_input","text":"Normal expected input"},{"id":"large_or_decimal_input","text":"Large number or decimal input"},{"id":"unexpected_input","text":"Unexpected text or blank input"}], "columns":[{"id":"input","text":"Input"},{"id":"output","text":"Output"}]},
       {"id":"variable","type":"long-text","prompt":"What does a variable store?"}
     ]
   },

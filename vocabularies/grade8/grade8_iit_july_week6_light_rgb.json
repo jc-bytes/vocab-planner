@@ -40,10 +40,13 @@
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The sensor value limit that changes the RGB LED response.",
       "example": "The threshold decided when the warning LED turned on.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +54,34 @@
       "definition": "Not very bright.",
       "example": "The room was dim, so the project changed color.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "low-light"
+      ],
+      "antonyms": [
+        "bright"
+      ]
     },
     {
       "word": "bright",
       "definition": "Giving a lot of light.",
       "example": "A bright flashlight made the sensor value rise.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "well-lit"
+      ],
+      "antonyms": [
+        "dim"
+      ]
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A sensor rule that compares a reading to a threshold before choosing a light color.",
       "example": "The condition checked whether the reading was above the threshold.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {

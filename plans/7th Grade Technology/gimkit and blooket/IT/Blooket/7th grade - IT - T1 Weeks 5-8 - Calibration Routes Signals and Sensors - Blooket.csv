@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What does calibration mean?,Adjusting values so the robot works more accurately,Choosing a random color,Deleting the program,Hiding the route,20,1
+2,Which values help control travel distance?,Title and header,Speed and time,Fill and stroke,Credit and source,20,2
+3,What is accuracy?,How bright a poster is,How hidden a file is,How close a result is to what was expected,How long a password is,20,3
+4,What should you record in a movement chart?,Only the robot name,Only a website link,Only a picture,"Speed, time, observed distance, and conclusion",20,4
+5,Your robot turns too far. What should you adjust?,Turn time or speed,Poster title,Source note,Search engine,20,1
+6,What is a path?,A web page section,The way from one place to another,A score value,A vector color,20,2
+7,What is a route?,A private message,A browser tab,The planned path to follow,A robot battery,20,3
+8,What is a checkpoint?,A random sound,A folder color,A hidden password,A place used to check route progress,20,4
+9,Why draw movement arrows before coding?,They help translate the route into commands,They delete the robot program,They replace testing,They make sensors unnecessary,20,1
+10,What does efficient mean for a route?,It goes nowhere,It uses fewer unnecessary steps,It is hidden,It ignores obstacles,20,2
+11,What is an obstacle?,A score variable,A website title,Something that blocks the way,A safe image,20,3
+12,Why remove an unnecessary command?,To make the route random,To hide the result,To stop all testing,To make the route clearer and more efficient,20,4
+13,What is an LED used for on the robot?,Showing a light signal or state,Saving a website,Moving a wheel,Measuring all distance,20,1
+14,What is a buzzer?,A block that stores score,A part that makes a sound,A web page section,A vector node,20,2
+15,What is a state?,A broken packet,A hidden source,The current condition of something,A search query,20,3
+16,Which LED color could show stop?,White text only,Transparent,No color,Red,20,4
+17,Why use light or sound signals?,They help people understand what the robot is doing,They hide robot behavior,They remove movement commands,They erase checkpoints,20,1
+18,What does ultrasonic mean?,Using images without source notes,Using sound waves to measure distance,Using a Scratch score,Using a website title,20,2
+19,What is a sensor reading?,A random poster icon,A menu label,A value measured by a sensor,A missing route,20,3
+20,What is a threshold?,A route with no start,A web page source,A team name,A limit where the robot changes action,20,4
+21,What does a condition do?,Checks whether a rule is true or false,Deletes the code,Paints the robot,Creates a website header,20,1
+22,What should happen if an object is too close?,The robot should ignore it,The robot should stop or react,The route should vanish,The LED should be unplugged,20,2
+23,What does else mean in an if/else program?,The first motor only,A page button,What happens when the if condition is false,A source credit,20,3
+24,Why test sensor values at different distances?,To make values random,To hide the sensor,To erase the route,To choose a reasonable threshold,20,4
+25,What should your obstacle reaction include?,"Movement, sensor condition, and one output signal",Only a title,Only a wheel label,Only a blank map,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

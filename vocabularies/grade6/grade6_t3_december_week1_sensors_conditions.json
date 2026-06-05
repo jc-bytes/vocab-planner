@@ -24,18 +24,23 @@
   "words": [
     {
       "word": "sensor",
-      "definition": "A part that detects something around it.",
+      "definition": "A micro:bit or robot part that notices something around it.",
       "example": "The sensor detected an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "condition",
-      "definition": "A rule that must be true for something to happen.",
+      "definition": "A sensor rule that decides when the micro:bit should act.",
       "example": "The condition checks for an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +72,10 @@
       "definition": "Words or symbols sent or shown to someone.",
       "example": "The micro:bit showed a message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "communication",
+        "note"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +83,9 @@
       "definition": "A diagram that shows steps or choices.",
       "example": "The flowchart showed what the robot should do.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "process diagram"
+      ],
       "antonyms": []
     }
   ]

@@ -27,7 +27,9 @@
       "definition": "The main page of a website.",
       "example": "The homepage introduced the project and linked to the evidence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "main page"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "The name of a page or project.",
       "example": "The title told visitors the name of the campaign.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "heading",
+        "name"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,10 @@
       "definition": "The reason something is made.",
       "example": "The purpose explained why the website was made.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reason",
+        "goal"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +59,9 @@
       "definition": "Short text that explains an image.",
       "example": "The caption explained what the screenshot showed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "image note"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "Images, video, sound, or other digital content.",
       "example": "The media section included an image and a short video.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "digital content"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +79,9 @@
       "definition": "Moving images with or without sound.",
       "example": "The video showed the project steps in order.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "moving images"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +89,9 @@
       "definition": "Making something usable by more people.",
       "example": "Alt text improved accessibility for the campaign image.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "usability for all"
+      ],
       "antonyms": []
     }
   ]

@@ -173,8 +173,8 @@ export const studentClassroomActivityBrowserRenderMethods = {
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(weekGroups.entries())
             .sort(([weekA], [weekB]) => {
-                const placementA = this.getAssignmentPlanningPlacement(weekGroups.get(weekA)?.[0]);
-                const placementB = this.getAssignmentPlanningPlacement(weekGroups.get(weekB)?.[0]);
+                const placementA = this.getAssignmentCalendarPlacement(weekGroups.get(weekA)?.[0]);
+                const placementB = this.getAssignmentCalendarPlacement(weekGroups.get(weekB)?.[0]);
                 return placementA.weekOrder - placementB.weekOrder;
             })
             .forEach(([weekKey, weekAssignments]) => {

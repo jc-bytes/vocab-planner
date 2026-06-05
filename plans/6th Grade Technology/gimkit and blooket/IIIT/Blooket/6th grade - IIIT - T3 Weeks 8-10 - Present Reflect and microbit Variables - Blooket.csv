@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What should you plan before presenting work?,"Goal, what you made, and what you improved",Only a hidden password,Only a random color,Only the date,20,1
+2,Why practice a one-minute explanation?,To hide your project,To share your work clearly and on time,To skip the topic,To delete your notes,20,2
+3,What should you do when listening to a classmate?,Interrupt every sentence,Open unrelated tabs,Pay attention and respond respectfully,Hide their file,20,3
+4,What is reflection?,A robot motor,A spreadsheet header,A browser tab,Thinking about what happened and what you learned,20,4
+5,Which reflection sentence is useful?,I improved my chart labels so the data was easier to read.,It was fine.,I did it.,The file is blue.,20,1
+6,What can a micro:bit show with a first program?,A full website,Text or an icon,A 3D printed object,A spreadsheet average,20,2
+7,Why test a micro:bit program?,To hide the output,To remove the code,To check what the board actually displays,To close the file forever,20,3
+8,Which output fits the LED display?,A temperature reading,A button press,A table row,A heart icon,20,4
+9,What should you check if the icon does not appear?,"Blocks, connection, and program download",Only the file color,Only the desk number,Only the chart title,20,1
+10,What is a variable?,A fixed drawing only,A place that stores a value that can change,A hidden folder,A web address,20,2
+11,What is a counter?,A robot wheel,A website source,A variable that counts up or down,A 3D shape,20,3
+12,What value should a simple counter often start with?,A secret word,A random picture,A web page title,0,20,4
+13,What should happen when a button increases a counter?,The number changes by the planned amount,The board disappears,The file deletes,The chart turns off,20,1
+14,Why show the counter value on the display?,So the value is hidden,So you can see the changing number,So buttons stop working,So the code is erased,20,2
+15,What should a counter plan include?,Only a color,Only a private note,"Starting value, input, change, and output",Only a 3D object,20,3
+16,What does initialize mean?,Delete all values,Hide the board,Change the website link,Set a starting value,20,4
+17,What does update mean in a counter?,Change the stored value,Erase the display,Move a 3D shape,Sort a table row,20,1
+18,Which button action fits a counter?,Press A to delete the board,Press A to add 1,Press A to open a random website,Press A to hide all code,20,2
+19,What should you do after testing your counter?,Remove the variable,Hide the value,Fix one problem or explain how it works,Close the project without saving,20,3
+20,What makes a micro:bit explanation clear?,Only say the file name,Only show a color,Only point to the keyboard,"Say the input, variable change, and output",20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

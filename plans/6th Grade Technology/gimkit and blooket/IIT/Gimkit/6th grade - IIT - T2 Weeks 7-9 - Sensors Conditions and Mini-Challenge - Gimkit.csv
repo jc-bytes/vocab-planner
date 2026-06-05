@@ -1,0 +1,22 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What does a sensor do for the mBot?,Detects something such as an object or line,Writes the project title,Makes a copyright license,Stores classmate passwords
+Which is an example of a sensor input?,An obstacle detected in front of the robot,A poster color,A team name,A blank page
+If obstacle then stop. What is the condition?,Obstacle detected,The robot has wheels,The notebook is blue,The class has a projector
+What does true mean in an if/then flowchart?,The condition is happening or correct,The robot is always wrong,The route map is blank,The team skipped testing
+What does false mean in an if/then flowchart?,The condition is not happening,The sensor is always broken,The robot has no parts,The answer is always the first option
+What should a condition flowchart include?,"Condition, true response, false response, and explanation",Only a title,Only a robot photo,Only a color
+Which response makes sense if the mBot sees an obstacle?,Stop or turn away,Speed up toward the obstacle,Erase the program,Hide the sensor
+Why test a sensor in two situations?,To compare how it responds,To avoid recording data,To make the robot heavier,To skip the flowchart
+What should a mini-challenge goal be?,Small enough to build and test in class,Impossible to test,Unclear and random,Only about decoration
+Which success rule is clear?,The mBot stops before the marker three times,The mBot is cool,The robot looks nice,The team worked somehow
+What belongs in the mini-challenge plan?,"Goal, commands, test area, and success rule",Only a class password,Only a poster image,Only a logo
+What should you record during testing?,One problem and one improvement,Only the date,Only the team color,Nothing
+Which pair is correct?,Input is what the robot detects; response is what it does,Input is a poster; response is a worksheet,Input is a pencil; response is a drawing,Input is a title; response is a password
+What is a flowchart?,A diagram that shows steps or choices,A motor inside the mBot,A sound made by the buzzer,A classroom folder
+Why should the test area be safe?,So the robot can be tried without hitting people or materials,So the robot can leave the room,So the team does not need a plan,So all commands are random
+Which is a good debugging step for a sensor response?,Check the condition and test again,Remove the sensor word from notes,Ignore the test result,Turn off all safety rules
+What makes an explanation sentence strong?,It tells what the sensor detected and what the robot did,It only says yes,It only lists the team name,It avoids the word sensor
+Which challenge uses a sensor?,Stop when an object is close,Draw a poster title,Sort classroom pencils,Choose a Canva color
+Why ask another group to watch the test?,They can notice a problem or give a useful suggestion,They can hide the result,They can replace the plan,They can delete the flowchart
+What should you improve after feedback?,One part of the program or test plan,Every unrelated file,The class schedule,The school year

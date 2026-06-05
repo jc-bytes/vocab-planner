@@ -27,7 +27,9 @@
       "definition": "To arrange data in order.",
       "example": "Sort arranged the scores from highest to lowest.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "arrange"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "To show only data that matches a rule.",
       "example": "The filter showed only students who completed the task.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "select"
+      ],
       "antonyms": []
     },
     {
@@ -56,18 +60,25 @@
     },
     {
       "word": "pattern",
-      "definition": "Something that repeats or has a clear order.",
+      "definition": "A repeated result in spreadsheet data that can be explained.",
       "example": "The pattern showed that scores rose after extra practice.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A spreadsheet rule used by a filter or COUNTIF to select data.",
       "example": "The condition counted only values above the passing score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     }
   ]

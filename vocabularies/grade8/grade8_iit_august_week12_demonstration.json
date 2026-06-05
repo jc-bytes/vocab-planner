@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "demonstration",
-      "definition": "Showing how something works.",
+      "definition": "Showing the circuit, sensor trigger, code evidence, and test result.",
       "example": "The demonstration showed how the sensor triggered the alert.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "showing"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,10 @@
       "definition": "A simple drawing that shows parts or ideas.",
       "example": "The diagram labelled the sensor, LED, resistor, and buzzer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "drawing",
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -51,24 +57,34 @@
       "definition": "What happened during a test.",
       "example": "The test result proved the project worked at the chosen distance.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outcome"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "An explanation of the circuit bug, test evidence, and final improvement.",
       "example": "The reflection explained which bug was hardest to fix.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A working test version of the circuit used in the final demo.",
       "example": "The prototype reacted when an object moved close to the sensor.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     }
   ]
 }

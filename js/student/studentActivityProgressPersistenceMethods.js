@@ -1,4 +1,6 @@
 import { $ } from '../main.js';
+import { imageDB } from '../db.js';
+import { studentApi as supabaseService } from '../services/studentApi.js';
 
 class StudentActivityProgressPersistenceMethods {
     handleAutoSave(scoreData) {
@@ -83,6 +85,7 @@ class StudentActivityProgressPersistenceMethods {
             }
 
             this.sm.progress.saveLocalProgress();
+            this.syncActivityProgressToCloud(activityType, scoreData, settings);
             this.scheduleActivityPreload();
 
             // Update in-game progress indicator
@@ -92,6 +95,51 @@ class StudentActivityProgressPersistenceMethods {
                 indicator.textContent = `Progress: ${percent}%`;
                 indicator.classList.remove('hidden');
             }
+        }
+    }
+
+    buildActivityProgressPayload(activityType, scoreData = {}, settings = {}) {
+        const unitProgress = this.getCurrentUnitProgress();
+        if (!unitProgress || !this.sm.currentVocab) return null;
+        return {
+            unitKey: this.getUnitProgressKey(this.sm.currentVocab),
+            unitContext: {
+                unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
+                unitName: unitProgress.unitName || this.sm.currentVocab.name || '',
+                subjectSlug: unitProgress.subjectSlug || '',
+                trimester: unitProgress.trimester || '',
+                schoolYear: unitProgress.schoolYear || '',
+                grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
+            },
+            activityType,
+            score: Number(scoreData.score) || 0,
+            isComplete: Boolean(scoreData.isComplete) || Number(scoreData.score) >= 100,
+            details: scoreData.details || {},
+            activitySettings: {
+                progressReward: settings.progressReward,
+                completionBonus: settings.completionBonus
+            },
+            clientId: this.sm.progress?.clientId || ''
+        };
+    }
+
+    async syncActivityProgressToCloud(activityType, scoreData = {}, settings = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) return;
+        const payload = this.buildActivityProgressPayload(activityType, scoreData, settings);
+        if (!payload) return;
+
+        try {
+            const progress = await supabaseService.submitStudentActivityProgress(payload);
+            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            this.sm.setAuthStatus('☁️ Synced');
+        } catch (error) {
+            console.warn('Could not sync activity progress event:', error);
+            try {
+                await imageDB.enqueueSyncAction('student-activity-progress', payload);
+            } catch (queueError) {
+                console.warn('Could not queue activity progress event:', queueError);
+            }
+            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Sync failed - saved locally' : 'Saved locally - offline');
         }
     }
 

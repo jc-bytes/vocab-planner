@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What should a game concept plan include?,"Purpose, player goal, input, response, scoring, and challenge",Only a title,Only a private password,Only a random sprite,20,1
+2,What is a player goal?,A hidden folder,What the player is trying to do,A binary number,A Python syntax mark,20,2
+3,What is a success condition?,A deleted sprite,A random sound,How the game knows the player succeeded,A secret file,20,3
+4,What should a final game plan include?,Only a backdrop,Only a password,Only the date,"Title, roles, goal, controls, scoring, sprites, and test cases",20,4
+5,Why map one micro:bit input to a sprite action first?,To test the main control before adding more,To hide the input,To delete the sprite,To skip testing,20,1
+6,What is a game shell?,The final perfect game,"Starter title, sprite, background, and first control",A hidden file,A binary conversion,20,2
+7,What should the main game loop do?,Delete the project,Hide the player,Keep important game actions running,Stop all inputs,20,3
+8,What is sensor-controlled movement?,Movement with no input,A copied screenshot,A private message,Movement changed by a micro:bit input or reading,20,4
+9,Why add scoring or a win condition?,So the player knows progress or success,To hide all results,To remove the player goal,To break controls,20,1
+10,What is an obstacle in a game?,A folder name,A challenge the player must avoid or solve,A Python comment,A binary digit,20,2
+11,What should peer testing feedback include?,Only use blue,Only a joke,"Control issue, clarity issue, and positive feature",Only a password,20,3
+12,Why collect user testing feedback?,To hide the game,To avoid revision,To remove all sprites,"To improve controls, clarity, and play experience",20,4
+13,What is documentation for a game?,"Notes, screenshots, and explanation of how it works",A deleted folder,A secret code,A random icon,20,1
+14,What should presentation notes include?,Only the file name,"Goal, controls, scoring, challenge, tests, and improvement",Only a color,Only a private note,20,2
+15,Why rehearse the game presentation?,To hide controls,To skip the demo,To explain and demonstrate the project clearly,To delete evidence,20,3
+16,What should you test before presenting?,Only the title,Only the folder,Only the binary number,"Start, controls, scoring, challenge, and ending",20,4
+17,What is a useful improvement after testing?,Make controls clearer or fix a confusing rule,Remove all instructions,Hide the score,Break the input,20,1
+18,What should your reflection discuss?,Only the date,"What worked, what changed, and what you would improve",Only the file size,Only a password,20,2
+19,Which game result is strongest?,The sprite never moves,The controls are secret,The input controls the sprite and the rules are clear,The game has no goal,20,3
+20,What should you submit with the final game?,Only a hidden folder,Only a blank page,Only a random file,"Project, reflection, screenshots or demo proof",20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

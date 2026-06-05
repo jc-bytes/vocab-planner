@@ -27,31 +27,48 @@
       "definition": "To try something and see if it works.",
       "example": "We test the program before showing it.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "check",
+        "trial"
+      ],
+      "antonyms": [
+        "guess"
+      ]
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem in a program.",
+      "definition": "To test a robot path, find the wrong movement, and fix it.",
       "example": "We debug when the robot turns the wrong way.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
+      "definition": "To change the robot route after a test so it works better.",
       "example": "We improve the route after testing.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     },
     {
       "word": "path",
       "definition": "The way something moves from start to finish.",
       "example": "The mBot followed a tape path.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "route"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +76,9 @@
       "definition": "The path used to get from one place to another.",
       "example": "The route had two turns.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "path"
+      ],
       "antonyms": []
     },
     {
@@ -75,8 +94,13 @@
       "definition": "To correct a problem.",
       "example": "We changed the time to fix the movement.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "correct",
+        "repair"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ],
   "month": "june",

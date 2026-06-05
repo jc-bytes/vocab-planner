@@ -24,10 +24,12 @@
   "words": [
     {
       "word": "speed",
-      "definition": "How fast something moves.",
+      "definition": "The movement setting adjusted to make the route more accurate.",
       "example": "We lowered the speed so the robot stayed on the path.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pace"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How long something lasts.",
       "example": "The robot moved for two seconds of time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "duration"
+      ],
       "antonyms": []
     },
     {
@@ -43,15 +47,21 @@
       "definition": "To change direction.",
       "example": "The robot made a left turn.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rotate",
+        "change direction"
+      ],
       "antonyms": []
     },
     {
       "word": "sequence",
-      "definition": "Steps in the correct order.",
+      "definition": "The exact order of movement steps used to test route accuracy.",
       "example": "The robot followed the movement sequence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "The path used to get from one place to another.",
       "example": "The route had two turns.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "path"
+      ],
       "antonyms": []
     },
     {

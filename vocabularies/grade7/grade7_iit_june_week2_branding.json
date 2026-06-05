@@ -27,7 +27,9 @@
       "definition": "The style and identity of a product or group.",
       "example": "The brand used the same colors on the poster and game screen.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "identity"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A symbol or design that represents a group or idea.",
       "example": "The logo represented the project with one simple symbol.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A planned set of colors.",
       "example": "The palette used blue, green, and white.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "color set"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "The style and arrangement of text.",
       "example": "The typography made the title easy to read.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "text style"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +67,22 @@
       "definition": "Keeping choices the same across a design.",
       "example": "Consistency kept the same logo size on each slide.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "same style"
+      ],
+      "antonyms": [
+        "inconsistency"
+      ]
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Comments about a logo, color palette, typography, or design consistency.",
       "example": "Feedback told the student to make the title larger.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +90,10 @@
       "definition": "A changed version made after review.",
       "example": "The revision changed the colors after peer review.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
       "antonyms": []
     }
   ]

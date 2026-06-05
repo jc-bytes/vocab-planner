@@ -27,7 +27,9 @@
       "definition": "A clear set of steps to solve a problem.",
       "example": "The algorithm listed the steps before the Python code was written.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "step-by-step plan"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "Instructions a computer can run.",
       "example": "The program printed a greeting and asked for a name.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions",
+        "code"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +64,9 @@
       "definition": "Text stored in a program.",
       "example": "The string stored the player's name.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "text"
+      ],
       "antonyms": []
     },
     {
@@ -72,11 +79,16 @@
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "Data typed by the user and stored by a Python command.",
       "example": "The input command asked the user for an answer.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     }
   ]
 }

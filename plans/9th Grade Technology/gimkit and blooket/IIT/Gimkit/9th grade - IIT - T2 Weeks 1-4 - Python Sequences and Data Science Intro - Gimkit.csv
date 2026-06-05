@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+"In Python, what is a list?",A collection of related items stored together,A circuit part,A poster title,A slide color
+"What prints from scores = [70, 82, 90]; print(scores[1])?",82,70,90,1
+Why is index 0 important in Python lists?,The first item is usually at position 0,Lists begin at 10,Index numbers are always letters,Indexes are only for posters
+Which line adds an item to the end of a list?,items.append('new'),items.remove_all(),items.sorter(),items.index = end
+Which method arranges list items in order?,sort,remove,display,substring
+What does a while loop need to avoid running forever?,A condition that eventually becomes false,A poster credit,A sensor wire,A color palette
+Which loop is best for checking each item in a list?,for loop,title loop,ground loop,credit loop
+What does this do: for score in scores: print(score)?,Prints each score in the list,Prints only the list name,Deletes the scores,Sorts the scores automatically
+Which task uses filtering?,Show only scores above 70,Change a poster color,Move an Arduino wire,Align a logo
+What is a string?,Text stored in a program,A circuit path,A chart type,A sensor reading only
+What is a character?,"One letter, number, space, or symbol in text",A complete dataset,A whole poster,An Arduino board
+What does len('data') return?,4,3,data,0
+Which error is likely in this line: for item in list print(item),Missing colon before the loop body,The word print is too short,The list must be a poster,There is no possible error
+"Which code idea combines list, loop, and condition?",Count how many survey answers are above 70,Choose a poster font,Charge a robot battery,Label a breadboard only
+Why use a condition in data code?,"To decide which branch, loop action, or result should happen",To remove all data,To make lists impossible,To hide output
+What is output in a Python data program?,A printed value or summary produced by the program,A resistor,A slide title,A poster credit
+Which result is a data observation?,Five classmates chose option A,The file is blue,The room is quiet,The cable is long
+What is data science?,Using data to answer questions,Only writing random code,Only decorating slides,Only building circuits
+What is the investigative cycle used for?,"Asking, collecting, analyzing, and concluding with data",Skipping data support,Choosing a random image,Replacing Python lists
+Which data question is measurable?,How many minutes classmates read each day?,Is lunch nice?,Are classmates cool?,Is school good?
+Why should code be tested with two data sets?,To check if it works beyond one example,To make the output random,To avoid debugging,To delete the list
+Which bug can happen with list indexes?,Trying to access a position that does not exist,Using a clear variable name,Printing an output,Writing a comment
+Which statement is a careful conclusion from small data?,"In this sample, more classmates chose A than B",Everyone everywhere chooses A,The data proves everything,No limitation exists
+What does a variable store?,A value that can change or be used by the program,Only a classroom poster,Only a breadboard row,Only a logo
+Why connect Python to real data?,"It lets code organize, check, and summarize useful information",It removes the need for thinking,It makes all answers correct,It replaces data with guesses

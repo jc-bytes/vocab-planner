@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is a spreadsheet?,A tool for organizing data in rows and columns,A robot motor,A website menu,A private message,20,1
+2,What is a cell?,A sensor value only,One box in a spreadsheet,A button on a robot,A Scratch costume,20,2
+3,What is a cell reference?,A random title,A hidden password,The column and row name for a cell,A robot route,20,3
+4,What does a row go across?,Only up and down,Around the robot,Behind the screen,Side to side,20,4
+5,What does a column go?,Up and down,Only side to side,In a circle,Through a battery,20,1
+6,What does a formula do?,Deletes the sheet,Calculates using cell values,Changes the file name,Draws a robot route,20,2
+7,What does a function help you do?,Hide every number,Open a sensor,Use a built-in calculation,Make a sound,20,3
+8,Which formula could add cells A1 and A2?,A1 plus words,open A1 A2,hide A1,=A1+A2,20,4
+9,What does average show?,A typical value from a set,Only the largest title,A missing file,A website icon,20,1
+10,Why format a spreadsheet?,To remove all data,To make information easier to read,To hide formulas,To delete the chart,20,2
+11,What does a chart help you do?,Change a password,Build a sensor,See patterns or comparisons,Delete comments,20,3
+12,Which chart is useful for comparing categories?,Private note,Robot wheel,Folder icon,Bar chart,20,4
+13,What should an interpretation sentence explain?,What the chart shows,Only your favorite color,Only a random file,Only the browser name,20,1
+14,What does sorting data do?,Deletes all rows,Changes the order based on a rule,Hides every value,Turns data into sound,20,2
+15,What does filtering data do?,Makes all rows visible forever,Changes the computer battery,Shows only rows that match a condition,Removes formulas,20,3
+16,What is conditional formatting?,A robot part,A blog title,A private link,A style that changes when data matches a rule,20,4
+17,What does COUNTIF count?,Cells that match a condition,Only pictures,Only hidden files,Only website pages,20,1
+18,Why check data before making a chart?,Charts never use data,Wrong data can make the chart misleading,Labels do not matter,Rows should be blank,20,2
+19,Which data question is clear?,What is the color?,Where is the mouse?,Which category has the highest value?,Can I close this?,20,3
+20,What should you do if a formula result looks wrong?,Hide the formula,Delete the sheet,Ignore the result,Check cell references and values,20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

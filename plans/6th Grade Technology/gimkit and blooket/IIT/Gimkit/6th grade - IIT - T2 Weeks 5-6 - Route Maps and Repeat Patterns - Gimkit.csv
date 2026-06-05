@@ -1,0 +1,22 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What should a route map include?,"A start, ordered steps, turns, stops, and a finish",Only the robot color,Only team names,Only the word route
+Why should the route have markers?,They show places the mBot should reach or avoid,They make the robot heavier,They replace all commands,They erase the program
+The mBot misses the target by a little. What should you do?,Adjust speed or time and test again,Throw away the route map,Skip the next test,Change the poster title
+Which route step is clear enough to test?,"Move forward, turn right, then stop at the marker",Do something cool,Move maybe somewhere,Be fast
+What is a loop useful for?,Repeating the same action pattern,Deleting all movement,Choosing an image source,Turning off the robot forever
+What idea helps program a square path?,Loop,Copyright,Credit,Audience
+What does accurate mean for a route?,Close to the planned target,Random and unclear,Hidden from your group,Only colorful
+Which test note is most useful?,"The robot turned too late, so we lowered the time",It was bad,My friend laughed,The floor is a floor
+What should you compare after using a loop?,The long command list and the shorter loop version,The robot and a poster,The wheel and a map,The class list and a route
+Which repeated path fits loop practice?,Zigzag pattern,One single stop,No movement,A blank map
+Why draw the route before programming?,It helps plan the order of commands,It replaces testing,It charges the mBot,It makes the buzzer louder
+A route has four movement steps. What should you label?,Turns and stop points,Only image credits,Only teammate names,Only Scratch costumes
+What is the safest test area?,The assigned space with markers and enough room,The table edge,A crowded walkway,Near loose cables
+Which command would probably fix a route that goes too far?,Use less time or lower speed,Add a random buzzer,Remove every command,Hide the route map
+What is a pattern?,Something that repeats in a regular way,A missing cable,A single random action,A class password
+Which statement explains why loops help?,They make repeated code shorter and easier to adjust,They make tests unnecessary,They make every route perfect,They remove the need for safety
+What should the team do after a failed route test?,"Find one problem, choose one fix, and try again",Blame the robot only,Stop recording,Change all values without thinking
+What should you include for this topic?,"Your route map, command plan, test result, and improvement",Only a poster,Only a blank worksheet,Only a vocabulary title
+What does sequence mean in route programming?,Steps in the correct order,A part that makes sound,A type of image license,A team role only
+How can you make a route easier to debug?,Test one section at a time,Run every idea at once,Avoid writing notes,Hide the markers

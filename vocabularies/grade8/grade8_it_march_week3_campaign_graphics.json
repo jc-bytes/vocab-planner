@@ -27,15 +27,20 @@
       "definition": "A planned message that asks people to care or act.",
       "example": "The campaign asked students to keep devices organized and safe.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "awareness effort"
+      ],
       "antonyms": []
     },
     {
       "word": "audience",
-      "definition": "The people who will see or use something.",
+      "definition": "The group the campaign graphic is made to inform or persuade.",
       "example": "The audience for the poster was Grade 8 students.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,10 @@
       "definition": "Information sent or shown.",
       "example": "The message told viewers to back up their portfolio files.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "communication",
+        "note"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +59,9 @@
       "definition": "A small picture that represents an idea.",
       "example": "The icon showed a small shield for online safety.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "A symbol or design that represents a group or idea.",
       "example": "The logo used simple shapes so it stayed clear when small.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,10 @@
       "definition": "A rough drawing or plan.",
       "example": "The sketch planned the poster layout before the final design.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "draft drawing",
+        "plan"
+      ],
       "antonyms": []
     }
   ]

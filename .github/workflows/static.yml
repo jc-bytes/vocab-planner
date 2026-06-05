@@ -40,9 +40,24 @@ jobs:
         run: npm ci
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
       - name: Smoke test app shells
         run: npm run test:ui:smoke
+      - name: Authenticated app smoke
+        run: npm run test:ui:auth-smoke
+      - name: Responsive authenticated audit
+        run: npm run test:ui:responsive:local
+      - name: Supabase lint
+        run: supabase db lint --local --fail-on none
+      - name: Supabase advisors
+        run: supabase db advisors --local --fail-on none --type all
       - name: Build site
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist

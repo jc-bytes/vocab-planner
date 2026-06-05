@@ -27,31 +27,45 @@
       "definition": "A smaller named part of a program that can be reused.",
       "example": "The jump subroutine reused the same movement blocks.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reusable block",
+        "helper routine"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A key press, click, or sprite touch that the Scratch game uses.",
       "example": "A key press was the input that started the action.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A Scratch rule that checks touching, score, or timer before choosing an action.",
       "example": "The condition checked whether the sprite touched the goal.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Peer comments used to improve the screen, controls, or instructions.",
       "example": "Peer feedback helped the student improve the start screen.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +73,10 @@
       "definition": "Trying something to see if it works.",
       "example": "Testing found that the timer was too short.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking",
+        "trial"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +84,10 @@
       "definition": "A mistake in a program.",
       "example": "The bug made the score reset during the game.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mistake",
+        "error"
+      ],
       "antonyms": []
     }
   ]

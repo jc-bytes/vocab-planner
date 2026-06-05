@@ -27,7 +27,9 @@
       "definition": "Using sound waves to measure distance.",
       "example": "The ultrasonic sensor measured the distance to the hand.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "sound-wave sensor"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How far apart two things are.",
       "example": "Distance was recorded in centimeters in the test table.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "space apart"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "Something that starts an action.",
       "example": "The trigger started the warning signal.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "starter"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +81,9 @@
       "definition": "How dependably something works.",
       "example": "Reliability improved when three tests gave the same result.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "dependability"
+      ],
       "antonyms": []
     }
   ]

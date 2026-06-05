@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "sequence",
-      "definition": "Steps in the correct order.",
+      "definition": "The ordered robot movement steps the program follows.",
       "example": "The robot followed the movement sequence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
@@ -35,39 +38,57 @@
       "definition": "Toward the front.",
       "example": "The robot moved forward.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "ahead"
+      ],
+      "antonyms": [
+        "backward"
+      ]
     },
     {
       "word": "backward",
       "definition": "Toward the back.",
       "example": "The robot moved backward.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "back"
+      ],
+      "antonyms": [
+        "forward"
+      ]
     },
     {
       "word": "turn",
       "definition": "To change direction.",
       "example": "The robot made a left turn.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rotate",
+        "change direction"
+      ],
       "antonyms": []
     },
     {
       "word": "stop",
       "definition": "To end movement.",
-      "example": "The robot stopped at the marker.",
+      "example": "The robot can stop at the marker.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "end",
+        "halt"
+      ],
+      "antonyms": [
+        "start"
+      ]
     },
     {
       "word": "speed",
-      "definition": "How fast something moves.",
+      "definition": "How quickly the robot moves during a simple route.",
       "example": "We lowered the speed so the robot stayed on the path.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pace"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +96,9 @@
       "definition": "How long something lasts.",
       "example": "The robot moved for two seconds of time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "duration"
+      ],
       "antonyms": []
     }
   ],

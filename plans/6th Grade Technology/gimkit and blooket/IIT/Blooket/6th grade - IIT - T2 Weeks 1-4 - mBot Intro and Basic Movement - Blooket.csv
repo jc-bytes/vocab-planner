@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,A group is ready to test the mBot. What should they do first?,Check that parts are secure and use the assigned test area,Place the mBot near the table edge,Hold the wheels while the motors run,Pull a cable if the robot moves too fast,20,1
+2,Which sentence best explains what a robot is?,A notebook used to record homework,A machine that can follow instructions to do a task,A website used for pictures,A classroom rule about pencils,20,2
+3,Which part helps the mBot wheels move?,Buzzer,LED,Motor,Notebook,20,3
+4,What does a program give to the mBot?,Extra wheels,A poster title,A password,Instructions to follow,20,4
+5,"What makes the mBot move, turn, and stop?",A sequence of commands,A copyright license,A color palette,A classroom seating chart,20,1
+6,Why is safety important when using mBots?,It makes the robot louder,"It protects people, devices, and classroom materials",It changes the robot color,It removes the need for instructions,20,2
+7,Which action is unsafe during a robot test?,Watching from the assigned area,Checking the route markers,Touching moving wheels,Writing the test result,20,3
+8,What does a sensor help a robot do?,Make a poster,Store a worksheet,Choose a team name,Notice something around it,20,4
+9,Which part can show a light signal?,LED,Wheel,Motor,USB cable,20,1
+10,Which part can make a beep or sound?,Wheel,Buzzer,Marker,Notebook,20,2
+11,Your robot goes too far. Which value should you change?,Poster title,Sticker color,Time or speed,Image credit,20,3
+12,"Your mBot does not turn correctly. What should your team check?",The logo color,The worksheet font,The classroom door,The turn command and its value,20,4
+13,Which answer is an example of an instruction?,Move forward for two seconds,The robot is blue,The class is noisy,The notebook is open,20,1
+14,What should a labeled mBot diagram show?,Only team names,Main parts and their functions,Only random colors,Only the due date,20,2
+15,Why should you explain one mBot part after labeling it?,To avoid using vocabulary,To skip the safety check,To show you know what the part does,To make the diagram blank,20,3
+16,"If the mBot stops working, what is a good first step?",Shake the robot hard,Pull random wires,Keep testing without looking,"Pause, check safely, and ask for help if needed",20,4
+17,Which pair is correct?,Wheel helps movement,Buzzer detects distance,LED stores code,Motor shows image credit,20,1
+18,What belongs in the Week 1 robotics vocabulary table?,Only the word copied three times,"Definition, illustration, and example sentence",Only a robot photo,Only a team name,20,2
+19,A good robot test result tells...,Only who won the race,Only the robot color,What happened and what was changed,Only the classroom number,20,3
+20,Which action shows responsible teamwork?,Everyone grabs the mBot at once,The team ignores loose parts,The group drives outside the test area,One teammate tests while another records results safely,20,4
+21,Why do commands need to be in order?,The robot follows them step by step,The LED chooses randomly,Only the robot color matters,The motor ignores commands,20,1
+22,What is the best reason to test slowly at first?,To finish without checking,To find problems before trying a faster route,To make the robot bump into objects,To skip recording results,20,2
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

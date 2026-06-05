@@ -27,7 +27,9 @@
       "definition": "The way from one place to another.",
       "example": "The path showed where the robot should travel.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "route"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "The planned path to follow.",
       "example": "The route included two turns and one checkpoint.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "path"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A place used to check progress on a route.",
       "example": "The checkpoint confirmed the robot reached the middle of the maze.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "progress point"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "Something that blocks the way.",
       "example": "The obstacle forced the robot to turn left.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "barrier"
+      ],
       "antonyms": []
     },
     {
@@ -64,11 +72,16 @@
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
-      "example": "The team improved the route after the robot hit the wall.",
+      "definition": "To change the route after a test so the robot avoids problems.",
+      "example": "The team can improve the route after the robot hits the wall.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     }
   ]
 }

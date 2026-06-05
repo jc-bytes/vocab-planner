@@ -7,6 +7,9 @@ export const resolveSupabaseConfig = () => window.SUPABASE_CONFIG || SUPABASE_CO
 
 export function createSupabaseClient() {
     const config = resolveSupabaseConfig();
+    if (!isSupabaseConfigured()) {
+        throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY, or provide window.SUPABASE_CONFIG.');
+    }
     return createClient(config.url, config.publishableKey, {
         auth: {
             autoRefreshToken: true,

@@ -37,7 +37,9 @@
       "definition": "A group of related items stored together.",
       "example": "The list stored the names of the project materials.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "collection"
+      ],
       "antonyms": []
     },
     {
@@ -45,7 +47,10 @@
       "definition": "One thing in a list.",
       "example": "Each item in the list represented one survey answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "thing",
+        "entry"
+      ],
       "antonyms": []
     },
     {
@@ -53,7 +58,9 @@
       "definition": "A position number in a list.",
       "example": "The student used index 0 to get the first item in the list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "position number"
+      ],
       "antonyms": []
     },
     {
@@ -61,23 +68,31 @@
       "definition": "Text stored in a program.",
       "example": "The student's name was stored as a string in the program.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "text"
+      ],
       "antonyms": []
     },
     {
       "word": "loop",
-      "definition": "Code that repeats.",
+      "definition": "Python code that repeats over data, list items, or user choices.",
       "example": "The loop printed each value from the data list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A Python test that decides which branch, loop action, or data result should happen.",
       "example": "The condition checked whether the score was greater than 70.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +100,10 @@
       "definition": "Facts or values that can be used or studied.",
       "example": "The program used survey data to count how many students chose each option.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "facts",
+        "values"
+      ],
       "antonyms": []
     },
     {
@@ -93,16 +111,24 @@
       "definition": "Information stored in a variable, cell, or program.",
       "example": "The variable stored the value entered by the user.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount",
+        "data"
+      ],
       "antonyms": []
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "A printed value, chart-ready result, or summary produced by the Python program.",
       "example": "The output showed the final count on the screen.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     }
   ]
 }

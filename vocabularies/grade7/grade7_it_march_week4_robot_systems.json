@@ -27,48 +27,71 @@
       "definition": "Parts that work together.",
       "example": "The robot system used sensors, motors, and code together.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "working parts"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "Data or an action from a robot part, such as a button or sensor, used by code.",
       "example": "The button press was input for the robot program.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
       "example": "The process checked the command and chose a movement.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "procedure",
+        "steps"
+      ],
       "antonyms": []
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "A robot response produced by code, such as movement, light, or sound.",
       "example": "The motor movement was the output from the robot.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "sequence",
-      "definition": "Steps in the correct order.",
+      "definition": "The ordered robot commands that make the system work.",
       "example": "The sequence moved forward, turned, and stopped.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem in code.",
-      "example": "The team debugged the code when the robot turned too far.",
+      "definition": "To test robot code, find a movement or sensor problem, and fix it.",
+      "example": "The team can debug the code when the robot turns too far.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

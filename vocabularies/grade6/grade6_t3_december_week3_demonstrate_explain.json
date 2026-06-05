@@ -24,26 +24,39 @@
   "words": [
     {
       "word": "input",
-      "definition": "Information or an action that goes into a device or program.",
+      "definition": "The information or action that starts part of the project.",
       "example": "A button press is an input.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
+      "definition": "The project result students show during the demonstration.",
       "example": "A sound can be an output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "condition",
-      "definition": "A rule that must be true for something to happen.",
+      "definition": "The rule students explain to show why the project changes.",
       "example": "The condition checks for an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +64,32 @@
       "definition": "A named place that stores a changing value.",
       "example": "The variable kept the score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "changing value"
+      ],
       "antonyms": []
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
-      "example": "We improve the route after testing.",
+      "definition": "To explain what change made the final project better.",
+      "example": "We can improve one part after testing.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     },
     {
       "word": "demonstrate",
       "definition": "To show how something works.",
       "example": "Students demonstrate their final program.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "show"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +97,10 @@
       "definition": "To make an idea clear with words.",
       "example": "Students explain what their robot does.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "describe",
+        "clarify"
+      ],
       "antonyms": []
     }
   ]

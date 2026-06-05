@@ -27,7 +27,9 @@
       "definition": "Letting a user try a product and give feedback.",
       "example": "User testing showed that the instructions needed to be shorter.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tester feedback"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How easy something is to understand.",
       "example": "Clarity improved after the start screen used simpler words.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clearness"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A part that works well.",
       "example": "One positive feature was the clear score display.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "strong part"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A record of project notes and tests.",
       "example": "The logbook recorded who tested the game and what happened.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "project record"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,9 @@
       "definition": "Short notes used during a presentation.",
       "example": "Speaking notes helped the student explain the game logic.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "talking notes"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,10 @@
       "definition": "A way to solve a problem.",
       "example": "The solution added a restart button after the test feedback.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "answer",
+        "fix"
+      ],
       "antonyms": []
     }
   ]

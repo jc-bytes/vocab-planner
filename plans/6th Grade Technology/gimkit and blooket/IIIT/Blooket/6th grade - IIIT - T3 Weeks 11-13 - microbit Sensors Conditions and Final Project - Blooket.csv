@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What does a sensor help a micro:bit do?,Detect something from the environment,Draw a 3D cube,Open a website,Make a spreadsheet formula,20,1
+2,Which is a sensor condition?,"If title is blue, delete files","If light is low, show an icon","If chart exists, hide values","If desk is near, make a password",20,2
+3,What does true mean in an if/then flowchart?,The program is deleted,The board is unplugged,The condition is met,The chart has no labels,20,3
+4,What does false mean in an if/then flowchart?,The input is always correct,The output is hidden forever,The model is finished,The condition is not met,20,4
+5,What should an if/then flowchart include?,"Condition, true output, and false output",Only a title,Only a picture,Only a password,20,1
+6,Which output fits a light condition?,Erase all code,Show a sun or moon icon,Sort a table,Resize a 3D model,20,2
+7,What is a temperature condition?,A web page section,A shape label,A rule based on a temperature value,A route map,20,3
+8,Why explain your flowchart in one sentence?,To hide the condition,To make the board random,To remove the sensor,To show how the input controls the output,20,4
+9,What should your final project plan include?,"Input, output, and success rule",Only a random color,Only a secret note,Only a file size,20,1
+10,What is a success rule?,A hidden password,How you know the project works,A browser setting,A chart style,20,2
+11,Why build with familiar blocks?,You must start with unknown tools,You should avoid testing,You can focus on making the project work,You should delete old practice,20,3
+12,What should you test in a final project?,Only the project name,Only the board color,Only the folder icon,"Input, output, and expected response",20,4
+13,What should you do if the output is wrong?,Check the condition and blocks,Hide the board,Change a random title,Delete the plan,20,1
+14,What should a partner help you practice?,A private password,A short explanation of what the project does,A random drawing,A file deletion,20,2
+15,What should your demonstration show?,Only a hidden file,Only a blank board,The project input and output working,Only the desk number,20,3
+16,What should you say in a one-minute demo?,Only your favorite color,Only the date,Only a secret code,"Goal, input, output, and one fix or improvement",20,4
+17,Which final project is clear?,A button counter that shows the number and explains the change,A board with no output,A random file,A chart with no title,20,1
+18,Why save a screenshot or photo?,To hide the result,To show what you built and tested,To delete the program,To replace the explanation,20,2
+19,What is one useful improvement?,Remove all outputs,Hide the input,Make the icon clearer when the condition is true,Make the board unreadable,20,3
+20,What should you do after the final demo?,Delete all work,Hide the board,Change every label randomly,Close files neatly and reflect on what you learned,20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

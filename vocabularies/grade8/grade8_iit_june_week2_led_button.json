@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "sequence",
-      "definition": "Steps or items in order.",
+      "definition": "The ordered Arduino steps for turning an output on and off.",
       "example": "The sequence turned the LED on, waited, and turned it off.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
@@ -43,47 +46,69 @@
       "definition": "A pause in a program.",
       "example": "The delay made the LED pause between blinks.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pause"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A button state or sensor signal read by the Arduino.",
       "example": "Pressing the button sent input to the Arduino.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "A physical response from the Arduino circuit, such as an LED turning on.",
       "example": "The LED was the output that showed the program worked.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "HIGH",
-      "definition": "An on or high signal.",
+      "definition": "A signal value that means on.",
       "example": "HIGH turned the LED on in the test sketch.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "on"
+      ],
+      "antonyms": [
+        "LOW"
+      ]
     },
     {
       "word": "LOW",
-      "definition": "An off or low signal.",
+      "definition": "A signal value that means off.",
       "example": "LOW turned the LED off after the delay.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "off"
+      ],
+      "antonyms": [
+        "HIGH"
+      ]
     },
     {
       "word": "button",
       "definition": "A part the user can press.",
       "example": "The button started the light change when it was pressed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "control"
+      ],
       "antonyms": []
     }
   ]

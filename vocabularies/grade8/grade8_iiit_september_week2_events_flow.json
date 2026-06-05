@@ -43,8 +43,13 @@
       "definition": "To begin.",
       "example": "The start event reset the score to zero.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "beginning",
+        "begin"
+      ],
+      "antonyms": [
+        "finish"
+      ]
     },
     {
       "word": "submit",
@@ -67,15 +72,20 @@
       "definition": "A tool or variable that tracks time.",
       "example": "The timer counted down during the challenge round.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clock",
+        "counter"
+      ],
       "antonyms": []
     },
     {
       "word": "score",
-      "definition": "A number that tracks points or progress.",
+      "definition": "An app or game value that changes when the user succeeds.",
       "example": "The score increased when the player chose the correct answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "points"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +93,10 @@
       "definition": "A mistake in a program.",
       "example": "The bug made the score increase twice for one click.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mistake",
+        "error"
+      ],
       "antonyms": []
     }
   ]

@@ -24,10 +24,12 @@
   "words": [
     {
       "word": "LED",
-      "definition": "A small light that a program can control.",
+      "definition": "A programmed robot light used as a feedback signal.",
       "example": "The LED turned on when the robot reached the checkpoint.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "A part that makes a sound.",
       "example": "The buzzer sounded after the robot completed the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "The current condition of something.",
       "example": "The robot state changed from moving to stopped.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "status"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,10 @@
       "definition": "Something that starts an action in a program.",
       "example": "Touching the sensor was the event that started the sound.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "trigger",
+        "action starter"
+      ],
       "antonyms": []
     },
     {
@@ -59,16 +69,22 @@
       "definition": "A sign or message sent to show information.",
       "example": "The blinking light was a signal that the robot was ready.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sign"
+      ],
       "antonyms": []
     },
     {
       "word": "pattern",
-      "definition": "Something that repeats or has a clear order.",
+      "definition": "A repeated light or sound signal that communicates robot status.",
       "example": "The LED pattern blinked twice before the robot moved.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
     }
   ]
 }

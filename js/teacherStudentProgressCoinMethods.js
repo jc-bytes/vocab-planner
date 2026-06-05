@@ -1,11 +1,6 @@
 import { $ } from './main.js';
 import {
-    teacherApi as supabaseService,
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc,
-    writeBatch
+    teacherApi as supabaseService
 } from './services/teacherApi.js';
 
 class TeacherStudentProgressCoinMethods {
@@ -44,62 +39,22 @@ class TeacherStudentProgressCoinMethods {
         const student = this.allStudentData.find(s => s.id === studentId);
         if (!student) throw new Error('Student not found');
 
-        const db = supabaseService.getDatabase();
-        const ref = doc(db, 'studentProgress', studentId);
-        
-        // Get current coin data
-        const snapshot = await getDoc(ref);
-        let coinData = {
-            balance: 0,
-            giftCoins: 0,
-            totalEarned: 0,
-            totalSpent: 0,
-            totalGifted: 0
-        };
-        
-        if (snapshot.exists()) {
-            const data = snapshot.data();
-            if (data.coinData) {
-                coinData = data.coinData;
-            } else {
-                // Migrate old format
-                const oldCoins = data.coins || 0;
-                coinData = {
-                    balance: oldCoins,
-                    giftCoins: 0,
-                    totalEarned: oldCoins,
-                    totalSpent: 0,
-                    totalGifted: 0
-                };
-            }
-        }
-
-        // Add to giftCoins instead of balance
-        coinData.giftCoins = (coinData.giftCoins || 0) + amount;
-        
-        // Update coin history
-        const coinHistory = snapshot.data()?.coinHistory || [];
-        coinHistory.push({
-            type: 'gift',
-            amount: amount,
-            timestamp: new Date().toISOString(),
-            source: 'teacher',
-            description: message || 'Gift from teacher'
+        const progress = await supabaseService.giftStudentCoins({
+            studentId,
+            amount,
+            message: message || 'Gift from teacher'
         });
 
-        await setDoc(ref, {
-            coinData: coinData,
-            coinHistory: coinHistory.slice(-100), // Keep last 100
-            coins: coinData.balance, // Legacy support
-            updatedAt: serverTimestamp()
-        }, { merge: true });
-
         // Update local student data (for display)
-        student.coins = coinData.balance; // Show current balance, not including pending gifts
+        student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
+        student.coinData = progress.coinData || student.coinData;
         const filteredItem = this.filteredStudentData.find(s => s.id === studentId);
-        if (filteredItem) filteredItem.coins = coinData.balance;
+        if (filteredItem) {
+            filteredItem.coins = student.coins;
+            filteredItem.coinData = student.coinData;
+        }
 
-        $('#detail-student-coins').textContent = coinData.balance;
+        $('#detail-student-coins').textContent = student.coins;
         this.renderProgressTable();
     }
 
@@ -174,82 +129,25 @@ class TeacherStudentProgressCoinMethods {
         if (!confirmed) return;
 
         try {
-            const db = supabaseService.getDatabase();
-            const batch = writeBatch(db);
-
-            // First, fetch all student data
-            const studentSnapshots = await Promise.all(
-                Array.from(this.selectedStudents).map(studentId => 
-                    getDoc(doc(db, 'studentProgress', studentId))
-                )
-            );
-
-            // Update each selected student
-            let index = 0;
             for (const studentId of this.selectedStudents) {
                 const student = this.allStudentData.find(s => s.id === studentId);
-                if (!student) {
-                    index++;
-                    continue;
-                }
+                if (!student) continue;
 
-                const snapshot = studentSnapshots[index];
-                const ref = doc(db, 'studentProgress', studentId);
-                
-                let coinData = {
-                    balance: 0,
-                    giftCoins: 0,
-                    totalEarned: 0,
-                    totalSpent: 0,
-                    totalGifted: 0
-                };
-                
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data.coinData) {
-                        coinData = { ...data.coinData }; // Clone to avoid mutation
-                    } else {
-                        // Migrate old format
-                        const oldCoins = data.coins || 0;
-                        coinData = {
-                            balance: oldCoins,
-                            giftCoins: 0,
-                            totalEarned: oldCoins,
-                            totalSpent: 0,
-                            totalGifted: 0
-                        };
-                    }
-                }
-
-                // Add to giftCoins
-                coinData.giftCoins = (coinData.giftCoins || 0) + amount;
-                
-                // Update coin history
-                const coinHistory = [...(snapshot.data()?.coinHistory || [])];
-                coinHistory.push({
-                    type: 'gift',
-                    amount: amount,
-                    timestamp: new Date().toISOString(),
-                    source: 'teacher',
-                    description: 'Bulk gift from teacher'
+                const progress = await supabaseService.giftStudentCoins({
+                    studentId,
+                    amount,
+                    message: 'Bulk gift from teacher'
                 });
 
-                batch.set(ref, {
-                    coinData: coinData,
-                    coinHistory: coinHistory.slice(-100),
-                    coins: coinData.balance, // Legacy support
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-
                 // Update local data
-                student.coins = coinData.balance;
+                student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
+                student.coinData = progress.coinData || student.coinData;
                 const filteredItem = this.filteredStudentData.find(s => s.id === studentId);
-                if (filteredItem) filteredItem.coins = coinData.balance;
-                
-                index++;
+                if (filteredItem) {
+                    filteredItem.coins = student.coins;
+                    filteredItem.coinData = student.coinData;
+                }
             }
-
-            await batch.commit();
 
             alert(`Successfully gifted ${amount} coins to ${this.selectedStudents.size} student${this.selectedStudents.size > 1 ? 's' : ''}! They will receive a notification when they log in.`);
 

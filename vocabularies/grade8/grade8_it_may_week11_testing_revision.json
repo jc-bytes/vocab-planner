@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "User or peer comments about portfolio navigation, readability, links, or media.",
       "example": "Feedback showed that the menu labels needed to be clearer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "How easy text is to read.",
       "example": "Readability improved after the student shortened the paragraph.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "ease of reading"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +56,9 @@
       "definition": "A way to open a web page or file.",
       "example": "The broken link was fixed before publishing the page.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "connection"
+      ],
       "antonyms": []
     },
     {
@@ -59,13 +66,16 @@
       "definition": "A changed version made after review.",
       "example": "The revision changed the homepage after peer review.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
       "antonyms": []
     },
     {
       "word": "publish",
       "definition": "To make a site or work available to others.",
-      "example": "The student published the final portfolio for the teacher to view.",
+      "example": "The student can publish the final portfolio for the teacher to view.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []

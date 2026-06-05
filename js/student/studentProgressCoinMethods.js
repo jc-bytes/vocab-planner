@@ -1,5 +1,5 @@
 import { $ } from '../main.js';
-import { studentApi as supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../services/studentApi.js';
+import { studentApi as supabaseService } from '../services/studentApi.js';
 
 class StudentProgressCoinMethods {
     addCoinHistory(type, amount, source, description = '') {
@@ -34,24 +34,34 @@ class StudentProgressCoinMethods {
     }
 
     async deductCoins(amount) {
-        if (this.sm.coinData.balance >= amount) {
+        if (this.sm.authDisabled) {
+            if (this.sm.coinData.balance < amount) return false;
             this.sm.coinData.balance -= amount;
             this.sm.coinData.totalSpent += amount;
-            this.sm.coins = this.sm.coinData.balance; // Legacy support
+            this.sm.coins = this.sm.coinData.balance;
             this.addCoinHistory('spend', amount, 'game', 'Spent on game');
             this.sm.updateCoinDisplay();
-            this.saveLocalProgress();
-            
-            // Immediately save to cloud to prevent sync issues
-            try {
-                await this.saveProgressToCloud();
-            } catch (error) {
-                console.error('Error saving coin deduction to cloud:', error);
-            }
-            
+            this.saveLocalProgress(true);
             return true;
         }
-        return false;
+
+        if (!this.sm.currentUser || this.sm.coinData.balance < amount) return false;
+
+        try {
+            const progress = await supabaseService.spendStudentCoins({
+                amount,
+                source: 'game',
+                description: 'Spent on game',
+                clientId: this.clientId
+            });
+            this.applyProgressSnapshot(progress, { saveLocal: true });
+            this.sm.setAuthStatus('☁️ Synced');
+            return true;
+        } catch (error) {
+            console.error('Error spending coins:', error);
+            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Could not spend coins' : 'Saved locally - offline');
+            return false;
+        }
     }
 
     async acceptGiftCoins() {
@@ -66,59 +76,17 @@ class StudentProgressCoinMethods {
         }
 
         const amount = this.sm.coinData.giftCoins;
-        
+
         // Immediately hide badge to prevent multiple clicks
         this.sm.hideNotificationBadge();
-        
-        // Update coin data
-        this.sm.coinData.balance += amount;
-        this.sm.coinData.totalGifted += amount;
-        this.addCoinHistory('accept', amount, 'teacher', 'Accepted gift from teacher');
-        
-        // Reset giftCoins BEFORE saving
-        this.sm.coinData.giftCoins = 0;
-        this.sm.coins = this.sm.coinData.balance; // Legacy support
-        
-        // Update display immediately
-        this.sm.updateCoinDisplay();
-        this.sm.showToast(`🎉 You received ${amount} coins!`);
-        
-        // Save to cloud immediately with giftCoins = 0
+
         try {
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-            
-            const snapshot = await getDoc(docRef);
-            let cloudHistory = [];
-            if (snapshot.exists()) {
-                const data = snapshot.data();
-                cloudHistory = this.migrateCoinData(data).coinHistory;
-            }
-            const mergedHistory = this.mergeCoinHistories(cloudHistory, this.sm.coinHistory);
-            
-            await setDoc(docRef, {
-                coinData: {
-                    balance: this.sm.coinData.balance,
-                    giftCoins: 0, // Explicitly set to 0
-                    totalEarned: this.sm.coinData.totalEarned,
-                    totalSpent: this.sm.coinData.totalSpent,
-                    totalGifted: this.sm.coinData.totalGifted
-                },
-                coinHistory: mergedHistory,
-                coins: this.sm.coinData.balance, // Legacy support
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-            
-            this.sm.coinHistory = mergedHistory;
-            this.saveLocalProgress(true);
+            const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.clientId });
+            this.applyProgressSnapshot(progress, { saveLocal: true });
+            this.sm.showToast(`🎉 You received ${amount} coins!`);
             this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
             console.error('Error saving after accepting coins:', error);
-            // If save fails, restore the gift coins so user can try again
-            this.sm.coinData.giftCoins = amount;
-            this.sm.coinData.balance -= amount;
-            this.sm.coinData.totalGifted -= amount;
-            this.sm.coins = this.sm.coinData.balance;
             this.sm.updateCoinDisplay();
             this.sm.showToast('Error saving. Please try again.', 5000);
         }

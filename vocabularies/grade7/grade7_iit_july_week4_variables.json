@@ -27,7 +27,9 @@
       "definition": "A named place that stores a value that can change.",
       "example": "The variable stored the player's score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "changing value"
+      ],
       "antonyms": []
     },
     {
@@ -35,23 +37,31 @@
       "definition": "Information stored in a variable or cell.",
       "example": "The score value changed after each correct answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount",
+        "data"
+      ],
       "antonyms": []
     },
     {
       "word": "score",
-      "definition": "A number that tracks points or progress.",
+      "definition": "A Scratch variable that counts player points.",
       "example": "The score increased when the sprite touched the target.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "points"
+      ],
       "antonyms": []
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A rule that checks a game value, such as score, before choosing an action.",
       "example": "The condition checked whether the score reached five.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {

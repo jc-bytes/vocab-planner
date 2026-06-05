@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "A structured explanation of the question, method, chart, conclusion, and recommendation.",
       "example": "The presentation showed the question, chart, conclusion, and recommendation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     },
     {
@@ -35,15 +38,21 @@
       "definition": "A command that performs an action on data.",
       "example": "The student explained the method used to collect the survey data.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command",
+        "procedure"
+      ],
       "antonyms": []
     },
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A selected data visual used to explain the main finding to an audience.",
       "example": "The chart helped the audience see the main data pattern quickly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +60,10 @@
       "definition": "Advice about what should be done.",
       "example": "The recommendation told the school which option the data supported.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "advice",
+        "suggestion"
+      ],
       "antonyms": []
     },
     {
@@ -64,10 +76,13 @@
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A project note explaining evidence, limitations, and the next improvement.",
       "example": "The reflection described one improvement the group would make next time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

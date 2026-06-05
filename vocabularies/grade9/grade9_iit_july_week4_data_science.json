@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "sequence",
-      "definition": "Steps or items in order.",
+      "definition": "The ordered data-science workflow from collection to explanation.",
       "example": "The class followed a sequence: collect data, clean it, chart it, and explain it.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "Words or characters.",
       "example": "The survey response was saved as text before the class analyzed it.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "words"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "Looking closely at data to understand it.",
       "example": "The analysis compared which option students chose most often.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "study"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "Using data to answer questions.",
       "example": "Data science helped the class use survey results to make a recommendation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data study"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +68,9 @@
       "definition": "Something noticed from data or testing.",
       "example": "The student wrote an observation after noticing one category was much higher.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "what you notice"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A choice made after thinking about information.",
       "example": "The group made a decision after comparing the chart results.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "choice"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +88,9 @@
       "definition": "Steps for asking, collecting, analyzing, and concluding with data.",
       "example": "The investigative cycle began with a question and ended with a conclusion.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "inquiry process"
+      ],
       "antonyms": []
     }
   ]

@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What is physical computing?,"Using code with circuits, sensors, or outputs",Only editing a website title,Only drawing vector shapes,Only writing a search query
+What is input in a physical computing system?,A button state or sensor value used by code,Only the final LED color,A private file,A page heading
+What is process in a system?,The steps or code that decide what happens,The table color,The folder icon,The source credit only
+What is output in a circuit project?,"A response such as an LED, sound, or message",A hidden password,A vector path,A search result
+Why make an input-process-output map?,To explain how the system responds,To avoid building,To hide the output,To remove the code
+What is a digital signal?,A signal with clear values like on or off,A value that smoothly changes forever,A web page section,A campaign icon
+What is an analog signal?,A value that can change across a range,Only on or off,A hidden menu,A vector fill
+What does an LED do?,Produces light as an output,Stores all code,Measures distance,Opens a website
+What does blink mean?,Turn on and off repeatedly,Stay hidden,Delete the sketch,Resize a page
+What is setup in Arduino code?,The part that runs first,The part that repeats forever only,A sensor value,A private message
+What is loop in Arduino code?,The part that repeats,A folder for images,A web link,A robot chassis
+What does delay change?,How long the program pauses,The board color,The campaign topic,The file extension
+Why test different delay values?,To see how timing changes the blink pattern,To make the LED vanish,To avoid uploading,To delete comments
+What is a lab safety checklist for?,Making sure parts and steps are handled carefully,Skipping careful setup,Hiding loose wires,Removing all notes
+What should you check before powering a circuit?,"Connections, parts, and safe setup",Only the project title,Only the icon color,Only the search query
+What does persistence mean during a build?,Keep trying carefully when something is difficult,Give up after one issue,Hide the problem,Unplug random parts
+What is a fix?,A change that solves a problem,A hidden file,A deleted circuit,A website source
+What is a button?,A part the user can press,A web page title,A vector layer,A source note
+What does pressed mean?,The button is pushed down or active,The LED is missing,The code is deleted,The link is broken
+What does released mean?,The button is not being pressed,The output is always red,The sensor is unplugged,The folder is archived
+What is state?,The current condition of something,A private password,A campaign color,A search engine
+What does a condition check?,Whether a rule is true or false,Only the file name,Only the page header,Only a graphic fill
+What does toggle mean?,Switch between two states,Delete both states,Hide every output,Change the source page
+Which output fits a button-toggle system?,An LED turns on or off when the state changes,A website opens randomly,A vector node moves,A browser deletes history
+What should your button-control explanation include?,"Input, condition, state, output, and fix notes",Only the board name,Only the icon,Only a color choice

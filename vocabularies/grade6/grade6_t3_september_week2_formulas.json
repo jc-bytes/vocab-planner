@@ -27,7 +27,10 @@
       "definition": "A rule or calculation used by a spreadsheet.",
       "example": "The formula added the costs.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "calculation",
+        "rule"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "The name of a cell, such as A1.",
       "example": "The formula used the cell reference B2.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "cell name"
+      ],
       "antonyms": []
     },
     {
@@ -51,31 +56,46 @@
       "definition": "A usual or middle value found from a group of numbers.",
       "example": "The average score was 8.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mean"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information or an action that goes into a device or program.",
-      "example": "A button press is an input.",
+      "definition": "A number or value typed into a spreadsheet cell for a formula to use.",
+      "example": "The price in cell B2 was an input for the formula.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
-      "example": "A sound can be an output.",
+      "definition": "The result a spreadsheet formula shows after calculating.",
+      "example": "The total cost was the formula output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "value",
       "definition": "A number or piece of data in a program or spreadsheet.",
       "example": "The cell value changed to 10.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount",
+        "data"
+      ],
       "antonyms": []
     }
   ]

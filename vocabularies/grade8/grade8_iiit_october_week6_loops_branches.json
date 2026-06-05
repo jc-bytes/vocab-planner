@@ -27,7 +27,9 @@
       "definition": "Chosen without a fixed pattern.",
       "example": "The random choice selected a new question each round.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "unplanned"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "To bring a code tool into a program.",
       "example": "The import line added the random tool to the program.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "bring in"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A Python choice used after if and before else.",
       "example": "The elif branch checked the second possible answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "else-if choice"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +57,20 @@
       "definition": "One possible path in a program.",
       "example": "Each branch showed a different message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code path"
+      ],
       "antonyms": []
     },
     {
       "word": "loop",
-      "definition": "Code that repeats.",
+      "definition": "Python code that repeats while a condition or game round continues.",
       "example": "The loop repeated until the player chose to stop.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A variable used to count.",
       "example": "The counter tracked how many questions were answered.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "counting variable"
+      ],
       "antonyms": []
     },
     {
@@ -75,15 +88,20 @@
       "definition": "A change made during a loop or process.",
       "example": "The update added one point after a correct answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "change",
+        "revision"
+      ],
       "antonyms": []
     },
     {
       "word": "while",
-      "definition": "A loop that repeats while a condition is true.",
+      "definition": "A loop that repeats as long as a condition is true.",
       "example": "The while loop kept the quiz running while play was true.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat while"
+      ],
       "antonyms": []
     }
   ]

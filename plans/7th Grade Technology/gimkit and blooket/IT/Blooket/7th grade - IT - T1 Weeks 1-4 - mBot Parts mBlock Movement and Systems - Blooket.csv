@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is an mBot?,A small robot used for coding and robotics,A website menu,A drawing layer,A private file,20,1
+2,What is hardware?,A password rule,Physical parts you can touch,A web page title,A Scratch score only,20,2
+3,What is software?,Only robot wheels,A paper route map,Programs that tell a device what to do,A broken cable,20,3
+4,Which part makes the mBot move?,Header,Source credit,Sprite costume,Motor,20,4
+5,Which part can detect information around the robot?,Sensor,Poster,Page title,Keyboard shortcut,20,1
+6,What does the control board do?,Adds a web link,Connects and controls robot parts,Stores classroom books,Paints the robot,20,2
+7,Why use safe routines during assembly?,To make the robot heavier,To hide every screw,To protect parts and work carefully,To avoid teamwork,20,3
+8,What is mBlock?,A recycling bin,A vector shape,A web browser,A block coding tool used to program the mBot,20,4
+9,What is the workspace?,The area where you build your program,The robot battery,A public message,A website audience,20,1
+10,What is a block in mBlock?,A broken file,A coding command that snaps into a program,A plastic wheel only,A search result,20,2
+11,What is a script?,A page source,A loose screw,Connected blocks that run together,A poster icon,20,3
+12,What does upload mean?,Delete the route,Close all tabs,Make a vector logo,Send a program from the computer to the robot,20,4
+13,Which command moves the robot toward the front?,Forward,Credit,Archive,Group,20,1
+14,Which command ends movement?,Resize,Stop,Search,Preview,20,2
+15,"If the robot moves too fast, what should you adjust?",Page title,Image source,Speed,Folder name,20,3
+16,"If the robot moves for too long, what should you adjust?",Robot color only,Website menu,Text font,Time,20,4
+17,What is a system?,Parts that work together,One random part alone,A picture with no source,A hidden password,20,1
+18,What is input in a robot system?,Only a poster title,Data or action used by the program,Only a page color,Only a final filename,20,2
+19,What is process in a robot system?,The battery label,The image border,The steps or code the system uses,The desk number,20,3
+20,What is output in a robot system?,A private address,A web page source,A blank note,"A response such as movement, light, or sound",20,4
+21,What does sequence mean?,Robot commands in order,A random pile of blocks,A color palette,A website audience,20,1
+22,What does debug mean?,Ignore the problem,"Test, find a problem, and fix it",Hide the code,Delete the route map,20,2
+23,Why test a movement program twice?,To make it disappear,To avoid adjusting values,To see if the route is consistent,To change the robot name,20,3
+24,What should your route notes include?,Only a smiley face,Only an image credit,Only a search query,What happened and what value you changed,20,4
+25,Which map best shows a robot system?,"Input, process, output, and sequence","Title, header, image, and link only","Fill, stroke, node, and path only","Privacy, rule, kindness, and poster only",20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

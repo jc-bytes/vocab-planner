@@ -48,10 +48,13 @@
     },
     {
       "word": "source",
-      "definition": "Where information or media comes from.",
+      "definition": "The website, author, or media location credited in a portfolio.",
       "example": "The source provided the image used in the page.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "origin",
+        "reference"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +62,10 @@
       "definition": "A note that says where information or media came from.",
       "example": "The credit named where the image came from.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "citation",
+        "acknowledgment"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +73,9 @@
       "definition": "How people move between pages.",
       "example": "The navigation menu helped visitors move between portfolio pages.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "movement through pages"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +83,9 @@
       "definition": "One screen or section in a website.",
       "example": "The page showed one part of the campaign project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen"
+      ],
       "antonyms": []
     },
     {

@@ -27,7 +27,9 @@
       "definition": "How likely something is to happen.",
       "example": "The group rated password sharing as high probability in the risk map.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "likelihood"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How serious the result would be.",
       "example": "Data loss had a high impact because it could remove important work.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "effect"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A chart that compares risks.",
       "example": "The risk map placed each problem by probability and impact.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "risk chart"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A plan for reducing risk.",
       "example": "The protection strategy used strong passwords and private sharing settings.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "safety plan"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,10 @@
       "definition": "Advice about what should be done.",
       "example": "The recommendation told users to turn on two-factor authentication.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "advice",
+        "suggestion"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A small test showing an idea can work.",
       "example": "The proof of concept showed that the alert screen could guide users.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "small test"
+      ],
       "antonyms": []
     }
   ]

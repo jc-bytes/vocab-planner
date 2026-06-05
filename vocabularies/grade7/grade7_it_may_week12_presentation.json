@@ -24,18 +24,24 @@
   "words": [
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "A short explanation and demonstration of the robot route, code, and result.",
       "example": "The presentation explained the robot route and code.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     },
     {
       "word": "demonstration",
-      "definition": "Showing how something works.",
+      "definition": "Showing the robot route, sensor response, or code behavior live.",
       "example": "The demonstration showed the robot moving through the maze.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "showing"
+      ],
       "antonyms": []
     },
     {
@@ -43,15 +49,21 @@
       "definition": "A way to solve a problem.",
       "example": "The solution used a sensor to avoid the obstacle.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "answer",
+        "fix"
+      ],
       "antonyms": []
     },
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "The difficult robot behavior the team had to solve.",
       "example": "The biggest challenge was making the turn accurate.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +71,20 @@
       "definition": "What happens at the end of a task or test.",
       "example": "The final result was a robot that reached the finish line.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outcome"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "An explanation of what the robot project proved, what was hard, and what improved.",
       "example": "The reflection described the strongest test evidence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ]

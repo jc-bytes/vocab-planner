@@ -8,8 +8,6 @@ import {
     limit,
     orderBy,
     query,
-    serverTimestamp,
-    setDoc,
     studentApi as supabaseService,
     where
 } from '../services/studentApi.js';
@@ -62,25 +60,18 @@ class StudentGameLeaderboardMethods {
                 : (!existingDoc.exists() || numericScore > existingScore);
             
             if (isNewHighScore) {
-                const scoreData = {
-                    userId: this.sm.currentUser.uid,
-                    name: this.sm.studentProfile.name || 'Anonymous',
-                    grade: this.sm.studentProfile.grade,
-                    gameId: gameId,
-                    score: numericScore, // Ensure we save as number
-                    timestamp: serverTimestamp()
-                };
-                
-                // Add metadata for Level Devil
+                const scoreMetadata = {};
                 if (gameId === 'level-devil' && metadata) {
-                    scoreData.metadata = {
-                        level: metadata.level || 0,
-                        deaths: metadata.deaths || 0,
-                        time: metadata.time || 0
-                    };
+                    scoreMetadata.level = metadata.level || 0;
+                    scoreMetadata.deaths = metadata.deaths || 0;
+                    scoreMetadata.time = metadata.time || 0;
                 }
-                
-                await setDoc(scoreDocRef, scoreData);
+
+                await supabaseService.submitStudentGameScore({
+                    gameId,
+                    score: numericScore,
+                    metadata: scoreMetadata
+                });
                 console.log(`[Leaderboard] Saved score for ${gameId}: ${numericScore} (previous: ${existingScore})`);
 
                 // Refresh leaderboard if we're viewing this game

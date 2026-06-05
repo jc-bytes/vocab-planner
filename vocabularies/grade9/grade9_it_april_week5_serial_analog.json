@@ -35,7 +35,9 @@
       "definition": "The speed used for serial messages.",
       "example": "The baud rate in the code matched the serial monitor setting.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "serial speed"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,10 @@
       "definition": "Facts or values that can be used or studied.",
       "example": "The Arduino sent sensor data to the computer every second.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "facts",
+        "values"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +56,10 @@
       "definition": "Information sent or shown.",
       "example": "The serial message showed the current potentiometer value.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "communication",
+        "note"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +75,9 @@
       "definition": "A knob that changes an analog value.",
       "example": "Turning the potentiometer changed the number printed on the screen.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "knob"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +85,9 @@
       "definition": "How light or dark something is.",
       "example": "The LED brightness increased when the analog value got higher.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light level"
+      ],
       "antonyms": []
     }
   ]

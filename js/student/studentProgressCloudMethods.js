@@ -1,9 +1,8 @@
 import { notifications } from '../notifications.js';
-import { studentApi as supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../services/studentApi.js';
+import { studentApi as supabaseService, doc, getDoc } from '../services/studentApi.js';
 import { imageDB } from '../db.js';
 import {
-    COIN_SYNC_INTERVAL_MS,
-    DEFAULT_COIN_DATA
+    COIN_SYNC_INTERVAL_MS
 } from './studentProgressConstants.js';
 
 class StudentProgressCloudMethods {
@@ -79,11 +78,6 @@ class StudentProgressCloudMethods {
         if (!progress) return;
         const cloudCoinData = this.migrateCoinData(progress);
 
-        if (this.hasAuthoritativeLocalCoinActivity(cloudCoinData.coinHistory, progress.updatedAt)) {
-            this.saveProgressToCloud();
-            return;
-        }
-
         this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
         this.sm.setAuthStatus('☁️ Synced');
     }
@@ -117,24 +111,8 @@ class StudentProgressCloudMethods {
                 const cloudCoinData = this.migrateCoinData(data);
                 const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
                 const localGiftCoins = this.sm.coinData.giftCoins || 0;
-                const localHasAuthority = this.hasAuthoritativeLocalCoinActivity(
-                    cloudCoinData.coinHistory,
-                    data.updatedAt
-                );
-                const mergedHistory = localHasAuthority
-                    ? this.mergeCoinHistories(cloudCoinData.coinHistory, this.sm.coinHistory)
-                    : cloudCoinData.coinHistory;
-
-                this.sm.coinData = localHasAuthority
-                    ? this.normalizeCoinData({
-                        ...this.sm.coinData,
-                        giftCoins: cloudGiftCoins,
-                        totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoinData.coinData.totalEarned),
-                        totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoinData.coinData.totalSpent),
-                        totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoinData.coinData.totalGifted)
-                    })
-                    : cloudCoinData.coinData;
-                this.sm.coinHistory = mergedHistory;
+                this.sm.coinData = cloudCoinData.coinData;
+                this.sm.coinHistory = cloudCoinData.coinHistory;
 
                 // Check for new gifts
                 if (cloudGiftCoins > localGiftCoins) {
@@ -161,23 +139,15 @@ class StudentProgressCloudMethods {
                 this.sm.studentProfile = mergedStudentProfile;
                 await this.restoreImagesFromProgress();
                 this.saveLocalProgress(true);
-
-                if (localHasAuthority) {
-                    await this.saveProgressToCloud();
-                } else {
-                    this.sm.setAuthStatus('☁️ Synced');
-                }
+                this.sm.setAuthStatus('☁️ Synced');
             } else {
                 // New user or no cloud data - Welcome Bonus
                 if (this.sm.coinData.balance === 0) {
-                    this.sm.coinData.balance = 100;
-                    this.sm.coinData.totalEarned = 100;
-                    this.sm.addCoinHistory('earn', 100, 'welcome', 'Welcome bonus!');
-                    this.sm.coins = 100; // Legacy
-                    this.sm.updateCoinDisplay();
+                    const progress = await supabaseService.claimStudentWelcomeBonus?.({ clientId: this.clientId });
+                    if (progress) {
+                        this.applyProgressSnapshot(progress, { saveLocal: true });
+                    }
                     this.sm.showToast('🎉 Welcome! You received 100 starting coins!');
-                    this.saveLocalProgress();
-                    await this.saveProgressToCloud();
                 }
                 this.sm.setAuthStatus('☁️ Ready');
             }
@@ -201,59 +171,19 @@ class StudentProgressCloudMethods {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         try {
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-
-            // Get current cloud data first to prevent overwriting newer data
-            const snapshot = await getDoc(docRef);
-            let cloudCoinData = null;
-            let cloudUpdatedAt = null;
-            if (snapshot.exists()) {
-                const data = snapshot.data();
-                cloudCoinData = this.migrateCoinData(data);
-                cloudUpdatedAt = data.updatedAt;
+            let progress = null;
+            if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
+                progress = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             }
 
-            const cloudHistory = cloudCoinData?.coinHistory || [];
-            const localHasAuthority = this.hasAuthoritativeLocalCoinActivity(cloudHistory, cloudUpdatedAt);
-            const localUnsynced = this.getUnsyncedLocalCoinHistory(cloudHistory);
-            const recentLocalAccept = localUnsynced.some(entry => entry.type === 'accept');
-            const cloudCoins = cloudCoinData?.coinData || { ...DEFAULT_COIN_DATA };
-            const mergedBalance = !cloudCoinData || localHasAuthority
-                ? this.sm.coinData.balance
-                : cloudCoins.balance;
-            const mergedGiftCoins = recentLocalAccept && this.sm.coinData.giftCoins === 0
-                ? 0
-                : Math.max(this.sm.coinData.giftCoins, cloudCoins.giftCoins || 0);
-            
-            const mergedCoinData = {
-                balance: mergedBalance,
-                giftCoins: mergedGiftCoins,
-                totalEarned: Math.max(this.sm.coinData.totalEarned, cloudCoins.totalEarned || 0),
-                totalSpent: Math.max(this.sm.coinData.totalSpent, cloudCoins.totalSpent || 0),
-                totalGifted: Math.max(this.sm.coinData.totalGifted, cloudCoins.totalGifted || 0)
-            };
+            const unitPayload = this.buildUnitWorkSyncPayload();
+            if (unitPayload && typeof supabaseService.syncStudentUnitWork === 'function') {
+                progress = await supabaseService.syncStudentUnitWork(unitPayload);
+            }
 
-            const mergedHistory = this.mergeCoinHistories(cloudHistory, this.sm.coinHistory);
-
-            const payload = {
-                studentProfile: this.sm.studentProfile,
-                units: this.sm.progressData.units || {},
-                coins: mergedCoinData.balance, // Legacy support
-                coinData: mergedCoinData,
-                coinHistory: mergedHistory,
-                email: this.sm.currentUser?.email || this.sm.studentProfile.email || '',
-                role: this.sm.currentRole || 'student',
-                updatedAt: serverTimestamp()
-            };
-            await setDoc(docRef, payload, { merge: true });
-
-            // Update local
-            this.sm.coinData = mergedCoinData;
-            this.sm.coinHistory = mergedHistory;
-            this.sm.coins = this.sm.coinData.balance; // Legacy
-            this.sm.updateCoinDisplay();
-            this.saveLocalProgress(true);
+            if (progress) {
+                this.applyProgressSnapshot(progress, { saveLocal: true });
+            }
 
             this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
@@ -263,21 +193,40 @@ class StudentProgressCloudMethods {
         }
     }
 
-    buildProgressSyncPayload() {
+    buildUnitWorkSyncPayload() {
+        if (!this.sm.currentVocab || !this.sm.activities?.getUnitProgressKey) return null;
+        const unitKey = this.sm.activities.getUnitProgressKey(this.sm.currentVocab);
+        const unitProgress = this.sm.progressData.units?.[unitKey];
+        if (!unitKey || !unitProgress) return null;
+
+        const {
+            scores: _scores,
+            coins: _coins,
+            coinData: _coinData,
+            coinHistory: _coinHistory,
+            ...workPatch
+        } = unitProgress;
+
         return {
-            studentProfile: this.sm.studentProfile,
-            units: this.sm.progressData.units || {},
-            coins: this.sm.coinData.balance,
-            coinData: this.normalizeCoinData(this.sm.coinData),
-            coinHistory: this.normalizeCoinHistory(this.sm.coinHistory),
-            email: this.sm.currentUser?.email || this.sm.studentProfile.email || '',
-            role: this.sm.currentRole || 'student'
+            unitKey,
+            unitContext: {
+                unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
+                unitName: unitProgress.unitName || this.sm.currentVocab.name || '',
+                subjectSlug: unitProgress.subjectSlug || '',
+                trimester: unitProgress.trimester || '',
+                schoolYear: unitProgress.schoolYear || '',
+                grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
+            },
+            workPatch
         };
     }
 
     async enqueueProgressSync() {
         try {
-            await imageDB.enqueueSyncAction('student-progress', this.buildProgressSyncPayload());
+            const payload = this.buildUnitWorkSyncPayload();
+            if (payload) {
+                await imageDB.enqueueSyncAction('student-unit-work', payload);
+            }
         } catch (queueError) {
             console.warn('Could not queue progress for later sync:', queueError);
         }
@@ -299,13 +248,14 @@ class StudentProgressCloudMethods {
 
         for (const record of pending) {
             try {
-                if (record.type === 'student-progress') {
-                    const db = supabaseService.getDatabase();
-                    const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-                    await setDoc(docRef, {
-                        ...(record.payload || {}),
-                        updatedAt: serverTimestamp()
-                    }, { merge: true });
+                if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
+                    const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
+                    this.applyProgressSnapshot(progress, { saveLocal: true });
+                } else if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
+                    const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
+                    this.applyProgressSnapshot(progress, { saveLocal: true });
+                } else if (record.type === 'student-progress') {
+                    await this.refreshCoinsFromCloud({ silent: true });
                 }
                 await imageDB.completeSyncAction(record.id);
             } catch (error) {

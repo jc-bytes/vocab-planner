@@ -27,7 +27,9 @@
       "definition": "Information about a person.",
       "example": "A home address is personal data because it identifies a person.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "private information"
+      ],
       "antonyms": []
     },
     {
@@ -35,23 +37,33 @@
       "definition": "Information that is okay for many people to see.",
       "example": "The event schedule was public data because everyone could see it.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "open information"
+      ],
+      "antonyms": [
+        "sensitive data"
+      ]
     },
     {
       "word": "sensitive data",
       "definition": "Information that needs extra protection.",
       "example": "A password is sensitive data and should not be shared in a form.",
       "difficulty": 2,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "protected information"
+      ],
+      "antonyms": [
+        "public data"
+      ]
     },
     {
       "word": "online service",
       "definition": "A website or app that provides a tool online.",
       "example": "The online service asked for an email before creating the account.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "web service"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +71,9 @@
       "definition": "An action that better protects people or data.",
       "example": "Using initials instead of a full name was the safer choice for the profile.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "better protection"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +81,9 @@
       "definition": "Keeping personal information protected.",
       "example": "Privacy improved when the student removed the phone number from the post.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data protection"
+      ],
       "antonyms": []
     }
   ]

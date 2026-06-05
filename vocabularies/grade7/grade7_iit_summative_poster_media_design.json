@@ -26,10 +26,13 @@
   "words": [
     {
       "word": "audience",
-      "definition": "The people who will see or use something.",
+      "definition": "The people the poster message is designed to reach.",
       "example": "The poster audience was Grade 6 students learning about e-waste.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
       "antonyms": []
     },
     {
@@ -37,7 +40,10 @@
       "definition": "The reason something is made.",
       "example": "The purpose of the poster was to convince students to recycle batteries safely.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reason",
+        "goal"
+      ],
       "antonyms": []
     },
     {
@@ -45,7 +51,9 @@
       "definition": "A visual message with text and images.",
       "example": "The student created a poster with one clear title, image, and call to action.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "visual message"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +77,9 @@
       "definition": "How text and objects line up.",
       "example": "The designer used alignment so the title, image, and text lined up neatly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "lining up"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +87,9 @@
       "definition": "How easy text is to read.",
       "example": "The poster had good readability because the font was large and clear.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "ease of reading"
+      ],
       "antonyms": []
     },
     {
@@ -101,7 +113,10 @@
       "definition": "A note that says who made or provided something.",
       "example": "The image credit was placed at the bottom of the poster.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "citation",
+        "acknowledgment"
+      ],
       "antonyms": []
     }
   ]

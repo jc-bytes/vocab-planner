@@ -29,7 +29,10 @@
       "definition": "Facts or values that can be collected.",
       "example": "Students collected class data about favorite colors in a spreadsheet.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "facts",
+        "values"
+      ],
       "antonyms": []
     },
     {
@@ -45,15 +48,21 @@
       "definition": "A rule or calculation used by a spreadsheet.",
       "example": "The formula added the material costs to find the total budget.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "calculation",
+        "rule"
+      ],
       "antonyms": []
     },
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A spreadsheet visual that compares data, costs, or totals.",
       "example": "The chart compared the cost of each group project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +78,9 @@
       "definition": "A form such as a cube, sphere, or cylinder.",
       "example": "The model started with one shape and then added a roof.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "form"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +88,10 @@
       "definition": "A simple version or design of something.",
       "example": "The 3D model showed the student's desk organizer idea.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "version",
+        "representation"
+      ],
       "antonyms": []
     },
     {
@@ -90,19 +104,29 @@
     },
     {
       "word": "input",
-      "definition": "Information or an action that goes into a device or program.",
+      "definition": "Data or a button press that a spreadsheet, model, or micro:bit uses.",
       "example": "A button press was the input that changed the micro:bit display.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
+      "definition": "A result shown by a spreadsheet, model explanation, or micro:bit display.",
       "example": "The icon on the LED display was the micro:bit output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     }
   ]
 }

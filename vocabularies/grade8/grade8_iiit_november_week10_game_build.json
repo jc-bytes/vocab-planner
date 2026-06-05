@@ -27,7 +27,9 @@
       "definition": "The basic starting structure of a game.",
       "example": "The game shell included the start screen and score variable.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "starter game"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "The scene behind sprites.",
       "example": "The background showed the scene behind the player sprite.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "scene"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "Movement in a program.",
       "example": "Motion made the sprite move across the stage.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "movement"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +57,19 @@
       "definition": "The repeated actions that keep a game running.",
       "example": "The game loop checked controls and obstacles again and again.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeating game actions"
+      ],
       "antonyms": []
     },
     {
       "word": "score",
-      "definition": "A number that tracks points or progress.",
+      "definition": "A game variable that tracks points earned during play.",
       "example": "The score increased when the player collected an item.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "points"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "Something that blocks or challenges the player.",
       "example": "The obstacle made the player lose a point.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "barrier"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "A way the player makes something happen.",
       "example": "Keyboard control moved the sprite left and right.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "player action"
+      ],
       "antonyms": []
     }
   ]

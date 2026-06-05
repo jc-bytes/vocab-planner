@@ -29,7 +29,9 @@
       "definition": "Breaking a big task into smaller parts.",
       "example": "The team used decomposition to split the app into screens, buttons, and events.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "breaking apart"
+      ],
       "antonyms": []
     },
     {
@@ -37,7 +39,9 @@
       "definition": "A person who uses a product or system.",
       "example": "The user needed a clear button to submit the form.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "person using it"
+      ],
       "antonyms": []
     },
     {
@@ -53,24 +57,37 @@
       "definition": "Something that starts an action in a program.",
       "example": "A click event started the timer in the app.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "trigger",
+        "action starter"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "Text, taps, clicks, or choices a user gives to an app.",
       "example": "The text typed by the user became the app input.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "The message, score, screen change, or result an app shows.",
       "example": "The score message was the app output after the user answered.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "app",
@@ -85,7 +102,9 @@
       "definition": "A part the user can press.",
       "example": "The button moved the user from the start screen to the game screen.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "control"
+      ],
       "antonyms": []
     },
     {
@@ -93,15 +112,20 @@
       "definition": "A value that can change in a program.",
       "example": "The score variable increased after each correct answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "changing value"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "A response from the app or a tester that helps the user improve.",
       "example": "The app gave feedback by showing Correct or Try again.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     }
   ]

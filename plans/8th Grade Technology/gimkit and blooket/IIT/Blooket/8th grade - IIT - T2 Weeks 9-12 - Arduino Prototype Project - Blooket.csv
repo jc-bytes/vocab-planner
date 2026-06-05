@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What should an Arduino prototype project solve?,A clear purpose or problem using an input and output,Only a random decoration,Only a poster title,Only a file name,20,1
+2,What does an ultrasonic sensor measure?,Image brightness in Canva,Distance using sound,Python string length,Scratch score,20,2
+3,Why record at least five distance readings?,To avoid the sensor,To replace the circuit,To choose a reliable near/far threshold,To skip the test plan,20,3
+4,What is a test case?,A random guess,A poster image,A hidden answer,A planned test with expected behavior,20,4
+5,Which test case is specific?,"At 10 cm, buzzer turns on; at 40 cm, buzzer stays off",Test it,Try something,Make it work,20,1
+6,What is a starter sketch?,A final reflection,A beginning Arduino program used to start the prototype,A poster draft,A data source,20,2
+7,What should a project design plan include?,Only the title,Only a team name,"Purpose, role, input, output, diagram, behavior, tests, materials",No test notes,20,3
+8,"Why label input, process, and output in notes?",To hide the code,To replace the build,To avoid responsibility,To explain how the prototype works as a system,20,4
+9,A prototype does not react to the sensor. What should you check?,"Wiring, pin numbers, sensor readings, condition, and output code",Poster palette,Scratch costume,Image credit,20,1
+10,What is a likely cause?,A guaranteed score,The reason a problem probably happened,A decoration,A class folder,20,2
+11,What is a solution?,A missing wire,An unrelated image,A way to solve the identified problem,A blank note,20,3
+12,Why document debugging?,It hides mistakes,It replaces testing,It deletes the project,"It shows the problem, likely cause, fix, and result",20,4
+13,What does reliability mean?,The prototype works dependably across repeated tests,It works once by luck,It has many colors only,The folder is empty,20,1
+14,What best shows your prototype is reliable?,Only a final photo,Repeated test results and notes,Only a title,Only a class list,20,2
+15,Which diagram is most useful?,A blank box,A poster thumbnail,A labeled circuit diagram showing parts and connections,A Python list,20,3
+16,What should your code screenshot show?,Only the classroom number,Only an unrelated file,Only a hidden link,The sketch or screen that explains the prototype behavior,20,4
+17,What belongs in a final demonstration?,"Circuit, sensor trigger, code screenshot, result, and improvement",Only a sound effect,Only a blank breadboard,Only a team name,20,1
+18,Why rehearse the demonstration?,To avoid showing the prototype,"To explain input, output, code decision, and test result",To remove all diagrams,To skip the reflection,20,2
+19,Which reflection is strongest?,It was fun,The circuit is done,The first threshold was too sensitive so I changed it,I liked the LED,20,3
+20,What should you do if the circuit partly works?,Rebuild randomly,Delete all code,Hide the issue,"Keep the working part, isolate the problem, and test one fix",20,4
+21,Why use a materials list?,To confirm required components before building,To replace the project goal,To hide missing parts,To skip testing,20,1
+22,Which project idea fits this window?,Environmental poster only,Distance alert with ultrasonic sensor and buzzer,Scratch dance game only,Python string quiz only,20,2
+23,What is the safest final setup?,Loose parts everywhere,Unlabeled wires near movement,"Stable circuit, clear wires, safe power, organized workspace",Forcing components into place,20,3
+24,What should you submit with your final project?,Only one unlabeled photo,Only a title,Only a missing link,"Diagram, code notes, testing notes, reflection, and demo result",20,4
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

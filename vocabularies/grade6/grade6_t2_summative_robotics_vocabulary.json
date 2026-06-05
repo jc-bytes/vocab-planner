@@ -45,7 +45,10 @@
       "definition": "A set of instructions a computer or robot follows.",
       "example": "The program made the robot move forward, turn, and stop.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions",
+        "code"
+      ],
       "antonyms": []
     },
     {
@@ -53,7 +56,10 @@
       "definition": "One step that tells a computer or robot what to do.",
       "example": "The first instruction told the robot to move forward for two seconds.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command",
+        "step"
+      ],
       "antonyms": []
     },
     {
@@ -61,7 +67,9 @@
       "definition": "Acting in a way that protects people and materials.",
       "example": "The group followed safety rules by keeping hands away from the moving wheels.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "protection"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +77,9 @@
       "definition": "A part that makes something move.",
       "example": "The motor turned the left wheel during the robot test.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "engine"
+      ],
       "antonyms": []
     },
     {
@@ -82,18 +92,22 @@
     },
     {
       "word": "sensor",
-      "definition": "A part that detects something around it.",
+      "definition": "A robot part that notices objects, light, or distance.",
       "example": "The sensor detected a box in front of the robot.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "LED",
-      "definition": "A small light on a device or robot.",
+      "definition": "A robot light used to show a state or warning.",
       "example": "The LED turned red when the robot reached the warning zone.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -101,7 +115,10 @@
       "definition": "A small part that makes a sound.",
       "example": "The buzzer made a short beep after the robot finished the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
       "antonyms": []
     }
   ]

@@ -29,15 +29,19 @@
       "definition": "Science, technology, engineering, and math used to solve problems.",
       "example": "The STEM project combined sensors, data, and a digital media explanation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "science technology engineering math"
+      ],
       "antonyms": []
     },
     {
       "word": "pixel",
       "definition": "One tiny dot in a digital image or display.",
-      "example": "The student zoomed in until individual pixels were visible.",
+      "example": "One pixel became visible when the student zoomed in.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "picture dot"
+      ],
       "antonyms": []
     },
     {
@@ -45,7 +49,9 @@
       "definition": "The amount of detail in an image.",
       "example": "The higher resolution image looked sharper in the presentation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "image detail"
+      ],
       "antonyms": []
     },
     {
@@ -53,7 +59,9 @@
       "definition": "How many colors an image can store.",
       "example": "Increasing color depth allowed the image to show more color detail.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "color detail"
+      ],
       "antonyms": []
     },
     {
@@ -61,15 +69,19 @@
       "definition": "A small piece of sound or data used for measurement.",
       "example": "The audio sample captured a short piece of the recorded sound.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "small example"
+      ],
       "antonyms": []
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A device that collects light, sound, distance, or other data for a media project.",
       "example": "The sensor collected light data for the media project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +89,9 @@
       "definition": "How much storage a file uses.",
       "example": "The file size became smaller after the student compressed the image.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "storage amount"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +99,9 @@
       "definition": "How good or clear something is.",
       "example": "The video quality dropped when the file was compressed too much.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clarity"
+      ],
       "antonyms": []
     },
     {
@@ -93,7 +109,9 @@
       "definition": "Making a file smaller, sometimes with less quality.",
       "example": "Compression reduced the image file size before submission.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "file shrinking"
+      ],
       "antonyms": []
     },
     {

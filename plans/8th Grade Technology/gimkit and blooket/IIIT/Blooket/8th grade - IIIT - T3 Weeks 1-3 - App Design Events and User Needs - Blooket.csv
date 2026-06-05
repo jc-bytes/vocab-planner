@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is decomposition in app design?,Breaking an app idea into smaller tasks,Deleting the app idea,Hiding the screen,Changing a password,20,1
+2,What is a user?,A random file,A person who will use the app,A robot part,A Python error,20,2
+3,What is a screen in an app?,A private message,A sensor wire,One view or page the user sees,A spreadsheet formula,20,3
+4,What is an event?,A hidden file,A broken cable,A chart title,Something that starts an action,20,4
+5,What is input in an app?,Information or action from the user,Only the final result,A deleted button,A hidden folder,20,1
+6,What is output in an app?,A private password,What the app shows or does after input,A random note,A missing screen,20,2
+7,What is a button?,A Python loop,A file archive,An interface element the user can press,A binary digit only,20,3
+8,What can a variable store in an app?,Only a title,Only a sensor wire,Only a hidden file,A changing value such as score or choice,20,4
+9,Why plan the app purpose?,To know what problem the app should solve,To avoid the user,To hide the screens,To remove all events,20,1
+10,What should an event map show?,Only the app color,How actions move the user between screens,Only a private link,Only a keyboard key,20,2
+11,What should an app screen plan include?,Only a random picture,Only a password,"Screens, interface elements, events, input, and tests",Only a folder name,20,3
+12,What is a test case?,A hidden screen,A deleted file,A random icon,A specific check for expected behavior,20,4
+13,Which test case is clear?,Tap Start and the app opens the quiz screen.,Try the app.,Make it better.,Use blue.,20,1
+14,What is a user need?,A random decoration,A problem or goal the app should help with,A hidden variable,A broken button,20,2
+15,What should a user-needs chart include?,Only a title,Only a folder color,"Audience, problem, feature, and success criteria",Only a Python command,20,3
+16,Why test your event map with a partner?,To hide the app,To remove feedback,To delete variables,To find confusing screen changes,20,4
+17,What is feedback?,Helpful comments about what works or needs change,A secret password,A binary number,A circuit part,20,1
+18,What should you revise after testing?,Only the date,"One screen, event, or test case that was unclear",Only a random color,Only the folder name,20,2
+19,What does success criteria explain?,Why the app is hidden,How to delete screens,How you know the app idea works,Which file is private,20,3
+20,Which app plan is strongest?,It has only a title,It hides all controls,It has no user,"It names the user, problem, screens, actions, and tests",20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

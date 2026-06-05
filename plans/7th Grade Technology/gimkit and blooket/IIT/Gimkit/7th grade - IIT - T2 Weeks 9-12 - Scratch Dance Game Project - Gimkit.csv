@@ -1,0 +1,26 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What should the dance game project plan include?,"Goal, controls, moves, variables, feedback, and roles",Only a sprite name,Only a poster palette,Only a due date
+Why build a prototype before the final game?,To test one feature and find what still needs work,To avoid all debugging,To skip testing,To remove player input
+What is a subroutine?,A smaller named part of a program that can be reused,A source credit line,A breadboard row,A chart title
+Which feature is a good subroutine?,DanceMove1 that runs the same move when called,A random background image,The classroom schedule,A poster title
+What is input in the dance game?,"A key press, click, or sprite touch from the player",A printed poster,A robot sensor wire,A data chart
+Which variable would help track progress?,score,credit,alignment,ground
+Which variable would help limit game time?,timer,logo,resistor,source
+What should success feedback do?,Tell the player the correct action worked,Hide all results,Delete the score,Stop every script
+What should failure feedback do?,Show that the player missed or chose the wrong input,Reward the wrong move,Remove all rules,Ignore the player
+Which bug should be recorded?,The correct key did not change the costume,The project has a clear title,The title screen is clear,The sprite exists
+What does functionality mean?,How well the game does what it should do,How colorful the folder is,How many classmates are in class,How loud the room is
+Which project record is strongest?,"Working game, test notes, bug fix, and code explanation",Only a screenshot with no notes,Only a game idea,Only the file name
+Why prepare a 1.5 to 2 minute demonstration?,"To explain rules, controls, code, and real-world use",To avoid showing the game,To replace all testing,To skip reflection
+What should the real-world application explanation connect to?,How programming concepts can be used outside the game,Only the sprite color,Only the class period,Only the background image
+Which part of your project is about code being easy to follow?,Code organization,Image credit,Circuit safety,Data privacy
+Score does not increase. What should you check?,The input condition and score-change block,The poster source,The Arduino board,The dataset source
+Which final improvement is meaningful?,Make timing clearer after peer feedback,Change color randomly with no reason,Delete the instructions,Remove feedback
+What should you do before presenting?,Test the start sequence and practice the explanation,Delete the project file,Skip testing,Hide the controls
+Which presentation statement is strongest?,Space key runs left move and increases score at the right time,It works because it works,The game is nice,We used Scratch
+What should your reflection explain?,"Bug fixed, improvement made, and skill learned",List only the team names,Draw only a sprite,Hide the testing results
+Which role helps pair programming stay organized?,Driver and navigator responsibilities,Everyone clicking at the same time,No one recording bugs,One person doing everything
+Why save a clear filename?,So the final project can be found and submitted,So variables disappear,So the sprite cannot move,So the file is hidden
+What should a final dance game include?,"Rules, input, score or timer, feedback, and dance moves",Only a background,Only a poster,Only a blank sprite
+What best shows your improvement?,Before-and-after test note explaining what changed,A hidden bug,A deleted script,A missing project file

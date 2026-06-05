@@ -27,7 +27,9 @@
       "definition": "A plan submitted for approval.",
       "example": "The proposal described the product, audience, tools, and evidence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "The tool or system used to build something.",
       "example": "The team selected Tinkercad as the platform for the 3D model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tool system"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,10 @@
       "definition": "A rough drawing or plan.",
       "example": "The sketch showed where each label would go on the model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "draft drawing",
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +66,9 @@
       "definition": "Proof you expect to collect.",
       "example": "The expected evidence included screenshots, test notes, and a final photo.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "planned proof"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +76,9 @@
       "definition": "Permission to continue.",
       "example": "Teacher approval let the team start building the chosen design.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "permission"
+      ],
       "antonyms": []
     }
   ]

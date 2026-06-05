@@ -27,7 +27,9 @@
       "definition": "A named place that stores a changing value.",
       "example": "The variable kept the score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "changing value"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "A number or piece of data in a program or spreadsheet.",
       "example": "The cell value changed to 10.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount",
+        "data"
+      ],
       "antonyms": []
     },
     {
@@ -43,23 +48,33 @@
       "definition": "To make a number larger.",
       "example": "Pressing A can increase the counter.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "raise"
+      ],
+      "antonyms": [
+        "decrease"
+      ]
     },
     {
       "word": "decrease",
       "definition": "To make a number smaller.",
       "example": "Pressing B can decrease the counter.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "lower"
+      ],
+      "antonyms": [
+        "increase"
+      ]
     },
     {
       "word": "counter",
       "definition": "A program or value that counts.",
       "example": "The counter went up by one.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "counting variable"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +82,9 @@
       "definition": "To set something back to the start.",
       "example": "The reset button changed the value to zero.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "start over"
+      ],
       "antonyms": []
     }
   ]

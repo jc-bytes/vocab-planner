@@ -27,7 +27,9 @@
       "definition": "A symbol or block that compares or calculates.",
       "example": "The greater-than operator compared the score to the goal.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "Checking how two values are related.",
       "example": "The comparison checked if the timer was less than zero.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking relationship"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +55,34 @@
       "definition": "Correct or matching a condition.",
       "example": "The condition was true when the sprite touched the target.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "correct"
+      ],
+      "antonyms": [
+        "false"
+      ]
     },
     {
       "word": "false",
       "definition": "Not correct or not matching a condition.",
       "example": "The condition was false when the sprite missed the target.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "incorrect"
+      ],
+      "antonyms": [
+        "true"
+      ]
     },
     {
       "word": "response",
       "definition": "What happens after an input or event.",
       "example": "The response played a sound after the player clicked.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reaction",
+        "reply"
+      ],
       "antonyms": []
     }
   ]

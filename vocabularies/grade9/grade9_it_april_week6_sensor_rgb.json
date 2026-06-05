@@ -24,18 +24,23 @@
   "words": [
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A circuit part that measures light or another value for the program.",
       "example": "The sensor measured how much light reached the circuit.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The value limit that decides when the RGB output changes.",
       "example": "The threshold decided when the RGB LED should change color.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,10 @@
       "definition": "A value measured by a sensor.",
       "example": "The reading dropped when the student covered the light sensor.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "measurement",
+        "value"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +59,9 @@
       "definition": "What you think the system should produce.",
       "example": "The expected output was a red light when the sensor value was low.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "planned result"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "One part of a color or signal.",
       "example": "The red channel became brighter than the green channel.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "color path"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "A warning signal.",
       "example": "The red LED alert warned that the sensor value passed the threshold.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "warning"
+      ],
       "antonyms": []
     }
   ]

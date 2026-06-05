@@ -27,7 +27,9 @@
       "definition": "The current condition of something.",
       "example": "The state changed from off to on after the button press.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "status"
+      ],
       "antonyms": []
     },
     {
@@ -41,17 +43,21 @@
     {
       "word": "send",
       "definition": "To move information to another place.",
-      "example": "The Arduino sent a message when the button changed.",
+      "example": "The Arduino can send a message when the button changes.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "transmit"
+      ],
       "antonyms": []
     },
     {
       "word": "receive",
       "definition": "To get information from another place.",
-      "example": "The computer received the serial message from the board.",
+      "example": "The computer can receive the serial message from the board.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "get"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +73,9 @@
       "definition": "The speed used for serial messages.",
       "example": "The baud rate matched the speed set in the code.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "serial speed"
+      ],
       "antonyms": []
     },
     {
@@ -75,16 +83,24 @@
       "definition": "Information sent or shown.",
       "example": "The message said whether the LED was on or off.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "communication",
+        "note"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem.",
-      "example": "Debugging showed that the button wire was in the wrong row.",
+      "definition": "To use serial messages and wiring checks to find and fix a circuit problem.",
+      "example": "The team can debug by checking whether the button wire is in the wrong row.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

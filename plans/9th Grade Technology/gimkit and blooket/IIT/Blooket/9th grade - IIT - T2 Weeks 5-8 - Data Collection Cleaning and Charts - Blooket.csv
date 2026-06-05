@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,Which data question is best for a class survey?,How many minutes classmates spend reading each day?,Do people like things?,Is school good?,What is the best answer?,20,1
+2,What should a data collection plan include?,Only a chart color,"Question, items, data types, method, and privacy rule",Only a file name,No collection method,20,2
+3,Why identify data type before collecting data?,It makes privacy unnecessary,It removes the question,It helps organize and analyze responses correctly,It hides labels,20,3
+4,Which item protects privacy?,Publish personal details,Ask for passwords,Share private messages,Do not collect names if they are not needed,20,4
+5,What is messy data?,"Data with mistakes, unclear values, blanks, or inconsistent wording",A perfectly labeled chart,A clean dataset,A final recommendation,20,1
+6,Which value likely needs cleaning?,12 in a minutes column,'ten' in a minutes column that should use numbers,15 in a minutes column,8 in a minutes column,20,2
+7,Why keep a change log?,To hide data cleaning,To replace the chart,To record what was changed and why,To skip notes,20,3
+8,Which cleaning decision is responsible?,Change values to make the result nicer,Delete data without reason,Hide impossible values,Fix a clear typo and record it in the change log,20,4
+9,What is an outlier?,A value very different from the others,The title of a chart,The data source,A privacy rule,20,1
+10,How should you treat an outlier?,Always delete it,Investigate and explain it instead of deleting automatically,Ignore it completely,Make every value match it,20,2
+11,Which chart compares categories?,Line chart only,Scatter plot only,Bar chart,Password table,20,3
+12,Which chart is better for change over time?,Random image,Source note,Tinkercad shape only,Line chart,20,4
+13,What does correlation suggest?,Two variables seem to change together,One value is always wrong,A chart has no labels,Privacy is not needed,20,1
+14,Which conclusion is careful?,The chart proves everyone behaves the same,"The chart suggests a pattern, but the small sample is a limitation",No limitation exists,The data is useless because one value is high,20,2
+15,What should a chart include?,Only bars with no labels,Only colors,"Title, labels, units or categories, and readable design",Only a file name,20,3
+16,What is a limitation?,A perfect proof,A chart title,A source link only,Something that makes the result less complete or certain,20,4
+17,What is an evidence statement?,A sentence that uses data or a chart result,A random opinion,A password,A design color,20,1
+18,Which data sentence is strongest?,A is better,"Option A had 18 responses, compared with 9 for option B",The chart looks nice,People like stuff,20,2
+19,What is an inference?,A private password,An untested guess,A careful idea based on evidence,A chart color,20,3
+20,What is a recommendation?,A random command,A hidden source,A label only,Advice about what should be done based on evidence,20,4
+21,Which product format could explain data clearly?,Dashboard or infographic,Unlabeled folder,Blank document,No chart,20,1
+22,Why test your prototype with a classmate?,To hide the limitation,To see if the main finding is understandable,To remove the chart,To skip cleaning,20,2
+23,What should a one-page data report include?,Only a title,Only a screenshot,"Question, chart, data finding, limitation, and recommendation",Only a shape,20,3
+24,How can Tinkercad connect to data work?,It replaces all data,It makes privacy unnecessary,It removes charts,A simple model can represent a category or display idea,20,4
+25,Which action shows responsible data use?,"Use clear sources, protect privacy, and explain limitations",Change data to fit a preferred answer,Hide the source,Ignore missing values,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

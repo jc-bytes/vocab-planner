@@ -35,7 +35,9 @@
       "definition": "A character or object in a Scratch or mBlock project.",
       "example": "The sprite moved when the player pressed an arrow key.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "character"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "A group of connected blocks that run together.",
       "example": "The script made the sprite say a message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code stack"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +55,10 @@
       "definition": "Something that starts an action in a program.",
       "example": "The green flag event started the project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "trigger",
+        "action starter"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +66,20 @@
       "definition": "A coding command that snaps into a program.",
       "example": "The motion block moved the sprite ten steps.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command piece"
+      ],
       "antonyms": []
     },
     {
       "word": "sequence",
-      "definition": "Steps in the correct order.",
+      "definition": "The ordered Scratch blocks that make the sprite act correctly.",
       "example": "The sequence played a sound, moved, and changed costume.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "steps"
+      ],
       "antonyms": []
     }
   ]

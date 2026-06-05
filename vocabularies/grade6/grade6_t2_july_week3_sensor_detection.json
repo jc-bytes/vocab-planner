@@ -24,10 +24,12 @@
   "words": [
     {
       "word": "sensor",
-      "definition": "A part that detects something around it.",
+      "definition": "A robot part that notices an object so the program can respond.",
       "example": "The sensor detected an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "Something in the way.",
       "example": "The robot stopped before the obstacle.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "barrier"
+      ],
       "antonyms": []
     },
     {
@@ -56,18 +60,26 @@
     },
     {
       "word": "input",
-      "definition": "Information or an action that goes into a device or program.",
+      "definition": "A button press or sensor reading that a robot can use.",
       "example": "A button press is an input.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "response",
       "definition": "What happens after an input or condition.",
       "example": "The response was a beep.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reaction",
+        "reply"
+      ],
       "antonyms": []
     }
   ],

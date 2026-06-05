@@ -26,34 +26,49 @@
   "words": [
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A button state, sensor value, or serial message used by a physical-computing system.",
       "example": "The button press was the input that started the LED pattern.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
       "example": "The code process checked the sensor value before choosing an output.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "procedure",
+        "steps"
+      ],
       "antonyms": []
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "A physical or digital response produced by the circuit after processing input.",
       "example": "The buzzer sound was the output after the distance was too low.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "system",
       "definition": "Parts that work together.",
       "example": "The sensor, code, and LED worked together as one system.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "working parts"
+      ],
       "antonyms": []
     },
     {
@@ -61,7 +76,9 @@
       "definition": "A tool or machine that does a task.",
       "example": "The Arduino device controlled the light and buzzer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "machine"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +86,9 @@
       "definition": "A path that electricity can follow.",
       "example": "The circuit connected the sensor, resistor, LED, power, and ground.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "electric path"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +96,10 @@
       "definition": "An Arduino program.",
       "example": "The sketch told the Arduino when to turn the LED on.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "draft drawing",
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -85,24 +107,36 @@
       "definition": "To send a program to a device.",
       "example": "The student clicked upload to send the sketch to the Arduino board.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "send to device"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem.",
-      "example": "The team debugged the circuit after the LED stayed off.",
+      "definition": "To isolate and fix a problem in code, wiring, or sensor behavior using test evidence.",
+      "example": "The team can debug the circuit after the LED stays off.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "test",
       "definition": "To try something and check what happens.",
       "example": "The student ran a test by pressing the button three times.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "check",
+        "trial"
+      ],
+      "antonyms": [
+        "guess"
+      ]
     }
   ]
 }

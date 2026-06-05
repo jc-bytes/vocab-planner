@@ -1,0 +1,22 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What is a spreadsheet?,A tool for organizing data in rows and columns,A robot motor,A website menu,A private message
+What is a cell?,One box in a spreadsheet,A sensor value only,A button on a robot,A Scratch costume
+What is a cell reference?,The column and row name for a cell,A random title,A hidden password,A robot route
+What does a row go across?,Side to side,Only up and down,Around the robot,Behind the screen
+What does a column go?,Up and down,Only side to side,In a circle,Through a battery
+What does a formula do?,Calculates using cell values,Deletes the sheet,Changes the file name,Draws a robot route
+What does a function help you do?,Use a built-in calculation,Hide every number,Open a sensor,Make a sound
+Which formula could add cells A1 and A2?,=A1+A2,A1 plus words,open A1 A2,hide A1
+What does average show?,A typical value from a set,Only the largest title,A missing file,A website icon
+Why format a spreadsheet?,To make information easier to read,To remove all data,To hide formulas,To delete the chart
+What does a chart help you do?,See patterns or comparisons,Change a password,Build a sensor,Delete comments
+Which chart is useful for comparing categories?,Bar chart,Private note,Robot wheel,Folder icon
+What should an interpretation sentence explain?,What the chart shows,Only your favorite color,Only a random file,Only the browser name
+What does sorting data do?,Changes the order based on a rule,Deletes all rows,Hides every value,Turns data into sound
+What does filtering data do?,Shows only rows that match a condition,Makes all rows visible forever,Changes the computer battery,Removes formulas
+What is conditional formatting?,A style that changes when data matches a rule,A robot part,A blog title,A private link
+What does COUNTIF count?,Cells that match a condition,Only pictures,Only hidden files,Only website pages
+Why check data before making a chart?,Wrong data can make the chart misleading,Charts never use data,Labels do not matter,Rows should be blank
+Which data question is clear?,Which category has the highest value?,What is the color?,Where is the mouse?,Can I close this?
+What should you do if a formula result looks wrong?,Check cell references and values,Hide the formula,Delete the sheet,Ignore the result

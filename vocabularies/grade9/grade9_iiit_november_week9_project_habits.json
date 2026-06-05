@@ -27,7 +27,9 @@
       "definition": "The work and energy put into a task.",
       "example": "The rubric showed effort because the group kept improving the model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work energy"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "Keeping work clear and easy to find.",
       "example": "The folder organization made the screenshots and notes easy to find.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "order",
+        "structure"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "Using tools or materials carefully.",
       "example": "Safe use meant carrying tools carefully and keeping cables out of the walkway.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "careful use"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +58,9 @@
       "definition": "Continuing to try when work is difficult.",
       "example": "Perseverance helped the team keep testing after the first design failed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "persistence"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +68,9 @@
       "definition": "A responsibility in a group.",
       "example": "The recorder's team role was to update the logbook after each test.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "group responsibility"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A plan for when parts of a project will be built.",
       "example": "The build schedule set one class for modeling and one class for testing.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "work plan"
+      ],
       "antonyms": []
     }
   ]

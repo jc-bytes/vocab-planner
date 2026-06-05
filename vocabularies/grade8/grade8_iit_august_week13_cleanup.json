@@ -27,7 +27,9 @@
       "definition": "Putting materials or files back in order.",
       "example": "Cleanup returned the breadboard and jumper wires to the kit.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "putting away"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A set of tools or parts.",
       "example": "The kit held the Arduino board, wires, and components.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "parts set"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "One electronic part.",
       "example": "Each component was counted before the group left.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "part"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +57,30 @@
       "definition": "A saved document, image, or project on a computer.",
       "example": "The code file was saved before the computer was shut down.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "saved document"
+      ],
       "antonyms": []
     },
     {
       "word": "archive",
       "definition": "To store files neatly for later.",
-      "example": "The student archived the final sketch and screenshots.",
+      "example": "The student can archive the final sketch and screenshots.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "store",
+        "save"
+      ],
       "antonyms": []
     },
     {
       "word": "return",
       "definition": "To put something back where it belongs.",
-      "example": "The group returned the sensor to the correct box.",
+      "example": "The group can return the sensor to the correct box.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "put back"
+      ],
       "antonyms": []
     }
   ]

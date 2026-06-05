@@ -29,7 +29,9 @@
       "definition": "An image made from shapes and paths that can scale cleanly.",
       "example": "The logo stayed sharp because it was made as a vector graphic.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "scalable image"
+      ],
       "antonyms": []
     },
     {
@@ -37,7 +39,9 @@
       "definition": "An image made from pixels.",
       "example": "The bitmap looked blurry after the student enlarged the image.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pixel image"
+      ],
       "antonyms": []
     },
     {
@@ -45,7 +49,9 @@
       "definition": "The color inside a shape.",
       "example": "The student changed the fill color of the circle to blue.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "inside color"
+      ],
       "antonyms": []
     },
     {
@@ -53,7 +59,9 @@
       "definition": "The outline of a shape or path.",
       "example": "The designer made the stroke thicker around the icon.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outline"
+      ],
       "antonyms": []
     },
     {
@@ -61,7 +69,9 @@
       "definition": "The front-to-back order of objects.",
       "example": "The student changed the z-order so the title appeared in front of the shape.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "stacking order"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +79,9 @@
       "definition": "A basic form such as a circle, box, or triangle.",
       "example": "The poster icon was built from a circle, rectangle, and triangle shape.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "form"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +89,9 @@
       "definition": "A level used to organize objects in a design.",
       "example": "The background layer stayed behind the logo and text.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "level"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +99,9 @@
       "definition": "One separate item in a design.",
       "example": "The student selected one object before resizing it.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "item"
+      ],
       "antonyms": []
     },
     {
@@ -93,7 +109,9 @@
       "definition": "A line or shape made from points.",
       "example": "The curved path formed the outline of the custom icon.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "route"
+      ],
       "antonyms": []
     },
     {
@@ -101,7 +119,9 @@
       "definition": "A point that controls part of a path.",
       "example": "Moving one node changed the curve of the path.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "point"
+      ],
       "antonyms": []
     }
   ]

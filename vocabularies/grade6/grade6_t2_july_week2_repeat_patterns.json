@@ -27,7 +27,9 @@
       "definition": "To do something again.",
       "example": "The robot can repeat the same move.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "do again"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "A part of a program that repeats.",
       "example": "A loop made the square path shorter to code.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     },
     {
@@ -43,15 +48,21 @@
       "definition": "Something that repeats in a regular way.",
       "example": "Forward and turn made a pattern.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "repetition"
+      ],
+      "antonyms": [
+        "randomness"
+      ]
     },
     {
       "word": "square",
       "definition": "A shape with four equal sides.",
       "example": "The robot drove in a square.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "four-sided shape"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +70,9 @@
       "definition": "A path that turns left and right again and again.",
       "example": "The robot followed a zigzag route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "back-and-forth path"
+      ],
       "antonyms": []
     },
     {
@@ -67,8 +80,12 @@
       "definition": "Using less length, time, or space.",
       "example": "The loop made the program shorter.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "less long"
+      ],
+      "antonyms": [
+        "longer"
+      ]
     }
   ],
   "month": "july",

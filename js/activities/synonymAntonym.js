@@ -28,12 +28,11 @@ export class SynonymAntonymActivity {
         const questions = [];
 
         this.words.forEach(word => {
-            // Try to create a Synonym question
-            if (word.synonyms && word.synonyms.length > 0) {
-                const correct = word.synonyms[0]; // Pick first one for simplicity
+            if (word.synonyms?.length > 0) {
+                const correct = this.getCorrectAnswer(word, 'synonyms');
                 const distractors = this.getDistractors(word, 'synonyms');
 
-                if (distractors.length >= 3) {
+                if (correct && distractors.length >= 3) {
                     questions.push({
                         type: 'Synonym',
                         word: word.word,
@@ -43,12 +42,11 @@ export class SynonymAntonymActivity {
                 }
             }
 
-            // Try to create an Antonym question
-            if (word.antonyms && word.antonyms.length > 0) {
-                const correct = word.antonyms[0];
+            if (word.antonyms?.length > 0) {
+                const correct = this.getCorrectAnswer(word, 'antonyms');
                 const distractors = this.getDistractors(word, 'antonyms');
 
-                if (distractors.length >= 3) {
+                if (correct && distractors.length >= 3) {
                     questions.push({
                         type: 'Antonym',
                         word: word.word,
@@ -62,19 +60,44 @@ export class SynonymAntonymActivity {
         return this.shuffle(questions);
     }
 
+    normalizeAnswer(value) {
+        return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    getAnswerList(word, type) {
+        const seen = new Set();
+        return (word[type] || [])
+            .map(answer => String(answer || '').trim())
+            .filter(answer => {
+                const normalized = this.normalizeAnswer(answer);
+                if (!normalized || seen.has(normalized)) return false;
+                seen.add(normalized);
+                return true;
+            });
+    }
+
+    getCorrectAnswer(word, type) {
+        const answers = this.getAnswerList(word, type);
+        return this.shuffle([...answers])[0] || null;
+    }
+
     getDistractors(targetWord, type) {
         const distractors = [];
+        const targetAnswers = new Set(this.getAnswerList(targetWord, type).map(answer => this.normalizeAnswer(answer)));
+        const used = new Set(targetAnswers);
         const otherWords = this.shuffle(this.words.filter(w => w !== targetWord));
 
         for (const w of otherWords) {
-            if (w[type] && w[type].length > 0) {
-                distractors.push(w[type][0]);
+            for (const answer of this.getAnswerList(w, type)) {
+                const normalized = this.normalizeAnswer(answer);
+                if (used.has(normalized)) continue;
+                distractors.push(answer);
+                used.add(normalized);
+                break;
             }
             if (distractors.length === 3) break;
         }
 
-        // If not enough, fill with random words? Or just skip. 
-        // For now, let's assume we have enough data or we skip the question.
         return distractors;
     }
 

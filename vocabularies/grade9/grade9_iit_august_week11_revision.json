@@ -27,7 +27,9 @@
       "definition": "Helpful comments from a classmate.",
       "example": "Peer feedback helped the student notice that the chart title was unclear.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "classmate comments"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A math result found by using numbers.",
       "example": "The calculation found the percentage of students who chose each answer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "math result"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A name or short description.",
       "example": "The student fixed the axis label so the chart showed what was being counted.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tag"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,10 @@
       "definition": "A changed version made after review.",
       "example": "The revision replaced a crowded chart with a simpler bar chart.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "updated version",
+        "edit"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +68,20 @@
       "definition": "A sentence that uses evidence.",
       "example": "The evidence statement connected the recommendation to the survey result.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "proof sentence"
+      ],
       "antonyms": []
     },
     {
       "word": "limitation",
-      "definition": "Something that makes results less complete or certain.",
+      "definition": "A project weakness that must be explained before making a recommendation.",
       "example": "The limitation explained that the survey only included one grade level.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "constraint",
+        "weakness"
+      ],
       "antonyms": []
     }
   ]

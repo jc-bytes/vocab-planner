@@ -51,7 +51,9 @@
       "definition": "A title for a page or section.",
       "example": "The heading named the campaign at the top of the page.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "section title"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +61,9 @@
       "definition": "A group of sentences about one idea.",
       "example": "The paragraph explained the purpose of the campaign.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "text block"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +71,9 @@
       "definition": "A group of related items stored together.",
       "example": "The list showed three safety tips in order.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "collection"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +81,9 @@
       "definition": "A way to open a web page or file.",
       "example": "The link opened the source used for the research.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "connection"
+      ],
       "antonyms": []
     },
     {
@@ -99,7 +107,10 @@
       "definition": "Information stored in a variable, cell, or program.",
       "example": "The color value changed the text from black to blue.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount",
+        "data"
+      ],
       "antonyms": []
     }
   ]

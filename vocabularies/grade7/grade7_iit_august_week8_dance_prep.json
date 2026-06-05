@@ -27,7 +27,9 @@
       "definition": "An interactive activity with rules or goals.",
       "example": "The game asked players to copy the dance pattern.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "play activity"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A sprite appearance in Scratch.",
       "example": "The sprite costume changed for each dance step.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sprite look"
+      ],
       "antonyms": []
     },
     {
@@ -43,31 +47,43 @@
       "definition": "Audio used in a project.",
       "example": "The sound played when the player pressed the correct key.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "audio"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A player action, such as a key press or click, that starts a game response.",
       "example": "The arrow key was input for the dance move.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "timing",
       "definition": "When actions happen and how long they last.",
       "example": "The timing made the costume change match the music.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "when actions happen"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Player comments about instructions, timing, sound, or controls.",
       "example": "Feedback showed that the dance instructions needed to be shorter.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     }
   ]

@@ -24,18 +24,25 @@
   "words": [
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test version of the digital media product used to collect feedback.",
       "example": "The prototype showed the main idea before the final product was finished.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "model section",
       "definition": "One part of a model.",
       "example": "One model section showed the lock screen and another showed the warning message.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "model part"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +50,9 @@
       "definition": "Something used to complete a task.",
       "example": "The group used the alignment tool to place labels evenly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instrument"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +60,9 @@
       "definition": "What happened during a test.",
       "example": "The test result showed that users understood the safety message.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "outcome"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +70,9 @@
       "definition": "A picture used as evidence.",
       "example": "The photo documented the cardboard model before it was improved.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "picture"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +80,9 @@
       "definition": "An image of what is on the screen.",
       "example": "The screenshot proved that the Tinkercad model was saved.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen capture"
+      ],
       "antonyms": []
     }
   ]

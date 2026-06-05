@@ -35,13 +35,15 @@
       "definition": "A person who uses a product or system.",
       "example": "The user was a student who needed help choosing safer online habits.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "person using it"
+      ],
       "antonyms": []
     },
     {
       "word": "constraint",
       "definition": "A limit or rule for a project.",
-      "example": "The team listed time, materials, and school rules as constraints.",
+      "example": "One constraint was the limited time, materials, or school rules.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -59,7 +61,9 @@
       "definition": "A record of project notes and tests.",
       "example": "The logbook recorded the date, change, test, and result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "project record"
+      ],
       "antonyms": []
     },
     {
@@ -67,16 +71,24 @@
       "definition": "An item or part used for work.",
       "example": "Cardboard was the material used for the first model section.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "part",
+        "supply"
+      ],
       "antonyms": []
     },
     {
       "word": "test",
       "definition": "To try something and check what happens.",
-      "example": "The team tested whether the warning label was easy to understand.",
+      "example": "The team can test whether the warning label is easy to understand.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "check",
+        "trial"
+      ],
+      "antonyms": [
+        "guess"
+      ]
     }
   ]
 }

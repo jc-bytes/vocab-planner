@@ -183,6 +183,43 @@ class StudentProgressCoreMethods {
         }
     }
 
+    applyProgressSnapshot(progress, options = {}) {
+        if (!progress) return;
+
+        const migrated = this.migrateCoinData(progress);
+        const mergedStudentProfile = typeof this.sm.mergeStudentProfile === 'function'
+            ? this.sm.mergeStudentProfile(this.sm.studentProfile, progress.studentProfile || {})
+            : (progress.studentProfile || this.sm.studentProfile || {});
+
+        this.sm.studentProfile = mergedStudentProfile;
+        this.sm.progressData = {
+            studentProfile: mergedStudentProfile,
+            units: progress.units || {},
+            coins: migrated.coinData.balance,
+            coinData: migrated.coinData,
+            coinHistory: migrated.coinHistory
+        };
+        this.sm.coinData = migrated.coinData;
+        this.sm.coinHistory = migrated.coinHistory;
+        this.sm.coins = migrated.coinData.balance;
+
+        if (this.sm.currentVocab && this.sm.activities?.getUnitProgressKey) {
+            const unitKey = this.sm.activities.getUnitProgressKey(this.sm.currentVocab);
+            const unitProgress = this.sm.progressData.units?.[unitKey];
+            if (unitProgress) {
+                this.sm.unitScores = unitProgress.scores || {};
+                this.sm.unitImages = unitProgress.images || {};
+                this.sm.unitWordHunt = unitProgress.wordHunt || {};
+                this.sm.unitStates = unitProgress.states || {};
+            }
+        }
+
+        this.sm.updateCoinDisplay();
+        if (options.saveLocal !== false) {
+            this.saveLocalProgress(true);
+        }
+    }
+
     shouldApplyIncomingLocalCoins(data) {
         const incoming = this.migrateCoinData(data || {});
         const incomingLatest = this.latestCoinHistoryMs(incoming.coinHistory);

@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What is an mBot?,A small robot used for coding and robotics,A website menu,A drawing layer,A private file
+What is hardware?,Physical parts you can touch,A password rule,A web page title,A Scratch score only
+What is software?,Programs that tell a device what to do,Only robot wheels,A paper route map,A broken cable
+Which part makes the mBot move?,Motor,Header,Source credit,Sprite costume
+Which part can detect information around the robot?,Sensor,Poster,Page title,Keyboard shortcut
+What does the control board do?,Connects and controls robot parts,Adds a web link,Stores classroom books,Paints the robot
+Why use safe routines during assembly?,To protect parts and work carefully,To make the robot heavier,To hide every screw,To avoid teamwork
+What is mBlock?,A block coding tool used to program the mBot,A recycling bin,A vector shape,A web browser
+What is the workspace?,The area where you build your program,The robot battery,A public message,A website audience
+What is a block in mBlock?,A coding command that snaps into a program,A broken file,A plastic wheel only,A search result
+What is a script?,Connected blocks that run together,A page source,A loose screw,A poster icon
+What does upload mean?,Send a program from the computer to the robot,Delete the route,Close all tabs,Make a vector logo
+Which command moves the robot toward the front?,Forward,Credit,Archive,Group
+Which command ends movement?,Stop,Resize,Search,Preview
+"If the robot moves too fast, what should you adjust?",Speed,Page title,Image source,Folder name
+"If the robot moves for too long, what should you adjust?",Time,Robot color only,Website menu,Text font
+What is a system?,Parts that work together,One random part alone,A picture with no source,A hidden password
+What is input in a robot system?,Data or action used by the program,Only a poster title,Only a page color,Only a final filename
+What is process in a robot system?,The steps or code the system uses,The battery label,The image border,The desk number
+What is output in a robot system?,"A response such as movement, light, or sound",A private address,A web page source,A blank note
+What does sequence mean?,Robot commands in order,A random pile of blocks,A color palette,A website audience
+What does debug mean?,"Test, find a problem, and fix it",Ignore the problem,Hide the code,Delete the route map
+Why test a movement program twice?,To see if the route is consistent,To make it disappear,To avoid adjusting values,To change the robot name
+What should your route notes include?,What happened and what value you changed,Only a smiley face,Only an image credit,Only a search query
+Which map best shows a robot system?,"Input, process, output, and sequence","Title, header, image, and link only","Fill, stroke, node, and path only","Privacy, rule, kindness, and poster only"

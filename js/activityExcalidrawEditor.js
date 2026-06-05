@@ -4,7 +4,6 @@ import {
     Excalidraw,
     convertToExcalidrawElements
 } from '@excalidraw/excalidraw';
-import '@excalidraw/excalidraw/index.css';
 
 const mountedRoots = new WeakMap();
 

@@ -24,18 +24,24 @@
   "words": [
     {
       "word": "demonstration",
-      "definition": "Showing how something works.",
+      "definition": "Showing the physical-computing system with code, circuit, and test evidence.",
       "example": "The demonstration showed the sensor triggering the LED and buzzer.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "showing"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "An evidence-based explanation of what worked, what changed, and what the team would improve.",
       "example": "The reflection explained what the team would improve with more time.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +49,9 @@
       "definition": "Proof from tests that shows what happened.",
       "example": "The testing evidence included a table with three successful trials.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "test proof"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +67,20 @@
       "definition": "A record of project work and tests.",
       "example": "The project log showed each build day and the problem solved.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work record"
+      ],
       "antonyms": []
     },
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "A structured explanation of the circuit, code, tests, and final result.",
       "example": "The presentation explained the circuit, code, tests, and final result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     }
   ]

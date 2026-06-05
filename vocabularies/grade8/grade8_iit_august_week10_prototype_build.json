@@ -32,50 +32,73 @@
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A circuit part that detects distance, light, touch, or another condition.",
       "example": "The sensor detected the hand near the project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A sensor value sent into the prototype code.",
       "example": "The sensor value became the input for the code.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "process",
       "definition": "The steps a system or program uses.",
       "example": "The process compared the reading to the threshold.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "procedure",
+        "steps"
+      ],
       "antonyms": []
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "The prototype action produced after the code checks the sensor value.",
       "example": "The output turned on the buzzer when the object was close.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem.",
-      "example": "The team debugged the sketch by checking one line at a time.",
+      "definition": "To test wiring and code one part at a time until the prototype works.",
+      "example": "The team can debug the sketch by checking one line at a time.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A code rule that decides which prototype output should happen.",
       "example": "The condition controlled when the warning light appeared.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     }
   ]

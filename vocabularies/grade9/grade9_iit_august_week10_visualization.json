@@ -27,7 +27,9 @@
       "definition": "Data that is corrected and organized.",
       "example": "Clean data made the chart easier to read and trust.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "prepared data"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A visual display of data.",
       "example": "The visualization turned the survey numbers into a clear chart.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "data visual"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "An explanation that uses data as evidence.",
       "example": "The data story explained why the highest category mattered.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data explanation"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "An image of what is on the screen.",
       "example": "The student added a screenshot of the finished chart as progress evidence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen capture"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,9 @@
       "definition": "A way to open a web page or file.",
       "example": "The shared link let the teacher open the dashboard.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "connection"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "Movement toward finishing a task.",
       "example": "The progress note showed which chart still needed labels.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "advancement"
+      ],
       "antonyms": []
     }
   ]

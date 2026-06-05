@@ -27,7 +27,9 @@
       "definition": "How often sound is measured each second.",
       "example": "The team chose a higher sample rate so the recorded voice sounded clearer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "audio sampling speed"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How much detail each sound sample stores.",
       "example": "The larger sample size kept more detail in the sound file.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sample detail"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A device that captures sound.",
       "example": "The microphone recorded the narration for the audio test.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mic"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A device that produces sound.",
       "example": "The speaker played the edited clip so the group could check the volume.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "audio output"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,9 @@
       "definition": "How clear or accurate sound is.",
       "example": "Background noise lowered the sound quality of the recording.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "clarity"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "Sound stored or played by a device.",
       "example": "The student exported the audio clip after trimming the silence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sound"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "An option that changes how a file is saved.",
       "example": "The file setting changed the format before the student saved the recording.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "save option"
+      ],
       "antonyms": []
     }
   ]

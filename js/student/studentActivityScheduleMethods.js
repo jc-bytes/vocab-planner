@@ -146,8 +146,7 @@ class StudentActivityScheduleMethods {
 
     buildVocabularyMonthGroups(vocabs = []) {
         return vocabs.reduce((groups, vocab) => {
-            const schedule = this.getVocabSchedule(vocab);
-            const monthKey = this.normalizeMonthKey(schedule.month);
+            const monthKey = this.getVocabCalendarMonthKey(vocab);
             if (!groups.has(monthKey)) groups.set(monthKey, []);
             groups.get(monthKey).push(vocab);
             return groups;
@@ -234,8 +233,7 @@ class StudentActivityScheduleMethods {
         const currentDate = date instanceof Date && !Number.isNaN(date.getTime())
             ? date
             : new Date();
-        const monthKey = Object.entries(MONTH_INDEX)
-            .find(([, index]) => index === currentDate.getMonth())?.[0] || 'other';
+        const monthKey = this.getMonthKeyFromIndex(currentDate.getMonth());
 
         return {
             date: currentDate,
@@ -248,6 +246,33 @@ class StudentActivityScheduleMethods {
     getDateOnlyStart(date) {
         if (!(date instanceof Date) || Number.isNaN(date.getTime())) return null;
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+    }
+
+    getMonthKeyFromIndex(monthIndex) {
+        return Object.entries(MONTH_INDEX)
+            .find(([, index]) => index === monthIndex)?.[0] || 'other';
+    }
+
+    getSchoolWeekMajorityMonth(date) {
+        if (!(date instanceof Date) || Number.isNaN(date.getTime())) return 'other';
+        const counts = new Map();
+
+        for (let offset = 0; offset < 5; offset += 1) {
+            const candidate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + offset, 12);
+            const monthKey = this.getMonthKeyFromIndex(candidate.getMonth());
+            counts.set(monthKey, (counts.get(monthKey) || 0) + 1);
+        }
+
+        return Array.from(counts.entries())
+            .sort(([, countA], [, countB]) => countB - countA)[0]?.[0] || this.getMonthKeyFromIndex(date.getMonth());
+    }
+
+    getVocabCalendarMonthKey(vocab, date = new Date()) {
+        const schedule = this.getVocabSchedule(vocab, date);
+        if (schedule.dueDate instanceof Date && !Number.isNaN(schedule.dueDate.getTime())) {
+            return this.getSchoolWeekMajorityMonth(schedule.dueDate);
+        }
+        return this.normalizeMonthKey(schedule.month);
     }
 
     filterStudentAvailableVocabulary(vocabs = [], date = new Date()) {
@@ -264,7 +289,7 @@ class StudentActivityScheduleMethods {
         );
         const schedule = this.getVocabSchedule(vocab, date);
         const trimesterKey = this.getVocabTrimesterKey(vocab);
-        const monthKey = this.normalizeMonthKey(schedule.month);
+        const monthKey = this.getVocabCalendarMonthKey(vocab, date);
         const monthIndex = MONTH_INDEX[monthKey];
 
         if (trimesterKey !== 'other' && trimesterKey !== currentWindow.trimester) {
@@ -275,7 +300,12 @@ class StudentActivityScheduleMethods {
             const scheduleStart = this.getDateOnlyStart(schedule.dueDate);
             const currentStart = this.getDateOnlyStart(currentWindow.date);
             if (scheduleStart && currentStart) {
-                return scheduleStart <= currentStart;
+                if (!Number.isFinite(monthIndex)) return scheduleStart <= currentStart;
+
+                const calendar = normalizeSchoolCalendar(this.sm?.schoolCalendar || null, date);
+                const schoolYear = Number.parseInt(calendar.schoolYear, 10) || date.getFullYear();
+                const scheduledMonthStart = new Date(schedule.dueDate.getFullYear() || schoolYear, monthIndex, 1, 12);
+                return scheduleStart <= currentStart && scheduledMonthStart <= currentMonthStart;
             }
         }
 

@@ -25,9 +25,12 @@
     {
       "word": "archive",
       "definition": "To store files neatly for later.",
-      "example": "The student archived the final website files in one folder.",
+      "example": "The student can archive the final website files in one folder.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "store",
+        "save"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,9 @@
       "definition": "A saved document, image, or project on a computer.",
       "example": "The HTML file was saved with a clear project name.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "saved document"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +48,9 @@
       "definition": "Work that is turned in to the teacher.",
       "example": "The submission included the link, screenshots, and reflection.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "turned-in work"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +58,20 @@
       "definition": "A change that fixes a mistake.",
       "example": "The correction fixed a missing image credit.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "fix"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "A final note about the strongest portfolio evidence and remaining improvements.",
       "example": "The reflection described the strongest part of the project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +79,9 @@
       "definition": "A place used to organize files.",
       "example": "The folder kept images, code, and notes together.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "file container"
+      ],
       "antonyms": []
     }
   ]

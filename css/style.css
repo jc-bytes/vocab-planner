@@ -6225,6 +6225,13 @@ input[type="checkbox"] {
     resize: vertical;
 }
 
+.word-hunt-field-helper {
+    margin: var(--spacing-xs) 0 0;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
 .word-hunt-image-label {
     display: block;
     font-weight: 600;

@@ -27,7 +27,9 @@
       "definition": "The physical parts of a computer or device.",
       "example": "The keyboard was hardware because the student could touch it.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "physical parts"
+      ],
       "antonyms": []
     },
     {
@@ -35,24 +37,36 @@
       "definition": "Programs that tell hardware what to do.",
       "example": "The browser software opened the portfolio webpage.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "programs"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A user action or typed value that a computer system uses.",
       "example": "Typing a keyword was input for the search engine.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "The result a computer system shows after processing input.",
       "example": "The search results were output from the system.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "processor",
@@ -91,7 +105,10 @@
       "definition": "Instructions a computer can run.",
       "example": "The drawing program helped the student edit the poster.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions",
+        "code"
+      ],
       "antonyms": []
     }
   ]

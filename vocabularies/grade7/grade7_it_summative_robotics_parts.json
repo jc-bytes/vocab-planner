@@ -37,7 +37,9 @@
       "definition": "The physical parts of a computer or robot.",
       "example": "The wheels, sensors, and control board were the robot hardware.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "physical parts"
+      ],
       "antonyms": []
     },
     {
@@ -45,7 +47,9 @@
       "definition": "Programs that tell a computer or robot what to do.",
       "example": "The mBlock software sent the movement program to the robot.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "programs"
+      ],
       "antonyms": []
     },
     {
@@ -61,23 +65,29 @@
       "definition": "A part that makes movement by turning or spinning.",
       "example": "The motor turned faster when the student increased the speed value.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "engine"
+      ],
       "antonyms": []
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A robot part that collects environmental information for code, such as distance.",
       "example": "The ultrasonic sensor helped the robot notice an obstacle.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "LED",
-      "definition": "A small light that a program can control.",
+      "definition": "A robot light controlled by code to show a state or checkpoint.",
       "example": "The LED flashed green when the robot reached a checkpoint.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +95,10 @@
       "definition": "A part that makes a sound.",
       "example": "The buzzer played a short sound after the robot completed the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
       "antonyms": []
     },
     {

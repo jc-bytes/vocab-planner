@@ -27,7 +27,10 @@
       "definition": "To store files neatly for later.",
       "example": "The student moved the final code and photos into the project archive.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "store",
+        "save"
+      ],
       "antonyms": []
     },
     {
@@ -35,23 +38,30 @@
       "definition": "Work completed later because it was missed.",
       "example": "The make-up task let the student submit missing test evidence.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "recovery work"
+      ],
       "antonyms": []
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Screenshots, photos, code, logs, and files that prove project completion.",
       "example": "The evidence folder included screenshots, photos, and the final sketch.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Teacher or peer comments used to complete the archived project evidence.",
       "example": "The student used teacher feedback to fix one missing explanation.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "Class tasks for organization, records, or exams.",
       "example": "The admin task was renaming files before final submission.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "management"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +79,9 @@
       "definition": "An ability you can practice and improve.",
       "example": "The reflection named debugging as the strongest skill practiced.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "ability"
+      ],
       "antonyms": []
     }
   ]

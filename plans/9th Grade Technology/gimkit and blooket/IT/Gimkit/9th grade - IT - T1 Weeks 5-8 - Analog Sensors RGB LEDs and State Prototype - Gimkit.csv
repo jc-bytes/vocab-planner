@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+What does Serial Monitor show?,Messages and values from a program,Only vector shapes,A private password,A website menu
+What is baud rate?,The speed used for serial messages,The color of an LED,The size of a logo,The number of website pages
+Why print sensor values?,To support debugging and understand readings,To hide the reading,To skip testing,To remove the circuit
+What is analog input?,A changing value read by a board,Only on or off,A campaign title,A source credit
+What does a potentiometer do?,Changes an analog value when turned,Stores a website,Moves a robot wheel,Deletes the sketch
+What is brightness?,How light or dark an output is,The speed of serial messages,A folder name,A search keyword
+How can a potentiometer control an LED?,Its value can change LED brightness,It writes the page title,It makes a vector path,It deletes the output
+What is a sensor?,A part that measures a value for the program,A private message,A search engine,A graphic layer
+What is a threshold?,A value limit that decides when output changes,A random color name,A folder password,A broken link
+How do you choose a reliable threshold?,Compare several readings and pick a useful limit,Pick the first random number,Use no readings,Copy a page title
+What is expected output?,What you think the system should produce,A deleted result,A hidden note,A vector shape
+What does RGB mean?,"Red, green, and blue","Route, goal, battery","Read, group, browse","Resize, grid, button"
+What is a color channel?,One part of a color or signal,A robot wheel,A private folder,A web page section
+What is an alert?,A warning signal,A hidden source,A blank page,A broken route
+Which state color might show warning?,Yellow or red,Invisible only,No output,Random gray only
+What is an addressable LED?,A light that can be controlled separately,A website address,A deleted circuit,A hidden password
+What is a pixel in an LED strip?,One controllable light point,A robot motor,A search result,A file folder
+What is animation?,A sequence of changes that looks like movement,A still hidden file,A single frozen value,A deleted sketch
+Why use team roles during a build?,"Builder, coder, tester, and recorder tasks stay clear",Nobody needs notes,The circuit fixes itself,The code disappears
+What should a recorder write?,"Values, test notes, and changes",Only a private password,Only the page color,Only a random icon
+What is state logic?,Rules for how a system changes between states,A search query,A vector outline,A hidden image
+What is an input trigger?,An input that starts a response,A deleted output,A page caption,A folder color
+What is an output response?,What the system does after an input,A private address,A campaign title,A loose wire only
+What is a prototype?,A test version of one feature before the full build,The final file deleted,A random search result,A graphic copied without changes
+What should prototype test notes include?,"Input, output, state, result, and next change",Only the color blue,Only a page title,Only the board brand

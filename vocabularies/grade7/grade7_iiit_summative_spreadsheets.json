@@ -29,7 +29,9 @@
       "definition": "A tool that organizes information in rows and columns.",
       "example": "The student used a spreadsheet to organize survey results.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data sheet"
+      ],
       "antonyms": []
     },
     {
@@ -69,7 +71,9 @@
       "definition": "The name of a cell, such as A1.",
       "example": "The formula used the cell reference B2 to add the first value.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "cell name"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +81,10 @@
       "definition": "A rule that calculates a value.",
       "example": "The formula calculated the total number of recycled items.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "calculation",
+        "rule"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +92,9 @@
       "definition": "A built-in formula tool, such as AVERAGE.",
       "example": "The SUM function added all the numbers in the column.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "built-in formula"
+      ],
       "antonyms": []
     },
     {
@@ -93,15 +102,20 @@
       "definition": "A number found by adding values and dividing by how many values there are.",
       "example": "The class found the average score for the spreadsheet challenge.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mean"
+      ],
       "antonyms": []
     },
     {
       "word": "chart",
-      "definition": "A visual way to show data.",
+      "definition": "A spreadsheet visual used to compare survey or class data.",
       "example": "The chart made the survey results easier to compare.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "graph",
+        "visual"
+      ],
       "antonyms": []
     }
   ]

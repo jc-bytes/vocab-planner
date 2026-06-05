@@ -27,15 +27,19 @@
       "definition": "A collection of work that shows learning.",
       "example": "The portfolio collected the campaign graphic, research, and reflection.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work collection"
+      ],
       "antonyms": []
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Screenshots, pages, or credits that prove portfolio progress.",
       "example": "The screenshot was evidence that the webpage worked.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A planned message that asks people to care or act.",
       "example": "The campaign focused on using school devices responsibly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "awareness effort"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +81,9 @@
       "definition": "Words that ask the reader to do something.",
       "example": "The call to action asked viewers to organize their files.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "action request"
+      ],
       "antonyms": []
     }
   ]

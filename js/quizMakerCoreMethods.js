@@ -1,8 +1,4 @@
-import { loadScript } from './main.js';
 import { cleanQuizTitle } from './quizMakerTitle.js';
-
-const HTML2CANVAS_SRC = 'js/libs/html2canvas.min.js';
-const JSZIP_SRC = 'js/libs/jszip.min.js';
 
 class QuizMakerCoreMethods {
     init(options = {}) {
@@ -92,20 +88,14 @@ class QuizMakerCoreMethods {
 
     async ensureHtml2Canvas() {
         if (typeof window.html2canvas === 'function') return window.html2canvas;
-        await loadScript(HTML2CANVAS_SRC);
-        if (typeof window.html2canvas !== 'function') {
-            throw new Error('html2canvas library not loaded');
-        }
-        return window.html2canvas;
+        const module = await import('html2canvas');
+        return module.default || module;
     }
 
     async ensureJSZip() {
         if (typeof window.JSZip === 'function') return window.JSZip;
-        await loadScript(JSZIP_SRC);
-        if (typeof window.JSZip !== 'function') {
-            throw new Error('JSZip library not loaded');
-        }
-        return window.JSZip;
+        const module = await import('jszip');
+        return module.default || module;
     }
 
     escapeHtml(value = '') {

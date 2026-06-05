@@ -25,28 +25,87 @@ export class QuizActivity {
     }
 
     generateQuestions() {
-        // Create a question for each word
         return this.words.map(word => {
-            // Find distractors (other definitions)
-            const otherWords = this.words.filter(w => w !== word);
-            // Shuffle other words to pick random distractors
-            otherWords.sort(() => Math.random() - 0.5);
-
-            // Pick up to 3 distractors
-            const distractors = otherWords.slice(0, 3).map(w => w.definition);
-
-            // Combine correct answer and distractors
-            const options = [word.definition, ...distractors];
-
-            // Shuffle options
-            options.sort(() => Math.random() - 0.5);
+            const distractors = this.getDefinitionDistractors(word, 3);
+            const options = this.shuffleOptions([word.definition, ...distractors]);
 
             return {
                 word: word.word,
                 correctAnswer: word.definition,
-                options: options
+                options
             };
         });
+    }
+
+    normalizeText(value) {
+        return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    getMeaningfulWords(value) {
+        const stopWords = new Set([
+            'a', 'an', 'the', 'of', 'to', 'in', 'on', 'for', 'with', 'by', 'and', 'or',
+            'is', 'are', 'was', 'were', 'be', 'can', 'that', 'used', 'use', 'from',
+            'into', 'about', 'how', 'when', 'while', 'whether', 'what', 'why', 'it',
+            'one', 'each', 'as'
+        ]);
+
+        return new Set(
+            String(value || '')
+                .toLowerCase()
+                .match(/[a-z0-9]+/g)
+                ?.filter(word => word.length > 2 && !stopWords.has(word)) || []
+        );
+    }
+
+    getKeywordOverlap(first, second) {
+        const firstWords = this.getMeaningfulWords(first);
+        const secondWords = this.getMeaningfulWords(second);
+        if (firstWords.size === 0 && secondWords.size === 0) return 0;
+
+        let shared = 0;
+        firstWords.forEach(word => {
+            if (secondWords.has(word)) shared++;
+        });
+
+        return shared / (firstWords.size + secondWords.size - shared || 1);
+    }
+
+    getDefinitionDistractors(targetWord, count = 3) {
+        const targetDefinition = this.normalizeText(targetWord.definition);
+        const seenDefinitions = new Set([targetDefinition]);
+        const candidates = [];
+
+        this.words.forEach(word => {
+            if (word === targetWord) return;
+
+            const definition = this.normalizeText(word.definition);
+            if (!definition || seenDefinitions.has(definition)) return;
+            seenDefinitions.add(definition);
+
+            const lengthDifference = Math.abs(String(targetWord.definition || '').length - String(word.definition || '').length);
+            const difficultyDifference = Math.abs((Number(targetWord.difficulty) || 1) - (Number(word.difficulty) || 1));
+            const targetIsMultiword = String(targetWord.word || '').trim().includes(' ');
+            const candidateIsMultiword = String(word.word || '').trim().includes(' ');
+            const keywordOverlap = this.getKeywordOverlap(targetWord.definition, word.definition);
+
+            candidates.push({
+                definition: word.definition,
+                score:
+                    keywordOverlap * 30 -
+                    difficultyDifference * 8 -
+                    lengthDifference * 0.12 +
+                    (targetIsMultiword === candidateIsMultiword ? 3 : 0)
+            });
+        });
+
+        return candidates
+            .sort((first, second) => second.score - first.score || Math.random() - 0.5)
+            .slice(0, count)
+            .map(candidate => candidate.definition);
+    }
+
+    shuffleOptions(options) {
+        return [...options].sort(() => Math.random() - 0.5);
     }
 
     restoreState() {

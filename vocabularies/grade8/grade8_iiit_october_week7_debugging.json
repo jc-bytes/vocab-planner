@@ -24,18 +24,25 @@
   "words": [
     {
       "word": "debug",
-      "definition": "To find and fix a problem.",
-      "example": "The student debugged the game by reading each error message.",
+      "definition": "To use Python errors, test results, or traces to find and fix a coding problem.",
+      "example": "The student can debug the game by reading each error message.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "colon",
       "definition": "The two-dot punctuation mark used in Python blocks.",
       "example": "The missing colon stopped the if block from running.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "two-dot mark"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +50,9 @@
       "definition": "Spaces at the start of a code line.",
       "example": "Indentation showed which lines belonged inside the loop.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code spacing"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +60,9 @@
       "definition": "Checking how two values are related.",
       "example": "The comparison checked whether the guess equaled the secret number.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking relationship"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +70,9 @@
       "definition": "The name used for a value in code.",
       "example": "The variable name had to match everywhere in the program.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "value name"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +80,9 @@
       "definition": "A problem that stops code or makes it wrong.",
       "example": "The error appeared because the input was treated as text.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "mistake"
+      ],
       "antonyms": []
     },
     {
@@ -75,8 +90,13 @@
       "definition": "A change that solves a problem.",
       "example": "The fix converted the input to a number before comparing it.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "correct",
+        "repair"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

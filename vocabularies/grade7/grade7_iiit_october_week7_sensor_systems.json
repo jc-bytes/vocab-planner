@@ -24,26 +24,38 @@
   "words": [
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A sensor value or microbit signal that the Scratch system uses.",
       "example": "The sensor reading was input for the system.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
+      "definition": "The sound, sprite action, or message produced by the sensor system.",
       "example": "The output was a sound when the distance was too close.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "A microbit part that detects distance or movement for Scratch.",
       "example": "The sensor detected an object in front of the project.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +63,20 @@
       "definition": "A sign or message sent to show information.",
       "example": "The signal told the program when to show an alert.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sign"
+      ],
       "antonyms": []
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The sensor limit that changes the Scratch output.",
       "example": "The threshold changed the output at 15 centimeters.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {

@@ -51,6 +51,9 @@ export const createSupabaseFirestoreAdapter = (supabaseService) => {
     const setDoc = async (ref, payload, _options = {}) => {
         await supabaseService.init();
         const tableName = ref.tableName || resolveTable(ref.collectionName);
+        if (tableName === 'student_progress' || tableName === 'scores') {
+            throw new Error(`Direct writes to ${tableName} are blocked. Use the validated Supabase RPC methods instead.`);
+        }
         const primaryKey = primaryKeyFor(tableName);
         const dbPayload = fromClientPayload(tableName, payload, ref.id);
 

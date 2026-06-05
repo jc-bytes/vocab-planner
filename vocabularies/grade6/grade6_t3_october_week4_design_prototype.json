@@ -32,18 +32,26 @@
     },
     {
       "word": "prototype",
-      "definition": "A first version used for testing.",
+      "definition": "A first 3D version used to test size, shape, and changes.",
       "example": "The prototype helped us find changes.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "sketch",
       "definition": "A quick drawing of an idea.",
       "example": "The sketch showed the model plan.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "draft drawing",
+        "plan"
+      ],
       "antonyms": []
     },
     {
@@ -56,26 +64,37 @@
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
-      "example": "We improve the route after testing.",
+      "definition": "To change the 3D prototype after feedback or testing.",
+      "example": "We can improve the model after testing the shape.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     },
     {
       "word": "purpose",
       "definition": "The reason something is made or used.",
       "example": "The purpose was to hold pencils.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reason",
+        "goal"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about work.",
+      "definition": "Comments that tell which part of a 3D prototype works and what to improve.",
       "example": "The feedback helped me improve the model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     }
   ]

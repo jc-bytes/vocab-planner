@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "A small robot task with a goal, route, or marker to reach.",
       "example": "The challenge was to reach the finish marker.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +38,10 @@
       "definition": "What you are trying to do.",
       "example": "The goal was to follow the route.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "target",
+        "aim"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +49,9 @@
       "definition": "A simple rule that says when the task is complete.",
       "example": "The success rule was to stop inside the box.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "completion rule"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +59,9 @@
       "definition": "The space where a project is tried safely.",
       "example": "We put tape in the test area.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "safe test space"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +69,9 @@
       "definition": "Instructions used in a program.",
       "example": "The commands told the robot when to turn.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "instructions"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +79,9 @@
       "definition": "Coding pieces that snap together in a program.",
       "example": "We used movement blocks for the mBot.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "coding pieces"
+      ],
       "antonyms": []
     }
   ],

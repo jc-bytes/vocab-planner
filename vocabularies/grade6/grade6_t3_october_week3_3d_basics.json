@@ -35,7 +35,9 @@
       "definition": "A form such as a cube, sphere, or cylinder.",
       "example": "The model started with one shape.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "form"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +53,9 @@
       "definition": "To make something bigger or smaller.",
       "example": "We resize the box to fit the model.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "change size"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +63,9 @@
       "definition": "To turn something around.",
       "example": "We rotate the shape sideways.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "turn"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +73,9 @@
       "definition": "To make a copy.",
       "example": "We duplicate the wheel shape.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "copy"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +83,10 @@
       "definition": "A simple version or design of something.",
       "example": "The 3D model looked like a desk tidy.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "version",
+        "representation"
+      ],
       "antonyms": []
     }
   ]

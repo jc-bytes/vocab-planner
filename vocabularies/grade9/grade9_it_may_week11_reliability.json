@@ -27,7 +27,9 @@
       "definition": "How dependably something works.",
       "example": "The team improved reliability by making the sensor work three times in a row.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "dependability"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A note in code that explains something.",
       "example": "The code comment explained why the threshold was set to 400.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code note"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A test where conditions are carefully chosen.",
       "example": "The controlled test used the same distance for each sensor trial.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "fair test"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A result showing whether something worked or not.",
       "example": "The group marked each trial as pass/fail in the test table.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "success check"
+      ],
       "antonyms": []
     },
     {
@@ -59,16 +67,23 @@
       "definition": "The part that needs the most improvement.",
       "example": "The weak point was a loose wire near the breadboard.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "weakness"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A tested change that makes the circuit or code more dependable.",
       "example": "The improvement secured the wire so the circuit stopped disconnecting.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     }
   ]
 }

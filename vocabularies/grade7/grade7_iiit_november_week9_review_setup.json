@@ -27,7 +27,9 @@
       "definition": "A tool that organizes information in rows and columns.",
       "example": "The spreadsheet organized the test data in rows.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data sheet"
+      ],
       "antonyms": []
     },
     {
@@ -40,10 +42,13 @@
     },
     {
       "word": "source",
-      "definition": "Where information or media comes from.",
+      "definition": "The saved origin of a fact or media item used in the final review.",
       "example": "The source was copied into the credits list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "origin",
+        "reference"
+      ],
       "antonyms": []
     },
     {
@@ -56,18 +61,23 @@
     },
     {
       "word": "sensor",
-      "definition": "A part that detects information from the environment.",
+      "definition": "The detecting part students check before final coding.",
       "example": "The sensor was tested before the code was changed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The limit reviewed before testing the alert behavior.",
       "example": "The threshold was reviewed before the alert test.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +85,9 @@
       "definition": "A sign or message sent to show information.",
       "example": "The signal showed whether the system was working.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sign"
+      ],
       "antonyms": []
     }
   ]

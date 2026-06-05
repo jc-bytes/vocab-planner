@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "The part of the robot task that was difficult and needed testing.",
       "example": "The challenge was to reach the finish marker.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
@@ -35,31 +38,49 @@
       "definition": "To try something and see if it works.",
       "example": "We test the program before showing it.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "check",
+        "trial"
+      ],
+      "antonyms": [
+        "guess"
+      ]
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem in a program.",
+      "definition": "To describe how the team found and fixed a robot problem.",
       "example": "We debug when the robot turns the wrong way.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "improve",
-      "definition": "To make something better.",
+      "definition": "To use reflection notes to make the robot route better.",
       "example": "We improve the route after testing.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "make better"
+      ],
+      "antonyms": [
+        "worsen"
+      ]
     },
     {
       "word": "audience",
       "definition": "The people who see or hear your work.",
       "example": "The audience watched the robot demo.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
       "antonyms": []
     },
     {
@@ -67,15 +88,21 @@
       "definition": "To make an idea clear with words.",
       "example": "Students explain what their robot does.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "describe",
+        "clarify"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what worked and what to improve.",
+      "definition": "A short note about what worked, what was fixed, and what to try next.",
       "example": "The reflection described one debugging step.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     }
   ],

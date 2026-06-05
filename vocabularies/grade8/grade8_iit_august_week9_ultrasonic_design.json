@@ -35,7 +35,9 @@
       "definition": "How far apart two things are.",
       "example": "The distance reading showed how far the object was.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "space apart"
+      ],
       "antonyms": []
     },
     {
@@ -51,39 +53,51 @@
       "definition": "Something that starts an action.",
       "example": "The trigger pin started the distance measurement.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "starter"
+      ],
       "antonyms": []
     },
     {
       "word": "centimeter",
       "definition": "A small unit for measuring length.",
-      "example": "The group recorded each distance in centimeters.",
+      "example": "The centimeter mark helped the group record the distance.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The distance limit that starts the ultrasonic alert.",
       "example": "The threshold set the distance that started the alert.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
       "word": "prototype",
-      "definition": "An early version used for testing.",
+      "definition": "A test circuit or design with a sensor, LED, and buzzer before final build.",
       "example": "The prototype used a sensor, LED, and buzzer.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "test model",
+        "draft"
+      ],
+      "antonyms": [
+        "final product"
+      ]
     },
     {
       "word": "test case",
       "definition": "A planned test with expected behavior.",
       "example": "The test case checked what happened at 10 centimeters.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "planned test"
+      ],
       "antonyms": []
     }
   ]

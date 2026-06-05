@@ -27,7 +27,9 @@
       "definition": "Using sound waves to measure distance.",
       "example": "The ultrasonic sensor checked how close the wall was.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "sound-wave sensor"
+      ],
       "antonyms": []
     },
     {
@@ -35,23 +37,32 @@
       "definition": "A value measured by a sensor.",
       "example": "The reading changed when the robot moved closer.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "measurement",
+        "value"
+      ],
       "antonyms": []
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The distance limit that tells the robot when to stop or react.",
       "example": "The threshold told the robot when to stop.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A sensor rule that can be true or false and controls the robot response.",
       "example": "The condition checked if the distance was less than 10 centimeters.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {

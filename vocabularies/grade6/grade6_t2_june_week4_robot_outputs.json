@@ -24,26 +24,35 @@
   "words": [
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
+      "definition": "A robot action after code runs, such as moving, lighting, or sounding.",
       "example": "A sound can be an output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "signal",
       "definition": "A sign that gives information.",
       "example": "The LED signal showed the robot was finished.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sign"
+      ],
       "antonyms": []
     },
     {
       "word": "LED",
-      "definition": "A small light on a device or robot.",
+      "definition": "A robot light used as a programmed output.",
       "example": "The LED turned red when the program started.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +60,10 @@
       "definition": "A small part that makes a sound.",
       "example": "The buzzer made a short beep.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "alarm",
+        "beeper"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +71,9 @@
       "definition": "What something is doing or how it is at a moment.",
       "example": "Stop is one robot state.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "status"
+      ],
       "antonyms": []
     },
     {
@@ -67,8 +81,13 @@
       "definition": "The beginning of an action or program.",
       "example": "The robot beeped at the start.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "beginning",
+        "begin"
+      ],
+      "antonyms": [
+        "finish"
+      ]
     },
     {
       "word": "finish",

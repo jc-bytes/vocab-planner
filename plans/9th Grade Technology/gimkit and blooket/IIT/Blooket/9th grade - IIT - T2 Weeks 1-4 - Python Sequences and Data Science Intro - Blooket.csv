@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,"In Python, what is a list?",A collection of related items stored together,A circuit part,A poster title,A slide color,20,1
+2,"What prints from scores = [70, 82, 90]; print(scores[1])?",70,82,90,1,20,2
+3,Why is index 0 important in Python lists?,Lists begin at 10,Index numbers are always letters,The first item is usually at position 0,Indexes are only for posters,20,3
+4,Which line adds an item to the end of a list?,items.remove_all(),items.sorter(),items.index = end,items.append('new'),20,4
+5,Which method arranges list items in order?,sort,remove,display,substring,20,1
+6,What does a while loop need to avoid running forever?,A poster credit,A condition that eventually becomes false,A sensor wire,A color palette,20,2
+7,Which loop is best for checking each item in a list?,title loop,ground loop,for loop,credit loop,20,3
+8,What does this do: for score in scores: print(score)?,Prints only the list name,Deletes the scores,Sorts the scores automatically,Prints each score in the list,20,4
+9,Which task uses filtering?,Show only scores above 70,Change a poster color,Move an Arduino wire,Align a logo,20,1
+10,What is a string?,A circuit path,Text stored in a program,A chart type,A sensor reading only,20,2
+11,What is a character?,A complete dataset,A whole poster,"One letter, number, space, or symbol in text",An Arduino board,20,3
+12,What does len('data') return?,3,data,0,4,20,4
+13,Which error is likely in this line: for item in list print(item),Missing colon before the loop body,The word print is too short,The list must be a poster,There is no possible error,20,1
+14,"Which code idea combines list, loop, and condition?",Choose a poster font,Count how many survey answers are above 70,Charge a robot battery,Label a breadboard only,20,2
+15,Why use a condition in data code?,To remove all data,To make lists impossible,"To decide which branch, loop action, or result should happen",To hide output,20,3
+16,What is output in a Python data program?,A resistor,A slide title,A poster credit,A printed value or summary produced by the program,20,4
+17,Which result is a data observation?,Five classmates chose option A,The file is blue,The room is quiet,The cable is long,20,1
+18,What is data science?,Only writing random code,Using data to answer questions,Only decorating slides,Only building circuits,20,2
+19,What is the investigative cycle used for?,Skipping data support,Choosing a random image,"Asking, collecting, analyzing, and concluding with data",Replacing Python lists,20,3
+20,Which data question is measurable?,Is lunch nice?,Are classmates cool?,Is school good?,How many minutes classmates read each day?,20,4
+21,Why should code be tested with two data sets?,To check if it works beyond one example,To make the output random,To avoid debugging,To delete the list,20,1
+22,Which bug can happen with list indexes?,Using a clear variable name,Trying to access a position that does not exist,Printing an output,Writing a comment,20,2
+23,Which statement is a careful conclusion from small data?,Everyone everywhere chooses A,The data proves everything,"In this sample, more classmates chose A than B",No limitation exists,20,3
+24,What does a variable store?,Only a classroom poster,Only a breadboard row,Only a logo,A value that can change or be used by the program,20,4
+25,Why connect Python to real data?,"It lets code organize, check, and summarize useful information",It removes the need for thinking,It makes all answers correct,It replaces data with guesses,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

@@ -29,7 +29,9 @@
       "definition": "A part the user can press.",
       "example": "The button started the LED pattern when the student pressed it.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "control"
+      ],
       "antonyms": []
     },
     {
@@ -53,15 +55,20 @@
       "definition": "The current condition of something.",
       "example": "The state stored whether the LED was currently on or off.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "status"
+      ],
       "antonyms": []
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A code rule that checks a button reading before changing the output state.",
       "example": "The condition checked if the button reading was HIGH.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
@@ -77,8 +84,12 @@
       "definition": "Working in a steady and dependable way.",
       "example": "The button reading became stable after the team fixed the wiring.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "steady"
+      ],
+      "antonyms": [
+        "unstable"
+      ]
     }
   ]
 }

@@ -27,7 +27,9 @@
       "definition": "What the robot should do.",
       "example": "The robot goal was to detect an object and give a warning signal.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "robot target"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "A list of parts needed for a project.",
       "example": "The component list included the sensor, LED, resistor, and buzzer.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "parts list"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "A table or diagram showing states and actions.",
       "example": "The state chart showed what the robot should do when the sensor changed.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "state diagram"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A plan for building and testing a project.",
       "example": "The design plan explained the inputs, outputs, and test steps.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "build plan"
+      ],
       "antonyms": []
     },
     {
@@ -59,15 +67,20 @@
       "definition": "One action used to check if something works.",
       "example": "The first test step checked whether the sensor reading appeared.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking step"
+      ],
       "antonyms": []
     },
     {
       "word": "feedback",
-      "definition": "Helpful comments about how to improve.",
+      "definition": "Peer or teacher comments used to refine the robot goal, design, or evidence plan.",
       "example": "Peer feedback helped the team simplify the robot goal.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "comments",
+        "advice"
+      ],
       "antonyms": []
     }
   ]

@@ -24,10 +24,13 @@
   "words": [
     {
       "word": "presentation",
-      "definition": "Sharing work or ideas with others.",
+      "definition": "An explanation of the portfolio, design choices, and evidence.",
       "example": "The presentation showed the portfolio and explained the design choices.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "demo",
+        "talk"
+      ],
       "antonyms": []
     },
     {
@@ -35,39 +38,54 @@
       "definition": "A decision made while designing.",
       "example": "Using large icons was a design choice for quick scanning.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "design decision"
+      ],
       "antonyms": []
     },
     {
       "word": "reflection",
-      "definition": "Thinking about what happened and what you learned.",
+      "definition": "An explanation of which portfolio design choices improved after feedback.",
       "example": "The reflection explained what improved after feedback.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "review",
+        "thinking back"
+      ],
       "antonyms": []
     },
     {
       "word": "audience",
-      "definition": "The people who will see or use something.",
+      "definition": "The viewers who need the portfolio explanation to be clear.",
       "example": "The student adjusted the explanation for a Grade 8 audience.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "viewers",
+        "users"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A revision that makes the portfolio clearer, more accurate, or easier to use.",
       "example": "The improvement made the source credits easier to find.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     },
     {
       "word": "portfolio",
       "definition": "A collection of work that shows learning.",
       "example": "The portfolio showed the final website, poster, and research notes.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work collection"
+      ],
       "antonyms": []
     }
   ]

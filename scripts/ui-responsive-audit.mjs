@@ -393,6 +393,49 @@ async function assertDataSettingsUnifiedTabs(page, baseUrl) {
     }
 }
 
+async function assertTeacherSparksRoute(page, baseUrl) {
+    await page.setViewportSize({ width: 390, height: viewportHeight });
+    await page.goto(`${baseUrl}/teacher.html#/teacher/sparks`, { waitUntil: 'domcontentloaded' });
+    await waitForApp(page);
+    await page.waitForSelector('#teacher-sparks-view:not(.hidden)', { timeout: 5000 });
+    await page.waitForSelector('#spark-library-list .spark-card, #spark-library-list .teacher-empty-state', { timeout: 10000 });
+
+    const state = await page.evaluate(() => ({
+        activeLabel: document.querySelector('.teacher-tab.active')?.textContent?.trim().replace(/\s+/g, ' '),
+        mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent?.trim(),
+        addButtonVisible: Boolean(document.querySelector('#add-spark-btn')),
+        currentSparkText: document.querySelector('#spark-library-list')?.textContent || ''
+    }));
+
+    if (state.activeLabel !== 'Sparks'
+        || state.mobileLabel !== 'Sparks'
+        || !state.addButtonVisible
+        || !state.currentSparkText.includes('Audit Spark')) {
+        throw new Error(`Teacher Sparks route did not render expected controls: ${JSON.stringify(state)}`);
+    }
+}
+
+async function assertStudentSparkCard(page, baseUrl) {
+    await page.setViewportSize({ width: 390, height: viewportHeight });
+    await page.goto(`${baseUrl}/student.html#/menu`, { waitUntil: 'domcontentloaded' });
+    await waitForApp(page);
+    await page.waitForSelector('.student-spark-card', { timeout: 10000 });
+
+    const state = await page.evaluate(() => {
+        const card = document.querySelector('.student-spark-card');
+        return {
+            text: card?.textContent || '',
+            beforeTabs: Boolean(card && card.compareDocumentPosition(document.querySelector('.student-home-tabs')) & Node.DOCUMENT_POSITION_FOLLOWING)
+        };
+    });
+
+    if (!state.text.includes('Audit Spark')
+        || state.text.includes('Future Audit Spark')
+        || !state.beforeTabs) {
+        throw new Error(`Student Today Spark card is wrong: ${JSON.stringify(state)}`);
+    }
+}
+
 async function assertStudentMobileMenu(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
     await page.goto(`${baseUrl}/student.html#/menu`, { waitUntil: 'domcontentloaded' });
@@ -571,6 +614,7 @@ async function main() {
                     }, null, { timeout: 20000 });
                 }
             }],
+            ['Teacher Sparks', `${baseUrl}/teacher.html#/teacher/sparks`],
             ['Teacher Quizzes', `${baseUrl}/teacher.html#/teacher/quizzes`],
             ['Teacher Data Settings', `${baseUrl}/teacher.html#/teacher/data-settings`]
         ];
@@ -632,7 +676,9 @@ async function main() {
         await auditTeacherStudentModal(teacherPage, baseUrl);
         await assertTeacherMobileMenu(teacherPage, baseUrl);
         await assertDataSettingsUnifiedTabs(teacherPage, baseUrl);
+        await assertTeacherSparksRoute(teacherPage, baseUrl);
         await assertStudentMobileMenu(studentPage, baseUrl);
+        await assertStudentSparkCard(studentPage, baseUrl);
         await assertStudentActivityCardsAreButtons(studentPage, baseUrl);
 
         console.log(`Responsive UI audit passed across widths: ${widths.join(', ')}`);

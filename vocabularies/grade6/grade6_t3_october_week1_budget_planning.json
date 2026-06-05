@@ -27,7 +27,9 @@
       "definition": "A plan for how much money can be used.",
       "example": "The budget was 20 dollars.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "spending plan"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "How many of something there are.",
       "example": "The quantity was three pencils.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "amount"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "How much money something takes to buy.",
       "example": "The cost of one item was two dollars.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "price"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "The whole amount after adding.",
       "example": "The total was 15 dollars.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sum"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,10 @@
       "definition": "One thing in a list.",
       "example": "Each item in the materials list had a price and quantity.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "thing",
+        "entry"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "A careful guess.",
       "example": "We estimate the cost before buying.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "careful guess"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +88,9 @@
       "definition": "Things used to make or do a project.",
       "example": "The materials included paper and tape.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "supplies"
+      ],
       "antonyms": []
     }
   ]

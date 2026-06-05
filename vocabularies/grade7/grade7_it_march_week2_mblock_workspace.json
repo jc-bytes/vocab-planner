@@ -35,7 +35,9 @@
       "definition": "The area in a program where you do your work.",
       "example": "The movement blocks were arranged in the workspace.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "work area"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "A character or object in a Scratch or mBlock project.",
       "example": "The sprite on the screen copied the robot movement.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "character"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +55,9 @@
       "definition": "A coding command that snaps into a program.",
       "example": "The forward block made the robot drive ahead.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command piece"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +65,9 @@
       "definition": "A group of connected blocks that run together.",
       "example": "The script connected start, move, and stop blocks.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code stack"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +75,9 @@
       "definition": "To send a program from the computer to the robot.",
       "example": "Upload sent the finished program to the mBot.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "send to device"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +85,9 @@
       "definition": "The screen and tools used to work with a program.",
       "example": "The interface showed the blocks, stage, and device connection.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "screen tools"
+      ],
       "antonyms": []
     }
   ]

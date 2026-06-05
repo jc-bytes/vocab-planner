@@ -27,7 +27,9 @@
       "definition": "A question that can be answered with data.",
       "example": "The data question asked which study habit helped students finish homework.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "research question"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "Able to be counted or measured.",
       "example": "The group made the question measurable by counting minutes of practice.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "countable"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "Questions used to collect answers.",
       "example": "The survey asked classmates to choose one answer from a short list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "question form"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "The kind of data, such as number or text.",
       "example": "The student identified age as a number data type and opinion as text.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "kind of data"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,10 @@
       "definition": "A command that performs an action on data.",
       "example": "The collection method was an anonymous Google Form.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command",
+        "procedure"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "Keeping personal information protected.",
       "example": "The survey protected privacy by not asking for student names.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data protection"
+      ],
       "antonyms": []
     }
   ]

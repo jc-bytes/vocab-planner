@@ -27,23 +27,33 @@
       "definition": "A whole number.",
       "example": "The score used an integer because it counted whole points.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "whole number"
+      ],
+      "antonyms": [
+        "float"
+      ]
     },
     {
       "word": "float",
       "definition": "A number with a decimal.",
       "example": "The average used a float because it included a decimal.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "decimal number"
+      ],
+      "antonyms": [
+        "integer"
+      ]
     },
     {
       "word": "operator",
       "definition": "A symbol or word that calculates or compares.",
       "example": "The plus operator added points to the score.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "symbol"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +61,19 @@
       "definition": "A piece of code that produces a value.",
       "example": "The expression calculated the total price.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "code calculation"
+      ],
       "antonyms": []
     },
     {
       "word": "calculate",
       "definition": "To find an answer using math.",
-      "example": "The program calculated the final score after each round.",
+      "example": "The program can calculate the final score after each round.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "compute"
+      ],
       "antonyms": []
     },
     {
@@ -72,10 +86,13 @@
     },
     {
       "word": "condition",
-      "definition": "A rule that can be true or false.",
+      "definition": "A Python true-or-false test used by if/else to choose a branch.",
       "example": "The condition checked whether the score was high enough.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     }
   ]

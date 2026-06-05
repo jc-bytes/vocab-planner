@@ -27,7 +27,9 @@
       "definition": "Being prepared to begin project work.",
       "example": "The checklist showed project readiness before the group started building.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "preparedness"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,9 @@
       "definition": "Data used carefully and fairly.",
       "example": "Responsible data meant the survey avoided private student information.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "ethical data"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +47,9 @@
       "definition": "The time when work is due.",
       "example": "The deadline helped the team decide which tasks to finish first.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "due date"
+      ],
       "antonyms": []
     },
     {
@@ -51,15 +57,20 @@
       "definition": "A collection of related data.",
       "example": "The dataset contained every survey response in one spreadsheet.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "data collection"
+      ],
       "antonyms": []
     },
     {
       "word": "source",
-      "definition": "Where information or media comes from.",
+      "definition": "The origin of the dataset, chart information, or media used in the project.",
       "example": "The student wrote the source of the data under the chart.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "origin",
+        "reference"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +78,9 @@
       "definition": "The type of final product being made.",
       "example": "The group chose an infographic as the product format for the final result.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "final format"
+      ],
       "antonyms": []
     }
   ]

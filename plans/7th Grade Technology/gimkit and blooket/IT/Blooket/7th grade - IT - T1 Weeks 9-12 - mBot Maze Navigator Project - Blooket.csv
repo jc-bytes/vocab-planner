@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is a maze in the robot project?,A path challenge with turns and obstacles,A website title,A Scratch costume,A private message,20,1
+2,Why sketch the maze route first?,To avoid all testing,"To plan turns, checkpoints, and possible sensor checks",To hide the route,To remove sensors,20,2
+3,What is a prototype?,A random color,A deleted program,A test version used before the final build,A web page source,20,3
+4,What is an algorithm?,A loose screw,A poster background,A missing file,A clear set of steps to solve a problem,20,4
+5,What should your project plan include?,"Route, sensors, sequence, checkpoints, and team roles",Only a robot name,Only a website link,Only one color,20,1
+6,What is the goal of a maze navigator?,Delete the maze,Move through the maze using planned movement and checks,Stay still forever,Hide the program,20,2
+7,Which sensor can help detect walls or obstacles?,Website header,Image source,Ultrasonic sensor,Folder icon,20,3
+8,Why assign team responsibilities?,So nobody helps,So the route disappears,So the robot cannot move,"So each person knows what to build, test, or record",20,4
+9,What should you document during a trial?,"What happened, what failed, and what changed",Only the desk number,Only a random sound,Only a private password,20,1
+10,What is a trial?,A web page section,One test attempt,A robot part,A source note,20,2
+11,What is an improvement?,A hidden program,A random route,A change based on test results,A deleted checkpoint,20,3
+12,What does performance mean?,How colorful a poster is,How private a message is,How long a title is,How well the robot works,20,4
+13,Why use a debugging checklist?,"To fix movement, sensor, or sequence issues step by step",To skip the maze,To hide mistakes,To remove checkpoints,20,1
+14,Your robot misses a turn. What should you check?,Image credit only,"Turn time, speed, and command order",Website audience only,Page title only,20,2
+15,Robot stops too late near an obstacle. What should you check?,Vector fill color,Scratch score,Sensor threshold and reading,Folder name,20,3
+16,What should final testing show?,The route is hidden,The program was never tested,Only the robot color,The robot can follow the route or explain needed fixes,20,4
+17,What is a demonstration?,Showing how the robot route or sensor response works,Closing every file,Choosing a random link,Drawing one shape,20,1
+18,What should your maze explanation include?,Only a title,"Route plan, code logic, sensor use, challenge, and solution",Only a private password,Only a color,20,2
+19,What is a solution?,A missing sensor,A broken link,A way to solve a problem,A random icon,20,3
+20,What is a challenge?,The easiest color,The hidden menu,The page title,The difficult part you had to solve,20,4
+21,Why save code screenshots or notes?,So you can explain what the robot did and changed,So the route disappears,So the robot resets forever,So the maze is deleted,20,1
+22,Which final reflection sounds useful?,Everything was perfect with no test.,"The robot turned late, so we reduced turn time.",I do not know what changed.,The color was nice.,20,2
+23,What should you do before presenting the maze?,Delete the program,Hide the route,Test the robot and practice the explanation,Remove the sensor,20,3
+24,Which result is strongest?,The robot never moved,The route was guessed,The sensor was ignored,The robot reached checkpoints and you can explain the fixes,20,4
+25,Why is teamwork important in the maze project?,"Building, coding, testing, and notes all need attention",Only one person can see the robot,It removes responsibility,It makes testing unnecessary,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

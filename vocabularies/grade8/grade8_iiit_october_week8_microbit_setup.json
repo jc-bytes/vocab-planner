@@ -51,7 +51,9 @@
       "definition": "A sensor that detects tilt or movement.",
       "example": "The accelerometer detected when the board tilted left.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "movement sensor"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +61,9 @@
       "definition": "The left-right direction in a coordinate system.",
       "example": "The x-axis value changed when the board moved sideways.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "left-right axis"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +71,9 @@
       "definition": "The up-down direction in a coordinate system.",
       "example": "The y-axis value changed when the board moved up and down.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "up-down axis"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +81,9 @@
       "definition": "A character or object in Scratch.",
       "example": "The sprite moved when the Micro:bit tilted.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "character"
+      ],
       "antonyms": []
     }
   ]

@@ -27,31 +27,43 @@
       "definition": "Using clear separate values, like on or off.",
       "example": "The digital pin turned the LED fully on or fully off.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "on-off"
+      ],
+      "antonyms": [
+        "analog"
+      ]
     },
     {
       "word": "analog",
       "definition": "Using values that can change smoothly.",
       "example": "The analog reading changed gradually as the sensor value changed.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "smooth value"
+      ],
+      "antonyms": [
+        "digital"
+      ]
     },
     {
       "word": "signal",
       "definition": "A sign or message sent by a system.",
       "example": "The signal told the Arduino when to change the LED state.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "sign"
+      ],
       "antonyms": []
     },
     {
       "word": "LED",
-      "definition": "A small light that a program can control.",
+      "definition": "A circuit output light controlled by Arduino code.",
       "example": "The LED blinked after the sketch uploaded successfully.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     },
     {
@@ -72,10 +84,13 @@
     },
     {
       "word": "loop",
-      "definition": "Code that repeats.",
+      "definition": "The Arduino section that repeats the signal pattern.",
       "example": "The loop repeated the blink pattern until the board was unplugged.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "repeat",
+        "cycle"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +98,9 @@
       "definition": "A pause in a program.",
       "example": "The delay made the LED wait one second before changing.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "pause"
+      ],
       "antonyms": []
     }
   ]

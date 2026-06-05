@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What should a route map include?,"A start, ordered steps, turns, stops, and a finish",Only the robot color,Only team names,Only the word route,20,1
+2,Why should the route have markers?,They make the robot heavier,They show places the mBot should reach or avoid,They replace all commands,They erase the program,20,2
+3,The mBot misses the target by a little. What should you do?,Throw away the route map,Skip the next test,Adjust speed or time and test again,Change the poster title,20,3
+4,Which route step is clear enough to test?,Do something cool,Move maybe somewhere,Be fast,"Move forward, turn right, then stop at the marker",20,4
+5,What is a loop useful for?,Repeating the same action pattern,Deleting all movement,Choosing an image source,Turning off the robot forever,20,1
+6,What idea helps program a square path?,Copyright,Loop,Credit,Audience,20,2
+7,What does accurate mean for a route?,Random and unclear,Hidden from your group,Close to the planned target,Only colorful,20,3
+8,Which test note is most useful?,It was bad,My friend laughed,The floor is a floor,"The robot turned too late, so we lowered the time",20,4
+9,What should you compare after using a loop?,The long command list and the shorter loop version,The robot and a poster,The wheel and a map,The class list and a route,20,1
+10,Which repeated path fits loop practice?,One single stop,Zigzag pattern,No movement,A blank map,20,2
+11,Why draw the route before programming?,It replaces testing,It charges the mBot,It helps plan the order of commands,It makes the buzzer louder,20,3
+12,A route has four movement steps. What should you label?,Only image credits,Only teammate names,Only Scratch costumes,Turns and stop points,20,4
+13,What is the safest test area?,The assigned space with markers and enough room,The table edge,A crowded walkway,Near loose cables,20,1
+14,Which command would probably fix a route that goes too far?,Add a random buzzer,Use less time or lower speed,Remove every command,Hide the route map,20,2
+15,What is a pattern?,A missing cable,A single random action,Something that repeats in a regular way,A class password,20,3
+16,Which statement explains why loops help?,They make tests unnecessary,They make every route perfect,They remove the need for safety,They make repeated code shorter and easier to adjust,20,4
+17,What should the team do after a failed route test?,"Find one problem, choose one fix, and try again",Blame the robot only,Stop recording,Change all values without thinking,20,1
+18,What should you include for this topic?,Only a poster,"Your route map, command plan, test result, and improvement",Only a blank worksheet,Only a vocabulary title,20,2
+19,What does sequence mean in route programming?,A part that makes sound,A type of image license,Steps in the correct order,A team role only,20,3
+20,How can you make a route easier to debug?,Run every idea at once,Avoid writing notes,Hide the markers,Test one section at a time,20,4
+21,,,,,,,
+22,,,,,,,
+23,,,,,,,
+24,,,,,,,
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

@@ -27,7 +27,9 @@
       "definition": "A group of related items stored together.",
       "example": "The list stored the sources used for the blog.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "collection"
+      ],
       "antonyms": []
     },
     {
@@ -35,7 +37,10 @@
       "definition": "One thing in a list.",
       "example": "Each item in the list was one website title.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "thing",
+        "entry"
+      ],
       "antonyms": []
     },
     {
@@ -43,15 +48,20 @@
       "definition": "A position number in a list.",
       "example": "The index showed the position of a source in the list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "position number"
+      ],
       "antonyms": []
     },
     {
       "word": "source",
-      "definition": "Where information or media comes from.",
+      "definition": "The website, image, or text location used for a blog fact.",
       "example": "The source provided the fact used in the paragraph.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "origin",
+        "reference"
+      ],
       "antonyms": []
     },
     {

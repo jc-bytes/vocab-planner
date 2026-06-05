@@ -35,7 +35,9 @@
       "definition": "Text that describes structure or design.",
       "example": "The markup described the circle, rectangle, and text.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "structure code"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "A markup label inside angle brackets.",
       "example": "The circle tag created one shape in the SVG.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "markup label"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +55,9 @@
       "definition": "Extra information inside a tag.",
       "example": "The fill attribute changed the icon color.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tag detail"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +65,9 @@
       "definition": "Able to change size without losing quality.",
       "example": "The scalable graphic looked clear on both small and large screens.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "resizable"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +75,9 @@
       "definition": "A style or setting that can be changed.",
       "example": "The width property controlled the size of the rectangle.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "setting"
+      ],
       "antonyms": []
     }
   ]

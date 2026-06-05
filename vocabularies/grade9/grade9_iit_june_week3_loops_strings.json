@@ -27,23 +27,29 @@
       "definition": "A loop that repeats for each item in a group.",
       "example": "The for loop checked each name in the class list.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "counting repeat"
+      ],
       "antonyms": []
     },
     {
       "word": "count",
       "definition": "To find how many there are.",
-      "example": "The program counted how many answers matched the word yes.",
+      "example": "The program can count how many answers match the word yes.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "number"
+      ],
       "antonyms": []
     },
     {
       "word": "filter",
       "definition": "To show or use only items that match a rule.",
-      "example": "The student filtered the list to show only scores above 70.",
+      "example": "The student can filter the list to show only scores above 70.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "select"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +57,9 @@
       "definition": "A name or short description.",
       "example": "The chart label explained that the numbers represented survey totals.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "tag"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +67,9 @@
       "definition": "Finding and fixing problems.",
       "example": "Debugging helped the student find why the loop skipped one item.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "troubleshooting"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +77,9 @@
       "definition": "One letter, number, space, or symbol in text.",
       "example": "The program checked the first character of each word.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "letter or symbol"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +87,9 @@
       "definition": "How many items or characters something has.",
       "example": "The length function showed how many characters were in the string.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "size"
+      ],
       "antonyms": []
     },
     {
@@ -83,7 +97,9 @@
       "definition": "A smaller part of a string.",
       "example": "The student used a substring to get the first three letters of a word.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "part of text"
+      ],
       "antonyms": []
     }
   ]

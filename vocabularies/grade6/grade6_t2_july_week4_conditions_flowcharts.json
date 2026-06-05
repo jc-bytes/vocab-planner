@@ -32,10 +32,13 @@
     },
     {
       "word": "condition",
-      "definition": "A rule that must be true for something to happen.",
+      "definition": "A yes-or-no rule in a flowchart or program that decides the next action.",
       "example": "The condition checks for an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "rule",
+        "requirement"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +46,10 @@
       "definition": "What happens after an input or condition.",
       "example": "The response was a beep.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "reaction",
+        "reply"
+      ],
       "antonyms": []
     },
     {
@@ -51,23 +57,33 @@
       "definition": "Correct or happening.",
       "example": "The condition is true when the object is close.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "correct"
+      ],
+      "antonyms": [
+        "false"
+      ]
     },
     {
       "word": "false",
       "definition": "Not correct or not happening.",
       "example": "The condition is false when the path is clear.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "incorrect"
+      ],
+      "antonyms": [
+        "true"
+      ]
     },
     {
       "word": "flowchart",
       "definition": "A diagram that shows steps or choices.",
       "example": "The flowchart showed what the robot should do.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "process diagram"
+      ],
       "antonyms": []
     }
   ],

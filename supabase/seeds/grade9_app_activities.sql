@@ -9,20 +9,18 @@ with grade9_raw_activities as (
 [
   {
     "id": "grade9_t1_daily_2_button_toggle_practical",
-    "title": "G9 T1 Daily Grade 2 - Button Toggle Practical Check",
+    "title": "G9 T1 Daily Grade 2 - Button Toggle Classroom Check",
     "class_slot": "March Week 4, 90-minute class",
-    "description": "Students submit evidence for a button-input LED system and explain input, output, state, condition, and toggle behavior.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the button-input LED system evidence sent through Classroom or observed by the teacher and explain state-change behavior.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use for Daily Grade #2 after the button state practice.",
-    "student_instructions": "Submit a photo, screenshot, code file link, or short video evidence of your button-input LED system and complete the checklist.",
-    "student_output": "Button-toggle evidence, two test cases, and state-change explanation.",
-    "materials": "Arduino/Freenove kit, breadboard, LED, resistor, button, code, and screenshot or photo tool.",
-    "checklist": [{"id":"button_input","text":"The system uses a button as input.","required":true},{"id":"led_output","text":"The system controls one LED output.","required":true},{"id":"toggle","text":"Each press changes the LED state from off to on or on to off.","required":true},{"id":"tests","text":"I included two test cases or observations.","required":true}],
-    "reflections": [{"id":"state","prompt":"Explain why the state changes when the button is pressed.","required":true},{"id":"issue","prompt":"What wiring or code issue did you check?","required":true}]
+    "student_instructions": "Confirm your button-toggle evidence was sent in Classroom or observed by the teacher, then complete the checklist, observations, and explanation.",
+    "student_output": "Classroom or teacher-observation confirmation, two test observations, and state-change explanation.",
+    "materials": "Arduino/Freenove kit, breadboard, LED, resistor, button, code, and Classroom evidence.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload photos, videos, code files, or links in this app. Submit evidence in Classroom or demonstrate the circuit for the teacher during class."},{"id":"submission_status","type":"select","prompt":"What is the button-toggle evidence status?","items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the working system."},{"id":"need_retest","text":"I need retest or makeup time."}]},{"id":"checklist","type":"checklist","prompt":"Button-toggle self-check","items":[{"id":"button_input","text":"The system uses a button as input."},{"id":"led_output","text":"The system controls one LED output."},{"id":"toggle","text":"Each press changes the LED state from off to on or on to off."},{"id":"tests","text":"I included two test cases or observations."}]},{"id":"observations","type":"table-grid","prompt":"Record two button-toggle observations.","rows":[{"id":"press_from_off","text":"Press when LED starts off"},{"id":"press_from_on","text":"Press when LED starts on"}],"columns":[{"id":"condition","text":"Condition"},{"id":"expected","text":"Expected state"},{"id":"actual","text":"Actual state"}]},{"id":"state","type":"long-text","prompt":"Explain why the state changes when the button is pressed."},{"id":"issue","type":"long-text","prompt":"What wiring or code issue did you check?"}]
   },
   {
     "id": "grade9_t1_daily_3_sensor_threshold_rgb_check",
@@ -37,7 +35,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the threshold check, choose a reliable threshold, predict each output, and explain the RGB state choices.",
     "student_output": "Threshold table, rule explanation, and RGB state justification.",
     "materials": "Sensor notes, sample readings, RGB state notes, and class examples.",
-    "fields": [{"id":"readings","type":"table-grid","prompt":"Complete the sensor threshold check for 6 readings.","rows":[{"id":"r1","text":"Reading 1"},{"id":"r2","text":"Reading 2"},{"id":"r3","text":"Reading 3"},{"id":"r4","text":"Reading 4"},{"id":"r5","text":"Reading 5"},{"id":"r6","text":"Reading 6"}],"columns":[{"id":"value","text":"Reading value"},{"id":"expected","text":"Expected output"},{"id":"reason","text":"Reason"}]},{"id":"threshold","type":"short-text","prompt":"What threshold did you choose?"},{"id":"rule","type":"long-text","prompt":"Explain the threshold rule in two sentences."},{"id":"rgb_states","type":"table-grid","prompt":"Plan the RGB state colors.","rows":[{"id":"ready","text":"Ready"},{"id":"active","text":"Active"},{"id":"warning","text":"Warning"},{"id":"error","text":"Error"}],"columns":[{"id":"color","text":"Color"},{"id":"reason","text":"Why it matches the state"}]}]
+    "fields": [{"id":"readings","type":"table-grid","prompt":"Complete the sensor threshold check for 6 readings.","rows":[{"id":"very_low","text":"Very low sample reading"},{"id":"low","text":"Low sample reading"},{"id":"near_threshold_low","text":"Near-threshold low reading"},{"id":"near_threshold_high","text":"Near-threshold high reading"},{"id":"high","text":"High sample reading"},{"id":"very_high","text":"Very high sample reading"}],"columns":[{"id":"value","text":"Reading value"},{"id":"expected","text":"Expected output"},{"id":"reason","text":"Reason"}]},{"id":"threshold","type":"short-text","prompt":"What threshold did you choose?"},{"id":"rule","type":"long-text","prompt":"Explain the threshold rule in two sentences."},{"id":"rgb_states","type":"table-grid","prompt":"Plan the RGB state colors.","rows":[{"id":"ready","text":"Ready"},{"id":"active","text":"Active"},{"id":"warning","text":"Warning"},{"id":"error","text":"Error"}],"columns":[{"id":"color","text":"Color"},{"id":"reason","text":"Why it matches the state"}]}]
   },
   {
     "id": "grade9_t1_daily_4_state_logic_prototype_log",
@@ -52,7 +50,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the state logic chart, record two prototype tests, and explain two improvements supported by evidence.",
     "student_output": "State logic chart, prototype test notes, and improvement log.",
     "materials": "Arduino/Freenove kit, buttons, sensors, RGB LED or other outputs, state chart, and project log.",
-    "fields": [{"id":"states","type":"table-grid","prompt":"Complete the 4-state logic chart.","rows":[{"id":"ready","text":"Ready"},{"id":"active","text":"Active"},{"id":"warning","text":"Warning"},{"id":"error","text":"Error"}],"columns":[{"id":"trigger","text":"Input trigger"},{"id":"response","text":"Output response"},{"id":"explanation","text":"Explanation"}]},{"id":"tests","type":"table-grid","prompt":"Record two prototype tests.","rows":[{"id":"test1","text":"Test 1"},{"id":"test2","text":"Test 2"}],"columns":[{"id":"condition","text":"Input/condition"},{"id":"expected","text":"Expected result"},{"id":"actual","text":"Actual result"}]},{"id":"improvements","type":"long-text","prompt":"Describe two evidence-based improvements."}]
+    "fields": [{"id":"states","type":"table-grid","prompt":"Complete the 4-state logic chart.","rows":[{"id":"ready","text":"Ready"},{"id":"active","text":"Active"},{"id":"warning","text":"Warning"},{"id":"error","text":"Error"}],"columns":[{"id":"trigger","text":"Input trigger"},{"id":"response","text":"Output response"},{"id":"explanation","text":"Explanation"}]},{"id":"tests","type":"table-grid","prompt":"Record two prototype tests.","rows":[{"id":"baseline_state","text":"Baseline state test"},{"id":"changed_input","text":"Changed input test"}],"columns":[{"id":"condition","text":"Input/condition"},{"id":"expected","text":"Expected result"},{"id":"actual","text":"Actual result"}]},{"id":"improvements","type":"long-text","prompt":"Describe two evidence-based improvements."}]
   },
   {
     "id": "grade9_t1_daily_5_robotics_design_plan",
@@ -67,7 +65,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the robotics design plan before building the exam project.",
     "student_output": "Robotics design plan and one evidence-based improvement.",
     "materials": "Project rubric, planning sheet, component notes, and Arduino/Freenove kit.",
-    "fields": [{"id":"goal","type":"long-text","prompt":"What is the robot goal?"},{"id":"inputs_outputs","type":"table-grid","prompt":"Plan the input-output system.","rows":[{"id":"input1","text":"Input or control 1"},{"id":"input2","text":"Input or control 2"},{"id":"output1","text":"Output 1"},{"id":"output2","text":"Output 2"}],"columns":[{"id":"part","text":"Part/component"},{"id":"behavior","text":"Expected behavior"}]},{"id":"state_chart","type":"long-text","prompt":"Describe or outline the state chart."},{"id":"risk","type":"short-text","prompt":"What is one project risk?"},{"id":"tests","type":"table-grid","prompt":"Write 3 test cases.","rows":[{"id":"test1","text":"Test case 1"},{"id":"test2","text":"Test case 2"},{"id":"test3","text":"Test case 3"}],"columns":[{"id":"condition","text":"Condition/input"},{"id":"expected","text":"Expected output"}]}]
+    "fields": [{"id":"goal","type":"long-text","prompt":"What is the robot goal?"},{"id":"inputs_outputs","type":"table-grid","prompt":"Plan the input-output system.","rows":[{"id":"primary_input","text":"Primary input or control"},{"id":"secondary_input","text":"Secondary input or control"},{"id":"main_output","text":"Main output response"},{"id":"feedback_output","text":"Feedback or alert output"}],"columns":[{"id":"part","text":"Part/component"},{"id":"behavior","text":"Expected behavior"}]},{"id":"state_chart","type":"long-text","prompt":"Describe or outline the state chart."},{"id":"risk","type":"short-text","prompt":"What is one project risk?"},{"id":"tests","type":"table-grid","prompt":"Write 3 test cases.","rows":[{"id":"normal_operation","text":"Normal operation test"},{"id":"boundary_or_obstacle","text":"Boundary or obstacle test"},{"id":"reset_or_recovery","text":"Reset or recovery test"}],"columns":[{"id":"condition","text":"Condition/input"},{"id":"expected","text":"Expected output"}]}]
   },
   {
     "id": "grade9_t1_appreciation_1_lab_safety_responsibility",
@@ -101,20 +99,18 @@ with grade9_raw_activities as (
   },
   {
     "id": "grade9_t1_exam_robotics_project_presentation",
-    "title": "G9 T1 Exam Project - Robotics Project Presentation",
+    "title": "G9 T1 Exam Project - Robotics Project Presentation Classroom Check",
     "class_slot": "May Weeks 10-12 exam project",
-    "description": "Students submit final robotics project evidence with goal, inputs, outputs, state logic, testing evidence, reliability, improvement, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm final robotics project evidence sent through Classroom or observed during the presentation and complete project reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the robotics project.",
-    "student_instructions": "Submit project evidence from the final robotics demonstration and complete the project reflection prompts.",
-    "student_output": "Robotics project evidence, project log, and reflection.",
-    "materials": "Robotics prototype, code, project log, screenshots/photos, test table, and rubric.",
-    "checklist": [{"id":"goal","text":"The evidence states the robot goal.","required":true},{"id":"inputs_outputs","text":"The evidence identifies inputs, outputs, and state logic.","required":true},{"id":"testing","text":"The evidence includes testing or reliability notes.","required":true},{"id":"improvement","text":"The evidence explains one improvement.","required":true},{"id":"reflection","text":"The final reflection is complete.","required":true}],
-    "reflections": [{"id":"logic","prompt":"How do the inputs, logic, and outputs work together?","required":true},{"id":"reliability","prompt":"What evidence shows how reliable the project is?","required":true},{"id":"next","prompt":"What would you improve next?","required":true}]
+    "student_instructions": "Confirm your robotics project evidence was sent in Classroom or observed by the teacher, then complete the project checklist and reflection prompts.",
+    "student_output": "Classroom or presentation confirmation, project checklist, log reflection, and improvement notes.",
+    "materials": "Robotics prototype, code, project log, screenshots/photos, test table, rubric, and Classroom submission.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload robotics files, photos, videos, or links in this app. Submit evidence in Classroom or demonstrate the prototype during the project presentation."},{"id":"submission_status","type":"select","prompt":"What is the robotics project evidence status?","items":[{"id":"classroom_sent","text":"I sent the required evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the demonstration/presentation."},{"id":"need_makeup","text":"I need makeup or resubmission time."}]},{"id":"checklist","type":"checklist","prompt":"Robotics project self-check","items":[{"id":"goal","text":"The evidence states the robot goal."},{"id":"inputs_outputs","text":"The evidence identifies inputs, outputs, and state logic."},{"id":"testing","text":"The evidence includes testing or reliability notes."},{"id":"improvement","text":"The evidence explains one improvement."},{"id":"reflection","text":"The final reflection is complete."}]},{"id":"logic","type":"long-text","prompt":"How do the inputs, logic, and outputs work together?"},{"id":"reliability","type":"long-text","prompt":"What evidence shows how reliable the project is?"},{"id":"next","type":"long-text","prompt":"What would you improve next?"}]
   },
   {
     "id": "grade9_t2_daily_2_loop_debugging_check",
@@ -129,7 +125,7 @@ with grade9_raw_activities as (
     "student_instructions": "Correct the loop program, submit the corrected code/output, and explain each fix.",
     "student_output": "Corrected code, output, and four fix explanations.",
     "materials": "Python editor, loop notes, broken code sample, and class examples.",
-    "fields": [{"id":"corrected_code","type":"long-text","prompt":"Paste or summarize the corrected code."},{"id":"output","type":"long-text","prompt":"What output did the corrected program produce?"},{"id":"fixes","type":"table-grid","prompt":"Explain the four fixes.","rows":[{"id":"fix1","text":"Fix 1"},{"id":"fix2","text":"Fix 2"},{"id":"fix3","text":"Fix 3"},{"id":"fix4","text":"Fix 4"}],"columns":[{"id":"issue","text":"Original issue"},{"id":"correction","text":"Correction"},{"id":"why","text":"Why it works"}]}]
+    "fields": [{"id":"corrected_code","type":"long-text","prompt":"Paste or summarize the corrected code."},{"id":"output","type":"long-text","prompt":"What output did the corrected program produce?"},{"id":"fixes","type":"table-grid","prompt":"Explain the four fixes.","rows":[{"id":"loop_condition","text":"Missing or wrong loop condition"},{"id":"counter_update","text":"Counter update problem"},{"id":"index_problem","text":"String/list index problem"},{"id":"output_placement","text":"Output or print placement problem"}],"columns":[{"id":"issue","text":"Original issue"},{"id":"correction","text":"Correction"},{"id":"why","text":"Why it works"}]}]
   },
   {
     "id": "grade9_t2_daily_3_data_collection_plan",
@@ -144,7 +140,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the data collection plan, list survey or measurement items, and describe how the dataset will be organized.",
     "student_output": "Data question, collection plan, privacy rule, and organized table plan.",
     "materials": "Dataset or survey plan, Google Classroom, spreadsheet tool, and privacy notes.",
-    "fields": [{"id":"question","type":"long-text","prompt":"Write the measurable data question."},{"id":"items","type":"table-grid","prompt":"Plan 5 survey or measurement items.","rows":[{"id":"item1","text":"Item 1"},{"id":"item2","text":"Item 2"},{"id":"item3","text":"Item 3"},{"id":"item4","text":"Item 4"},{"id":"item5","text":"Item 5"}],"columns":[{"id":"wording","text":"Question/item wording"},{"id":"data_type","text":"Expected data type"},{"id":"unit_category","text":"Unit or category"}]},{"id":"method","type":"short-text","prompt":"How will you collect or enter the data?"},{"id":"privacy","type":"long-text","prompt":"What privacy rule will you follow?"},{"id":"quality","type":"long-text","prompt":"List two data quality issues you checked."}]
+    "fields": [{"id":"question","type":"long-text","prompt":"Write the measurable data question."},{"id":"items","type":"table-grid","prompt":"Plan 5 survey or measurement items.","rows":[{"id":"main_measurement","text":"Main measurement or survey question"},{"id":"category_field","text":"Category or group field"},{"id":"context_field","text":"Time, location, or context field"},{"id":"quality_check","text":"Quality check field"},{"id":"optional_note","text":"Optional note or consent field"}],"columns":[{"id":"wording","text":"Question/item wording"},{"id":"data_type","text":"Expected data type"},{"id":"unit_category","text":"Unit or category"}]},{"id":"method","type":"short-text","prompt":"How will you collect or enter the data?"},{"id":"privacy","type":"long-text","prompt":"What privacy rule will you follow?"},{"id":"quality","type":"long-text","prompt":"List two data quality issues you checked."}]
   },
   {
     "id": "grade9_t2_daily_4_chart_interpretation_check",
@@ -178,7 +174,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the data report draft and record feedback from the 30-second understanding test.",
     "student_output": "One-page data report draft and feedback response.",
     "materials": "Clean dataset, chart, report draft, prototype idea, and feedback notes.",
-    "fields": [{"id":"title","type":"short-text","prompt":"Report title"},{"id":"question","type":"long-text","prompt":"Data question"},{"id":"evidence","type":"table-grid","prompt":"Write 3 evidence statements.","rows":[{"id":"e1","text":"Evidence 1"},{"id":"e2","text":"Evidence 2"},{"id":"e3","text":"Evidence 3"}],"columns":[{"id":"statement","text":"Evidence statement"}]},{"id":"limitation","type":"long-text","prompt":"What is one limitation?"},{"id":"recommendation","type":"long-text","prompt":"What recommendation follows from the evidence?"},{"id":"feedback","type":"long-text","prompt":"What feedback did you receive, and what will you change?"}]
+    "fields": [{"id":"title","type":"short-text","prompt":"Report title"},{"id":"question","type":"long-text","prompt":"Data question"},{"id":"evidence","type":"table-grid","prompt":"Write 3 evidence statements.","rows":[{"id":"pattern_statement","text":"Pattern or trend statement"},{"id":"comparison_statement","text":"Comparison statement"},{"id":"limitation_statement","text":"Limitation or outlier statement"}],"columns":[{"id":"statement","text":"Evidence statement"}]},{"id":"limitation","type":"long-text","prompt":"What is one limitation?"},{"id":"recommendation","type":"long-text","prompt":"What recommendation follows from the evidence?"},{"id":"feedback","type":"long-text","prompt":"What feedback did you receive, and what will you change?"}]
   },
   {
     "id": "grade9_t2_appreciation_1_data_teamwork_checklist",
@@ -193,7 +189,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the collaboration checklist and record at least three cleaned values.",
     "student_output": "Data teamwork checklist and change log.",
     "materials": "Messy dataset, cleaning notes, Tinkercad model evidence when used, and checklist.",
-    "fields": [{"id":"checklist","type":"checklist","prompt":"Pair programming and data teamwork checklist","items":[{"id":"responsibility","text":"I worked responsibly with the dataset."},{"id":"respect","text":"I communicated respectfully."},{"id":"shared","text":"I shared work fairly."},{"id":"care","text":"I handled data carefully."},{"id":"persistence","text":"I showed persistence during cleaning."}]},{"id":"changes","type":"table-grid","prompt":"Record at least 3 cleaned values.","rows":[{"id":"c1","text":"Change 1"},{"id":"c2","text":"Change 2"},{"id":"c3","text":"Change 3"}],"columns":[{"id":"before","text":"Before"},{"id":"after","text":"After"},{"id":"reason","text":"Reason"}]}]
+    "fields": [{"id":"checklist","type":"checklist","prompt":"Pair programming and data teamwork checklist","items":[{"id":"responsibility","text":"I worked responsibly with the dataset."},{"id":"respect","text":"I communicated respectfully."},{"id":"shared","text":"I shared work fairly."},{"id":"care","text":"I handled data carefully."},{"id":"persistence","text":"I showed persistence during cleaning."}]},{"id":"changes","type":"table-grid","prompt":"Record at least 3 cleaned values.","rows":[{"id":"duplicate_or_inconsistent","text":"Duplicate or inconsistent value"},{"id":"missing_or_unclear","text":"Missing or unclear value"},{"id":"wrong_type_or_unit","text":"Wrong type, unit, or category"}],"columns":[{"id":"before","text":"Before"},{"id":"after","text":"After"},{"id":"reason","text":"Reason"}]}]
   },
   {
     "id": "grade9_t2_appreciation_2_data_project_readiness",
@@ -212,20 +208,18 @@ with grade9_raw_activities as (
   },
   {
     "id": "grade9_t2_exam_data_project_presentation",
-    "title": "G9 T2 Exam Project - Data Project Presentation",
+    "title": "G9 T2 Exam Project - Data Project Presentation Classroom Check",
     "class_slot": "August Weeks 10-12 exam project",
-    "description": "Students submit the final data product with question, method, clean data, chart, conclusion, limitation, recommendation, final product, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm final data project evidence sent through Classroom or presented to the teacher and complete project reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the data project.",
-    "student_instructions": "Submit the final data project link or screenshot evidence and complete the project reflection prompts.",
-    "student_output": "Final data product, dataset evidence, presentation evidence, and reflection.",
-    "materials": "Clean dataset, chart, report/dashboard/infographic, Tinkercad model if used, and rubric.",
-    "checklist": [{"id":"question","text":"The project includes a clear data question and method.","required":true},{"id":"clean_data","text":"The project includes clean data or dataset evidence.","required":true},{"id":"chart","text":"The project includes at least one chart or visualization.","required":true},{"id":"conclusion","text":"The conclusion matches the evidence and includes a limitation.","required":true},{"id":"product","text":"The final product and reflection are submitted.","required":true}],
-    "reflections": [{"id":"finding","prompt":"What is the main finding from your data?","required":true},{"id":"limitation","prompt":"What limitation should the audience remember?","required":true},{"id":"revision","prompt":"What revision improved your final product?","required":true}]
+    "student_instructions": "Confirm your final data project evidence was sent in Classroom or presented to the teacher, then complete the project checklist and reflections.",
+    "student_output": "Classroom or presentation confirmation, final product self-check, and reflection.",
+    "materials": "Clean dataset, chart, report/dashboard/infographic, Tinkercad model if used, rubric, and Classroom submission.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload data project files, links, screenshots, or dashboards in this app. Submit the final evidence in Classroom or present it for the teacher."},{"id":"submission_status","type":"select","prompt":"What is the data project evidence status?","items":[{"id":"classroom_sent","text":"I sent the required evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked the final product/presentation."},{"id":"need_makeup","text":"I need makeup or resubmission time."}]},{"id":"checklist","type":"checklist","prompt":"Data project self-check","items":[{"id":"question","text":"The project includes a clear data question and method."},{"id":"clean_data","text":"The project includes clean data or dataset evidence."},{"id":"chart","text":"The project includes at least one chart or visualization."},{"id":"conclusion","text":"The conclusion matches the evidence and includes a limitation."},{"id":"product","text":"The final product and reflection are submitted."}]},{"id":"finding","type":"long-text","prompt":"What is the main finding from your data?"},{"id":"limitation","type":"long-text","prompt":"What limitation should the audience remember?"},{"id":"revision","type":"long-text","prompt":"What revision improved your final product?"}]
   },
   {
     "id": "grade9_t3_daily_2_image_sound_representation_check",
@@ -255,7 +249,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the scenario quiz and justify three answers with evidence from the scenario.",
     "student_output": "Scenario answers, protections, and three justification sentences.",
     "materials": "Cybersecurity notes, scenario cards or worksheet, and risk/protection vocabulary.",
-    "fields": [{"id":"scenario_answers","type":"table-grid","prompt":"Record your scenario quiz answers.","rows":[{"id":"s1","text":"Scenario 1"},{"id":"s2","text":"Scenario 2"},{"id":"s3","text":"Scenario 3"},{"id":"s4","text":"Scenario 4"},{"id":"s5","text":"Scenario 5"},{"id":"s6","text":"Scenario 6"}],"columns":[{"id":"threat","text":"Threat"},{"id":"protection","text":"Best protection"}]},{"id":"justifications","type":"table-grid","prompt":"Justify three answers.","rows":[{"id":"j1","text":"Justification 1"},{"id":"j2","text":"Justification 2"},{"id":"j3","text":"Justification 3"}],"columns":[{"id":"scenario","text":"Scenario number"},{"id":"reason","text":"Reason"}]},{"id":"recommendation","type":"long-text","prompt":"Write one recommendation based on the highest-risk item."}]
+    "fields": [{"id":"scenario_answers","type":"table-grid","prompt":"Record your scenario quiz answers.","rows":[{"id":"password_request","text":"Password request message"},{"id":"free_download","text":"Free-download bait"},{"id":"unknown_attachment","text":"Unknown attachment"},{"id":"impersonated_account","text":"Impersonated school account"},{"id":"public_wifi","text":"Public Wi-Fi login"},{"id":"overshared_data","text":"Overshared personal data"}],"columns":[{"id":"threat","text":"Threat"},{"id":"protection","text":"Best protection"}]},{"id":"justifications","type":"table-grid","prompt":"Justify three answers.","rows":[{"id":"highest_risk","text":"Highest-risk answer"},{"id":"best_protection","text":"Most effective protection"},{"id":"most_confusing","text":"Most confusing scenario"}],"columns":[{"id":"scenario","text":"Scenario number"},{"id":"reason","text":"Reason"}]},{"id":"recommendation","type":"long-text","prompt":"Write one recommendation based on the highest-risk item."}]
   },
   {
     "id": "grade9_t3_daily_4_risk_map",
@@ -288,7 +282,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the STEM project proposal and record the result of one practice prototype feature.",
     "student_output": "STEM project proposal and practice prototype result.",
     "materials": "Project rubric, planning sheet, Tinkercad or Arduino/Freenove tools, project logbook, and approved resources.",
-    "fields": [{"id":"problem","type":"long-text","prompt":"What problem will the STEM project address?"},{"id":"users_goal","type":"long-text","prompt":"Who are the users, and what is the project goal?"},{"id":"tools","type":"long-text","prompt":"Which tools or platforms will you use?"},{"id":"materials","type":"long-text","prompt":"List materials or files needed."},{"id":"tests","type":"table-grid","prompt":"Write 3 test criteria.","rows":[{"id":"test1","text":"Test criterion 1"},{"id":"test2","text":"Test criterion 2"},{"id":"test3","text":"Test criterion 3"}],"columns":[{"id":"criterion","text":"Criterion"},{"id":"evidence","text":"Expected evidence"}]},{"id":"prototype_result","type":"long-text","prompt":"What practice prototype feature did you test, and what happened?"}]
+    "fields": [{"id":"problem","type":"long-text","prompt":"What problem will the STEM project address?"},{"id":"users_goal","type":"long-text","prompt":"Who are the users, and what is the project goal?"},{"id":"tools","type":"long-text","prompt":"Which tools or platforms will you use?"},{"id":"materials","type":"long-text","prompt":"List materials or files needed."},{"id":"tests","type":"table-grid","prompt":"Write 3 test criteria.","rows":[{"id":"functionality","text":"Functionality test"},{"id":"user_audience","text":"User or audience test"},{"id":"safety_reliability","text":"Safety or reliability test"}],"columns":[{"id":"criterion","text":"Criterion"},{"id":"evidence","text":"Expected evidence"}]},{"id":"prototype_result","type":"long-text","prompt":"What practice prototype feature did you test, and what happened?"}]
   },
   {
     "id": "grade9_t3_appreciation_1_digital_responsibility",
@@ -322,20 +316,18 @@ with grade9_raw_activities as (
   },
   {
     "id": "grade9_t3_exam_stem_project_presentation",
-    "title": "G9 T3 Exam Project - STEM Project Presentation",
+    "title": "G9 T3 Exam Project - STEM Project Presentation Classroom Check",
     "class_slot": "November-December Weeks 10-12 exam project",
-    "description": "Students submit final STEM project evidence with problem, tools, design choices, testing evidence, improvement, limitation, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm final STEM project evidence sent through Classroom or observed during the presentation and complete project reflections.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use as the exam project evidence wrapper for the STEM project presentation.",
-    "student_instructions": "Submit final STEM project evidence and complete the reflection prompts.",
-    "student_output": "Final STEM product evidence, logbook, and reflection.",
-    "materials": "Prototype or digital product, project logbook, photos/screenshots, presentation notes, and rubric.",
-    "checklist": [{"id":"problem","text":"The evidence explains the problem and users.","required":true},{"id":"design","text":"The evidence shows tools, materials, and design choices.","required":true},{"id":"testing","text":"The evidence includes testing results.","required":true},{"id":"improvement","text":"The evidence explains one improvement and limitation.","required":true},{"id":"reflection","text":"The final reflection is complete.","required":true}],
-    "reflections": [{"id":"goal","prompt":"How does the project meet its goal?","required":true},{"id":"test","prompt":"What testing evidence is strongest?","required":true},{"id":"limitation","prompt":"What limitation remains?","required":true}]
+    "student_instructions": "Confirm your final STEM project evidence was sent in Classroom or observed by the teacher, then complete the project checklist and reflections.",
+    "student_output": "Classroom or presentation confirmation, project self-check, logbook reflection, and limitation note.",
+    "materials": "Prototype or digital product, project logbook, photos/screenshots, presentation notes, rubric, and Classroom submission.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload STEM project files, photos, videos, or links in this app. Submit final evidence in Classroom or demonstrate the project during the presentation."},{"id":"submission_status","type":"select","prompt":"What is the STEM project evidence status?","items":[{"id":"classroom_sent","text":"I sent the required evidence in Classroom."},{"id":"teacher_observed","text":"The teacher observed the final project/presentation."},{"id":"need_makeup","text":"I need makeup or resubmission time."}]},{"id":"checklist","type":"checklist","prompt":"STEM project self-check","items":[{"id":"problem","text":"The evidence explains the problem and users."},{"id":"design","text":"The evidence shows tools, materials, and design choices."},{"id":"testing","text":"The evidence includes testing results."},{"id":"improvement","text":"The evidence explains one improvement and limitation."},{"id":"reflection","text":"The final reflection is complete."}]},{"id":"goal","type":"long-text","prompt":"How does the project meet its goal?"},{"id":"test","type":"long-text","prompt":"What testing evidence is strongest?"},{"id":"limitation","type":"long-text","prompt":"What limitation remains?"}]
   },
   {
     "id": "grade9_formative_t1_w1_device_system_sort",
@@ -632,7 +624,7 @@ with grade9_raw_activities as (
     "student_instructions": "Describe the list, rule, two test data sets, and comparison between for and while loops.",
     "student_output": "For loop plan and test summary.",
     "materials": "Python editor, sample lists, and loop notes.",
-    "fields": [{"id":"rule","type":"long-text","prompt":"What will your for loop count, filter, or label?"},{"id":"tests","type":"table-grid","prompt":"Plan two data set tests.","rows":[{"id":"set1","text":"Data set 1"},{"id":"set2","text":"Data set 2"}],"columns":[{"id":"data","text":"Data"},{"id":"expected","text":"Expected result"}]},{"id":"compare","type":"long-text","prompt":"Compare for loops and while loops in two sentences."}]
+    "fields": [{"id":"rule","type":"long-text","prompt":"What will your for loop count, filter, or label?"},{"id":"tests","type":"table-grid","prompt":"Plan two data set tests.","rows":[{"id":"typical_dataset","text":"Typical data set"},{"id":"edge_case_dataset","text":"Edge-case data set"}],"columns":[{"id":"data","text":"Data"},{"id":"expected","text":"Expected result"}]},{"id":"compare","type":"long-text","prompt":"Compare for loops and while loops in two sentences."}]
   },
   {
     "id": "grade9_formative_t2_w3_loop_error_practice",
@@ -729,20 +721,18 @@ with grade9_raw_activities as (
   },
   {
     "id": "grade9_formative_t2_w6_tinkercad_data_model_evidence",
-    "title": "G9 T2 Practice - Tinkercad Data Model Evidence",
+    "title": "G9 T2 Practice - Tinkercad Data Model Classroom Check",
     "class_slot": "July Week 6, 90-minute class",
-    "description": "Students submit evidence of a simple Tinkercad model connected to one category, object, or display idea from the data topic.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the Tinkercad data model evidence sent through Classroom and explain how the model connects to the data topic.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formative",
     "estimated_minutes": 20,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use when Tinkercad is used to support the data topic.",
-    "student_instructions": "Submit the model link or screenshot and explain how it connects to the data topic.",
-    "student_output": "Tinkercad evidence and data connection note.",
-    "materials": "Tinkercad access, dataset topic, screenshot or link tool.",
-    "checklist": [{"id":"model","text":"The evidence shows a simple model or mock-up.","required":true},{"id":"connection","text":"The model connects to a data topic or category.","required":true}],
-    "reflections": [{"id":"connection_note","prompt":"How does this model connect to the data topic?","required":true}]
+    "student_instructions": "Confirm your Tinkercad model evidence was sent in Classroom or checked by the teacher, then complete the model self-check and connection note.",
+    "student_output": "Classroom confirmation and data model connection note.",
+    "materials": "Tinkercad access, dataset topic, screenshot or link in Classroom.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload model links or screenshots in this app. Submit them in Classroom or show the model to the teacher during class."},{"id":"submission_status","type":"select","prompt":"What is the model evidence status?","items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked the model during class."},{"id":"need_help","text":"I need help or makeup time."}]},{"id":"checklist","type":"checklist","prompt":"Tinkercad data model self-check","items":[{"id":"model","text":"The evidence shows a simple model or mock-up."},{"id":"connection","text":"The model connects to a data topic or category."}]},{"id":"connection_note","type":"long-text","prompt":"How does this model connect to the data topic?"}]
   },
   {
     "id": "grade9_formative_t2_w7_chart_interpretation_practice",
@@ -938,7 +928,7 @@ with grade9_raw_activities as (
     "student_instructions": "Analyze four online-service scenarios and write one personal data rule for project research.",
     "student_output": "Scenario analysis and personal data rule.",
     "materials": "Online-service scenarios and privacy notes.",
-    "fields": [{"id":"scenarios","type":"table-grid","prompt":"Analyze four online-service scenarios.","rows":[{"id":"s1","text":"Scenario 1"},{"id":"s2","text":"Scenario 2"},{"id":"s3","text":"Scenario 3"},{"id":"s4","text":"Scenario 4"}],"columns":[{"id":"data","text":"Data collected"},{"id":"matter","text":"Why it matters"},{"id":"choice","text":"Safer choice"}]},{"id":"rule","type":"long-text","prompt":"Write one personal data rule for project research."}]
+    "fields": [{"id":"scenarios","type":"table-grid","prompt":"Analyze four online-service scenarios.","rows":[{"id":"account_signup","text":"Account sign-up form"},{"id":"location_sharing","text":"Location-sharing app"},{"id":"public_comment","text":"Public comment post"},{"id":"cloud_file_share","text":"Cloud file share"}],"columns":[{"id":"data","text":"Data collected"},{"id":"matter","text":"Why it matters"},{"id":"choice","text":"Safer choice"}]},{"id":"rule","type":"long-text","prompt":"Write one personal data rule for project research."}]
   },
   {
     "id": "grade9_formative_t3_w3_social_engineering_warning_signs",
@@ -987,7 +977,7 @@ with grade9_raw_activities as (
     "student_instructions": "Practice three security scenarios and correct one uncertain answer using notes.",
     "student_output": "Practice scenario answers.",
     "materials": "Security scenario cards, threat vocabulary, and protection notes.",
-    "fields": [{"id":"practice","type":"table-grid","prompt":"Practice three security scenarios.","rows":[{"id":"s1","text":"Scenario 1"},{"id":"s2","text":"Scenario 2"},{"id":"s3","text":"Scenario 3"}],"columns":[{"id":"threat","text":"Threat"},{"id":"protection","text":"Protection"},{"id":"reason","text":"Reason"}]},{"id":"correction","type":"long-text","prompt":"Which answer did you correct or confirm with notes?"}]
+    "fields": [{"id":"practice","type":"table-grid","prompt":"Practice three security scenarios.","rows":[{"id":"password_request","text":"Password request"},{"id":"suspicious_download","text":"Suspicious download"},{"id":"public_wifi","text":"Public Wi-Fi login"}],"columns":[{"id":"threat","text":"Threat"},{"id":"protection","text":"Protection"},{"id":"reason","text":"Reason"}]},{"id":"correction","type":"long-text","prompt":"Which answer did you correct or confirm with notes?"}]
   },
   {
     "id": "grade9_formative_t3_w5_draft_risk_map",
@@ -1035,7 +1025,7 @@ with grade9_raw_activities as (
     "student_instructions": "Complete the first project plan and update the logbook with one feedback note.",
     "student_output": "First STEM project plan.",
     "materials": "Project logbook, planning sheet, prototype tool access, and feedback notes.",
-    "fields": [{"id":"goal","type":"long-text","prompt":"What is the project goal?"},{"id":"roles_materials","type":"long-text","prompt":"List roles and materials."},{"id":"tools","type":"long-text","prompt":"Which digital tools or platforms will you use?"},{"id":"tests","type":"table-grid","prompt":"Plan three tests.","rows":[{"id":"test1","text":"Test 1"},{"id":"test2","text":"Test 2"},{"id":"test3","text":"Test 3"}],"columns":[{"id":"question","text":"Test question"},{"id":"evidence","text":"Evidence expected"}]},{"id":"feedback","type":"long-text","prompt":"What feedback note did you add to the logbook?"}]
+    "fields": [{"id":"goal","type":"long-text","prompt":"What is the project goal?"},{"id":"roles_materials","type":"long-text","prompt":"List roles and materials."},{"id":"tools","type":"long-text","prompt":"Which digital tools or platforms will you use?"},{"id":"tests","type":"table-grid","prompt":"Plan three tests.","rows":[{"id":"function_test","text":"Function test"},{"id":"user_audience_test","text":"User or audience test"},{"id":"reliability_safety_test","text":"Reliability or safety test"}],"columns":[{"id":"question","text":"Test question"},{"id":"evidence","text":"Evidence expected"}]},{"id":"feedback","type":"long-text","prompt":"What feedback note did you add to the logbook?"}]
   },
   {
     "id": "grade9_formative_t3_w7_risk_map_practice",
@@ -1057,20 +1047,18 @@ with grade9_raw_activities as (
   },
   {
     "id": "grade9_formative_t3_w7_proof_of_concept_evidence",
-    "title": "G9 T3 Practice - STEM Proof of Concept Evidence",
+    "title": "G9 T3 Practice - STEM Proof of Concept Classroom Check",
     "class_slot": "October Week 7, 90-minute class",
-    "description": "Students submit evidence of one proof of concept built with the approved project tool.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm proof-of-concept evidence sent through Classroom or checked by the teacher and write the next build step.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formative",
     "estimated_minutes": 20,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
+    "template_id": "worksheet",
     "teacher_note": "Use after the risk map daily grade as the next build-step evidence.",
-    "student_instructions": "Submit proof-of-concept evidence and write the next build step.",
-    "student_output": "Proof-of-concept evidence and next build step.",
-    "materials": "Approved project tool, Tinkercad or Arduino/Freenove materials, screenshots/photos, and logbook.",
-    "checklist": [{"id":"approved_tool","text":"The evidence uses the approved project tool.","required":true},{"id":"proof","text":"The evidence shows a small test of the idea.","required":true}],
-    "reflections": [{"id":"next_step","prompt":"What is the next build step?","required":true}]
+    "student_instructions": "Confirm your proof-of-concept evidence was sent in Classroom or checked by the teacher, then complete the self-check and next build step.",
+    "student_output": "Classroom confirmation, proof-of-concept self-check, and next build step.",
+    "materials": "Approved project tool, Tinkercad or Arduino/Freenove materials, screenshots/photos in Classroom, and logbook.",
+    "fields": [{"id":"evidence_reminder","type":"instructions","prompt":"Classroom evidence reminder","helperText":"Do not upload proof-of-concept screenshots, photos, or links in this app. Submit them in Classroom or show the build to the teacher during class."},{"id":"submission_status","type":"select","prompt":"What is the proof-of-concept evidence status?","items":[{"id":"classroom_sent","text":"I sent the evidence in Classroom."},{"id":"teacher_checked","text":"The teacher checked it during class."},{"id":"need_help","text":"I need help or makeup time."}]},{"id":"checklist","type":"checklist","prompt":"Proof-of-concept self-check","items":[{"id":"approved_tool","text":"The evidence uses the approved project tool."},{"id":"proof","text":"The evidence shows a small test of the idea."}]},{"id":"next_step","type":"long-text","prompt":"What is the next build step?"}]
   },
   {
     "id": "grade9_formative_t3_w10_build_log_first_feature",
@@ -1085,7 +1073,7 @@ with grade9_raw_activities as (
     "student_instructions": "Document the first feature or model section and write the next action.",
     "student_output": "First feature build log.",
     "materials": "Final project plan, logbook, prototype tools, and rubric.",
-    "fields": [{"id":"feature","type":"long-text","prompt":"What first feature or model section did you build?"},{"id":"tool","type":"short-text","prompt":"What tool did you use?"},{"id":"test","type":"table-grid","prompt":"Record the first test.","rows":[{"id":"test1","text":"First test"}],"columns":[{"id":"condition","text":"Test condition"},{"id":"expected","text":"Expected result"},{"id":"actual","text":"Actual result"}]},{"id":"next","type":"short-text","prompt":"What is the next action?"}]
+    "fields": [{"id":"feature","type":"long-text","prompt":"What first feature or model section did you build?"},{"id":"tool","type":"short-text","prompt":"What tool did you use?"},{"id":"test","type":"table-grid","prompt":"Record the first test.","rows":[{"id":"first_feature_test","text":"First feature test"}],"columns":[{"id":"condition","text":"Test condition"},{"id":"expected","text":"Expected result"},{"id":"actual","text":"Actual result"}]},{"id":"next","type":"short-text","prompt":"What is the next action?"}]
   },
   {
     "id": "grade9_formative_t3_w11_testing_improvement_table",

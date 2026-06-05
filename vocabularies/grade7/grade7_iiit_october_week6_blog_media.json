@@ -35,7 +35,9 @@
       "definition": "A title for a section of text.",
       "example": "The heading named the main section of the post.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "section title"
+      ],
       "antonyms": []
     },
     {
@@ -43,7 +45,9 @@
       "definition": "Short text that explains an image.",
       "example": "The caption described the image under the paragraph.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "image note"
+      ],
       "antonyms": []
     },
     {
@@ -51,7 +55,9 @@
       "definition": "A group of sentences about one idea.",
       "example": "The paragraph explained one idea with supporting details.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "text block"
+      ],
       "antonyms": []
     },
     {
@@ -59,7 +65,9 @@
       "definition": "How text and images are arranged.",
       "example": "The layout placed the image next to the safety tip.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "arrangement"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +75,9 @@
       "definition": "Words that ask the reader to do something.",
       "example": "The call to action asked readers to protect their passwords.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "action request"
+      ],
       "antonyms": []
     },
     {
@@ -75,7 +85,10 @@
       "definition": "A note that says who made or provided something.",
       "example": "The credit named the creator of the image.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "citation",
+        "acknowledgment"
+      ],
       "antonyms": []
     }
   ]

@@ -27,32 +27,46 @@
       "definition": "Changing place or position.",
       "example": "The robot movement started slowly.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "motion"
+      ],
       "antonyms": []
     },
     {
       "word": "output",
-      "definition": "What a device does or shows after a program runs.",
+      "definition": "A robot action students can name and explain, such as movement, light, or sound.",
       "example": "A sound can be an output.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "sensor",
-      "definition": "A part that detects something around it.",
+      "definition": "A robot part students can identify as an input source.",
       "example": "The sensor detected an object.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "detector"
+      ],
       "antonyms": []
     },
     {
       "word": "debug",
-      "definition": "To find and fix a problem in a program.",
+      "definition": "To explain how a wrong robot action was found and fixed.",
       "example": "We debug when the robot turns the wrong way.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "troubleshoot",
+        "fix"
+      ],
+      "antonyms": [
+        "break"
+      ]
     },
     {
       "word": "card",
@@ -75,7 +89,9 @@
       "definition": "Something a device or person does.",
       "example": "The robot action was a short turn.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "activity"
+      ],
       "antonyms": []
     }
   ],

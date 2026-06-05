@@ -53,7 +53,9 @@
       "definition": "A path that electricity can follow.",
       "example": "The circuit connected power, ground, a resistor, and an LED.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "electric path"
+      ],
       "antonyms": []
     },
     {
@@ -77,7 +79,9 @@
       "definition": "Electricity used to run a circuit.",
       "example": "The power wire carried electricity from the board to the circuit.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "electricity"
+      ],
       "antonyms": []
     },
     {
@@ -85,7 +89,9 @@
       "definition": "The return path for electricity in a circuit.",
       "example": "The ground wire completed the circuit back to the Arduino.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "return path"
+      ],
       "antonyms": []
     },
     {
@@ -93,15 +99,19 @@
       "definition": "A part that limits electric current.",
       "example": "The resistor protected the LED from too much current.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "current limiter"
+      ],
       "antonyms": []
     },
     {
       "word": "LED",
-      "definition": "A small light that a program can control.",
+      "definition": "An Arduino output light controlled by a digital pin.",
       "example": "The LED turned on when the output pin was HIGH.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "light"
+      ],
       "antonyms": []
     }
   ]

@@ -27,7 +27,9 @@
       "definition": "Careful actions that prevent harm or damage.",
       "example": "The group followed safety rules before connecting power to the board.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "protection"
+      ],
       "antonyms": []
     },
     {
@@ -35,15 +37,20 @@
       "definition": "A list used to make sure steps are done.",
       "example": "The checklist reminded the team to check wiring before uploading code.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "step list"
+      ],
       "antonyms": []
     },
     {
       "word": "material",
       "definition": "An item or part used for work.",
-      "example": "The materials tray included wires, a resistor, an LED, and the Arduino.",
+      "example": "One material in the tray was a resistor.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "part",
+        "supply"
+      ],
       "antonyms": []
     },
     {
@@ -59,16 +66,24 @@
       "definition": "A step that tells what to do.",
       "example": "The student followed the instruction to connect ground before testing.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "command",
+        "step"
+      ],
       "antonyms": []
     },
     {
       "word": "fix",
       "definition": "A change that solves a problem.",
-      "example": "The team fixed the circuit by moving the LED to the correct row.",
+      "example": "The team can fix the circuit by moving the LED to the correct row.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "correct",
+        "repair"
+      ],
+      "antonyms": [
+        "break"
+      ]
     }
   ]
 }

@@ -1,0 +1,27 @@
+Gimkit Spreadsheet Import Template,,,,
+Question,Correct Answer,Incorrect Answer 1,Incorrect Answer 2,Incorrect Answer 3
+Which data question is best for a class survey?,How many minutes classmates spend reading each day?,Do people like things?,Is school good?,What is the best answer?
+What should a data collection plan include?,"Question, items, data types, method, and privacy rule",Only a chart color,Only a file name,No collection method
+Why identify data type before collecting data?,It helps organize and analyze responses correctly,It makes privacy unnecessary,It removes the question,It hides labels
+Which item protects privacy?,Do not collect names if they are not needed,Publish personal details,Ask for passwords,Share private messages
+What is messy data?,"Data with mistakes, unclear values, blanks, or inconsistent wording",A perfectly labeled chart,A clean dataset,A final recommendation
+Which value likely needs cleaning?,'ten' in a minutes column that should use numbers,12 in a minutes column,15 in a minutes column,8 in a minutes column
+Why keep a change log?,To record what was changed and why,To hide data cleaning,To replace the chart,To skip notes
+Which cleaning decision is responsible?,Fix a clear typo and record it in the change log,Change values to make the result nicer,Delete data without reason,Hide impossible values
+What is an outlier?,A value very different from the others,The title of a chart,The data source,A privacy rule
+How should you treat an outlier?,Investigate and explain it instead of deleting automatically,Always delete it,Ignore it completely,Make every value match it
+Which chart compares categories?,Bar chart,Line chart only,Scatter plot only,Password table
+Which chart is better for change over time?,Line chart,Random image,Source note,Tinkercad shape only
+What does correlation suggest?,Two variables seem to change together,One value is always wrong,A chart has no labels,Privacy is not needed
+Which conclusion is careful?,"The chart suggests a pattern, but the small sample is a limitation",The chart proves everyone behaves the same,No limitation exists,The data is useless because one value is high
+What should a chart include?,"Title, labels, units or categories, and readable design",Only bars with no labels,Only colors,Only a file name
+What is a limitation?,Something that makes the result less complete or certain,A perfect proof,A chart title,A source link only
+What is an evidence statement?,A sentence that uses data or a chart result,A random opinion,A password,A design color
+Which data sentence is strongest?,"Option A had 18 responses, compared with 9 for option B",A is better,The chart looks nice,People like stuff
+What is an inference?,A careful idea based on evidence,A private password,An untested guess,A chart color
+What is a recommendation?,Advice about what should be done based on evidence,A random command,A hidden source,A label only
+Which product format could explain data clearly?,Dashboard or infographic,Unlabeled folder,Blank document,No chart
+Why test your prototype with a classmate?,To see if the main finding is understandable,To hide the limitation,To remove the chart,To skip cleaning
+What should a one-page data report include?,"Question, chart, data finding, limitation, and recommendation",Only a title,Only a screenshot,Only a shape
+How can Tinkercad connect to data work?,A simple model can represent a category or display idea,It replaces all data,It makes privacy unnecessary,It removes charts
+Which action shows responsible data use?,"Use clear sources, protect privacy, and explain limitations",Change data to fit a preferred answer,Hide the source,Ignore missing values

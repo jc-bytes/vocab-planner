@@ -27,7 +27,9 @@
       "definition": "Lining objects up neatly.",
       "example": "The student used alignment to line up the poster icons.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "lining up"
+      ],
       "antonyms": []
     },
     {
@@ -49,25 +51,31 @@
     {
       "word": "duplicate",
       "definition": "To make a copy.",
-      "example": "The student duplicated the shape to make a matching icon set.",
+      "example": "The student can duplicate the shape to make a matching icon set.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "copy"
+      ],
       "antonyms": []
     },
     {
       "word": "resize",
       "definition": "To change size.",
-      "example": "Resizing the logo made it fit inside the corner of the poster.",
+      "example": "The student can resize the logo to fit inside the corner of the poster.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "change size"
+      ],
       "antonyms": []
     },
     {
       "word": "rotate",
       "definition": "To turn an object.",
-      "example": "The arrow was rotated to point toward the call to action.",
+      "example": "The student can rotate the arrow to point toward the call to action.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "turn"
+      ],
       "antonyms": []
     }
   ]

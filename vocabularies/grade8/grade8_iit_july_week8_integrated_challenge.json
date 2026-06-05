@@ -32,34 +32,50 @@
     },
     {
       "word": "threshold",
-      "definition": "A limit where an action changes.",
+      "definition": "The safe reading limit used to choose between outputs.",
       "example": "The threshold separated safe readings from alert readings.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "limit",
+        "cutoff"
+      ],
       "antonyms": []
     },
     {
       "word": "input",
-      "definition": "Information that goes into a system or program.",
+      "definition": "A sensor reading or button state used by the Arduino challenge.",
       "example": "The sensor reading was the input for the challenge.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "entry",
+        "data in"
+      ],
+      "antonyms": [
+        "output"
+      ]
     },
     {
       "word": "output",
-      "definition": "What a system or program produces.",
-      "example": "The buzzer and LED were outputs from the project.",
+      "definition": "The LED, buzzer, or other circuit response produced by the challenge.",
+      "example": "One output from the project was the buzzer.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "result",
+        "response"
+      ],
+      "antonyms": [
+        "input"
+      ]
     },
     {
       "word": "challenge",
-      "definition": "A task that takes effort to complete.",
+      "definition": "An Arduino task that combines input, condition, output, and testing.",
       "example": "The challenge asked the team to combine input, process, and output.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "task",
+        "problem"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +83,9 @@
       "definition": "Continuing to try when work is difficult.",
       "example": "Perseverance helped the group keep testing after the first failure.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "persistence"
+      ],
       "antonyms": []
     },
     {
@@ -75,16 +93,24 @@
       "definition": "Trying something to see if it works.",
       "example": "Testing proved which threshold worked best.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "checking",
+        "trial"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A change that makes the Arduino alert clearer or more reliable.",
       "example": "The improvement made the alert easier to notice.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     }
   ]
 }

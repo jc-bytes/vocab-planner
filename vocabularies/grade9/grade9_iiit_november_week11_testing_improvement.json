@@ -27,7 +27,9 @@
       "definition": "Rules used to decide if a test succeeds.",
       "example": "The test criteria required the product to be clear, stable, and easy to explain.",
       "difficulty": 2,
-      "synonyms": [],
+      "synonyms": [
+        "success rules"
+      ],
       "antonyms": []
     },
     {
@@ -35,31 +37,43 @@
       "definition": "A part that does not work well yet.",
       "example": "The weakness was that the warning icon was too small to notice.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "weak point"
+      ],
       "antonyms": []
     },
     {
       "word": "evidence",
-      "definition": "Information that shows what happened or supports an idea.",
+      "definition": "Photos, screenshots, notes, or test results used to support a design decision.",
       "example": "The evidence included a photo of the test and a note about the result.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "proof"
+      ],
       "antonyms": []
     },
     {
       "word": "improvement",
-      "definition": "A change that makes something better.",
+      "definition": "A tested change that makes the product clearer, safer, or more useful.",
       "example": "The improvement made the label larger and easier to read.",
       "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "synonyms": [
+        "upgrade",
+        "better change"
+      ],
+      "antonyms": [
+        "setback"
+      ]
     },
     {
       "word": "limitation",
-      "definition": "Something that makes results less complete or certain.",
+      "definition": "A testing weakness that makes the product results less certain.",
       "example": "One limitation was that only two classmates tested the product.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "constraint",
+        "weakness"
+      ],
       "antonyms": []
     },
     {
@@ -67,7 +81,9 @@
       "definition": "A clear description of how or why something works.",
       "example": "The explanation connected the design choice to the user problem.",
       "difficulty": 1,
-      "synonyms": [],
+      "synonyms": [
+        "clear description"
+      ],
       "antonyms": []
     }
   ]

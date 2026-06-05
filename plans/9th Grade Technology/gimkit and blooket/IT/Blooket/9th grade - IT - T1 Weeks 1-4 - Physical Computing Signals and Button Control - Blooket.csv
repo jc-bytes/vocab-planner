@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,What is physical computing?,"Using code with circuits, sensors, or outputs",Only editing a website title,Only drawing vector shapes,Only writing a search query,20,1
+2,What is input in a physical computing system?,Only the final LED color,A button state or sensor value used by code,A private file,A page heading,20,2
+3,What is process in a system?,The table color,The folder icon,The steps or code that decide what happens,The source credit only,20,3
+4,What is output in a circuit project?,A hidden password,A vector path,A search result,"A response such as an LED, sound, or message",20,4
+5,Why make an input-process-output map?,To explain how the system responds,To avoid building,To hide the output,To remove the code,20,1
+6,What is a digital signal?,A value that smoothly changes forever,A signal with clear values like on or off,A web page section,A campaign icon,20,2
+7,What is an analog signal?,Only on or off,A hidden menu,A value that can change across a range,A vector fill,20,3
+8,What does an LED do?,Stores all code,Measures distance,Opens a website,Produces light as an output,20,4
+9,What does blink mean?,Turn on and off repeatedly,Stay hidden,Delete the sketch,Resize a page,20,1
+10,What is setup in Arduino code?,The part that repeats forever only,The part that runs first,A sensor value,A private message,20,2
+11,What is loop in Arduino code?,A folder for images,A web link,The part that repeats,A robot chassis,20,3
+12,What does delay change?,The board color,The campaign topic,The file extension,How long the program pauses,20,4
+13,Why test different delay values?,To see how timing changes the blink pattern,To make the LED vanish,To avoid uploading,To delete comments,20,1
+14,What is a lab safety checklist for?,Skipping careful setup,Making sure parts and steps are handled carefully,Hiding loose wires,Removing all notes,20,2
+15,What should you check before powering a circuit?,Only the project title,Only the icon color,"Connections, parts, and safe setup",Only the search query,20,3
+16,What does persistence mean during a build?,Give up after one issue,Hide the problem,Unplug random parts,Keep trying carefully when something is difficult,20,4
+17,What is a fix?,A change that solves a problem,A hidden file,A deleted circuit,A website source,20,1
+18,What is a button?,A web page title,A part the user can press,A vector layer,A source note,20,2
+19,What does pressed mean?,The LED is missing,The code is deleted,The button is pushed down or active,The link is broken,20,3
+20,What does released mean?,The output is always red,The sensor is unplugged,The folder is archived,The button is not being pressed,20,4
+21,What is state?,The current condition of something,A private password,A campaign color,A search engine,20,1
+22,What does a condition check?,Only the file name,Whether a rule is true or false,Only the page header,Only a graphic fill,20,2
+23,What does toggle mean?,Delete both states,Hide every output,Switch between two states,Change the source page,20,3
+24,Which output fits a button-toggle system?,A website opens randomly,A vector node moves,A browser deletes history,An LED turns on or off when the state changes,20,4
+25,What should your button-control explanation include?,"Input, condition, state, output, and fix notes",Only the board name,Only the icon,Only a color choice,20,1
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,

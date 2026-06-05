@@ -393,20 +393,34 @@ with grade6_formative_activities as (
     "title": "G6 Formative - May W2 90m - Technology Waste Fact List",
     "class_slot": "May Week 2, 90-minute class",
     "description": "Students collect three facts or tips about reducing technology waste.",
-    "activity_type": "structured-response",
+    "activity_type": "spreadsheet-table",
     "estimated_minutes": 15,
     "teacher_note": "Use after the e-waste sorting check as class-list support.",
-    "student_instructions": "Record three facts or tips and choose the one that would help students most.",
-    "student_output": "Three facts or tips and one explanation.",
+    "student_instructions": "Record three technology-waste facts or tips in the table, then choose the one that would help students most.",
+    "student_output": "Technology-waste fact table and best-tip explanation.",
     "materials": "Teacher-approved sources or class notes.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "data-table",
+      "spreadsheetTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "tips_table", "type": "table-grid", "prompt": "Record three facts or tips.", "required": true, "rows": [{ "id": "tip_1", "text": "Fact or tip 1" }, { "id": "tip_2", "text": "Fact or tip 2" }, { "id": "tip_3", "text": "Fact or tip 3" }], "columns": [{ "id": "source", "text": "Source or note" }, { "id": "why_matters", "text": "Why it matters" }] },
-          { "id": "best_tip", "type": "long-text", "prompt": "Which fact or tip would help students at school most? Explain why.", "required": true }
+        "templateId": "data-table",
+        "columns": [
+          { "id": "focus", "title": "Focus", "type": "text", "width": 160 },
+          { "id": "fact_tip", "title": "Fact or Tip", "type": "text", "width": 220 },
+          { "id": "source", "title": "Source or Note", "type": "text", "width": 180 },
+          { "id": "why_matters", "title": "Why It Matters", "type": "text", "width": 200 }
+        ],
+        "seedData": [
+          ["Reuse or repair", "", "", ""],
+          ["Recycle safely", "", "", ""],
+          ["E-waste safety", "", "", ""]
+        ],
+        "minRows": 3,
+        "maxRows": 6,
+        "allowAddRows": true,
+        "chart": { "enabled": false, "type": "bar", "labelColumnId": "focus", "valueColumnId": "why_matters" },
+        "reflectionPrompts": [
+          { "id": "best_tip", "prompt": "Which fact or tip would help students at school most? Explain why.", "required": true }
         ]
       }
     }
@@ -545,21 +559,37 @@ with grade6_formative_activities as (
     "id": "grade6_formative_2026_06_w3_45_debugging_practice",
     "title": "G6 Formative - June W3 45m - mBot Debugging Practice",
     "class_slot": "June Week 3, 45-minute class",
-    "description": "Students identify simple movement bugs and choose fixes.",
-    "activity_type": "structured-response",
+    "description": "Students sort simple mBot bugs and fixes by problem type.",
+    "activity_type": "card-sort",
     "estimated_minutes": 15,
     "teacher_note": "Use before the mBot movement debugging summative.",
-    "student_instructions": "Choose the best fix for each problem and write one debugging tip.",
-    "student_output": "Completed debugging practice.",
+    "student_instructions": "Sort each debugging fix card under the mBot problem it would help solve.",
+    "student_output": "Completed debugging fix card sort.",
     "materials": "mBot debugging notes.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "category-sort",
+      "cardSortTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "problem_table", "type": "table-grid", "prompt": "Choose the best fix.", "required": true, "rows": [{ "id": "does_not_move", "text": "Robot does not move" }, { "id": "wrong_direction", "text": "Robot moves in the wrong direction" }, { "id": "sensor_no_response", "text": "Sensor does not respond" }], "columns": [{ "id": "best_fix", "text": "Best fix" }, { "id": "why", "text": "Why?" }] },
-          { "id": "debug_tip", "type": "short-text", "prompt": "Write one debugging tip for mBot movement.", "required": true }
+        "templateId": "category-sort",
+        "prompt": "Sort each fix under the problem it would help solve.",
+        "helperText": "Use the problem category first, then think about what part of the robot or program should be checked.",
+        "requireAllCards": true,
+        "orderMode": "none",
+        "categories": [
+          { "id": "does_not_move", "title": "Robot Does Not Move", "helperText": "The robot stays still when the program runs." },
+          { "id": "wrong_direction", "title": "Wrong Direction", "helperText": "The robot moves, but not the way the route needs." },
+          { "id": "sensor_no_response", "title": "Sensor No Response", "helperText": "The robot does not react to the sensor condition." }
+        ],
+        "cards": [
+          { "id": "battery_switch", "text": "Check battery connection and power switch", "helperText": "Power must be ready before movement can start.", "expectedCategoryId": "does_not_move" },
+          { "id": "speed_zero", "text": "Set speed above 0", "helperText": "A zero or very low speed can look like no movement.", "expectedCategoryId": "does_not_move" },
+          { "id": "motor_cable", "text": "Check that motor cables are connected", "helperText": "A loose motor cable can stop the wheels.", "expectedCategoryId": "does_not_move" },
+          { "id": "reverse_turn", "text": "Change left turn to right turn", "helperText": "The turn command may be facing the wrong way.", "expectedCategoryId": "wrong_direction" },
+          { "id": "left_right_motor", "text": "Check left and right motor direction settings", "helperText": "Motor direction affects turning and forward movement.", "expectedCategoryId": "wrong_direction" },
+          { "id": "adjust_time", "text": "Shorten or lengthen movement time", "helperText": "Timing can make the robot overshoot or stop early.", "expectedCategoryId": "wrong_direction" },
+          { "id": "sensor_port", "text": "Check the sensor cable and port", "helperText": "The program must read the correct connected sensor.", "expectedCategoryId": "sensor_no_response" },
+          { "id": "test_reading", "text": "Test the sensor reading by itself", "helperText": "Check the input before using it in the full program.", "expectedCategoryId": "sensor_no_response" },
+          { "id": "move_object", "text": "Move the line or object into sensor range", "helperText": "The sensor needs something clear to detect.", "expectedCategoryId": "sensor_no_response" }
         ]
       }
     }
@@ -696,20 +726,33 @@ with grade6_formative_activities as (
     "title": "G6 Formative - July W7 90m - Sensor Observation Log",
     "class_slot": "July Week 7, 90-minute class",
     "description": "Students record two sensor tests and the responses they observed.",
-    "activity_type": "structured-response",
+    "activity_type": "spreadsheet-table",
     "estimated_minutes": 15,
     "teacher_note": "Use after students test a sensor in two situations.",
-    "student_instructions": "Record what the sensor detected and what changed in each test.",
-    "student_output": "Completed sensor observation log.",
+    "student_instructions": "Record two sensor tests in the table, then answer the reflection prompt.",
+    "student_output": "Sensor observation table and sensor sentence.",
     "materials": "mBot, sensor card, or teacher demonstration.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "data-table",
+      "spreadsheetTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "sensor_log", "type": "table-grid", "prompt": "Record two sensor tests.", "required": true, "rows": [{ "id": "test_1", "text": "Test 1" }, { "id": "test_2", "text": "Test 2" }], "columns": [{ "id": "situation", "text": "Situation" }, { "id": "detected", "text": "What did the sensor detect?" }, { "id": "response", "text": "What response happened?" }] },
-          { "id": "sensor_sentence", "type": "short-text", "prompt": "What does a sensor do?", "required": true }
+        "templateId": "data-table",
+        "columns": [
+          { "id": "test", "title": "Test", "type": "text", "width": 110 },
+          { "id": "situation", "title": "Situation", "type": "text", "width": 180 },
+          { "id": "detected", "title": "Sensor Detected", "type": "text", "width": 180 },
+          { "id": "response", "title": "Response", "type": "text", "width": 180 }
+        ],
+        "seedData": [
+          ["Line or marker test", "", "", ""],
+          ["Obstacle or object test", "", "", ""]
+        ],
+        "minRows": 2,
+        "maxRows": 4,
+        "allowAddRows": true,
+        "chart": { "enabled": false, "type": "bar", "labelColumnId": "test", "valueColumnId": "response" },
+        "reflectionPrompts": [
+          { "id": "sensor_sentence", "prompt": "What does a sensor do?", "required": true }
         ]
       }
     }
@@ -796,7 +839,7 @@ with grade6_formative_activities as (
     "teacher_note": "Use before station practice.",
     "student_instructions": "Sort each card or block example by the robot action it helps create.",
     "student_output": "Completed card-to-action sort.",
-    "materials": "mBot Knowledge Cards Part 1.",
+    "materials": "mBot Knowledge Cards set.",
     "activity_data": {
       "templateId": "category-sort",
       "cardSortTemplate": {
@@ -828,20 +871,33 @@ with grade6_formative_activities as (
     "title": "G6 Formative - August W10 90m - mBot Station Notes",
     "class_slot": "August Week 10, 90-minute class",
     "description": "Students record what worked and what was hard at two mBot practice stations.",
-    "activity_type": "structured-response",
+    "activity_type": "spreadsheet-table",
     "estimated_minutes": 12,
     "teacher_note": "Use during or after station rotation.",
-    "student_instructions": "Record notes for two practice stations.",
-    "student_output": "Completed station notes.",
+    "student_instructions": "Record notes for two practice stations in the table, then choose one card or action to reuse.",
+    "student_output": "Station notes table and challenge-card reflection.",
     "materials": "mBot, station cards, and knowledge cards.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "data-table",
+      "spreadsheetTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "station_table", "type": "table-grid", "prompt": "Record two station notes.", "required": true, "rows": [{ "id": "station_1", "text": "Station 1" }, { "id": "station_2", "text": "Station 2" }], "columns": [{ "id": "card_used", "text": "Card or action used" }, { "id": "worked", "text": "What worked?" }, { "id": "hard", "text": "What was hard?" }] },
-          { "id": "use_in_challenge", "type": "short-text", "prompt": "Which card do you want to use in the STEM challenge?", "required": true }
+        "templateId": "data-table",
+        "columns": [
+          { "id": "station", "title": "Station", "type": "text", "width": 150 },
+          { "id": "card_action", "title": "Card or Action Used", "type": "text", "width": 190 },
+          { "id": "worked", "title": "What Worked?", "type": "text", "width": 180 },
+          { "id": "hard", "title": "What Was Hard?", "type": "text", "width": 180 }
+        ],
+        "seedData": [
+          ["Movement station", "", "", ""],
+          ["Sensor/output station", "", "", ""]
+        ],
+        "minRows": 2,
+        "maxRows": 4,
+        "allowAddRows": true,
+        "chart": { "enabled": false, "type": "bar", "labelColumnId": "station", "valueColumnId": "worked" },
+        "reflectionPrompts": [
+          { "id": "use_in_challenge", "prompt": "Which card or action do you want to use in the STEM challenge?", "required": true }
         ]
       }
     }
@@ -1159,46 +1215,96 @@ with grade6_formative_activities as (
     "id": "grade6_formative_2026_11_w3_45_counter_program_plan",
     "title": "G6 Formative - November W3 45m - micro:bit Counter Program Plan",
     "class_slot": "November Week 3, 45-minute class",
-    "description": "Students plan a counter program with variable, button input, and LED output.",
-    "activity_type": "structured-response",
+    "description": "Students plan a counter program as input, condition, variable update, and LED output.",
+    "activity_type": "flowchart-algorithm",
     "estimated_minutes": 15,
     "teacher_note": "Use before building the counter program.",
-    "student_instructions": "Plan how your counter program will work.",
-    "student_output": "Completed counter program plan.",
+    "student_instructions": "Build a flowchart for a counter program. Show the button input, the condition checked, the variable update, and the LED output.",
+    "student_output": "Counter program flowchart with checklist and explanation.",
     "materials": "micro:bit variable notes and MakeCode example.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "sensor-response",
+      "flowchartTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "variable", "type": "short-text", "prompt": "What variable will remember the counter value?", "required": true },
-          { "id": "increase", "type": "short-text", "prompt": "Which button will increase the value?", "required": true },
-          { "id": "display", "type": "short-text", "prompt": "How will the value appear on the LED display?", "required": true },
-          { "id": "remember", "type": "short-text", "prompt": "What does the variable remember?", "required": true }
+        "templateId": "sensor-response",
+        "prompt": "Plan a micro:bit counter program as a flowchart.",
+        "helperText": "Use Button A as the input, a condition, a variable update, and the LED display output.",
+        "allowedNodeTypes": ["start", "input", "condition", "process", "output", "end"],
+        "requiredNodeTypes": ["start", "input", "condition", "process", "output", "end"],
+        "requireConditionBranches": true,
+        "minNodes": 6,
+        "minEdges": 6,
+        "starterNodes": [
+          { "id": "start", "type": "start", "label": "Start", "position": { "x": 180, "y": 30 } },
+          { "id": "button_input", "type": "input", "label": "Read Button A", "description": "Input from the micro:bit button.", "position": { "x": 180, "y": 140 } },
+          { "id": "condition", "type": "condition", "label": "Button A pressed?", "description": "Check whether the input happened.", "position": { "x": 180, "y": 250 } },
+          { "id": "increase_count", "type": "process", "label": "Increase count by 1", "description": "Change the variable value.", "position": { "x": 20, "y": 370 } },
+          { "id": "show_count", "type": "output", "label": "Show count on LEDs", "description": "Display the variable value.", "position": { "x": 180, "y": 500 } },
+          { "id": "end", "type": "end", "label": "End", "position": { "x": 340, "y": 370 } }
+        ],
+        "starterEdges": [
+          { "id": "edge_start_input", "source": "start", "target": "button_input", "label": "" },
+          { "id": "edge_input_condition", "source": "button_input", "target": "condition", "label": "" },
+          { "id": "edge_condition_yes", "source": "condition", "target": "increase_count", "label": "Yes" },
+          { "id": "edge_condition_no", "source": "condition", "target": "end", "label": "No" },
+          { "id": "edge_increase_show", "source": "increase_count", "target": "show_count", "label": "" },
+          { "id": "edge_show_end", "source": "show_count", "target": "end", "label": "" }
+        ],
+        "checklistItems": [
+          { "id": "input_named", "text": "I named the button input.", "required": true },
+          { "id": "variable_update", "text": "I showed how the counter variable changes.", "required": true },
+          { "id": "led_output", "text": "I included the LED display output.", "required": true }
+        ],
+        "reflectionPrompts": [
+          { "id": "variable_memory", "prompt": "What does the counter variable remember?", "required": true },
+          { "id": "input_output", "prompt": "What input changes the counter, and what output shows the result?", "required": true }
         ]
       }
     }
   },
   {
     "id": "grade6_formative_2026_12_w1_45_everyday_if_then",
-    "title": "G6 Formative - December W1 45m - Everyday If/Then Examples",
+    "title": "G6 Formative - December W1 45m - Everyday If/Then Flowchart",
     "class_slot": "December Week 1, 45-minute class",
-    "description": "Students complete everyday if/then examples before sensor-condition flowcharts.",
-    "activity_type": "structured-response",
-    "estimated_minutes": 10,
+    "description": "Students build one everyday if/then flowchart before sensor-condition flowcharts.",
+    "activity_type": "flowchart-algorithm",
+    "estimated_minutes": 15,
     "teacher_note": "Use before the micro:bit sensor-condition summative.",
-    "student_instructions": "Complete the if/then examples and explain one output.",
-    "student_output": "Completed if/then practice.",
+    "student_instructions": "Build one everyday if/then flowchart. Use classroom lights, rain during recess, or low battery as your condition.",
+    "student_output": "Everyday if/then flowchart and output explanation.",
     "materials": "Condition vocabulary notes.",
     "activity_data": {
-      "templateId": "worksheet",
-      "responseTemplate": {
+      "templateId": "if-then-condition",
+      "flowchartTemplate": {
         "version": 1,
-        "templateId": "worksheet",
-        "blocks": [
-          { "id": "if_then_table", "type": "table-grid", "prompt": "Complete three everyday if/then examples.", "required": true, "rows": [{ "id": "example_1", "text": "Example 1" }, { "id": "example_2", "text": "Example 2" }, { "id": "example_3", "text": "Example 3" }], "columns": [{ "id": "if", "text": "If condition" }, { "id": "then", "text": "Then response" }] },
-          { "id": "output_sentence", "type": "short-text", "prompt": "Write one sentence explaining what an output does.", "required": true }
+        "templateId": "if-then-condition",
+        "prompt": "Build an everyday if/then flowchart.",
+        "helperText": "Choose one condition: classroom lights are off, rain starts during recess, or a device battery is low.",
+        "allowedNodeTypes": ["start", "condition", "output", "end"],
+        "requiredNodeTypes": ["start", "condition", "output", "end"],
+        "requireConditionBranches": true,
+        "minNodes": 5,
+        "minEdges": 4,
+        "starterNodes": [
+          { "id": "start", "type": "start", "label": "Start", "position": { "x": 180, "y": 30 } },
+          { "id": "condition", "type": "condition", "label": "Condition?", "description": "Example: Device battery is low?", "position": { "x": 180, "y": 160 } },
+          { "id": "true_output", "type": "output", "label": "Then response", "description": "What happens if the condition is true?", "position": { "x": 20, "y": 300 } },
+          { "id": "false_output", "type": "output", "label": "Otherwise response", "description": "What happens if the condition is false?", "position": { "x": 340, "y": 300 } },
+          { "id": "end", "type": "end", "label": "End", "position": { "x": 180, "y": 430 } }
+        ],
+        "starterEdges": [
+          { "id": "edge_start_condition", "source": "start", "target": "condition", "label": "" },
+          { "id": "edge_condition_true", "source": "condition", "target": "true_output", "label": "Yes" },
+          { "id": "edge_condition_false", "source": "condition", "target": "false_output", "label": "No" },
+          { "id": "edge_true_end", "source": "true_output", "target": "end", "label": "" },
+          { "id": "edge_false_end", "source": "false_output", "target": "end", "label": "" }
+        ],
+        "checklistItems": [
+          { "id": "condition_clear", "text": "I wrote a clear if condition.", "required": true },
+          { "id": "two_responses", "text": "I included Yes and No responses.", "required": true }
+        ],
+        "reflectionPrompts": [
+          { "id": "output_sentence", "prompt": "Write one sentence explaining what an output does.", "required": true }
         ]
       }
     }

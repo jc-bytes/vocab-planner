@@ -35,7 +35,7 @@ with grade7_raw_activities as (
     "student_output": "Completed interface labeling check.",
     "materials": "mBlock interface screenshot or open mBlock workspace.",
     "fields": [
-      { "id": "interface_table", "type": "table-grid", "prompt": "Label at least 6 mBlock interface areas.", "rows": [{"id":"area_1","text":"Area 1"},{"id":"area_2","text":"Area 2"},{"id":"area_3","text":"Area 3"},{"id":"area_4","text":"Area 4"},{"id":"area_5","text":"Area 5"},{"id":"area_6","text":"Area 6"}], "columns": [{"id":"label","text":"Label"},{"id":"function","text":"What is it used for?"}] },
+      { "id": "interface_table", "type": "table-grid", "prompt": "Label at least 6 mBlock interface areas.", "rows": [{"id":"stage","text":"Stage or preview area"},{"id":"blocks_palette","text":"Blocks palette"},{"id":"coding_area","text":"Coding/script area"},{"id":"sprite_device_panel","text":"Sprite or device panel"},{"id":"run_controls","text":"Green flag and stop controls"},{"id":"extension_device_button","text":"Extension or connect-device button"}], "columns": [{"id":"label","text":"Label"},{"id":"function","text":"What is it used for?"}] },
       { "id": "blocks_to_robot", "type": "long-text", "prompt": "Explain how connected blocks become robot instructions." }
     ]
   },
@@ -67,27 +67,23 @@ with grade7_raw_activities as (
   },
   {
     "id": "grade7_t1_daily_5_obstacle_reaction_demo",
-    "title": "G7 T1 Daily Grade 5 - Reactive Obstacle Program Demonstration",
+    "title": "G7 T1 Daily Grade 5 - Reactive Obstacle Program Classroom Check",
     "class_slot": "April Week 8, 90-minute class",
-    "description": "Students submit evidence of an mBot obstacle reaction using if/else logic and robot feedback.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm the mBot obstacle reaction evidence or demonstration was handled through Classroom or teacher observation, then explain if/else logic and robot feedback.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
-    "teacher_note": "Use for Daily Grade #5 after students test obstacle thresholds.",
-    "student_instructions": "Submit a link, screenshot, or photo/video evidence of the obstacle reaction and complete the checklist.",
-    "student_output": "Program evidence, checklist, and explanation.",
-    "materials": "mBot, mBlock, ultrasonic sensor, LED or sound output.",
-    "checklist": [
-      {"id":"moves_clear","text":"The robot moves forward when the path is clear.", "required": true},
-      {"id":"detects_close","text":"The robot detects a nearby object.", "required": true},
-      {"id":"stops_feedback","text":"The robot stops and shows a red LED or sound feedback.", "required": true},
-      {"id":"logic_explained","text":"I explained the if/else logic.", "required": true}
-    ],
-    "reflections": [
-      {"id":"threshold","prompt":"What threshold or condition did your program use?", "required": true},
-      {"id":"improvement","prompt":"What would improve the robot for a maze?", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use for Daily Grade #5 after students test obstacle thresholds. Grade the program evidence from Classroom or teacher observation; use this app check for confirmation and explanation.",
+    "student_instructions": "Send your obstacle reaction evidence in Classroom or complete the teacher-observed demonstration, then complete this app check.",
+    "student_output": "Classroom/demo confirmation, obstacle reaction checklist, and logic explanation.",
+    "materials": "mBot, mBlock, ultrasonic sensor, LED or sound output, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"The obstacle reaction evidence is sent in Classroom or checked by teacher observation.","helperText":"This app check does not collect links, screenshots, files, or videos."},
+      {"id":"submission_status","type":"select","prompt":"How was your obstacle reaction evidence checked?","items":[{"id":"classroom","text":"I sent the evidence in Classroom."},{"id":"observed","text":"My teacher observed the program in class."},{"id":"need_help","text":"I still need help submitting or demonstrating it."}]},
+      {"id":"reaction_check","type":"checklist","prompt":"Obstacle reaction checklist","items":[{"id":"moves_clear","text":"The robot moves forward when the path is clear."},{"id":"detects_close","text":"The robot detects a nearby object."},{"id":"stops_feedback","text":"The robot stops and shows a red LED or sound feedback."},{"id":"logic_explained","text":"I can explain the if/else logic."}]},
+      {"id":"threshold","type":"long-text","prompt":"What threshold or condition did your program use?"},
+      {"id":"improvement","type":"long-text","prompt":"What would improve the robot for a maze?"}
     ]
   },
   {
@@ -130,101 +126,85 @@ with grade7_raw_activities as (
   },
   {
     "id": "grade7_t1_exam_mbot_maze_navigator",
-    "title": "G7 T1 Exam Project - mBot Maze Navigator Evidence",
+    "title": "G7 T1 Exam Project - mBot Maze Navigator Classroom Check",
     "class_slot": "May Weeks 10-12 exam project",
-    "description": "Students submit project plan, test evidence, final demonstration evidence, and reflection for the mBot Maze Navigator.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm mBot Maze Navigator project evidence was handled through Classroom or teacher observation, then reflect on code logic, sensors, and problem solving.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "both",
-    "teacher_note": "Use as the exam project evidence wrapper for the May project cycle.",
-    "student_instructions": "Submit your maze navigator evidence and complete the project checklist and reflection prompts.",
-    "student_output": "Project link or file evidence, checklist, and reflection.",
-    "materials": "mBot, maze, program, test table, project rubric, and presentation notes.",
-    "checklist": [
-      {"id":"plan","text":"My evidence includes a maze plan with start, finish, checkpoints, and sensor checks.", "required": true},
-      {"id":"testing","text":"My evidence includes testing or debugging notes.", "required": true},
-      {"id":"demo","text":"My evidence shows the final robot demonstration or best available section.", "required": true},
-      {"id":"team_roles","text":"I can explain my role and responsibility.", "required": true}
-    ],
-    "reflections": [
-      {"id":"code_logic","prompt":"How did your code control the robot?", "required": true},
-      {"id":"sensor_use","prompt":"How did sensors support decisions?", "required": true},
-      {"id":"challenge_solution","prompt":"Name one challenge and how your group solved or improved it.", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use as the exam project check for the May project cycle. Grade the project evidence from Classroom and the final demonstration; use this app activity for confirmation and reflection.",
+    "student_instructions": "Send your maze navigator evidence in Classroom or complete the teacher-observed demonstration, then complete this project check.",
+    "student_output": "Classroom/demo confirmation, project checklist, and reflection.",
+    "materials": "mBot, maze, program, test table, project rubric, presentation notes, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your maze navigator files, screenshots, test evidence, or demo evidence belong in Classroom or teacher observation.","helperText":"This app check collects only confirmation and reflection."},
+      {"id":"submission_status","type":"select","prompt":"How was your maze navigator evidence submitted or checked?","items":[{"id":"classroom","text":"I sent the project evidence in Classroom."},{"id":"observed","text":"My teacher observed the final demonstration."},{"id":"both","text":"I used both Classroom evidence and teacher observation."},{"id":"need_makeup","text":"I need a make-up submission or demonstration."}]},
+      {"id":"project_check","type":"checklist","prompt":"Maze Navigator project checklist","items":[{"id":"plan","text":"My Classroom evidence or demo includes a maze plan with start, finish, checkpoints, and sensor checks."},{"id":"testing","text":"My evidence includes testing or debugging notes."},{"id":"demo","text":"My teacher can see the final robot demonstration or best available section."},{"id":"team_roles","text":"I can explain my role and responsibility."}]},
+      {"id":"code_logic","type":"long-text","prompt":"How did your code control the robot?"},
+      {"id":"sensor_use","type":"long-text","prompt":"How did sensors support decisions?"},
+      {"id":"challenge_solution","type":"long-text","prompt":"Name one challenge and how your group solved or improved it."}
     ]
   },
   {
     "id": "grade7_t2_daily_2_environmental_poster_evidence",
-    "title": "G7 T2 Daily Grade 2 - Environmental Poster Evidence",
+    "title": "G7 T2 Daily Grade 2 - Environmental Poster Classroom Check",
     "class_slot": "June Week 2, 90-minute class",
-    "description": "Students submit an environmental poster with title, message, readable text, image, and source credit.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm their environmental poster was sent through Classroom, then check title, message, readability, image, and source credit.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
-    "teacher_note": "Use for Daily Grade #2 after Canva revision practice.",
-    "student_instructions": "Submit your poster evidence and complete the checklist.",
-    "student_output": "Poster evidence and design reflection.",
+    "template_id": "worksheet",
+    "teacher_note": "Use for Daily Grade #2 after Canva revision practice. Grade the poster evidence from Classroom; use this app check for confirmation and reflection.",
+    "student_instructions": "Send your poster evidence in Classroom, then complete this app check.",
+    "student_output": "Classroom submission confirmation, poster checklist, and design reflection.",
     "materials": "Canva poster, image source, and Google Classroom.",
-    "checklist": [
-      {"id":"title","text":"The poster has a clear title.", "required": true},
-      {"id":"message","text":"The poster communicates one main environmental message.", "required": true},
-      {"id":"readable","text":"The text is readable.", "required": true},
-      {"id":"credit","text":"The image has credit or source evidence.", "required": true}
-    ],
-    "reflections": [
-      {"id":"choice","prompt":"What is your strongest design choice?", "required": true},
-      {"id":"revision","prompt":"What revision made the poster clearer?", "required": true}
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your poster file or screenshot must be sent in Classroom.","helperText":"This app check does not collect the poster file."},
+      {"id":"submission_status","type":"select","prompt":"What is your poster submission status?","items":[{"id":"submitted","text":"I sent the poster evidence in Classroom."},{"id":"teacher_checked","text":"My teacher checked the poster during class."},{"id":"need_help","text":"I still need help sending the poster."}]},
+      {"id":"poster_check","type":"checklist","prompt":"Poster checklist","items":[{"id":"title","text":"The poster has a clear title."},{"id":"message","text":"The poster communicates one main environmental message."},{"id":"readable","text":"The text is readable."},{"id":"credit","text":"The image has credit or source evidence."}]},
+      {"id":"choice","type":"long-text","prompt":"What is your strongest design choice?"},
+      {"id":"revision","type":"long-text","prompt":"What revision made the poster clearer?"}
     ]
   },
   {
     "id": "grade7_t2_daily_3_branded_slide_set_evidence",
-    "title": "G7 T2 Daily Grade 3 - Branded Mini-Presentation Evidence",
+    "title": "G7 T2 Daily Grade 3 - Branded Mini-Presentation Classroom Check",
     "class_slot": "June Week 3, 90-minute class",
-    "description": "Students submit a 3-slide branded mini-presentation with consistent logo, colors, readable text, and image/icon use.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm their 3-slide branded mini-presentation was sent through Classroom, then explain design consistency.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 35,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
-    "teacher_note": "Use for Daily Grade #3 before the Scratch transition.",
-    "student_instructions": "Submit your slide evidence and explain how the design supports the message.",
-    "student_output": "Slide evidence and design explanation.",
+    "template_id": "worksheet",
+    "teacher_note": "Use for Daily Grade #3 before the Scratch transition. Grade the slide evidence from Classroom; use this app check for confirmation and design explanation.",
+    "student_instructions": "Send your mini-presentation evidence in Classroom, then complete this app check.",
+    "student_output": "Classroom submission confirmation, slide checklist, and design explanation.",
     "materials": "Canva, Google Slides, or exported screenshot/PDF.",
-    "checklist": [
-      {"id":"three_slides","text":"My mini-presentation has 3 slides.", "required": true},
-      {"id":"consistent_logo","text":"Logo placement is consistent.", "required": true},
-      {"id":"colors","text":"Colors and text style are consistent and readable.", "required": true},
-      {"id":"image_icon","text":"At least one image or icon supports the message.", "required": true}
-    ],
-    "reflections": [
-      {"id":"support","prompt":"How does the design support the message?", "required": true}
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your presentation file, screenshot, or PDF must be sent in Classroom.","helperText":"This app check does not collect the presentation file."},
+      {"id":"submission_status","type":"select","prompt":"What is your mini-presentation submission status?","items":[{"id":"submitted","text":"I sent the slide evidence in Classroom."},{"id":"teacher_checked","text":"My teacher checked the slides during class."},{"id":"need_help","text":"I still need help sending the slides."}]},
+      {"id":"slide_check","type":"checklist","prompt":"Mini-presentation checklist","items":[{"id":"three_slides","text":"My mini-presentation has 3 slides."},{"id":"consistent_logo","text":"Logo placement is consistent."},{"id":"colors","text":"Colors and text style are consistent and readable."},{"id":"image_icon","text":"At least one image or icon supports the message."}]},
+      {"id":"support","type":"long-text","prompt":"How does the design support the message?"}
     ]
   },
   {
     "id": "grade7_t2_daily_4_scratch_sequence_evidence",
-    "title": "G7 T2 Daily Grade 4 - Scratch Sequence Program Evidence",
+    "title": "G7 T2 Daily Grade 4 - Scratch Sequence Program Classroom Check",
     "class_slot": "June Week 4, 90-minute class",
-    "description": "Students submit a Scratch sequence with at least 8 blocks, one event block, one sound or costume change, and an order explanation.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm their Scratch sequence evidence was sent through Classroom, then explain block order.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 30,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
-    "teacher_note": "Use for Daily Grade #4 after sequence and variable practice.",
-    "student_instructions": "Submit your Scratch evidence and explain why the order of blocks matters.",
-    "student_output": "Scratch link or screenshot with checklist and explanation.",
-    "materials": "Scratch project and screenshot or link.",
-    "checklist": [
-      {"id":"eight_blocks","text":"The sequence has at least 8 blocks.", "required": true},
-      {"id":"event","text":"The program has one event block.", "required": true},
-      {"id":"change","text":"The program includes one sound or costume change.", "required": true},
-      {"id":"tested","text":"I tested the sequence.", "required": true}
-    ],
-    "reflections": [
-      {"id":"order","prompt":"Why does block order matter in your program?", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use for Daily Grade #4 after sequence and variable practice. Grade Scratch evidence from Classroom or teacher observation; use this app check for confirmation and explanation.",
+    "student_instructions": "Send your Scratch sequence evidence in Classroom or show it to your teacher, then complete this app check.",
+    "student_output": "Classroom/demo confirmation, Scratch sequence checklist, and order explanation.",
+    "materials": "Scratch project, screenshot or link, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your Scratch project evidence belongs in Classroom or teacher observation.","helperText":"This app check does not collect the Scratch file, screenshot, or link."},
+      {"id":"submission_status","type":"select","prompt":"How was your Scratch sequence evidence checked?","items":[{"id":"classroom","text":"I sent the Scratch evidence in Classroom."},{"id":"observed","text":"My teacher checked the project during class."},{"id":"need_help","text":"I still need help submitting or showing it."}]},
+      {"id":"sequence_check","type":"checklist","prompt":"Scratch sequence checklist","items":[{"id":"eight_blocks","text":"The sequence has at least 8 blocks."},{"id":"event","text":"The program has one event block."},{"id":"change","text":"The program includes one sound or costume change."},{"id":"tested","text":"I tested the sequence."}]},
+      {"id":"order","type":"long-text","prompt":"Why does block order matter in your program?"}
     ]
   },
   {
@@ -241,7 +221,7 @@ with grade7_raw_activities as (
     "student_output": "Scratch debugging note.",
     "materials": "Scratch starter file and test program.",
     "fields": [
-      { "id": "debug_table", "type": "table-grid", "prompt": "Complete the debugging table.", "rows": [{"id":"bug_1","text":"Bug 1"},{"id":"bug_2","text":"Bug 2"},{"id":"bug_3","text":"Bug 3"}], "columns": [{"id":"problem","text":"Problem"},{"id":"fix","text":"Fix tried"},{"id":"result","text":"Result"}] },
+      { "id": "debug_table", "type": "table-grid", "prompt": "Complete the debugging table.", "rows": [{"id":"event_bug","text":"Event does not start the program"},{"id":"order_bug","text":"Blocks run in the wrong order"},{"id":"feedback_bug","text":"Sound, costume, score, or timer feedback is wrong"}], "columns": [{"id":"problem","text":"Problem"},{"id":"fix","text":"Fix tried"},{"id":"result","text":"Result"}] },
       { "id": "best_fix", "type": "long-text", "prompt": "Which fix improved the program most? Explain why." }
     ]
   },
@@ -285,28 +265,24 @@ with grade7_raw_activities as (
   },
   {
     "id": "grade7_t2_exam_scratch_dance_game",
-    "title": "G7 T2 Exam Project - Scratch Dance Game Evidence",
+    "title": "G7 T2 Exam Project - Scratch Dance Game Classroom Check",
     "class_slot": "August Weeks 10-12 exam project",
-    "description": "Students submit Scratch Dance Game evidence, testing notes, demonstration evidence, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm Scratch Dance Game evidence was sent through Classroom or checked by teacher observation, then reflect on organization, application, and improvement.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "link",
-    "teacher_note": "Use as the exam project evidence wrapper for the August Scratch project cycle.",
-    "student_instructions": "Submit the Scratch project link and complete the project checklist and reflection prompts.",
-    "student_output": "Scratch project link, checklist, and reflection.",
-    "materials": "Scratch project, test notes, project rubric, and presentation notes.",
-    "checklist": [
-      {"id":"inputs","text":"The game uses player input.", "required": true},
-      {"id":"concepts","text":"The game uses subroutines, conditionals, loops, and variables.", "required": true},
-      {"id":"feedback","text":"The game gives success or failure feedback.", "required": true},
-      {"id":"tested","text":"The game was tested and improved.", "required": true}
-    ],
-    "reflections": [
-      {"id":"organization","prompt":"How is your code organized?", "required": true},
-      {"id":"application","prompt":"What real-world application or skill does this project connect to?", "required": true},
-      {"id":"improvement","prompt":"What improvement did you make or would make next?", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use as the exam project check for the August Scratch project cycle. Grade the project link, screenshots, testing notes, or demonstration evidence from Classroom and class observation.",
+    "student_instructions": "Send your Scratch Dance Game evidence in Classroom or complete the teacher-observed demonstration, then complete this project check.",
+    "student_output": "Classroom/demo confirmation, Scratch Dance Game checklist, and reflection.",
+    "materials": "Scratch project, test notes, project rubric, presentation notes, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your Scratch Dance Game project evidence belongs in Classroom or teacher observation.","helperText":"This app check collects only confirmation and reflection."},
+      {"id":"submission_status","type":"select","prompt":"How was your Scratch Dance Game evidence submitted or checked?","items":[{"id":"classroom","text":"I sent the Scratch project evidence in Classroom."},{"id":"observed","text":"My teacher observed the demonstration."},{"id":"both","text":"I used both Classroom evidence and teacher observation."},{"id":"need_makeup","text":"I need a make-up submission or demonstration."}]},
+      {"id":"project_check","type":"checklist","prompt":"Scratch Dance Game checklist","items":[{"id":"inputs","text":"The game uses player input."},{"id":"concepts","text":"The game uses subroutines, conditionals, loops, and variables."},{"id":"feedback","text":"The game gives success or failure feedback."},{"id":"tested","text":"The game was tested and improved."}]},
+      {"id":"organization","type":"long-text","prompt":"How is your code organized?"},
+      {"id":"application","type":"long-text","prompt":"What real-world application or skill does this project connect to?"},
+      {"id":"improvement","type":"long-text","prompt":"What improvement did you make or would make next?"}
     ]
   },
   {
@@ -338,26 +314,22 @@ with grade7_raw_activities as (
   },
   {
     "id": "grade7_t3_daily_3_scratch_subroutine_loop_demo",
-    "title": "G7 T3 Daily Grade 3 - Scratch Subroutine and Loop Demonstration",
+    "title": "G7 T3 Daily Grade 3 - Scratch Subroutine and Loop Classroom Check",
     "class_slot": "October Week 4, 90-minute class",
-    "description": "Students submit evidence of a Scratch program with a subroutine or custom block, loop, event, and decomposition explanation.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm Scratch subroutine and loop evidence was sent through Classroom or checked by teacher observation, then explain decomposition.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 30,
-    "template_id": "project-evidence",
-    "evidence_mode": "either",
-    "teacher_note": "Use for Daily Grade #3 after decomposition practice.",
-    "student_instructions": "Submit Scratch evidence and explain how decomposition improves your program.",
-    "student_output": "Scratch evidence and decomposition explanation.",
-    "materials": "Scratch project and screenshot or link.",
-    "checklist": [
-      {"id":"subroutine","text":"My program uses at least one subroutine or custom block.", "required": true},
-      {"id":"loop","text":"My program uses at least one loop.", "required": true},
-      {"id":"event","text":"My program uses at least one event.", "required": true},
-      {"id":"tested","text":"I tested the program.", "required": true}
-    ],
-    "reflections": [
-      {"id":"decomposition","prompt":"How does decomposition improve your program?", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use for Daily Grade #3 after decomposition practice. Grade Scratch evidence from Classroom or class observation; use this app check for confirmation and explanation.",
+    "student_instructions": "Send your Scratch evidence in Classroom or show it to your teacher, then complete this app check.",
+    "student_output": "Classroom/demo confirmation, Scratch subroutine checklist, and decomposition explanation.",
+    "materials": "Scratch project, screenshot or link, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your Scratch program evidence belongs in Classroom or teacher observation.","helperText":"This app check does not collect the project file, screenshot, or link."},
+      {"id":"submission_status","type":"select","prompt":"How was your Scratch subroutine evidence checked?","items":[{"id":"classroom","text":"I sent the Scratch evidence in Classroom."},{"id":"observed","text":"My teacher checked the project during class."},{"id":"need_help","text":"I still need help submitting or showing it."}]},
+      {"id":"subroutine_check","type":"checklist","prompt":"Scratch subroutine and loop checklist","items":[{"id":"subroutine","text":"My program uses at least one subroutine or custom block."},{"id":"loop","text":"My program uses at least one loop."},{"id":"event","text":"My program uses at least one event."},{"id":"tested","text":"I tested the program."}]},
+      {"id":"decomposition","type":"long-text","prompt":"How does decomposition improve your program?"}
     ]
   },
   {
@@ -374,7 +346,7 @@ with grade7_raw_activities as (
     "student_output": "Source credibility table, credit information, and explanation.",
     "materials": "Teacher-approved sources or source examples.",
     "fields": [
-      { "id": "source_table", "type": "table-grid", "prompt": "Evaluate 3 sources.", "rows": [{"id":"source_1","text":"Source 1"},{"id":"source_2","text":"Source 2"},{"id":"source_3","text":"Source 3"}], "columns": [{"id":"author_date","text":"Author/date evidence"},{"id":"purpose","text":"Purpose or bias"},{"id":"evidence","text":"Evidence quality"},{"id":"usable","text":"Usable? Why?"}] },
+      { "id": "source_table", "type": "table-grid", "prompt": "Evaluate 3 sources.", "rows": [{"id":"official_page","text":"Official organization or school-safe information page"},{"id":"news_blog","text":"News article or blog post"},{"id":"image_media_page","text":"Image, video, or media source page"}], "columns": [{"id":"author_date","text":"Author/date evidence"},{"id":"purpose","text":"Purpose or bias"},{"id":"evidence","text":"Evidence quality"},{"id":"usable","text":"Usable? Why?"}] },
       { "id": "credit", "type": "short-text", "prompt": "Write the image or text credit information for the source you chose." },
       { "id": "usable_reason", "type": "long-text", "prompt": "Write two sentences explaining why the source is usable." }
     ]
@@ -439,28 +411,24 @@ with grade7_raw_activities as (
   },
   {
     "id": "grade7_t3_exam_mandrake_detection_system",
-    "title": "G7 T3 Exam Project - Mandrake Detection System Evidence",
+    "title": "G7 T3 Exam Project - Mandrake Detection System Classroom Check",
     "class_slot": "November Weeks 10-12 exam project",
-    "description": "Students submit evidence for the micro:bit Mandrake Detection System or simulation, including testing, support slide, demonstration, and reflection.",
-    "activity_type": "external-artifact",
+    "description": "Students confirm Mandrake Detection System evidence was sent through Classroom or checked by teacher observation, then reflect on parts, sensor logic, reliability, and improvement.",
+    "activity_type": "structured-response",
     "assessment_purpose": "formal",
     "estimated_minutes": 90,
-    "template_id": "project-evidence",
-    "evidence_mode": "both",
-    "teacher_note": "Use as the exam project evidence wrapper for the November Mandrake project cycle.",
-    "student_instructions": "Submit project evidence and complete the checklist and reflections.",
-    "student_output": "Project evidence, checklist, and reflection.",
-    "materials": "micro:bit or simulation, sensor, support slide, test table, and rubric.",
-    "checklist": [
-      {"id":"purpose","text":"My evidence explains the project purpose.", "required": true},
-      {"id":"threshold","text":"My evidence shows the threshold rule or sensor logic.", "required": true},
-      {"id":"testing","text":"My evidence includes test results or reliability notes.", "required": true},
-      {"id":"demo","text":"My evidence shows the final demonstration or clearly labeled simulation.", "required": true}
-    ],
-    "reflections": [
-      {"id":"parts_logic","prompt":"Explain the input, threshold/process, signal, and output.", "required": true},
-      {"id":"challenge","prompt":"What challenge did you face and how did you respond?", "required": true},
-      {"id":"improvement","prompt":"What realistic improvement would you make next?", "required": true}
+    "template_id": "worksheet",
+    "teacher_note": "Use as the exam project check for the November Mandrake project cycle. Grade project evidence from Classroom and final demonstration; use this app activity for confirmation and reflection.",
+    "student_instructions": "Send your Mandrake project evidence in Classroom or complete the teacher-observed demonstration, then complete this project check.",
+    "student_output": "Classroom/demo confirmation, Mandrake project checklist, and reflection.",
+    "materials": "micro:bit or simulation, sensor, support slide, test table, rubric, and Classroom assignment.",
+    "fields": [
+      {"id":"classroom_note","type":"instructions","prompt":"Your Mandrake Detection System evidence belongs in Classroom or teacher observation.","helperText":"This app check collects only confirmation and reflection."},
+      {"id":"submission_status","type":"select","prompt":"How was your Mandrake project evidence submitted or checked?","items":[{"id":"classroom","text":"I sent the project evidence in Classroom."},{"id":"observed","text":"My teacher observed the final demonstration."},{"id":"both","text":"I used both Classroom evidence and teacher observation."},{"id":"need_makeup","text":"I need a make-up submission or demonstration."}]},
+      {"id":"project_check","type":"checklist","prompt":"Mandrake Detection System checklist","items":[{"id":"purpose","text":"My Classroom evidence or demo explains the project purpose."},{"id":"threshold","text":"My evidence shows the threshold rule or sensor logic."},{"id":"testing","text":"My evidence includes test results or reliability notes."},{"id":"demo","text":"My teacher can see the final demonstration or clearly labeled simulation."}]},
+      {"id":"parts_logic","type":"long-text","prompt":"Explain the input, threshold/process, signal, and output."},
+      {"id":"challenge","type":"long-text","prompt":"What challenge did you face and how did you respond?"},
+      {"id":"improvement","type":"long-text","prompt":"What realistic improvement would you make next?"}
     ]
   },
   {
@@ -508,7 +476,7 @@ with grade7_raw_activities as (
     "student_output": "Practice parts and functions table.",
     "materials": "mBot parts diagram and class notes.",
     "fields": [
-      { "id": "parts_table", "type": "table-grid", "prompt": "Practice labels and function sentences.", "rows": [{"id":"part_1","text":"Part 1"},{"id":"part_2","text":"Part 2"},{"id":"part_3","text":"Part 3"},{"id":"part_4","text":"Part 4"},{"id":"part_5","text":"Part 5"}], "columns": [{"id":"label","text":"Part label"},{"id":"function","text":"Function sentence"}] },
+      { "id": "parts_table", "type": "table-grid", "prompt": "Practice labels and function sentences.", "rows": [{"id":"chassis","text":"Chassis or frame"},{"id":"control_board","text":"Control board/controller"},{"id":"motor","text":"Motor"},{"id":"wheel","text":"Wheel"},{"id":"ultrasonic_sensor","text":"Ultrasonic sensor"}], "columns": [{"id":"label","text":"Part label"},{"id":"function","text":"Function sentence"}] },
       { "id": "correction", "type": "short-text", "prompt": "What label or function did you correct after feedback?" }
     ]
   },

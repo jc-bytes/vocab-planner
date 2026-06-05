@@ -7,7 +7,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         if (this.client) return this;
 
         if (!isSupabaseConfigured()) {
-            throw new Error('Supabase is not configured. Update config/supabase-config.js with your project URL and publishable key.');
+            throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY, or provide window.SUPABASE_CONFIG.');
         }
 
         this.client = createSupabaseClient();
@@ -151,6 +151,12 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
 
     async ensureStudentProgress(userId, profile = {}) {
         await this.init();
+        if (userId && this.currentUser?.uid && userId !== this.currentUser.uid) {
+            throw new Error('Students can only initialize their own progress.');
+        }
+        if (typeof this.ensureOwnStudentProgress === 'function') {
+            return this.ensureOwnStudentProgress(normalizeProfile(profile));
+        }
         const payload = fromClientPayload('student_progress', {
             studentProfile: normalizeProfile(profile),
             coinData: { ...DEFAULT_COIN_DATA },
@@ -163,6 +169,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
             .from('student_progress')
             .upsert(payload, { onConflict: 'user_id', ignoreDuplicates: false });
         if (error) throw error;
+        return null;
     },
 
     async getProfile(userId = null) {

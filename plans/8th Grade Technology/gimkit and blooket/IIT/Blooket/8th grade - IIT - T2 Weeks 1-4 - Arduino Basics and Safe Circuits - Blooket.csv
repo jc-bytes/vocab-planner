@@ -1,0 +1,107 @@
+"Blooket
+Import Template",,,,,,,
+Question #,Question Text,Answer 1,Answer 2,"Answer 3
+(Optional)","Answer 4
+(Optional)","Time Limit (sec)
+(Max: 300 seconds)","Correct Answer(s)
+(Only include Answer #)"
+1,"Before connecting power, what should you check?",Inspect parts and check connections safely,Force wires into random holes,Remove resistors from the circuit,Touch components roughly,20,1
+2,What is a microcontroller?,A poster tool,A small computer board that controls electronics,A spreadsheet chart,A Scratch costume,20,2
+3,Why use a resistor with an LED?,To make the breadboard heavier,To store code,To limit current and protect the LED,To replace ground,20,3
+4,The LED does not turn on. Which check should come early?,Poster contrast,Image credit,Project reflection,"Power, ground, LED direction, resistor, pin, and code",20,4
+5,What is a circuit?,A path electricity can follow,A visual message,A data question,A dance move,20,1
+6,What does ground do?,Makes the poster readable,Provides the return path for electricity,Stores a Python list,Names the sprite,20,2
+7,What does a digital output pin control?,A source credit,A chart title,An output such as an LED,A Scratch costume,20,3
+8,What does delay change in an LED pattern?,The image source,The project name,The board name,How long the program pauses,20,4
+9,A button is pressed and the LED changes. What model is shown?,Input-process-output,Audience-purpose-poster,Route-marker-loop,Question-chart-conclusion only,20,1
+10,What does HIGH usually mean in an Arduino circuit?,Hidden answer,On or high signal,Wrong source,No power ever,20,2
+11,What does LOW usually mean?,A colorful poster,A data product,Off or low signal,A robot path,20,3
+12,Why use the Serial Monitor?,To choose a logo,To clean the workstation only,To replace wiring,To observe messages or values while testing,20,4
+13,What is baud rate?,The speed used for serial messages,The brightness of a poster,The size of a dataset,The length of a route,20,1
+14,Serial shows button pressed three times. What helps?,Choosing image credit,Debugging and confirming the input is read,Writing a reflection only,Drawing a route map,20,2
+15,Which team role writes build notes?,Ground,Pin,Recorder,LED,20,3
+16,Which team role focuses on code?,Resistor,Button,Source,Coder,20,4
+17,Which team role builds the physical parts?,Builder,Credit,Loop,Audience,20,1
+18,Why use a checklist during a build challenge?,To avoid responsibility,To verify steps and reduce missed mistakes,To hide mistakes,To remove all tests,20,2
+19,What is safe material use?,Leaving wires scattered,Forcing components,"Careful handling, organization, and returning parts",Skipping cleanup,20,3
+20,What should you include for your button-controlled LED check?,Only a poster,Only a Scratch file,Only a data chart,"Labeled photo or diagram, IPO sentence, and observations",20,4
+21,What is a breadboard used for?,Building circuits without soldering,Making slide layouts,Writing Python strings,Creating image credit,20,1
+22,Why label a circuit diagram?,To hide the circuit,To show how parts connect and what they do,To replace the build,To remove observations,20,2
+23,Which mistake could stop an LED circuit from working?,Title aligned correctly,Image credit included,LED facing the wrong direction,Dataset cleaned,20,3
+24,What should you do after solving a circuit problem?,Erase your notes,Change unrelated files,Hide the diagram,Record the debugging step that helped,20,4
+25,,,,,,,
+26,,,,,,,
+27,,,,,,,
+28,,,,,,,
+29,,,,,,,
+30,,,,,,,
+31,,,,,,,
+32,,,,,,,
+33,,,,,,,
+34,,,,,,,
+35,,,,,,,
+36,,,,,,,
+37,,,,,,,
+38,,,,,,,
+39,,,,,,,
+40,,,,,,,
+41,,,,,,,
+42,,,,,,,
+43,,,,,,,
+44,,,,,,,
+45,,,,,,,
+46,,,,,,,
+47,,,,,,,
+48,,,,,,,
+49,,,,,,,
+50,,,,,,,
+51,,,,,,,
+52,,,,,,,
+53,,,,,,,
+54,,,,,,,
+55,,,,,,,
+56,,,,,,,
+57,,,,,,,
+58,,,,,,,
+59,,,,,,,
+60,,,,,,,
+61,,,,,,,
+62,,,,,,,
+63,,,,,,,
+64,,,,,,,
+65,,,,,,,
+66,,,,,,,
+67,,,,,,,
+68,,,,,,,
+69,,,,,,,
+70,,,,,,,
+71,,,,,,,
+72,,,,,,,
+73,,,,,,,
+74,,,,,,,
+75,,,,,,,
+76,,,,,,,
+77,,,,,,,
+78,,,,,,,
+79,,,,,,,
+80,,,,,,,
+81,,,,,,,
+82,,,,,,,
+83,,,,,,,
+84,,,,,,,
+85,,,,,,,
+86,,,,,,,
+87,,,,,,,
+88,,,,,,,
+89,,,,,,,
+90,,,,,,,
+91,,,,,,,
+92,,,,,,,
+93,,,,,,,
+94,,,,,,,
+95,,,,,,,
+96,,,,,,,
+97,,,,,,,
+98,,,,,,,
+99,,,,,,,
+100,,,,,,,
