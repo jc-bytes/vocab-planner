@@ -34,6 +34,7 @@ const SPARK_TYPE_FILTERS = [
         icon: meta.icon
     }))
 ];
+const SPARK_GRADE_LEVELS = ['6', '7', '8', '9'];
 
 function getPanamaDateValue(date = new Date()) {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -138,6 +139,15 @@ function isDuplicateScheduledDateError(error) {
         || (text.includes('duplicate key') && text.includes('scheduled_date'));
 }
 
+function normalizeSparkGradeQuestions(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
+        const text = String(source[grade] ?? source[`grade${grade}`] ?? '').trim();
+        if (text) questions[grade] = text;
+        return questions;
+    }, {});
+}
+
 class TeacherSparkMethods {
     normalizeSpark(spark = {}) {
         const source = spark && typeof spark === 'object' ? spark : {};
@@ -152,6 +162,7 @@ class TeacherSparkMethods {
             sparkText: String(source.sparkText ?? source.spark_text ?? '').trim(),
             whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
             question: String(source.question || '').trim(),
+            gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
             sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
             sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
             subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? DEFAULT_SUBJECT_SLUG).trim() || DEFAULT_SUBJECT_SLUG,
@@ -579,6 +590,7 @@ class TeacherSparkMethods {
                         <span>${escapeHtml(spark.question)}</span>
                     </div>
                 ` : ''}
+                ${this.createSparkGradeQuestionSummaryHtml(spark)}
             </div>
             <div class="spark-spotlight-actions">
                 <button class="btn secondary-btn spark-card-action" type="button" data-spark-action="edit" data-spark-id="${escapeHtml(spark.id)}">
@@ -658,6 +670,7 @@ class TeacherSparkMethods {
                     <span>${escapeHtml(spark.question)}</span>
                 </div>
             ` : ''}
+            ${this.createSparkGradeQuestionSummaryHtml(spark)}
             <div class="spark-card-footer">
                 <div class="spark-card-meta">
                     <span>${escapeHtml(this.formatSparkDateLabel(spark))}</span>
@@ -692,6 +705,25 @@ class TeacherSparkMethods {
 
     getSparkTypeLabel(sparkType) {
         return (SPARK_TYPE_META[sparkType] || SPARK_TYPE_META.cool_fact).label;
+    }
+
+    getSparkGradeQuestionEntries(spark) {
+        const questions = normalizeSparkGradeQuestions(spark?.gradeQuestions);
+        return SPARK_GRADE_LEVELS
+            .map(grade => [grade, questions[grade] || ''])
+            .filter(([, question]) => question);
+    }
+
+    createSparkGradeQuestionSummaryHtml(spark) {
+        const entries = this.getSparkGradeQuestionEntries(spark);
+        if (entries.length === 0) return '';
+        const labels = entries.map(([grade]) => `Grade ${grade}`).join(', ');
+        return `
+            <div class="spark-detail spark-grade-question-summary">
+                <strong>Grade questions</strong>
+                <span>${escapeHtml(labels)}</span>
+            </div>
+        `;
     }
 
     refreshSparkLibrarySurface() {
@@ -749,6 +781,10 @@ class TeacherSparkMethods {
             '#spark-text-input': source.sparkText,
             '#spark-why-input': source.whyItMatters,
             '#spark-question-input': source.question,
+            '#spark-grade-question-6-input': source.gradeQuestions['6'],
+            '#spark-grade-question-7-input': source.gradeQuestions['7'],
+            '#spark-grade-question-8-input': source.gradeQuestions['8'],
+            '#spark-grade-question-9-input': source.gradeQuestions['9'],
             '#spark-source-title-input': source.sourceTitle,
             '#spark-source-url-input': source.sourceUrl,
             '#spark-scheduled-date-input': duplicate ? '' : source.scheduledDate,
@@ -764,6 +800,15 @@ class TeacherSparkMethods {
         openModal('#spark-modal', { initialFocus: '#spark-title-input' });
     }
 
+    readSparkGradeQuestionsFromForm() {
+        return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
+            const field = $(`#spark-grade-question-${grade}-input`);
+            const text = String(field?.value || '').trim();
+            if (text) questions[grade] = text;
+            return questions;
+        }, {});
+    }
+
     readSparkForm(statusOverride = null) {
         const status = statusOverride || $('#spark-status-input')?.value || 'draft';
         const spark = this.normalizeSpark({
@@ -773,6 +818,7 @@ class TeacherSparkMethods {
             sparkText: $('#spark-text-input')?.value || '',
             whyItMatters: $('#spark-why-input')?.value || '',
             question: $('#spark-question-input')?.value || '',
+            gradeQuestions: this.readSparkGradeQuestionsFromForm(),
             sourceTitle: $('#spark-source-title-input')?.value || '',
             sourceUrl: $('#spark-source-url-input')?.value || '',
             subjectSlug: DEFAULT_SUBJECT_SLUG,
@@ -783,7 +829,7 @@ class TeacherSparkMethods {
 
         if (!spark.title) throw new Error('Add a title for this Spark.');
         if (!spark.sparkText) throw new Error('Add the Spark text students will read.');
-        if (!spark.question) throw new Error('Add a quick question for students to think about.');
+        if (!spark.question) throw new Error('Add a fallback question for students to think about.');
         if (spark.status === 'scheduled' && !spark.scheduledDate) {
             throw new Error('Choose a scheduled date before scheduling this Spark.');
         }

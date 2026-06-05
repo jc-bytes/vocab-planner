@@ -116,6 +116,7 @@ export const FIELD_ALIASES = {
         updatedAt: 'updated_at'
     },
     weekly_sparks: {
+        gradeQuestions: 'grade_questions',
         ownerId: 'owner_id',
         scheduledDate: 'scheduled_date',
         sourceTitle: 'source_title',
@@ -420,6 +421,7 @@ export const toClientRow = (tableName, row) => {
             sparkText: row.spark_text || '',
             whyItMatters: row.why_it_matters || '',
             question: row.question || '',
+            gradeQuestions: row.grade_questions && typeof row.grade_questions === 'object' ? row.grade_questions : {},
             sourceTitle: row.source_title || '',
             sourceUrl: row.source_url || '',
             subjectSlug: row.subject_slug || 'technology',
@@ -634,6 +636,7 @@ export const fromClientPayload = (tableName, payload = {}, id = null) => {
             spark_text: payload.sparkText ?? payload.spark_text,
             why_it_matters: payload.whyItMatters ?? payload.why_it_matters,
             question: payload.question,
+            grade_questions: payload.gradeQuestions ?? payload.grade_questions ?? {},
             source_title: payload.sourceTitle ?? payload.source_title ?? '',
             source_url: payload.sourceUrl ?? payload.source_url ?? '',
             subject_slug: payload.subjectSlug || payload.subject_slug || 'technology',
@@ -703,8 +706,17 @@ export const applyConstraints = (builder, tableName, constraints = []) => {
     constraints.forEach((constraint) => {
         if (constraint.kind === 'where') {
             const field = toDatabaseField(tableName, constraint.field);
+            const value = toDatabaseValue(field, constraint.value);
             if (constraint.operator === '==') {
-                currentBuilder = currentBuilder.eq(field, toDatabaseValue(field, constraint.value));
+                currentBuilder = currentBuilder.eq(field, value);
+            } else if (constraint.operator === '<=') {
+                currentBuilder = currentBuilder.lte(field, value);
+            } else if (constraint.operator === '<') {
+                currentBuilder = currentBuilder.lt(field, value);
+            } else if (constraint.operator === '>=') {
+                currentBuilder = currentBuilder.gte(field, value);
+            } else if (constraint.operator === '>') {
+                currentBuilder = currentBuilder.gt(field, value);
             }
         }
 

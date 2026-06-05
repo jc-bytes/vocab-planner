@@ -19,6 +19,27 @@ const SPARK_TYPE_LABELS = {
     reflection: 'Reflection',
     debate: 'Debate'
 };
+const SPARK_GRADE_LEVELS = ['6', '7', '8', '9'];
+
+function getPanamaDateValue(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Panama',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
+    const valueByType = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
+}
+
+function normalizeSparkGradeQuestions(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
+        const text = String(source[grade] ?? source[`grade${grade}`] ?? '').trim();
+        if (text) questions[grade] = text;
+        return questions;
+    }, {});
+}
 
 class StudentActivityHomeMethods {
     getUnitProgressSummary(vocab) {
@@ -178,6 +199,7 @@ class StudentActivityHomeMethods {
             sparkText: String(source.sparkText ?? source.spark_text ?? '').trim(),
             whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
             question: String(source.question || '').trim(),
+            gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
             sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
             sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
             subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? 'technology').trim() || 'technology',
@@ -193,6 +215,7 @@ class StudentActivityHomeMethods {
             collection(db, SPARK_COLLECTION),
             where('subjectSlug', '==', subjectSlug),
             where('status', '==', 'scheduled'),
+            where('scheduledDate', '<=', getPanamaDateValue()),
             orderBy('scheduledDate', 'desc'),
             limit(1)
         ));
@@ -215,9 +238,15 @@ class StudentActivityHomeMethods {
         }
     }
 
+    getStudentSparkQuestion(spark) {
+        const grade = String(this.sm.studentProfile?.grade || '').match(/\d+/)?.[0] || '';
+        return String(spark.gradeQuestions?.[grade] || spark.question || '').trim();
+    }
+
     createStudentSparkCard(spark) {
         const card = createElement('section', 'student-spark-card');
         card.setAttribute('aria-label', 'Spark of the Week');
+        const question = this.getStudentSparkQuestion(spark);
         const sourceHtml = spark.sourceUrl
             ? `<a href="${escapeHtml(spark.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
             : '';
@@ -234,10 +263,12 @@ class StudentActivityHomeMethods {
                     <span>${escapeHtml(spark.whyItMatters)}</span>
                 </div>
             ` : ''}
-            <div class="student-spark-question">
-                <i data-lucide="message-circle-question"></i>
-                <span>${escapeHtml(spark.question)}</span>
-            </div>
+            ${question ? `
+                <div class="student-spark-question">
+                    <i data-lucide="message-circle-question"></i>
+                    <span>${escapeHtml(question)}</span>
+                </div>
+            ` : ''}
             ${sourceHtml ? `<div class="student-spark-source">${sourceHtml}</div>` : ''}
         `;
         return card;
