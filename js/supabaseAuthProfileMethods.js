@@ -157,19 +157,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         if (typeof this.ensureOwnStudentProgress === 'function') {
             return this.ensureOwnStudentProgress(normalizeProfile(profile));
         }
-        const payload = fromClientPayload('student_progress', {
-            studentProfile: normalizeProfile(profile),
-            coinData: { ...DEFAULT_COIN_DATA },
-            coinHistory: [],
-            coins: 0,
-            units: {}
-        }, userId);
-
-        const { error } = await this.client
-            .from('student_progress')
-            .upsert(payload, { onConflict: 'user_id', ignoreDuplicates: false });
-        if (error) throw error;
-        return null;
+        throw new Error('Student progress initialization RPC is unavailable.');
     },
 
     async getProfile(userId = null) {
