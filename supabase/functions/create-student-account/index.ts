@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
     email: payload.email,
     grade_level: payload.gradeLevel,
     section_letter: payload.section,
-    must_change_password: true,
+    must_change_password: false,
   };
   const studentProfile = {
     firstName: payload.firstName,
