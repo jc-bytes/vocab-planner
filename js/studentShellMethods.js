@@ -1,13 +1,17 @@
 import { $, $$ } from './main.js';
 
 const CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY = 'student_classroom_instructions_collapsed';
+const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
 
 class StudentShellMethods {
     switchView(viewId) {
         const currentViewId = $('.view.active')?.id || '';
         const currentSection = this.getStudentSectionForView(currentViewId);
         const nextSection = this.getStudentSectionForView(viewId);
-        const shouldRestoreSectionScroll = Boolean(currentSection && nextSection && currentSection !== nextSection);
+        const shouldRestoreSectionScroll = Boolean(
+            nextSection &&
+            (currentSection !== nextSection || this.hasSavedStudentRouteScroll())
+        );
 
         this.saveStudentSectionScroll(currentViewId);
 
@@ -46,15 +50,24 @@ class StudentShellMethods {
         if (!this.studentSectionScrollPositions) {
             this.studentSectionScrollPositions = {};
         }
-        this.studentSectionScrollPositions[section] = window.scrollY || document.documentElement.scrollTop || 0;
+        const top = window.scrollY || document.documentElement.scrollTop || 0;
+        this.studentSectionScrollPositions[section] = top;
+        this.persistStudentScroll(this.getStudentSectionScrollKey(section), top);
+
+        const routeKey = this.getStudentRouteScrollKey();
+        if (routeKey) {
+            this.persistStudentScroll(routeKey, top);
+        }
     }
 
     restoreStudentSectionScroll(viewId = '') {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
-        const savedTop = Number.isFinite(this.studentSectionScrollPositions?.[section])
+        const routeTop = this.readStudentScroll(this.getStudentRouteScrollKey());
+        const sectionTop = Number.isFinite(this.studentSectionScrollPositions?.[section])
             ? this.studentSectionScrollPositions[section]
-            : 0;
+            : this.readStudentScroll(this.getStudentSectionScrollKey(section));
+        const savedTop = Number.isFinite(routeTop) ? routeTop : (Number.isFinite(sectionTop) ? sectionTop : 0);
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -66,6 +79,38 @@ class StudentShellMethods {
                 });
             });
         });
+    }
+
+    getStudentSectionScrollKey(section) {
+        return `${STUDENT_SCROLL_KEY_PREFIX}:section:${section}`;
+    }
+
+    getStudentRouteScrollKey() {
+        const hash = String(window.location.hash || '').trim();
+        return hash ? `${STUDENT_SCROLL_KEY_PREFIX}:route:${hash}` : '';
+    }
+
+    hasSavedStudentRouteScroll() {
+        return Number.isFinite(this.readStudentScroll(this.getStudentRouteScrollKey()));
+    }
+
+    persistStudentScroll(key, top) {
+        if (!key) return;
+        try {
+            sessionStorage.setItem(key, String(Math.max(0, Math.round(top))));
+        } catch {
+            // Ignore storage failures; in-memory scroll restore still works.
+        }
+    }
+
+    readStudentScroll(key) {
+        if (!key) return NaN;
+        try {
+            const parsed = Number(sessionStorage.getItem(key));
+            return Number.isFinite(parsed) ? parsed : NaN;
+        } catch {
+            return NaN;
+        }
     }
 
     getStudentSectionForView(viewId) {

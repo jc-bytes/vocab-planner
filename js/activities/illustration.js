@@ -189,9 +189,11 @@ export class IllustrationActivity {
         wrapper.appendChild(this.createResearchActions(word));
         wrapper.appendChild(this.createHuntGrid(word, entry));
         wrapper.appendChild(this.createStatusPanel(entry));
+        wrapper.appendChild(this.createBottomNav(entry));
         this.container.appendChild(wrapper);
 
         this.previewImage = this.container.querySelector('#word-hunt-preview');
+        this.removeImageButton = this.container.querySelector('[data-word-hunt-remove-image]');
         this.loadImage();
 
         this.pasteHandler = event => this.handlePaste(event);
@@ -357,13 +359,36 @@ export class IllustrationActivity {
         image.id = 'word-hunt-preview';
         image.alt = 'Saved word hunt image';
         image.hidden = true;
+        const removeButton = createElement('button', 'word-hunt-remove-image');
+        removeButton.type = 'button';
+        removeButton.dataset.wordHuntRemoveImage = 'true';
+        removeButton.setAttribute('aria-label', 'Remove saved image');
+        removeButton.title = 'Remove image';
+        removeButton.textContent = 'x';
+        removeButton.hidden = !entry.hasImage;
+        removeButton.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            this.removeCurrentImage();
+        });
         preview.appendChild(image);
+        preview.appendChild(removeButton);
 
         panel.appendChild(label);
         panel.appendChild(uploadArea);
         panel.appendChild(preview);
 
         return panel;
+    }
+
+    createBottomNav(entry) {
+        const nav = createElement('div', 'word-hunt-bottom-nav');
+        const next = createElement('button', 'btn primary-btn word-hunt-next-btn', this.currentIndex === this.words.length - 1 ? 'Finish' : 'Next');
+        next.type = 'button';
+        next.disabled = !this.isEntryComplete(entry);
+        next.addEventListener('click', () => this.navigate(1));
+        nav.appendChild(next);
+        return nav;
     }
 
     createStatusPanel(entry) {
@@ -403,10 +428,10 @@ export class IllustrationActivity {
 
     updateLiveStatus() {
         const entry = this.getEntry();
-        const nextButton = this.container.querySelector('.word-hunt-nav .primary-btn');
-        if (nextButton) {
-            nextButton.disabled = !this.isEntryComplete(entry);
-        }
+        const canContinue = this.isEntryComplete(entry);
+        this.container.querySelectorAll('.word-hunt-next-btn, .word-hunt-nav .primary-btn').forEach(nextButton => {
+            nextButton.disabled = !canContinue;
+        });
 
         const quality = this.getEntryQuality(entry);
         const fields = {
@@ -423,6 +448,10 @@ export class IllustrationActivity {
         const progress = this.container.querySelector('.word-hunt-status strong');
         if (progress) {
             progress.textContent = `${this.getCompletedCount()}/${this.words.length} words complete`;
+        }
+
+        if (this.removeImageButton) {
+            this.removeImageButton.hidden = !quality.image;
         }
     }
 
@@ -541,6 +570,37 @@ export class IllustrationActivity {
         }
 
         this.previewImage.hidden = true;
+        if (this.removeImageButton) this.removeImageButton.hidden = true;
+    }
+
+    async removeCurrentImage() {
+        const word = this.getCurrentWord()?.word;
+        if (!word) return;
+
+        const entry = this.getEntry(word);
+        await imageDB.deleteDrawing(this.vocabName, word);
+        if (this.previewUrl) {
+            URL.revokeObjectURL(this.previewUrl);
+            this.previewUrl = null;
+        }
+
+        entry.hasImage = false;
+        entry.imagePath = '';
+        entry.imageSizeBytes = null;
+        entry.imageWidth = null;
+        entry.imageHeight = null;
+        entry.imageUpdatedAt = null;
+        entry.pendingImageUpload = false;
+        entry.updatedAt = new Date().toISOString();
+
+        if (this.previewImage) {
+            this.previewImage.removeAttribute('src');
+            this.previewImage.hidden = true;
+        }
+        if (this.removeImageButton) this.removeImageButton.hidden = true;
+
+        this.saveEntry(word);
+        this.updateLiveStatus();
     }
 
     displayImage(blob) {
@@ -549,6 +609,7 @@ export class IllustrationActivity {
         this.previewUrl = URL.createObjectURL(blob);
         this.previewImage.src = this.previewUrl;
         this.previewImage.hidden = false;
+        if (this.removeImageButton) this.removeImageButton.hidden = false;
     }
 
     navigate(direction) {

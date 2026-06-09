@@ -425,7 +425,7 @@ export class ReportGenerator {
                     <th style="width: 16%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Word</th>
                     <th style="width: 40%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Evidence</th>
                     <th style="width: 22%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Image</th>
-                    <th style="width: 22%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Quality Check</th>
+                    <th style="width: 22%; padding: 0.75rem; border: 1px solid #e5e7eb; text-align: left;">Submission</th>
                 </tr>
             `;
             table.appendChild(thead);
@@ -553,28 +553,31 @@ export class ReportGenerator {
         }
         row.appendChild(imageCell);
 
-        const quality = this.getWordHuntQuality(entry);
-        quality.image = Boolean(imageBlob);
-        quality.complete = quality.definition &&
-            quality.image &&
-            quality.examples;
+        const provided = {
+            definition: Boolean(String(entry.definition || '').trim()),
+            image: Boolean(imageBlob),
+            exampleOne: Boolean(String(entry.exampleOne || '').trim()),
+            exampleTwo: Boolean(String(entry.exampleTwo || '').trim())
+        };
+        const hasSavedWork = Object.values(provided).some(Boolean);
 
         const status = document.createElement('div');
         const statusBadge = document.createElement('div');
-        statusBadge.textContent = quality.complete ? 'Complete' : 'Needs review';
+        statusBadge.textContent = hasSavedWork ? 'Saved' : 'No saved work';
         statusBadge.style.display = 'inline-flex';
         statusBadge.style.marginBottom = '0.65rem';
         statusBadge.style.borderRadius = '999px';
         statusBadge.style.padding = '0.25rem 0.65rem';
         statusBadge.style.fontWeight = '800';
         statusBadge.style.fontSize = '0.78rem';
-        statusBadge.style.background = quality.complete ? '#d1fae5' : '#fef3c7';
-        statusBadge.style.color = quality.complete ? '#065f46' : '#92400e';
+        statusBadge.style.background = hasSavedWork ? '#d1fae5' : '#fef3c7';
+        statusBadge.style.color = hasSavedWork ? '#065f46' : '#92400e';
         status.appendChild(statusBadge);
         [
-            ['Definition', quality.definition],
-            ['Image', quality.image],
-            ['Two examples', quality.examples]
+            ['Definition', provided.definition],
+            ['Image', provided.image],
+            ['Example 1', provided.exampleOne],
+            ['Example 2', provided.exampleTwo]
         ].forEach(([label, done]) => {
             status.appendChild(this.createQualityItem(label, done));
         });
