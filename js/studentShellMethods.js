@@ -4,6 +4,13 @@ const CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY = 'student_classroom_instructions_col
 
 class StudentShellMethods {
     switchView(viewId) {
+        const currentViewId = $('.view.active')?.id || '';
+        const currentSection = this.getStudentSectionForView(currentViewId);
+        const nextSection = this.getStudentSectionForView(viewId);
+        const shouldRestoreSectionScroll = Boolean(currentSection && nextSection && currentSection !== nextSection);
+
+        this.saveStudentSectionScroll(currentViewId);
+
         if (viewId !== 'student-classroom-activity-view') {
             this.classroomActivities?.cleanup?.();
         }
@@ -26,6 +33,39 @@ class StudentShellMethods {
         if (window.lucide) {
             window.lucide.createIcons();
         }
+
+        if (shouldRestoreSectionScroll) {
+            this.restoreStudentSectionScroll(viewId);
+        }
+    }
+
+    saveStudentSectionScroll(viewId = '') {
+        const section = this.getStudentSectionForView(viewId);
+        if (!section) return;
+
+        if (!this.studentSectionScrollPositions) {
+            this.studentSectionScrollPositions = {};
+        }
+        this.studentSectionScrollPositions[section] = window.scrollY || document.documentElement.scrollTop || 0;
+    }
+
+    restoreStudentSectionScroll(viewId = '') {
+        const section = this.getStudentSectionForView(viewId);
+        if (!section) return;
+        const savedTop = Number.isFinite(this.studentSectionScrollPositions?.[section])
+            ? this.studentSectionScrollPositions[section]
+            : 0;
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+                window.scrollTo({
+                    top: Math.min(Math.max(0, savedTop), maxTop),
+                    left: 0,
+                    behavior: 'auto'
+                });
+            });
+        });
     }
 
     getStudentSectionForView(viewId) {

@@ -96,6 +96,7 @@ class StudentManager {
             month: null,
             week: null
         };
+        this.studentSectionScrollPositions = {};
         this.cloudSaveTimeout = null;
         this.unitImages = {};
         this.routeReady = false;

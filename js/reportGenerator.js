@@ -49,6 +49,39 @@ export class ReportGenerator {
         return selectedWords.length > 0 ? selectedWords : allWords.slice(0, fallbackLimit);
     }
 
+    static mergeSavedWordHuntWords(words = [], wordHunt = {}) {
+        const merged = [];
+        const seen = new Set();
+
+        words.forEach(wordObj => {
+            const normalized = typeof wordObj === 'string' ? { word: wordObj } : wordObj;
+            const word = String(normalized?.word || '').trim();
+            if (!word || seen.has(word)) return;
+            seen.add(word);
+            merged.push(normalized);
+        });
+
+        Object.keys(wordHunt || {}).forEach(word => {
+            const normalizedWord = String(word || '').trim();
+            if (!normalizedWord || seen.has(normalizedWord)) return;
+            seen.add(normalizedWord);
+            merged.push({ word: normalizedWord });
+        });
+
+        return merged;
+    }
+
+    static async waitForImages(root) {
+        const images = Array.from(root?.querySelectorAll?.('img') || []);
+        await Promise.all(images.map(image => {
+            if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+            return new Promise(resolve => {
+                image.addEventListener('load', resolve, { once: true });
+                image.addEventListener('error', resolve, { once: true });
+            });
+        }));
+    }
+
     static slugForDownload(value) {
         return String(value || 'word-hunt')
             .toLowerCase()
@@ -221,6 +254,7 @@ export class ReportGenerator {
 
         try {
             const html2canvas = await this.ensureHtml2Canvas();
+            await this.waitForImages(reportCard);
             const canvas = await html2canvas(reportCard);
             const imgData = canvas.toDataURL('image/png');
 
@@ -303,6 +337,7 @@ export class ReportGenerator {
             });
             detailsContainer.appendChild(section);
 
+            await this.waitForImages(reportCard);
             const canvas = await html2canvas(reportCard);
             const link = document.createElement('a');
             link.download = `word-hunt-${this.slugForDownload(vocabName)}-${Date.now()}.png`;
@@ -355,9 +390,10 @@ export class ReportGenerator {
 
     static async renderWordHuntTable(section, vocabName, words, options = {}) {
         const wordHunt = options.wordHunt || {};
-        const sourceWords = words.length > 0
-            ? words.map(word => (typeof word === 'string' ? { word } : word))
+        const fallbackWords = words.length > 0
+            ? words
             : (await this.getWordsFromImageDB(vocabName)).map(word => ({ word }));
+        const sourceWords = this.mergeSavedWordHuntWords(fallbackWords, wordHunt);
 
         if (sourceWords.length === 0) {
             const empty = createElement('p');

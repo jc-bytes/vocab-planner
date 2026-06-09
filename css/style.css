@@ -6316,6 +6316,7 @@ input[type="checkbox"] {
     text-align: center;
     background: rgba(15, 23, 42, 0.5);
     overflow: hidden;
+    cursor: text;
 }
 
 .word-hunt-upload-area p {
@@ -6334,18 +6335,22 @@ input[type="checkbox"] {
     color: #fff;
     font-weight: 700;
     box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+    cursor: pointer;
 }
 
+.word-hunt-upload-area:focus,
 .word-hunt-upload-area:focus-within {
     border-color: rgba(99, 102, 241, 0.8);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    outline: none;
 }
 
 .word-hunt-upload-area input[type="file"] {
     position: absolute;
-    inset: 0;
+    width: 1px;
+    height: 1px;
     opacity: 0;
-    cursor: pointer;
+    pointer-events: none;
 }
 
 .word-hunt-preview-frame {

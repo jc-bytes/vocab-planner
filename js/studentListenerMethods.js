@@ -3,9 +3,22 @@ import { studentApi as supabaseService } from './services/studentApi.js';
 
 class StudentListenerMethods {
     initListeners() {
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
         window.addEventListener('resize', () => this.setStudentMobileMenu(false));
+        window.addEventListener('pagehide', () => this.saveStudentSectionScroll($('.view.active')?.id || ''));
+        document.addEventListener('visibilitychange', () => {
+            const activeViewId = $('.view.active')?.id || '';
+            if (document.hidden) {
+                this.saveStudentSectionScroll(activeViewId);
+            } else {
+                this.restoreStudentSectionScroll(activeViewId);
+            }
+        });
 
         setupModal('#leaderboard-modal', { dismissible: true });
         setupModal('#profile-modal', { dismissible: false });

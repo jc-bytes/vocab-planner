@@ -241,9 +241,9 @@ export class IllustrationActivity {
         const actions = createElement('div', 'word-hunt-actions');
         const searchTerm = word.word || '';
         const links = [
-            ['Definition', `https://www.google.com/search?q=${encodeURIComponent(`${searchTerm} definition`)}`],
+            ['Definition', `https://www.google.com/search?q=${encodeURIComponent(`definition of the word ${searchTerm} in technology/robotic class`)}`],
             ['Image', `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(searchTerm)}`],
-            ['Examples', `https://www.google.com/search?q=${encodeURIComponent(`${searchTerm} example sentence`)}`]
+            ['Examples', `https://www.google.com/search?q=${encodeURIComponent(`example of the word ${searchTerm} in a sentence`)}`]
         ];
 
         links.forEach(([label, href]) => {
@@ -324,11 +324,17 @@ export class IllustrationActivity {
 
         const uploadArea = createElement('div', 'word-hunt-upload-area');
         uploadArea.tabIndex = 0;
+        uploadArea.setAttribute('aria-label', 'Paste image area. Click here, then paste an image.');
+        uploadArea.addEventListener('click', event => {
+            if (event.target.closest('.word-hunt-upload-action')) return;
+            uploadArea.focus({ preventScroll: true });
+        });
 
         const instruction = createElement('p');
         instruction.textContent = entry.hasImage ? 'Image saved. Paste or upload to replace it.' : 'Paste an image or upload a file.';
 
-        const uploadAction = createElement('span', 'word-hunt-upload-action');
+        const uploadAction = createElement('button', 'word-hunt-upload-action');
+        uploadAction.type = 'button';
         uploadAction.textContent = entry.hasImage ? 'Replace Image' : 'Choose Image';
 
         const fileInput = document.createElement('input');
@@ -336,6 +342,11 @@ export class IllustrationActivity {
         fileInput.accept = 'image/*';
         fileInput.setAttribute('aria-label', 'Upload image');
         fileInput.addEventListener('change', event => this.handleFileSelect(event));
+        uploadAction.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            fileInput.click();
+        });
 
         uploadArea.appendChild(instruction);
         uploadArea.appendChild(uploadAction);
