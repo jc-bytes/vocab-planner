@@ -87,13 +87,12 @@ class StudentShellMethods {
             });
         };
 
+        restore();
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                restore();
-                setTimeout(restore, 120);
-                setTimeout(restore, 350);
-                setTimeout(restore, 800);
-            });
+            restore();
+            setTimeout(restore, 120);
+            setTimeout(restore, 350);
+            setTimeout(restore, 800);
         });
     }
 
