@@ -77,9 +77,6 @@ class StudentActivityHomeMethods {
 
         this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
-        const sparkHost = createElement('div', 'student-spark-host');
-        container.appendChild(sparkHost);
-        this.loadAndRenderCurrentSpark(sparkHost);
 
         const { vocabs, message } = this.getVisibleVocabularyList({
             availableOnly: true,
@@ -111,11 +108,6 @@ class StudentActivityHomeMethods {
             .slice(-2)
             .reverse();
 
-        const recentItems = decorated
-            .filter(item => item.progress.latestPlayed > 0 && !item.progress.isComplete)
-            .sort((a, b) => b.progress.latestPlayed - a.progress.latestPlayed)
-            .slice(0, 2);
-
         const weekItems = decorated
             .filter(item => {
                 const monthIndex = MONTH_INDEX[item.schedule.month];
@@ -132,18 +124,16 @@ class StudentActivityHomeMethods {
 
         const panels = [
             {
+                key: 'spark',
+                title: 'Spark',
+                subtitle: 'Question of the week'
+            },
+            {
                 key: 'pending',
                 title: 'Pending',
                 subtitle: 'Due this trimester',
                 items: dueItems,
                 emptyText: message || 'No pending units due yet.'
-            },
-            {
-                key: 'recent',
-                title: 'Recent',
-                subtitle: 'Unfinished practice',
-                items: recentItems,
-                emptyText: 'No unfinished recent work.'
             },
             {
                 key: 'week',
@@ -171,10 +161,14 @@ class StudentActivityHomeMethods {
         });
         container.appendChild(tabList);
 
-        panels.forEach((panel, index) => {
-            container.appendChild(this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText, index === 0));
+        panels.forEach((panel) => {
+            const homePanel = panel.key === 'spark'
+                ? this.createSparkHomePanel(panel.title, panel.subtitle)
+                : this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText);
+            container.appendChild(homePanel);
         });
         this.bindHomePanelTabs(container);
+        this.loadAndRenderCurrentSpark(container.querySelector('.student-spark-host'));
         this.scheduleFirstVocabularyPreload(container);
 
         if (window.lucide) {
@@ -223,13 +217,13 @@ class StudentActivityHomeMethods {
         try {
             const spark = await this.fetchCurrentSpark();
             if (!spark?.id) {
-                host.remove();
+                this.removeSparkHomePanel(host);
                 return;
             }
             host.replaceChildren(this.createStudentSparkCard(spark));
             if (window.lucide) window.lucide.createIcons();
         } catch {
-            host.remove();
+            this.removeSparkHomePanel(host);
         }
     }
 
@@ -267,6 +261,41 @@ class StudentActivityHomeMethods {
             ${sourceHtml ? `<div class="student-spark-source">${sourceHtml}</div>` : ''}
         `;
         return card;
+    }
+
+    removeSparkHomePanel(host) {
+        const panel = host?.closest('.student-home-panel');
+        const tab = $('#student-home-tab-spark');
+        panel?.remove();
+        tab?.remove();
+        const firstTab = $('.student-home-tab');
+        if (firstTab) {
+            firstTab.classList.add('active');
+            firstTab.setAttribute('aria-selected', 'true');
+            firstTab.tabIndex = 0;
+            const firstPanel = $(`#${firstTab.getAttribute('aria-controls')}`);
+            firstPanel?.classList.add('active');
+        }
+    }
+
+    createSparkHomePanel(title, subtitle) {
+        const panel = createElement('section', 'student-home-panel student-home-spark-panel active');
+        panel.id = 'student-home-panel-spark';
+        panel.dataset.panel = 'spark';
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', 'student-home-tab-spark');
+        panel.innerHTML = `
+            <div class="teacher-panel-header">
+                <div>
+                    <h3>${title}</h3>
+                    <p>${subtitle}</p>
+                </div>
+            </div>
+            <div class="student-spark-host">
+                <p class="teacher-empty-state">Loading Spark...</p>
+            </div>
+        `;
+        return panel;
     }
 
     bindHomePanelTabs(container) {
