@@ -188,8 +188,7 @@ export class IllustrationActivity {
         wrapper.appendChild(this.createHeader(word, entry));
         wrapper.appendChild(this.createResearchActions(word));
         wrapper.appendChild(this.createHuntGrid(word, entry));
-        wrapper.appendChild(this.createStatusPanel(entry));
-        wrapper.appendChild(this.createBottomNav(entry));
+        wrapper.appendChild(this.createFooter(entry));
         this.container.appendChild(wrapper);
 
         this.previewImage = this.container.querySelector('#word-hunt-preview');
@@ -305,7 +304,7 @@ export class IllustrationActivity {
 
         const textarea = document.createElement('textarea');
         textarea.id = id;
-        textarea.rows = field === 'definition' ? 4 : 3;
+        textarea.rows = field === 'definition' ? 3 : 2;
         textarea.placeholder = placeholder;
         textarea.value = value || '';
         textarea.addEventListener('input', event => this.updateEntryField(field, event.target.value));
@@ -389,6 +388,13 @@ export class IllustrationActivity {
         next.addEventListener('click', () => this.navigate(1));
         nav.appendChild(next);
         return nav;
+    }
+
+    createFooter(entry) {
+        const footer = createElement('div', 'word-hunt-footer');
+        footer.appendChild(this.createStatusPanel(entry));
+        footer.appendChild(this.createBottomNav(entry));
+        return footer;
     }
 
     createStatusPanel(entry) {
