@@ -427,6 +427,7 @@ function buildAuditSparks({ teacherId }) {
             question: 'What classroom problem could technology help us improve this week?',
             source_title: 'Local audit seed',
             source_url: '',
+            subject_slug: 'technology',
             scheduled_date: auditVisibleFromDate(),
             status: 'scheduled',
             owner_id: teacherId
@@ -440,6 +441,7 @@ function buildAuditSparks({ teacherId }) {
             question: 'Why is scheduling useful for classroom routines?',
             source_title: 'Local audit seed',
             source_url: '',
+            subject_slug: 'technology',
             scheduled_date: '2099-01-01',
             status: 'scheduled',
             owner_id: teacherId
@@ -467,9 +469,17 @@ export async function seedLocalAuditData({ resetSubmissions = false } = {}) {
         .upsert(buildAuditAssignments({ teacherId: users.teacher.id, image }), { onConflict: 'id' })
         .throwOnError();
 
+    const auditSparks = buildAuditSparks({ teacherId: users.teacher.id });
     await admin
         .from('weekly_sparks')
-        .upsert(buildAuditSparks({ teacherId: users.teacher.id }), { onConflict: 'id' })
+        .delete()
+        .eq('subject_slug', 'technology')
+        .in('scheduled_date', auditSparks.map(spark => spark.scheduled_date))
+        .throwOnError();
+
+    await admin
+        .from('weekly_sparks')
+        .upsert(auditSparks, { onConflict: 'id' })
         .throwOnError();
 
     if (resetSubmissions) await resetAuditSubmissions(admin);
