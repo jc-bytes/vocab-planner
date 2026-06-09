@@ -425,13 +425,15 @@ async function assertStudentSparkCard(page, baseUrl) {
         const card = document.querySelector('.student-spark-card');
         return {
             text: card?.textContent || '',
-            beforeTabs: Boolean(card && card.compareDocumentPosition(document.querySelector('.student-home-tabs')) & Node.DOCUMENT_POSITION_FOLLOWING)
+            activeTab: document.querySelector('.student-home-tab.active')?.dataset.panel,
+            visiblePanel: document.querySelector('.student-home-panel.active')?.dataset.panel
         };
     });
 
     if (!state.text.includes('Audit Spark')
         || state.text.includes('Future Audit Spark')
-        || !state.beforeTabs) {
+        || state.activeTab !== 'spark'
+        || state.visiblePanel !== 'spark') {
         throw new Error(`Student Today Spark card is wrong: ${JSON.stringify(state)}`);
     }
 }
@@ -537,9 +539,9 @@ async function assertStudentMobileMenu(page, baseUrl) {
 
     if (dashboardState.headingVisible
         || !dashboardState.tabsVisible
-        || dashboardState.activeTab !== 'pending'
+        || dashboardState.activeTab !== 'spark'
         || dashboardState.visiblePanels.length !== 1
-        || dashboardState.visiblePanels[0] !== 'pending') {
+        || dashboardState.visiblePanels[0] !== 'spark') {
         throw new Error(`Student mobile dashboard is not compacted into one active panel: ${JSON.stringify(dashboardState)}`);
     }
     if (!dashboardState.subject || !dashboardState.allUnits
