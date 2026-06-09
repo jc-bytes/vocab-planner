@@ -41,6 +41,20 @@ function normalizeSparkGradeQuestions(value) {
     }, {});
 }
 
+function normalizeSparkTargetGrades(value) {
+    const source = Array.isArray(value) ? value : String(value || '').split(',');
+    const grades = source
+        .flatMap(item => String(item || '').split(','))
+        .map(item => item.trim().match(/\d+/)?.[0] || '')
+        .filter(grade => SPARK_GRADE_LEVELS.includes(grade));
+    return Array.from(new Set(grades));
+}
+
+function isAllGradeSpark(spark) {
+    const targetGrades = normalizeSparkTargetGrades(spark?.targetGrades ?? spark?.target_grades);
+    return SPARK_GRADE_LEVELS.every(grade => targetGrades.includes(grade));
+}
+
 class StudentActivityHomeMethods {
     getUnitProgressSummary(vocab) {
         const unitProgress = this.sm.progressData?.units?.[this.getUnitProgressKey(vocab)]
@@ -189,11 +203,16 @@ class StudentActivityHomeMethods {
             whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
             question: String(source.question || '').trim(),
             gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
+            targetGrades: normalizeSparkTargetGrades(source.targetGrades ?? source.target_grades ?? SPARK_GRADE_LEVELS),
             sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
             sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
             subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? 'technology').trim() || 'technology',
             scheduledDate: String(source.scheduledDate ?? source.scheduled_date ?? '').trim()
         };
+    }
+
+    getStudentGradeLevel() {
+        return String(this.sm.studentProfile?.grade || '').match(/\d+/)?.[0] || '';
     }
 
     async fetchCurrentSpark() {
@@ -206,10 +225,15 @@ class StudentActivityHomeMethods {
             where('status', '==', 'scheduled'),
             where('scheduledDate', '<=', getPanamaDateValue()),
             orderBy('scheduledDate', 'desc'),
-            limit(1)
+            limit(40)
         ));
-        const first = snapshot.docs[0];
-        return first ? this.normalizeSpark({ id: first.id, ...first.data() }) : null;
+        const sparks = snapshot.docs.map(docSnap => this.normalizeSpark({ id: docSnap.id, ...docSnap.data() }));
+        const grade = this.getStudentGradeLevel();
+        if (grade) {
+            const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
+            if (gradeMatch) return gradeMatch;
+        }
+        return sparks.find(isAllGradeSpark) || null;
     }
 
     async loadAndRenderCurrentSpark(host) {
@@ -228,7 +252,7 @@ class StudentActivityHomeMethods {
     }
 
     getStudentSparkQuestion(spark) {
-        const grade = String(this.sm.studentProfile?.grade || '').match(/\d+/)?.[0] || '';
+        const grade = this.getStudentGradeLevel();
         return String(spark.gradeQuestions?.[grade] || spark.question || '').trim();
     }
 

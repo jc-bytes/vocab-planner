@@ -5078,6 +5078,30 @@ select:focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.spark-target-grade-grid {
+    display: grid;
+    gap: var(--spacing-sm);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.spark-target-grade-option {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: var(--touch-target);
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.42);
+    color: var(--text-primary);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.spark-target-grade-option input {
+    flex: 0 0 auto;
+}
+
 .spark-grade-question-grid .form-group {
     margin-bottom: 0;
 }
@@ -9347,7 +9371,8 @@ button.activity-card {
         width: 100%;
     }
 
-    .spark-grade-question-grid {
+    .spark-grade-question-grid,
+    .spark-target-grade-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 

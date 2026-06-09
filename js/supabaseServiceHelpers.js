@@ -124,6 +124,7 @@ export const FIELD_ALIASES = {
         sparkText: 'spark_text',
         sparkType: 'spark_type',
         subjectSlug: 'subject_slug',
+        targetGrades: 'target_grades',
         updatedAt: 'updated_at',
         whyItMatters: 'why_it_matters'
     }
@@ -422,6 +423,7 @@ export const toClientRow = (tableName, row) => {
             whyItMatters: row.why_it_matters || '',
             question: row.question || '',
             gradeQuestions: row.grade_questions && typeof row.grade_questions === 'object' ? row.grade_questions : {},
+            targetGrades: normalizeTextArray(row.target_grades || ['6', '7', '8', '9']),
             sourceTitle: row.source_title || '',
             sourceUrl: row.source_url || '',
             subjectSlug: row.subject_slug || 'technology',
@@ -637,6 +639,7 @@ export const fromClientPayload = (tableName, payload = {}, id = null) => {
             why_it_matters: payload.whyItMatters ?? payload.why_it_matters,
             question: payload.question,
             grade_questions: payload.gradeQuestions ?? payload.grade_questions ?? {},
+            target_grades: normalizeTextArray(payload.targetGrades ?? payload.target_grades ?? ['6', '7', '8', '9']),
             source_title: payload.sourceTitle ?? payload.source_title ?? '',
             source_url: payload.sourceUrl ?? payload.source_url ?? '',
             subject_slug: payload.subjectSlug || payload.subject_slug || 'technology',

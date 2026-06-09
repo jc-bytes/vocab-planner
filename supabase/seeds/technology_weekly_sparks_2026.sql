@@ -1,90 +1,2363 @@
 -- Technology Sparks for the 2026 school year.
--- These are subject-level Sparks for all Technology grades, not grade-specific lessons.
+-- Generated from vocabularies/manifest.json so Sparks follow each grade's weekly topic.
 delete from public.weekly_sparks
-where id ~ '^grade6_2026_w[0-9]{2}_[ab]$';
+where id ~ '^technology_2026_'
+   or id ~ '^grade[0-9]+_2026_w[0-9]{2}_[ab]$';
 
 with technology_weekly_sparks_2026 as (
-    select *
+    select
+        spark.id,
+        spark.spark_type,
+        spark.title,
+        spark.spark_text,
+        spark.why_it_matters,
+        spark.question,
+        spark.source_title,
+        spark.source_url,
+        spark.subject_slug,
+        array(
+            select jsonb_array_elements_text(spark.target_grades)
+        ) as target_grades,
+        spark.scheduled_date,
+        spark.status
     from jsonb_to_recordset($technology_weekly_sparks_2026$
 [
-  {"id":"technology_2026_w01_a","spark_type":"cool_fact","title":"DNS Is A Translator","spark_text":"When you type a domain name, DNS helps connect that name to the numeric IP address computers use to find the right server.","why_it_matters":"Every Technology class uses the web, so understanding DNS helps students see the hidden system behind a simple click.","question":"Why might humans prefer domain names while computers use IP addresses?","source_title":"ICANN - The Domain Name System","source_url":"https://www.icann.org/resources/pages/dns-2022-09-13-en","scheduled_date":"2026-03-02","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w01_b","spark_type":"trivia","title":"The Web Was A Research Tool","spark_text":"The World Wide Web was invented at CERN in 1989 to help scientists share information across different computers.","why_it_matters":"Technology often starts as a solution to a communication problem before becoming part of everyday life.","question":"What problem would you want a new technology to solve for students?","source_title":"CERN - Where the web was born","source_url":"https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/","scheduled_date":"2026-03-04","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w02_a","spark_type":"good_news","title":"Packets Carry Big Ideas","spark_text":"Internet data can be broken into smaller packets, sent across networks, and reassembled when it arrives.","why_it_matters":"The same packet idea helps explain websites, messages, video calls, cloud work, and online games.","question":"What could go wrong if one packet in a message arrived late or out of order?","source_title":"Cloudflare - How does the Internet work?","source_url":"https://www.cloudflare.com/learning/network-layer/how-does-the-internet-work","scheduled_date":"2026-03-09","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w02_b","spark_type":"reflection","title":"Invisible Systems Still Matter","spark_text":"Most people do not see packets, servers, protocols, or DNS when they use technology, but those systems shape the experience.","why_it_matters":"Students learn to look underneath the surface of apps and devices instead of treating them like magic.","question":"Name one invisible technology system you depend on almost every day.","source_title":"Cloudflare - What is a packet?","source_url":"https://www.cloudflare.com/learning/network-layer/what-is-a-packet/","scheduled_date":"2026-03-11","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w03_a","spark_type":"debate","title":"Shared Work Or Solo First?","spark_text":"Shared documents help teams move fast, but planning alone first can sometimes make each person think more carefully.","why_it_matters":"Collaboration is a Technology skill across websites, robots, code, spreadsheets, and projects.","question":"Should teams start in a shared file right away, or should each person plan alone first? Choose a side.","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-03-16","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w03_b","spark_type":"cool_fact","title":"Comments Are Design Tools","spark_text":"A useful comment names what works, points to one specific improvement, and stays respectful.","why_it_matters":"Peer feedback can improve a website, program, model, chart, robot, or presentation.","question":"What is one comment sentence that would actually help a partner improve?","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-03-18","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w04_a","spark_type":"trivia","title":"Public Can Travel Far","spark_text":"A public post or file can reach people far beyond the first audience, while a private message is meant for selected people.","why_it_matters":"Students need privacy and audience awareness in every digital project, not only social media.","question":"What is one thing that is fine to share with a teacher but not with the whole internet?","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-03-23","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w04_b","spark_type":"good_news","title":"The First Website Was Simple","spark_text":"The first website was a simple page explaining the World Wide Web project, not a flashy app.","why_it_matters":"Clear structure and purpose often matter more than decoration.","question":"What would your first website explain to someone else?","source_title":"CERN - Where the web was born","source_url":"https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/","scheduled_date":"2026-03-25","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w05_a","spark_type":"reflection","title":"Credit Shows Respect","spark_text":"Using a creator's work responsibly means checking permission, naming the source, and giving credit when required.","why_it_matters":"Copyright and credit affect websites, posters, videos, slides, datasets, and AI-assisted work.","question":"How does a credit line help both the creator and the audience?","source_title":"Creative Commons - Attribution","source_url":"https://creativecommons.org/licenses/by/3.0/us/deed.en","scheduled_date":"2026-03-30","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w05_b","spark_type":"debate","title":"Fast Search Or Safe Search?","spark_text":"The fastest image, fact, or code result is not always the safest or most responsible one to use.","why_it_matters":"Students practice checking source, permission, and fit before adding digital material to a project.","question":"Should a class project lose points for using an image or fact with no source listed? Defend your answer.","source_title":"Creative Commons - CC Search","source_url":"https://wiki.creativecommons.org/wiki/CC_Search","scheduled_date":"2026-04-01","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w06_a","spark_type":"cool_fact","title":"Layout Guides Attention","spark_text":"A title, sections, labels, and spacing help people understand what to look at first.","why_it_matters":"Layout affects websites, slides, dashboards, app screens, posters, and data reports.","question":"What should a visitor understand in the first five seconds of a digital product?","source_title":"CERN - Where the web was born","source_url":"https://home.cern/science/computing/the-birth-of-the-web/where-web-was-born/","scheduled_date":"2026-04-06","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w06_b","spark_type":"trivia","title":"Preview Before You Publish","spark_text":"A design that looks clear on one screen can feel crowded or hard to use on another screen.","why_it_matters":"Previewing helps students catch problems before an audience sees the final work.","question":"Which detail would you check first when previewing a project: title, image, data, text size, or link? Why?","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-04-08","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w07_a","spark_type":"good_news","title":"Beginner Coding Can Be Creative","spark_text":"Scratch supports beginner-friendly creative coding with tutorials, starter projects, remixing, testing, and reflection.","why_it_matters":"Creative coding builds problem-solving habits that carry into robotics, apps, and physical computing.","question":"What could you remix to make it more personal or useful?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-04-13","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w07_b","spark_type":"reflection","title":"Debugging Is Expected","spark_text":"Debugging means finding and fixing problems when a project does not work as expected.","why_it_matters":"A calm debugging routine helps in Scratch, MakeCode, Arduino, Python, robots, spreadsheets, and websites.","question":"What is one calm first step when your technology project does not work?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-04-15","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w08_a","spark_type":"debate","title":"Should Games Always Score?","spark_text":"A score variable can motivate players, but it can also distract from exploration, creativity, or learning.","why_it_matters":"Students learn that variables and feedback systems are design choices.","question":"Should every classroom game or challenge have a score? Choose a side and give one reason.","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-04-20","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w08_b","spark_type":"cool_fact","title":"Variables Remember Change","spark_text":"A variable stores a value that can change, such as score, lives, temperature, distance, money, or attempts.","why_it_matters":"Variables connect games, spreadsheets, sensors, robotics, and data projects.","question":"What changing value would your project need to remember?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-04-22","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w09_a","spark_type":"trivia","title":"A Campaign Needs One Clear Message","spark_text":"An awareness product works best when the audience can remember the main rule, fact, or action quickly.","why_it_matters":"Communication design matters in safety campaigns, environmental projects, and technology presentations.","question":"What is one technology rule students should remember without needing a long explanation?","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-04-27","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w09_b","spark_type":"good_news","title":"Safety Can Be Designed In","spark_text":"Many technology tools build privacy and safety controls directly into the product instead of leaving every choice to the user.","why_it_matters":"Safety is both a user habit and a design responsibility.","question":"What safety feature would you add to a class communication or project tool?","source_title":"Google Safety Center","source_url":"https://safety.google/","scheduled_date":"2026-04-29","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w10_a","spark_type":"reflection","title":"Old Devices Still Matter","spark_text":"E-waste includes discarded devices with plugs or batteries, and it can affect people and the environment if handled badly.","why_it_matters":"Technology work includes thinking about what happens before and after a device is used.","question":"What should happen to an old phone, battery, or computer before it becomes trash?","source_title":"WHO - Electronic waste","source_url":"https://www.who.int/news-room/fact-sheets/detail/electronic-waste-%28e-waste%29","scheduled_date":"2026-05-04","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w10_b","spark_type":"debate","title":"Repair Or Replace?","spark_text":"Repairing a device can reduce waste, but replacement may be safer or cheaper when a device is too damaged.","why_it_matters":"Students practice responsible technology decisions with tradeoffs instead of one easy answer.","question":"Should schools repair old devices whenever possible, or replace them when they slow down learning? Choose one and explain.","source_title":"WHO - Electronic waste","source_url":"https://www.who.int/news-room/fact-sheets/detail/electronic-waste-%28e-waste%29","scheduled_date":"2026-05-06","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w11_a","spark_type":"cool_fact","title":"The 22 Percent Problem","spark_text":"In 2022, only 22.3 percent of global e-waste was documented as formally collected and recycled.","why_it_matters":"A single checked statistic can make a technology sustainability message stronger.","question":"If only about one fifth is formally recycled, what problem should an awareness product focus on?","source_title":"WHO - Electronic waste","source_url":"https://www.who.int/news-room/fact-sheets/detail/electronic-waste-%28e-waste%29","scheduled_date":"2026-05-11","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w11_b","spark_type":"trivia","title":"E-Waste Has Hidden Value","spark_text":"Old electronics can contain valuable materials, but recovering them safely takes planning, collection, and good recycling systems.","why_it_matters":"Students see waste as a design and systems problem, not only a trash problem.","question":"What makes e-waste harder to recycle than paper or plastic bottles?","source_title":"WHO - Electronic waste","source_url":"https://www.who.int/news-room/fact-sheets/detail/electronic-waste-%28e-waste%29","scheduled_date":"2026-05-13","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w12_a","spark_type":"good_news","title":"Smart Recycling Ideas Are Growing","spark_text":"Some projects use technology to classify donated electronics and decide whether they should be reused, repaired, or recycled.","why_it_matters":"Computing, AI, and robotics can support environmental solutions when designed responsibly.","question":"How could a smart recycling station help people sort devices more responsibly?","source_title":"Central Washington University - eRecyclee","source_url":"https://www.cwu.edu/about/media-resources/news/2026/03/it-management-alum-launches-nonprofit-to-reduce-e-waste-and-support-stem-learning.php","scheduled_date":"2026-05-18","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w12_b","spark_type":"reflection","title":"One Fact, One Action","spark_text":"A strong technology awareness message usually combines one checkable fact with one action the audience can take.","why_it_matters":"Students learn to make digital communication practical, focused, and believable.","question":"What action could a student take this week to use technology more responsibly?","source_title":"WHO - Electronic waste","source_url":"https://www.who.int/news-room/fact-sheets/detail/electronic-waste-%28e-waste%29","scheduled_date":"2026-05-20","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w13_a","spark_type":"debate","title":"Best Evidence Of Learning","spark_text":"A diagram, website, spreadsheet, program, robot test, model, and reflection all show learning in different ways.","why_it_matters":"Technology classes should value both products and explanations.","question":"Which shows learning better: a finished product or an explanation of how it works? Defend your choice.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-05-25","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w13_b","spark_type":"cool_fact","title":"Small Projects Build Big Skills","spark_text":"Short classroom products can still build important skills: planning, testing, explaining, improving, and presenting.","why_it_matters":"Students can take small tasks seriously without needing every project to become huge.","question":"What small technology task helped you practice a big skill?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-05-27","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w14_a","spark_type":"trivia","title":"Robots Need Routines Too","spark_text":"A robot class needs safety routines because moving parts, wires, batteries, sensors, and testing spaces all matter.","why_it_matters":"Safe routines protect people, devices, data, and class time.","question":"What is one robot safety rule that protects both the device and the team?","source_title":"Makeblock - Beginner's Guide to mBot","source_url":"https://support.makeblock.com/hc/en-us/articles/12822859943959-A-Beginner-s-Guide-to-mBot","scheduled_date":"2026-06-08","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w14_b","spark_type":"good_news","title":"STEM Robots Make Code Visible","spark_text":"Educational robots can show code through movement, lights, sounds, sensor readings, and physical responses.","why_it_matters":"Students can connect abstract instructions to visible behavior.","question":"Which robot action would help you understand code faster: movement, light, sound, or sensor response? Why?","source_title":"Makeblock - Beginner's Guide to mBot","source_url":"https://support.makeblock.com/hc/en-us/articles/12822859943959-A-Beginner-s-Guide-to-mBot","scheduled_date":"2026-06-10","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w15_a","spark_type":"reflection","title":"Parts Have Jobs","spark_text":"A robot or device is easier to understand when each part has a job: input, processing, output, power, or movement.","why_it_matters":"Systems thinking helps students troubleshoot unfamiliar devices.","question":"Pick one device part and explain its job without using the word thing.","source_title":"Makeblock - Beginner's Guide to mBot","source_url":"https://support.makeblock.com/hc/en-us/articles/12822859943959-A-Beginner-s-Guide-to-mBot","scheduled_date":"2026-06-15","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w15_b","spark_type":"debate","title":"Partners Or Solo Drivers?","spark_text":"Teams can work faster with roles, but everyone needs a fair chance to plan, test, record, and explain.","why_it_matters":"Collaboration affects robotics, coding, design, data, and presentation work.","question":"Should one student control the device during a test, or should the role rotate every run? Explain.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-06-17","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w16_a","spark_type":"cool_fact","title":"Sequence Changes Everything","spark_text":"A program can have the right commands but still fail if the commands are in the wrong order.","why_it_matters":"Sequencing matters in robots, animations, spreadsheets, websites, circuits, and algorithms.","question":"What is one real-life task that only works if the steps are in the right order?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-06-22","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w16_b","spark_type":"trivia","title":"Speed And Time Work Together","spark_text":"Changing speed or time can change how far a robot or animation travels, even when the command looks almost the same.","why_it_matters":"Students learn to test one variable at a time so results can be explained.","question":"If a moving project goes too far, would you change speed, time, distance, or all three? Why?","source_title":"Makeblock - Beginner's Guide to mBot","source_url":"https://support.makeblock.com/hc/en-us/articles/12822859943959-A-Beginner-s-Guide-to-mBot","scheduled_date":"2026-06-24","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w17_a","spark_type":"good_news","title":"Outputs Communicate","spark_text":"Lights, sounds, screens, movement, and messages can all be outputs that tell a user what a system is doing.","why_it_matters":"Clear feedback makes technology easier and safer to use.","question":"What output should a device show when it finishes a task?","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-06-29","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w17_b","spark_type":"reflection","title":"Signals Need An Audience","spark_text":"A signal only helps if another person can understand what it means.","why_it_matters":"Students design outputs for users, not just for decoration.","question":"How could you test whether another group understands your signal or message?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-07-01","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w18_a","spark_type":"debate","title":"Perfect Run Or Good Explanation?","spark_text":"A technology test may not be perfect, but a clear explanation can show what was tried, measured, and improved.","why_it_matters":"Debugging evidence matters when hardware, data, or code behaves unpredictably.","question":"Should a grade reward a perfect final run more than a clear debugging explanation? Choose one and explain.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-07-06","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w18_b","spark_type":"cool_fact","title":"Test One Piece At A Time","spark_text":"Testing one section at a time makes it easier to find which command, value, sensor, formula, or design choice caused a problem.","why_it_matters":"This debugging habit works across almost every Technology unit.","question":"Why is testing one small section better than testing the whole project first?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-07-08","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w19_a","spark_type":"trivia","title":"Loops Save Repetition","spark_text":"A loop can replace repeated instructions when the same action pattern happens again and again.","why_it_matters":"Loops make programs shorter, clearer, and easier to adjust.","question":"What daily action could you describe with a repeat instruction?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-07-13","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w19_b","spark_type":"good_news","title":"Shorter Code Can Be Smarter","spark_text":"Efficient code is not just faster; it can be easier to read, test, reuse, and explain.","why_it_matters":"Students learn that elegance in technology often means clarity.","question":"When could shorter code make debugging easier?","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-07-15","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w20_a","spark_type":"reflection","title":"Sensors Are Device Senses","spark_text":"Sensors give a device information about the world, such as light, motion, temperature, distance, or touch.","why_it_matters":"Inputs help technology respond to real conditions instead of only fixed instructions.","question":"Which human sense is most similar to a distance or obstacle sensor? Explain your comparison.","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-07-20","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w20_b","spark_type":"debate","title":"Should Devices Decide?","spark_text":"A sensor-triggered behavior can make a device react without a person pressing a button every time.","why_it_matters":"Automation brings convenience, but it also raises questions about control and responsibility.","question":"Should a device stop by itself when it detects danger, or should a person always decide? Defend your answer.","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-07-22","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w21_a","spark_type":"cool_fact","title":"If Then Is A Choice","spark_text":"An if/then rule checks a condition and chooses a response based on whether the condition is true.","why_it_matters":"Conditional logic appears in games, robots, microcontrollers, apps, spreadsheets, and websites.","question":"Complete this sentence: If the sensor detects something, then the device should...","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-07-27","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w21_b","spark_type":"trivia","title":"Flowcharts Slow Down Thinking","spark_text":"A flowchart helps designers plan steps and choices before they start coding or building.","why_it_matters":"Drawing logic first can prevent confusing programs later.","question":"Why might drawing a flowchart prevent a coding mistake?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-07-29","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w22_a","spark_type":"good_news","title":"Challenges Can Be Small","spark_text":"A strong technology challenge can be simple: one goal, one success rule, one test, and one improvement.","why_it_matters":"A small controlled challenge can still show real design thinking.","question":"What is one realistic success rule for a technology challenge?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-03","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w22_b","spark_type":"reflection","title":"A Test Area Tells A Story","spark_text":"The test setup, data, route, inputs, or user conditions are part of the evidence because they show what the project was supposed to do.","why_it_matters":"Students learn to document the conditions around a result, not only the final screenshot.","question":"What should another team know before repeating your test?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-05","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w23_a","spark_type":"debate","title":"Guide First Or Explore First?","spark_text":"Tutorials and cards can help beginners, but experimenting can reveal ideas the guide did not mention.","why_it_matters":"Technology learning needs both support and curiosity.","question":"Should students follow the guide exactly first, or change it right away to experiment? Choose one and explain.","source_title":"Scratch Foundation - Getting Started","source_url":"https://www.scratchfoundation.org/learn/learning-library/getting-started","scheduled_date":"2026-08-10","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w23_b","spark_type":"cool_fact","title":"A Station Is A Mini Lab","spark_text":"A practice station can focus attention on one action, one test, and one explanation.","why_it_matters":"Small stations help students collect evidence without losing the main goal.","question":"What makes a station note useful after the test is over?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-12","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w24_a","spark_type":"trivia","title":"A Goal Is Not A Wish","spark_text":"A good project goal says exactly what the technology should do and how the team will know it worked.","why_it_matters":"Clear goals make coding, building, testing, and grading easier.","question":"Rewrite this goal to be clearer: Make the project do something cool.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-17","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w24_b","spark_type":"good_news","title":"Robotics Helps Real Recycling","spark_text":"Researchers and companies are testing robots that can help disassemble electronics for recycling.","why_it_matters":"Classroom robotics ideas can connect to real environmental engineering problems.","question":"Why might a robot be useful in an e-waste recycling facility?","source_title":"Carnegie Mellon University - E-waste robot","source_url":"https://www.cmu.edu/news/stories/archives/2025/february/cmu-robot-works-inside-e-waste-recycling-facility","scheduled_date":"2026-08-19","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w25_a","spark_type":"reflection","title":"Demo Means Explain","spark_text":"A technology demonstration is stronger when the team explains the goal, action, test result, and improvement.","why_it_matters":"An audience needs to understand both what happened and why it matters.","question":"Which part of your project explanation needs the most practice?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-24","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w25_b","spark_type":"debate","title":"Best Attempt Or Final Attempt?","spark_text":"A final demo can show the best result, but test notes can show the learning path that led there.","why_it_matters":"Students compare polished performance with process evidence.","question":"Should the teacher grade only the final result, or also the testing notes? Defend your answer.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-26","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w26_a","spark_type":"cool_fact","title":"Readiness Is Evidence","spark_text":"Saved files, labeled parts, clean data, screenshots, version names, and notes can make the next class start faster.","why_it_matters":"Organization is part of professional technology work.","question":"What is one detail your future self will thank you for saving clearly?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-08-31","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w26_b","spark_type":"trivia","title":"Tests Become Data","spark_text":"A technology test can produce records such as time, attempts, success, error type, sensor used, or improvement.","why_it_matters":"Students bridge from hands-on testing to organized data tables.","question":"What is one project result that belongs in a spreadsheet column?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-02","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w27_a","spark_type":"good_news","title":"Data Helps Teams Improve","spark_text":"When teams record the same fields for each test, the class can compare results more fairly.","why_it_matters":"Good data structure supports better decisions.","question":"What header would make project test data easier to understand?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-14","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w27_b","spark_type":"reflection","title":"One Row, One Record","spark_text":"A spreadsheet record is one complete row of information about one test, item, person, or observation.","why_it_matters":"Clean records prevent messy analysis later.","question":"What details should be in one complete project test record?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-16","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w28_a","spark_type":"debate","title":"Calculator Or Formula?","spark_text":"A calculator can answer one problem, but a spreadsheet formula can update when input values change.","why_it_matters":"Students compare manual calculation with automated calculation.","question":"Should students calculate totals by hand first before using formulas? Choose one side and explain.","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-21","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w28_b","spark_type":"cool_fact","title":"Inputs Change Outputs","spark_text":"In a spreadsheet formula, changing one input cell can change the output answer automatically.","why_it_matters":"Spreadsheet formulas connect directly to the input-output idea used in programming and robotics.","question":"What might happen to an average if one test value becomes much larger?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-23","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w29_a","spark_type":"trivia","title":"Formulas Need References","spark_text":"A cell reference such as A1 lets a formula point to data without copying the data into the formula again.","why_it_matters":"Labels and clean tables make formulas easier to check.","question":"Why is =B2+C2 more flexible than typing two fixed numbers?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-28","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w29_b","spark_type":"good_news","title":"Tables Can Become Pictures","spark_text":"Spreadsheet data can become charts that help people see comparisons, patterns, and trends faster.","why_it_matters":"Visual data can help an audience understand results without reading every row.","question":"What question could a chart answer better than a table?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-09-30","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w30_a","spark_type":"reflection","title":"Chart Titles Are Claims","spark_text":"A chart title should help the reader know what data is being shown and why it matters.","why_it_matters":"Chart labels communicate meaning, not decoration.","question":"What title would make a project-results chart clear?","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-10-05","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w30_b","spark_type":"debate","title":"Table Or Chart?","spark_text":"Tables show exact values, while charts can make comparisons easier to see quickly.","why_it_matters":"Students practice choosing the best format for the question and audience.","question":"Should a final data report include both a table and a chart, or only the clearer one? Defend your answer.","source_title":"Google Sheets Help - Charts","source_url":"https://support.google.com/docs/answer/190718?hl=en","scheduled_date":"2026-10-07","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w31_a","spark_type":"cool_fact","title":"3D Adds Depth","spark_text":"A 3D model has height, width, and depth, so designers have to think from more than one view.","why_it_matters":"Spatial thinking supports design, engineering, architecture, product prototypes, and game worlds.","question":"What real object could you build from a cube, cylinder, and sphere?","source_title":"Tinkercad","source_url":"https://www.tinkercad.com/?authuser=0","scheduled_date":"2026-10-12","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w31_b","spark_type":"trivia","title":"Simple Shapes Can Combine","spark_text":"Beginner 3D tools often let users build complex models by combining simple shapes.","why_it_matters":"Students do not need advanced tools to start designing useful objects.","question":"Which three basic shapes would you use to design a desk organizer, robot part, or game object?","source_title":"Tinkercad","source_url":"https://www.tinkercad.com/?authuser=0","scheduled_date":"2026-10-14","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w32_a","spark_type":"good_news","title":"3D Design Builds STEM Confidence","spark_text":"Tinkercad describes itself as a free web app for 3D design, electronics, and coding used in STEM classrooms.","why_it_matters":"3D modelling can connect art, math, engineering, electronics, and coding.","question":"How could a 3D model help someone understand an idea before making it physically?","source_title":"Tinkercad","source_url":"https://www.tinkercad.com/?authuser=0","scheduled_date":"2026-10-19","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w32_b","spark_type":"reflection","title":"Plan Before Building","spark_text":"A sketch with labels helps a designer decide what to build before opening the tool.","why_it_matters":"Planning evidence often makes the build cleaner, faster, and easier to explain.","question":"What label would make your design sketch easier for someone else to follow?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-10-21","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w33_a","spark_type":"debate","title":"Useful Or Creative?","spark_text":"Some digital models solve a practical problem, while others communicate identity, style, or imagination.","why_it_matters":"Purpose can be functional, expressive, or both.","question":"Should a class design be graded more on usefulness or creativity? Choose one and explain.","source_title":"Tinkercad","source_url":"https://www.tinkercad.com/?authuser=0","scheduled_date":"2026-10-26","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w33_b","spark_type":"cool_fact","title":"Microcontrollers Are Tiny Computers","spark_text":"A microcontroller can read inputs, run a program, and control outputs in a small physical device.","why_it_matters":"This idea connects micro:bit, Arduino, robots, sensors, wearables, and smart devices.","question":"What should a tiny computer be able to sense or show to be useful?","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-10-28","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w34_a","spark_type":"trivia","title":"LEDs Can Be Sensors Too","spark_text":"On the micro:bit, the LED display can show outputs, and the LEDs can also help sense light levels.","why_it_matters":"One part can sometimes play more than one role in a system.","question":"How can the same part be connected to both output and input?","source_title":"micro:bit - Features overview","source_url":"https://microbit.org/get-started/features/overview/","scheduled_date":"2026-11-02","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w34_b","spark_type":"good_news","title":"Students Can Build AI Ideas","spark_text":"In 2026, micro:bit announced a CreateAI pilot to help students become creators of AI and technology through hands-on activities.","why_it_matters":"Sensors, data, and programs connect to newer conversations about AI and responsible design.","question":"What is one rule students should follow when creating technology that learns from data?","source_title":"micro:bit - CreateAI US pilot","source_url":"https://microbit.org/news/2026-02-19/microbit-createai-us-pilot-supported-by-googleorg/","scheduled_date":"2026-11-04","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w35_a","spark_type":"reflection","title":"Input, Process, Output","spark_text":"A technology system can be described as input, process, and output: information goes in, logic runs, and something comes out.","why_it_matters":"This model works for apps, robots, spreadsheets, sensors, and AI tools.","question":"Describe one device using input, process, and output.","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-11-09","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w35_b","spark_type":"debate","title":"Simulator Or Real Device?","spark_text":"A simulator is fast and safe, but a real device lets students test how code behaves on hardware.","why_it_matters":"Technology testing often balances convenience with realism.","question":"Should beginners test in the simulator before touching the real device? Choose a side and explain.","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-11-11","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w36_a","spark_type":"cool_fact","title":"A Counter Needs Memory","spark_text":"A counter program needs a variable so the system can remember the changing number.","why_it_matters":"Memory is important in games, sensors, data logging, scores, timers, and user settings.","question":"What should happen to a counter variable when a button is pressed?","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-11-16","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w36_b","spark_type":"trivia","title":"Reset Is A Design Choice","spark_text":"A reset button can make a project easier to reuse, but it can also erase data if pressed by mistake.","why_it_matters":"Controls should be designed from the user's point of view.","question":"Should every counter, game, or data project include a reset button? Why or why not?","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-11-18","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w37_a","spark_type":"good_news","title":"Tiny Sensors Measure The World","spark_text":"The micro:bit can use built-in sensors, including an approximate temperature reading from its processor.","why_it_matters":"Sensor data can help students build projects that respond to real conditions.","question":"What classroom condition could a tiny sensor help measure?","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-11-23","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w37_b","spark_type":"reflection","title":"Reading Is Not Responding","spark_text":"Reading a sensor value tells the program what is happening, but the program still needs rules for how to respond.","why_it_matters":"Students separate input data from decision logic.","question":"What should a program do after it reads a sensor value?","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-11-25","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w38_a","spark_type":"debate","title":"Should Devices React Automatically?","spark_text":"A sensor program can react when light, temperature, movement, or distance changes, even if the user does not press a button.","why_it_matters":"Automation can be helpful, but designers must decide when automatic action is appropriate.","question":"Should a classroom device react automatically, or should a person press a button? Defend your choice.","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-11-30","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w38_b","spark_type":"cool_fact","title":"Conditions Need Thresholds","spark_text":"A sensor condition often needs a threshold, such as if the light level is below a chosen number.","why_it_matters":"A condition must be specific enough for a program to check.","question":"Why is if it is dark less precise than if light level is below 50?","source_title":"micro:bit - Sensors","source_url":"https://microbit.org/get-started/first-steps/sensors/","scheduled_date":"2026-12-02","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w39_a","spark_type":"trivia","title":"Demonstrate Means Show And Tell","spark_text":"A strong technology demo shows the project working and explains the input, process, output, test result, and improvement.","why_it_matters":"Good demonstrations make learning visible to an audience.","question":"Which word must appear in your demo: input, output, condition, variable, test, or improve? Use it correctly.","source_title":"Technology Planning 2026","source_url":"","scheduled_date":"2026-12-07","status":"scheduled","subject_slug":"technology"},
-  {"id":"technology_2026_w39_b","spark_type":"good_news","title":"Small Projects Can Point Forward","spark_text":"A final project can be small and still show real design thinking: goal, test, improvement, and explanation.","why_it_matters":"Students end the year with confidence that finished work includes reflection, not just files or code.","question":"What is one improvement you would make if you had one more class period?","source_title":"micro:bit - What is the micro:bit?","source_url":"https://microbit.org/get-started/what-is-the-microbit/","scheduled_date":"2026-12-09","status":"scheduled","subject_slug":"technology"}
+  {
+    "id": "technology_2026_g6_it_march_week1_core_vocabulary",
+    "spark_type": "debate",
+    "title": "Core Vocabulary",
+    "spark_text": "This week, Grade 6 connects its vocabulary to core first-trimester words for the Grade 6 summative vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Core Vocabulary that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-03-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_march_week1_robotics_parts",
+    "spark_type": "reflection",
+    "title": "Robotics Parts",
+    "spark_text": "This week, Grade 7 connects its vocabulary to core first-trimester words for the Grade 7 robotics vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics Parts that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-03-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_march_week1_vector_graphics",
+    "spark_type": "cool_fact",
+    "title": "Vector Graphics",
+    "spark_text": "This week, Grade 8 connects its vocabulary to core first-trimester words for the Grade 8 vector graphics vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Vector Graphics that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-03-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_march_week1_physical_computing",
+    "spark_type": "trivia",
+    "title": "Physical Computing",
+    "spark_text": "This week, Grade 9 connects its vocabulary to core first-trimester words for the Grade 9 physical computing vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Physical Computing that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-03-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_march_week2_sending_messages",
+    "spark_type": "reflection",
+    "title": "Sending Messages",
+    "spark_text": "This week, Grade 6 connects its vocabulary to sending messages and packet order.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Sending Messages that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-03-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_march_week2_robotics_mblock_workspace",
+    "spark_type": "cool_fact",
+    "title": "Robotics: mBlock Workspace",
+    "spark_text": "This week, Grade 7 connects its vocabulary to mBlock tools and first scripts.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: mBlock Workspace that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-03-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_march_week2_alignment_and_grouping",
+    "spark_type": "trivia",
+    "title": "Alignment and Grouping",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Alignment and Grouping that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-03-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_march_week2_blink_and_signals",
+    "spark_type": "good_news",
+    "title": "Blink and Signals",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Blink and Signals that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-03-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_march_week3_working_together_online",
+    "spark_type": "cool_fact",
+    "title": "Working Together Online",
+    "spark_text": "This week, Grade 6 connects its vocabulary to online collaboration and shared work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Working Together Online that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-03-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_march_week3_robotics_movement_commands",
+    "spark_type": "trivia",
+    "title": "Robotics: Movement Commands",
+    "spark_text": "This week, Grade 7 connects its vocabulary to basic robot movement.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Movement Commands that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-03-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_march_week3_campaign_graphics",
+    "spark_type": "good_news",
+    "title": "Campaign Graphics",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Campaign Graphics that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-03-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_march_week3_lab_routine",
+    "spark_type": "debate",
+    "title": "Lab Routine",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Lab Routine that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-03-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_march_week4_safe_communication_and_websites",
+    "spark_type": "trivia",
+    "title": "Safe Communication and Websites",
+    "spark_text": "This week, Grade 6 connects its vocabulary to safe communication and basic website planning.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Safe Communication and Websites that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-03-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_march_week4_robotics_robot_systems",
+    "spark_type": "good_news",
+    "title": "Robotics: Robot Systems",
+    "spark_text": "This week, Grade 7 connects its vocabulary to robots as systems and debugging.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Robot Systems that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-03-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_march_week4_svg_and_markup",
+    "spark_type": "debate",
+    "title": "SVG and Markup",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from SVG and Markup that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-03-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_march_week4_button_toggle",
+    "spark_type": "reflection",
+    "title": "Button Toggle",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Button Toggle that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-03-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_april_week1_copyright_and_images",
+    "spark_type": "reflection",
+    "title": "Copyright and Images",
+    "spark_text": "This week, Grade 6 connects its vocabulary to choosing safe images and giving credit.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Copyright and Images that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-04-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_april_week5_robotics_calibration",
+    "spark_type": "reflection",
+    "title": "Robotics: Calibration",
+    "spark_text": "This week, Grade 7 connects its vocabulary to speed, time, distance, and accuracy.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Calibration that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-04-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_april_week5_computing_systems",
+    "spark_type": "cool_fact",
+    "title": "Computing Systems",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Computing Systems that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-04-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_april_week5_serial_and_analog",
+    "spark_type": "trivia",
+    "title": "Serial and Analog",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Serial and Analog that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-04-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_april_week6_robotics_route_planning",
+    "spark_type": "cool_fact",
+    "title": "Robotics: Route Planning",
+    "spark_text": "This week, Grade 7 connects its vocabulary to planning and improving robot routes.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Route Planning that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-04-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_april_week6_ai_and_responsible_remix",
+    "spark_type": "trivia",
+    "title": "AI and Responsible Remix",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from AI and Responsible Remix that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-04-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_april_week6_sensor_and_rgb",
+    "spark_type": "good_news",
+    "title": "Sensor and RGB",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Sensor and RGB that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-04-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_april_week2_web_page_structure",
+    "spark_type": "cool_fact",
+    "title": "Web Page Structure",
+    "spark_text": "This week, Grade 6 connects its vocabulary to organizing and previewing a web page.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Web Page Structure that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-04-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_april_week7_feedback_signals",
+    "spark_type": "trivia",
+    "title": "Feedback Signals",
+    "spark_text": "This week, Grade 7 connects its vocabulary to lights, sound, and robot state signals.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Feedback Signals that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-04-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_april_week7_html_and_css",
+    "spark_type": "good_news",
+    "title": "HTML and CSS",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from HTML and CSS that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-04-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_april_week7_led_teamwork",
+    "spark_type": "debate",
+    "title": "LED Teamwork",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from LED Teamwork that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-04-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_april_week3_links_and_navigation",
+    "spark_type": "trivia",
+    "title": "Links and Navigation",
+    "spark_text": "This week, Grade 6 connects its vocabulary to moving around a website and testing links.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Links and Navigation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-04-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_april_week8_robotics_sensor_conditions",
+    "spark_type": "good_news",
+    "title": "Robotics: Sensor Conditions",
+    "spark_text": "This week, Grade 7 connects its vocabulary to ultrasonic sensors and if/else reactions.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Sensor Conditions that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-04-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_april_week8_search_and_portfolio",
+    "spark_type": "debate",
+    "title": "Search and Portfolio",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Search and Portfolio that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-04-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_april_week8_state_prototype",
+    "spark_type": "reflection",
+    "title": "State Prototype",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from State Prototype that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-04-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_april_week4_scratch_variables",
+    "spark_type": "good_news",
+    "title": "Scratch Variables",
+    "spark_text": "This week, Grade 6 connects its vocabulary to a Scratch score challenge.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Scratch Variables that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-04-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_may_week1_internet_day",
+    "spark_type": "cool_fact",
+    "title": "Internet Day",
+    "spark_text": "This week, Grade 6 connects its vocabulary to responsible Internet Day choices and campaign messages.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Internet Day that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-05-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_may_week9_robotics_maze_planning",
+    "spark_type": "reflection",
+    "title": "Robotics: Maze Planning",
+    "spark_text": "This week, Grade 7 connects its vocabulary to maze route planning.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Maze Planning that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-05-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_may_week9_portfolio_planning",
+    "spark_type": "cool_fact",
+    "title": "Portfolio Planning",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Portfolio Planning that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-05-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_may_week9_robot_design",
+    "spark_type": "trivia",
+    "title": "Robot Design",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robot Design that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-05-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_may_week10_project_plan",
+    "spark_type": "cool_fact",
+    "title": "Project Plan",
+    "spark_text": "This week, Grade 7 connects its vocabulary to planning the mBot maze project.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Plan that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-05-04",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_may_week10_homepage_and_media",
+    "spark_type": "trivia",
+    "title": "Homepage and Media",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Homepage and Media that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-05-04",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_may_week10_project_build",
+    "spark_type": "good_news",
+    "title": "Project Build",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Build that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-05-04",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_may_week2_recycling_and_e_waste",
+    "spark_type": "trivia",
+    "title": "Recycling and E-Waste",
+    "spark_text": "This week, Grade 6 connects its vocabulary to responsible technology waste choices.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Recycling and E-Waste that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-05-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_may_week11_testing_and_debugging",
+    "spark_type": "trivia",
+    "title": "Testing and Debugging",
+    "spark_text": "This week, Grade 7 connects its vocabulary to debugging and documenting robot performance.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Testing and Debugging that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-05-11",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_may_week11_testing_and_revision",
+    "spark_type": "good_news",
+    "title": "Testing and Revision",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Testing and Revision that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-05-11",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_may_week11_reliability",
+    "spark_type": "debate",
+    "title": "Reliability",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Reliability that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-05-11",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_it_may_week3_awareness_product",
+    "spark_type": "good_news",
+    "title": "Awareness Product",
+    "spark_text": "This week, Grade 6 connects its vocabulary to planning and presenting an awareness product.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Awareness Product that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-05-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_it_may_week12_presentation",
+    "spark_type": "good_news",
+    "title": "Presentation",
+    "spark_text": "This week, Grade 7 connects its vocabulary to presenting the maze solution.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Presentation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-05-18",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_may_week12_presentation",
+    "spark_type": "debate",
+    "title": "Presentation",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Presentation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-05-18",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_may_week12_demonstration",
+    "spark_type": "reflection",
+    "title": "Demonstration",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Demonstration that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-05-18",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_it_may_week13_archive_and_reflection",
+    "spark_type": "reflection",
+    "title": "Archive and Reflection",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 first-trimester work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Archive and Reflection that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-05-25",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_it_may_week13_archive",
+    "spark_type": "cool_fact",
+    "title": "Archive",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 first-trimester physical computing work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Archive that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-05-25",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_june_week1_robotics_vocabulary",
+    "spark_type": "trivia",
+    "title": "Robotics Vocabulary",
+    "spark_text": "This week, Grade 6 connects its vocabulary to core second-trimester words for the Grade 6 robotics summative vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics Vocabulary that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-06-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_june_week1_poster_and_media_design",
+    "spark_type": "good_news",
+    "title": "Poster and Media Design",
+    "spark_text": "This week, Grade 7 connects its vocabulary to core second-trimester words for the Grade 7 poster and media design vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Poster and Media Design that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-06-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_june_week1_arduino_basics",
+    "spark_type": "debate",
+    "title": "Arduino Basics",
+    "spark_text": "This week, Grade 8 connects its vocabulary to core second-trimester words for the Grade 8 Arduino vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Arduino Basics that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-06-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_june_week1_python_and_data",
+    "spark_type": "reflection",
+    "title": "Python and Data",
+    "spark_text": "This week, Grade 9 connects its vocabulary to core second-trimester words for the Grade 9 Python and data vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-06-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_june_week2_robotics_movement_instructions",
+    "spark_type": "good_news",
+    "title": "Robotics: Movement Instructions",
+    "spark_text": "This week, Grade 6 connects its vocabulary to movement instructions and timing.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Movement Instructions that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-06-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_june_week2_branding",
+    "spark_type": "debate",
+    "title": "Branding",
+    "spark_text": "This week, Grade 7 connects its vocabulary to branding and consistent design.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Branding that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-06-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_june_week2_led_and_button",
+    "spark_type": "reflection",
+    "title": "LED and Button",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from LED and Button that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-06-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_june_week2_python_and_data_list_methods",
+    "spark_type": "cool_fact",
+    "title": "Python and Data: List Methods",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: List Methods that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-06-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_june_week3_debugging_paths",
+    "spark_type": "debate",
+    "title": "Debugging Paths",
+    "spark_text": "This week, Grade 6 connects its vocabulary to testing, debugging, and improving robot paths.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Debugging Paths that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-06-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_july_week3_scratch_intro",
+    "spark_type": "cool_fact",
+    "title": "Scratch Intro",
+    "spark_text": "This week, Grade 7 connects its vocabulary to Scratch sequences and events.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Scratch Intro that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-06-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_june_week3_state_and_serial",
+    "spark_type": "cool_fact",
+    "title": "State and Serial",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from State and Serial that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-06-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_june_week3_python_and_data_loops_and_strings",
+    "spark_type": "trivia",
+    "title": "Python and Data: Loops and Strings",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Loops and Strings that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-06-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_june_week4_robotics_robot_outputs",
+    "spark_type": "reflection",
+    "title": "Robotics: Robot Outputs",
+    "spark_text": "This week, Grade 6 connects its vocabulary to robot outputs and signals.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Robot Outputs that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-06-29",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_june_week4_safe_debugging",
+    "spark_type": "trivia",
+    "title": "Safe Debugging",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Safe Debugging that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-06-29",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_july_week4_variables",
+    "spark_type": "trivia",
+    "title": "Variables",
+    "spark_text": "This week, Grade 7 connects its vocabulary to variables and if/else choices.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Variables that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-07-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_july_week4_python_and_data_data_science",
+    "spark_type": "debate",
+    "title": "Python and Data: Data Science",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Data Science that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-07-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_july_week5_robotics_route_accuracy",
+    "spark_type": "trivia",
+    "title": "Robotics: Route Accuracy",
+    "spark_text": "This week, Grade 6 connects its vocabulary to route maps and accurate movement.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Route Accuracy that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-07-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_july_week5_operators",
+    "spark_type": "good_news",
+    "title": "Operators",
+    "spark_text": "This week, Grade 7 connects its vocabulary to comparison and logic operators.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Operators that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-07-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_july_week5_analog_values",
+    "spark_type": "debate",
+    "title": "Analog Values",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Analog Values that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-07-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_july_week5_python_and_data_collection_plan",
+    "spark_type": "reflection",
+    "title": "Python and Data: Collection Plan",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Collection Plan that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-07-06",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_july_week6_repeat_patterns",
+    "spark_type": "good_news",
+    "title": "Repeat Patterns",
+    "spark_text": "This week, Grade 6 connects its vocabulary to loops and repeated movement patterns.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Repeat Patterns that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-07-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_july_week6_loops",
+    "spark_type": "debate",
+    "title": "Loops",
+    "spark_text": "This week, Grade 7 connects its vocabulary to loops and timing.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Loops that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-07-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_july_week6_light_and_rgb",
+    "spark_type": "reflection",
+    "title": "Light and RGB",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Light and RGB that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-07-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_july_week6_python_and_data_cleaning_and_model",
+    "spark_type": "cool_fact",
+    "title": "Python and Data: Cleaning and Model",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Cleaning and Model that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-07-13",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_july_week7_robotics_sensor_detection",
+    "spark_type": "debate",
+    "title": "Robotics: Sensor Detection",
+    "spark_text": "This week, Grade 6 connects its vocabulary to sensors, inputs, and responses.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Sensor Detection that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-07-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_july_week7_debugging_roles",
+    "spark_type": "reflection",
+    "title": "Debugging Roles",
+    "spark_text": "This week, Grade 7 connects its vocabulary to debugging and pair-programming roles.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Debugging Roles that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-07-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_july_week7_buzzer_and_servo",
+    "spark_type": "cool_fact",
+    "title": "Buzzer and Servo",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Buzzer and Servo that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-07-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_july_week7_python_and_data_charts_and_patterns",
+    "spark_type": "trivia",
+    "title": "Python and Data: Charts and Patterns",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Charts and Patterns that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-07-20",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_july_week8_conditions_and_flowcharts",
+    "spark_type": "reflection",
+    "title": "Conditions and Flowcharts",
+    "spark_text": "This week, Grade 6 connects its vocabulary to simple conditions and robot responses.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Conditions and Flowcharts that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-07-27",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_august_week8_dance_prep",
+    "spark_type": "trivia",
+    "title": "Dance Prep",
+    "spark_text": "This week, Grade 7 connects its vocabulary to dance game preparation.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Dance Prep that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-07-27",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_july_week8_integrated_challenge",
+    "spark_type": "trivia",
+    "title": "Integrated Challenge",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Integrated Challenge that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-07-27",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_august_week8_python_and_data_data_product",
+    "spark_type": "debate",
+    "title": "Python and Data: Data Product",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Data Product that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-07-27",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_august_week9_knowledge_cards",
+    "spark_type": "trivia",
+    "title": "Knowledge Cards",
+    "spark_text": "This week, Grade 6 connects its vocabulary to mBot card stations and actions.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Knowledge Cards that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-08-03",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_july_week9_mini_challenge_plan",
+    "spark_type": "cool_fact",
+    "title": "Mini-Challenge Plan",
+    "spark_text": "This week, Grade 6 connects its vocabulary to planning a small mBot challenge.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Mini-Challenge Plan that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-08-03",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_august_week9_project_planning",
+    "spark_type": "good_news",
+    "title": "Project Planning",
+    "spark_text": "This week, Grade 7 connects its vocabulary to dance game planning and scoring.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Planning that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-08-03",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_august_week9_ultrasonic_design",
+    "spark_type": "debate",
+    "title": "Ultrasonic Design",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Ultrasonic Design that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-08-03",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_august_week9_python_and_data_project_readiness",
+    "spark_type": "reflection",
+    "title": "Python and Data: Project Readiness",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Project Readiness that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-08-03",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_august_week10_final_challenge_plan",
+    "spark_type": "good_news",
+    "title": "Final Challenge Plan",
+    "spark_text": "This week, Grade 6 connects its vocabulary to planning and improving the final mBot challenge.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Final Challenge Plan that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-08-10",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_august_week10_build",
+    "spark_type": "debate",
+    "title": "Build",
+    "spark_text": "This week, Grade 7 connects its vocabulary to building and testing dance game logic.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Build that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-08-10",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_august_week10_prototype_build",
+    "spark_type": "reflection",
+    "title": "Prototype Build",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Prototype Build that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-08-10",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_august_week10_python_and_data_visualization",
+    "spark_type": "cool_fact",
+    "title": "Python and Data: Visualization",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Visualization that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-08-10",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iit_august_week11_demo_reflection",
+    "spark_type": "debate",
+    "title": "Demo Reflection",
+    "spark_text": "This week, Grade 6 connects its vocabulary to testing, explaining, and reflecting on the final robotics challenge.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Demo Reflection that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-08-17",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_august_week11_improve",
+    "spark_type": "reflection",
+    "title": "Improve",
+    "spark_text": "This week, Grade 7 connects its vocabulary to improving game features.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Improve that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-08-17",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_august_week11_reliability",
+    "spark_type": "cool_fact",
+    "title": "Reliability",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Reliability that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-08-17",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_august_week11_python_and_data_revision",
+    "spark_type": "trivia",
+    "title": "Python and Data: Revision",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Revision that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-08-17",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iit_august_week12_demo",
+    "spark_type": "cool_fact",
+    "title": "Demo",
+    "spark_text": "This week, Grade 7 connects its vocabulary to demonstrating and reflecting on the dance game.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Demo that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-08-24",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_august_week12_demonstration",
+    "spark_type": "trivia",
+    "title": "Demonstration",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Demonstration that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-08-24",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iit_august_week12_python_and_data_presentation",
+    "spark_type": "good_news",
+    "title": "Python and Data: Presentation",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 second-trimester Python and data work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Python and Data: Presentation that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-08-24",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iit_august_week13_cleanup",
+    "spark_type": "good_news",
+    "title": "Cleanup",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 second-trimester Arduino work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Cleanup that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-08-31",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_september_week1_iiit_vocabulary",
+    "spark_type": "reflection",
+    "title": "IIIT Vocabulary",
+    "spark_text": "This week, Grade 6 connects its vocabulary to core third-trimester words for the Grade 6 IIIT summative vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from IIIT Vocabulary that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-09-14",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_september_week1_spreadsheets",
+    "spark_type": "cool_fact",
+    "title": "Spreadsheets",
+    "spark_text": "This week, Grade 7 connects its vocabulary to core third-trimester words for the Grade 7 spreadsheet vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Spreadsheets that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-09-14",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_september_week1_app_design",
+    "spark_type": "trivia",
+    "title": "App Design",
+    "spark_text": "This week, Grade 8 connects its vocabulary to core third-trimester words for the Grade 8 app design vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from App Design that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-09-14",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_september_week1_digital_media",
+    "spark_type": "good_news",
+    "title": "Digital Media",
+    "spark_text": "This week, Grade 9 connects its vocabulary to core third-trimester words for the Grade 9 digital media vocabulary table.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Digital Media that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-09-14",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_september_week2_formulas",
+    "spark_type": "cool_fact",
+    "title": "Formulas",
+    "spark_text": "This week, Grade 6 connects its vocabulary to spreadsheet formulas and values.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Formulas that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-09-21",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_september_week2_formulas_and_charts",
+    "spark_type": "trivia",
+    "title": "Formulas and Charts",
+    "spark_text": "This week, Grade 7 connects its vocabulary to formulas, functions, and chart interpretation.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Formulas and Charts that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-09-21",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_september_week2_events_and_flow",
+    "spark_type": "good_news",
+    "title": "Events and Flow",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Events and Flow that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-09-21",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_september_week2_sound_quality",
+    "spark_type": "debate",
+    "title": "Sound Quality",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Sound Quality that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-09-21",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_september_week3_user_needs",
+    "spark_type": "debate",
+    "title": "User Needs",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from User Needs that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-09-28",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_october_week1_budget_planning",
+    "spark_type": "cool_fact",
+    "title": "Budget Planning",
+    "spark_text": "This week, Grade 6 connects its vocabulary to planning with quantities, costs, and totals.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Budget Planning that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-10-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_october_week3_data_analysis",
+    "spark_type": "debate",
+    "title": "Data Analysis",
+    "spark_text": "This week, Grade 7 connects its vocabulary to sorting, filtering, and patterns.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Data Analysis that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-10-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_october_week3_personal_data",
+    "spark_type": "cool_fact",
+    "title": "Personal Data",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Personal Data that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-10-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_october_week4_scratch_decomposition",
+    "spark_type": "reflection",
+    "title": "Scratch Decomposition",
+    "spark_text": "This week, Grade 7 connects its vocabulary to decomposition and subroutines.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Scratch Decomposition that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-10-05",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_october_week4_first_python",
+    "spark_type": "cool_fact",
+    "title": "First Python",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from First Python that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-10-05",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_october_week4_social_engineering_and_malware",
+    "spark_type": "trivia",
+    "title": "Social Engineering and Malware",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Social Engineering and Malware that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-10-05",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_october_week2_charts",
+    "spark_type": "trivia",
+    "title": "Charts",
+    "spark_text": "This week, Grade 6 connects its vocabulary to chart parts and conclusions.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Charts that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-10-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_october_week5_sources_and_lists",
+    "spark_type": "cool_fact",
+    "title": "Sources and Lists",
+    "spark_text": "This week, Grade 7 connects its vocabulary to lists, credible sources, and citation.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one data detail, pattern, or Python idea from Sources and Lists that could help your work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-10-12",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_october_week5_numbers_and_selection",
+    "spark_type": "trivia",
+    "title": "Numbers and Selection",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Numbers and Selection that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-10-12",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_october_week5_security_risk",
+    "spark_type": "good_news",
+    "title": "Security Risk",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Security Risk that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-10-12",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_october_week3_3d_basics",
+    "spark_type": "good_news",
+    "title": "3D Basics",
+    "spark_text": "This week, Grade 6 connects its vocabulary to basic 3D modeling actions.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from 3D Basics that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-10-15",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_october_week6_blog_media",
+    "spark_type": "trivia",
+    "title": "Blog Media",
+    "spark_text": "This week, Grade 7 connects its vocabulary to blog posts and media layout.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Blog Media that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-10-19",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_october_week6_loops_and_branches",
+    "spark_type": "good_news",
+    "title": "Loops and Branches",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Loops and Branches that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-10-19",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_october_week6_project_problem",
+    "spark_type": "debate",
+    "title": "Project Problem",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Problem that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-10-19",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_october_week4_design_prototype",
+    "spark_type": "debate",
+    "title": "Design Prototype",
+    "spark_text": "This week, Grade 6 connects its vocabulary to planning and improving a simple model.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Design Prototype that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-10-22",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_october_week7_robotics_sensor_systems",
+    "spark_type": "good_news",
+    "title": "Robotics: Sensor Systems",
+    "spark_text": "This week, Grade 7 connects its vocabulary to micro:bit input and output systems.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Sensor Systems that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-10-26",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_october_week7_debugging",
+    "spark_type": "debate",
+    "title": "Debugging",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Debugging that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-10-26",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_october_week7_risk_map",
+    "spark_type": "reflection",
+    "title": "Risk Map",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Risk Map that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-10-26",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_november_week1_present_and_reflect",
+    "spark_type": "trivia",
+    "title": "Present and Reflect",
+    "spark_text": "This week, Grade 6 connects its vocabulary to presenting, feedback, and reflection.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Present and Reflect that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-11-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_november_week8_test_table",
+    "spark_type": "reflection",
+    "title": "Test Table",
+    "spark_text": "This week, Grade 7 connects its vocabulary to sensor testing and reliability.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Test Table that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-11-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_october_week8_micro_bit_setup",
+    "spark_type": "reflection",
+    "title": "Micro:bit Setup",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Micro:bit Setup that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-11-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_november_week8_proposal",
+    "spark_type": "trivia",
+    "title": "Proposal",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Proposal that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-11-02",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_november_week2_micro_bit_input_and_output",
+    "spark_type": "good_news",
+    "title": "micro:bit Input and Output",
+    "spark_text": "This week, Grade 6 connects its vocabulary to micro:bit parts, inputs, and outputs.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from micro:bit Input and Output that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-11-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_november_week9_review_setup",
+    "spark_type": "cool_fact",
+    "title": "Review Setup",
+    "spark_text": "This week, Grade 7 connects its vocabulary to reviewing third-trimester concepts.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Review Setup that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-11-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_november_week9_binary_representation",
+    "spark_type": "trivia",
+    "title": "Binary Representation",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Binary Representation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-11-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_november_week9_project_habits",
+    "spark_type": "good_news",
+    "title": "Project Habits",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Habits that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-11-09",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_november_week3_micro_bit_variables",
+    "spark_type": "debate",
+    "title": "micro:bit Variables",
+    "spark_text": "This week, Grade 6 connects its vocabulary to counters and changing values.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from micro:bit Variables that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-11-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_november_week10_project_plan",
+    "spark_type": "trivia",
+    "title": "Project Plan",
+    "spark_text": "This week, Grade 7 connects its vocabulary to planning the Mandrake Detection System.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Project Plan that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-11-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_november_week10_game_build",
+    "spark_type": "good_news",
+    "title": "Game Build",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Game Build that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-11-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_november_week10_build_evidence",
+    "spark_type": "debate",
+    "title": "Build Evidence",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Build Evidence that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-11-16",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_november_week11_debug_reliability",
+    "spark_type": "good_news",
+    "title": "Debug Reliability",
+    "spark_text": "This week, Grade 7 connects its vocabulary to retesting and improving reliability.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Debug Reliability that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-11-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_november_week11_user_testing",
+    "spark_type": "debate",
+    "title": "User Testing",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from User Testing that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-11-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_november_week11_testing_and_improvement",
+    "spark_type": "reflection",
+    "title": "Testing and Improvement",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Testing and Improvement that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-11-23",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g7_iiit_november_week12_presentation",
+    "spark_type": "debate",
+    "title": "Presentation",
+    "spark_text": "This week, Grade 7 connects its vocabulary to presenting the final system.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Presentation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "7"
+    ],
+    "scheduled_date": "2026-11-30",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g8_iiit_november_week12_presentation",
+    "spark_type": "reflection",
+    "title": "Presentation",
+    "spark_text": "This week, Grade 8 connects its vocabulary to Grade 8 third-trimester app, Python, and Micro:bit work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Presentation that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "8"
+    ],
+    "scheduled_date": "2026-11-30",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_december_week1_robotics_sensors_and_conditions",
+    "spark_type": "good_news",
+    "title": "Robotics: Sensors and Conditions",
+    "spark_text": "This week, Grade 6 connects its vocabulary to sensors, conditions, and messages.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one robot behavior, sensor detail, or safety habit from Robotics: Sensors and Conditions that your team should test carefully?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-12-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g9_iiit_december_week12_final_demo",
+    "spark_type": "trivia",
+    "title": "Final Demo",
+    "spark_text": "This week, Grade 9 connects its vocabulary to Grade 9 third-trimester STEM and cybersecurity work.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Final Demo that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "9"
+    ],
+    "scheduled_date": "2026-12-01",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_december_week2_final_project",
+    "spark_type": "debate",
+    "title": "Final Project",
+    "spark_text": "This week, Grade 6 connects its vocabulary to building and improving the final micro:bit project.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Final Project that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-12-08",
+    "status": "scheduled"
+  },
+  {
+    "id": "technology_2026_g6_iiit_december_week3_demonstrate_and_explain",
+    "spark_type": "reflection",
+    "title": "Demonstrate and Explain",
+    "spark_text": "This week, Grade 6 connects its vocabulary to demonstrating and explaining the final project.",
+    "why_it_matters": "This connects the weekly vocabulary to the work students will practice in class.",
+    "question": "What is one idea from Demonstrate and Explain that could help your Technology work this week?",
+    "source_title": "Technology Planning 2026",
+    "source_url": "",
+    "subject_slug": "technology",
+    "target_grades": [
+      "6"
+    ],
+    "scheduled_date": "2026-12-15",
+    "status": "scheduled"
+  }
 ]
 $technology_weekly_sparks_2026$) as spark (
         id text,
@@ -95,38 +2368,17 @@ $technology_weekly_sparks_2026$) as spark (
         question text,
         source_title text,
         source_url text,
+        subject_slug text,
+        target_grades jsonb,
         scheduled_date date,
-        status text,
-        subject_slug text
+        status text
     )
 )
 insert into public.weekly_sparks (
-    id,
-    spark_type,
-    title,
-    spark_text,
-    why_it_matters,
-    question,
-    source_title,
-    source_url,
-    scheduled_date,
-    status,
-    subject_slug,
-    owner_id
+    id, spark_type, title, spark_text, why_it_matters, question, source_title, source_url, subject_slug, target_grades, scheduled_date, status
 )
 select
-    id,
-    spark_type,
-    title,
-    spark_text,
-    why_it_matters,
-    question,
-    source_title,
-    source_url,
-    scheduled_date,
-    status,
-    subject_slug,
-    null::uuid
+    id, spark_type, title, spark_text, why_it_matters, question, source_title, source_url, subject_slug, target_grades, scheduled_date, status
 from technology_weekly_sparks_2026
 on conflict (id) do update set
     spark_type = excluded.spark_type,
@@ -136,7 +2388,8 @@ on conflict (id) do update set
     question = excluded.question,
     source_title = excluded.source_title,
     source_url = excluded.source_url,
+    subject_slug = excluded.subject_slug,
+    target_grades = excluded.target_grades,
     scheduled_date = excluded.scheduled_date,
     status = excluded.status,
-    subject_slug = excluded.subject_slug,
     updated_at = now();

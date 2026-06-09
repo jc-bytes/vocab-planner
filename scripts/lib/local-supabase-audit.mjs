@@ -428,6 +428,7 @@ function buildAuditSparks({ teacherId }) {
             source_title: 'Local audit seed',
             source_url: '',
             subject_slug: 'technology',
+            target_grades: ['6'],
             scheduled_date: auditVisibleFromDate(),
             status: 'scheduled',
             owner_id: teacherId
@@ -442,6 +443,7 @@ function buildAuditSparks({ teacherId }) {
             source_title: 'Local audit seed',
             source_url: '',
             subject_slug: 'technology',
+            target_grades: ['6'],
             scheduled_date: '2099-01-01',
             status: 'scheduled',
             owner_id: teacherId

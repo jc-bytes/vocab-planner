@@ -148,6 +148,15 @@ function normalizeSparkGradeQuestions(value) {
     }, {});
 }
 
+function normalizeSparkTargetGrades(value) {
+    const source = Array.isArray(value) ? value : String(value || '').split(',');
+    const grades = source
+        .flatMap(item => String(item || '').split(','))
+        .map(item => item.trim().match(/\d+/)?.[0] || '')
+        .filter(grade => SPARK_GRADE_LEVELS.includes(grade));
+    return Array.from(new Set(grades));
+}
+
 class TeacherSparkMethods {
     normalizeSpark(spark = {}) {
         const source = spark && typeof spark === 'object' ? spark : {};
@@ -163,6 +172,7 @@ class TeacherSparkMethods {
             whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
             question: String(source.question || '').trim(),
             gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
+            targetGrades: normalizeSparkTargetGrades(source.targetGrades ?? source.target_grades ?? SPARK_GRADE_LEVELS),
             sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
             sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
             subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? DEFAULT_SUBJECT_SLUG).trim() || DEFAULT_SUBJECT_SLUG,
@@ -178,7 +188,8 @@ class TeacherSparkMethods {
         return this.normalizeSpark({
             sparkType: 'cool_fact',
             status: 'draft',
-            scheduledDate: getPanamaDateValue()
+            scheduledDate: getPanamaDateValue(),
+            targetGrades: SPARK_GRADE_LEVELS
         });
     }
 
@@ -590,6 +601,7 @@ class TeacherSparkMethods {
                         <span>${escapeHtml(spark.question)}</span>
                     </div>
                 ` : ''}
+                ${this.createSparkTargetGradeSummaryHtml(spark)}
                 ${this.createSparkGradeQuestionSummaryHtml(spark)}
             </div>
             <div class="spark-spotlight-actions">
@@ -670,6 +682,7 @@ class TeacherSparkMethods {
                     <span>${escapeHtml(spark.question)}</span>
                 </div>
             ` : ''}
+            ${this.createSparkTargetGradeSummaryHtml(spark)}
             ${this.createSparkGradeQuestionSummaryHtml(spark)}
             <div class="spark-card-footer">
                 <div class="spark-card-meta">
@@ -722,6 +735,21 @@ class TeacherSparkMethods {
             <div class="spark-detail spark-grade-question-summary">
                 <strong>Grade questions</strong>
                 <span>${escapeHtml(labels)}</span>
+            </div>
+        `;
+    }
+
+    createSparkTargetGradeSummaryHtml(spark) {
+        const targetGrades = normalizeSparkTargetGrades(spark?.targetGrades ?? spark?.target_grades);
+        const grades = targetGrades.length ? targetGrades : SPARK_GRADE_LEVELS;
+        const allGrades = SPARK_GRADE_LEVELS.every(grade => grades.includes(grade));
+        const label = allGrades
+            ? 'All grades'
+            : grades.map(grade => `Grade ${grade}`).join(', ');
+        return `
+            <div class="spark-detail spark-target-grade-summary">
+                <strong>Target grades</strong>
+                <span>${escapeHtml(label)}</span>
             </div>
         `;
     }
@@ -796,8 +824,17 @@ class TeacherSparkMethods {
             if (field) field.value = value || '';
         });
 
+        SPARK_GRADE_LEVELS.forEach(grade => {
+            const field = $(`#spark-target-grade-${grade}-input`);
+            if (field) field.checked = source.targetGrades.includes(grade);
+        });
+
         this.setSparkModalStatus('');
         openModal('#spark-modal', { initialFocus: '#spark-title-input' });
+    }
+
+    readSparkTargetGradesFromForm() {
+        return SPARK_GRADE_LEVELS.filter(grade => $(`#spark-target-grade-${grade}-input`)?.checked);
     }
 
     readSparkGradeQuestionsFromForm() {
@@ -819,6 +856,7 @@ class TeacherSparkMethods {
             whyItMatters: $('#spark-why-input')?.value || '',
             question: $('#spark-question-input')?.value || '',
             gradeQuestions: this.readSparkGradeQuestionsFromForm(),
+            targetGrades: this.readSparkTargetGradesFromForm(),
             sourceTitle: $('#spark-source-title-input')?.value || '',
             sourceUrl: $('#spark-source-url-input')?.value || '',
             subjectSlug: DEFAULT_SUBJECT_SLUG,
@@ -830,6 +868,7 @@ class TeacherSparkMethods {
         if (!spark.title) throw new Error('Add a title for this Spark.');
         if (!spark.sparkText) throw new Error('Add the Spark text students will read.');
         if (!spark.question) throw new Error('Add a fallback question for students to think about.');
+        if (spark.targetGrades.length === 0) throw new Error('Choose at least one target grade.');
         if (spark.status === 'scheduled' && !spark.scheduledDate) {
             throw new Error('Choose a scheduled date before scheduling this Spark.');
         }
@@ -866,7 +905,7 @@ class TeacherSparkMethods {
         } catch (error) {
             console.error('Failed to save Spark:', error);
             const message = isDuplicateScheduledDateError(error)
-                ? 'A scheduled Spark already starts on this date. Choose a different date or archive the existing one first.'
+                ? 'A Spark with that exact schedule already exists. Check the date and try again.'
                 : 'Could not save this Spark. Check the fields and try again.';
             this.setSparkModalStatus(message, 'error');
             notifications.error(message);
