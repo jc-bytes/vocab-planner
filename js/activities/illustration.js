@@ -186,7 +186,6 @@ export class IllustrationActivity {
 
         const wrapper = createElement('div', 'word-hunt-wrapper');
         wrapper.appendChild(this.createHeader(word, entry));
-        wrapper.appendChild(this.createResearchActions(word));
         wrapper.appendChild(this.createHuntGrid(word, entry));
         wrapper.appendChild(this.createFooter(entry));
         this.container.appendChild(wrapper);
@@ -209,9 +208,12 @@ export class IllustrationActivity {
         title.textContent = 'Word Hunt';
         const wordText = createElement('strong');
         wordText.textContent = word.word || '';
+        const titleRow = createElement('div', 'word-hunt-title-row');
+        titleRow.appendChild(wordText);
+        titleRow.appendChild(this.createResearchActions(word));
         copy.appendChild(eyebrow);
         copy.appendChild(title);
-        copy.appendChild(wordText);
+        copy.appendChild(titleRow);
 
         const nav = createElement('div', 'word-hunt-nav');
         const previous = createElement('button', 'btn secondary-btn', 'Previous');

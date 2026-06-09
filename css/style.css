@@ -6232,6 +6232,7 @@ input[type="checkbox"] {
 
 .word-hunt-title {
     min-width: 0;
+    flex: 1 1 420px;
 }
 
 .word-hunt-title span {
@@ -6247,9 +6248,17 @@ input[type="checkbox"] {
     line-height: 1.15;
 }
 
-.word-hunt-title strong {
-    display: block;
+.word-hunt-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
     margin-top: 0.15rem;
+}
+
+.word-hunt-title strong {
+    display: inline-flex;
+    align-items: center;
     color: var(--primary-color);
     font-size: clamp(1.25rem, 2.5vw, 1.8rem);
     line-height: 1.05;
@@ -6266,6 +6275,8 @@ input[type="checkbox"] {
 
 .word-hunt-search-link {
     text-decoration: none;
+    min-height: 38px;
+    padding: 0.45rem 0.85rem;
 }
 
 .word-hunt-grid {
