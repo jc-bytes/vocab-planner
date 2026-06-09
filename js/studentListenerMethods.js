@@ -11,13 +11,21 @@ class StudentListenerMethods {
         window.addEventListener('popstate', () => this.handleRouteChange());
         window.addEventListener('resize', () => this.setStudentMobileMenu(false));
         window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
-        window.addEventListener('pagehide', () => this.saveStudentSectionScroll($('.view.active')?.id || ''));
+        window.addEventListener('pagehide', (event) => {
+            this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
+            this.saveStudentSectionScroll($('.view.active')?.id || '');
+        });
+        window.addEventListener('pageshow', (event) => {
+            this.debugStudentScrollLifecycle('pageshow', { persisted: event.persisted });
+        });
         document.addEventListener('visibilitychange', () => {
             const activeViewId = $('.view.active')?.id || '';
+            this.debugStudentScrollLifecycle('visibilitychange', {
+                state: document.visibilityState,
+                activeViewId
+            });
             if (document.hidden) {
                 this.saveStudentSectionScroll(activeViewId);
-            } else {
-                this.restoreStudentSectionScroll(activeViewId);
             }
         });
 

@@ -52,6 +52,28 @@ class StudentShellMethods {
         });
     }
 
+    shouldDebugStudentScroll() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('debugScroll') === '1'
+                || localStorage.getItem('debug_student_scroll') === '1';
+        } catch {
+            return false;
+        }
+    }
+
+    debugStudentScrollLifecycle(eventName, details = {}) {
+        if (!this.shouldDebugStudentScroll()) return;
+        console.debug('[student-scroll]', eventName, {
+            ...details,
+            hash: window.location.hash,
+            scrollY: Math.round(window.scrollY || document.documentElement.scrollTop || 0),
+            scrollHeight: document.documentElement.scrollHeight,
+            innerHeight: window.innerHeight,
+            activeViewId: $('.view.active')?.id || ''
+        });
+    }
+
     saveStudentSectionScroll(viewId = '') {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
@@ -67,6 +89,12 @@ class StudentShellMethods {
         if (routeKey) {
             this.persistStudentScroll(routeKey, top);
         }
+        this.debugStudentScrollLifecycle('save', {
+            viewId,
+            section,
+            routeKey,
+            top: Math.round(top)
+        });
     }
 
     restoreStudentSectionScroll(viewId = '') {
@@ -77,6 +105,13 @@ class StudentShellMethods {
             ? this.studentSectionScrollPositions[section]
             : this.readStudentScroll(this.getStudentSectionScrollKey(section));
         const savedTop = Number.isFinite(routeTop) ? routeTop : (Number.isFinite(sectionTop) ? sectionTop : 0);
+        this.debugStudentScrollLifecycle('restore:start', {
+            viewId,
+            section,
+            routeTop,
+            sectionTop,
+            savedTop
+        });
 
         const restore = () => {
             const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
