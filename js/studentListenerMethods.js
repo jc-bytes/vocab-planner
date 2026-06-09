@@ -10,6 +10,7 @@ class StudentListenerMethods {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
         window.addEventListener('resize', () => this.setStudentMobileMenu(false));
+        window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
         window.addEventListener('pagehide', () => this.saveStudentSectionScroll($('.view.active')?.id || ''));
         document.addEventListener('visibilitychange', () => {
             const activeViewId = $('.view.active')?.id || '';

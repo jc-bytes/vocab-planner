@@ -43,6 +43,15 @@ class StudentShellMethods {
         }
     }
 
+    scheduleStudentScrollSave() {
+        if (this.studentScrollSaveFrame) return;
+
+        this.studentScrollSaveFrame = requestAnimationFrame(() => {
+            this.studentScrollSaveFrame = null;
+            this.saveStudentSectionScroll($('.view.active')?.id || '');
+        });
+    }
+
     saveStudentSectionScroll(viewId = '') {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
@@ -69,14 +78,21 @@ class StudentShellMethods {
             : this.readStudentScroll(this.getStudentSectionScrollKey(section));
         const savedTop = Number.isFinite(routeTop) ? routeTop : (Number.isFinite(sectionTop) ? sectionTop : 0);
 
+        const restore = () => {
+            const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            window.scrollTo({
+                top: Math.min(Math.max(0, savedTop), maxTop),
+                left: 0,
+                behavior: 'auto'
+            });
+        };
+
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-                window.scrollTo({
-                    top: Math.min(Math.max(0, savedTop), maxTop),
-                    left: 0,
-                    behavior: 'auto'
-                });
+                restore();
+                setTimeout(restore, 120);
+                setTimeout(restore, 350);
+                setTimeout(restore, 800);
             });
         });
     }
