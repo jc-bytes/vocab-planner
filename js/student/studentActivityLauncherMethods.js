@@ -1,5 +1,6 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
+import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 
 class StudentActivityLauncherMethods {
     async startActivity(type, options = {}) {
@@ -114,6 +115,8 @@ class StudentActivityLauncherMethods {
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
                 const illustrationWords = this.getWordHuntWords(settings);
+                const wordHuntSubjectSlug = getVocabSubjectSlug(this.sm.currentVocab);
+                const wordHuntSubject = getSubjectBySlug(this.sm.subjects, wordHuntSubjectSlug);
                 this.sm.activityInstance = new ActivityClass(
                     container,
                     illustrationWords,
@@ -135,7 +138,13 @@ class StudentActivityLauncherMethods {
                         },
                         uploadImage: (word, blob, imageInfo) => this.uploadWordHuntImage(word, blob, imageInfo),
                         loadImage: path => this.loadWordHuntImage(path),
-                        onDownloadWordHunt: () => this.downloadWordHuntSubmission()
+                        onDownloadWordHunt: () => this.downloadWordHuntSubmission(),
+                        researchContext: {
+                            grade: this.getUnitGrade(this.sm.currentVocab),
+                            subjectName: wordHuntSubject.name,
+                            subjectSlug: wordHuntSubjectSlug,
+                            unitName: this.sm.currentVocab.name || ''
+                        }
                     }
                 );
                 break;

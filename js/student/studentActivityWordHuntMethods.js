@@ -37,6 +37,54 @@ class StudentActivityWordHuntMethods {
         return supabaseService.downloadWordHuntImage(path);
     }
 
+    getLocalWordHuntEntries(vocab = this.sm.currentVocab) {
+        if (!vocab?.name || !Array.isArray(vocab.words)) return {};
+
+        try {
+            return JSON.parse(localStorage.getItem(`word_hunt_state_${vocab.name}_${vocab.words.length}`) || '{}');
+        } catch (error) {
+            console.warn('Could not read local Word Hunt draft entries:', error);
+            return {};
+        }
+    }
+
+    mergeWordHuntEntry(base = {}, next = {}) {
+        const merged = { ...base };
+        Object.entries(next || {}).forEach(([key, value]) => {
+            if (value === '' || value === null || value === undefined) return;
+            if (typeof value === 'boolean' && value === false && merged[key]) return;
+            merged[key] = value;
+        });
+        return merged;
+    }
+
+    mergeWordHuntEntryMaps(...maps) {
+        return maps.reduce((merged, map) => {
+            Object.entries(map || {}).forEach(([word, entry]) => {
+                merged[word] = this.mergeWordHuntEntry(merged[word], entry);
+            });
+            return merged;
+        }, {});
+    }
+
+    getReportWordHuntEntries() {
+        const unitProgress = this.getCurrentUnitProgress();
+        const progressEntries = unitProgress?.wordHunt || {};
+        const localEntries = this.getLocalWordHuntEntries(this.sm.currentVocab);
+        const liveEntries = this.sm.activityInstance && typeof this.sm.activityInstance.getWordHuntEntries === 'function'
+            ? this.sm.activityInstance.getWordHuntEntries()
+            : {};
+        const merged = this.mergeWordHuntEntryMaps(progressEntries, localEntries, liveEntries);
+
+        if (unitProgress) {
+            unitProgress.wordHunt = merged;
+            this.sm.unitWordHunt = merged;
+            this.sm.progress.saveLocalProgress();
+        }
+
+        return merged;
+    }
+
     async downloadWordHuntSubmission() {
         if (!this.sm.currentVocab) return;
 
@@ -45,9 +93,10 @@ class StudentActivityWordHuntMethods {
             this.sm.progress.saveLocalProgress();
         }
 
+        const wordHunt = this.getReportWordHuntEntries();
         const { ReportGenerator } = await import('../reportGenerator.js');
         await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
-            wordHunt: this.sm.unitWordHunt || {},
+            wordHunt,
             loadImage: path => this.loadWordHuntImage(path)
         });
     }

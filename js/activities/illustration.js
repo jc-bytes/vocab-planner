@@ -18,6 +18,9 @@ export class IllustrationActivity {
         this.uploadImage = typeof options.uploadImage === 'function' ? options.uploadImage : null;
         this.loadRemoteImage = typeof options.loadImage === 'function' ? options.loadImage : null;
         this.onDownloadWordHunt = typeof options.onDownloadWordHunt === 'function' ? options.onDownloadWordHunt : null;
+        this.researchContext = options.researchContext && typeof options.researchContext === 'object'
+            ? options.researchContext
+            : {};
         this.currentIndex = this.clampIndex(options.initialIndex || 0);
         this.entries = this.mergeEntries(initialData);
         this.previewImage = null;
@@ -237,18 +240,33 @@ export class IllustrationActivity {
         return header;
     }
 
+    getResearchClassContext() {
+        const grade = String(this.researchContext.grade || '').match(/\d+/)?.[0] || '';
+        const subjectName = String(this.researchContext.subjectName || '').trim();
+        const subjectSlug = String(this.researchContext.subjectSlug || '').trim().toLowerCase();
+        const gradeLabel = grade ? `Grade ${grade}` : 'middle school';
+        const subjectLabel = subjectName || (subjectSlug
+            ? subjectSlug.replace(/-/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase())
+            : 'Technology and Robotics');
+        const roboticsContext = subjectSlug === 'technology' && !/robot/i.test(subjectLabel)
+            ? ' and Robotics'
+            : '';
+        return `${gradeLabel} ${subjectLabel}${roboticsContext} class`;
+    }
+
     createResearchActions(word) {
         const actions = createElement('div', 'word-hunt-actions');
         const searchTerm = word.word || '';
+        const classContext = this.getResearchClassContext();
         const classMeaning = String(word.definition || '').trim();
         const classMeaningSentence = classMeaning && /[.!?]$/.test(classMeaning)
             ? classMeaning
             : `${classMeaning}.`;
         const contextLine = classMeaning
-            ? ` Use this class meaning for context: ${classMeaningSentence}`
+            ? `\nMeaning hint: ${classMeaningSentence}`
             : '';
-        const definitionPrompt = `Define "${searchTerm}" for a Grade 6 technology and robotics class. Use the technology-related meaning.${contextLine} Keep it simple and classroom appropriate. Answer with one short definition.`;
-        const examplesPrompt = `Write exactly 2 student-friendly example sentences using "${searchTerm}" in a Grade 6 technology and robotics class. Use the technology-related meaning.${contextLine} Number them 1 and 2.`;
+        const definitionPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nTask: Write one short, student-friendly definition. Use the meaning that fits this class.`;
+        const examplesPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nTask: Write exactly 2 student-friendly example sentences. Use the meaning that fits this class. Number them 1 and 2.`;
         const aiModeUrl = prompt => `https://www.google.com/aimode?q=${encodeURIComponent(prompt)}`;
         const links = [
             ['Definition', aiModeUrl(definitionPrompt)],
@@ -520,6 +538,15 @@ export class IllustrationActivity {
 
     persistLocalEntries() {
         localStorage.setItem(this.getStorageKey(), JSON.stringify(this.entries));
+    }
+
+    getWordHuntEntries() {
+        return Object.fromEntries(
+            Object.entries(this.entries || {}).map(([word, entry]) => [
+                word,
+                this.normalizeEntry(entry)
+            ])
+        );
     }
 
     saveEntry(word) {
