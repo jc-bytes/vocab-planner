@@ -6475,9 +6475,18 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 
+.word-hunt-upload-area.hidden {
+    display: none;
+}
+
+.word-hunt-paste-feedback {
+    width: 100%;
+    color: #bfdbfe;
+    font-size: 0.82rem;
+}
+
 .word-hunt-preview-frame {
     position: relative;
-    margin-top: 0.65rem;
     min-height: 128px;
     border-radius: var(--radius-md);
     background: rgba(15, 23, 42, 0.55);
