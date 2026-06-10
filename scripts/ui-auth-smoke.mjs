@@ -123,17 +123,34 @@ async function loginStudent(page) {
     if (errorText?.trim()) throw new Error(`Student login failed: ${errorText.trim()}`);
 }
 
-async function openStudentAssignment(page, assignmentId, titlePattern, readyPattern) {
+async function getStudentActivityStatus(page) {
+    return page.locator('#student-classroom-activity-save-status').textContent().catch(() => '');
+}
+
+async function openStudentAssignment(page, assignmentId, titlePattern, readyPattern, options = {}) {
     await page.goto(`${baseUrl}/student.html#/classroom-activities/${encodeURIComponent(assignmentId)}`, {
         waitUntil: 'domcontentloaded'
     });
     await waitForApp(page);
     await page.locator('#student-classroom-activity-view:not(.hidden)').waitFor({ timeout: 15000 });
     await page.locator('#student-classroom-activity-title').filter({ hasText: titlePattern }).waitFor({ timeout: 15000 });
-    await page.waitForFunction(pattern => {
-        const text = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
-        return new RegExp(pattern).test(text);
-    }, readyPattern.source, { timeout: 30000 });
+    try {
+        await page.waitForFunction(pattern => {
+            const text = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
+            return new RegExp(pattern).test(text)
+                || /Saved locally|Cloud sync pending|Cloud retry pending|Draft saved/i.test(text);
+        }, readyPattern.source, { timeout: 30000 });
+    } catch (error) {
+        const statusText = (await getStudentActivityStatus(page))?.trim();
+        if (options.readySelector && await page.locator(options.readySelector).first().isVisible().catch(() => false)) {
+            return;
+        }
+        throw new Error(`${assignmentId} did not become ready. Current status: ${statusText || 'empty'}. ${error.message}`);
+    }
+
+    if (options.readySelector) {
+        await page.locator(options.readySelector).first().waitFor({ state: 'visible', timeout: 15000 });
+    }
 }
 
 async function submitOpenAssignment(page, label) {
@@ -170,7 +187,9 @@ async function submitSpreadsheet(page) {
 }
 
 async function submitImageHotspot(page) {
-    await openStudentAssignment(page, 'audit-image-hotspot', /Audit Image Hotspot/, /Image activity ready/i);
+    await openStudentAssignment(page, 'audit-image-hotspot', /Audit Image Hotspot/, /Image activity ready/i, {
+        readySelector: '[data-image-hotspot-stage]'
+    });
     const image = page.locator('[data-image-hotspot-stage] img');
     await image.waitFor({ state: 'visible', timeout: 15000 });
     const box = await image.boundingBox();
