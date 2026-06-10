@@ -11,6 +11,24 @@ import { activityUsesCanvas, validateActivityResponse } from '../classroomActivi
 const SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
 
 class StudentClassroomActivityPersistenceMethods {
+    hasMeaningfulResponseData(value) {
+        if (value === null || value === undefined) return false;
+        if (typeof value === 'string') return value.trim().length > 0;
+        if (typeof value === 'number') return Number.isFinite(value);
+        if (typeof value === 'boolean') return value === true;
+        if (Array.isArray(value)) return value.some(item => this.hasMeaningfulResponseData(item));
+        if (typeof value === 'object') {
+            return Object.values(value).some(item => this.hasMeaningfulResponseData(item));
+        }
+        return false;
+    }
+
+    submissionHasMeaningfulWork(submission = {}) {
+        return submission.status === 'submitted'
+            || Boolean(submission.submittedAt)
+            || this.hasMeaningfulResponseData(submission.responseData);
+    }
+
     syncEditorScene() {
         if (this.currentAssignment?.activityType === STRUCTURED_RESPONSE_TYPE) {
             this.syncStructuredResponses();
@@ -53,15 +71,22 @@ class StudentClassroomActivityPersistenceMethods {
     async queueAutosave() {
         clearTimeout(this.autosaveTimeout);
         if (this.hasDraftConflict()) return;
+        const submissionId = this.currentSubmission?.id || '';
         await this.flushLocalDraft({ statusText: 'Saved on this device. Syncing...' });
         this.autosaveTimeout = window.setTimeout(() => {
             this.autosaveTimeout = null;
-            this.saveCurrentSubmission({ notifyOnError: false });
+            this.saveCurrentSubmission({ notifyOnError: false, submissionId });
         }, 1200);
     }
 
     async flushLocalDraft(options = {}) {
         if (!this.currentSubmission?.id) return false;
+        const savingSubmissionId = this.currentSubmission.id;
+        const savingAssignmentId = this.currentAssignment?.id || '';
+        const isStillCurrentSubmission = () => (
+            this.currentSubmission?.id === savingSubmissionId
+            && (this.currentAssignment?.id || '') === savingAssignmentId
+        );
         if (this.hasDraftConflict()) return false;
         await this.refreshLocalSubmission(this.currentSubmission.id);
         const localConflict = this.getLocalDraftConflict();
@@ -73,15 +98,19 @@ class StudentClassroomActivityPersistenceMethods {
         clearTimeout(this.autosaveTimeout);
         this.autosaveTimeout = null;
         this.syncEditorScene();
-        this.currentSubmission = this.normalizeSubmission({
+        let workingSubmission = this.normalizeSubmission({
             ...this.currentSubmission,
             studentProfile: this.sm.studentProfile || {},
             updatedAt: new Date().toISOString()
         });
+        if (isStillCurrentSubmission()) this.currentSubmission = workingSubmission;
 
         try {
-            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
-            if (!options.quiet) {
+            workingSubmission = await this.saveSubmissionLocally(workingSubmission);
+            if (isStillCurrentSubmission()) {
+                this.currentSubmission = workingSubmission;
+            }
+            if (!options.quiet && isStillCurrentSubmission()) {
                 this.setSaveStatus(options.statusText || 'Saved on this device. Cloud sync pending.');
             }
             return true;
@@ -107,6 +136,17 @@ class StudentClassroomActivityPersistenceMethods {
             const loadedMillis = this.timestampMillis(this.currentSubmission.loadedAt);
             const baseMillis = Math.max(knownCloudMillis, loadedMillis);
             if (cloudMillis > baseMillis + 1000) {
+                const localSubmission = this.getLocalSubmission(this.currentSubmission.id);
+                const localMillis = this.timestampMillis(localSubmission?.updatedAt);
+                if (
+                    localSubmission?.lastSavedByTabId === this.getClassroomDraftTabId()
+                    && localMillis >= cloudMillis - 1000
+                ) {
+                    return null;
+                }
+                const cloudHasWork = this.submissionHasMeaningfulWork(cloudSubmission);
+                const localHasWork = this.submissionHasMeaningfulWork(this.currentSubmission);
+                if (!cloudHasWork && localHasWork) return null;
                 return {
                     source: 'cloud',
                     submission: this.markSubmissionLoaded({
@@ -122,7 +162,29 @@ class StudentClassroomActivityPersistenceMethods {
     }
 
     async saveCurrentSubmission(options = {}) {
+        const previousSave = this.saveCurrentSubmissionPromise || Promise.resolve();
+        const nextSave = previousSave
+            .catch(() => {})
+            .then(() => this.performSaveCurrentSubmission(options));
+        this.saveCurrentSubmissionPromise = nextSave.finally(() => {
+            if (this.saveCurrentSubmissionPromise === nextSave) {
+                this.saveCurrentSubmissionPromise = null;
+            }
+        });
+        return nextSave;
+    }
+
+    async performSaveCurrentSubmission(options = {}) {
         if (!this.currentSubmission?.id) return false;
+        if (options.submissionId && options.submissionId !== this.currentSubmission.id) return false;
+        const savingSubmissionId = this.currentSubmission.id;
+        const savingAssignment = this.currentAssignment;
+        const isStillCurrentSubmission = () => (
+            this.currentSubmission?.id === savingSubmissionId
+            && this.currentAssignment?.id === savingAssignment?.id
+        );
+        clearTimeout(this.autosaveTimeout);
+        this.autosaveTimeout = null;
         if (this.hasDraftConflict()) {
             notifications.warning('Load the newer work before saving.');
             return false;
@@ -135,11 +197,12 @@ class StudentClassroomActivityPersistenceMethods {
             return false;
         }
         this.syncEditorScene();
-        this.currentSubmission = this.normalizeSubmission({
+        let workingSubmission = this.normalizeSubmission({
             ...this.currentSubmission,
             studentProfile: this.sm.studentProfile || {},
             updatedAt: new Date().toISOString()
         });
+        if (isStillCurrentSubmission()) this.currentSubmission = workingSubmission;
 
         const cloudConflict = await this.getCloudDraftConflict();
         if (cloudConflict) {
@@ -149,45 +212,56 @@ class StudentClassroomActivityPersistenceMethods {
         }
 
         try {
-            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
+            workingSubmission = await this.saveSubmissionLocally(workingSubmission);
+            if (isStillCurrentSubmission()) this.currentSubmission = workingSubmission;
         } catch (error) {
             console.error('Failed to stage classroom activity draft locally before cloud save:', error);
         }
 
         try {
             const db = supabaseService.getDatabase();
-            const cloudSubmission = await this.prepareSubmissionForCloud(this.currentSubmission);
+            const cloudSubmission = await this.prepareSubmissionForCloud(workingSubmission, savingAssignment);
             await setDoc(doc(db, SUBMISSION_COLLECTION, cloudSubmission.id), {
                 ...cloudSubmission,
                 updatedAt: serverTimestamp()
             });
-            await this.refreshLocalSubmission(this.currentSubmission.id);
-            const postCloudLocalConflict = this.getLocalDraftConflict();
-            if (postCloudLocalConflict) {
-                this.markDraftConflict(postCloudLocalConflict);
-                notifications.warning('Load the newer work before saving.');
-                return false;
+            await this.refreshLocalSubmission(savingSubmissionId);
+            if (isStillCurrentSubmission()) {
+                const postCloudLocalConflict = this.getLocalDraftConflict();
+                if (postCloudLocalConflict) {
+                    this.markDraftConflict(postCloudLocalConflict);
+                    notifications.warning('Load the newer work before saving.');
+                    return false;
+                }
             }
-            this.currentSubmission = this.normalizeSubmission({
+            workingSubmission = this.normalizeSubmission({
                 ...cloudSubmission,
                 updatedAt: new Date().toISOString(),
                 loadedAt: new Date().toISOString(),
                 cloudUpdatedAt: new Date().toISOString(),
                 lastSavedByTabId: this.getClassroomDraftTabId()
             });
-            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission, { source: 'cloud-synced' });
-            this.setSaveStatus(this.currentSubmission.status === 'submitted' ? 'Submission saved.' : 'Draft saved.');
+            workingSubmission = await this.saveSubmissionLocally(workingSubmission, { source: 'cloud-synced' });
+            if (isStillCurrentSubmission()) {
+                this.currentSubmission = workingSubmission;
+                this.setSaveStatus(this.currentSubmission.status === 'submitted' ? 'Submission saved.' : 'Draft saved.');
+            }
             return true;
         } catch (error) {
             console.error('Failed to save classroom activity submission:', error);
-            await this.refreshLocalSubmission(this.currentSubmission.id);
-            const localConflictAfterError = this.getLocalDraftConflict();
-            if (localConflictAfterError) {
-                this.markDraftConflict(localConflictAfterError);
-                return false;
+            await this.refreshLocalSubmission(savingSubmissionId);
+            if (isStillCurrentSubmission()) {
+                const localConflictAfterError = this.getLocalDraftConflict();
+                if (localConflictAfterError) {
+                    this.markDraftConflict(localConflictAfterError);
+                    return false;
+                }
             }
-            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
-            this.setSaveStatus('Saved locally. Cloud retry pending.');
+            workingSubmission = await this.saveSubmissionLocally(workingSubmission);
+            if (isStillCurrentSubmission()) {
+                this.currentSubmission = workingSubmission;
+                this.setSaveStatus('Saved locally. Cloud retry pending.');
+            }
             if (options.notifyOnError !== false) {
                 notifications.warning('Saved locally. Try again when cloud sync is available.');
             }

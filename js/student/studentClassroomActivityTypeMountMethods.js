@@ -61,10 +61,7 @@ export const studentClassroomActivityTypeMountMethods = {
             assignment.activityData?.templateId || 'category-sort'
         );
         const response = normalizeCardSortResponse(template, submission.responseData?.cardSortResponse || {});
-        this.currentSubmission.responseData = {
-            ...(this.currentSubmission.responseData || {}),
-            cardSortResponse: response
-        };
+        this.currentSubmission.responseData = { cardSortResponse: response };
         root.classList.add('card-sort-response-root');
         root.classList.remove('structured-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root', 'flowchart-response-root');
         root.innerHTML = this.renderCardSortBoard(template, response);
@@ -108,10 +105,7 @@ export const studentClassroomActivityTypeMountMethods = {
             assignment.activityData?.templateId || 'data-table'
         );
         const response = normalizeSpreadsheetResponse(template, submission.responseData?.spreadsheetResponse || {});
-        this.currentSubmission.responseData = {
-            ...(this.currentSubmission.responseData || {}),
-            spreadsheetResponse: response
-        };
+        this.currentSubmission.responseData = { spreadsheetResponse: response };
         root.classList.add('spreadsheet-table-response-root');
         root.classList.remove('structured-response-root', 'card-sort-response-root', 'image-hotspot-response-root', 'external-artifact-response-root', 'flowchart-response-root');
         this.setSaveStatus('Loading spreadsheet...');
@@ -151,10 +145,7 @@ export const studentClassroomActivityTypeMountMethods = {
             assignment.activityData?.templateId || 'label-image-parts'
         );
         const response = normalizeImageHotspotResponse(template, submission.responseData?.imageHotspotResponse || {});
-        this.currentSubmission.responseData = {
-            ...(this.currentSubmission.responseData || {}),
-            imageHotspotResponse: response
-        };
+        this.currentSubmission.responseData = { imageHotspotResponse: response };
         root.classList.add('image-hotspot-response-root');
         root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'external-artifact-response-root', 'flowchart-response-root');
         this.setSaveStatus('Loading image activity...');
@@ -200,10 +191,7 @@ export const studentClassroomActivityTypeMountMethods = {
             assignment.activityData?.templateId || 'project-evidence'
         );
         const response = normalizeExternalArtifactResponse(template, submission.responseData?.externalArtifactResponse || {});
-        this.currentSubmission.responseData = {
-            ...(this.currentSubmission.responseData || {}),
-            externalArtifactResponse: response
-        };
+        this.currentSubmission.responseData = { externalArtifactResponse: response };
         root.classList.add('external-artifact-response-root');
         root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'flowchart-response-root');
         this.setSaveStatus('Loading evidence activity...');
@@ -232,10 +220,7 @@ export const studentClassroomActivityTypeMountMethods = {
             assignment.activityData?.templateId || 'sequence-algorithm'
         );
         const response = normalizeFlowchartResponse(template, submission.responseData?.flowchartResponse || {});
-        this.currentSubmission.responseData = {
-            ...(this.currentSubmission.responseData || {}),
-            flowchartResponse: response
-        };
+        this.currentSubmission.responseData = { flowchartResponse: response };
         root.classList.add('flowchart-response-root');
         root.classList.remove('structured-response-root', 'card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root');
         this.setSaveStatus('Loading flowchart...');

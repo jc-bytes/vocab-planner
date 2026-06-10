@@ -135,6 +135,24 @@ async function openStudentAssignment(page, assignmentId, titlePattern, readyPatt
     await page.locator('#student-classroom-activity-view:not(.hidden)').waitFor({ timeout: 15000 });
     await page.locator('#student-classroom-activity-title').filter({ hasText: titlePattern }).waitFor({ timeout: 15000 });
     try {
+        await page.waitForFunction(expectedAssignmentId => {
+            return window.studentApp?.classroomActivities?.currentSubmission?.assignmentId === expectedAssignmentId;
+        }, assignmentId, { timeout: 15000 });
+    } catch (error) {
+        const state = await page.evaluate(() => {
+            const activity = window.studentApp?.classroomActivities;
+            return {
+                hash: window.location.hash,
+                title: document.querySelector('#student-classroom-activity-title')?.textContent || '',
+                currentAssignmentId: activity?.currentAssignment?.id || '',
+                currentSubmissionId: activity?.currentSubmission?.id || '',
+                currentSubmissionAssignmentId: activity?.currentSubmission?.assignmentId || '',
+                activeAssignmentLoadId: activity?.activeAssignmentLoadId || ''
+            };
+        });
+        throw new Error(`${assignmentId} app state did not become active. State: ${JSON.stringify(state)}. ${error.message}`);
+    }
+    try {
         await page.waitForFunction(pattern => {
             const text = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
             return new RegExp(pattern).test(text)
@@ -154,18 +172,31 @@ async function openStudentAssignment(page, assignmentId, titlePattern, readyPatt
 }
 
 async function submitOpenAssignment(page, label) {
-    await page.locator('#student-submit-classroom-activity-btn').click();
-    await page.waitForFunction(() => {
-        const status = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
-        const submit = document.querySelector('#student-submit-classroom-activity-btn')?.textContent || '';
-        return /Submission saved|Activity submitted|Submitted/i.test(status)
-            || /Resubmit/i.test(submit)
-            || /Complete:|failed|unavailable|locally/i.test(status);
-    }, null, { timeout: 30000 });
+    const submitButton = page.locator('#student-submit-classroom-activity-btn');
+    await submitButton.scrollIntoViewIfNeeded();
+    await page.evaluate(async () => {
+        await window.studentApp?.classroomActivities?.submitCurrentActivity?.();
+    });
+    try {
+        await page.waitForFunction(() => {
+            const status = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
+            const submit = document.querySelector('#student-submit-classroom-activity-btn')?.textContent || '';
+            return /Submission saved|Activity submitted|Submitted/i.test(status)
+                || /Resubmit/i.test(submit)
+                || /Complete:|failed|unavailable|locally/i.test(status);
+        }, null, { timeout: 30000 });
+    } catch (error) {
+        const statusText = (await getStudentActivityStatus(page))?.trim();
+        const buttonText = (await submitButton.textContent().catch(() => ''))?.trim();
+        const buttonDisabled = await submitButton.isDisabled().catch(() => false);
+        const detail = problems.length ? `\nBrowser problems:\n${problems.join('\n')}` : '';
+        throw new Error(`${label} submit did not finish. Status: ${statusText || 'empty'}. Button: ${buttonText || 'empty'} (${buttonDisabled ? 'disabled' : 'enabled'}). ${error.message}${detail}`);
+    }
 
     const statusText = await page.locator('#student-classroom-activity-save-status').textContent().catch(() => '');
     if (/complete|required|failed|unavailable|locally/i.test(statusText || '')) {
-        throw new Error(`${label} did not submit cleanly: ${statusText}`);
+        const detail = problems.length ? `\nBrowser problems:\n${problems.join('\n')}` : '';
+        throw new Error(`${label} did not submit cleanly: ${statusText}${detail}`);
     }
 }
 
@@ -230,17 +261,19 @@ async function submitFlowchart(page) {
 
 async function waitForSubmitted(admin, assignmentId) {
     const started = Date.now();
+    let latestRows = [];
     while (Date.now() - started < 15000) {
         const { data, error } = await admin
             .from('classroom_activity_submissions')
-            .select('id,status')
-            .eq('assignment_id', assignmentId)
-            .eq('status', 'submitted');
+            .select('id,status,submitted_at,updated_at')
+            .eq('assignment_id', assignmentId);
         if (error) throw error;
-        if ((data || []).length > 0) return;
+        latestRows = data || [];
+        if (latestRows.some(row => row.status === 'submitted')) return;
         await new Promise(resolve => setTimeout(resolve, 500));
     }
-    throw new Error(`No submitted audit response found for ${assignmentId}.`);
+    const detail = problems.length ? ` Browser problems: ${problems.join(' | ')}` : '';
+    throw new Error(`No submitted audit response found for ${assignmentId}. Rows: ${JSON.stringify(latestRows)}.${detail}`);
 }
 
 async function verifyTeacherReview(page, assignmentId, titlePattern) {

@@ -15,6 +15,7 @@ function getCompactTaskSummary(value = '', fallback = '') {
 
 export const studentClassroomActivityMountDetailsMethods = {
     async showAssignment(assignmentId) {
+        this.activeAssignmentLoadId = assignmentId;
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
         this.sm.switchView('student-classroom-activity-view');
@@ -26,6 +27,7 @@ export const studentClassroomActivityMountDetailsMethods = {
         if (root) root.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
 
         const assignment = await this.findAssignment(assignmentId, { forceRefresh: true });
+        if (this.activeAssignmentLoadId !== assignmentId) return;
         if (!assignment) {
             notifications.warning('This activity is not available for your class.');
             this.sm.navigateTo({ view: 'classroom-activities' }, { replace: true });
@@ -33,6 +35,7 @@ export const studentClassroomActivityMountDetailsMethods = {
         }
 
         const submission = await this.loadOrCreateSubmission(assignment);
+        if (this.activeAssignmentLoadId !== assignmentId) return;
         this.currentAssignment = assignment;
         this.currentSubmission = submission;
         this.renderAssignmentDetails(assignment, submission);
