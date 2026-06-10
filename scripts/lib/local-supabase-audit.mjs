@@ -101,7 +101,7 @@ export async function readLocalSupabaseStatus({ startIfStopped = true } = {}) {
         if (!startIfStopped) {
             throw new Error(`Local Supabase is not reachable. Start it with "supabase start". ${error.stderr || error.message}`);
         }
-        await runCommand('supabase', ['start'], { stdio: 'ignore' });
+        await runCommand('supabase', ['start'], { stdio: process.env.CI ? 'inherit' : 'ignore' });
         output = await execFileText('supabase', ['status', '--output', 'json']);
     }
 

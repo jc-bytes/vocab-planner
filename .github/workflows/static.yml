@@ -43,7 +43,13 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.98.2
+      - name: Check Docker
+        run: docker info
+      - name: Start local Supabase
+        env:
+          SUPABASE_TELEMETRY_DISABLED: 1
+        run: supabase start
       - name: Smoke test app shells
         run: npm run test:ui:smoke
       - name: Authenticated app smoke
