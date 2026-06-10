@@ -326,18 +326,52 @@ export class IllustrationActivity {
         label.textContent = 'Image';
 
         const uploadArea = createElement('div', 'word-hunt-upload-area');
+        uploadArea.setAttribute('role', 'button');
         uploadArea.tabIndex = 0;
-        uploadArea.setAttribute('aria-label', 'Paste image area. Click here, then paste an image.');
+        uploadArea.setAttribute('aria-label', 'Add an image. Paste from clipboard, drag here, or choose a file.');
         uploadArea.addEventListener('click', event => {
             if (event.target.closest('.word-hunt-upload-action')) return;
             uploadArea.focus({ preventScroll: true });
+            fileInput.click();
+        });
+        uploadArea.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            uploadArea.focus({ preventScroll: true });
+            fileInput.click();
+        });
+        uploadArea.addEventListener('dragover', event => {
+            event.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        uploadArea.addEventListener('dragleave', event => {
+            if (!uploadArea.contains(event.relatedTarget)) {
+                uploadArea.classList.remove('drag-over');
+            }
+        });
+        uploadArea.addEventListener('drop', event => {
+            event.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const file = Array.from(event.dataTransfer?.files || []).find(item => item.type.startsWith('image/'));
+            if (file) {
+                this.processAndSaveImage(file);
+            }
         });
 
+        const title = createElement('strong', 'word-hunt-upload-title', entry.hasImage ? 'Image saved' : 'Add an image');
         const instruction = createElement('p');
-        instruction.textContent = entry.hasImage ? 'Image saved. Paste or upload to replace it.' : 'Paste an image or upload a file.';
+        instruction.textContent = entry.hasImage
+            ? 'Paste, drag, or choose a new image to replace it.'
+            : 'Paste from clipboard, drag here, or choose a file.';
+
+        const actions = createElement('div', 'word-hunt-upload-actions');
+        const pasteAction = createElement('button', 'word-hunt-upload-action secondary');
+        pasteAction.type = 'button';
+        pasteAction.textContent = 'Paste Image';
 
         const uploadAction = createElement('button', 'word-hunt-upload-action');
         uploadAction.type = 'button';
+        uploadAction.dataset.wordHuntChooseImage = 'true';
         uploadAction.textContent = entry.hasImage ? 'Replace Image' : 'Choose Image';
 
         const fileInput = document.createElement('input');
@@ -345,17 +379,26 @@ export class IllustrationActivity {
         fileInput.accept = 'image/*';
         fileInput.setAttribute('aria-label', 'Upload image');
         fileInput.addEventListener('change', event => this.handleFileSelect(event));
+        pasteAction.addEventListener('click', async event => {
+            event.preventDefault();
+            event.stopPropagation();
+            uploadArea.focus({ preventScroll: true });
+            await this.pasteImageFromClipboard();
+        });
         uploadAction.addEventListener('click', event => {
             event.preventDefault();
             event.stopPropagation();
             fileInput.click();
         });
 
+        actions.appendChild(pasteAction);
+        actions.appendChild(uploadAction);
+        uploadArea.appendChild(title);
         uploadArea.appendChild(instruction);
-        uploadArea.appendChild(uploadAction);
+        uploadArea.appendChild(actions);
         uploadArea.appendChild(fileInput);
 
-        const preview = createElement('div', 'word-hunt-preview-frame');
+        const preview = createElement('div', `word-hunt-preview-frame ${entry.hasImage ? '' : 'hidden'}`);
         const image = document.createElement('img');
         image.id = 'word-hunt-preview';
         image.alt = 'Saved word hunt image';
@@ -499,6 +542,29 @@ export class IllustrationActivity {
         }
     }
 
+    async pasteImageFromClipboard() {
+        if (!navigator.clipboard?.read) {
+            alert('Press Ctrl+V or Cmd+V after copying an image.');
+            return;
+        }
+
+        try {
+            const clipboardItems = await navigator.clipboard.read();
+            for (const clipboardItem of clipboardItems) {
+                const imageType = clipboardItem.types.find(type => type.startsWith('image/'));
+                if (imageType) {
+                    const blob = await clipboardItem.getType(imageType);
+                    await this.processAndSaveImage(blob);
+                    return;
+                }
+            }
+            alert('No image was found on the clipboard.');
+        } catch (error) {
+            console.warn('Could not read image from clipboard:', error);
+            alert('Press Ctrl+V or Cmd+V after copying an image.');
+        }
+    }
+
     async processAndSaveImage(file) {
         try {
             const imageData = await compressImageToWebp(file);
@@ -578,7 +644,9 @@ export class IllustrationActivity {
         }
 
         this.previewImage.hidden = true;
+        this.previewImage.closest('.word-hunt-preview-frame')?.classList.add('hidden');
         if (this.removeImageButton) this.removeImageButton.hidden = true;
+        this.updateImagePanelCopy(false);
     }
 
     async removeCurrentImage() {
@@ -604,11 +672,13 @@ export class IllustrationActivity {
         if (this.previewImage) {
             this.previewImage.removeAttribute('src');
             this.previewImage.hidden = true;
+            this.previewImage.closest('.word-hunt-preview-frame')?.classList.add('hidden');
         }
         if (this.removeImageButton) this.removeImageButton.hidden = true;
 
         this.saveEntry(word);
         this.updateLiveStatus();
+        this.updateImagePanelCopy(false);
     }
 
     displayImage(blob) {
@@ -617,7 +687,24 @@ export class IllustrationActivity {
         this.previewUrl = URL.createObjectURL(blob);
         this.previewImage.src = this.previewUrl;
         this.previewImage.hidden = false;
+        this.previewImage.closest('.word-hunt-preview-frame')?.classList.remove('hidden');
         if (this.removeImageButton) this.removeImageButton.hidden = false;
+        this.updateImagePanelCopy(true);
+    }
+
+    updateImagePanelCopy(hasImage) {
+        const title = this.container.querySelector('.word-hunt-upload-title');
+        if (title) title.textContent = hasImage ? 'Image saved' : 'Add an image';
+
+        const instruction = this.container.querySelector('.word-hunt-upload-area p');
+        if (instruction) {
+            instruction.textContent = hasImage
+                ? 'Paste, drag, or choose a new image to replace it.'
+                : 'Paste from clipboard, drag here, or choose a file.';
+        }
+
+        const chooseButton = this.container.querySelector('[data-word-hunt-choose-image]');
+        if (chooseButton) chooseButton.textContent = hasImage ? 'Replace Image' : 'Choose Image';
     }
 
     navigate(direction) {
