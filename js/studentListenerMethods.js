@@ -112,6 +112,10 @@ class StudentListenerMethods {
             this.classroomActivities.submitCurrentActivity();
         });
 
+        this.addListener('#mobile-edit-profile-btn', 'click', () => {
+            this.auth.checkProfile(true);
+        });
+
         this.addListener('#student-load-newer-classroom-draft-btn', 'click', () => {
             this.classroomActivities.reloadNewestDraft();
         });
