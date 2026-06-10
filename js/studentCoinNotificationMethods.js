@@ -2,6 +2,7 @@ import { $ } from './main.js';
 
 class StudentCoinNotificationMethods {
     showNotificationBadge() {
+        this.logStudentDomUpdate?.('coin-notification-badge', { source: 'showNotificationBadge' });
         // Only show if there are actually gift coins
         if (this.coinData.giftCoins <= 0) {
             this.hideNotificationBadge();
@@ -49,6 +50,7 @@ class StudentCoinNotificationMethods {
     }
 
     hideNotificationBadge() {
+        this.logStudentDomUpdate?.('coin-notification-badge', { source: 'hideNotificationBadge' });
         const badge = $('#coin-notification-badge');
         if (badge) {
             badge.style.display = 'none';

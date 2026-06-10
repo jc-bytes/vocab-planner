@@ -104,6 +104,19 @@ Students connect technology with community responsibility through Internet Day a
 | infographic | A visual that explains information with pictures and short text. |
 | present | To show and explain work to others. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 1 - 45 minutes|Internet Day: responsible choices]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 1 - 90 minutes|Internet Day campaign]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 2 - 45 minutes|Recycling and e-waste]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 2 - 90 minutes|Technology and the environment]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 3 - 45 minutes|Plan awareness product]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 3 - 90 minutes|Create and present]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-05 May/6th Grade Technology - T1 - 2026-05 - May - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

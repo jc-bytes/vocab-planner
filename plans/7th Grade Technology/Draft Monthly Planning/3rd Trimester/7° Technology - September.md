@@ -68,6 +68,19 @@ spreadsheet, sheet, row, column, cell, cell reference, formula, function, averag
 | chart | A visual way to show data. |
 | interpretation | An explanation of what data means. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 1 - 45 minutes|Spreadsheet introduction]]
+- Week 1 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 1 - 90 minutes|Entering, formatting, and core vocabulary]]
+- Week 2 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 2 - 45 minutes|Basic formulas]]
+- Week 2 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 2 - 90 minutes|Charts and data interpretation]]
+- Week 3 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 3 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 3 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 3 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-09 September/7th Grade Technology - T3 - 2026-09 - September - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

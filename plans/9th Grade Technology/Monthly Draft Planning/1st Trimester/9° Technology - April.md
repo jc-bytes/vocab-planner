@@ -96,6 +96,17 @@ Students extend robotics foundations by using buttons, sensors, serial monitorin
 | project log | A record of project work and tests. |
 | improvement | A change that makes something better. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 5 - 45 minutes|Serial monitor]]
+- Week 5 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 5 - 90 minutes|Analog input with potentiometer]]
+- Week 6 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 6 - 45 minutes|Sensor threshold]]
+- Week 6 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 6 - 90 minutes|RGB output and state colors]]
+- Week 7 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 7 - 45 minutes|Addressable LEDs and animation]]
+- Week 7 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 7 - 90 minutes|Team robotics practice]]
+- Week 8 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 8 - 45 minutes|State logic chart]]
+- Week 8 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-04 April/9th Grade Technology - T1 - 2026-04 - April - Week 8 - 90 minutes|Integrated input-output prototype]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

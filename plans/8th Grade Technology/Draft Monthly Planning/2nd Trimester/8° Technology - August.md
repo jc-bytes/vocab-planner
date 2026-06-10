@@ -113,6 +113,17 @@ Students complete the Arduino trimester by exploring distance sensing and integr
 | archive | To store files neatly for later. |
 | return | To put something back where it belongs. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 9 - 45 minutes|Ultrasonic sensing]]
+- Week 9 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 9 - 90 minutes|Project design plan]]
+- Week 10 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 10 - 45 minutes|Exam project launch]]
+- Week 10 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 10 - 90 minutes|Prototype building and code]]
+- Week 11 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 11 - 45 minutes|Testing and debugging]]
+- Week 11 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 11 - 90 minutes|Improvement and documentation]]
+- Week 12 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 12 - 45 minutes|Demonstration setup]]
+- Week 12 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-08 August/8th Grade Technology - T2 - 2026-08 - August - Week 12 - 90 minutes|Demonstration continuation]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

@@ -144,7 +144,7 @@ class StudentGameLeaderboardMethods {
 
         // Only show if we have a grade to filter by
         if (!this.sm.studentProfile.grade) {
-            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Update your profile grade to see the leaderboard!</p>';
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Ask your teacher to add your profile grade to see the leaderboard.</p>';
             return;
         }
 

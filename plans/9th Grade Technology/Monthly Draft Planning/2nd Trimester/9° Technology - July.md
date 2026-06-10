@@ -82,6 +82,17 @@ Students move from Python sequence practice into data science. They collect, cle
 | correlation | A relationship where two things seem to change together. |
 | conclusion | A final idea based on evidence. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 5 - 45 minutes|Data collection plan]]
+- Week 5 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 5 - 90 minutes|Collect and organize data]]
+- Week 6 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 6 - 45 minutes|Data cleaning habits]]
+- Week 6 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 6 - 90 minutes|Tinkercad data model intro]]
+- Week 7 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 7 - 45 minutes|Charts and patterns]]
+- Week 7 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 7 - 90 minutes|Correlation and outliers]]
+- Week 8 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 8 - 45 minutes|Data conclusions]]
+- Week 8 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-07 July/9th Grade Technology - T2 - 2026-07 - July - Week 8 - 90 minutes|Data product prototype]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

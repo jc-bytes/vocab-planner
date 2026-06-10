@@ -92,6 +92,19 @@ vector graphic, bitmap, fill, stroke, z-order, shape, layer, object, path, node
 | scalable | Able to change size without losing quality. |
 | property | A style or setting that can be changed. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 1 - 45 minutes|Introduction to vector graphics]]
+- Week 1 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 1 - 90 minutes|Shapes, layers, object order, and core vocabulary]]
+- Week 2 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 2 - 45 minutes|Alignment, distribution, and grouping]]
+- Week 2 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 2 - 90 minutes|Paths and nodes]]
+- Week 3 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 3 - 45 minutes|Campaign graphic planning]]
+- Week 3 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 3 - 90 minutes|Campaign icon or logo draft]]
+- Week 4 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 4 - 45 minutes|SVG and markup basics]]
+- Week 4 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 4 - 90 minutes|Design review and improvement]]
+- Week 5 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-03 March/8th Grade Technology - T1 - 2026-03 - March - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

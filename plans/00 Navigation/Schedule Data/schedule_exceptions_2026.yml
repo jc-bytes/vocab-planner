@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "notes": [
+    "Editable draft. Add no-class days, holidays, school events, or cancelled class blocks here.",
+    "Skip-and-continue behavior: an exception does not consume the next lesson for that section and duration."
+  ],
+  "examples": [
+    {"date": "2026-06-15", "section": "TECH 6A", "reason": "Example no-class block"},
+    {"date": "2026-11-03", "grade": 7, "reason": "Example grade-wide event"}
+  ],
+  "exceptions": []
+}

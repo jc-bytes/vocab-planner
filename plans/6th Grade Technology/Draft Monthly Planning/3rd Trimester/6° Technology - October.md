@@ -117,6 +117,17 @@ Students finish the mBot STEM bridge by creating a chart and conclusion from pro
 | display | A screen or lights that show output. |
 | icon | A small picture or symbol. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 1 - 45 minutes|mBot charts tell a story]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 1 - 90 minutes|mBot Data Chart and Conclusion]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 2 - 45 minutes|3D modelling basics]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 2 - 90 minutes|Shape practice]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 3 - 45 minutes|Plan a simple model]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 3 - 90 minutes|3D Model Design]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 4 - 45 minutes|Meet the micro:bit]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-10 October/6th Grade Technology - T3 - 2026-10 - October - Week 4 - 90 minutes|micro:bit Parts and Input/Output Check]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

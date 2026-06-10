@@ -113,6 +113,19 @@ Students complete the first trimester by turning their vector graphics, environm
 | reflection | Thinking about what happened and what you learned. |
 | folder | A place used to organize files. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 9 - 45 minutes|Project evidence check]]
+- Week 9 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 9 - 90 minutes|Google Sites setup]]
+- Week 10 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 10 - 45 minutes|Exam project launch]]
+- Week 10 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 10 - 90 minutes|Portfolio build and media integration]]
+- Week 11 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 11 - 45 minutes|Testing and feedback]]
+- Week 11 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 11 - 90 minutes|Final revision and reflection]]
+- Week 12 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 12 - 45 minutes|Presentation setup]]
+- Week 12 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 12 - 90 minutes|Presentation continuation]]
+- Week 13 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 13 - 45 minutes|Exam/admin buffer]]
+- Week 13 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-05 May/8th Grade Technology - T1 - 2026-05 - May - Week 13 - 90 minutes|Trimester reflection and archive]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

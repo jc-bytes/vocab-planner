@@ -93,6 +93,15 @@ Used for Summative Activity #1. These words support the full trimester and keep 
 | output | What a device does or shows after a program runs. |
 | value | A number or piece of data in a program or spreadsheet. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 1 - 45 minutes|Inspect ready mBots]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 1 - 90 minutes|IIIT vocabulary and challenge plan]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 2 - 45 minutes|Collect mBot data]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 2 - 90 minutes|mBot STEM Data Table]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 3 - 45 minutes|Formulas with mBot data]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-09 September/6th Grade Technology - T3 - 2026-09 - September - Week 3 - 90 minutes|Formula practice with project data]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

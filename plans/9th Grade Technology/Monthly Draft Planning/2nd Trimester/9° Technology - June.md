@@ -64,6 +64,17 @@ Python, list, item, index, string, loop, condition, data, value, output
 | length | How many items or characters something has. |
 | substring | A smaller part of a string. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes|Python sequence review]]
+- Week 1 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes|Lists for real data and core vocabulary]]
+- Week 2 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes|While loops]]
+- Week 2 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes|For loops with lists]]
+- Week 3 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 3 - 45 minutes|Loop debugging quiz-style check]]
+- Week 3 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 3 - 90 minutes|Strings as data]]
+- Week 4 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 4 - 45 minutes|Mini program with sequences]]
+- Week 4 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 4 - 90 minutes|From programming to data science]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

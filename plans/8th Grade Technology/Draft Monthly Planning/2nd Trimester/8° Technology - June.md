@@ -91,6 +91,17 @@ Arduino, Freenove, microcontroller, circuit, breadboard, pin, power, ground, res
 | coder | The person who works on the code. |
 | recorder | The person who writes notes or evidence. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes|Arduino and Freenove kit introduction]]
+- Week 1 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes|LED blink and core vocabulary]]
+- Week 2 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes|Flowing LED sequence]]
+- Week 2 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes|Digital input with a button]]
+- Week 3 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 3 - 45 minutes|Button logic and state changes]]
+- Week 3 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 3 - 90 minutes|Serial monitor and button-build rehearsal]]
+- Week 4 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 4 - 45 minutes|Button-controlled LED build check]]
+- Week 4 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 4 - 90 minutes|Safe build challenge]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

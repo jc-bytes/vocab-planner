@@ -223,6 +223,7 @@ class StudentAuthUiMethods {
     }
 
     setAuthStatus(text) {
+        this.logStudentDomUpdate?.('auth-status', { source: 'setAuthStatus', text });
         const statusEl = $('#auth-status');
         if (!statusEl) return;
         const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';

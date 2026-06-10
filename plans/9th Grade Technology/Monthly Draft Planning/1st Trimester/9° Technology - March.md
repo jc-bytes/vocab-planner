@@ -63,6 +63,17 @@ input, process, output, system, device, circuit, sketch, upload, debug, test
 | instruction | A step that tells what to do. |
 | fix | A change that solves a problem. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 1 - 45 minutes|Physical computing systems]]
+- Week 1 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 1 - 90 minutes|Lab safety, system map, and core vocabulary]]
+- Week 2 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 2 - 45 minutes|Digital and analog signals]]
+- Week 2 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 2 - 90 minutes|LED blink and core vocabulary and program structure]]
+- Week 3 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 3 - 45 minutes|Vocabulary and debugging routine]]
+- Week 3 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 3 - 90 minutes|Mini LED control practice]]
+- Week 4 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 4 - 45 minutes|Button input]]
+- Week 4 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-03 March/9th Grade Technology - T1 - 2026-03 - March - Week 4 - 90 minutes|Toggle control]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

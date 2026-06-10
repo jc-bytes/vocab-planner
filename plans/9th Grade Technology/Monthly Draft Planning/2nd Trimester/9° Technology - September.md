@@ -21,6 +21,11 @@ This short second-trimester September plan is reserved for week 13 exam administ
 ## Evaluation
 - Week 13 reserved for exams/admin and make-up evidence.
 
+## Class Notes (Generated)
+
+- 13 - Class 1 - 45 min: [[9th Grade Technology/Class Notes (Generated)/T2 2026-09 September/9th Grade Technology - T2 - 2026-09 - September - 13 - Class 1 - 45 min|Exam/admin buffer]]
+- 13 - Class 2 - 90 min: [[9th Grade Technology/Class Notes (Generated)/T2 2026-09 September/9th Grade Technology - T2 - 2026-09 - September - 13 - Class 2 - 90 min|Portfolio cleanup and reflection]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

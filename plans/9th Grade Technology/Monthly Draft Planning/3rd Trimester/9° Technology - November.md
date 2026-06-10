@@ -79,6 +79,19 @@ Students complete the fifth daily grade, use Week 9 for make-up and project setu
 | limitation | Something that makes results less complete or certain. |
 | explanation | A clear description of how or why something works. |
 
+## Class Notes (Generated)
+
+- Week 8 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 8 - 45 minutes|STEM proposal]]
+- Week 8 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 8 - 90 minutes|Prototype practice]]
+- Week 9 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 9 - 45 minutes|Project habits review]]
+- Week 9 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 9 - 90 minutes|Exam project planning]]
+- Week 10 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 10 - 45 minutes|Exam project setup]]
+- Week 10 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 10 - 90 minutes|Exam project build]]
+- Week 11 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 11 - 45 minutes|Exam project testing]]
+- Week 11 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 11 - 90 minutes|Exam project improvement]]
+- Week 12 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 12 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 12 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-11 November/9th Grade Technology - T3 - 2026-11 - November - Week 12 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

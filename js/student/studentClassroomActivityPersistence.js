@@ -1,5 +1,5 @@
 import { $, notifications } from '../main.js';
-import { studentApi as supabaseService, doc, setDoc, serverTimestamp } from '../services/studentApi.js';
+import { studentApi as supabaseService, doc, getDoc, setDoc, serverTimestamp } from '../services/studentApi.js';
 import { STRUCTURED_RESPONSE_TYPE } from '../activityStructuredResponse.js';
 import { CARD_SORT_TYPE } from '../activityCardSort.js';
 import { SPREADSHEET_TABLE_TYPE } from '../activitySpreadsheetTable.js';
@@ -50,16 +50,28 @@ class StudentClassroomActivityPersistenceMethods {
         };
     }
 
-    queueAutosave() {
+    async queueAutosave() {
         clearTimeout(this.autosaveTimeout);
-        this.setSaveStatus('Saving draft...');
+        if (this.hasDraftConflict()) return;
+        await this.flushLocalDraft({ statusText: 'Saved on this device. Syncing...' });
         this.autosaveTimeout = window.setTimeout(() => {
+            this.autosaveTimeout = null;
             this.saveCurrentSubmission({ notifyOnError: false });
         }, 1200);
     }
 
-    async saveCurrentSubmission(options = {}) {
+    async flushLocalDraft(options = {}) {
         if (!this.currentSubmission?.id) return false;
+        if (this.hasDraftConflict()) return false;
+        await this.refreshLocalSubmission(this.currentSubmission.id);
+        const localConflict = this.getLocalDraftConflict();
+        if (localConflict) {
+            this.markDraftConflict(localConflict);
+            return false;
+        }
+
+        clearTimeout(this.autosaveTimeout);
+        this.autosaveTimeout = null;
         this.syncEditorScene();
         this.currentSubmission = this.normalizeSubmission({
             ...this.currentSubmission,
@@ -68,22 +80,113 @@ class StudentClassroomActivityPersistenceMethods {
         });
 
         try {
+            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
+            if (!options.quiet) {
+                this.setSaveStatus(options.statusText || 'Saved on this device. Cloud sync pending.');
+            }
+            return true;
+        } catch (error) {
+            console.error('Failed to save classroom activity draft locally:', error);
+            if (!options.quiet) {
+                this.setSaveStatus('Local draft save failed.');
+            }
+            return false;
+        }
+    }
+
+    async getCloudDraftConflict() {
+        if (!this.currentSubmission?.id) return null;
+        try {
+            const db = supabaseService.getDatabase();
+            const snap = await getDoc(doc(db, SUBMISSION_COLLECTION, this.currentSubmission.id));
+            if (!snap.exists()) return null;
+
+            const cloudSubmission = this.normalizeSubmission({ id: snap.id, ...snap.data() });
+            const cloudMillis = this.timestampMillis(cloudSubmission.updatedAt);
+            const knownCloudMillis = this.timestampMillis(this.currentSubmission.cloudUpdatedAt);
+            const loadedMillis = this.timestampMillis(this.currentSubmission.loadedAt);
+            const baseMillis = Math.max(knownCloudMillis, loadedMillis);
+            if (cloudMillis > baseMillis + 1000) {
+                return {
+                    source: 'cloud',
+                    submission: this.markSubmissionLoaded({
+                        ...cloudSubmission,
+                        cloudUpdatedAt: cloudSubmission.updatedAt || new Date().toISOString()
+                    })
+                };
+            }
+        } catch (error) {
+            console.warn('Could not check cloud draft conflict before save:', error);
+        }
+        return null;
+    }
+
+    async saveCurrentSubmission(options = {}) {
+        if (!this.currentSubmission?.id) return false;
+        if (this.hasDraftConflict()) {
+            notifications.warning('Load the newer work before saving.');
+            return false;
+        }
+        await this.refreshLocalSubmission(this.currentSubmission.id);
+        const localConflict = this.getLocalDraftConflict();
+        if (localConflict) {
+            this.markDraftConflict(localConflict);
+            notifications.warning('Load the newer work before saving.');
+            return false;
+        }
+        this.syncEditorScene();
+        this.currentSubmission = this.normalizeSubmission({
+            ...this.currentSubmission,
+            studentProfile: this.sm.studentProfile || {},
+            updatedAt: new Date().toISOString()
+        });
+
+        const cloudConflict = await this.getCloudDraftConflict();
+        if (cloudConflict) {
+            this.markDraftConflict(cloudConflict);
+            notifications.warning('Load the newer work before saving.');
+            return false;
+        }
+
+        try {
+            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
+        } catch (error) {
+            console.error('Failed to stage classroom activity draft locally before cloud save:', error);
+        }
+
+        try {
             const db = supabaseService.getDatabase();
             const cloudSubmission = await this.prepareSubmissionForCloud(this.currentSubmission);
             await setDoc(doc(db, SUBMISSION_COLLECTION, cloudSubmission.id), {
                 ...cloudSubmission,
                 updatedAt: serverTimestamp()
             });
+            await this.refreshLocalSubmission(this.currentSubmission.id);
+            const postCloudLocalConflict = this.getLocalDraftConflict();
+            if (postCloudLocalConflict) {
+                this.markDraftConflict(postCloudLocalConflict);
+                notifications.warning('Load the newer work before saving.');
+                return false;
+            }
             this.currentSubmission = this.normalizeSubmission({
                 ...cloudSubmission,
-                updatedAt: new Date().toISOString()
+                updatedAt: new Date().toISOString(),
+                loadedAt: new Date().toISOString(),
+                cloudUpdatedAt: new Date().toISOString(),
+                lastSavedByTabId: this.getClassroomDraftTabId()
             });
-            this.removeLocalSubmission(this.currentSubmission.id);
+            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission, { source: 'cloud-synced' });
             this.setSaveStatus(this.currentSubmission.status === 'submitted' ? 'Submission saved.' : 'Draft saved.');
             return true;
         } catch (error) {
             console.error('Failed to save classroom activity submission:', error);
-            this.saveSubmissionLocally(this.currentSubmission);
+            await this.refreshLocalSubmission(this.currentSubmission.id);
+            const localConflictAfterError = this.getLocalDraftConflict();
+            if (localConflictAfterError) {
+                this.markDraftConflict(localConflictAfterError);
+                return false;
+            }
+            this.currentSubmission = await this.saveSubmissionLocally(this.currentSubmission);
             this.setSaveStatus('Saved locally. Cloud retry pending.');
             if (options.notifyOnError !== false) {
                 notifications.warning('Saved locally. Try again when cloud sync is available.');
@@ -96,7 +199,7 @@ class StudentClassroomActivityPersistenceMethods {
         const button = $('#student-export-classroom-activity-pdf-btn');
         if (!button) return;
 
-        button.disabled = isExporting || !this.currentSubmission?.id;
+        button.disabled = isExporting || !this.currentSubmission?.id || this.hasDraftConflict();
         button.innerHTML = isExporting
             ? '<i data-lucide="loader-circle"></i> Preparing PDF...'
             : '<i data-lucide="download"></i> Export PDF';
@@ -107,6 +210,13 @@ class StudentClassroomActivityPersistenceMethods {
         if (this.pdfExportInProgress) return;
         if (!this.currentAssignment || !this.currentSubmission?.id) {
             notifications.warning('Open an activity before exporting a PDF.');
+            return;
+        }
+        await this.refreshLocalSubmission(this.currentSubmission.id);
+        const localConflict = this.getLocalDraftConflict();
+        if (this.hasDraftConflict() || localConflict) {
+            if (!this.hasDraftConflict() && localConflict) this.markDraftConflict(localConflict);
+            notifications.warning('Load the newer work before exporting.');
             return;
         }
 
@@ -154,6 +264,13 @@ class StudentClassroomActivityPersistenceMethods {
 
     async submitCurrentActivity() {
         if (!this.currentSubmission?.id) return;
+        await this.refreshLocalSubmission(this.currentSubmission.id);
+        const localConflict = this.getLocalDraftConflict();
+        if (this.hasDraftConflict() || localConflict) {
+            if (!this.hasDraftConflict() && localConflict) this.markDraftConflict(localConflict);
+            notifications.warning('Load the newer work before submitting.');
+            return;
+        }
         this.syncEditorScene();
         const validation = validateActivityResponse(this.currentAssignment, this.currentSubmission.responseData || {});
         if (!validation.valid) {

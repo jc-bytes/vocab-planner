@@ -1,0 +1,223 @@
+{
+  "main": {
+    "id": "cb09e6cca30eb582",
+    "type": "split",
+    "children": [
+      {
+        "id": "aa22fbadf3661fc0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "08f3490a11d27da3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "9th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "0e015250e9611c95",
+    "type": "split",
+    "children": [
+      {
+        "id": "1e5f29f92bddc7f3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b61b234200b104d3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "29b5de2cca670004",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "0d4dc1b292eff805",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "80553fa905a2bc7a",
+    "type": "split",
+    "children": [
+      {
+        "id": "85fcf22684560afd",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "72af7e8b650103d7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "0938066444d45439",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "79e36d8b5a54d141",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "e4107fad7d42226b",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "689c58543e6045ff",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "08f3490a11d27da3",
+  "lastOpenFiles": [
+    "00 Navigation/Month Classes/June Classes - 2026.md",
+    "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes.md",
+    "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes.md",
+    "00 Navigation/This Week.md",
+    "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes.md",
+    "00 Navigation/Schedule Audit.md",
+    "00 Navigation/This Week - June 8-12 2026.md",
+    "00 Navigation/Start Here.md",
+    "00 Navigation/Month Classes/July Classes - 2026.md",
+    "00 Navigation/Monthly Schedule/Monthly Schedule Index.md",
+    "00 Navigation/Monthly Schedule/December Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/November Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/October Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/September Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/August Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/July Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/June Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/May Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/April Schedule - 2026.md",
+    "00 Navigation/Monthly Schedule/March Schedule - 2026.md",
+    "00 Navigation/Weekly Classes/December 21-25 2026.md",
+    "00 Navigation/Weekly Classes/December 14-18 2026.md",
+    "00 Navigation/Weekly Classes/December 7-11 2026.md",
+    "00 Navigation/Weekly Classes/November 30-December 4 2026.md",
+    "00 Navigation/Weekly Classes/November 23-27 2026.md",
+    "00 Navigation/Weekly Classes/November 16-20 2026.md",
+    "00 Navigation/Monthly Schedule",
+    "00 Navigation/Weekly Classes",
+    "00 Navigation/Schedule Data/school_weeks_2026.yml",
+    "00 Navigation/Schedule Data/weekly_rotation_2026.yml",
+    "00 Navigation/Schedule Data/schedule_exceptions_2026.yml",
+    "00 Navigation/Schedule Data",
+    "9th Grade Technology/Monthly Draft Planning/1st Trimester/Physical Computing Systems.canvas",
+    "00 Navigation/Month Classes",
+    "9th Grade Technology/Class Notes (Generated)/T3 2026-12 December",
+    "9th Grade Technology/Class Notes (Generated)/T3 2026-11 November",
+    "9th Grade Technology/Class Notes (Generated)/T3 2026-10 October"
+  ]
+}

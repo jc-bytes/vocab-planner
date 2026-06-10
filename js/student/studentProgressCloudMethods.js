@@ -21,25 +21,30 @@ class StudentProgressCloudMethods {
 
         this.visibilitySyncHandler = () => {
             if (document.visibilityState === 'visible') {
-                this.refreshCoinsFromCloud({ silent: true });
+                if (this.sm.shouldDebugStudentDom?.()) console.log('VISIBILITY', document.visibilityState);
+                this.refreshCoinsFromCloud({ silent: true, reason: 'visibilitychange' });
             }
         };
         document.addEventListener('visibilitychange', this.visibilitySyncHandler);
 
-        this.focusSyncHandler = () => this.refreshCoinsFromCloud({ silent: true });
+        this.focusSyncHandler = () => {
+            if (this.sm.shouldDebugStudentDom?.()) console.log('FOCUS');
+            this.refreshCoinsFromCloud({ silent: true, reason: 'focus' });
+        };
         this.onlineSyncHandler = () => {
             this.flushLocalSyncQueue({ silent: true });
-            this.refreshCoinsFromCloud({ silent: true });
+            this.refreshCoinsFromCloud({ silent: true, reason: 'online' });
         };
         window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
 
         this.coinSyncInterval = window.setInterval(() => {
-            this.refreshCoinsFromCloud({ silent: true });
+            this.refreshCoinsFromCloud({ silent: true, reason: 'interval' });
         }, COIN_SYNC_INTERVAL_MS);
 
         if (typeof supabaseService.subscribeToStudentProgress === 'function') {
             this.coinRealtimeUnsubscribe = supabaseService.subscribeToStudentProgress(userId, progress => {
+                this.sm.logStudentDomUpdate?.('student-progress-realtime', { source: 'subscribeToStudentProgress' });
                 this.applyRemoteCoinProgress(progress);
             });
         }
@@ -76,6 +81,7 @@ class StudentProgressCloudMethods {
 
     applyRemoteCoinProgress(progress) {
         if (!progress) return;
+        this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyRemoteCoinProgress' });
         const cloudCoinData = this.migrateCoinData(progress);
 
         this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
@@ -86,10 +92,18 @@ class StudentProgressCloudMethods {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
 
         try {
+            this.sm.logStudentDomUpdate?.('student-progress', {
+                source: 'refreshCoinsFromCloud:start',
+                reason: options.reason || ''
+            });
             const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
             const snapshot = await getDoc(docRef);
             if (!snapshot.exists()) return;
+            this.sm.logStudentDomUpdate?.('student-progress', {
+                source: 'refreshCoinsFromCloud:snapshot',
+                reason: options.reason || ''
+            });
             this.applyRemoteCoinProgress(snapshot.data());
         } catch (error) {
             if (!options.silent) {

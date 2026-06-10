@@ -116,6 +116,19 @@ Students create and improve a simple website, then begin using variables in Scra
 | test | To try something to see if it works. |
 | debug | To find and fix a problem. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 1 - 45 minutes|Copyright and images]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 1 - 90 minutes|Finding useful images]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 2 - 45 minutes|Web page structure]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 2 - 90 minutes|Build and preview]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 3 - 45 minutes|Links and navigation]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 3 - 90 minutes|Add links and evaluate]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 4 - 45 minutes|Scratch variables]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 4 - 90 minutes|Scratch score challenge]]
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-04 April/6th Grade Technology - T1 - 2026-04 - April - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

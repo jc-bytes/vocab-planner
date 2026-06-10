@@ -117,6 +117,19 @@ Students use November for make-up, project setup, and the Mandrake Detection Sys
 | improvement | A change that makes something better. |
 | reflection | Thinking about what happened and what you learned. |
 
+## Class Notes (Generated)
+
+- Week 8 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 8 - 45 minutes|Sensor-system review and make-up]]
+- Week 8 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 8 - 90 minutes|Threshold testing practice]]
+- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 9 - 45 minutes|Project rubric and readiness]]
+- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 9 - 90 minutes|Make-up, review, and project setup]]
+- Week 10 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 10 - 45 minutes|Begin Exam Project: Mandrake Detection System]]
+- Week 10 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 10 - 90 minutes|Build and test the sensor logic]]
+- Week 11 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 11 - 45 minutes|Debugging and reliability]]
+- Week 11 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 11 - 90 minutes|Final build and presentation preparation]]
+- Week 12 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 12 - 45 minutes|Presentation rehearsal]]
+- Week 12 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-11 November/7th Grade Technology - T3 - 2026-11 - November - Week 12 - 90 minutes|Final Mandrake Detection System presentation]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

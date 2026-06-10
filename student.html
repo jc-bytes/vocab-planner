@@ -15,8 +15,6 @@
                 <a href="index.html" class="back-link" style="display:none;">← Home</a>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
                     <h1 id="welcome-header">Welcome!</h1>
-                    <button id="edit-profile-btn" class="btn text-btn" title="Edit profile"
-                        style="font-size:0.9rem;">✏️</button>
                 </div>
             </div>
             <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
@@ -54,10 +52,6 @@
                 <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
                     <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">🪙 0</div>
                     <span id="auth-status" class="status-dot" title="Syncing" aria-label="Syncing"></span>
-                    <button id="mobile-edit-profile-btn" class="btn text-btn icon-btn student-mobile-profile-btn"
-                        title="Edit profile" aria-label="Edit profile">
-                        <i data-lucide="user-pen"></i>
-                    </button>
                     <button id="sign-out-btn" class="btn text-btn icon-btn" title="Sign out" aria-label="Sign out">
                         <i data-lucide="log-out"></i>
                     </button>
@@ -351,6 +345,17 @@
                                 Submit
                             </button>
                         </div>
+                    </div>
+
+                    <div id="student-classroom-draft-conflict-banner" class="student-classroom-draft-conflict-banner" hidden>
+                        <div>
+                            <strong>Newer work is available</strong>
+                            <p data-draft-conflict-message>This activity was updated in another tab or device. Load the newer work before continuing.</p>
+                        </div>
+                        <button id="student-load-newer-classroom-draft-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="refresh-cw"></i>
+                            Load newer work
+                        </button>
                     </div>
 
                     <div id="student-classroom-activity-layout" class="student-classroom-activity-layout">

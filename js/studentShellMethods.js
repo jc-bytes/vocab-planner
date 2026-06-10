@@ -74,6 +74,62 @@ class StudentShellMethods {
         });
     }
 
+    shouldDebugStudentDom() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('debugDom') === '1'
+                || params.get('debugScroll') === '1'
+                || localStorage.getItem('debug_student_dom') === '1';
+        } catch {
+            return false;
+        }
+    }
+
+    logStudentDomUpdate(containerId, details = {}) {
+        if (!this.shouldDebugStudentDom()) return;
+        console.log('DOM UPDATE', containerId, {
+            ...details,
+            hash: window.location.hash,
+            activeViewId: $('.view.active')?.id || '',
+            visibilityState: document.visibilityState
+        });
+    }
+
+    getStudentMutationTargetLabel(target) {
+        if (!target) return '';
+        if (target.id) return `#${target.id}`;
+        if (target.className && typeof target.className === 'string') {
+            return `.${target.className.trim().replace(/\s+/g, '.')}`;
+        }
+        return target.nodeName || '';
+    }
+
+    startStudentDashboardMutationObserver() {
+        if (this.studentDashboardMutationObserver || !this.shouldDebugStudentDom()) return;
+        const dashboard = $('#student-home-dashboard');
+        if (!dashboard) return;
+
+        this.studentDashboardMutationObserver = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                console.log('DOM UPDATE', 'student-home-dashboard', {
+                    mutationType: mutation.type,
+                    target: this.getStudentMutationTargetLabel(mutation.target),
+                    attributeName: mutation.attributeName || '',
+                    addedNodes: mutation.addedNodes?.length || 0,
+                    removedNodes: mutation.removedNodes?.length || 0,
+                    hash: window.location.hash,
+                    visibilityState: document.visibilityState
+                });
+            });
+        });
+        this.studentDashboardMutationObserver.observe(dashboard, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+        this.logStudentDomUpdate('student-home-dashboard', { source: 'MutationObserver attached' });
+    }
+
     saveStudentSectionScroll(viewId = '') {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;

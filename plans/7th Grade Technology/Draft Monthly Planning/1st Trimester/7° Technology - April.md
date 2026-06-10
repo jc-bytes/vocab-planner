@@ -101,6 +101,19 @@ Students improve mBot movement control by using speed, time, direction, turns, L
 | else | A code word for what happens when an if condition is false. |
 | reactive | Able to respond when something changes. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 5 - 45 minutes|Speed, time, and distance]]
+- Week 5 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 5 - 90 minutes|Precise turns and measured paths]]
+- Week 6 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 6 - 45 minutes|Path planning on a grid]]
+- Week 6 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 6 - 90 minutes|Efficient navigation]]
+- Week 7 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 7 - 45 minutes|LED states and meaning]]
+- Week 7 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 7 - 90 minutes|Movement with LEDs and sound]]
+- Week 8 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 8 - 45 minutes|Ultrasonic sensor values and thresholds]]
+- Week 8 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 8 - 90 minutes|If/else obstacle detection]]
+- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 9 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-04 April/7th Grade Technology - T1 - 2026-04 - April - Week 9 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

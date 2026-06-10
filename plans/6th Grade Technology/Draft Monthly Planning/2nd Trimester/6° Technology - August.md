@@ -97,6 +97,15 @@ Students finish the mBot unit by using mBot Knowledge Cards Part 1 as preparatio
 | explain | To make an idea clear with words. |
 | reflection | Thinking about what worked and what to improve. |
 
+## Class Notes (Generated)
+
+- Week 10 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 10 - 45 minutes|Knowledge Cards review]]
+- Week 10 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 10 - 90 minutes|Card practice stations]]
+- Week 11 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 11 - 45 minutes|Plan the mBot STEM challenge]]
+- Week 11 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 11 - 90 minutes|Build and test final challenge]]
+- Week 12 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 12 - 45 minutes|Prepare demonstration]]
+- Week 12 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-08 August/6th Grade Technology - T2 - 2026-08 - August - Week 12 - 90 minutes|Demonstrate, reflect, and leave mBots ready]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

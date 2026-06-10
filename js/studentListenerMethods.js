@@ -6,26 +6,37 @@ class StudentListenerMethods {
         if ('scrollRestoration' in window.history) {
             window.history.scrollRestoration = 'manual';
         }
+        this.startStudentDashboardMutationObserver();
 
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
+        window.addEventListener('storage', event => {
+            this.classroomActivities?.handleLocalSubmissionStorageEvent?.(event)?.catch(error => {
+                console.warn('Could not process classroom draft storage event:', error);
+            });
+        });
         window.addEventListener('resize', () => this.setStudentMobileMenu(false));
         window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
         window.addEventListener('pagehide', (event) => {
             this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
             this.saveStudentSectionScroll($('.view.active')?.id || '');
+            this.classroomActivities?.flushLocalDraft?.({ quiet: true });
         });
         window.addEventListener('pageshow', (event) => {
+            if (this.shouldDebugStudentDom()) console.log('PAGESHOW', event.persisted);
             this.debugStudentScrollLifecycle('pageshow', { persisted: event.persisted });
+            this.startStudentDashboardMutationObserver();
         });
         document.addEventListener('visibilitychange', () => {
             const activeViewId = $('.view.active')?.id || '';
+            if (this.shouldDebugStudentDom()) console.log('VISIBILITY', document.visibilityState);
             this.debugStudentScrollLifecycle('visibilitychange', {
                 state: document.visibilityState,
                 activeViewId
             });
             if (document.hidden) {
                 this.saveStudentSectionScroll(activeViewId);
+                this.classroomActivities?.flushLocalDraft?.({ quiet: true });
             }
         });
 
@@ -81,7 +92,8 @@ class StudentListenerMethods {
             this.navigateTo({ view: 'classroom-activities' });
         });
 
-        this.addListener('#back-to-classroom-activities-btn', 'click', () => {
+        this.addListener('#back-to-classroom-activities-btn', 'click', async () => {
+            await this.classroomActivities?.flushLocalDraft?.({ statusText: 'Draft saved on this device.' });
             this.navigateTo({
                 view: 'classroom-activities',
                 ...this.studentClassroomActivityDrilldown
@@ -98,6 +110,10 @@ class StudentListenerMethods {
 
         this.addListener('#student-submit-classroom-activity-btn', 'click', () => {
             this.classroomActivities.submitCurrentActivity();
+        });
+
+        this.addListener('#student-load-newer-classroom-draft-btn', 'click', () => {
+            this.classroomActivities.reloadNewestDraft();
         });
 
         this.addListener('#student-toggle-classroom-instructions-btn', 'click', () => {
@@ -255,15 +271,14 @@ class StudentListenerMethods {
             }
         });
 
-        this.addListener('#edit-profile-btn', 'click', () => {
-            this.checkProfile(true);
-        });
-        this.addListener('#mobile-edit-profile-btn', 'click', () => {
-            this.checkProfile(true);
-        });
-
         // Profile Save
         this.addListener('#save-profile-btn', 'click', async () => {
+            if (this.hasCompleteStudentProfile()) {
+                notifications.warning('Ask your teacher to update your profile.');
+                closeDialog('#profile-modal', { restoreFocus: false });
+                return;
+            }
+
             const firstName = $('#student-firstname').value.trim();
             const lastName = $('#student-lastname').value.trim();
             let grade = $('#student-grade').value.trim();

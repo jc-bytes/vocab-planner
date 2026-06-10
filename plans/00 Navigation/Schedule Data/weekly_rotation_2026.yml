@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "timezone": "America/Panama",
+  "source": "Notion Calendar screenshot, June 2026 week view",
+  "days": {
+    "Monday": [
+      {"start": "7:30", "end": "8:15", "section": "TECH 9B", "grade": 9, "duration": "45 minutes"},
+      {"start": "9:00", "end": "9:45", "section": "TECH 8B", "grade": 8, "duration": "45 minutes"},
+      {"start": "11:30", "end": "12:15", "section": "TECH 9A", "grade": 9, "duration": "45 minutes"},
+      {"start": "1:30", "end": "2:15", "section": "TECH 6A", "grade": 6, "duration": "45 minutes"}
+    ],
+    "Tuesday": [
+      {"start": "7:30", "end": "9:00", "section": "TECH 6A", "grade": 6, "duration": "90 minutes"},
+      {"start": "10:45", "end": "11:30", "section": "TECH 6B", "grade": 6, "duration": "45 minutes"},
+      {"start": "12:45", "end": "2:15", "section": "TECH 9A", "grade": 9, "duration": "90 minutes"}
+    ],
+    "Wednesday": [
+      {"start": "7:30", "end": "9:00", "section": "TECH 6B", "grade": 6, "duration": "90 minutes"},
+      {"start": "9:00", "end": "9:45", "section": "TECH 8A", "grade": 8, "duration": "45 minutes"},
+      {"start": "10:00", "end": "10:45", "section": "TECH 7A", "grade": 7, "duration": "45 minutes"},
+      {"start": "10:45", "end": "11:30", "section": "TECH 6C", "grade": 6, "duration": "45 minutes"},
+      {"start": "12:45", "end": "2:15", "section": "TECH 9B", "grade": 9, "duration": "90 minutes"}
+    ],
+    "Thursday": [
+      {"start": "10:00", "end": "11:30", "section": "TECH 8A", "grade": 8, "duration": "90 minutes"},
+      {"start": "11:30", "end": "12:15", "section": "TECH 7B", "grade": 7, "duration": "45 minutes"},
+      {"start": "12:45", "end": "2:15", "section": "TECH 8B", "grade": 8, "duration": "90 minutes"}
+    ],
+    "Friday": [
+      {"start": "7:30", "end": "9:00", "section": "TECH 7B", "grade": 7, "duration": "90 minutes"},
+      {"start": "10:45", "end": "12:15", "section": "TECH 7A", "grade": 7, "duration": "90 minutes"},
+      {"start": "12:45", "end": "2:15", "section": "TECH 6C", "grade": 6, "duration": "90 minutes"}
+    ]
+  }
+}

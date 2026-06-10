@@ -95,6 +95,19 @@ mBot, hardware, software, chassis, motor, sensor, LED, buzzer, controller, contr
 | sequence | Steps in the correct order. |
 | debug | To find and fix a problem in code. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 1 - 45 minutes|mBot components and robot parts]]
+- Week 1 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 1 - 90 minutes|mBot assembly, safety, and core vocabulary]]
+- Week 2 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 2 - 45 minutes|Sensors, motors, and control board]]
+- Week 2 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 2 - 90 minutes|mBlock workspace and first scripts]]
+- Week 3 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 3 - 45 minutes|Connecting mBlock commands to robot actions]]
+- Week 3 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 3 - 90 minutes|First movement program]]
+- Week 4 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 4 - 45 minutes|Robots as systems]]
+- Week 4 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 4 - 90 minutes|Movement sequence practice]]
+- Week 5 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-03 March/7th Grade Technology - T1 - 2026-03 - March - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

@@ -98,6 +98,19 @@ Students share spreadsheet or 3D work, complete any needed make-up for the Week 
 | counter | A program or value that counts. |
 | reset | To set something back to the start. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 1 - 45 minutes|Prepare to share]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 1 - 90 minutes|Present and reflect]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 2 - 45 minutes|Meet the micro:bit]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 2 - 90 minutes|First micro:bit programs]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 3 - 45 minutes|Variables on micro:bit]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 3 - 90 minutes|Counter program]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-11 November/6th Grade Technology - T3 - 2026-11 - November - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

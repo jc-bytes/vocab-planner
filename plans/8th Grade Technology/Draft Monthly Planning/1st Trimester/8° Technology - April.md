@@ -109,6 +109,19 @@ Students extend the campaign portfolio by learning computing systems, web develo
 | page | One screen or section in a website. |
 | storyboard | A plan that shows scenes in order. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 5 - 45 minutes|Computing systems]]
+- Week 5 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 5 - 90 minutes|Operating systems and logical thinking]]
+- Week 6 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 6 - 45 minutes|AI and machine learning]]
+- Week 6 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 6 - 90 minutes|Open source and responsible remixing]]
+- Week 7 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 7 - 45 minutes|HTML structure]]
+- Week 7 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 7 - 90 minutes|Images and CSS styling]]
+- Week 8 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 8 - 45 minutes|Search engines and keywords]]
+- Week 8 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 8 - 90 minutes|Portfolio content and video organization]]
+- Week 9 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 9 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 9 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T1 2026-04 April/8th Grade Technology - T1 - 2026-04 - April - Week 9 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

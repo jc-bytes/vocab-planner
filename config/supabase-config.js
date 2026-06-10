@@ -7,10 +7,13 @@ export const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co
 
 export const isSupabaseConfigured = () => {
     const config = window.SUPABASE_CONFIG || SUPABASE_CONFIG;
+    const url = String(config.url || '');
+    const publishableKey = String(config.publishableKey || '');
     return Boolean(
-        config.url &&
-        config.publishableKey &&
-        !config.url.includes('YOUR_PROJECT_REF') &&
-        !config.publishableKey.includes('YOUR_SUPABASE')
+        url &&
+        publishableKey &&
+        !url.includes('YOUR_PROJECT_REF') &&
+        !publishableKey.includes('YOUR_SUPABASE') &&
+        !publishableKey.includes('your_key_here')
     );
 };

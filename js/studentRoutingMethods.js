@@ -236,6 +236,16 @@ class StudentRoutingMethods {
 
     async applyRoute(route) {
         const targetRoute = route && route.view ? route : { view: 'menu' };
+        const activeClassroomAssignmentId = this.classroomActivities?.currentAssignment?.id || '';
+        if (
+            activeClassroomAssignmentId
+            && (
+                targetRoute.view !== 'classroom-activity'
+                || targetRoute.assignmentId !== activeClassroomAssignmentId
+            )
+        ) {
+            await this.classroomActivities.flushLocalDraft?.({ quiet: true });
+        }
         this.isApplyingRoute = true;
 
         try {

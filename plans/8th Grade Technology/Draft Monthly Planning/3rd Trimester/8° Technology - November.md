@@ -103,6 +103,19 @@ Students use November for Scratch + Micro:bit project setup, make-up, and the in
 | reflection | Thinking about what happened and what you learned. |
 | screenshot | An image of what is on the screen. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 9 - 45 minutes|Scratch + Micro:bit setup]]
+- Week 9 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 9 - 90 minutes|Project readiness and final planning]]
+- Week 10 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 10 - 45 minutes|Exam project launch]]
+- Week 10 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 10 - 90 minutes|Game building and sensor control]]
+- Week 11 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 11 - 45 minutes|Debugging and user testing]]
+- Week 11 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 11 - 90 minutes|Documentation and presentation prep]]
+- Week 12 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 12 - 45 minutes|Presentation setup]]
+- Week 12 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 12 - 90 minutes|Presentation continuation]]
+- Week 13 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 13 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 13 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-11 November/8th Grade Technology - T3 - 2026-11 - November - Week 13 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

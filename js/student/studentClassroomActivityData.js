@@ -19,12 +19,59 @@ import {
     getDefaultTemplateIdForType,
     normalizeActivityData
 } from '../classroomActivityRegistry.js';
+import { imageDB } from '../db.js';
 
 const ASSIGNMENT_COLLECTION = 'classroomActivityAssignments';
 const SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
 const LOCAL_SUBMISSION_KEY = 'student_classroom_activity_submissions';
+const LOCAL_SUBMISSION_SIGNAL_KEY = 'student_classroom_activity_submissions_signal';
+const CLASSROOM_DRAFT_TAB_KEY = 'student_classroom_activity_tab_id';
+const CLASSROOM_DRAFT_CHANNEL = 'student_classroom_activity_drafts';
 
 class StudentClassroomActivityDataMethods {
+    timestampMillis(value) {
+        if (!value) return 0;
+        if (value.toDate) return value.toDate().getTime();
+        if (value.seconds !== undefined) return Number(value.seconds) * 1000;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : parsed;
+    }
+
+    getClassroomDraftTabId() {
+        if (this.classroomDraftTabId) return this.classroomDraftTabId;
+        try {
+            const existing = sessionStorage.getItem(CLASSROOM_DRAFT_TAB_KEY);
+            if (existing) {
+                this.classroomDraftTabId = existing;
+                return existing;
+            }
+            const id = `tab_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+            sessionStorage.setItem(CLASSROOM_DRAFT_TAB_KEY, id);
+            this.classroomDraftTabId = id;
+            return id;
+        } catch {
+            this.classroomDraftTabId = this.classroomDraftTabId
+                || `tab_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+            return this.classroomDraftTabId;
+        }
+    }
+
+    initDraftConflictChannel() {
+        this.getClassroomDraftTabId();
+        if (typeof window === 'undefined') return;
+        if (!('BroadcastChannel' in window)) return;
+        try {
+            this.draftBroadcastChannel = new BroadcastChannel(CLASSROOM_DRAFT_CHANNEL);
+            this.draftBroadcastChannel.addEventListener('message', event => {
+                this.handleDraftBroadcastMessage(event.data).catch(error => {
+                    console.warn('Could not process classroom draft broadcast:', error);
+                });
+            });
+        } catch (error) {
+            console.warn('Classroom draft broadcast channel unavailable:', error);
+        }
+    }
+
     normalizeTextList(value, { uppercase = false } = {}) {
         const source = Array.isArray(value) ? value : String(value || '').split(',');
         const items = source
@@ -96,6 +143,10 @@ class StudentClassroomActivityDataMethods {
             lateOverrideAt: source.lateOverrideAt || source.late_override_at,
             createdAt: source.createdAt || source.created_at,
             updatedAt: source.updatedAt || source.updated_at,
+            loadedAt: source.loadedAt || source.loaded_at || '',
+            localRevision: Number(source.localRevision ?? source.local_revision ?? 0) || 0,
+            lastSavedByTabId: String(source.lastSavedByTabId || source.last_saved_by_tab_id || ''),
+            cloudUpdatedAt: source.cloudUpdatedAt || source.cloud_updated_at || '',
             source: source.source || ''
         };
     }
@@ -125,6 +176,10 @@ class StudentClassroomActivityDataMethods {
     }
 
     getLocalSubmissions() {
+        return this.localSubmissionCache || {};
+    }
+
+    getLegacyLocalSubmissions() {
         try {
             const stored = JSON.parse(localStorage.getItem(LOCAL_SUBMISSION_KEY) || '{}');
             return stored && typeof stored === 'object' ? stored : {};
@@ -133,25 +188,212 @@ class StudentClassroomActivityDataMethods {
         }
     }
 
-    saveSubmissionLocally(submission) {
-        if (!submission?.id) return;
-        const local = this.getLocalSubmissions();
-        local[submission.id] = this.normalizeSubmission({ ...submission, source: 'local' });
-        local[submission.id].updatedAt = new Date().toISOString();
-        local[submission.id].source = 'local';
-        localStorage.setItem(LOCAL_SUBMISSION_KEY, JSON.stringify(local));
+    async loadLocalSubmissionCache() {
+        const drafts = await imageDB.getAllClassroomDrafts();
+        const cache = {};
+        drafts.forEach(draft => {
+            if (!draft?.id) return;
+            cache[draft.id] = this.normalizeSubmission(draft);
+        });
+
+        const legacy = this.getLegacyLocalSubmissions();
+        await Promise.all(Object.values(legacy).map(async legacySubmission => {
+            const normalized = this.normalizeSubmission(legacySubmission);
+            if (!normalized.id) return;
+            const existing = cache[normalized.id];
+            const newest = existing?.id ? this.pickNewestSubmission(existing, normalized) : normalized;
+            cache[normalized.id] = newest;
+            await imageDB.saveClassroomDraft(newest);
+        }));
+
+        if (Object.keys(legacy).length) {
+            localStorage.removeItem(LOCAL_SUBMISSION_KEY);
+        }
+        this.localSubmissionCache = cache;
+        return cache;
     }
 
-    removeLocalSubmission(id) {
+    signalLocalDraftChange(submission) {
+        try {
+            localStorage.setItem(LOCAL_SUBMISSION_SIGNAL_KEY, JSON.stringify({
+                submissionId: submission.id,
+                assignmentId: submission.assignmentId,
+                localRevision: submission.localRevision || 0,
+                updatedAt: submission.updatedAt || '',
+                lastSavedByTabId: submission.lastSavedByTabId || this.getClassroomDraftTabId(),
+                signalAt: new Date().toISOString()
+            }));
+        } catch {
+            // The real draft is in IndexedDB; this tiny signal is only a cross-tab hint.
+        }
+    }
+
+    async saveSubmissionLocally(submission, options = {}) {
+        if (!submission?.id) return null;
+        const tabId = this.getClassroomDraftTabId();
+        const source = options.source || 'local';
+        if (!this.localSubmissionCache) await this.loadLocalSubmissionCache();
+        const existing = this.normalizeSubmission(this.localSubmissionCache[submission.id] || {});
+        const draft = this.normalizeSubmission({
+            ...submission,
+            source,
+            localRevision: Math.max(existing.localRevision || 0, submission.localRevision || 0) + 1,
+            lastSavedByTabId: tabId,
+            loadedAt: submission.loadedAt || new Date().toISOString()
+        });
+        draft.updatedAt = new Date().toISOString();
+        draft.source = source;
+        await imageDB.saveClassroomDraft(draft);
+        this.localSubmissionCache[draft.id] = draft;
+        this.broadcastDraftUpdate(draft);
+        this.signalLocalDraftChange(draft);
+        return draft;
+    }
+
+    async removeLocalSubmission(id) {
         if (!id) return;
-        const local = this.getLocalSubmissions();
-        if (!local[id]) return;
-        delete local[id];
-        localStorage.setItem(LOCAL_SUBMISSION_KEY, JSON.stringify(local));
+        if (!this.localSubmissionCache) await this.loadLocalSubmissionCache();
+        delete this.localSubmissionCache[id];
+        await imageDB.deleteClassroomDraft(id);
     }
 
     getLocalSubmission(id) {
-        return this.normalizeSubmission(this.getLocalSubmissions()[id] || {});
+        return this.normalizeSubmission(this.localSubmissionCache?.[id] || {});
+    }
+
+    async refreshLocalSubmission(id) {
+        if (!id) return this.normalizeSubmission({});
+        const draft = await imageDB.getClassroomDraft(id);
+        if (!this.localSubmissionCache) this.localSubmissionCache = {};
+        if (draft?.id) {
+            this.localSubmissionCache[id] = this.normalizeSubmission(draft);
+            return this.localSubmissionCache[id];
+        }
+        delete this.localSubmissionCache[id];
+        return this.normalizeSubmission({});
+    }
+
+    broadcastDraftUpdate(submission) {
+        if (!submission?.id || !this.draftBroadcastChannel) return;
+        try {
+            this.draftBroadcastChannel.postMessage({
+                type: 'classroom-draft-updated',
+                submissionId: submission.id,
+                assignmentId: submission.assignmentId,
+                localRevision: submission.localRevision || 0,
+                updatedAt: submission.updatedAt || '',
+                lastSavedByTabId: submission.lastSavedByTabId || this.getClassroomDraftTabId()
+            });
+        } catch (error) {
+            console.warn('Could not broadcast classroom draft update:', error);
+        }
+    }
+
+    async handleDraftBroadcastMessage(message = {}) {
+        if (message?.type !== 'classroom-draft-updated') return;
+        if (!this.currentSubmission?.id || message.submissionId !== this.currentSubmission.id) return;
+        if (message.lastSavedByTabId === this.getClassroomDraftTabId()) return;
+        await this.refreshLocalSubmission(this.currentSubmission.id);
+        if ((Number(message.localRevision) || 0) <= (this.currentSubmission.localRevision || 0)) return;
+        this.markDraftConflict({
+            source: 'local',
+            reason: 'broadcast',
+            submission: this.getLocalSubmission(this.currentSubmission.id)
+        });
+    }
+
+    async handleLocalSubmissionStorageEvent(event) {
+        if (event.key !== LOCAL_SUBMISSION_SIGNAL_KEY || !this.currentSubmission?.id) return;
+        let signal = {};
+        try {
+            signal = JSON.parse(event.newValue || '{}');
+        } catch {
+            signal = {};
+        }
+        if (signal.submissionId && signal.submissionId !== this.currentSubmission.id) return;
+        const localSubmission = await this.refreshLocalSubmission(this.currentSubmission.id);
+        if (!localSubmission?.id) return;
+        if (localSubmission.lastSavedByTabId === this.getClassroomDraftTabId()) return;
+        if ((localSubmission.localRevision || 0) <= (this.currentSubmission.localRevision || 0)) return;
+        this.markDraftConflict({
+            source: 'local',
+            reason: 'storage',
+            submission: localSubmission
+        });
+    }
+
+    getLocalDraftConflict() {
+        if (!this.currentSubmission?.id) return null;
+        const localSubmission = this.getLocalSubmission(this.currentSubmission.id);
+        if (!localSubmission?.id) return null;
+        if (localSubmission.lastSavedByTabId === this.getClassroomDraftTabId()) return null;
+        if ((localSubmission.localRevision || 0) <= (this.currentSubmission.localRevision || 0)) return null;
+        return {
+            source: 'local',
+            submission: localSubmission
+        };
+    }
+
+    clearDraftConflict() {
+        this.draftConflict = null;
+        this.updateDraftConflictUi();
+    }
+
+    markDraftConflict(conflict = {}) {
+        this.draftConflict = conflict;
+        clearTimeout(this.autosaveTimeout);
+        this.autosaveTimeout = null;
+        this.updateDraftConflictUi();
+    }
+
+    hasDraftConflict() {
+        return Boolean(this.draftConflict);
+    }
+
+    updateDraftConflictUi() {
+        const hasConflict = this.hasDraftConflict();
+        const banner = document.getElementById('student-classroom-draft-conflict-banner');
+        const message = 'This activity was updated in another tab or device. Load the newer work before continuing.';
+        if (banner) {
+            banner.hidden = !hasConflict;
+            banner.querySelector('[data-draft-conflict-message]')?.replaceChildren(document.createTextNode(message));
+        }
+
+        ['student-save-classroom-activity-btn', 'student-export-classroom-activity-pdf-btn', 'student-submit-classroom-activity-btn']
+            .forEach(id => {
+                const button = document.getElementById(id);
+                if (button) button.disabled = hasConflict;
+            });
+
+        if (hasConflict) {
+            this.setSaveStatus(message);
+        }
+    }
+
+    async reloadNewestDraft() {
+        if (!this.currentAssignment || !this.currentSubmission?.id) return;
+        const currentId = this.currentSubmission.id;
+        const localSubmission = await this.refreshLocalSubmission(currentId);
+        let nextSubmission = localSubmission?.id ? localSubmission : null;
+
+        try {
+            const db = supabaseService.getDatabase();
+            const snap = await getDoc(doc(db, SUBMISSION_COLLECTION, currentId));
+            if (snap.exists()) {
+                const cloudSubmission = this.normalizeSubmission({ id: snap.id, ...snap.data() });
+                nextSubmission = nextSubmission
+                    ? this.pickNewestSubmission(cloudSubmission, nextSubmission)
+                    : cloudSubmission;
+            }
+        } catch (error) {
+            console.warn('Could not check cloud submission while reloading newer draft:', error);
+        }
+
+        if (!nextSubmission?.id) return;
+        this.clearDraftConflict();
+        this.currentSubmission = this.markSubmissionLoaded(nextSubmission);
+        this.renderAssignmentDetails(this.currentAssignment, this.currentSubmission);
+        await this.mountEditor(this.currentAssignment, this.currentSubmission);
     }
 
     withoutInlineScene(responseData = {}) {
@@ -222,12 +464,16 @@ class StudentClassroomActivityDataMethods {
 
     async loadSubmissions() {
         if (this.sm.authDisabled || !this.sm.currentUser) {
+            await this.loadLocalSubmissionCache();
             this.submissions = [];
             return [];
         }
 
         const db = supabaseService.getDatabase();
-        const snapshot = await getDocs(collection(db, SUBMISSION_COLLECTION));
+        const [snapshot] = await Promise.all([
+            getDocs(collection(db, SUBMISSION_COLLECTION)),
+            this.loadLocalSubmissionCache()
+        ]);
         this.submissions = snapshot.docs.map(docSnap => this.normalizeSubmission({ id: docSnap.id, ...docSnap.data() }));
         return this.submissions;
     }
@@ -279,14 +525,22 @@ class StudentClassroomActivityDataMethods {
 
     async loadOrCreateSubmission(assignment) {
         const submissionId = this.getSubmissionId(assignment.id);
+        if (!this.localSubmissionCache) await this.loadLocalSubmissionCache();
         const localSubmission = this.getLocalSubmission(submissionId);
+        const loadedAt = new Date().toISOString();
 
         try {
             const db = supabaseService.getDatabase();
             const snap = await getDoc(doc(db, SUBMISSION_COLLECTION, submissionId));
             if (snap.exists()) {
-                const cloudSubmission = this.normalizeSubmission({ id: snap.id, ...snap.data() });
-                return localSubmission?.id ? this.pickNewestSubmission(cloudSubmission, localSubmission) : cloudSubmission;
+                const cloudSubmission = this.normalizeSubmission({
+                    id: snap.id,
+                    ...snap.data(),
+                    cloudUpdatedAt: snap.data()?.updatedAt || snap.data()?.updated_at
+                });
+                return this.markSubmissionLoaded(localSubmission?.id
+                    ? this.pickNewestSubmission(cloudSubmission, localSubmission)
+                    : cloudSubmission, loadedAt);
             }
 
             const draft = localSubmission?.id ? localSubmission : this.createSubmissionDraft(assignment);
@@ -295,32 +549,35 @@ class StudentClassroomActivityDataMethods {
                 ...cloudDraft,
                 updatedAt: serverTimestamp()
             });
-            this.removeLocalSubmission(draft.id);
-            return this.normalizeSubmission({
+            const normalizedDraft = this.normalizeSubmission({
                 ...draft,
                 responseDataStoragePath: cloudDraft.responseDataStoragePath,
                 responseDataStorageSizeBytes: cloudDraft.responseDataStorageSizeBytes,
-                responseDataStorageUpdatedAt: cloudDraft.responseDataStorageUpdatedAt
+                responseDataStorageUpdatedAt: cloudDraft.responseDataStorageUpdatedAt,
+                cloudUpdatedAt: new Date().toISOString()
             });
+            await this.saveSubmissionLocally(normalizedDraft, { source: 'cloud-synced' });
+            return this.markSubmissionLoaded(normalizedDraft, loadedAt);
         } catch (error) {
             console.error('Failed to load classroom activity submission:', error);
             const draft = localSubmission?.id ? localSubmission : this.createSubmissionDraft(assignment);
-            this.saveSubmissionLocally(draft);
-            return draft;
+            await this.saveSubmissionLocally(draft);
+            return this.markSubmissionLoaded(draft, loadedAt);
         }
     }
 
     pickNewestSubmission(cloudSubmission, localSubmission) {
-        const toMillis = value => {
-            if (!value) return 0;
-            if (value.toDate) return value.toDate().getTime();
-            if (value.seconds !== undefined) return Number(value.seconds) * 1000;
-            const parsed = Date.parse(value);
-            return Number.isNaN(parsed) ? 0 : parsed;
-        };
-        return toMillis(localSubmission.updatedAt) > toMillis(cloudSubmission.updatedAt)
+        return this.timestampMillis(localSubmission.updatedAt) > this.timestampMillis(cloudSubmission.updatedAt)
             ? localSubmission
             : cloudSubmission;
+    }
+
+    markSubmissionLoaded(submission, loadedAt = new Date().toISOString()) {
+        return this.normalizeSubmission({
+            ...submission,
+            loadedAt,
+            cloudUpdatedAt: submission.cloudUpdatedAt || submission.updatedAt || ''
+        });
     }
 }
 

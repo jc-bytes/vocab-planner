@@ -109,6 +109,7 @@ export const studentClassroomActivityMountDetailsMethods = {
                 : '<i data-lucide="send"></i> Submit';
         }
         this.setPdfExportButtonState(false);
+        this.updateDraftConflictUi();
         if (window.lucide) window.lucide.createIcons();
     },
 

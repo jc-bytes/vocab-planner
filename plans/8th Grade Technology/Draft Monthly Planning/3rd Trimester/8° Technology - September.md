@@ -85,6 +85,19 @@ decomposition, user, screen, event, input, output, app, button, variable, feedba
 | test case | A planned test with expected behavior. |
 | wireframe | A simple layout plan for a screen. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 1 - 45 minutes|Decomposition and app purpose]]
+- Week 1 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 1 - 90 minutes|Interface planning and core vocabulary]]
+- Week 2 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 2 - 45 minutes|Events and screen flow]]
+- Week 2 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 2 - 90 minutes|App screen plan and event map]]
+- Week 3 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 3 - 45 minutes|User needs and feedback]]
+- Week 3 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 3 - 90 minutes|App plan improvement and testing]]
+- Week 4 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-09 September/8th Grade Technology - T3 - 2026-09 - September - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

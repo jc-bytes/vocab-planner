@@ -64,6 +64,10 @@ function bindActivityNavigation(manager) {
 }
 
 function bindActivityReview(manager) {
+    $('#test-activity-as-student-btn')?.addEventListener('click', () => {
+        manager.openActivityStudentPreview(manager.activeActivityAssignment || manager.activity);
+    });
+
     $('#refresh-activity-assignment-review-btn')?.addEventListener('click', () => {
         if (!manager.activeActivityAssignment?.id) return;
         manager.showActivityAssignmentReview(manager.activeActivityAssignment.id, { forceRefresh: true });
@@ -101,6 +105,10 @@ function bindActivityAssignmentModal(manager) {
 }
 
 function bindActivityEditorActions(manager) {
+    $('#test-current-activity-as-student-btn')?.addEventListener('click', () => {
+        manager.openActivityStudentPreview(manager.activity);
+    });
+
     $('#save-activity-update-btn')?.addEventListener('click', () => {
         manager.publishActivity({ asNew: false });
     });
@@ -150,4 +158,5 @@ export function initTeacherActivityListeners(manager) {
     bindActivityReview(manager);
     bindActivityAssignmentModal(manager);
     bindActivityEditorActions(manager);
+    manager.initActivityStudentPreview();
 }

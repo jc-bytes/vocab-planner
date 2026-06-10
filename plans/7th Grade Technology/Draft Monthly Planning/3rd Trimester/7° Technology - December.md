@@ -49,6 +49,19 @@ December is treated as week 13 buffer, regular exam, make-up, reflection, or adm
 
 No new vocabulary set is added in December. Use this month only for review, make-up, reflection, or administrative tasks if class meets.
 
+## Class Notes (Generated)
+
+- Week 13 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 13 - 45 minutes|Exam/admin buffer]]
+- Week 13 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 13 - 90 minutes|Exam/admin buffer]]
+- Week 14 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 14 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 14 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 14 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 15 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 15 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 16 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 16 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 17 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 17 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 17 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-12 December/7th Grade Technology - T3 - 2026-12 - December - Week 17 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

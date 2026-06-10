@@ -112,6 +112,19 @@ Students continue using mBot through hands-on challenges. Students practice move
 | commands | Instructions used in a program. |
 | blocks | Coding pieces that snap together in a program. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 5 - 45 minutes|Movement review]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 5 - 90 minutes|Path challenge 2]]
+- Week 6 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 6 - 45 minutes|Loops as repeated actions]]
+- Week 6 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 6 - 90 minutes|Repeat patterns]]
+- Week 7 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 7 - 45 minutes|Sensors around us]]
+- Week 7 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 7 - 90 minutes|mBot sensor practice]]
+- Week 8 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 8 - 45 minutes|Simple conditions]]
+- Week 8 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 8 - 90 minutes|Obstacle or line challenge]]
+- Week 9 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 45 minutes|Plan a mini-challenge]]
+- Week 9 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 90 minutes|mBot mini-challenge practice]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

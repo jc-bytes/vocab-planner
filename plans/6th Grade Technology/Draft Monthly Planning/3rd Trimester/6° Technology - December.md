@@ -100,6 +100,19 @@ Students use micro:bit sensors and simple conditions to create a small interacti
 | demonstrate | To show how something works. |
 | explain | To make an idea clear with words. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 1 - 45 minutes|Sensors and conditions]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 1 - 90 minutes|Sensor response program]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 2 - 45 minutes|Plan final interactive project]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 2 - 90 minutes|Build and test final project]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 3 - 45 minutes|Prepare explanation]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 3 - 90 minutes|Demonstrate and close]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T3 2026-12 December/6th Grade Technology - T3 - 2026-12 - December - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

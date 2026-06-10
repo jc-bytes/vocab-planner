@@ -167,6 +167,7 @@ class StudentProgressCoreMethods {
     }
 
     applyCoinSnapshot(coinData, coinHistory, options = {}) {
+        this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyCoinSnapshot' });
         const normalizedCoinData = this.normalizeCoinData(coinData);
         const normalizedHistory = this.normalizeCoinHistory(coinHistory || this.sm.coinHistory);
 
@@ -185,6 +186,7 @@ class StudentProgressCoreMethods {
 
     applyProgressSnapshot(progress, options = {}) {
         if (!progress) return;
+        this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyProgressSnapshot' });
 
         const migrated = this.migrateCoinData(progress);
         const mergedStudentProfile = typeof this.sm.mergeStudentProfile === 'function'

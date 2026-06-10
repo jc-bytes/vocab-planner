@@ -109,6 +109,19 @@ internet, website, browser, address, domain name, DNS, IP address, packet, messa
 | image | A picture. |
 | section | One organized part of a page. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 1 - 45 minutes|Internet addresses]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 1 - 90 minutes|Domain names and IP addresses]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 2 - 45 minutes|Data packets]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 2 - 90 minutes|Packet simulation]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 3 - 45 minutes|Working together online]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 3 - 90 minutes|Shared digital work]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 4 - 45 minutes|Responsible communication]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 4 - 90 minutes|Website features and planning]]
+- Week 5 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T1 2026-03 March/6th Grade Technology - T1 - 2026-03 - March - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

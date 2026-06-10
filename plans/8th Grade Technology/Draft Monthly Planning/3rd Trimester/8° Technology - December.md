@@ -54,6 +54,19 @@ December is reserved for remaining project presentations, exam administration, m
 
 No new vocabulary set is added this month. Use this month only for review, project presentation, make-up, reflection, or administrative tasks if class meets.
 
+## Class Notes (Generated)
+
+- Week 13 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 13 - 45 minutes|Presentation make-up and exam/admin work]]
+- Week 13 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 13 - 90 minutes|Trimester reflection and file cleanup]]
+- Week 14 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 14 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 14 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 14 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 15 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 15 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 16 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 16 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 17 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 17 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 17 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-12 December/8th Grade Technology - T3 - 2026-12 - December - Week 17 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

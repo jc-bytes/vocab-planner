@@ -103,6 +103,17 @@ Students transition from digital media into Scratch programming. They practice s
 | navigator | The partner who guides and checks the work during pair work. |
 | feedback | Helpful comments about how to improve. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 5 - 45 minutes|Selection and if/else logic]]
+- Week 5 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 5 - 90 minutes|Comparison and logic operators]]
+- Week 6 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 6 - 45 minutes|Count-controlled loops]]
+- Week 6 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 6 - 90 minutes|Loops and variables together]]
+- Week 7 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 7 - 45 minutes|Debugging strategies]]
+- Week 7 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 7 - 90 minutes|Independent problem solving with Scratch]]
+- Week 8 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 8 - 45 minutes|Scratch concept review]]
+- Week 8 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-07 July/7th Grade Technology - T2 - 2026-07 - July - Week 8 - 90 minutes|Dance game preparation]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

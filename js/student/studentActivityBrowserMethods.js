@@ -4,6 +4,7 @@ import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '..
 class StudentActivityBrowserMethods {
     renderDashboard() {
         const container = $('#vocab-list');
+        this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
         this.renderSubjectPicker('#vocab-subject-picker');
         container.innerHTML = '';
         container.className = 'vocab-groups';
@@ -22,6 +23,7 @@ class StudentActivityBrowserMethods {
 
     renderVocabularyBrowser(container = $('#vocab-list'), vocabs = null) {
         if (!container) return;
+        this.sm.logStudentDomUpdate?.(container.id || 'vocab-list', { source: 'renderVocabularyBrowser:clear' });
 
         container.classList.remove('vocab-grid', 'vocab-groups');
         container.classList.add('teacher-library-browser');

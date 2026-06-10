@@ -1,0 +1,1201 @@
+{
+  "version": 1,
+  "year": 2026,
+  "timezone": "America/Panama",
+  "draft": true,
+  "notes": [
+    "Editable draft generated from existing class-note sequence and trimester anchors. Update this file when the official school calendar or no-class weeks are known.",
+    "Trimester anchors: 1st starts 2026-03-02, 2nd starts 2026-06-01, 3rd starts 2026-08-31.",
+    "The generator assigns lessons by grade + month + planning week + duration, then uses schedule_exceptions_2026.yml for skipped blocks."
+  ],
+  "weeks": [
+    {
+      "start": "2026-03-02",
+      "end": "2026-03-06",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        },
+        "8": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        },
+        "9": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        }
+      }
+    },
+    {
+      "start": "2026-03-09",
+      "end": "2026-03-13",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        },
+        "8": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        },
+        "9": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        }
+      }
+    },
+    {
+      "start": "2026-03-16",
+      "end": "2026-03-20",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        },
+        "8": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        },
+        "9": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        }
+      }
+    },
+    {
+      "start": "2026-03-23",
+      "end": "2026-03-27",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 4"
+        },
+        "8": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 4"
+        },
+        "9": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 4"
+        }
+      }
+    },
+    {
+      "start": "2026-03-30",
+      "end": "2026-04-03",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "7": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "8": {
+          "month": "March",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "9": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        }
+      }
+    },
+    {
+      "start": "2026-04-06",
+      "end": "2026-04-10",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "8": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "9": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 6"
+        }
+      }
+    },
+    {
+      "start": "2026-04-13",
+      "end": "2026-04-17",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 6"
+        },
+        "8": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 6"
+        },
+        "9": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 7"
+        }
+      }
+    },
+    {
+      "start": "2026-04-20",
+      "end": "2026-04-24",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 7"
+        },
+        "8": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 7"
+        },
+        "9": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 8"
+        }
+      }
+    },
+    {
+      "start": "2026-04-27",
+      "end": "2026-05-01",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 8"
+        },
+        "8": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 8"
+        },
+        "9": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 9"
+        }
+      }
+    },
+    {
+      "start": "2026-05-04",
+      "end": "2026-05-08",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 5"
+        },
+        "7": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 9"
+        },
+        "8": {
+          "month": "April",
+          "trimester": "1st Trimester",
+          "week": "Week 9"
+        },
+        "9": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 10"
+        }
+      }
+    },
+    {
+      "start": "2026-05-11",
+      "end": "2026-05-15",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 9"
+        },
+        "8": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 9"
+        },
+        "9": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 11"
+        }
+      }
+    },
+    {
+      "start": "2026-05-18",
+      "end": "2026-05-22",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 10"
+        },
+        "8": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 10"
+        },
+        "9": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 12"
+        }
+      }
+    },
+    {
+      "start": "2026-05-25",
+      "end": "2026-05-29",
+      "draft": true,
+      "trimester": "1st Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 11"
+        },
+        "8": {
+          "month": "May",
+          "trimester": "1st Trimester",
+          "week": "Week 11"
+        },
+        "9": null
+      }
+    },
+    {
+      "start": "2026-06-01",
+      "end": "2026-06-05",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 1"
+        },
+        "8": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 1"
+        },
+        "9": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 1"
+        }
+      }
+    },
+    {
+      "start": "2026-06-08",
+      "end": "2026-06-12",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 2"
+        },
+        "8": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 2"
+        },
+        "9": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 2"
+        }
+      }
+    },
+    {
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 3"
+        },
+        "8": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 3"
+        },
+        "9": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 3"
+        }
+      }
+    },
+    {
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 4"
+        },
+        "8": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 4"
+        },
+        "9": {
+          "month": "June",
+          "trimester": "2nd Trimester",
+          "week": "Week 4"
+        }
+      }
+    },
+    {
+      "start": "2026-06-29",
+      "end": "2026-07-03",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 5"
+        },
+        "7": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 5"
+        },
+        "8": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 5"
+        },
+        "9": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 5"
+        }
+      }
+    },
+    {
+      "start": "2026-07-06",
+      "end": "2026-07-10",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 6"
+        },
+        "7": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 6"
+        },
+        "8": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 6"
+        },
+        "9": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 6"
+        }
+      }
+    },
+    {
+      "start": "2026-07-13",
+      "end": "2026-07-17",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 7"
+        },
+        "7": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 7"
+        },
+        "8": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 7"
+        },
+        "9": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 7"
+        }
+      }
+    },
+    {
+      "start": "2026-07-20",
+      "end": "2026-07-24",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 8"
+        },
+        "7": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 8"
+        },
+        "8": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 8"
+        },
+        "9": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 8"
+        }
+      }
+    },
+    {
+      "start": "2026-07-27",
+      "end": "2026-07-31",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "July",
+          "trimester": "2nd Trimester",
+          "week": "Week 9"
+        },
+        "7": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 9"
+        },
+        "8": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 9"
+        },
+        "9": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 9"
+        }
+      }
+    },
+    {
+      "start": "2026-08-03",
+      "end": "2026-08-07",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 10"
+        },
+        "7": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 10"
+        },
+        "8": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 10"
+        },
+        "9": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 10"
+        }
+      }
+    },
+    {
+      "start": "2026-08-10",
+      "end": "2026-08-14",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 11"
+        },
+        "7": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 11"
+        },
+        "8": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 11"
+        },
+        "9": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 11"
+        }
+      }
+    },
+    {
+      "start": "2026-08-17",
+      "end": "2026-08-21",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 12"
+        },
+        "7": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 12"
+        },
+        "8": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 12"
+        },
+        "9": {
+          "month": "August",
+          "trimester": "2nd Trimester",
+          "week": "Week 12"
+        }
+      }
+    },
+    {
+      "start": "2026-08-24",
+      "end": "2026-08-28",
+      "draft": true,
+      "trimester": "2nd Trimester",
+      "grade_weeks": {
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": {
+          "month": "September",
+          "trimester": "2nd Trimester",
+          "week": "13"
+        }
+      }
+    },
+    {
+      "start": "2026-08-31",
+      "end": "2026-09-04",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "8": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "9": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        }
+      }
+    },
+    {
+      "start": "2026-09-07",
+      "end": "2026-09-11",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "8": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "9": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        }
+      }
+    },
+    {
+      "start": "2026-09-14",
+      "end": "2026-09-18",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "8": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "9": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        }
+      }
+    },
+    {
+      "start": "2026-09-21",
+      "end": "2026-09-25",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "8": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "9": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        }
+      }
+    },
+    {
+      "start": "2026-09-28",
+      "end": "2026-10-02",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "8": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "9": {
+          "month": "September",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        }
+      }
+    },
+    {
+      "start": "2026-10-05",
+      "end": "2026-10-09",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "8": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "9": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        }
+      }
+    },
+    {
+      "start": "2026-10-12",
+      "end": "2026-10-16",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "8": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "9": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        }
+      }
+    },
+    {
+      "start": "2026-10-19",
+      "end": "2026-10-23",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "8": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 6"
+        },
+        "9": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        }
+      }
+    },
+    {
+      "start": "2026-10-26",
+      "end": "2026-10-30",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 6"
+        },
+        "8": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 7"
+        },
+        "9": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 6"
+        }
+      }
+    },
+    {
+      "start": "2026-11-02",
+      "end": "2026-11-06",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 7"
+        },
+        "8": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 8"
+        },
+        "9": {
+          "month": "October",
+          "trimester": "3rd Trimester",
+          "week": "Week 7"
+        }
+      }
+    },
+    {
+      "start": "2026-11-09",
+      "end": "2026-11-13",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 8"
+        },
+        "8": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 9"
+        },
+        "9": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 8"
+        }
+      }
+    },
+    {
+      "start": "2026-11-16",
+      "end": "2026-11-20",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "7": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 9"
+        },
+        "8": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 10"
+        },
+        "9": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 9"
+        }
+      }
+    },
+    {
+      "start": "2026-11-23",
+      "end": "2026-11-27",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 1"
+        },
+        "7": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 10"
+        },
+        "8": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 11"
+        },
+        "9": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 10"
+        }
+      }
+    },
+    {
+      "start": "2026-11-30",
+      "end": "2026-12-04",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 2"
+        },
+        "7": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 11"
+        },
+        "8": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 12"
+        },
+        "9": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 11"
+        }
+      }
+    },
+    {
+      "start": "2026-12-07",
+      "end": "2026-12-11",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 3"
+        },
+        "7": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 12"
+        },
+        "8": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 13"
+        },
+        "9": {
+          "month": "November",
+          "trimester": "3rd Trimester",
+          "week": "Week 12"
+        }
+      }
+    },
+    {
+      "start": "2026-12-14",
+      "end": "2026-12-18",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 4"
+        },
+        "7": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 13"
+        },
+        "8": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 13"
+        },
+        "9": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 12"
+        }
+      }
+    },
+    {
+      "start": "2026-12-21",
+      "end": "2026-12-25",
+      "draft": true,
+      "trimester": "3rd Trimester",
+      "grade_weeks": {
+        "6": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 5"
+        },
+        "7": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 14"
+        },
+        "8": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 14"
+        },
+        "9": {
+          "month": "December",
+          "trimester": "3rd Trimester",
+          "week": "Week 13"
+        }
+      }
+    }
+  ]
+}

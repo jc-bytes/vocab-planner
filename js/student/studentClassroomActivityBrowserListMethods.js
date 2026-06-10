@@ -8,12 +8,14 @@ export const studentClassroomActivityBrowserListMethods = {
         const list = $('#student-classroom-activities-list');
         if (!list) return;
 
+        this.sm.logStudentDomUpdate?.('student-classroom-activities-list', { source: 'renderList:loading' });
         list.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
         try {
             const [assignments] = await Promise.all([
                 this.loadAssignments(),
                 this.loadSubmissions()
             ]);
+            this.sm.logStudentDomUpdate?.('student-classroom-activities-list', { source: 'renderList:clear' });
             list.innerHTML = '';
 
             if (assignments.length === 0) {

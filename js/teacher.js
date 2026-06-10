@@ -102,6 +102,7 @@ class TeacherManager {
         this.activityReviewHandle = null;
         this.activeActivityReview = null;
         this.activeActivityReviewSelectionIndex = -1;
+        this.activityStudentPreview = null;
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;
         this.studentProgressPromise = null;

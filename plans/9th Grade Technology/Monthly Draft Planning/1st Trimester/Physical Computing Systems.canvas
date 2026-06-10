@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "physical-computing",
+      "type": "text",
+      "text": "Physical Computing Systems\n\nSystems that use hardware and software to interact with the physical world.",
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 180
+    },
+    {
+      "id": "input-process-output",
+      "type": "text",
+      "text": "Input -> Process -> Output\n\nInput: information received\nProcess: actions performed\nOutput: result or action",
+      "x": 420,
+      "y": 0,
+      "width": 360,
+      "height": 180
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-physical-to-ipo",
+      "fromNode": "physical-computing",
+      "fromSide": "right",
+      "toNode": "input-process-output",
+      "toSide": "left"
+    }
+  ]
+}

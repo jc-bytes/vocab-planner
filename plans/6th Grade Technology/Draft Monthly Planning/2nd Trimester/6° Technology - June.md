@@ -120,6 +120,17 @@ Words: robot, mBot, program, instruction, safety, motor, wheel, sensor, LED, buz
 | start | Beginning. |
 | finish | End. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes|Robotics routines and safety]]
+- Week 1 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes|Meet the mBot]]
+- Week 2 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes|Instructions and movement]]
+- Week 2 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes|First mBot movements]]
+- Week 3 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 3 - 45 minutes|Debugging movement]]
+- Week 3 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 3 - 90 minutes|Path challenge 1]]
+- Week 4 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 4 - 45 minutes|Robot outputs]]
+- Week 4 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 4 - 90 minutes|Movement plus signals]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

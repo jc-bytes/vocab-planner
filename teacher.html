@@ -371,6 +371,10 @@
                             <i data-lucide="send"></i>
                             Assign
                         </button>
+                        <button id="test-current-activity-as-student-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="play-circle"></i>
+                            Test as Student
+                        </button>
                         <button id="save-activity-update-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="cloud-upload"></i>
                             Save Update
@@ -540,6 +544,10 @@
                         <h2 id="activity-assignment-title" style="margin: 0.35rem 0 0 0;">Activity Review</h2>
                     </div>
                     <div class="teacher-toolbar">
+                        <button id="test-activity-as-student-btn" class="btn secondary-btn" type="button">
+                            <i data-lucide="play-circle"></i>
+                            Test as Student
+                        </button>
                         <button id="update-published-activity-assignment-btn" class="btn secondary-btn" type="button" disabled>
                             <i data-lucide="cloud-upload"></i>
                             Update Published Assignment
@@ -1699,6 +1707,101 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="activity-student-preview-modal" class="modal hidden activity-student-preview-modal" role="dialog" aria-modal="true" aria-labelledby="activity-student-preview-title">
+        <div class="modal-content activity-student-preview-content">
+            <div class="modal-header activity-student-preview-header">
+                <div>
+                    <p class="teacher-eyebrow">Teacher Test Mode</p>
+                    <h3 id="activity-student-preview-title">Student Preview</h3>
+                    <small id="activity-student-preview-subtitle" style="color:var(--text-muted);">Loading activity...</small>
+                </div>
+                <button id="close-activity-student-preview-modal" class="btn text-btn icon-btn" type="button" aria-label="Close student preview" title="Close student preview">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <section id="student-classroom-activity-view" class="activity-student-preview-shell">
+                <div class="student-classroom-activity-shell">
+                    <div class="teacher-page-heading student-classroom-activity-heading">
+                        <div>
+                            <button id="back-to-classroom-activities-btn" class="btn text-btn teacher-back-btn" type="button">
+                                <i data-lucide="arrow-left"></i>
+                                Close Preview
+                            </button>
+                            <p id="student-classroom-activity-meta" class="teacher-eyebrow">Classroom Activity</p>
+                            <h2 id="student-classroom-activity-title">Classroom Activity</h2>
+                        </div>
+                        <div class="teacher-toolbar">
+                            <button id="student-toggle-classroom-instructions-btn" class="btn secondary-btn student-instructions-toggle" type="button"
+                                aria-controls="student-classroom-instructions-panel" aria-expanded="true"
+                                aria-label="Hide instructions" title="Hide instructions">
+                                <i data-lucide="book-open"></i>
+                                Instructions
+                            </button>
+                            <button id="student-save-classroom-activity-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="cloud-upload"></i>
+                                Save Draft
+                            </button>
+                            <button id="student-export-classroom-activity-pdf-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="download"></i>
+                                Export PDF
+                            </button>
+                            <button id="student-submit-classroom-activity-btn" class="btn primary-btn" type="button">
+                                <i data-lucide="send"></i>
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="student-classroom-activity-layout" class="student-classroom-activity-layout">
+                        <aside id="student-classroom-instructions-panel" class="teacher-panel student-classroom-instructions">
+                            <div class="teacher-panel-header">
+                                <div class="student-classroom-instructions-heading">
+                                    <h3>Instructions</h3>
+                                    <p id="student-classroom-activity-save-status">Preview not loaded yet.</p>
+                                </div>
+                                <button id="student-close-classroom-instructions-btn" class="btn text-btn icon-btn student-instructions-close" type="button"
+                                    aria-label="Close instructions" title="Close instructions">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                            <div id="student-classroom-instructions-body" class="student-classroom-instructions-body">
+                                <p id="student-classroom-activity-task-summary" class="student-classroom-task-summary"></p>
+                                <details class="student-classroom-details-disclosure">
+                                    <summary>Activity details</summary>
+                                    <div id="student-classroom-activity-timing-block" class="student-classroom-detail-block">
+                                        <h4>Timing</h4>
+                                        <p id="student-classroom-activity-timing"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Description</h4>
+                                        <p id="student-classroom-activity-description" class="student-classroom-description"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>What to do</h4>
+                                        <p id="student-classroom-activity-instructions"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Materials</h4>
+                                        <p id="student-classroom-activity-materials"></p>
+                                    </div>
+                                    <div class="student-classroom-detail-block">
+                                        <h4>Turn in</h4>
+                                        <p id="student-classroom-activity-output"></p>
+                                    </div>
+                                </details>
+                            </div>
+                        </aside>
+
+                        <section class="teacher-panel student-classroom-canvas-panel">
+                            <div id="student-classroom-excalidraw-root" class="activity-excalidraw-root student-classroom-excalidraw-root"></div>
+                        </section>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 

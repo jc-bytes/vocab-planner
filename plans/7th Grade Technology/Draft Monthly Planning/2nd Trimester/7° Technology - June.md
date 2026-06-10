@@ -64,6 +64,17 @@ audience, purpose, poster, Canva, contrast, alignment, readability, copyright-fr
 | feedback | Helpful comments about how to improve. |
 | revision | A changed version made after review. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes|Clear digital messages]]
+- Week 1 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes|Poster planning and copyright-free images]]
+- Week 2 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes|Poster revision]]
+- Week 2 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes|Branding and consistent design]]
+- Week 3 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 3 - 45 minutes|Brand consistency in slides]]
+- Week 3 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 3 - 90 minutes|How computers follow instructions]]
+- Week 4 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 4 - 45 minutes|Scratch sequence and music]]
+- Week 4 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 4 - 90 minutes|Variables for changing data]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

@@ -103,6 +103,17 @@ Students finish regular Scratch preparation, then complete the Scratch Dance Gam
 | reflection | Thinking about what happened and what you learned. |
 | improvement | A change that makes something better. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 45 minutes|Project rubric and planning]]
+- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 90 minutes|Prototype and testing checklist]]
+- Week 10 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 45 minutes|Begin Exam Project: Scratch Dance Game]]
+- Week 10 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 90 minutes|Build dance moves and input logic]]
+- Week 11 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 45 minutes|Score, timer, and feedback]]
+- Week 11 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 90 minutes|Final game improvement and presentation prep]]
+- Week 12 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 45 minutes|Presentation rehearsal]]
+- Week 12 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 90 minutes|Final dance game demonstration]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

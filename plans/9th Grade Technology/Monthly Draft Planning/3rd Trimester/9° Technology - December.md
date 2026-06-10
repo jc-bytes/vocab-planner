@@ -44,6 +44,19 @@ Students present the STEM exam project in week 12 and reserve week 13 for exams,
 | product | Something created for a project. |
 | presentation | Sharing work or ideas with others. |
 
+## Class Notes (Generated)
+
+- Week 12 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 12 - 45 minutes|Presentation rehearsal]]
+- Week 12 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 12 - 90 minutes|STEM project presentations]]
+- Week 13 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 13 - 45 minutes|Exam/admin buffer]]
+- Week 13 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 13 - 90 minutes|Exam/admin buffer]]
+- Week 14 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 14 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 14 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 14 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 15 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 15 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 15 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 16 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 16 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-12 December/9th Grade Technology - T3 - 2026-12 - December - Week 16 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

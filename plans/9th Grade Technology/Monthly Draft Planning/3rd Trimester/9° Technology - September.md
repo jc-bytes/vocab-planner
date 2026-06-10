@@ -51,6 +51,19 @@ STEM, pixel, resolution, color depth, sample, sensor, file size, quality, compre
 | audio | Sound stored or played by a device. |
 | file setting | An option that changes how a file is saved. |
 
+## Class Notes (Generated)
+
+- Week 1 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 1 - 45 minutes|STEM and digital media launch]]
+- Week 1 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 1 - 90 minutes|A splash of colour and core vocabulary]]
+- Week 2 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 2 - 45 minutes|Sound representation]]
+- Week 2 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 2 - 90 minutes|Sonic playground]]
+- Week 3 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 3 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 3 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 3 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 4 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 4 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 4 - 90 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 5 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 5 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-09 September/9th Grade Technology - T3 - 2026-09 - September - Week 5 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

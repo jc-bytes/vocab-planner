@@ -119,6 +119,19 @@ Students connect app-design logic to text-based programming, debugging habits, a
 | code | Instructions or symbols used by a computer. |
 | decimal | The number system using digits 0 through 9. |
 
+## Class Notes (Generated)
+
+- Week 4 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 4 - 45 minutes|Algorithms and first Python output]]
+- Week 4 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 4 - 90 minutes|Variables, input, and work habits]]
+- Week 5 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 5 - 45 minutes|Numbers and arithmetic]]
+- Week 5 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 5 - 90 minutes|Selection with if/else]]
+- Week 6 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 6 - 45 minutes|Random numbers and multi-branch choices]]
+- Week 6 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 6 - 90 minutes|Loops, counters, and debugging habits]]
+- Week 7 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 7 - 45 minutes|Debugging selection and loops]]
+- Week 7 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 7 - 90 minutes|Scratch + Micro:bit setup]]
+- Week 8 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 8 - 45 minutes|Representation and binary digits]]
+- Week 8 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T3 2026-10 October/8th Grade Technology - T3 - 2026-10 - October - Week 8 - 90 minutes|Binary check and project setup]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

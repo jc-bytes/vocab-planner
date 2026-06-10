@@ -117,6 +117,19 @@ Students extend spreadsheet skills into data analysis, then connect computationa
 | Bluetooth | A wireless way for devices to communicate nearby. |
 | microbit | A small computer board used for coding projects. |
 
+## Class Notes (Generated)
+
+- Week 3 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 3 - 45 minutes|Sorting and filtering data]]
+- Week 3 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 3 - 90 minutes|Conditional formatting and COUNTIF]]
+- Week 4 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 4 - 45 minutes|Decomposition and subroutines]]
+- Week 4 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 4 - 90 minutes|Scratch loops and subroutines]]
+- Week 5 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 5 - 45 minutes|Lists and organized data in Scratch]]
+- Week 5 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 5 - 90 minutes|Credible sources and plagiarism]]
+- Week 6 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 6 - 45 minutes|Blog and media features]]
+- Week 6 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 6 - 90 minutes|Building a short media post]]
+- Week 7 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 7 - 45 minutes|Micro:bit sensor systems]]
+- Week 7 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T3 2026-10 October/7th Grade Technology - T3 - 2026-10 - October - Week 7 - 90 minutes|Mandrake sensor-system design plan]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

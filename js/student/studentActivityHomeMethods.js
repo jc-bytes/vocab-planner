@@ -88,6 +88,7 @@ class StudentActivityHomeMethods {
     renderStudentHome() {
         const container = $('#student-home-dashboard');
         if (!container) return;
+        this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'renderStudentHome:clear' });
 
         this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
@@ -239,11 +240,13 @@ class StudentActivityHomeMethods {
     async loadAndRenderCurrentSpark(host) {
         if (!host) return;
         try {
+            this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:fetch' });
             const spark = await this.fetchCurrentSpark();
             if (!spark?.id) {
                 this.removeSparkHomePanel(host);
                 return;
             }
+            this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:replaceChildren' });
             host.replaceChildren(this.createStudentSparkCard(spark));
             if (window.lucide) window.lucide.createIcons();
         } catch {
@@ -288,6 +291,7 @@ class StudentActivityHomeMethods {
     }
 
     removeSparkHomePanel(host) {
+        this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'removeSparkHomePanel' });
         const panel = host?.closest('.student-home-panel');
         const tab = $('#student-home-tab-spark');
         panel?.remove();

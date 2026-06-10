@@ -98,6 +98,17 @@ Students move from simple digital circuits to analog input, sensor data, sound, 
 | testing | Trying something to see if it works. |
 | improvement | A change that makes something better. |
 
+## Class Notes (Generated)
+
+- Week 5 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 5 - 45 minutes|Digital vs analog signals]]
+- Week 5 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 5 - 90 minutes|Potentiometer data and LED brightness]]
+- Week 6 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 6 - 45 minutes|Photoresistor and environmental input]]
+- Week 6 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 6 - 90 minutes|RGB LED and color output]]
+- Week 7 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 7 - 45 minutes|Buzzer output]]
+- Week 7 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 7 - 90 minutes|Servo control]]
+- Week 8 - 45 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 8 - 45 minutes|Conditional logic with sensors]]
+- Week 8 - 90 minutes: [[8th Grade Technology/Class Notes (Generated)/T2 2026-07 July/8th Grade Technology - T2 - 2026-07 - July - Week 8 - 90 minutes|Integrated practice challenge]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

@@ -35,10 +35,21 @@ export class StudentAuth {
                 redirectProcessed = true;
             }
             
-            supabaseService.onAuthStateChanged(async (user) => {
+            supabaseService.onAuthStateChanged(async (user, event) => {
+                this.sm.logStudentDomUpdate?.('auth-state', {
+                    source: 'onAuthStateChanged',
+                    event,
+                    userId: user?.uid || ''
+                });
                 if (user) {
+                    const isSameUser = this.sm.currentUser?.uid === user.uid;
+                    const isAlreadyInitialized = Boolean(this.sm.authInitialized);
+                    const isRedirectUser = redirectProcessed && redirectResult?.user?.uid === user.uid;
+                    if (isSameUser && isAlreadyInitialized && event !== 'USER_UPDATED') {
+                        return;
+                    }
                     // Only handle if we didn't already process redirect result
-                    if (!redirectProcessed || !redirectResult?.user || redirectResult.user.uid !== user.uid) {
+                    if (!isRedirectUser) {
                         await this.handleBackendSignIn(user);
                     }
                 } else {
@@ -83,6 +94,7 @@ export class StudentAuth {
         }
 
         await this.finishSignedInSession();
+        this.sm.authInitialized = true;
     }
 
     async finishSignedInSession() {
@@ -156,22 +168,18 @@ export class StudentAuth {
     }
 
     updateHeader() {
+        this.sm.logStudentDomUpdate?.('welcome-header', { source: 'updateHeader' });
         const headerTitle = $('.header-left h1');
         const profile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
         const studentName = profile.name || this.sm.currentUser?.displayName || 'Student';
         headerTitle.textContent = studentName;
-
-        const editButton = $('#edit-profile-btn');
-        if (editButton) {
-            editButton.style.display = 'inline-flex';
-        }
     }
 
     checkProfile(force = false) {
         this.sm.studentProfile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
         const isComplete = this.sm.hasCompleteStudentProfile();
 
-        if (isComplete && !force) {
+        if (isComplete) {
             return;
         }
 
@@ -202,6 +210,7 @@ export class StudentAuth {
     }
 
     setAuthStatus(text) {
+        this.sm.logStudentDomUpdate?.('auth-status', { source: 'StudentAuth.setAuthStatus', text });
         const statusEl = $('#auth-status');
         if (!statusEl) return;
         const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';

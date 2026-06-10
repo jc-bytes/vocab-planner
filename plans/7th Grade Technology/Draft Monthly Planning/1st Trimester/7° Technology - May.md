@@ -101,6 +101,19 @@ Students complete the first trimester by applying mBot movement, sensors, testin
 | result | What happens at the end of a task or test. |
 | reflection | Thinking about what happened and what you learned. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 9 - 45 minutes|Maze vocabulary and route planning]]
+- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 9 - 90 minutes|Maze prototype and final project preparation]]
+- Week 10 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 10 - 45 minutes|Begin Exam Project: mBot Maze Navigator]]
+- Week 10 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 10 - 90 minutes|Build and program maze sections]]
+- Week 11 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 11 - 45 minutes|Debugging and improvement plan]]
+- Week 11 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 11 - 90 minutes|Final testing and documentation]]
+- Week 12 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 12 - 45 minutes|Presentation rehearsal]]
+- Week 12 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 12 - 90 minutes|Final maze demonstration]]
+- Week 13 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 13 - 45 minutes|No regular class scheduled in this monthly plan.]]
+- Week 13 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T1 2026-05 May/7th Grade Technology - T1 - 2026-05 - May - Week 13 - 90 minutes|No regular class scheduled in this monthly plan.]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

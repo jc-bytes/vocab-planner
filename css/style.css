@@ -1822,7 +1822,8 @@ select:focus {
     margin-top: 0;
 }
 
-.teacher-activity-card .teacher-card-actions .assign-activity-btn {
+.teacher-activity-card .teacher-card-actions .assign-activity-btn,
+.teacher-activity-card .teacher-card-actions .test-activity-btn {
     position: static;
     min-height: 2.35rem;
     padding: 0 0.75rem;
@@ -1886,7 +1887,8 @@ select:focus {
     font-weight: 900;
 }
 
-.assign-activity-btn {
+.assign-activity-btn,
+.test-activity-btn {
     position: absolute;
     left: 0.75rem;
     bottom: 0.75rem;
@@ -1904,7 +1906,14 @@ select:focus {
     cursor: pointer;
 }
 
-.assign-activity-btn svg {
+.test-activity-btn {
+    border-color: rgba(52, 211, 153, 0.42);
+    background: rgba(16, 185, 129, 0.12);
+    color: #bbf7d0;
+}
+
+.assign-activity-btn svg,
+.test-activity-btn svg {
     width: 1rem;
     height: 1rem;
 }
@@ -4264,6 +4273,35 @@ select:focus {
     color: #99f6e4;
 }
 
+.student-classroom-draft-conflict-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.55);
+    border-radius: var(--radius-sm);
+    background: rgba(120, 53, 15, 0.22);
+    color: #fde68a;
+}
+
+.student-classroom-draft-conflict-banner[hidden] {
+    display: none;
+}
+
+.student-classroom-draft-conflict-banner strong {
+    display: block;
+    color: #fef3c7;
+    font-size: 0.94rem;
+}
+
+.student-classroom-draft-conflict-banner p {
+    margin: 0.2rem 0 0;
+    color: #fde68a;
+    font-size: 0.88rem;
+    line-height: 1.35;
+}
+
 .student-empty-state {
     color: var(--text-muted);
     font-weight: 700;
@@ -5671,6 +5709,49 @@ select:focus {
     align-items: center;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
+}
+
+.activity-student-preview-modal {
+    align-items: stretch;
+    padding: var(--spacing-sm);
+}
+
+.activity-student-preview-content {
+    width: min(96vw, 1480px);
+    max-width: 1480px;
+    max-height: calc(100svh - 2rem);
+    overflow-y: auto;
+}
+
+.activity-student-preview-header {
+    position: sticky;
+    top: calc(-1 * var(--spacing-lg));
+    z-index: 5;
+    padding-bottom: var(--spacing-sm);
+    background: rgba(15, 23, 42, 0.94);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.activity-student-preview-header h3 {
+    margin: 0;
+}
+
+.activity-student-preview-shell .teacher-page-heading {
+    margin-bottom: var(--spacing-md);
+}
+
+.activity-student-preview-shell .student-classroom-excalidraw-root {
+    height: clamp(560px, calc(100svh - 300px), 860px);
+}
+
+.activity-student-preview-shell .student-classroom-excalidraw-root.structured-response-root,
+.activity-student-preview-shell .student-classroom-excalidraw-root.card-sort-response-root,
+.activity-student-preview-shell .student-classroom-excalidraw-root.spreadsheet-table-response-root,
+.activity-student-preview-shell .student-classroom-excalidraw-root.image-hotspot-response-root,
+.activity-student-preview-shell .student-classroom-excalidraw-root.external-artifact-response-root,
+.activity-student-preview-shell .student-classroom-excalidraw-root.flowchart-response-root {
+    height: auto;
+    min-height: 0;
 }
 
 .close-modal {

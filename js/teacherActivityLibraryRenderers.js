@@ -303,6 +303,12 @@ export function createTeacherActivityCard(manager, container, activity, type) {
             <span>Assign</span>
         </button>
     `;
+    const testBtnHtml = `
+        <button class="test-activity-btn" type="button" title="Test as Student" aria-label="Test ${escapeHtml(normalized.title || 'activity')} as student">
+            <i data-lucide="play-circle"></i>
+            <span>Test</span>
+        </button>
+    `;
     let deleteActionHtml = '';
     if (type === 'local' || type === 'cloud') {
         const label = type === 'cloud' ? 'Delete Cloud Activity' : 'Delete Draft Activity';
@@ -324,6 +330,7 @@ export function createTeacherActivityCard(manager, container, activity, type) {
         <small class="teacher-card-type-meta">${escapeHtml(manager.getActivityTypeLabel(normalized.activityType))} · ${escapeHtml(templateLabel)}</small>
         <div class="teacher-card-actions">
             <span class="teacher-pick-action"><i data-lucide="arrow-right"></i> Open</span>
+            ${testBtnHtml}
             ${assignBtnHtml}
         </div>
         <details class="teacher-card-details">
@@ -338,7 +345,7 @@ export function createTeacherActivityCard(manager, container, activity, type) {
     `;
 
     card.addEventListener('click', (event) => {
-        if (event.target.closest('.delete-activity-btn, .assign-activity-btn, .teacher-card-details')) return;
+        if (event.target.closest('.delete-activity-btn, .assign-activity-btn, .test-activity-btn, .teacher-card-details')) return;
         manager.loadActivityObject(normalized, type);
     });
     card.addEventListener('keydown', (event) => {
@@ -358,6 +365,11 @@ export function createTeacherActivityCard(manager, container, activity, type) {
         card.querySelector('.assign-activity-btn')?.addEventListener('click', (event) => {
             event.stopPropagation();
             manager.openActivityAssignmentModal(normalized);
+        });
+
+        card.querySelector('.test-activity-btn')?.addEventListener('click', (event) => {
+            event.stopPropagation();
+            manager.openActivityStudentPreview(normalized);
         });
 
         const deleteBtn = card.querySelector('.delete-activity-btn');

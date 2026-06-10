@@ -93,6 +93,7 @@ class StudentProgressCoinMethods {
     }
 
     updateCoinDisplay() {
+        this.sm.logStudentDomUpdate?.('coin-balance', { source: 'updateCoinDisplay' });
         const coinEl = $('#coin-balance');
         if (coinEl) {
             coinEl.textContent = `🪙 ${this.sm.coinData.balance} `;

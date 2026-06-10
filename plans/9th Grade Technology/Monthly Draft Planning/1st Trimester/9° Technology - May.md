@@ -89,6 +89,17 @@ Students finish the robotics learning sequence by documenting design decisions, 
 | admin | Class tasks for organization, records, or exams. |
 | skill | An ability you can practice and improve. |
 
+## Class Notes (Generated)
+
+- Week 9 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 9 - 45 minutes|Robotics project planning]]
+- Week 9 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 9 - 90 minutes|Prototype rehearsal]]
+- Week 10 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 10 - 45 minutes|Exam project setup]]
+- Week 10 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 10 - 90 minutes|Exam project build]]
+- Week 11 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 11 - 45 minutes|Exam project testing]]
+- Week 11 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 11 - 90 minutes|Exam project improvement]]
+- Week 12 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 12 - 45 minutes|Presentation rehearsal]]
+- Week 12 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T1 2026-05 May/9th Grade Technology - T1 - 2026-05 - May - Week 12 - 90 minutes|Robotics project presentations]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |

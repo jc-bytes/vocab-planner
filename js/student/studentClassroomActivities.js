@@ -19,6 +19,10 @@ export class StudentClassroomActivities {
         this.selectedHotspotLabelId = '';
         this.draggingHotspotPinId = '';
         this.suppressNextHotspotClick = false;
+        this.draftConflict = null;
+        this.classroomDraftTabId = '';
+        this.draftBroadcastChannel = null;
+        this.initDraftConflictChannel?.();
     }
 
 }

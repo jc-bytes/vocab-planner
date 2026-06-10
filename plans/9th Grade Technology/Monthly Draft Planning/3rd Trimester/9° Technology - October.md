@@ -96,6 +96,19 @@ Students study cyber security and responsible digital behavior, then connect tho
 | recommendation | Advice about what should be done. |
 | proof of concept | A small test showing an idea can work. |
 
+## Class Notes (Generated)
+
+- Week 3 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 3 - 45 minutes|You and your data]]
+- Week 3 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 3 - 90 minutes|Social engineering]]
+- Week 4 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 4 - 45 minutes|Digital responsibility habits]]
+- Week 4 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 4 - 90 minutes|Script kiddies and malware]]
+- Week 5 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 5 - 45 minutes|Cyber security scenario quiz]]
+- Week 5 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 5 - 90 minutes|Risk and impact]]
+- Week 6 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 6 - 45 minutes|STEM project problem selection]]
+- Week 6 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 6 - 90 minutes|STEM prototype planning]]
+- Week 7 - 45 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 7 - 45 minutes|Risk map final]]
+- Week 7 - 90 minutes: [[9th Grade Technology/Class Notes (Generated)/T3 2026-10 October/9th Grade Technology - T3 - 2026-10 - October - Week 7 - 90 minutes|STEM design refinement]]
+
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |
