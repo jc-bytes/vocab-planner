@@ -8650,6 +8650,27 @@ input[type="checkbox"] {
     margin-bottom: var(--spacing-md);
 }
 
+.activity-header {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) auto minmax(110px, 1fr);
+}
+
+.activity-header #back-to-menu-btn {
+    justify-self: start;
+}
+
+.activity-header-title {
+    justify-self: center;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+    line-height: 1.15;
+}
+
+.activity-header #activity-progress-indicator {
+    justify-self: end;
+}
+
 .section-header h2,
 .activity-header h2,
 #current-unit-title {
@@ -9357,7 +9378,18 @@ button.activity-card {
         align-items: flex-start;
     }
 
+    .activity-header {
+        grid-template-columns: 1fr;
+    }
+
+    .activity-header-title,
+    .activity-header #back-to-menu-btn,
+    .activity-header #activity-progress-indicator {
+        justify-self: start;
+    }
+
     .section-header h2,
+    .activity-header-title,
     #current-unit-title {
         flex-basis: 100%;
     }

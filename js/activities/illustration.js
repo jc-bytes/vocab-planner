@@ -204,15 +204,12 @@ export class IllustrationActivity {
         const copy = createElement('div', 'word-hunt-title');
         const eyebrow = createElement('span');
         eyebrow.textContent = `Word ${this.currentIndex + 1} of ${this.words.length}`;
-        const title = createElement('h2');
-        title.textContent = 'Word Hunt';
         const wordText = createElement('strong');
         wordText.textContent = word.word || '';
         const titleRow = createElement('div', 'word-hunt-title-row');
         titleRow.appendChild(wordText);
         titleRow.appendChild(this.createResearchActions(word));
         copy.appendChild(eyebrow);
-        copy.appendChild(title);
         copy.appendChild(titleRow);
 
         const nav = createElement('div', 'word-hunt-nav');
@@ -243,10 +240,20 @@ export class IllustrationActivity {
     createResearchActions(word) {
         const actions = createElement('div', 'word-hunt-actions');
         const searchTerm = word.word || '';
+        const classMeaning = String(word.definition || '').trim();
+        const classMeaningSentence = classMeaning && /[.!?]$/.test(classMeaning)
+            ? classMeaning
+            : `${classMeaning}.`;
+        const contextLine = classMeaning
+            ? ` Use this class meaning for context: ${classMeaningSentence}`
+            : '';
+        const definitionPrompt = `Define "${searchTerm}" for a Grade 6 technology and robotics class. Use the technology-related meaning.${contextLine} Keep it simple and classroom appropriate. Answer with one short definition.`;
+        const examplesPrompt = `Write exactly 2 student-friendly example sentences using "${searchTerm}" in a Grade 6 technology and robotics class. Use the technology-related meaning.${contextLine} Number them 1 and 2.`;
+        const aiModeUrl = prompt => `https://www.google.com/aimode?q=${encodeURIComponent(prompt)}`;
         const links = [
-            ['Definition', `https://www.google.com/search?q=${encodeURIComponent(`definition of the word ${searchTerm} in technology/robotic class`)}`],
+            ['Definition', aiModeUrl(definitionPrompt)],
             ['Image', `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(searchTerm)}`],
-            ['Examples', `https://www.google.com/search?q=${encodeURIComponent(`example of the word ${searchTerm} in a sentence`)}`]
+            ['Examples', aiModeUrl(examplesPrompt)]
         ];
 
         links.forEach(([label, href]) => {

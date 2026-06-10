@@ -338,6 +338,11 @@ class StudentShellMethods {
             indicator.textContent = 'Progress: 0%';
             indicator.classList.add('hidden');
         }
+        const activityTitle = $('#activity-header-title');
+        if (activityTitle) {
+            activityTitle.textContent = '';
+            activityTitle.classList.add('hidden');
+        }
 
         this.currentActivityType = null;
         this.activityInstance = null;

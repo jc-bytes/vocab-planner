@@ -40,6 +40,7 @@ class StudentActivityLauncherMethods {
 
         this.sm.currentActivityType = type; // Track current activity type
         this.sm.switchView('activity-view');
+        this.setActivityHeaderTitle(type);
 
         const container = $('#activity-container');
         if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
@@ -211,6 +212,29 @@ class StudentActivityLauncherMethods {
                 container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
                 this.sm.activityInstance = null;
         }
+    }
+
+    setActivityHeaderTitle(type) {
+        const title = $('#activity-header-title');
+        if (!title) return;
+
+        const labels = {
+            illustration: 'Word Hunt',
+            matching: 'Matching',
+            flashcards: 'Flashcards',
+            quiz: 'Quiz',
+            'synonym-antonym': 'Synonym & Antonym',
+            'word-search': 'Word Search',
+            crossword: 'Crossword',
+            hangman: 'Hangman',
+            scramble: 'Scramble',
+            wordle: 'Wordle',
+            'speed-match': 'Speed Match',
+            'fill-in-blank': 'Fill in Blank'
+        };
+
+        title.textContent = labels[type] || '';
+        title.classList.toggle('hidden', !title.textContent);
     }
 }
 
