@@ -133,7 +133,6 @@ const teacherDataViewerMethods = {
 
         if (activeTab === 'dashboard') {
             this.loadDashboardData();
-            this.loadWordHuntReview();
         }
     },
 

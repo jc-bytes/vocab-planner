@@ -21,6 +21,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[0] !== 'teacher') return null;
             if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
             if (parts[1] === 'students') return { view: 'students' };
+            if (parts[1] === 'word-hunt') return { view: 'word-hunt-review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
             if (parts[1] === 'activities' && parts[2] === 'assignment' && parts[3]) {
                 return { view: 'activity-assignment', assignmentId: parts[3] };
@@ -57,6 +58,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (!route || !route.view) return '#/teacher/overview';
             if (route.view === 'overview') return '#/teacher/overview';
             if (route.view === 'students') return '#/teacher/students';
+            if (route.view === 'word-hunt-review') return '#/teacher/word-hunt';
             if (route.view === 'sparks') return '#/teacher/sparks';
             if (route.view === 'activities') {
                 const params = new URLSearchParams();
@@ -120,6 +122,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             }
             if (viewId === 'teacher-sparks-view') return { view: 'sparks' };
             if (viewId === 'teacher-progress-view') return { view: 'students' };
+            if (viewId === 'teacher-word-hunt-review-view') return { view: 'word-hunt-review' };
             if (viewId === 'teacher-quizzes-view') return { view: 'quizzes' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === 'teacher-data-management-view') return { view: 'data-settings' };
@@ -224,6 +227,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             break;
                         case 'students':
                             await this.showProgressView();
+                            break;
+                        case 'word-hunt-review':
+                            await this.showWordHuntReviewView();
                             break;
                         case 'sparks':
                             await this.showSparksView();

@@ -112,6 +112,19 @@ class TeacherAuthMethods {
     async fetchUserRole(user) {
         try {
             const profile = await supabaseService.getProfile(user.uid);
+            if (!profile || profile.role !== 'teacher') {
+                if (typeof supabaseService.ensureAllowlistedTeacherProfile === 'function') {
+                    try {
+                        const repairedProfile = await supabaseService.ensureAllowlistedTeacherProfile();
+                        const repairedRole = repairedProfile?.role || 'unknown';
+                        localStorage.setItem(`userRole_${user.uid}`, repairedRole);
+                        return repairedRole;
+                    } catch (repairError) {
+                        console.warn('Could not repair allowlisted teacher profile:', repairError);
+                    }
+                }
+            }
+
             if (!profile) {
                 localStorage.removeItem(`userRole_${user.uid}`);
                 return 'unknown';

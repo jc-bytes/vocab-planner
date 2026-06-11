@@ -43,6 +43,11 @@
                         <i data-lucide="users"></i>
                         Students
                     </button>
+                    <button class="teacher-tab" id="tab-word-hunt-review" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-word-hunt-review-view" data-section="word-hunt-review">
+                        <i data-lucide="search-check"></i>
+                        Word Hunt
+                    </button>
                     <button class="teacher-tab" id="tab-quizzes" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-quizzes-view" data-section="quizzes">
                         <i data-lucide="file-text"></i>
@@ -1453,85 +1458,6 @@
                             <div class="loading-spinner">Loading activity data...</div>
                         </div>
                     </div>
-
-                    <!-- Word Hunt Review -->
-                    <section class="word-hunt-review-shell">
-                        <div class="word-hunt-review-header">
-                            <div>
-                                <h3>Word Hunt Review</h3>
-                                <p>Inspect vocabulary definitions, examples, images, and local review notes from student progress.</p>
-                            </div>
-                            <button id="refresh-word-hunt-review-btn" class="btn secondary-btn" type="button">
-                                <i data-lucide="refresh-cw"></i>
-                                Refresh
-                            </button>
-                        </div>
-
-                        <div class="word-hunt-review-stats" aria-label="Word Hunt review summary">
-                            <div>
-                                <strong id="word-hunt-total-count">--</strong>
-                                <span>Submissions</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-complete-count">--</strong>
-                                <span>Complete</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-needs-review-count">--</strong>
-                                <span>Needs Review</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-reviewed-count">--</strong>
-                                <span>Reviewed</span>
-                            </div>
-                        </div>
-
-                        <div class="word-hunt-review-filters">
-                            <label>
-                                <span>Grade</span>
-                                <select id="word-hunt-grade-filter">
-                                    <option value="">All Grades</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Section</span>
-                                <select id="word-hunt-section-filter">
-                                    <option value="">All Sections</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Status</span>
-                                <select id="word-hunt-status-filter">
-                                    <option value="">All Statuses</option>
-                                    <option value="needs-review">Needs Review</option>
-                                    <option value="complete">Complete</option>
-                                    <option value="reviewed">Reviewed</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Vocabulary</span>
-                                <select id="word-hunt-unit-filter">
-                                    <option value="">All Vocabularies</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Search</span>
-                                <input type="search" id="word-hunt-search-filter" placeholder="Student or vocabulary">
-                            </label>
-                        </div>
-
-                        <div class="word-hunt-review-layout">
-                            <div class="word-hunt-review-roster" id="word-hunt-review-roster">
-                                <div class="loading-spinner">Loading Word Hunt work...</div>
-                            </div>
-                            <div class="word-hunt-review-detail" id="word-hunt-review-detail">
-                                <div class="word-hunt-review-empty">
-                                    <strong>Select a Word Hunt submission</strong>
-                                    <span>Student vocabulary responses will appear here.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
                 </div>
 
                 <!-- Export Tab -->
@@ -1561,7 +1487,7 @@
                                     <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Game high scores</div>
                                 </div>
                             </label>
-                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
+                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
                                 <input type="checkbox" id="export-roles" style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--primary-color, #6366f1);">
                                 <div style="flex: 1;">
                                     <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">User Roles</div>
@@ -1570,7 +1496,6 @@
                             </label>
                         </div>
                     </div>
-
                     <!-- Student Selection -->
                     <div class="form-group" style="margin-bottom: 2rem;">
                         <label style="font-weight: 600; margin-bottom: 1rem; display: block; font-size: 1rem; color: var(--text-main, #f8fafc);">Select students:</label>
@@ -1737,6 +1662,96 @@
                         Reset All Data
                     </button>
                 </div>
+            </section>
+
+            <!-- View: Word Hunt Review -->
+            <section id="teacher-word-hunt-review-view" class="view hidden" role="tabpanel" aria-labelledby="tab-word-hunt-review">
+                <div class="teacher-page-heading">
+                    <div>
+                        <p class="teacher-eyebrow">Vocabulary responses</p>
+                        <h2>Word Hunt Review</h2>
+                    </div>
+                </div>
+
+                <section class="teacher-panel">
+                    <section class="word-hunt-review-shell">
+                        <div class="word-hunt-review-header">
+                            <div>
+                                <h3>Word Hunt Review</h3>
+                                <p>Inspect vocabulary definitions, examples, images, and local review notes from student progress.</p>
+                            </div>
+                            <button id="refresh-word-hunt-review-btn" class="btn secondary-btn" type="button">
+                                <i data-lucide="refresh-cw"></i>
+                                Refresh
+                            </button>
+                        </div>
+
+                        <div class="word-hunt-review-stats" aria-label="Word Hunt review summary">
+                            <div>
+                                <strong id="word-hunt-total-count">--</strong>
+                                <span>Submissions</span>
+                            </div>
+                            <div>
+                                <strong id="word-hunt-complete-count">--</strong>
+                                <span>Complete</span>
+                            </div>
+                            <div>
+                                <strong id="word-hunt-needs-review-count">--</strong>
+                                <span>Needs Review</span>
+                            </div>
+                            <div>
+                                <strong id="word-hunt-reviewed-count">--</strong>
+                                <span>Reviewed</span>
+                            </div>
+                        </div>
+
+                        <div class="word-hunt-review-filters">
+                            <label>
+                                <span>Grade</span>
+                                <select id="word-hunt-grade-filter">
+                                    <option value="">All Grades</option>
+                                </select>
+                            </label>
+                            <label>
+                                <span>Section</span>
+                                <select id="word-hunt-section-filter">
+                                    <option value="">All Sections</option>
+                                </select>
+                            </label>
+                            <label>
+                                <span>Status</span>
+                                <select id="word-hunt-status-filter">
+                                    <option value="">All Statuses</option>
+                                    <option value="needs-review">Needs Review</option>
+                                    <option value="complete">Complete</option>
+                                    <option value="reviewed">Reviewed</option>
+                                </select>
+                            </label>
+                            <label>
+                                <span>Vocabulary</span>
+                                <select id="word-hunt-unit-filter">
+                                    <option value="">All Vocabularies</option>
+                                </select>
+                            </label>
+                            <label>
+                                <span>Search</span>
+                                <input type="search" id="word-hunt-search-filter" placeholder="Student or vocabulary">
+                            </label>
+                        </div>
+
+                        <div class="word-hunt-review-layout">
+                            <div class="word-hunt-review-roster" id="word-hunt-review-roster">
+                                <div class="loading-spinner">Loading Word Hunt work...</div>
+                            </div>
+                            <div class="word-hunt-review-detail" id="word-hunt-review-detail">
+                                <div class="word-hunt-review-empty">
+                                    <strong>Select a Word Hunt submission</strong>
+                                    <span>Student vocabulary responses will appear here.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </section>
             </section>
         </main>
     </div>

@@ -174,6 +174,15 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return toClientRow('profiles', data);
     },
 
+    async ensureAllowlistedTeacherProfile() {
+        await this.init();
+        if (!this.currentUser) throw new Error('You must be signed in to verify teacher access.');
+
+        const { data, error } = await this.client.rpc('ensure_allowlisted_teacher_profile');
+        if (error) throw error;
+        return toClientRow('profiles', Array.isArray(data) ? data[0] : data);
+    },
+
     async getStudentsWithProgress() {
         await this.init();
         const [{ data: profiles, error: profilesError }, { data: progressRows, error: progressError }] =

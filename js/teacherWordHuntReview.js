@@ -39,6 +39,12 @@ const getWordQuality = (entry = {}) => ({
 const getUnitLabel = (unitId = '') => String(unitId || 'Vocabulary').replace(/_/g, ' ');
 
 class TeacherWordHuntReviewMethods {
+    async showWordHuntReviewView(options = {}) {
+        if (!this.ensureAuthenticated(false)) return;
+        this.switchView('teacher-word-hunt-review-view');
+        await this.loadWordHuntReview(options);
+    }
+
     initWordHuntReview() {
         if (this.wordHuntReviewInitialized) return;
         this.wordHuntReviewInitialized = true;

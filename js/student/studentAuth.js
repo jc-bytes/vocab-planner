@@ -142,9 +142,15 @@ export class StudentAuth {
         try {
             const profile = await supabaseService.getProfile(user.uid);
             if (!profile) {
-                this.sm.currentRole = 'unknown';
+                this.sm.currentRole = 'student';
                 this.sm.mustChangePassword = false;
-                localStorage.removeItem(`userRole_${user.uid}`);
+                this.sm.studentProfile = this.sm.normalizeStudentProfile({
+                    firstName: user.user_metadata?.first_name || '',
+                    lastName: user.user_metadata?.last_name || '',
+                    name: user.displayName || '',
+                    email: user.email || ''
+                });
+                localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
                 return this.sm.currentRole;
             }
             this.sm.currentRole = profile.role || 'unknown';
