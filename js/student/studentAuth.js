@@ -82,7 +82,10 @@ export class StudentAuth {
         }
 
         if (this.sm.currentRole !== 'student') {
-            this.sm.showLoginError('This page is for student accounts. Please use the teacher dashboard.');
+            const message = this.sm.currentRole === 'teacher'
+                ? 'This page is for student accounts. Please use the teacher dashboard.'
+                : 'No student profile was found for this account. Please ask your teacher to check the account setup.';
+            this.sm.showLoginError(message);
             await supabaseService.signOut();
             return;
         }
@@ -138,7 +141,13 @@ export class StudentAuth {
     async fetchAndSetRole(user) {
         try {
             const profile = await supabaseService.getProfile(user.uid);
-            this.sm.currentRole = profile?.role || 'student';
+            if (!profile) {
+                this.sm.currentRole = 'unknown';
+                this.sm.mustChangePassword = false;
+                localStorage.removeItem(`userRole_${user.uid}`);
+                return this.sm.currentRole;
+            }
+            this.sm.currentRole = profile.role || 'unknown';
             this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
 
             if (profile && this.sm.currentRole === 'student') {

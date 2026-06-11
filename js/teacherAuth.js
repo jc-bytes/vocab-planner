@@ -89,7 +89,9 @@ class TeacherAuthMethods {
             this.currentRole = role;
             if (role !== 'teacher') {
                 await supabaseService.signOut();
-                this.showAuthError('Access restricted to allowlisted teacher emails.');
+                this.showAuthError(role === 'unknown'
+                    ? 'No teacher profile was found for this account. Check the teacher allowlist and database sync.'
+                    : 'Access restricted to allowlisted teacher emails.');
                 this.showLoginView();
                 return;
             }
@@ -110,7 +112,11 @@ class TeacherAuthMethods {
     async fetchUserRole(user) {
         try {
             const profile = await supabaseService.getProfile(user.uid);
-            const role = profile?.role || 'student';
+            if (!profile) {
+                localStorage.removeItem(`userRole_${user.uid}`);
+                return 'unknown';
+            }
+            const role = profile.role || 'unknown';
             localStorage.setItem(`userRole_${user.uid}`, role);
             return role;
         } catch (err) {

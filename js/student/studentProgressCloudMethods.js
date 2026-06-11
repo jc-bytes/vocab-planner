@@ -116,55 +116,65 @@ class StudentProgressCloudMethods {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         try {
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-            const snapshot = await getDoc(docRef);
+            let data = null;
 
-            if (snapshot.exists()) {
-                const data = snapshot.data();
-                const cloudCoinData = this.migrateCoinData(data);
-                const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
-                const localGiftCoins = this.sm.coinData.giftCoins || 0;
-                this.sm.coinData = cloudCoinData.coinData;
-                this.sm.coinHistory = cloudCoinData.coinHistory;
-
-                // Check for new gifts
-                if (cloudGiftCoins > localGiftCoins) {
-                    this.sm.showNotificationBadge();
-                    // Don't auto-accept, wait for user to click accept
-                }
-
-                // Legacy support
-                this.sm.coins = this.sm.coinData.balance;
-
-                const mergedStudentProfile = this.sm.mergeStudentProfile(
-                    this.sm.studentProfile,
-                    data.studentProfile || {}
-                );
-
-                this.sm.progressData = {
-                    studentProfile: mergedStudentProfile,
-                    units: data.units || {},
-                    coins: this.sm.coins,
-                    coinData: this.sm.coinData,
-                    coinHistory: this.sm.coinHistory
-                };
-                this.sm.updateCoinDisplay();
-                this.sm.studentProfile = mergedStudentProfile;
-                await this.restoreImagesFromProgress();
-                this.saveLocalProgress(true);
-                this.sm.setAuthStatus('☁️ Synced');
+            if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
+                data = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             } else {
-                // New user or no cloud data - Welcome Bonus
-                if (this.sm.coinData.balance === 0) {
-                    const progress = await supabaseService.claimStudentWelcomeBonus?.({ clientId: this.clientId });
-                    if (progress) {
-                        this.applyProgressSnapshot(progress, { saveLocal: true });
-                    }
-                    this.sm.showToast('🎉 Welcome! You received 100 starting coins!');
-                }
-                this.sm.setAuthStatus('☁️ Ready');
+                const db = supabaseService.getDatabase();
+                const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
+                const snapshot = await getDoc(docRef);
+                data = snapshot.exists() ? snapshot.data() : null;
             }
+
+            if (!data) {
+                this.sm.setAuthStatus('☁️ Ready');
+                return;
+            }
+
+            const cloudCoinData = this.migrateCoinData(data);
+            const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
+            const localGiftCoins = this.sm.coinData.giftCoins || 0;
+            const hasWelcomeBonus = cloudCoinData.coinHistory.some(entry => entry?.source === 'welcome');
+            this.sm.coinData = cloudCoinData.coinData;
+            this.sm.coinHistory = cloudCoinData.coinHistory;
+
+            if (cloudGiftCoins > localGiftCoins) {
+                this.sm.showNotificationBadge();
+            }
+
+            this.sm.coins = this.sm.coinData.balance;
+
+            const mergedStudentProfile = this.sm.mergeStudentProfile(
+                this.sm.studentProfile,
+                data.studentProfile || {}
+            );
+
+            this.sm.progressData = {
+                studentProfile: mergedStudentProfile,
+                units: data.units || {},
+                coins: this.sm.coins,
+                coinData: this.sm.coinData,
+                coinHistory: this.sm.coinHistory
+            };
+            this.sm.updateCoinDisplay();
+            this.sm.studentProfile = mergedStudentProfile;
+            await this.restoreImagesFromProgress();
+
+            if (!hasWelcomeBonus && this.sm.coinData.balance === 0 && typeof supabaseService.claimStudentWelcomeBonus === 'function') {
+                const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.clientId });
+                if (progress) {
+                    this.applyProgressSnapshot(progress, { saveLocal: true });
+                    const bonusCoinData = this.migrateCoinData(progress);
+                    if (bonusCoinData.coinHistory.some(entry => entry?.source === 'welcome')) {
+                        this.sm.showToast('🎉 Welcome! You received 100 starting coins!');
+                    }
+                }
+            } else {
+                this.saveLocalProgress(true);
+            }
+
+            this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
             console.error('Failed to load cloud progress:', error);
             // Check if we're offline
