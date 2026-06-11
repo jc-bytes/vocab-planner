@@ -9295,6 +9295,53 @@ button.activity-card {
     }
 }
 
+@media (max-width: 1180px) {
+    .teacher-app-header {
+        grid-template-columns: minmax(0, 1fr) max-content;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    .teacher-app-header .teacher-tab-shell {
+        justify-self: stretch;
+        position: relative;
+        z-index: 30;
+        width: auto;
+        min-width: 0;
+    }
+
+    .teacher-mobile-menu-toggle {
+        display: inline-flex;
+    }
+
+    .teacher-app-header .teacher-tabs {
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        display: none;
+        grid-template-columns: 1fr;
+        width: min(19rem, calc(100vw - 2rem));
+        max-height: min(70vh, 24rem);
+        overflow-y: auto;
+        justify-content: stretch;
+        padding: 0.35rem;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.98);
+        box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
+    }
+
+    .teacher-tab-shell.mobile-menu-open .teacher-tabs {
+        display: grid;
+    }
+
+    .teacher-app-header .teacher-tab {
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
+    }
+}
+
 @media (max-width: 850px) {
     .app-header {
         align-items: flex-start;

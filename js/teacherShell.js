@@ -121,7 +121,7 @@ class TeacherShellMethods {
         toggle.setAttribute('aria-label', open ? 'Close teacher sections menu' : 'Open teacher sections menu');
 
         if (tabs) {
-            const mobileLayout = window.matchMedia('(max-width: 850px)').matches;
+            const mobileLayout = window.matchMedia('(max-width: 1180px)').matches;
             tabs.setAttribute('aria-hidden', mobileLayout && !open ? 'true' : 'false');
         }
     }
