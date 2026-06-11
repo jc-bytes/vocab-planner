@@ -19,6 +19,7 @@ export class StudentActivities {
         this.wordCoverage = {}; // Track which words have been used in each activity
         this.activityModulePromises = new Map();
         this.activityPreloadKeys = new Set();
+        this.wordHuntExportInProgress = false;
     }
 
 }

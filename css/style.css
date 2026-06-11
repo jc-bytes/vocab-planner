@@ -811,6 +811,15 @@ body {
     outline: none;
 }
 
+.student-export-menu-item:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+.student-export-menu-item:disabled:hover {
+    background: transparent;
+}
+
 .student-export-menu-item svg {
     width: 1rem;
     height: 1rem;

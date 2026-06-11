@@ -1,5 +1,6 @@
 import { imageDB } from '../db.js';
 import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
+import { $, notifications } from '../main.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 
 class StudentActivityWordHuntMethods {
@@ -85,20 +86,46 @@ class StudentActivityWordHuntMethods {
         return merged;
     }
 
+    setWordHuntExportButtonState(isExporting = false) {
+        const button = $('#download-word-hunt-btn');
+        if (!button) return;
+
+        button.disabled = isExporting;
+        button.setAttribute('aria-busy', isExporting ? 'true' : 'false');
+        button.innerHTML = isExporting
+            ? '<i data-lucide="loader-circle"></i><span>Generating PDF...</span>'
+            : '<i data-lucide="file-down"></i><span>Word Hunt PDF</span>';
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+    }
+
     async downloadWordHuntSubmission() {
         if (!this.sm.currentVocab) return;
+        if (this.wordHuntExportInProgress) return;
 
-        if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
-            this.sm.unitScores[this.sm.currentActivityType] = this.sm.activityInstance.getScore();
-            this.sm.progress.saveLocalProgress();
+        this.wordHuntExportInProgress = true;
+        this.setWordHuntExportButtonState(true);
+
+        try {
+            if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
+                this.sm.unitScores[this.sm.currentActivityType] = this.sm.activityInstance.getScore();
+                this.sm.progress.saveLocalProgress();
+            }
+
+            const wordHunt = this.getReportWordHuntEntries();
+            const unitProgress = this.getCurrentUnitProgress();
+            const { ReportGenerator } = await import('../reportGenerator.js');
+            await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
+                wordHunt,
+                trimester: unitProgress?.trimester || '',
+                loadImage: path => this.loadWordHuntImage(path)
+            });
+        } catch (error) {
+            console.error('Failed to export Word Hunt PDF:', error);
+            notifications.error('Could not export Word Hunt PDF.');
+        } finally {
+            this.wordHuntExportInProgress = false;
+            this.setWordHuntExportButtonState(false);
         }
-
-        const wordHunt = this.getReportWordHuntEntries();
-        const { ReportGenerator } = await import('../reportGenerator.js');
-        await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
-            wordHunt,
-            loadImage: path => this.loadWordHuntImage(path)
-        });
     }
 
     async migrateLegacyWordHuntImages() {

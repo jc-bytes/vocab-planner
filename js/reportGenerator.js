@@ -91,6 +91,62 @@ export class ReportGenerator {
             .replace(/^-|-$/g, '') || 'word-hunt';
     }
 
+    static toPascalFileSegment(value, fallback = 'WordHunt') {
+        const parts = String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .split(/[^a-zA-Z0-9]+/)
+            .filter(Boolean);
+
+        if (parts.length === 0) return fallback;
+
+        return parts.map(part => {
+            const lower = part.toLowerCase();
+            return lower.charAt(0).toUpperCase() + lower.slice(1);
+        }).join('');
+    }
+
+    static getGradeGroupFileSegment(grade, group) {
+        const groupText = String(group || '').replace(/[^a-zA-Z0-9]+/g, '');
+        const gradeText = groupText
+            ? (String(grade || '').match(/\d+/)?.[0] || String(grade || '').replace(/[^a-zA-Z0-9]+/g, ''))
+            : String(grade || '').replace(/[^a-zA-Z0-9]+/g, '');
+        return `${gradeText}${groupText}`.toLowerCase() || 'class';
+    }
+
+    static getTrimesterFileSegment(vocabOrName, options = {}) {
+        const raw = String(
+            options.trimester
+            || vocabOrName?.trimester
+            || vocabOrName?.trimesterKey
+            || vocabOrName?.trimester_key
+            || ''
+        ).trim().toUpperCase();
+
+        if (!raw) return '';
+        if (raw === 'IT' || raw === 'T1' || raw === '1') return 't1';
+        if (raw === 'IIT' || raw === 'T2' || raw === '2') return 't2';
+        if (raw === 'IIIT' || raw === 'T3' || raw === '3') return 't3';
+
+        return raw
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '')
+            .replace(/^trimester/, 't');
+    }
+
+    static buildWordHuntFileName(studentProfile, vocabOrName, options = {}) {
+        const vocabName = this.getVocabName(vocabOrName);
+        const { fullName, grade, group } = this.getStudentInfo(studentProfile);
+        const segments = [
+            this.toPascalFileSegment(fullName, 'Student'),
+            this.getGradeGroupFileSegment(grade, group),
+            this.getTrimesterFileSegment(vocabOrName, options),
+            this.toPascalFileSegment(vocabName, 'Vocabulary')
+        ].filter(Boolean);
+
+        return `${segments.join('-')}.pdf`;
+    }
+
     static addCanvasToPdf(pdf, canvas) {
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
@@ -386,7 +442,7 @@ export class ReportGenerator {
             });
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: PDF_PAGE_FORMAT });
             this.addCanvasToPdf(pdf, canvas);
-            pdf.save(`word-hunt-${this.slugForDownload(vocabName)}-${Date.now()}.pdf`);
+            pdf.save(this.buildWordHuntFileName(studentProfile, vocabOrName, options));
         } catch (err) {
             console.error('Word Hunt report generation failed:', err);
             alert('Failed to generate Word Hunt download.');
