@@ -1,5 +1,7 @@
 import { createElement, $ } from './main.js';
 import { imageDB } from './db.js';
+import { jsPDF } from 'jspdf';
+import { PDF_PAGE_FORMAT } from './classroomActivityPdfStyles.js';
 
 const WORD_HUNT_TEXT_RULES = {
     definition: { minChars: 12, minWords: 3 },
@@ -87,6 +89,42 @@ export class ReportGenerator {
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '') || 'word-hunt';
+    }
+
+    static addCanvasToPdf(pdf, canvas) {
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const pagePixelHeight = Math.floor(canvas.width * (pageHeight / pageWidth));
+        const pageCanvas = document.createElement('canvas');
+        const pageContext = pageCanvas.getContext('2d');
+        let offsetY = 0;
+        let pageIndex = 0;
+
+        while (offsetY < canvas.height) {
+            const sliceHeight = Math.min(pagePixelHeight, canvas.height - offsetY);
+            pageCanvas.width = canvas.width;
+            pageCanvas.height = sliceHeight;
+            pageContext.fillStyle = '#ffffff';
+            pageContext.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            pageContext.drawImage(
+                canvas,
+                0,
+                offsetY,
+                canvas.width,
+                sliceHeight,
+                0,
+                0,
+                canvas.width,
+                sliceHeight
+            );
+
+            if (pageIndex > 0) pdf.addPage(PDF_PAGE_FORMAT, 'portrait');
+            const imageHeight = sliceHeight * (pageWidth / canvas.width);
+            pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, imageHeight);
+
+            offsetY += sliceHeight;
+            pageIndex += 1;
+        }
     }
 
     static hasMeaningfulWordHuntText(value, rules = WORD_HUNT_TEXT_RULES.definition) {
@@ -338,11 +376,17 @@ export class ReportGenerator {
             detailsContainer.appendChild(section);
 
             await this.waitForImages(reportCard);
-            const canvas = await html2canvas(reportCard);
-            const link = document.createElement('a');
-            link.download = `word-hunt-${this.slugForDownload(vocabName)}-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            const canvas = await html2canvas(reportCard, {
+                backgroundColor: '#ffffff',
+                logging: false,
+                scale: 2,
+                useCORS: true,
+                windowHeight: reportCard.scrollHeight,
+                windowWidth: reportCard.scrollWidth
+            });
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: PDF_PAGE_FORMAT });
+            this.addCanvasToPdf(pdf, canvas);
+            pdf.save(`word-hunt-${this.slugForDownload(vocabName)}-${Date.now()}.pdf`);
         } catch (err) {
             console.error('Word Hunt report generation failed:', err);
             alert('Failed to generate Word Hunt download.');
