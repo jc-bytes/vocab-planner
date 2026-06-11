@@ -44,7 +44,8 @@ Identify three class rules for using the mBot responsibly: handle the robot care
 ## While Activities
 
 - Identify three class rules for using the mBot responsibly: handle the robot carefully, check that no parts are loose, and test it only in the assigned safe area.
-- Let’s make groups! Discuss how the rules protect people and materials.
+- Let’s make groups! 
+- Discuss how the rules protect people and materials.
 
 ## Post-Activities
 

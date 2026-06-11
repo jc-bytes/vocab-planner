@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 200,
+    "collapsed": true
   },
   "right": {
     "id": "80553fa905a2bc7a",
@@ -184,6 +185,10 @@
   "lastOpenFiles": [
     "00 Navigation/Month Classes/June Classes - 2026.md",
     "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes.md",
+    "7th Grade Technology/Class Notes (Generated)/T2 2026-06 June/7th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes.md",
+    "8th Grade Technology/Class Notes (Generated)/T2 2026-06 June/8th Grade Technology - T2 - 2026-06 - June - Week 1 - 45 minutes.md",
+    "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes.md",
+    "9th Grade Technology/Class Notes (Generated)/T2 2026-06 June/9th Grade Technology - T2 - 2026-06 - June - Week 1 - 90 minutes.md",
     "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 45 minutes.md",
     "00 Navigation/This Week.md",
     "6th Grade Technology/Class Notes (Generated)/T2 2026-06 June/6th Grade Technology - T2 - 2026-06 - June - Week 2 - 90 minutes.md",
@@ -204,10 +209,6 @@
     "00 Navigation/Monthly Schedule/March Schedule - 2026.md",
     "00 Navigation/Weekly Classes/December 21-25 2026.md",
     "00 Navigation/Weekly Classes/December 14-18 2026.md",
-    "00 Navigation/Weekly Classes/December 7-11 2026.md",
-    "00 Navigation/Weekly Classes/November 30-December 4 2026.md",
-    "00 Navigation/Weekly Classes/November 23-27 2026.md",
-    "00 Navigation/Weekly Classes/November 16-20 2026.md",
     "00 Navigation/Monthly Schedule",
     "00 Navigation/Weekly Classes",
     "00 Navigation/Schedule Data/school_weeks_2026.yml",

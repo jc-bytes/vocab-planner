@@ -38,9 +38,18 @@ Analyze one environmental poster using a checklist with 2 strengths, 2 weaknesse
 
 - Identify 5 public messages you see in daily life, such as a school poster, recycling sign, warning label, advertisement, or app notification, and discuss what makes them clear.
 
+- 2 strengths: not AI, nice colors 
+- 2 weaknesses: Missing information
+- Audience: Everyone
+- Purpose: To teach
+- Main image : The planet
+- Title : Waste R. C.
+- One improvement suggestion: Add more info.
+
 ## While Activities
 
 - Analyze one environmental poster using a checklist with 2 strengths, 2 weaknesses, audience, purpose, main image, title, and one improvement suggestion.
+
 
 ## Post-Activities
 

@@ -108,6 +108,7 @@ const teacherDataViewerMethods = {
             gamification: 'data-gamification-section',
             calendar: 'data-calendar-section',
             dashboard: 'data-dashboard-section',
+            'word-hunt': 'data-word-hunt-section',
             export: 'data-export-section',
             view: 'data-viewer-section',
             reset: 'data-reset-section'
@@ -133,6 +134,9 @@ const teacherDataViewerMethods = {
 
         if (activeTab === 'dashboard') {
             this.loadDashboardData();
+        }
+        if (activeTab === 'word-hunt') {
+            this.loadWordHuntReview();
         }
     },
 

@@ -5462,6 +5462,303 @@ select:focus {
     min-width: 640px;
 }
 
+.word-hunt-review-shell {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.word-hunt-review-header,
+.word-hunt-review-filters,
+.word-hunt-detail-header,
+.word-hunt-note-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.word-hunt-review-header h3,
+.word-hunt-detail-header h4 {
+    margin: 0 0 0.35rem;
+    color: var(--text-main);
+}
+
+.word-hunt-review-header p,
+.word-hunt-detail-header p,
+.word-hunt-teacher-note p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.45;
+}
+
+.word-hunt-review-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.word-hunt-review-stats div {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.85rem 0;
+}
+
+.word-hunt-review-stats strong {
+    color: var(--text-main);
+    font-size: 1.55rem;
+    line-height: 1;
+}
+
+.word-hunt-review-stats span,
+.word-hunt-review-filters span,
+.word-hunt-evidence-block span {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.word-hunt-review-filters {
+    justify-content: flex-start;
+    align-items: end;
+}
+
+.word-hunt-review-filters label {
+    display: grid;
+    gap: 0.35rem;
+    min-width: min(100%, 150px);
+    flex: 1 1 150px;
+}
+
+.word-hunt-review-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.word-hunt-review-roster,
+.word-hunt-review-detail {
+    min-width: 0;
+}
+
+.word-hunt-review-roster {
+    display: grid;
+    gap: 0;
+    max-height: min(68vh, 720px);
+    overflow: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.word-hunt-roster-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem 0.8rem;
+    width: 100%;
+    padding: 0.85rem 0.1rem;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent;
+    color: var(--text-main);
+    text-align: left;
+    cursor: pointer;
+}
+
+.word-hunt-roster-row:hover,
+.word-hunt-roster-row.is-selected {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.word-hunt-roster-row:focus-visible {
+    outline: 3px solid rgba(14, 165, 233, 0.8);
+    outline-offset: -3px;
+}
+
+.word-hunt-roster-main,
+.word-hunt-roster-meta {
+    display: grid;
+    gap: 0.18rem;
+    min-width: 0;
+}
+
+.word-hunt-roster-main strong,
+.word-hunt-roster-main small,
+.word-hunt-roster-meta span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.word-hunt-roster-main small,
+.word-hunt-roster-meta {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+}
+
+.word-hunt-roster-meta {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.word-hunt-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.73rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.word-hunt-status-pill.is-complete {
+    background: rgba(16, 185, 129, 0.14);
+    color: #86efac;
+}
+
+.word-hunt-status-pill.needs-review {
+    background: rgba(251, 191, 36, 0.14);
+    color: #fde68a;
+}
+
+.word-hunt-status-pill.is-reviewed {
+    background: rgba(99, 102, 241, 0.18);
+    color: #c7d2fe;
+}
+
+.word-hunt-review-empty {
+    display: grid;
+    place-items: center;
+    gap: 0.35rem;
+    min-height: 320px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.word-hunt-review-empty strong {
+    color: var(--text-main);
+}
+
+.word-hunt-detail-score {
+    display: grid;
+    gap: 0.2rem;
+    text-align: right;
+}
+
+.word-hunt-detail-score strong {
+    color: var(--primary-color);
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.word-hunt-detail-score span,
+.word-hunt-detail-summary span {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.word-hunt-detail-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin: 1rem 0;
+    padding: 0.8rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.word-hunt-word-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.word-hunt-word-card {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.word-hunt-word-title,
+.word-hunt-word-grid {
+    display: grid;
+    gap: 0.8rem;
+}
+
+.word-hunt-word-title {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+}
+
+.word-hunt-word-title strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--text-main);
+    font-size: 1.05rem;
+}
+
+.word-hunt-word-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(130px, 180px);
+    align-items: stretch;
+}
+
+.word-hunt-evidence-block,
+.word-hunt-image-review {
+    min-width: 0;
+    padding: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.28);
+}
+
+.word-hunt-evidence-block p {
+    margin: 0.4rem 0 0;
+    color: var(--text-main);
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.word-hunt-image-review {
+    display: grid;
+    place-items: center;
+    min-height: 118px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.word-hunt-image-review img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+}
+
+.word-hunt-teacher-note {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.word-hunt-teacher-note label {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.word-hunt-teacher-note textarea {
+    width: 100%;
+    resize: vertical;
+}
+
 .student-filter-card {
     margin-bottom: 1.5rem;
 }
@@ -9622,6 +9919,22 @@ button.activity-card {
     .data-tab-btn.active {
         border-color: rgba(99, 102, 241, 0.75);
         background: rgba(99, 102, 241, 0.18);
+    }
+
+    .word-hunt-review-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .word-hunt-review-roster {
+        max-height: 340px;
+    }
+
+    .word-hunt-word-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .word-hunt-detail-score {
+        text-align: left;
     }
 
     .data-tab-list.spark-view-tabs {
