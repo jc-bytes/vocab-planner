@@ -147,40 +147,288 @@ export class ReportGenerator {
         return `${segments.join('-')}.pdf`;
     }
 
-    static addCanvasToPdf(pdf, canvas) {
+    static async blobToDataUrl(blob) {
+        if (!blob) return '';
+        return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result || '');
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    static async getImageSize(dataUrl) {
+        if (!dataUrl) return null;
+        const image = new Image();
+        image.src = dataUrl;
+        return new Promise(resolve => {
+            image.onload = () => resolve({ width: image.naturalWidth || 1, height: image.naturalHeight || 1 });
+            image.onerror = () => resolve(null);
+        });
+    }
+
+    static async normalizePdfImageDataUrl(dataUrl) {
+        if (!dataUrl) return '';
+        const image = new Image();
+        image.src = dataUrl;
+
+        const loadedImage = await new Promise(resolve => {
+            image.onload = () => resolve(image);
+            image.onerror = () => resolve(null);
+        });
+        if (!loadedImage) return '';
+
+        const canvas = document.createElement('canvas');
+        canvas.width = loadedImage.naturalWidth || 1;
+        canvas.height = loadedImage.naturalHeight || 1;
+        const context = canvas.getContext('2d');
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(loadedImage, 0, 0);
+        return canvas.toDataURL('image/png');
+    }
+
+    static setPdfTextStyle(pdf, { size = 10, style = 'normal', color = [55, 65, 81] } = {}) {
+        pdf.setFont('helvetica', style);
+        pdf.setFontSize(size);
+        pdf.setTextColor(...color);
+    }
+
+    static drawWrappedPdfText(pdf, text, x, y, width, options = {}) {
+        const lineHeight = options.lineHeight || 11;
+        this.setPdfTextStyle(pdf, options);
+        const lines = pdf.splitTextToSize(String(text || ''), width);
+        pdf.text(lines, x, y);
+        return y + (lines.length * lineHeight);
+    }
+
+    static getPdfTextLines(pdf, text, width, fontSize = 9, style = 'normal') {
+        pdf.setFont('helvetica', style);
+        pdf.setFontSize(fontSize);
+        return pdf.splitTextToSize(String(text || ''), width);
+    }
+
+    static drawWordHuntPdfHeader(pdf, { vocabName, subjectName, fullName, grade, group, pageNumber }) {
         const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const pagePixelHeight = Math.floor(canvas.width * (pageHeight / pageWidth));
-        const pageCanvas = document.createElement('canvas');
-        const pageContext = pageCanvas.getContext('2d');
-        let offsetY = 0;
-        let pageIndex = 0;
+        const margin = 42;
+        const rightX = pageWidth - margin;
+        const compact = pageNumber > 1;
+        let y = margin;
 
-        while (offsetY < canvas.height) {
-            const sliceHeight = Math.min(pagePixelHeight, canvas.height - offsetY);
-            pageCanvas.width = canvas.width;
-            pageCanvas.height = sliceHeight;
-            pageContext.fillStyle = '#ffffff';
-            pageContext.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-            pageContext.drawImage(
-                canvas,
-                0,
-                offsetY,
-                canvas.width,
-                sliceHeight,
-                0,
-                0,
-                canvas.width,
-                sliceHeight
-            );
+        this.setPdfTextStyle(pdf, { size: compact ? 16 : 20, style: 'bold', color: [17, 24, 39] });
+        pdf.text('Word Hunt Submission', margin, y);
 
-            if (pageIndex > 0) pdf.addPage(PDF_PAGE_FORMAT, 'portrait');
-            const imageHeight = sliceHeight * (pageWidth / canvas.width);
-            pdf.addImage(pageCanvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, imageHeight);
+        this.setPdfTextStyle(pdf, { size: compact ? 10 : 12, style: 'bold', color: [79, 70, 229] });
+        const vocabLines = pdf.splitTextToSize(vocabName, 230);
+        pdf.text(vocabLines, rightX, y, { align: 'right' });
 
-            offsetY += sliceHeight;
-            pageIndex += 1;
+        y += compact ? 17 : 22;
+        this.setPdfTextStyle(pdf, { size: 9, color: [107, 114, 128] });
+        pdf.text(`Generated on ${new Date().toLocaleDateString()}`, margin, y);
+        pdf.text(subjectName, rightX, y, { align: 'right' });
+
+        y += 14;
+        pdf.setDrawColor(79, 70, 229);
+        pdf.setLineWidth(1.4);
+        pdf.line(margin, y, rightX, y);
+
+        y += compact ? 16 : 24;
+        if (compact) {
+            this.setPdfTextStyle(pdf, { size: 10, style: 'bold', color: [55, 65, 81] });
+            pdf.text(`${fullName} - Grade ${grade || '-'} Group ${group || '-'}`, margin, y);
+            return y + 18;
         }
+
+        pdf.setFillColor(249, 250, 251);
+        pdf.roundedRect(margin, y, pageWidth - (margin * 2), 58, 5, 5, 'F');
+        this.setPdfTextStyle(pdf, { size: 12, style: 'bold', color: [55, 65, 81] });
+        pdf.text('Student Information', margin + 14, y + 18);
+        this.setPdfTextStyle(pdf, { size: 8, style: 'normal', color: [107, 114, 128] });
+        pdf.text('Name', margin + 14, y + 34);
+        pdf.text('Grade', margin + 230, y + 34);
+        pdf.text('Group', margin + 340, y + 34);
+        this.setPdfTextStyle(pdf, { size: 11, style: 'normal', color: [31, 41, 55] });
+        pdf.text(fullName, margin + 14, y + 49);
+        pdf.text(String(grade || '-'), margin + 230, y + 49);
+        pdf.text(String(group || '-'), margin + 340, y + 49);
+        return y + 78;
+    }
+
+    static drawWordHuntPdfTableHeader(pdf, y) {
+        const margin = 42;
+        const columns = this.getWordHuntPdfColumns();
+        pdf.setFillColor(243, 244, 246);
+        pdf.setDrawColor(229, 231, 235);
+        pdf.rect(margin, y, columns.totalWidth, 26, 'FD');
+        this.setPdfTextStyle(pdf, { size: 9, style: 'bold', color: [31, 41, 55] });
+        columns.items.forEach(column => {
+            pdf.text(column.label, column.x + 8, y + 17);
+            if (column.index > 0) {
+                pdf.line(column.x, y, column.x, y + 26);
+            }
+        });
+        return y + 26;
+    }
+
+    static getWordHuntPdfColumns() {
+        const margin = 42;
+        const widths = [72, 216, 116, 124];
+        let x = margin;
+        const labels = ['Word', 'Evidence', 'Image', 'Submission'];
+        const items = widths.map((width, index) => {
+            const column = { label: labels[index], width, x, index };
+            x += width;
+            return column;
+        });
+        return { items, totalWidth: widths.reduce((sum, width) => sum + width, 0) };
+    }
+
+    static getWordHuntPdfRowHeight(pdf, row) {
+        const columns = this.getWordHuntPdfColumns().items;
+        const evidenceWidth = columns[1].width - 16;
+        const definitionLines = this.getPdfTextLines(pdf, row.entry.definition || 'Missing definition', evidenceWidth, 9);
+        const examplesText = [
+            row.entry.exampleOne ? `1. ${row.entry.exampleOne}` : '',
+            row.entry.exampleTwo ? `2. ${row.entry.exampleTwo}` : ''
+        ].filter(Boolean).join('\n') || 'Missing two examples';
+        const exampleLines = this.getPdfTextLines(pdf, examplesText, evidenceWidth, 9);
+        const evidenceHeight = 13 + (definitionLines.length * 11) + 16 + 13 + (exampleLines.length * 11);
+        const statusHeight = 24 + (4 * 18);
+        return Math.max(104, evidenceHeight + 18, statusHeight + 18);
+    }
+
+    static drawWordHuntStatusBadge(pdf, label, x, y, options = {}) {
+        const done = Boolean(options.done);
+        const width = options.width || (done ? 34 : 42);
+        pdf.setFillColor(...(done ? [209, 250, 229] : [254, 226, 226]));
+        pdf.roundedRect(x, y - 9, width, 14, 7, 7, 'F');
+        this.setPdfTextStyle(pdf, {
+            size: 7,
+            style: 'bold',
+            color: done ? [6, 95, 70] : [153, 27, 27]
+        });
+        pdf.text(label, x + width / 2, y + 1, { align: 'center' });
+    }
+
+    static drawWordHuntPdfRow(pdf, row, y, height) {
+        const columns = this.getWordHuntPdfColumns().items;
+        const padding = 8;
+
+        pdf.setDrawColor(229, 231, 235);
+        pdf.rect(columns[0].x, y, columns.reduce((sum, column) => sum + column.width, 0), height);
+        columns.slice(1).forEach(column => {
+            pdf.line(column.x, y, column.x, y + height);
+        });
+
+        this.drawWrappedPdfText(pdf, row.word, columns[0].x + padding, y + 18, columns[0].width - (padding * 2), {
+            size: 9,
+            style: 'bold',
+            color: [31, 41, 55],
+            lineHeight: 11
+        });
+
+        let textY = y + 16;
+        this.setPdfTextStyle(pdf, { size: 7, style: 'bold', color: [107, 114, 128] });
+        pdf.text('DEFINITION', columns[1].x + padding, textY);
+        textY += 12;
+        textY = this.drawWrappedPdfText(
+            pdf,
+            row.entry.definition || 'Missing definition',
+            columns[1].x + padding,
+            textY,
+            columns[1].width - (padding * 2),
+            {
+                size: 9,
+                color: row.entry.definition ? [55, 65, 81] : [156, 163, 175],
+                style: row.entry.definition ? 'normal' : 'italic',
+                lineHeight: 11
+            }
+        );
+        textY += 8;
+        this.setPdfTextStyle(pdf, { size: 7, style: 'bold', color: [107, 114, 128] });
+        pdf.text('EXAMPLES', columns[1].x + padding, textY);
+        textY += 12;
+        const examples = [
+            row.entry.exampleOne ? `1. ${row.entry.exampleOne}` : '',
+            row.entry.exampleTwo ? `2. ${row.entry.exampleTwo}` : ''
+        ].filter(Boolean).join('\n');
+        this.drawWrappedPdfText(
+            pdf,
+            examples || 'Missing two examples',
+            columns[1].x + padding,
+            textY,
+            columns[1].width - (padding * 2),
+            {
+                size: 9,
+                color: examples ? [55, 65, 81] : [156, 163, 175],
+                style: examples ? 'normal' : 'italic',
+                lineHeight: 11
+            }
+        );
+
+        if (row.imageDataUrl && row.imageSize) {
+            const maxWidth = columns[2].width - (padding * 2);
+            const maxHeight = Math.min(76, height - 18);
+            const ratio = Math.min(maxWidth / row.imageSize.width, maxHeight / row.imageSize.height);
+            const imageWidth = row.imageSize.width * ratio;
+            const imageHeight = row.imageSize.height * ratio;
+            const imageX = columns[2].x + (columns[2].width - imageWidth) / 2;
+            const imageY = y + 14;
+            pdf.addImage(row.imageDataUrl, 'PNG', imageX, imageY, imageWidth, imageHeight);
+        } else {
+            this.setPdfTextStyle(pdf, { size: 9, style: 'italic', color: [107, 114, 128] });
+            pdf.text('No image saved', columns[2].x + padding, y + 24);
+        }
+
+        const provided = {
+            definition: Boolean(String(row.entry.definition || '').trim()),
+            image: Boolean(row.imageDataUrl),
+            exampleOne: Boolean(String(row.entry.exampleOne || '').trim()),
+            exampleTwo: Boolean(String(row.entry.exampleTwo || '').trim())
+        };
+        const hasSavedWork = Object.values(provided).some(Boolean);
+        this.drawWordHuntStatusBadge(pdf, hasSavedWork ? 'Saved' : 'Review', columns[3].x + padding, y + 18, {
+            done: hasSavedWork,
+            width: hasSavedWork ? 42 : 46
+        });
+        [
+            ['Definition', provided.definition],
+            ['Image', provided.image],
+            ['Example 1', provided.exampleOne],
+            ['Example 2', provided.exampleTwo]
+        ].forEach(([label, done], index) => {
+            const itemY = y + 42 + (index * 18);
+            this.setPdfTextStyle(pdf, { size: 8, style: 'bold', color: [55, 65, 81] });
+            pdf.text(label, columns[3].x + padding, itemY);
+            this.drawWordHuntStatusBadge(pdf, done ? 'Done' : 'Review', columns[3].x + columns[3].width - 44, itemY, {
+                done,
+                width: done ? 34 : 42
+            });
+        });
+    }
+
+    static async buildWordHuntPdfRows(vocabName, words, options = {}) {
+        const wordHunt = options.wordHunt || {};
+        const fallbackWords = words.length > 0
+            ? words
+            : (await this.getWordsFromImageDB(vocabName)).map(word => ({ word }));
+        const sourceWords = this.mergeSavedWordHuntWords(fallbackWords, wordHunt);
+        const rows = [];
+
+        for (const wordObj of sourceWords) {
+            const word = wordObj.word || '';
+            const entry = wordHunt[word] || {};
+            const imageBlob = await this.loadWordHuntImageBlob(vocabName, word, entry, options);
+            const imageDataUrl = await this.normalizePdfImageDataUrl(await this.blobToDataUrl(imageBlob));
+            rows.push({
+                word,
+                entry,
+                imageDataUrl,
+                imageSize: await this.getImageSize(imageDataUrl)
+            });
+        }
+
+        return rows;
     }
 
     static hasMeaningfulWordHuntText(value, rules = WORD_HUNT_TEXT_RULES.definition) {
@@ -371,84 +619,64 @@ export class ReportGenerator {
         const vocabName = this.getVocabName(vocabOrName);
         const subjectName = this.getSubjectName(vocabOrName);
         const { fullName, grade, group } = this.getStudentInfo(studentProfile);
-        const objectUrls = [];
-        const reportCard = createElement('div', 'report-card word-hunt-report-card');
-
-        reportCard.style.padding = '3rem';
-        reportCard.style.background = 'white';
-        reportCard.style.color = '#1f2937';
-        reportCard.style.borderRadius = '0';
-        reportCard.style.width = '800px';
-        reportCard.style.fontFamily = "'Inter', sans-serif";
-        reportCard.style.position = 'fixed';
-        reportCard.style.top = '-9999px';
-        reportCard.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-
-        reportCard.innerHTML = `
-            <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-                <div>
-                    <h1 style="font-size: 2rem; font-weight: 800; color: #111827; margin: 0;">Word Hunt Submission</h1>
-                    <p style="color: #6b7280; margin-top: 0.5rem;">Generated on ${new Date().toLocaleDateString()}</p>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 1.4rem; font-weight: bold; color: #4f46e5;">${vocabName}</div>
-                    <div style="font-size: 0.95rem; color: #6b7280;">${subjectName}</div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 2rem; background: #f9fafb; padding: 1.5rem; border-radius: 0.5rem;">
-                <h2 style="font-size: 1.25rem; font-weight: 600; margin: 0 0 1rem 0; color: #374151;">Student Information</h2>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                    <div>
-                        <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.25rem 0;">Name</p>
-                        <p style="font-size: 1.125rem; font-weight: 500; margin: 0;">${fullName}</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.25rem 0;">Grade</p>
-                        <p style="font-size: 1.125rem; font-weight: 500; margin: 0;">${grade || '-'}</p>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.875rem; color: #6b7280; margin: 0 0 0.25rem 0;">Group</p>
-                        <p style="font-size: 1.125rem; font-weight: 500; margin: 0;">${group || '-'}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="word-hunt-details"></div>
-        `;
-
-        document.body.appendChild(reportCard);
 
         try {
-            const html2canvas = await this.ensureHtml2Canvas();
-
-            const detailsContainer = reportCard.querySelector('#word-hunt-details');
-            const section = createElement('div');
             const words = this.getWordHuntWords(vocabOrName);
-            await this.renderWordHuntTable(section, vocabName, words, {
-                ...options,
-                objectUrls
-            });
-            detailsContainer.appendChild(section);
-
-            await this.waitForImages(reportCard);
-            const canvas = await html2canvas(reportCard, {
-                backgroundColor: '#ffffff',
-                logging: false,
-                scale: 2,
-                useCORS: true,
-                windowHeight: reportCard.scrollHeight,
-                windowWidth: reportCard.scrollWidth
-            });
+            const rows = await this.buildWordHuntPdfRows(vocabName, words, options);
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: PDF_PAGE_FORMAT });
-            this.addCanvasToPdf(pdf, canvas);
+
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 42;
+            const bottomMargin = 42;
+            let pageNumber = 1;
+            let y = this.drawWordHuntPdfHeader(pdf, {
+                vocabName,
+                subjectName,
+                fullName,
+                grade,
+                group,
+                pageNumber
+            });
+
+            if (rows.length === 0) {
+                this.setPdfTextStyle(pdf, { size: 11, style: 'italic', color: [107, 114, 128] });
+                pdf.text('No Word Hunt work saved yet.', margin, y + 18);
+            } else {
+                y = this.drawWordHuntPdfTableHeader(pdf, y);
+                for (const row of rows) {
+                    const rowHeight = this.getWordHuntPdfRowHeight(pdf, row);
+                    if (y + rowHeight > pageHeight - bottomMargin) {
+                        pdf.addPage(PDF_PAGE_FORMAT, 'portrait');
+                        pageNumber += 1;
+                        y = this.drawWordHuntPdfHeader(pdf, {
+                            vocabName,
+                            subjectName,
+                            fullName,
+                            grade,
+                            group,
+                            pageNumber
+                        });
+                        y = this.drawWordHuntPdfTableHeader(pdf, y);
+                    }
+
+                    this.drawWordHuntPdfRow(pdf, row, y, rowHeight);
+                    y += rowHeight;
+                }
+            }
+
+            const totalPages = pdf.getNumberOfPages();
+            for (let index = 1; index <= totalPages; index += 1) {
+                pdf.setPage(index);
+                this.setPdfTextStyle(pdf, { size: 8, color: [107, 114, 128] });
+                pdf.text(`Page ${index} of ${totalPages}`, pdf.internal.pageSize.getWidth() - margin, pageHeight - 20, {
+                    align: 'right'
+                });
+            }
+
             pdf.save(this.buildWordHuntFileName(studentProfile, vocabOrName, options));
         } catch (err) {
             console.error('Word Hunt report generation failed:', err);
             alert('Failed to generate Word Hunt download.');
-        } finally {
-            objectUrls.forEach(url => URL.revokeObjectURL(url));
-            document.body.removeChild(reportCard);
         }
     }
 

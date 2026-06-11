@@ -265,8 +265,9 @@ export class IllustrationActivity {
         const contextLine = classMeaning
             ? `\nMeaning hint: ${classMeaningSentence}`
             : '';
-        const definitionPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nLanguage: English only.\nTask: Write one short, student-friendly definition. Use the meaning that fits this class.`;
-        const examplesPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nLanguage: English only.\nTask: Write exactly 2 student-friendly example sentences. Use the meaning that fits this class. Number them 1 and 2.`;
+        const responseRule = 'Answer only the requested content. Do not add explanations, follow-up questions, offers to help, lesson ideas, quizzes, or extra suggestions.';
+        const definitionPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nLanguage: English only.\nResponse rule: ${responseRule}\nTask: Write one short, student-friendly definition. Use the meaning that fits this class.`;
+        const examplesPrompt = `Vocabulary word: "${searchTerm}"\nClass context: ${classContext}.${contextLine}\nLanguage: English only.\nResponse rule: ${responseRule}\nTask: Write exactly 2 student-friendly example sentences. Use the meaning that fits this class. Number them 1 and 2.`;
         const aiModeUrl = prompt => `https://www.google.com/aimode?q=${encodeURIComponent(prompt)}`;
         const links = [
             ['Definition', aiModeUrl(definitionPrompt)],
