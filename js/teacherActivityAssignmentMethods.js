@@ -144,8 +144,8 @@ const teacherActivityAssignmentMethods = {
             renderTeacherActivityAssignmentBrowser(this, container);
         },
 
-        renderActivityAssignmentBreadcrumb(container, selectedSubject = null, selectedGrade = null) {
-            renderTeacherActivityAssignmentBreadcrumb(this, container, selectedSubject, selectedGrade);
+        renderActivityAssignmentBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null) {
+            renderTeacherActivityAssignmentBreadcrumb(this, container, selectedSubject, selectedGrade, selectedTrimester);
         },
 
         formatAssignmentReviewSummary(assignments = []) {
@@ -160,8 +160,8 @@ const teacherActivityAssignmentMethods = {
             renderTeacherActivityAssignmentGradePicker(this, container, selectedSubject, gradeGroups);
         },
 
-        renderActivityAssignmentClassBrowser(container, selectedSubject, selectedGrade, assignments) {
-            renderTeacherActivityAssignmentClassBrowser(this, container, selectedSubject, selectedGrade, assignments);
+        renderActivityAssignmentClassBrowser(container, selectedSubject, selectedGrade, selectedTrimester, assignments) {
+            renderTeacherActivityAssignmentClassBrowser(this, container, selectedSubject, selectedGrade, selectedTrimester, assignments);
         },
 
         getActivityAssignmentSortValue(assignment = {}) {

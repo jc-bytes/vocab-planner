@@ -16,11 +16,13 @@ import {
     renderTeacherActivityLibraryBrowser,
     renderTeacherActivityMonthPicker,
     renderTeacherActivitySubjectPicker,
+    renderTeacherActivityTrimesterPicker,
     renderTeacherActivityWeekPicker
 } from './teacherActivityLibraryRenderers.js';
 import {
     buildTeacherActivityLibraryGroups,
     buildTeacherActivityMonthWeekGroups,
+    buildTeacherActivityTrimesterGroups,
     collapseDuplicateTeacherActivityItems,
     compareTeacherActivityGroupGrades,
     compareTeacherActivityPlacement,
@@ -29,6 +31,7 @@ import {
     formatTeacherActivityGroupGradeLabel,
     formatTeacherActivityMonthSummary,
     formatTeacherActivityTemplateSummary,
+    formatTeacherActivityTrimesterSummary,
     formatTeacherActivityTypeSummary,
     formatTeacherActivityUpdatedLabel,
     formatTeacherActivityWeekLabel,
@@ -44,6 +47,7 @@ import {
     getTeacherActivityTemplateLabel,
     getTeacherActivityTemplateType,
     getTeacherActivityTimestamp,
+    getTeacherActivityTrimesterKey,
     getTeacherActivityTypeLabel,
     getTeacherActivityWeekKey,
     getTeacherActivityWeekOrder,
@@ -166,6 +170,7 @@ const teacherActivityLibraryMethods = {
                 view: 'activities',
                 subject: this.activityDrilldown.subject,
                 grade: this.activityDrilldown.grade,
+                trimester: this.activityDrilldown.trimester,
                 month: this.activityDrilldown.month,
                 week: this.activityDrilldown.week,
                 mode: this.activityMode
@@ -173,7 +178,9 @@ const teacherActivityLibraryMethods = {
             this.switchView('teacher-activities-view');
             this.setActivityWorkflowTab(this.activityMode || 'assign');
             await this.loadActivityLibrary();
-            await this.loadActivityAssignments();
+            if (this.activityMode === 'review') {
+                await this.loadActivityAssignments();
+            }
         },
 
         setActivityWorkflowTab(mode = 'assign', options = {}) {
@@ -200,13 +207,8 @@ const teacherActivityLibraryMethods = {
                     this.renderActivityLibraryBrowser();
                 }
             }
-            if (nextMode === 'review' && this.activityAssignmentsLoaded) {
-                const list = $('#activity-assignment-list');
-                if (list && this.activityAssignmentItems.length === 0) {
-                    list.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
-                } else {
-                    this.renderActivityAssignmentBrowser();
-                }
+            if (nextMode === 'review' && !this.activityAssignmentRefreshing) {
+                this.loadActivityAssignments();
             }
 
             if (options.updateRoute !== false) {
@@ -283,6 +285,7 @@ const teacherActivityLibraryMethods = {
             this.activityDrilldown = {
                 subject: null,
                 grade: null,
+                trimester: null,
                 month: null,
                 week: null
             };
@@ -312,8 +315,8 @@ const teacherActivityLibraryMethods = {
             renderTeacherActivityLibraryBrowser(this, container);
         },
 
-        renderActivityLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedMonth = null, selectedWeek = null) {
-            renderTeacherActivityLibraryBreadcrumb(this, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+        renderActivityLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null, selectedWeek = null) {
+            renderTeacherActivityLibraryBreadcrumb(this, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
         },
 
         formatActivityTemplateSummary(activityItems = []) {
@@ -328,6 +331,10 @@ const teacherActivityLibraryMethods = {
             return formatTeacherActivityMonthSummary(this, monthGroups);
         },
 
+        formatActivityTrimesterSummary(trimesterGroups) {
+            return formatTeacherActivityTrimesterSummary(this, trimesterGroups);
+        },
+
         formatActivityWeekSummary(weekGroups) {
             return formatTeacherActivityWeekSummary(this, weekGroups);
         },
@@ -340,16 +347,20 @@ const teacherActivityLibraryMethods = {
             renderTeacherActivityGradePicker(this, container, selectedSubject, gradeGroups);
         },
 
-        renderActivityMonthPicker(container, selectedSubject, selectedGrade, monthGroups) {
-            renderTeacherActivityMonthPicker(this, container, selectedSubject, selectedGrade, monthGroups);
+        renderActivityMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups) {
+            renderTeacherActivityMonthPicker(this, container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
         },
 
-        renderActivityWeekPicker(container, selectedSubject, selectedGrade, selectedMonth, weekGroups) {
-            renderTeacherActivityWeekPicker(this, container, selectedSubject, selectedGrade, selectedMonth, weekGroups);
+        renderActivityTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups) {
+            renderTeacherActivityTrimesterPicker(this, container, selectedSubject, selectedGrade, trimesterGroups);
         },
 
-        renderActivityClassBrowser(container, selectedSubject, selectedGrade, selectedMonth, selectedWeek, activityItems) {
-            renderTeacherActivityClassBrowser(this, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek, activityItems);
+        renderActivityWeekPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, weekGroups) {
+            renderTeacherActivityWeekPicker(this, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, weekGroups);
+        },
+
+        renderActivityClassBrowser(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek, activityItems) {
+            renderTeacherActivityClassBrowser(this, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek, activityItems);
         },
 
         getActivitySortName(activity) {
@@ -362,6 +373,10 @@ const teacherActivityLibraryMethods = {
 
         getActivityMonthKey(activity = {}) {
             return getTeacherActivityMonthKey(this, activity);
+        },
+
+        getActivityTrimesterKey(activity = {}) {
+            return getTeacherActivityTrimesterKey(this, activity);
         },
 
         inferActivityWeek(activity = {}) {
@@ -394,6 +409,10 @@ const teacherActivityLibraryMethods = {
 
         buildActivityMonthWeekGroups(activityItems = []) {
             return buildTeacherActivityMonthWeekGroups(this, activityItems);
+        },
+
+        buildActivityTrimesterGroups(activityItems = []) {
+            return buildTeacherActivityTrimesterGroups(this, activityItems);
         },
 
         getActivityPlacementSortValue(activity = {}) {

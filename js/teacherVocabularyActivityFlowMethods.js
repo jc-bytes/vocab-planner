@@ -3,7 +3,8 @@ import {
     DEFAULT_PRACTICE_REQUIRED_ROTATION,
     DEFAULT_REQUIRED_BY_PURPOSE,
     VOCAB_ACTIVITY_IDS,
-    VOCAB_ACTIVITY_OPTIONS
+    VOCAB_ACTIVITY_OPTIONS,
+    VOCAB_ACTIVITY_SETTING_KEYS
 } from './teacherVocabularyEditorConstants.js';
 
 class TeacherVocabularyActivityFlowMethods {
@@ -98,6 +99,57 @@ class TeacherVocabularyActivityFlowMethods {
         this.vocabSet.activitySettings.requiredActivities = [...new Set(required)];
         this.vocabSet.activitySettings.additionalActivities = [...new Set(additional)];
         this.renderActivityFlowSettings();
+        this.renderWords();
+        this.triggerAutoSave();
+        this.updateVocabularyEditorSummary();
+    }
+
+    setActivityWordCount(activityId, value) {
+        const settingKey = VOCAB_ACTIVITY_SETTING_KEYS[activityId];
+        if (!settingKey) return;
+        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+
+        const parsedValue = Number.parseInt(value, 10);
+        if (Number.isFinite(parsedValue) && parsedValue > 0) {
+            this.vocabSet.activitySettings[settingKey] = parsedValue;
+        } else {
+            delete this.vocabSet.activitySettings[settingKey];
+        }
+
+        this.triggerAutoSave();
+    }
+
+    getActivityRewardSettings(activityId) {
+        const settings = this.vocabSet?.activitySettings || {};
+        const activityRewards = settings.activityRewards || {};
+        const rewardSettings = activityRewards[activityId] || {};
+
+        return {
+            completionBonus: rewardSettings.completionBonus !== undefined
+                ? rewardSettings.completionBonus
+                : (settings.completionBonus !== undefined ? settings.completionBonus : 50),
+            progressReward: rewardSettings.progressReward !== undefined
+                ? rewardSettings.progressReward
+                : (settings.progressReward !== undefined ? settings.progressReward : 1)
+        };
+    }
+
+    setActivityRewardSetting(activityId, field, value) {
+        if (!VOCAB_ACTIVITY_IDS.includes(activityId)) return;
+        if (!['completionBonus', 'progressReward'].includes(field)) return;
+        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+        if (!this.vocabSet.activitySettings.activityRewards) {
+            this.vocabSet.activitySettings.activityRewards = {};
+        }
+        if (!this.vocabSet.activitySettings.activityRewards[activityId]) {
+            this.vocabSet.activitySettings.activityRewards[activityId] = {};
+        }
+
+        const fallback = field === 'completionBonus' ? 50 : 1;
+        const parsedValue = Number.parseInt(value, 10);
+        this.vocabSet.activitySettings.activityRewards[activityId][field] =
+            Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : fallback;
+
         this.triggerAutoSave();
     }
 
@@ -106,6 +158,7 @@ class TeacherVocabularyActivityFlowMethods {
         if (!container) return;
 
         const flow = this.getActivityFlowConfig(this.vocabSet);
+        const settings = this.vocabSet?.activitySettings || {};
         container.innerHTML = '';
 
         VOCAB_ACTIVITY_OPTIONS.forEach(activity => {
@@ -114,15 +167,22 @@ class TeacherVocabularyActivityFlowMethods {
                 : flow.additional.includes(activity.id)
                     ? 'additional'
                     : 'hidden';
-            const group = createElement('div', 'form-group');
-            group.style.cssText = 'background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem;';
+            const settingKey = activity.settingKey || VOCAB_ACTIVITY_SETTING_KEYS[activity.id];
+            const wordCount = settings[settingKey];
+            const rewardSettings = this.getActivityRewardSettings(activity.id);
+            const disabled = currentValue === 'hidden' ? ' disabled' : '';
+            const group = createElement('div', `form-group activity-flow-choice${currentValue === 'hidden' ? ' is-hidden' : ''}`);
+            group.setAttribute('role', 'row');
             group.innerHTML = `
-                <label for="flow-${activity.id}" style="display:block; margin-bottom:0.35rem;">${activity.label}</label>
+                <label for="flow-${activity.id}" role="cell">${activity.label}</label>
                 <select id="flow-${activity.id}" class="activity-flow-select" data-activity="${activity.id}">
                     <option value="required"${currentValue === 'required' ? ' selected' : ''}>Required</option>
                     <option value="additional"${currentValue === 'additional' ? ' selected' : ''}>Additional</option>
                     <option value="hidden"${currentValue === 'hidden' ? ' selected' : ''}>Hidden</option>
                 </select>
+                <input type="number" min="1" placeholder="All" aria-label="${activity.label} words" data-activity-word-count="${activity.id}" value="${wordCount || ''}"${disabled}>
+                <input type="number" min="0" aria-label="${activity.label} completion coins" data-activity-reward="completionBonus" data-activity="${activity.id}" value="${rewardSettings.completionBonus}"${disabled}>
+                <input type="number" min="0" aria-label="${activity.label} progress coins" data-activity-reward="progressReward" data-activity="${activity.id}" value="${rewardSettings.progressReward}"${disabled}>
             `;
             container.appendChild(group);
         });

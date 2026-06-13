@@ -70,6 +70,13 @@ class StudentActivityProgressFlowMethods {
     getWordHuntWords(settings = {}) {
         if (!this.sm.currentVocab?.words) return [];
 
+        const flow = this.getActivityFlowConfig(this.sm.currentVocab);
+        const wordHuntIsRequired = flow.required.includes('illustration');
+        const customSelection = settings.wordHuntSelectionMode === 'custom';
+        if (wordHuntIsRequired && !customSelection) {
+            return [...this.sm.currentVocab.words];
+        }
+
         const selectedWords = this.sm.currentVocab.words.filter(word => (
             word.wordHunt === true ||
             word.wordHunt === 'true' ||
@@ -79,7 +86,7 @@ class StudentActivityProgressFlowMethods {
             return selectedWords;
         }
 
-        const fallbackLimit = settings.illustration || 5;
+        const fallbackLimit = settings.illustration || this.sm.currentVocab.words.length;
         return this.sm.currentVocab.words.slice(0, fallbackLimit);
     }
 

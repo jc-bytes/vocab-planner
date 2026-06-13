@@ -32,6 +32,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     view: 'activities',
                     subject: params.get('subject') || null,
                     grade: params.get('grade') || null,
+                    trimester: params.get('trimester') || null,
                     month: params.get('month') || null,
                     week: params.get('week') || null,
                     mode: params.get('mode') === 'review' ? 'review' : 'assign'
@@ -40,7 +41,12 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
             if (parts[1] === 'quizzes') return { view: 'quizzes' };
             if (parts[1] === 'data-settings') return { view: 'data-settings', tab: params.get('tab') || undefined };
-            if (parts[1] === 'vocabulary' && parts[2] === 'editor') return { view: 'editor' };
+            if (parts[1] === 'vocabulary' && parts[2] === 'editor') {
+                return {
+                    view: 'editor',
+                    vocabularyId: parts[3] || params.get('id') || null
+                };
+            }
             if (parts[1] === 'vocabulary') {
                 return {
                     view: 'vocabulary',
@@ -64,6 +70,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 const params = new URLSearchParams();
                 if (route.subject) params.set('subject', route.subject);
                 if (route.grade) params.set('grade', route.grade);
+                if (route.mode !== 'review' && route.trimester) params.set('trimester', route.trimester);
                 if (route.mode !== 'review' && route.month) params.set('month', route.month);
                 if (route.mode !== 'review' && route.week) params.set('week', route.week);
                 if (route.mode === 'review') params.set('mode', 'review');
@@ -76,7 +83,11 @@ export function installTeacherRoutingMethods(TeacherManager) {
             }
             if (route.view === 'quizzes') return '#/teacher/quizzes';
             if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
-            if (route.view === 'editor') return '#/teacher/vocabulary/editor';
+            if (route.view === 'editor') {
+                return route.vocabularyId
+                    ? `#/teacher/vocabulary/editor/${encodeURIComponent(route.vocabularyId)}`
+                    : '#/teacher/vocabulary/editor';
+            }
             if (route.view === 'data-settings') {
                 const params = new URLSearchParams();
                 if (route.tab) params.set('tab', route.tab);
@@ -105,12 +116,18 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     month: this.libraryDrilldown.month
                 };
             }
-            if (viewId === 'teacher-editor-view') return { view: 'editor' };
+            if (viewId === 'teacher-editor-view') {
+                return {
+                    view: 'editor',
+                    vocabularyId: this.vocabSet?.id || null
+                };
+            }
             if (viewId === 'teacher-activities-view') {
                 return {
                     view: 'activities',
                     subject: this.activityDrilldown.subject,
                     grade: this.activityDrilldown.grade,
+                    trimester: this.activityDrilldown.trimester,
                     month: this.activityDrilldown.month,
                     week: this.activityDrilldown.week,
                     mode: this.activityMode
@@ -160,6 +177,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 view: 'activities',
                 subject: this.activityDrilldown.subject,
                 grade: this.activityDrilldown.grade,
+                trimester: this.activityDrilldown.trimester,
                 month: this.activityDrilldown.month,
                 week: this.activityDrilldown.week,
                 mode: this.activityMode
@@ -206,12 +224,17 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             await this.loadLibrary();
                             break;
                         case 'editor':
-                            this.showEditor();
+                            if (routeToApply.vocabularyId && routeToApply.vocabularyId !== this.vocabSet?.id) {
+                                await this.loadVocabularyById(routeToApply.vocabularyId);
+                            } else {
+                                this.showEditor();
+                            }
                             break;
                         case 'activities':
                             this.activityDrilldown = {
                                 subject: routeToApply.subject || null,
                                 grade: routeToApply.grade || null,
+                                trimester: routeToApply.trimester ? this.normalizeTeacherTrimester(routeToApply.trimester) : null,
                                 month: routeToApply.month ? this.normalizeTeacherMonth(routeToApply.month) : null,
                                 week: routeToApply.week ? this.normalizeActivityWeekKey(routeToApply.week) : null
                             };

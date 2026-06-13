@@ -93,7 +93,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
                 .map(student => ({ student, time: this.getStudentUpdatedTime(student) }))
                 .filter(item => item.time)
                 .sort((a, b) => b.time - a.time)
-                .slice(0, 6);
+                .slice(0, 20);
 
             if (recent.length === 0) {
                 container.innerHTML = '<p class="teacher-empty-state">No recent student activity yet.</p>';

@@ -42,6 +42,13 @@ export class ReportGenerator {
 
     static getWordHuntWords(vocabOrName) {
         const allWords = Array.isArray(vocabOrName?.words) ? vocabOrName.words : [];
+        const settings = vocabOrName?.activitySettings || {};
+        const wordHuntIsRequired = Array.isArray(settings.requiredActivities)
+            && settings.requiredActivities.includes('illustration');
+        if (wordHuntIsRequired && settings.wordHuntSelectionMode !== 'custom') {
+            return allWords;
+        }
+
         const selectedWords = allWords.filter(word => (
             word.wordHunt === true ||
             word.wordHunt === 'true' ||

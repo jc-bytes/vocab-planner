@@ -257,6 +257,13 @@ export function formatTeacherActivityMonthSummary(manager, monthGroups) {
         .join(' · ');
 }
 
+export function formatTeacherActivityTrimesterSummary(manager, trimesterGroups) {
+    return Array.from(trimesterGroups.entries())
+        .sort(([trimesterA], [trimesterB]) => manager.getTeacherTrimesterOrder(trimesterA) - manager.getTeacherTrimesterOrder(trimesterB))
+        .map(([trimesterKey, activityItems]) => `${manager.getTeacherTrimesterShortLabel(trimesterKey)}: ${activityItems.length}`)
+        .join(' · ');
+}
+
 export function formatTeacherActivityWeekSummary(manager, weekGroups) {
     return Array.from(weekGroups.entries())
         .sort(([weekA], [weekB]) => manager.getActivityWeekOrder(weekA) - manager.getActivityWeekOrder(weekB))
@@ -286,6 +293,22 @@ export function getTeacherActivityMonthKey(manager, activity = {}) {
     const source = getTeacherActivityPlacementSource(activity);
     const monthMatch = source.match(/(?:^|[^a-z])(january|jan|february|feb|march|mar|april|apr|may|june|jun|july|jul|august|aug|september|sept|sep|october|oct|november|nov|december|dec)(?=[^a-z]|$)/i);
     return manager.normalizeTeacherMonth(monthMatch?.[1]);
+}
+
+export function getTeacherActivityTrimesterKey(manager, activity = {}) {
+    const explicitTrimester = manager.normalizeTeacherTrimester(activity?.trimester);
+    if (explicitTrimester !== 'other') return explicitTrimester;
+
+    const monthKey = manager.getActivityMonthKey(activity);
+    if (['march', 'april', 'may'].includes(monthKey)) return 'IT';
+    if (['june', 'july', 'august'].includes(monthKey)) return 'IIT';
+    if (['september', 'october', 'november', 'december'].includes(monthKey)) return 'IIIT';
+
+    const source = getTeacherActivityPlacementSource(activity);
+    const shorthandMatch = source.match(/(?:^|[\s_-])t\s*([123])(?:[\s_-]|$)/i);
+    const wordMatch = source.match(/\btrimester\s*([123])\b/i);
+    const inferred = shorthandMatch?.[1] || wordMatch?.[1] || '';
+    return manager.normalizeTeacherTrimester(inferred);
 }
 
 export function inferTeacherActivityWeek(activity = {}) {
@@ -355,6 +378,23 @@ export function buildTeacherActivityMonthWeekGroups(manager, activityItems = [])
     });
 
     return monthGroups;
+}
+
+export function buildTeacherActivityTrimesterGroups(manager, activityItems = []) {
+    const trimesterGroups = new Map();
+
+    activityItems.forEach(({ activity, type }) => {
+        const normalized = manager.normalizeActivity(activity);
+        const trimesterKey = manager.getActivityTrimesterKey(normalized);
+
+        if (!trimesterGroups.has(trimesterKey)) {
+            trimesterGroups.set(trimesterKey, []);
+        }
+
+        trimesterGroups.get(trimesterKey).push({ activity: normalized, type });
+    });
+
+    return trimesterGroups;
 }
 
 export function getTeacherActivityPlacementSortValue(manager, activity = {}) {

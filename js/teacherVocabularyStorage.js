@@ -114,8 +114,7 @@ class TeacherVocabularyStorageMethods {
             if (type === 'remote') {
                 this.loadVocabularyFromPath(vocab.path);
             } else if (type === 'cloud') {
-                this.vocabSet.source = 'cloud';
-                this.loadVocabularyObject(vocab);
+                this.loadVocabularyObject(vocab, { source: 'cloud' });
             } else {
                 this.loadLocalVocabulary(vocab);
             }
@@ -165,24 +164,63 @@ class TeacherVocabularyStorageMethods {
 
     loadLocalVocabulary(vocab) {
         if (!this.ensureAuthenticated()) return;
-        this.loadVocabularyObject(vocab);
+        this.loadVocabularyObject(vocab, { source: 'local' });
     }
 
     async loadVocabularyFromPath(path) {
         if (!this.ensureAuthenticated()) return;
         const data = await loadVocabularyFile(path);
         if (data) {
-            this.loadVocabularyObject(data);
+            this.loadVocabularyObject(data, { source: 'remote', path });
         } else {
             alert('Failed to load vocabulary file.');
         }
     }
 
-    loadVocabularyObject(vocab) {
+    async loadVocabularyById(vocabularyId) {
+        if (!this.ensureAuthenticated(false)) return false;
+        const id = String(vocabularyId || '').trim();
+        if (!id) {
+            this.showEditor();
+            return false;
+        }
+
+        this.setCloudStatus('Loading vocabulary...', 'info');
+
+        try {
+            const library = await this.getTeacherLibrary();
+            const item = library.items.find(({ vocab }) => vocab?.id === id);
+            if (!item) {
+                notifications.warning('That vocabulary could not be found. Returning to the library.');
+                this.showVocabularyLibrary();
+                return false;
+            }
+
+            if (item.type === 'remote') {
+                const path = item.vocab.path;
+                const data = await loadVocabularyFile(path);
+                if (!data) throw new Error(`Could not load vocabulary file ${path}`);
+                this.loadVocabularyObject(data, { source: 'remote', path });
+            } else {
+                this.loadVocabularyObject(item.vocab, { source: item.type });
+            }
+            return true;
+        } catch (error) {
+            console.error('Failed to restore vocabulary route:', error);
+            notifications.error('Could not reopen that vocabulary after refresh.');
+            this.showVocabularyLibrary();
+            return false;
+        }
+    }
+
+    loadVocabularyObject(vocab, options = {}) {
         const clone = JSON.parse(JSON.stringify(vocab));
         delete clone.__source;
+        if (options.source) clone.source = options.source;
+        if (options.path) clone.path = options.path;
         clone.subjectSlug = getVocabSubjectSlug(clone);
         this.vocabSet = clone;
+        this.autoGenerateVocabId = false;
         this.updateFormUI();
         this.renderWords();
         this.showEditor();

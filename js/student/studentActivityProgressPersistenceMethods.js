@@ -3,12 +3,23 @@ import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 
 class StudentActivityProgressPersistenceMethods {
+    getActivityCoinRewards(activityType, settings = {}) {
+        const activityRewards = settings.activityRewards?.[activityType] || {};
+        return {
+            progressReward: activityRewards.progressReward !== undefined
+                ? activityRewards.progressReward
+                : (settings.progressReward !== undefined ? settings.progressReward : 1),
+            completionBonus: activityRewards.completionBonus !== undefined
+                ? activityRewards.completionBonus
+                : (settings.completionBonus !== undefined ? settings.completionBonus : 50)
+        };
+    }
+
     handleAutoSave(scoreData) {
         if (this.sm.currentVocab && this.sm.currentActivityType) {
             const activityType = this.sm.currentActivityType;
             const settings = this.sm.currentVocab.activitySettings || {};
-            const progressReward = settings.progressReward !== undefined ? settings.progressReward : 1;
-            const completionBonus = settings.completionBonus !== undefined ? settings.completionBonus : 50;
+            const { progressReward, completionBonus } = this.getActivityCoinRewards(activityType, settings);
 
             // Non-replayable activities (flashcards, illustration) - only reward first-time progress
             const nonReplayable = ['flashcards', 'illustration'];
@@ -85,7 +96,11 @@ class StudentActivityProgressPersistenceMethods {
             }
 
             this.sm.progress.saveLocalProgress();
-            this.syncActivityProgressToCloud(activityType, scoreData, settings);
+            this.syncActivityProgressToCloud(activityType, scoreData, {
+                ...settings,
+                progressReward,
+                completionBonus
+            });
             this.scheduleActivityPreload();
 
             // Update in-game progress indicator

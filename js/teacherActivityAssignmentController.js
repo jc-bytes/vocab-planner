@@ -12,6 +12,41 @@ import {
     where
 } from './services/teacherApi.js';
 
+const ACTIVITY_REVIEW_SUBMISSION_LIMIT = 1500;
+const ACTIVITY_REVIEW_ASSIGNMENT_CHUNK_SIZE = 100;
+
+function getActivityAssignmentCacheKey(manager) {
+    const drilldown = manager.activityDrilldown || {};
+    return [
+        drilldown.subject || '',
+        drilldown.grade || '',
+        drilldown.trimester || '',
+        drilldown.month || '',
+        drilldown.week || ''
+    ].join('|');
+}
+
+function chunkActivityIds(ids = [], size = ACTIVITY_REVIEW_ASSIGNMENT_CHUNK_SIZE) {
+    const chunks = [];
+    for (let index = 0; index < ids.length; index += size) {
+        chunks.push(ids.slice(index, index + size));
+    }
+    return chunks;
+}
+
+function filterAssignmentsForReviewDrilldown(manager, assignments = []) {
+    const drilldown = manager.activityDrilldown || {};
+    return assignments.filter(assignment => {
+        const normalized = manager.normalizeActivityAssignment(assignment);
+        if (drilldown.subject && normalized.subjectSlug !== drilldown.subject) return false;
+        if (drilldown.grade && !manager.getActivityAssignmentGroupGrades(normalized).includes(drilldown.grade)) return false;
+        if (drilldown.trimester && manager.getActivityTrimesterKey(normalized) !== drilldown.trimester) return false;
+        if (drilldown.month && manager.getActivityMonthKey(normalized) !== drilldown.month) return false;
+        if (drilldown.week && manager.getActivityWeekKey(normalized) !== drilldown.week) return false;
+        return true;
+    });
+}
+
 export function createTeacherActivityAssignmentSnapshot(manager, activity = manager.activity) {
     if (activity?.id && manager.activity?.id === activity.id) {
         manager.syncActivityWorkspace();
@@ -131,7 +166,9 @@ export async function saveTeacherActivityAssignment(manager, event) {
 
 export function invalidateTeacherActivityAssignmentCache(manager) {
     manager.activityAssignmentCache = null;
+    manager.activityAssignmentCacheKey = null;
     manager.activityAssignmentPromise = null;
+    manager.activityAssignmentPromiseKey = null;
     manager.activityAssignmentStale = true;
 }
 
@@ -149,12 +186,53 @@ export async function fetchTeacherActivityAssignments(manager) {
     if (!manager.ensureAuthenticated(false)) return [];
 
     try {
-        const db = supabaseService.getDatabase();
-        const snapshot = await getDocs(collection(db, manager.ACTIVITY_ASSIGNMENT_COLLECTION));
-        return snapshot.docs.map(docSnap => manager.normalizeActivityAssignment({
-            id: docSnap.id,
-            ...docSnap.data()
-        }));
+        await supabaseService.init();
+        const client = supabaseService.getClient();
+
+        const { data: submissionRows, error: submissionError } = await client
+            .from('classroom_activity_submissions')
+            .select('assignment_id, updated_at, submitted_at, started_at')
+            .order('updated_at', { ascending: false })
+            .limit(ACTIVITY_REVIEW_SUBMISSION_LIMIT);
+
+        if (submissionError) throw submissionError;
+
+        const assignmentIds = Array.from(new Set(
+            (submissionRows || [])
+                .map(row => String(row.assignment_id || '').trim())
+                .filter(Boolean)
+        ));
+
+        if (assignmentIds.length === 0) return [];
+
+        const assignments = [];
+        for (const idChunk of chunkActivityIds(assignmentIds)) {
+            let queryBuilder = client
+                .from('classroom_activity_assignments')
+                .select('*')
+                .in('id', idChunk)
+                .order('updated_at', { ascending: false });
+
+            if (manager.activityDrilldown?.subject) {
+                queryBuilder = queryBuilder.eq('subject_slug', manager.activityDrilldown.subject);
+            }
+            if (manager.activityDrilldown?.grade) {
+                queryBuilder = queryBuilder.contains('target_grades', [manager.activityDrilldown.grade]);
+            }
+
+            const { data: assignmentRows, error: assignmentError } = await queryBuilder;
+            if (assignmentError) throw assignmentError;
+
+            assignments.push(...(assignmentRows || []).map(row => manager.normalizeActivityAssignment(row)));
+        }
+
+        const assignmentOrder = new Map(assignmentIds.map((id, index) => [id, index]));
+        return filterAssignmentsForReviewDrilldown(manager, assignments)
+            .sort((assignmentA, assignmentB) => {
+                const orderA = assignmentOrder.get(assignmentA.id) ?? Number.MAX_SAFE_INTEGER;
+                const orderB = assignmentOrder.get(assignmentB.id) ?? Number.MAX_SAFE_INTEGER;
+                return orderA - orderB;
+            });
     } catch (error) {
         console.error('Failed to fetch activity assignments:', error);
         manager.activityAssignmentLastFetchFailed = true;
@@ -166,20 +244,24 @@ export async function fetchTeacherActivityAssignments(manager) {
 }
 
 export async function getTeacherActivityAssignments(manager, { forceRefresh = false } = {}) {
-    if (!forceRefresh && manager.activityAssignmentCache) {
+    const cacheKey = getActivityAssignmentCacheKey(manager);
+    if (!forceRefresh && manager.activityAssignmentCache && manager.activityAssignmentCacheKey === cacheKey) {
         return manager.activityAssignmentCache;
     }
-    if (!forceRefresh && manager.activityAssignmentPromise) {
+    if (!forceRefresh && manager.activityAssignmentPromise && manager.activityAssignmentPromiseKey === cacheKey) {
         return manager.activityAssignmentPromise;
     }
 
+    manager.activityAssignmentPromiseKey = cacheKey;
     manager.activityAssignmentPromise = manager.fetchActivityAssignments()
         .then(assignments => {
             manager.activityAssignmentCache = assignments;
+            manager.activityAssignmentCacheKey = cacheKey;
             return assignments;
         })
         .finally(() => {
             manager.activityAssignmentPromise = null;
+            manager.activityAssignmentPromiseKey = null;
         });
 
     return manager.activityAssignmentPromise;
@@ -221,7 +303,7 @@ export async function loadTeacherActivityAssignments(manager) {
         manager.activityAssignmentStale = false;
         if (assignments.length === 0) {
             if (manager.activityMode === 'review') {
-                list.innerHTML = '<p class="teacher-empty-state">No activities assigned yet.</p>';
+                list.innerHTML = '<p class="teacher-empty-state">No worked-on activity assignments here yet.</p>';
             }
             list.removeAttribute('aria-busy');
             return;

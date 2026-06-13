@@ -7,7 +7,9 @@ import {
 class TeacherVocabularyEditorCoreMethods {
     startNewVocab() {
         if (!this.ensureAuthenticated()) return;
-        this.vocabSet = { id: `custom_${Date.now()}`, name: 'New Vocabulary', description: '', subjectSlug: DEFAULT_SUBJECT_SLUG, grades: [], words: [] };
+        this.autoGenerateVocabId = true;
+        this.vocabSet = { id: '', name: 'New Vocabulary', description: '', subjectSlug: DEFAULT_SUBJECT_SLUG, grades: [], words: [] };
+        this.updateGeneratedVocabId();
         this.updateFormUI();
         this.renderWords();
         this.triggerAutoSave(); // Save immediately so it appears in library
@@ -30,28 +32,60 @@ class TeacherVocabularyEditorCoreMethods {
         $('#vocab-week').value = this.vocabSet.week || this.inferTeacherWeek(this.vocabSet) || '';
         this.updatePlacementControlState();
 
-        // Load activity settings
-        const settings = this.vocabSet.activitySettings || {};
-        $('#setting-flashcards').value = settings.flashcards || '';
-        $('#setting-matching').value = settings.matching || 10;
-        $('#setting-quiz').value = settings.quiz || 10;
-        $('#setting-synonym-antonym').value = settings.synonymAntonym || 10;
-        $('#setting-word-search').value = settings.wordSearch || 10;
-        $('#setting-illustration').value = settings.illustration || 5;
-        $('#setting-crossword').value = settings.crossword || 10;
-        $('#setting-hangman').value = settings.hangman || 10;
-        $('#setting-scramble').value = settings.scramble || 10;
-        $('#setting-wordle').value = settings.wordle || 10;
-        $('#setting-speed-match').value = settings.speedMatch || 10;
-        $('#setting-fill-in-blank').value = settings.fillInBlank || 10;
-
-        // Gamification Settings
-        $('#setting-completion-bonus').value = settings.completionBonus !== undefined ? settings.completionBonus : 50;
-        $('#setting-exchange-rate').value = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
-        $('#setting-progress-reward').value = settings.progressReward !== undefined ? settings.progressReward : 1;
-
         this.renderActivityFlowSettings();
+
+        const settings = this.vocabSet.activitySettings || {};
+        $('#setting-exchange-rate').value = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
         this.renderWords();
+        this.updateVocabularyEditorSummary();
+    }
+
+    getVocabularyPlacementSummary() {
+        const trimester = this.getTeacherTrimesterKey(this.vocabSet);
+        const month = this.getTeacherMonthKey(this.vocabSet);
+        const week = this.vocabSet.week || this.inferTeacherWeek(this.vocabSet);
+        const parts = [
+            trimester !== 'other' ? trimester : '',
+            month !== 'other' ? month.charAt(0).toUpperCase() + month.slice(1) : '',
+            week ? `Week ${week}` : ''
+        ].filter(Boolean);
+
+        return parts.length ? parts.join(' / ') : 'Not set';
+    }
+
+    updateVocabularyEditorSummary() {
+        const words = Array.isArray(this.vocabSet?.words) ? this.vocabSet.words : [];
+        const wordHuntRequired = this.isWordHuntRequired();
+        const customWordHunt = this.isWordHuntCustomSelection();
+        const wordHuntCount = this.getWordHuntWordCount();
+        const flow = this.getActivityFlowConfig(this.vocabSet);
+        const requiredCount = flow.required.length;
+        const wordCountLabel = `${words.length} ${words.length === 1 ? 'word' : 'words'}`;
+        const wordHuntLabel = wordHuntRequired && !customWordHunt
+            ? 'All words'
+            : `${wordHuntCount} selected`;
+        const requiredLabel = requiredCount
+            ? `${requiredCount} required`
+            : 'None required';
+
+        const subtitle = $('#vocab-editor-subtitle');
+        const wordCount = $('#vocab-word-count');
+        const wordHunt = $('#vocab-word-hunt-count');
+        const placement = $('#vocab-placement-summary');
+        const required = $('#vocab-required-summary');
+        const wordsSummary = $('#vocab-words-summary');
+
+        if (subtitle) {
+            const name = String(this.vocabSet?.name || '').trim();
+            subtitle.textContent = name && name !== 'New Vocabulary' ? name : '';
+        }
+        if (wordCount) wordCount.textContent = String(words.length);
+        if (wordHunt) wordHunt.textContent = wordHuntRequired && !customWordHunt ? 'All' : String(wordHuntCount);
+        if (placement) placement.textContent = this.getVocabularyPlacementSummary();
+        if (required) required.textContent = requiredLabel;
+        if (wordsSummary) wordsSummary.textContent = wordHuntRequired && !customWordHunt
+            ? `${wordCountLabel} / all included in required Word Hunt.`
+            : `${wordCountLabel} / ${wordHuntLabel} for Word Hunt.`;
     }
 
     inferTeacherWeek(vocab) {
@@ -99,7 +133,9 @@ class TeacherVocabularyEditorCoreMethods {
             }
         }
 
+        this.updateGeneratedVocabId();
         this.triggerAutoSave();
+        this.updateVocabularyEditorSummary();
     }
 
     setVocabAssignedDate(value) {
@@ -108,7 +144,9 @@ class TeacherVocabularyEditorCoreMethods {
         if (!assignedDate) {
             this.vocabSet.assignedDate = '';
             this.updatePlacementControlState();
+            this.updateGeneratedVocabId();
             this.triggerAutoSave();
+            this.updateVocabularyEditorSummary();
             return;
         }
 
@@ -117,7 +155,9 @@ class TeacherVocabularyEditorCoreMethods {
         $('#vocab-month').value = this.vocabSet.month || '';
         $('#vocab-week').value = this.vocabSet.week || '';
         this.updatePlacementControlState();
+        this.updateGeneratedVocabId();
         this.triggerAutoSave();
+        this.updateVocabularyEditorSummary();
     }
 
     slugifyVocabPart(value) {
@@ -147,23 +187,39 @@ class TeacherVocabularyEditorCoreMethods {
         return parts.join('_') || `vocab_${Date.now()}`;
     }
 
+    updateGeneratedVocabId({ force = false } = {}) {
+        if (!force && !this.autoGenerateVocabId) return;
+        const generatedId = this.createVocabIdSuggestion();
+        this.vocabSet.id = generatedId;
+        const idField = $('#vocab-id');
+        if (idField) idField.value = generatedId;
+        if (this.routeReady && document.getElementById('teacher-editor-view')?.classList.contains('active')) {
+            this.updateTeacherRouteForView('teacher-editor-view', { replace: true });
+        }
+    }
+
     async publishVocabulary({ asNew = false } = {}) {
         if (!this.ensureAuthenticated()) return;
         this.applyAssignedDatePlacement(this.vocabSet);
 
         if (asNew) {
-            const suggestedId = this.createVocabIdSuggestion();
-            const newId = prompt('New vocabulary ID', suggestedId);
-            if (!newId) return;
-            this.vocabSet.id = this.slugifyVocabPart(newId) || suggestedId;
+            const currentId = this.vocabSet.id;
+            const generatedId = this.createVocabIdSuggestion();
+            this.vocabSet.id = generatedId === currentId
+                ? `${generatedId}_${Date.now().toString(36)}`
+                : generatedId;
             $('#vocab-id').value = this.vocabSet.id;
             delete this.vocabSet.source;
+        } else {
+            this.updateGeneratedVocabId();
         }
 
+        this.prepareWordHuntWordsForSave(this.vocabSet);
         this.normalizeActivityFlowSettings();
         const saved = await this.saveToCloud();
 
         if (saved) {
+            this.autoGenerateVocabId = false;
             notifications.success(asNew ? 'Saved as a new vocabulary.' : 'Vocabulary update saved.');
             this.loadLibrary();
         } else {
@@ -177,6 +233,7 @@ class TeacherVocabularyEditorCoreMethods {
             return;
         }
 
+        this.prepareWordHuntWordsForSave(this.vocabSet);
         this.normalizeActivityFlowSettings();
         const dataStr = JSON.stringify(this.vocabSet, null, 2);
         const blob = new Blob([dataStr], { type: 'application/json' });
@@ -201,6 +258,7 @@ class TeacherVocabularyEditorCoreMethods {
                 const data = JSON.parse(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
                 this.vocabSet = data;
+                this.autoGenerateVocabId = false;
 
                 this.updateFormUI();
                 this.renderWords();

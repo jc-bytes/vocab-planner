@@ -1,11 +1,60 @@
-import { $, createElement } from './main.js';
+import { $, createElement, escapeHtml } from './main.js';
 import {
     getSubjectBySlug,
     getVocabSubjectSlug,
+    loadVocabularyFile,
     loadManifest
 } from './services/vocabularyApi.js';
 
 class TeacherVocabularyLibraryMethods {
+    getTeacherVocabularyViewDepth(drilldown = this.libraryDrilldown || {}) {
+        if (drilldown.month) return 'month';
+        if (drilldown.trimester) return 'trimester';
+        if (drilldown.grade) return 'grade';
+        if (drilldown.subject) return 'subject';
+        return 'root';
+    }
+
+    getDefaultTeacherVocabularyViewMode(depth = this.getTeacherVocabularyViewDepth()) {
+        return ['trimester', 'month'].includes(depth) ? 'rows' : 'cards';
+    }
+
+    getTeacherVocabularyViewMode(drilldown = this.libraryDrilldown || {}) {
+        const depth = this.getTeacherVocabularyViewDepth(drilldown);
+        const savedMode = this.teacherVocabularyViewModes?.[depth];
+        return savedMode === 'rows' || savedMode === 'cards'
+            ? savedMode
+            : this.getDefaultTeacherVocabularyViewMode(depth);
+    }
+
+    setTeacherVocabularyViewMode(mode) {
+        const depth = this.getTeacherVocabularyViewDepth();
+        this.teacherVocabularyViewModes = {
+            ...(this.teacherVocabularyViewModes || {}),
+            [depth]: mode === 'rows' ? 'rows' : 'cards'
+        };
+        localStorage.setItem('teacher_vocabulary_view_modes', JSON.stringify(this.teacherVocabularyViewModes));
+        this.renderLibraryBrowser();
+        this.refreshIcons();
+    }
+
+    renderTeacherVocabularyViewControls() {
+        const container = $('#teacher-vocab-view-toggle');
+        if (!container) return;
+        const currentMode = this.getTeacherVocabularyViewMode();
+        container.innerHTML = `
+            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-teacher-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
+                <i data-lucide="layout-grid"></i><span>Cards</span>
+            </button>
+            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-teacher-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
+                <i data-lucide="list"></i><span>Rows</span>
+            </button>
+        `;
+        container.querySelectorAll('[data-teacher-vocab-view-mode]').forEach(button => {
+            button.addEventListener('click', () => this.setTeacherVocabularyViewMode(button.dataset.teacherVocabViewMode));
+        });
+    }
+
     showVocabularyLibrary() {
         if (!this.ensureAuthenticated(false)) return;
         this.resetLibraryDrilldown();
@@ -150,6 +199,7 @@ class TeacherVocabularyLibraryMethods {
     renderLibraryBrowser(container = $('#library-list')) {
         if (!container) return;
 
+        this.renderTeacherVocabularyViewControls();
         container.classList.remove('vocab-grid');
         container.classList.add('teacher-library-browser');
         container.innerHTML = '';
@@ -162,7 +212,12 @@ class TeacherVocabularyLibraryMethods {
 
         if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
             this.resetLibraryDrilldown();
-            this.renderSubjectPicker(container, subjectGroups);
+            if (this.getTeacherVocabularyViewMode({}) === 'rows') {
+                this.renderLibraryBreadcrumb(container);
+                this.renderTeacherVocabularyRows(container, this.libraryItems || []);
+            } else {
+                this.renderSubjectPicker(container, subjectGroups);
+            }
             return;
         }
 
@@ -172,7 +227,12 @@ class TeacherVocabularyLibraryMethods {
             this.libraryDrilldown.grade = null;
             this.libraryDrilldown.trimester = null;
             this.libraryDrilldown.month = null;
-            this.renderGradePicker(container, selectedSubject, gradeGroups);
+            if (this.getTeacherVocabularyViewMode({ subject: selectedSubject }) === 'rows') {
+                this.renderLibraryBreadcrumb(container, selectedSubject);
+                this.renderTeacherVocabularyRows(container, this.getTeacherVocabularyItemsForDrilldown({ subject: selectedSubject }));
+            } else {
+                this.renderGradePicker(container, selectedSubject, gradeGroups);
+            }
             return;
         }
 
@@ -181,7 +241,15 @@ class TeacherVocabularyLibraryMethods {
         if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
             this.libraryDrilldown.trimester = null;
             this.libraryDrilldown.month = null;
-            this.renderTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups);
+            if (this.getTeacherVocabularyViewMode({ subject: selectedSubject, grade: selectedGrade }) === 'rows') {
+                this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade);
+                this.renderTeacherVocabularyRows(container, this.getTeacherVocabularyItemsForDrilldown({
+                    subject: selectedSubject,
+                    grade: selectedGrade
+                }));
+            } else {
+                this.renderTrimesterPicker(container, selectedSubject, selectedGrade, trimesterGroups);
+            }
             return;
         }
 
@@ -189,14 +257,167 @@ class TeacherVocabularyLibraryMethods {
 
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
             this.libraryDrilldown.month = null;
-            this.renderMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
+            if (this.getTeacherVocabularyViewMode({
+                subject: selectedSubject,
+                grade: selectedGrade,
+                trimester: selectedTrimester
+            }) === 'rows') {
+                this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester);
+                this.renderTeacherVocabularyRows(container, trimesterGroups.get(selectedTrimester));
+            } else {
+                this.renderMonthPicker(container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
+            }
             return;
         }
 
         this.renderAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
     }
 
+    getTeacherVocabularyItemsForDrilldown(drilldown = {}) {
+        const subject = drilldown.subject || null;
+        const grade = drilldown.grade || null;
+        const trimester = drilldown.trimester || null;
+        const month = drilldown.month || null;
+
+        return (this.libraryItems || []).filter(({ vocab }) => {
+            if (subject && getVocabSubjectSlug(vocab) !== subject) return false;
+            if (grade && !this.getVocabGrades(vocab).includes(grade)) return false;
+            if (trimester && this.getTeacherTrimesterKey(vocab) !== trimester) return false;
+            if (month && this.getTeacherMonthKey(vocab) !== month) return false;
+            return true;
+        });
+    }
+
+    openTeacherVocabularyItem(vocab, type) {
+        if (type === 'remote') {
+            this.loadVocabularyFromPath(vocab.path);
+        } else if (type === 'cloud') {
+            this.loadVocabularyObject(vocab, { source: 'cloud' });
+        } else {
+            this.loadLocalVocabulary(vocab);
+        }
+    }
+
+    createTeacherVocabularyRowList(headers = []) {
+        const list = createElement('div', 'student-vocab-row-list teacher-vocab-row-list');
+        const header = createElement('div', 'student-vocab-row student-vocab-row-header teacher-vocab-row');
+        header.setAttribute('aria-hidden', 'true');
+        header.appendChild(createElement('strong', null, headers[0] || 'Name'));
+        headers.slice(1).forEach(label => header.appendChild(createElement('span', null, label)));
+        header.appendChild(createElement('i'));
+        list.appendChild(header);
+        return list;
+    }
+
+    createTeacherVocabularyRow({ vocab, type }) {
+        const grades = this.getVocabGrades(vocab).map(grade => this.formatGradeLabel(grade)).join(', ');
+        const trimester = this.getTeacherTrimesterShortLabel(this.getTeacherTrimesterKey(vocab));
+        const month = this.getTeacherMonthShortLabel(this.getTeacherMonthKey(vocab));
+        const week = vocab?.week || this.inferTeacherWeek(vocab) || '';
+        const purpose = String(vocab?.purpose || vocab?.assessmentPurpose || vocab?.type || type || '').trim();
+        const wordCount = this.getTeacherVocabularyWordCount(vocab);
+        const row = createElement('button', 'student-vocab-row teacher-vocab-row');
+        row.type = 'button';
+        row.innerHTML = `
+            <strong>${escapeHtml(vocab.name || 'Untitled')}</strong>
+            <span>${escapeHtml(grades || 'Other')}</span>
+            <span>${escapeHtml(trimester)}</span>
+            <span>${escapeHtml(month)}</span>
+            <span>${escapeHtml(week ? `Week ${week}` : 'No week')}</span>
+            <span class="student-vocab-purpose">${escapeHtml(purpose || type || 'Unit')}</span>
+            <span data-vocab-word-count>${escapeHtml(wordCount ? `${wordCount}` : '...')}</span>
+            <i data-lucide="chevron-right"></i>
+        `;
+        const countNode = row.querySelector('[data-vocab-word-count]');
+        if (!wordCount && vocab?.path) {
+            countNode.dataset.vocabWordCountPath = vocab.path;
+        }
+        row.addEventListener('click', () => this.openTeacherVocabularyItem(vocab, type));
+        return row;
+    }
+
+    getTeacherVocabularyWordCount(vocab = {}) {
+        if (Array.isArray(vocab.words)) return vocab.words.length;
+        if (Array.isArray(vocab.terms)) return vocab.terms.length;
+        if (Array.isArray(vocab.vocabulary)) return vocab.vocabulary.length;
+        const explicit = Number(vocab.wordCount ?? vocab.word_count ?? vocab.wordsCount ?? vocab.words_count);
+        return Number.isFinite(explicit) && explicit >= 0 ? explicit : 0;
+    }
+
+    hydrateTeacherVocabularyRowWordCounts(container) {
+        const countNodes = Array.from(container.querySelectorAll('[data-vocab-word-count-path]'));
+        const paths = Array.from(new Set(countNodes.map(node => node.dataset.vocabWordCountPath).filter(Boolean)));
+        paths.forEach(async path => {
+            const data = await loadVocabularyFile(path, { silent: true });
+            const count = this.getTeacherVocabularyWordCount(data || {});
+            countNodes
+                .filter(node => node.dataset.vocabWordCountPath === path)
+                .forEach(node => {
+                    node.textContent = String(count);
+                    delete node.dataset.vocabWordCountPath;
+                });
+        });
+    }
+
+    getTeacherVocabularyWeekOrder(vocab = {}) {
+        const week = Number.parseInt(vocab?.week || this.inferTeacherWeek(vocab) || '', 10);
+        return Number.isFinite(week) && week > 0 ? week : 99;
+    }
+
+    compareTeacherVocabularyRowOrder(itemA, itemB, drilldown = this.libraryDrilldown || {}) {
+        const vocabA = itemA.vocab;
+        const vocabB = itemB.vocab;
+
+        if (!drilldown.subject) {
+            const subjectCompare = getSubjectBySlug(this.getSubjects(), getVocabSubjectSlug(vocabA)).name
+                .localeCompare(getSubjectBySlug(this.getSubjects(), getVocabSubjectSlug(vocabB)).name);
+            if (subjectCompare) return subjectCompare;
+        }
+
+        if (!drilldown.grade) {
+            const gradeCompare = this.compareGradeLabels(this.getVocabGrades(vocabA)[0], this.getVocabGrades(vocabB)[0]);
+            if (gradeCompare) return gradeCompare;
+        }
+
+        if (!drilldown.trimester) {
+            const trimesterCompare = this.getTeacherTrimesterOrder(this.getTeacherTrimesterKey(vocabA))
+                - this.getTeacherTrimesterOrder(this.getTeacherTrimesterKey(vocabB));
+            if (trimesterCompare) return trimesterCompare;
+        }
+
+        if (!drilldown.month) {
+            const monthCompare = this.getTeacherMonthOrder(this.getTeacherMonthKey(vocabA))
+                - this.getTeacherMonthOrder(this.getTeacherMonthKey(vocabB));
+            if (monthCompare) return monthCompare;
+        }
+
+        const weekCompare = this.getTeacherVocabularyWeekOrder(vocabA) - this.getTeacherVocabularyWeekOrder(vocabB);
+        if (weekCompare) return weekCompare;
+
+        const purposeCompare = String(vocabA?.purpose || itemA.type || '').localeCompare(String(vocabB?.purpose || itemB.type || ''));
+        if (purposeCompare) return purposeCompare;
+
+        return this.getVocabSortName(vocabA).localeCompare(this.getVocabSortName(vocabB));
+    }
+
+    renderTeacherVocabularyRows(container, vocabItems = []) {
+        if (!vocabItems.length) {
+            container.appendChild(createElement('p', 'teacher-empty-state', 'No vocabulary units here yet.'));
+            return;
+        }
+
+        const list = this.createTeacherVocabularyRowList(['Name', 'Grade', 'Trimester', 'Month', 'Week', 'Purpose', 'Words']);
+        vocabItems
+            .slice()
+            .sort((itemA, itemB) => this.compareTeacherVocabularyRowOrder(itemA, itemB))
+            .forEach(item => list.appendChild(this.createTeacherVocabularyRow(item)));
+        container.appendChild(list);
+        this.hydrateTeacherVocabularyRowWordCounts(list);
+    }
+
     renderLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
+        const host = $('#teacher-vocab-breadcrumb') || container;
+        host.innerHTML = '';
         const nav = createElement('div', 'teacher-library-breadcrumb');
 
         const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
@@ -250,7 +471,7 @@ class TeacherVocabularyLibraryMethods {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth)));
         }
 
-        container.appendChild(nav);
+        host.appendChild(nav);
     }
 
     createLibraryBreadcrumbButton(label, onClick) {
@@ -391,6 +612,11 @@ class TeacherVocabularyLibraryMethods {
 
     renderAssignmentPicker(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, vocabItems) {
         this.renderLibraryBreadcrumb(container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth);
+
+        if (this.getTeacherVocabularyViewMode() === 'rows') {
+            this.renderTeacherVocabularyRows(container, vocabItems);
+            return;
+        }
 
         const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid');
         vocabItems

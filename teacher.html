@@ -226,7 +226,7 @@
                         </div>
                     </section>
 
-                    <section class="teacher-panel">
+                    <section class="teacher-panel teacher-recent-activity-panel">
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>Recent Activity</h3>
@@ -242,19 +242,17 @@
 
             <!-- View: Vocabulary -->
             <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <div class="teacher-page-heading">
-                    <div>
-                        <p class="teacher-eyebrow">Vocabulary</p>
-                        <h2>Library</h2>
-                    </div>
+                <div class="teacher-vocab-library-header">
+                    <div id="teacher-vocab-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
                     <div class="teacher-toolbar">
+                        <div id="teacher-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Vocabulary view"></div>
                         <button id="create-new-btn" class="btn primary-btn">
                             <i data-lucide="plus"></i>
-                            Create New
+                            Create
                         </button>
                         <label for="import-file" class="btn secondary-btn">
                             <i data-lucide="upload"></i>
-                            Import JSON
+                            Import
                         </label>
                         <input type="file" id="import-file" accept=".json" hidden>
                     </div>
@@ -269,13 +267,6 @@
 
             <!-- View: Activities -->
             <section id="teacher-activities-view" class="view hidden" role="tabpanel" aria-labelledby="tab-activities">
-                <div class="teacher-page-heading">
-                    <div>
-                        <p class="teacher-eyebrow">Activities</p>
-                        <h2>Classroom Activities</h2>
-                    </div>
-                </div>
-
                 <div class="data-tab-list activity-workflow-tabs" role="tablist" aria-label="Activity workflow">
                     <button id="activity-tab-assign" class="data-tab-btn activity-workflow-tab active" type="button"
                         role="tab" aria-selected="true" aria-controls="activity-assign-panel" data-activity-tab="assign">
@@ -291,54 +282,6 @@
 
                 <div id="activity-assign-panel" class="activity-workflow-panel" role="tabpanel" aria-labelledby="activity-tab-assign">
                     <section class="teacher-panel">
-                        <div class="teacher-panel-header">
-                            <div>
-                                <h3>Activity Library</h3>
-                                <p>Organized by subject, grade, month, and week so each class has its own activity set.</p>
-                            </div>
-                            <div class="teacher-toolbar">
-                                <label class="teacher-toolbar-select" for="activity-template-select">
-                                    <span>Template</span>
-                                    <select id="activity-template-select">
-                                        <optgroup label="Map / Diagram">
-                                            <option value="blank-map-diagram">Blank Map / Diagram</option>
-                                            <option value="labeled-map">Labeled Map</option>
-                                            <option value="concept-map">Concept Map</option>
-                                            <option value="process-diagram">Process Diagram</option>
-                                        </optgroup>
-                                        <optgroup label="Structured Response">
-                                            <option value="worksheet">Worksheet</option>
-                                            <option value="reflection">Reflection</option>
-                                            <option value="checklist">Checklist</option>
-                                        </optgroup>
-                                        <optgroup label="Card Sort">
-                                            <option value="category-sort">Category Sort</option>
-                                            <option value="sequence-sort">Sequence Sort</option>
-                                            <option value="process-sort">Process Sort</option>
-                                        </optgroup>
-                                        <optgroup label="Data / Spreadsheet">
-                                            <option value="data-table">Data Table</option>
-                                            <option value="formula-practice">Formula Practice</option>
-                                            <option value="chart-from-table">Chart From Table</option>
-                                        </optgroup>
-                                        <optgroup label="Image / Hotspot">
-                                            <option value="label-image-parts">Label Image Parts</option>
-                                            <option value="screenshot-callouts">Screenshot Callouts</option>
-                                            <option value="hotspot-explanation">Hotspot Explanation</option>
-                                        </optgroup>
-                                        <optgroup label="Flowchart / Algorithm">
-                                            <option value="sequence-algorithm">Sequence Algorithm</option>
-                                            <option value="if-then-condition">If/Then Condition</option>
-                                            <option value="sensor-response">Sensor Response</option>
-                                        </optgroup>
-                                    </select>
-                                </label>
-                                <button id="create-activity-btn" class="btn primary-btn" type="button">
-                                    <i data-lucide="plus"></i>
-                                    Create Activity
-                                </button>
-                            </div>
-                        </div>
                         <div id="activity-library-list" class="teacher-library-browser">
                             <div class="loading-spinner">Loading activities...</div>
                         </div>
@@ -870,197 +813,207 @@
 
             <!-- View: Editor -->
             <section id="teacher-editor-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <div class="teacher-page-heading">
+                <div class="teacher-page-heading vocab-editor-heading">
                     <div>
                         <button id="back-to-dashboard" class="btn text-btn teacher-back-btn">
                             <i data-lucide="arrow-left"></i>
                             Back to Library
                         </button>
                         <h2 style="margin: 0.35rem 0 0 0;">Vocabulary Editor</h2>
+                        <p id="vocab-editor-subtitle" class="vocab-editor-subtitle"></p>
                     </div>
                     <div class="teacher-toolbar">
-                        <button id="generate-quiz-btn" class="btn secondary-btn">
+                        <button id="generate-quiz-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="file-text"></i>
-                            Generate Quiz
+                            Create Quiz
                         </button>
-                        <button id="publish-update-btn" class="btn secondary-btn">
-                            <i data-lucide="cloud-upload"></i>
-                            Save Update
-                        </button>
-                        <button id="publish-new-version-btn" class="btn secondary-btn">
-                            <i data-lucide="copy-plus"></i>
-                            Save as New
-                        </button>
-                        <button id="export-btn" class="btn primary-btn">
-                            <i data-lucide="download"></i>
-                            Export JSON
-                        </button>
+                        <div class="split-action">
+                            <button id="publish-update-btn" class="btn primary-btn split-action-main" type="button">
+                                <i data-lucide="cloud-upload"></i>
+                                Save
+                            </button>
+                            <details class="toolbar-menu split-action-menu">
+                                <summary class="btn primary-btn split-action-toggle" aria-label="More save options">
+                                    <i data-lucide="chevron-down"></i>
+                                </summary>
+                                <div class="toolbar-menu-panel toolbar-menu-panel-right">
+                                    <button id="publish-new-version-btn" class="toolbar-menu-item" type="button">
+                                        <i data-lucide="copy-plus"></i>
+                                        Save as New
+                                    </button>
+                                    <button id="export-btn" class="toolbar-menu-item" type="button">
+                                        <i data-lucide="download"></i>
+                                        Export JSON
+                                    </button>
+                                </div>
+                            </details>
+                        </div>
                     </div>
                 </div>
 
-                <section class="vocab-meta-section card">
-                    <h2>Vocabulary Set Details</h2>
-                    <div class="form-group">
-                        <label for="vocab-id">ID (e.g., grade6_unit3)</label>
-                        <input type="text" id="vocab-id" placeholder="Unique ID">
+                <div class="vocab-editor-summary" aria-label="Vocabulary summary">
+                    <div class="vocab-editor-stat">
+                        <span>Words</span>
+                        <strong id="vocab-word-count">0</strong>
                     </div>
-                    <div class="form-group">
-                        <label for="vocab-name">Name</label>
-                        <input type="text" id="vocab-name" placeholder="e.g., Technology Unit 3">
+                    <div class="vocab-editor-stat">
+                        <span>Word Hunt</span>
+                        <strong id="vocab-word-hunt-count">0</strong>
                     </div>
-                    <div class="form-group">
-                        <label for="vocab-desc">Description</label>
-                        <textarea id="vocab-desc" placeholder="Brief description of this set"></textarea>
+                    <div class="vocab-editor-stat">
+                        <span>Placement</span>
+                        <strong id="vocab-placement-summary">Not set</strong>
                     </div>
-                    <div class="form-group">
-                        <label for="vocab-subject">Subject</label>
-                        <select id="vocab-subject"></select>
+                    <div class="vocab-editor-stat">
+                        <span>Student Gate</span>
+                        <strong id="vocab-required-summary">Not set</strong>
                     </div>
-                    <div class="form-group">
-                        <label for="vocab-grade">Grade Levels (comma separated)</label>
-                        <input type="text" id="vocab-grade" placeholder="e.g., 6, 7">
-                    </div>
-                    <div class="form-group">
-                        <label for="vocab-assigned-date">Assigned Date</label>
-                        <input type="date" id="vocab-assigned-date">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="vocab-trimester">Trimester</label>
-                            <select id="vocab-trimester">
-                                <option value="">Auto / Other</option>
-                                <option value="IT">1st Trimester</option>
-                                <option value="IIT">2nd Trimester</option>
-                                <option value="IIIT">3rd Trimester</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vocab-month">Month</label>
-                            <select id="vocab-month">
-                                <option value="">Auto / Other</option>
-                                <option value="january">January</option>
-                                <option value="february">February</option>
-                                <option value="march">March</option>
-                                <option value="april">April</option>
-                                <option value="may">May</option>
-                                <option value="june">June</option>
-                                <option value="july">July</option>
-                                <option value="august">August</option>
-                                <option value="september">September</option>
-                                <option value="october">October</option>
-                                <option value="november">November</option>
-                                <option value="december">December</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vocab-week">Week</label>
-                            <input type="number" id="vocab-week" min="1" max="52" placeholder="e.g., 2">
-                        </div>
-                    </div>
-                </section>
+                </div>
 
-                <section class="activity-settings-section card">
-                    <h2>Activity Settings</h2>
-                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">Configure how many
-                        words each activity should use.</p>
+                <div class="vocab-editor-tabs" role="tablist" aria-label="Vocabulary editor sections">
+                    <button class="vocab-editor-tab active" id="vocab-editor-tab-details" type="button" role="tab"
+                        aria-selected="true" aria-controls="vocab-editor-panel-details" data-vocab-editor-tab="details">
+                        <i data-lucide="info"></i>
+                        Details
+                    </button>
+                    <button class="vocab-editor-tab" id="vocab-editor-tab-config" type="button" role="tab"
+                        aria-selected="false" aria-controls="vocab-editor-panel-config" data-vocab-editor-tab="config">
+                        <i data-lucide="sliders-horizontal"></i>
+                        Activity Config
+                    </button>
+                    <button class="vocab-editor-tab" id="vocab-editor-tab-words" type="button" role="tab"
+                        aria-selected="false" aria-controls="vocab-editor-panel-words" data-vocab-editor-tab="words">
+                        <i data-lucide="list"></i>
+                        Words
+                    </button>
+                </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="setting-flashcards">Flashcards</label>
-                            <input type="number" id="setting-flashcards" min="1" placeholder="All words"
-                                style="width: 100px;">
+                <div class="vocab-editor-workspace">
+                    <section id="vocab-editor-panel-details" class="vocab-editor-tab-panel active" role="tabpanel"
+                        aria-labelledby="vocab-editor-tab-details" data-vocab-editor-panel="details">
+                        <div class="vocab-editor-panel">
+                            <div class="vocab-editor-panel-header">
+                                <div>
+                                    <h3>Set Details</h3>
+                                    <p>Name, grade, and calendar placement.</p>
+                                </div>
+                            </div>
+                            <div class="vocab-details-grid">
+                                <div class="form-group vocab-field-name">
+                                    <label for="vocab-name">Name</label>
+                                    <input type="text" id="vocab-name" placeholder="e.g., Technology Unit 3">
+                                </div>
+                                <div class="form-group vocab-field-desc">
+                                    <label for="vocab-desc">Description</label>
+                                    <textarea id="vocab-desc" placeholder="Brief description of this set"></textarea>
+                                </div>
+                                <div class="form-group vocab-field-subject">
+                                    <label for="vocab-subject">Subject</label>
+                                    <select id="vocab-subject"></select>
+                                </div>
+                                <div class="form-group vocab-field-grades">
+                                    <label for="vocab-grade">Grades</label>
+                                    <input type="text" id="vocab-grade" placeholder="e.g., 6, 7">
+                                </div>
+                                <div class="form-group vocab-field-week">
+                                    <label for="vocab-week">Week</label>
+                                    <input type="number" id="vocab-week" min="1" max="52" placeholder="2">
+                                </div>
+                                <input type="hidden" id="vocab-id">
+                                <div class="form-group vocab-field-date">
+                                    <label for="vocab-assigned-date">Assigned Date</label>
+                                    <input type="date" id="vocab-assigned-date">
+                                </div>
+                                <div class="form-group vocab-field-trimester">
+                                    <label for="vocab-trimester">Trimester</label>
+                                    <select id="vocab-trimester">
+                                        <option value="">Auto / Other</option>
+                                        <option value="IT">1st Trimester</option>
+                                        <option value="IIT">2nd Trimester</option>
+                                        <option value="IIIT">3rd Trimester</option>
+                                    </select>
+                                </div>
+                                <div class="form-group vocab-field-month">
+                                    <label for="vocab-month">Month</label>
+                                    <select id="vocab-month">
+                                        <option value="">Auto / Other</option>
+                                        <option value="january">January</option>
+                                        <option value="february">February</option>
+                                        <option value="march">March</option>
+                                        <option value="april">April</option>
+                                        <option value="may">May</option>
+                                        <option value="june">June</option>
+                                        <option value="july">July</option>
+                                        <option value="august">August</option>
+                                        <option value="september">September</option>
+                                        <option value="october">October</option>
+                                        <option value="november">November</option>
+                                        <option value="december">December</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="setting-matching">Matching</label>
-                            <input type="number" id="setting-matching" min="1" value="10" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-quiz">Quiz</label>
-                            <input type="number" id="setting-quiz" min="1" value="10" style="width: 100px;">
-                        </div>
-                    </div>
+                    </section>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="setting-synonym-antonym">Synonym & Antonym</label>
-                            <input type="number" id="setting-synonym-antonym" min="1" value="10" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-word-search">Word Search</label>
-                            <input type="number" id="setting-word-search" min="1" value="10" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-illustration">Word Hunt fallback</label>
-                            <input type="number" id="setting-illustration" min="1" value="5" style="width: 100px;">
-                        </div>
-                    </div>
+                    <section id="vocab-editor-panel-config" class="vocab-editor-tab-panel hidden" role="tabpanel"
+                        aria-labelledby="vocab-editor-tab-config" data-vocab-editor-panel="config">
+                        <div class="vocab-editor-config-grid">
+                            <section class="vocab-editor-panel vocab-config-activities-panel">
+                                <div class="vocab-editor-panel-header">
+                                    <div>
+                                        <h3>Activities</h3>
+                                        <p>Student flow, word coverage, and rewards.</p>
+                                    </div>
+                                </div>
+                                <div class="vocab-activity-config-table" role="table" aria-label="Activity settings">
+                                    <div class="vocab-activity-config-header" role="row">
+                                        <span role="columnheader">Activity</span>
+                                        <span role="columnheader">Student Flow</span>
+                                        <span role="columnheader">Words</span>
+                                        <span role="columnheader">Completion</span>
+                                        <span role="columnheader">Progress</span>
+                                    </div>
+                                    <div id="activity-flow-settings" class="activity-flow-settings"></div>
+                                </div>
+                            </section>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="setting-crossword">Crossword</label>
-                            <input type="number" id="setting-crossword" min="1" value="10" style="width: 100px;">
+                            <section class="vocab-editor-panel vocab-config-rewards-panel">
+                                <div class="vocab-editor-panel-header">
+                                    <div>
+                                        <h3>Coin Economy</h3>
+                                        <p>Global game-time exchange rate.</p>
+                                    </div>
+                                </div>
+                                <div class="vocab-count-grid vocab-reward-grid">
+                                    <label>Exchange Rate<input type="number" id="setting-exchange-rate" min="1" value="10"></label>
+                                </div>
+                            </section>
                         </div>
-                        <div class="form-group">
-                            <label for="setting-hangman">Hangman</label>
-                            <input type="number" id="setting-hangman" min="1" value="10" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-scramble">Word Scramble</label>
-                            <input type="number" id="setting-scramble" min="1" value="10" style="width: 100px;">
-                        </div>
-                    </div>
+                    </section>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="setting-wordle">Vocabulary Wordle</label>
-                            <input type="number" id="setting-wordle" min="1" value="10" style="width: 100px;">
+                    <section id="vocab-editor-panel-words" class="words-section vocab-words-panel vocab-editor-tab-panel hidden"
+                        role="tabpanel" aria-labelledby="vocab-editor-tab-words" data-vocab-editor-panel="words">
+                        <div class="section-header vocab-words-header">
+                            <div>
+                                <h2>Words</h2>
+                                <p id="vocab-words-summary">No words yet.</p>
+                            </div>
+                            <div class="vocab-words-tools">
+                                <label for="vocab-word-filter" class="vocab-word-filter-label">
+                                    <i data-lucide="search"></i>
+                                    <input id="vocab-word-filter" type="search" placeholder="Find word">
+                                </label>
+                                <button id="add-word-btn" class="btn accent-btn">
+                                    <i data-lucide="plus"></i>
+                                    Add Word
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="setting-speed-match">Speed Match</label>
-                            <input type="number" id="setting-speed-match" min="1" value="10" style="width: 100px;">
+                        <div id="words-container" class="words-grid">
+                            <!-- Word cards will be injected here -->
                         </div>
-                        <div class="form-group">
-                            <label for="setting-fill-in-blank">Fill in Blank</label>
-                            <input type="number" id="setting-fill-in-blank" min="1" value="10" style="width: 100px;">
-                        </div>
-                    </div>
-
-                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Student Activity Flow</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Choose which
-                        activities students must finish before additional practice appears.</p>
-                    <div id="activity-flow-settings" class="activity-flow-settings"
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
-                    </div>
-
-                    <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: #fbbf24;">Gamification Settings</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Configure coin rewards
-                        and costs.</p>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="setting-completion-bonus">Completion Bonus (Coins)</label>
-                            <input type="number" id="setting-completion-bonus" min="0" value="50" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-exchange-rate">Exchange Rate (Coins/Min)</label>
-                            <input type="number" id="setting-exchange-rate" min="1" value="10" style="width: 100px;">
-                        </div>
-                        <div class="form-group">
-                            <label for="setting-progress-reward">Progress Reward (Coins/10%)</label>
-                            <input type="number" id="setting-progress-reward" min="0" value="1" style="width: 100px;">
-                        </div>
-                    </div>
-                </section>
-
-                <section class="words-section">
-                    <div class="section-header">
-                        <h2>Words List</h2>
-                        <button id="add-word-btn" class="btn accent-btn">+ Add Word</button>
-                    </div>
-                    <div id="words-container" class="words-grid">
-                        <!-- Word cards will be injected here -->
-                    </div>
-                </section>
+                    </section>
+                </div>
             </section>
 
             <!-- View: Quizzes -->
@@ -1758,6 +1711,24 @@
                 </section>
             </section>
         </main>
+    </div>
+
+    <!-- Activity Template Modal -->
+    <div id="activity-template-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="activity-template-modal-title">
+        <div class="modal-content activity-template-modal-content">
+            <div class="modal-header">
+                <div>
+                    <h3 id="activity-template-modal-title">Create Activity</h3>
+                    <small>Choose a starting format.</small>
+                </div>
+                <button id="close-activity-template-modal" class="btn text-btn icon-btn" type="button" aria-label="Close create activity dialog">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="activity-template-picker" class="activity-template-picker"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Activity Assignment Modal -->

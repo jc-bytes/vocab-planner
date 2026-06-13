@@ -91,6 +91,7 @@ export function initTeacherGlobalListeners(manager) {
         }
     });
     setupModal('#quiz-modal', { dismissible: true });
+    setupModal('#activity-template-modal', { dismissible: true });
     setupModal('#activity-assignment-modal', { dismissible: true });
     setupModal('#spark-modal', {
         dismissible: true,

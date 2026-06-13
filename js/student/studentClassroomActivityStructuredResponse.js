@@ -212,6 +212,7 @@ class StudentClassroomActivityStructuredResponseMethods {
                 <h4>${escapeHtml(block.prompt)}${block.required ? ' *' : ''}</h4>
                 ${helper}
                 ${field}
+                <div class="writing-suggestion-panel" data-writing-suggestions role="status" hidden></div>
             </section>
         `;
     }

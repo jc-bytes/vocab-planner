@@ -69,6 +69,13 @@ class StudentActivityLauncherMethods {
 
         container.innerHTML = '';
 
+        const getActivityWordLimit = (settingKey) => {
+            const configuredLimit = Number(settings[settingKey]);
+            return Number.isFinite(configuredLimit) && configuredLimit > 0
+                ? configuredLimit
+                : this.sm.currentVocab.words.length;
+        };
+
         // Helper to get prioritized words (least practiced first)
         const getPrioritized = (limit, filter = null) => {
             let words = filter
@@ -79,7 +86,7 @@ class StudentActivityLauncherMethods {
 
         switch (type) {
             case 'matching':
-                const matchingLimit = settings.matching || 10;
+                const matchingLimit = getActivityWordLimit('matching');
                 const matchingWords = this.restoreWordsFromState(
                     initialState,
                     getPrioritized(matchingLimit, w => w.word.length >= 2),
@@ -91,18 +98,18 @@ class StudentActivityLauncherMethods {
                 break;
             case 'flashcards':
                 // Flashcards: use all words (non-replayable, study mode)
-                const flashcardsLimit = settings.flashcards || this.sm.currentVocab.words.length;
+                const flashcardsLimit = getActivityWordLimit('flashcards');
                 const flashcardsWords = this.sm.currentVocab.words.slice(0, flashcardsLimit);
                 this.sm.activityInstance = new ActivityClass(container, flashcardsWords, onProgress, onSaveState, initialState);
                 break;
             case 'quiz':
-                const quizLimit = settings.quiz || 10;
+                const quizLimit = getActivityWordLimit('quiz');
                 const quizWords = this.restoreWordsFromState(initialState, getPrioritized(quizLimit));
                 this.sm.activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, quizWords);
                 break;
             case 'synonym-antonym':
-                const synonymLimit = settings.synonymAntonym || 10;
+                const synonymLimit = getActivityWordLimit('synonymAntonym');
                 const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);
                 const synonymWords = this.restoreWordsFromState(
                     initialState,
@@ -149,7 +156,7 @@ class StudentActivityLauncherMethods {
                 );
                 break;
             case 'word-search':
-                const wordSearchLimit = settings.wordSearch || 10;
+                const wordSearchLimit = getActivityWordLimit('wordSearch');
                 const wordSearchWords = this.restoreWordsFromState(
                     initialState,
                     getPrioritized(wordSearchLimit, w => w.word.length >= 4),
@@ -176,22 +183,22 @@ class StudentActivityLauncherMethods {
                 this.markWordsPracticed(type, this.sm.activityInstance.words);
                 break;
             case 'crossword':
-                const crosswordWords = getPrioritized(this.sm.currentVocab.words.length);
+                const crosswordWords = getPrioritized(getActivityWordLimit('crossword'));
                 this.sm.activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, this.sm.activityInstance.placedWords);
                 break;
             case 'hangman':
-                const hangmanWords = getPrioritized(this.sm.currentVocab.words.length);
+                const hangmanWords = getPrioritized(getActivityWordLimit('hangman'));
                 this.sm.activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, hangmanWords);
                 break;
             case 'scramble':
-                const scrambleWords = getPrioritized(this.sm.currentVocab.words.length);
+                const scrambleWords = getPrioritized(getActivityWordLimit('scramble'));
                 this.sm.activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, scrambleWords);
                 break;
             case 'wordle':
-                const wordleLimit = settings.wordle || 10;
+                const wordleLimit = getActivityWordLimit('wordle');
                 const wordleWords = this.restoreWordsFromState(
                     initialState,
                     getPrioritized(wordleLimit, w => {
@@ -207,13 +214,12 @@ class StudentActivityLauncherMethods {
                 this.markWordsPracticed(type, wordleWords);
                 break;
             case 'speed-match':
-                // Speed match uses all words randomly during gameplay
-                this.sm.activityInstance = new ActivityClass(container, this.sm.currentVocab.words, onProgress, onSaveState, initialState);
-                // Mark all words as potentially practiced
-                this.markWordsPracticed(type, this.sm.currentVocab.words);
+                const speedMatchWords = getPrioritized(getActivityWordLimit('speedMatch'));
+                this.sm.activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, initialState);
+                this.markWordsPracticed(type, speedMatchWords);
                 break;
             case 'fill-in-blank':
-                const fibWords = getPrioritized(this.sm.currentVocab.words.length, w => w.example);
+                const fibWords = getPrioritized(getActivityWordLimit('fillInBlank'), w => w.example);
                 this.sm.activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, initialState);
                 this.markWordsPracticed(type, fibWords);
                 break;

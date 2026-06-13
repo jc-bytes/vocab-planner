@@ -1,5 +1,151 @@
-import { $, $$, closeModal as closeDialog } from './main.js';
-import { DEFAULT_ACTIVITY_TEMPLATE_ID } from './classroomActivityRegistry.js';
+import { $, $$, closeModal as closeDialog, createElement, openModal } from './main.js';
+import { ACTIVITY_TEMPLATE_OPTIONS } from './classroomActivityRegistry.js';
+
+function getTemplateCategoryIcon(label = '') {
+    const normalized = label.toLowerCase();
+    if (normalized.includes('map') || normalized.includes('diagram')) return 'git-branch';
+    if (normalized.includes('structured')) return 'file-text';
+    if (normalized.includes('card')) return 'columns-3';
+    if (normalized.includes('spreadsheet') || normalized.includes('data')) return 'table-2';
+    if (normalized.includes('image')) return 'image';
+    if (normalized.includes('artifact')) return 'paperclip';
+    if (normalized.includes('flowchart')) return 'workflow';
+    return 'sparkles';
+}
+
+function renderActivityTemplatePicker(manager) {
+    const container = $('#activity-template-picker');
+    if (!container || container.dataset.rendered === 'true') return;
+
+    container.innerHTML = '';
+    const templatesByType = ACTIVITY_TEMPLATE_OPTIONS.reduce((groups, template) => {
+        const type = template.type || '';
+        if (!groups.has(type)) groups.set(type, []);
+        groups.get(type).push(template);
+        return groups;
+    }, new Map());
+
+    const categories = [
+        { id: 'all', label: 'All formats', icon: 'sparkles' },
+        ...Array.from(templatesByType.keys()).map((type) => {
+            const label = manager.getActivityTypeLabel(type);
+            return {
+                id: type,
+                label,
+                icon: getTemplateCategoryIcon(label)
+            };
+        })
+    ];
+
+    const sidebar = createElement('aside', 'activity-template-sidebar');
+    const searchWrap = createElement('label', 'activity-template-search');
+    const searchIcon = createElement('i');
+    searchIcon.dataset.lucide = 'search';
+    const searchInput = createElement('input');
+    searchInput.id = 'activity-template-search';
+    searchInput.type = 'search';
+    searchInput.placeholder = 'Search formats';
+    searchWrap.append(searchIcon, searchInput);
+
+    const nav = createElement('div', 'activity-template-category-list');
+    const content = createElement('div', 'activity-template-results');
+    const status = createElement('p', 'activity-template-empty', 'No matching formats.');
+    status.hidden = true;
+
+    let activeCategory = 'all';
+
+    function makeTemplateOption(template, typeLabel) {
+        const option = createElement('button', 'activity-template-option');
+        const preview = createElement('span', 'activity-template-preview');
+        const previewIcon = createElement('i');
+        previewIcon.dataset.lucide = getTemplateCategoryIcon(typeLabel);
+        preview.appendChild(previewIcon);
+
+        const title = createElement('strong', '', template.label);
+        const description = createElement('span', '', template.description || '');
+        const meta = createElement('small', '', typeLabel);
+
+        option.type = 'button';
+        option.dataset.activityTemplateId = template.id;
+        option.append(preview, title, description, meta);
+        option.addEventListener('click', () => {
+            closeDialog('#activity-template-modal');
+            manager.startNewActivity(template.id);
+        });
+        return option;
+    }
+
+    function renderTemplateGroup(type, templates) {
+        const typeLabel = manager.getActivityTypeLabel(type);
+        const group = createElement('section', 'activity-template-group');
+        const heading = createElement('h4', '', typeLabel);
+        const grid = createElement('div', 'activity-template-grid');
+
+        templates.forEach((template) => {
+            grid.appendChild(makeTemplateOption(template, typeLabel));
+        });
+
+        group.append(heading, grid);
+        return group;
+    }
+
+    function updateResults() {
+        const query = searchInput.value.trim().toLowerCase();
+        content.innerHTML = '';
+        let visibleCount = 0;
+
+        templatesByType.forEach((templates, type) => {
+            if (activeCategory !== 'all' && activeCategory !== type) return;
+            const filteredTemplates = templates.filter((template) => {
+                const haystack = `${template.label} ${template.description || ''} ${manager.getActivityTypeLabel(type)}`.toLowerCase();
+                return !query || haystack.includes(query);
+            });
+            if (filteredTemplates.length === 0) return;
+            visibleCount += filteredTemplates.length;
+            content.appendChild(renderTemplateGroup(type, filteredTemplates));
+        });
+
+        status.hidden = visibleCount > 0;
+        if (visibleCount === 0) {
+            content.appendChild(status);
+        }
+        manager.refreshIcons?.();
+    }
+
+    categories.forEach((category) => {
+        const button = createElement('button', 'activity-template-category');
+        const icon = createElement('i');
+        icon.dataset.lucide = category.icon;
+        const label = createElement('span', '', category.label);
+        button.type = 'button';
+        button.dataset.activityTemplateCategory = category.id;
+        button.append(icon, label);
+        button.addEventListener('click', () => {
+            activeCategory = category.id;
+            nav.querySelectorAll('.activity-template-category').forEach((categoryButton) => {
+                const isActive = categoryButton.dataset.activityTemplateCategory === activeCategory;
+                categoryButton.classList.toggle('is-active', isActive);
+                categoryButton.setAttribute('aria-pressed', String(isActive));
+            });
+            updateResults();
+        });
+        if (category.id === activeCategory) {
+            button.classList.add('is-active');
+            button.setAttribute('aria-pressed', 'true');
+        } else {
+            button.setAttribute('aria-pressed', 'false');
+        }
+        nav.appendChild(button);
+    });
+
+    searchInput.addEventListener('input', updateResults);
+
+    sidebar.append(searchWrap, nav);
+    container.append(sidebar, content);
+    updateResults();
+    container.dataset.rendered = 'true';
+    manager.refreshIcons?.();
+}
 
 function bindActivityWorkflowTabs(manager) {
     $$('.activity-workflow-tab').forEach(tab => {
@@ -44,9 +190,20 @@ function bindActivityEditorTabs(manager) {
 }
 
 function bindActivityNavigation(manager) {
-    $('#create-activity-btn')?.addEventListener('click', () => {
-        const templateId = $('#activity-template-select')?.value || DEFAULT_ACTIVITY_TEMPLATE_ID;
-        manager.startNewActivity(templateId);
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('#create-activity-btn')) return;
+        renderActivityTemplatePicker(manager);
+        $('#activity-template-picker [data-activity-template-category="all"]')?.click();
+        const search = $('#activity-template-search');
+        if (search) {
+            search.value = '';
+            search.dispatchEvent(new Event('input'));
+        }
+        openModal('#activity-template-modal', { initialFocus: '#activity-template-search' });
+    });
+
+    $('#close-activity-template-modal')?.addEventListener('click', () => {
+        closeDialog('#activity-template-modal');
     });
 
     $('#back-to-activities')?.addEventListener('click', () => {

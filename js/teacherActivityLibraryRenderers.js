@@ -2,9 +2,58 @@ import { $, createElement, escapeHtml } from './main.js';
 import { getSubjectBySlug } from './services/vocabularyApi.js';
 import { getTeacherActivityWorkspaceSummary } from './teacherActivitySummaries.js';
 
-function renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek) {
-    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+function renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek) {
+    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
     container.appendChild(createElement('div', 'loading-spinner', 'Loading activities...'));
+}
+
+function getTeacherActivityViewDepth(drilldown = {}) {
+    if (drilldown.week) return 'week';
+    if (drilldown.month) return 'month';
+    if (drilldown.trimester) return 'trimester';
+    if (drilldown.grade) return 'grade';
+    if (drilldown.subject) return 'subject';
+    return 'root';
+}
+
+function getDefaultTeacherActivityViewMode(depth = getTeacherActivityViewDepth()) {
+    return depth === 'week' ? 'rows' : 'cards';
+}
+
+function getTeacherActivityViewMode(manager, drilldown = manager.activityDrilldown || {}) {
+    const depth = getTeacherActivityViewDepth(drilldown);
+    const savedMode = manager.teacherActivityViewModes?.[depth];
+    return savedMode === 'rows' || savedMode === 'cards'
+        ? savedMode
+        : getDefaultTeacherActivityViewMode(depth);
+}
+
+function setTeacherActivityViewMode(manager, mode) {
+    const depth = getTeacherActivityViewDepth(manager.activityDrilldown || {});
+    manager.teacherActivityViewModes = {
+        ...(manager.teacherActivityViewModes || {}),
+        [depth]: mode === 'rows' ? 'rows' : 'cards'
+    };
+    localStorage.setItem('teacher_activity_view_modes', JSON.stringify(manager.teacherActivityViewModes));
+    manager.renderActivityLibraryBrowser();
+    manager.refreshIcons();
+}
+
+function renderTeacherActivityViewControls(manager) {
+    const container = $('#teacher-activity-view-toggle');
+    if (!container) return;
+    const currentMode = getTeacherActivityViewMode(manager);
+    container.innerHTML = `
+        <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-teacher-activity-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
+            <i data-lucide="layout-grid"></i><span>Cards</span>
+        </button>
+        <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-teacher-activity-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
+            <i data-lucide="list"></i><span>Rows</span>
+        </button>
+    `;
+    container.querySelectorAll('[data-teacher-activity-view-mode]').forEach(button => {
+        button.addEventListener('click', () => setTeacherActivityViewMode(manager, button.dataset.teacherActivityViewMode));
+    });
 }
 
 export function renderTeacherActivityLibraryBrowser(manager, container = $('#activity-library-list')) {
@@ -17,6 +66,7 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
     const subjectGroups = manager.buildActivityLibraryGroups();
     const selectedSubject = manager.activityDrilldown.subject;
     const selectedGrade = manager.activityDrilldown.grade;
+    const selectedTrimester = manager.activityDrilldown.trimester;
     const selectedMonth = manager.activityDrilldown.month;
     const selectedWeek = manager.activityDrilldown.week;
     const isWaitingForFreshData = manager.activityLibraryRefreshing
@@ -25,47 +75,94 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
 
     if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
         if (selectedSubject && isWaitingForFreshData) {
-            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
             return;
         }
         manager.resetActivityLibraryDrilldown();
-        renderTeacherActivitySubjectPicker(manager, container, subjectGroups);
+        if (getTeacherActivityViewMode(manager, {}) === 'rows') {
+            renderTeacherActivityLibraryBreadcrumb(manager, container);
+            renderTeacherActivityRows(manager, container, manager.activityLibraryItems || []);
+        } else {
+            renderTeacherActivitySubjectPicker(manager, container, subjectGroups);
+        }
         return;
     }
 
     const gradeGroups = subjectGroups.get(selectedSubject);
     if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
         if (selectedGrade && isWaitingForFreshData) {
-            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
             return;
         }
         manager.activityDrilldown.grade = null;
+        manager.activityDrilldown.trimester = null;
         manager.activityDrilldown.month = null;
         manager.activityDrilldown.week = null;
-        renderTeacherActivityGradePicker(manager, container, selectedSubject, gradeGroups);
+        if (getTeacherActivityViewMode(manager, { subject: selectedSubject }) === 'rows') {
+            renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject);
+            renderTeacherActivityRows(manager, container, getTeacherActivityItemsForDrilldown(manager, { subject: selectedSubject }));
+        } else {
+            renderTeacherActivityGradePicker(manager, container, selectedSubject, gradeGroups);
+        }
         return;
     }
 
-    const monthGroups = manager.buildActivityMonthWeekGroups(gradeGroups.get(selectedGrade));
+    const trimesterGroups = manager.buildActivityTrimesterGroups(gradeGroups.get(selectedGrade));
+    if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
+        if (selectedTrimester && isWaitingForFreshData) {
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
+            return;
+        }
+        manager.activityDrilldown.trimester = null;
+        manager.activityDrilldown.month = null;
+        manager.activityDrilldown.week = null;
+        if (getTeacherActivityViewMode(manager, { subject: selectedSubject, grade: selectedGrade }) === 'rows') {
+            renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade);
+            renderTeacherActivityRows(manager, container, getTeacherActivityItemsForDrilldown(manager, {
+                subject: selectedSubject,
+                grade: selectedGrade
+            }));
+        } else {
+            renderTeacherActivityTrimesterPicker(manager, container, selectedSubject, selectedGrade, trimesterGroups);
+        }
+        return;
+    }
+
+    const monthGroups = manager.buildActivityMonthWeekGroups(trimesterGroups.get(selectedTrimester));
     if (!selectedMonth || !monthGroups.has(selectedMonth)) {
         if (selectedMonth && isWaitingForFreshData) {
-            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
             return;
         }
         manager.activityDrilldown.month = null;
         manager.activityDrilldown.week = null;
-        renderTeacherActivityMonthPicker(manager, container, selectedSubject, selectedGrade, monthGroups);
+        if (getTeacherActivityViewMode(manager, { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester }) === 'rows') {
+            renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester);
+            renderTeacherActivityRows(manager, container, trimesterGroups.get(selectedTrimester));
+        } else {
+            renderTeacherActivityMonthPicker(manager, container, selectedSubject, selectedGrade, selectedTrimester, monthGroups);
+        }
         return;
     }
 
     const weekGroups = monthGroups.get(selectedMonth);
     if (!selectedWeek || !weekGroups.has(selectedWeek)) {
         if (selectedWeek && isWaitingForFreshData) {
-            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+            renderTeacherActivityPendingRoute(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
             return;
         }
         manager.activityDrilldown.week = null;
-        renderTeacherActivityWeekPicker(manager, container, selectedSubject, selectedGrade, selectedMonth, weekGroups);
+        if (getTeacherActivityViewMode(manager, {
+            subject: selectedSubject,
+            grade: selectedGrade,
+            trimester: selectedTrimester,
+            month: selectedMonth
+        }) === 'rows') {
+            renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth);
+            renderTeacherActivityRows(manager, container, Array.from(weekGroups.values()).flat());
+        } else {
+            renderTeacherActivityWeekPicker(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, weekGroups);
+        }
         return;
     }
 
@@ -74,14 +171,147 @@ export function renderTeacherActivityLibraryBrowser(manager, container = $('#act
         container,
         selectedSubject,
         selectedGrade,
+        selectedTrimester,
         selectedMonth,
         selectedWeek,
         weekGroups.get(selectedWeek)
     );
 }
 
-export function renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject = null, selectedGrade = null, selectedMonth = null, selectedWeek = null) {
+function getTeacherActivityItemsForDrilldown(manager, drilldown = {}) {
+    const subject = drilldown.subject || null;
+    const grade = drilldown.grade || null;
+    const trimester = drilldown.trimester || null;
+    const month = drilldown.month || null;
+    const week = drilldown.week || null;
+
+    return (manager.activityLibraryItems || []).filter(({ activity }) => {
+        const normalized = manager.normalizeActivity(activity);
+        if (subject && normalized.subjectSlug !== subject) return false;
+        if (grade && !manager.getActivityGroupGrades(normalized).includes(grade)) return false;
+        if (trimester && manager.getActivityTrimesterKey(normalized) !== trimester) return false;
+        if (month && manager.getActivityMonthKey(normalized) !== month) return false;
+        if (week && manager.getActivityWeekKey(normalized) !== week) return false;
+        return true;
+    });
+}
+
+function createTeacherActivityRowList(headers = []) {
+    const list = createElement('div', 'student-vocab-row-list teacher-activity-row-list');
+    const header = createElement('div', 'student-vocab-row student-vocab-row-header teacher-activity-row');
+    header.setAttribute('aria-hidden', 'true');
+    header.appendChild(createElement('strong', null, headers[0] || 'Name'));
+    headers.slice(1).forEach(label => header.appendChild(createElement('span', null, label)));
+    header.appendChild(createElement('i'));
+    list.appendChild(header);
+    return list;
+}
+
+function compareTeacherActivityRowOrder(manager, itemA, itemB, drilldown = manager.activityDrilldown || {}) {
+    const activityA = manager.normalizeActivity(itemA.activity);
+    const activityB = manager.normalizeActivity(itemB.activity);
+
+    if (!drilldown.subject) {
+        const subjectCompare = getSubjectBySlug(manager.getSubjects(), activityA.subjectSlug).name
+            .localeCompare(getSubjectBySlug(manager.getSubjects(), activityB.subjectSlug).name);
+        if (subjectCompare) return subjectCompare;
+    }
+
+    if (!drilldown.grade) {
+        const gradeCompare = manager.compareActivityGroupGrades(
+            manager.getActivityGroupGrades(activityA)[0],
+            manager.getActivityGroupGrades(activityB)[0]
+        );
+        if (gradeCompare) return gradeCompare;
+    }
+
+    if (!drilldown.trimester) {
+        const trimesterCompare = manager.getTeacherTrimesterOrder(manager.getActivityTrimesterKey(activityA))
+            - manager.getTeacherTrimesterOrder(manager.getActivityTrimesterKey(activityB));
+        if (trimesterCompare) return trimesterCompare;
+    }
+
+    if (!drilldown.month) {
+        const monthCompare = manager.getTeacherMonthOrder(manager.getActivityMonthKey(activityA))
+            - manager.getTeacherMonthOrder(manager.getActivityMonthKey(activityB));
+        if (monthCompare) return monthCompare;
+    }
+
+    if (!drilldown.week) {
+        const weekCompare = manager.getActivityWeekOrder(manager.getActivityWeekKey(activityA))
+            - manager.getActivityWeekOrder(manager.getActivityWeekKey(activityB));
+        if (weekCompare) return weekCompare;
+    }
+
+    const minutesCompare = manager.inferActivitySlotMinutes(activityA) - manager.inferActivitySlotMinutes(activityB);
+    if (minutesCompare) return minutesCompare;
+
+    const typeCompare = manager.getActivityTypeLabel(activityA.activityType).localeCompare(manager.getActivityTypeLabel(activityB.activityType));
+    if (typeCompare) return typeCompare;
+
+    return manager.getActivitySortName(activityA).localeCompare(manager.getActivitySortName(activityB));
+}
+
+function createTeacherActivityRow(manager, { activity, type }, { showGrade = true } = {}) {
+    const normalized = manager.normalizeActivity({ ...activity, source: type });
+    const grades = normalized.grades.length
+        ? normalized.grades.map(grade => manager.formatGradeLabel(grade)).join(', ')
+        : 'Needs Grade';
+    const trimester = manager.getTeacherTrimesterShortLabel(manager.getActivityTrimesterKey(normalized));
+    const month = manager.getTeacherMonthShortLabel(manager.getActivityMonthKey(normalized));
+    const week = manager.formatActivityWeekLabel(manager.getActivityWeekKey(normalized));
+    const template = manager.getActivityTemplateLabel(normalized.activityData?.templateId);
+    const minutes = normalized.estimatedMinutes || manager.inferActivitySlotMinutes(normalized);
+    const row = createElement('button', 'student-vocab-row teacher-activity-row');
+    row.type = 'button';
+    row.classList.toggle('teacher-activity-row-has-grade', showGrade);
+    row.innerHTML = `
+        <strong>${escapeHtml(normalized.title || 'Untitled Activity')}</strong>
+        ${showGrade ? `<span>${escapeHtml(grades)}</span>` : ''}
+        <span>${escapeHtml(trimester)}</span>
+        <span>${escapeHtml(month)}</span>
+        <span>${escapeHtml(week)}</span>
+        <span class="student-vocab-purpose">${escapeHtml(manager.getActivityTypeLabel(normalized.activityType))}</span>
+        <span>${escapeHtml(template)}</span>
+        <span>${escapeHtml(minutes && minutes !== 999 ? `${minutes}` : '-')}</span>
+        <i data-lucide="chevron-right"></i>
+    `;
+    row.addEventListener('click', () => manager.loadActivityObject(normalized, type));
+    return row;
+}
+
+function renderTeacherActivityRows(manager, container, activityItems = []) {
+    if (!activityItems.length) {
+        container.appendChild(createElement('p', 'teacher-empty-state', 'No activities here yet.'));
+        return;
+    }
+
+    const showGrade = !manager.activityDrilldown?.grade;
+    const headers = showGrade
+        ? ['Name', 'Grade', 'Trimester', 'Month', 'Week', 'Type', 'Template', 'Min']
+        : ['Name', 'Trimester', 'Month', 'Week', 'Type', 'Template', 'Min'];
+    const list = createTeacherActivityRowList(headers);
+    list.classList.toggle('teacher-activity-row-list-has-grade', showGrade);
+    activityItems
+        .slice()
+        .sort((itemA, itemB) => compareTeacherActivityRowOrder(manager, itemA, itemB))
+        .forEach(item => list.appendChild(createTeacherActivityRow(manager, item, { showGrade })));
+    container.appendChild(list);
+}
+
+export function renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null, selectedWeek = null) {
+    const header = createElement('div', 'activity-library-header');
     const nav = createElement('div', 'teacher-library-breadcrumb');
+    const actions = createElement('div', 'activity-library-actions');
+    const viewToggle = createElement('div', 'vocab-view-toggle teacher-activity-view-toggle');
+    const createButton = createElement('button', 'vocab-view-toggle-btn activity-create-toggle-btn');
+
+    viewToggle.id = 'teacher-activity-view-toggle';
+    viewToggle.setAttribute('aria-label', 'Activity view');
+
+    createButton.id = 'create-activity-btn';
+    createButton.type = 'button';
+    createButton.innerHTML = '<i data-lucide="plus"></i><span>Create Activity</span>';
 
     const subjectsButton = manager.createLibraryBreadcrumbButton('Subjects', () => {
         manager.resetActivityLibraryDrilldown();
@@ -96,7 +326,7 @@ export function renderTeacherActivityLibraryBreadcrumb(manager, container, selec
         const subject = getSubjectBySlug(manager.getSubjects(), selectedSubject);
         const subjectNode = selectedGrade
             ? manager.createLibraryBreadcrumbButton(subject.name, () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade: null, month: null, week: null };
+                manager.activityDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -109,9 +339,9 @@ export function renderTeacherActivityLibraryBreadcrumb(manager, container, selec
         nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
         const subject = getSubjectBySlug(manager.getSubjects(), selectedSubject);
         const gradeLabel = `${manager.formatActivityGroupGradeLabel(selectedGrade)} ${subject.name}`;
-        const gradeNode = selectedMonth || selectedWeek
+        const gradeNode = selectedTrimester || selectedMonth || selectedWeek
             ? manager.createLibraryBreadcrumbButton(gradeLabel, () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade: selectedGrade, month: null, week: null };
+                manager.activityDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -120,12 +350,38 @@ export function renderTeacherActivityLibraryBreadcrumb(manager, container, selec
         nav.appendChild(gradeNode);
     }
 
+    if (selectedTrimester) {
+        nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+        const trimesterLabel = manager.getTeacherTrimesterLabel(selectedTrimester);
+        const trimesterNode = selectedMonth || selectedWeek
+            ? manager.createLibraryBreadcrumbButton(trimesterLabel, () => {
+                manager.activityDrilldown = {
+                    subject: selectedSubject,
+                    grade: selectedGrade,
+                    trimester: selectedTrimester,
+                    month: null,
+                    week: null
+                };
+                manager.updateActivityRoute();
+                manager.renderActivityLibraryBrowser();
+                manager.refreshIcons();
+            })
+            : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+        nav.appendChild(trimesterNode);
+    }
+
     if (selectedMonth) {
         nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
         const monthLabel = manager.getTeacherMonthLabel(selectedMonth);
         const monthNode = selectedWeek
             ? manager.createLibraryBreadcrumbButton(monthLabel, () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade: selectedGrade, month: selectedMonth, week: null };
+                manager.activityDrilldown = {
+                    subject: selectedSubject,
+                    grade: selectedGrade,
+                    trimester: selectedTrimester,
+                    month: selectedMonth,
+                    week: null
+                };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -139,7 +395,10 @@ export function renderTeacherActivityLibraryBreadcrumb(manager, container, selec
         nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', manager.formatActivityWeekLabel(selectedWeek)));
     }
 
-    container.appendChild(nav);
+    actions.append(viewToggle, createButton);
+    header.append(nav, actions);
+    container.appendChild(header);
+    renderTeacherActivityViewControls(manager);
 }
 
 export function renderTeacherActivitySubjectPicker(manager, container, subjectGroups) {
@@ -168,7 +427,7 @@ export function renderTeacherActivitySubjectPicker(manager, container, subjectGr
                 color: subject.color
             });
             card.addEventListener('click', () => {
-                manager.activityDrilldown = { subject: subjectSlug, grade: null, month: null, week: null };
+                manager.activityDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -187,16 +446,16 @@ export function renderTeacherActivityGradePicker(manager, container, selectedSub
     Array.from(gradeGroups.entries())
         .sort(([gradeA], [gradeB]) => manager.compareActivityGroupGrades(gradeA, gradeB))
         .forEach(([grade, activityItems]) => {
-            const monthSummary = manager.formatActivityMonthSummary(manager.buildActivityMonthWeekGroups(activityItems));
+            const trimesterSummary = manager.formatActivityTrimesterSummary(manager.buildActivityTrimesterGroups(activityItems));
             const card = manager.createLibraryChoiceCard({
                 title: `${manager.formatActivityGroupGradeLabel(grade)} ${subject.name}`,
                 count: manager.formatActivityCount(activityItems.length),
-                meta: monthSummary || manager.formatActivityTemplateSummary(activityItems),
+                meta: trimesterSummary || manager.formatActivityTemplateSummary(activityItems),
                 icon: 'chevron-right',
                 color: subject.color
             });
             card.addEventListener('click', () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade, month: null, week: null };
+                manager.activityDrilldown = { subject: selectedSubject, grade, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -207,8 +466,40 @@ export function renderTeacherActivityGradePicker(manager, container, selectedSub
     container.appendChild(grid);
 }
 
-export function renderTeacherActivityMonthPicker(manager, container, selectedSubject, selectedGrade, monthGroups) {
+export function renderTeacherActivityTrimesterPicker(manager, container, selectedSubject, selectedGrade, trimesterGroups) {
     renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade);
+
+    const grid = createElement('div', 'teacher-library-choice-grid');
+    Array.from(trimesterGroups.entries())
+        .sort(([trimesterA], [trimesterB]) => manager.getTeacherTrimesterOrder(trimesterA) - manager.getTeacherTrimesterOrder(trimesterB))
+        .forEach(([trimesterKey, activityItems]) => {
+            const monthSummary = manager.formatActivityMonthSummary(manager.buildActivityMonthWeekGroups(activityItems));
+            const card = manager.createLibraryChoiceCard({
+                title: manager.getTeacherTrimesterLabel(trimesterKey),
+                count: manager.formatActivityCount(activityItems.length),
+                meta: monthSummary || manager.formatActivityTemplateSummary(activityItems),
+                icon: 'chevron-right'
+            });
+            card.addEventListener('click', () => {
+                manager.activityDrilldown = {
+                    subject: selectedSubject,
+                    grade: selectedGrade,
+                    trimester: trimesterKey,
+                    month: null,
+                    week: null
+                };
+                manager.updateActivityRoute();
+                manager.renderActivityLibraryBrowser();
+                manager.refreshIcons();
+            });
+            grid.appendChild(card);
+        });
+
+    container.appendChild(grid);
+}
+
+export function renderTeacherActivityMonthPicker(manager, container, selectedSubject, selectedGrade, selectedTrimester, monthGroups) {
+    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester);
 
     const grid = createElement('div', 'teacher-library-choice-grid');
     Array.from(monthGroups.entries())
@@ -222,7 +513,13 @@ export function renderTeacherActivityMonthPicker(manager, container, selectedSub
                 icon: 'folder'
             });
             card.addEventListener('click', () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade: selectedGrade, month: monthKey, week: null };
+                manager.activityDrilldown = {
+                    subject: selectedSubject,
+                    grade: selectedGrade,
+                    trimester: selectedTrimester,
+                    month: monthKey,
+                    week: null
+                };
                 manager.updateActivityRoute();
                 manager.renderActivityLibraryBrowser();
                 manager.refreshIcons();
@@ -233,8 +530,8 @@ export function renderTeacherActivityMonthPicker(manager, container, selectedSub
     container.appendChild(grid);
 }
 
-export function renderTeacherActivityWeekPicker(manager, container, selectedSubject, selectedGrade, selectedMonth, weekGroups) {
-    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedMonth);
+export function renderTeacherActivityWeekPicker(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, weekGroups) {
+    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth);
 
     const grid = createElement('div', 'teacher-library-choice-grid');
     Array.from(weekGroups.entries())
@@ -250,6 +547,7 @@ export function renderTeacherActivityWeekPicker(manager, container, selectedSubj
                 manager.activityDrilldown = {
                     subject: selectedSubject,
                     grade: selectedGrade,
+                    trimester: selectedTrimester,
                     month: selectedMonth,
                     week: weekKey
                 };
@@ -263,8 +561,19 @@ export function renderTeacherActivityWeekPicker(manager, container, selectedSubj
     container.appendChild(grid);
 }
 
-export function renderTeacherActivityClassBrowser(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek, activityItems) {
-    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedMonth, selectedWeek);
+export function renderTeacherActivityClassBrowser(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek, activityItems) {
+    renderTeacherActivityLibraryBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester, selectedMonth, selectedWeek);
+
+    if (getTeacherActivityViewMode(manager, {
+        subject: selectedSubject,
+        grade: selectedGrade,
+        trimester: selectedTrimester,
+        month: selectedMonth,
+        week: selectedWeek
+    }) === 'rows') {
+        renderTeacherActivityRows(manager, container, activityItems);
+        return;
+    }
 
     const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid');
     activityItems

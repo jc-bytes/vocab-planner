@@ -16,6 +16,7 @@ export function renderTeacherActivityAssignmentBrowser(manager, container = $('#
 
     const selectedSubject = manager.activityDrilldown.subject;
     const selectedGrade = manager.activityDrilldown.grade;
+    const selectedTrimester = manager.activityDrilldown.trimester;
 
     if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
         manager.resetActivityLibraryDrilldown();
@@ -30,10 +31,10 @@ export function renderTeacherActivityAssignmentBrowser(manager, container = $('#
         return;
     }
 
-    renderTeacherActivityAssignmentClassBrowser(manager, container, selectedSubject, selectedGrade, gradeGroups.get(selectedGrade));
+    renderTeacherActivityAssignmentClassBrowser(manager, container, selectedSubject, selectedGrade, selectedTrimester, gradeGroups.get(selectedGrade));
 }
 
-export function renderTeacherActivityAssignmentBreadcrumb(manager, container, selectedSubject = null, selectedGrade = null) {
+export function renderTeacherActivityAssignmentBreadcrumb(manager, container, selectedSubject = null, selectedGrade = null, selectedTrimester = null) {
     const nav = createElement('div', 'teacher-library-breadcrumb');
 
     const subjectsButton = manager.createLibraryBreadcrumbButton('Subjects', () => {
@@ -49,7 +50,7 @@ export function renderTeacherActivityAssignmentBreadcrumb(manager, container, se
         const subject = getSubjectBySlug(manager.getSubjects(), selectedSubject);
         const subjectNode = selectedGrade
             ? manager.createLibraryBreadcrumbButton(subject.name, () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade: null };
+                manager.activityDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityAssignmentBrowser();
                 manager.refreshIcons();
@@ -61,10 +62,24 @@ export function renderTeacherActivityAssignmentBreadcrumb(manager, container, se
     if (selectedGrade) {
         nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
         const subject = getSubjectBySlug(manager.getSubjects(), selectedSubject);
+        const gradeLabel = `${manager.formatActivityGroupGradeLabel(selectedGrade)} ${subject.name}`;
+        const gradeNode = selectedTrimester
+            ? manager.createLibraryBreadcrumbButton(gradeLabel, () => {
+                manager.activityDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null, week: null };
+                manager.updateActivityRoute();
+                manager.renderActivityAssignmentBrowser();
+                manager.refreshIcons();
+            })
+            : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
+        nav.appendChild(gradeNode);
+    }
+
+    if (selectedTrimester) {
+        nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
         nav.appendChild(createElement(
             'span',
             'teacher-library-breadcrumb-current',
-            `${manager.formatActivityGroupGradeLabel(selectedGrade)} ${subject.name}`
+            manager.getTeacherTrimesterLabel(selectedTrimester)
         ));
     }
 
@@ -97,7 +112,7 @@ export function renderTeacherActivityAssignmentSubjectPicker(manager, container,
                 color: subject.color
             });
             card.addEventListener('click', () => {
-                manager.activityDrilldown = { subject: subjectSlug, grade: null };
+                manager.activityDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityAssignmentBrowser();
                 manager.refreshIcons();
@@ -124,7 +139,7 @@ export function renderTeacherActivityAssignmentGradePicker(manager, container, s
                 color: subject.color
             });
             card.addEventListener('click', () => {
-                manager.activityDrilldown = { subject: selectedSubject, grade };
+                manager.activityDrilldown = { subject: selectedSubject, grade, trimester: null, month: null, week: null };
                 manager.updateActivityRoute();
                 manager.renderActivityAssignmentBrowser();
                 manager.refreshIcons();
@@ -135,8 +150,8 @@ export function renderTeacherActivityAssignmentGradePicker(manager, container, s
     container.appendChild(grid);
 }
 
-export function renderTeacherActivityAssignmentClassBrowser(manager, container, selectedSubject, selectedGrade, assignments) {
-    renderTeacherActivityAssignmentBreadcrumb(manager, container, selectedSubject, selectedGrade);
+export function renderTeacherActivityAssignmentClassBrowser(manager, container, selectedSubject, selectedGrade, selectedTrimester, assignments) {
+    renderTeacherActivityAssignmentBreadcrumb(manager, container, selectedSubject, selectedGrade, selectedTrimester);
 
     const grid = createElement('div', 'vocab-grid trimester-vocab-grid teacher-assignment-grid compact-vocab-grid');
     assignments

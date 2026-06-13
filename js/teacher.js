@@ -35,6 +35,7 @@ class TeacherManager {
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.editingWordIndex = -1;
+        this.autoGenerateVocabId = false;
         this.authDisabled = DEV_AUTH_DISABLED;
         this.isAuthenticated = this.authDisabled;
         this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
@@ -59,12 +60,23 @@ class TeacherManager {
             trimester: null,
             month: null
         };
+        try {
+            this.teacherVocabularyViewModes = JSON.parse(localStorage.getItem('teacher_vocabulary_view_modes') || '{}') || {};
+        } catch {
+            this.teacherVocabularyViewModes = {};
+        }
         this.activityDrilldown = {
             subject: null,
             grade: null,
+            trimester: null,
             month: null,
             week: null
         };
+        try {
+            this.teacherActivityViewModes = JSON.parse(localStorage.getItem('teacher_activity_view_modes') || '{}') || {};
+        } catch {
+            this.teacherActivityViewModes = {};
+        }
         this.quizLibraryItems = [];
         this.quizDrilldown = {
             subject: null,
@@ -82,7 +94,9 @@ class TeacherManager {
         this.activityLibraryStale = false;
         this.activityLibraryLastFetchFailed = false;
         this.activityAssignmentCache = null;
+        this.activityAssignmentCacheKey = null;
         this.activityAssignmentPromise = null;
+        this.activityAssignmentPromiseKey = null;
         this.activityAssignmentItems = [];
         this.weeklySparkItems = [];
         this.weeklySparkCache = null;

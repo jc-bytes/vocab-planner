@@ -7,17 +7,25 @@ function ensureActivitySettings(manager) {
 }
 
 function bindVocabularyMetaListeners(manager) {
-    $('#vocab-id').addEventListener('input', (e) => { manager.vocabSet.id = e.target.value; manager.triggerAutoSave(); });
-    $('#vocab-name').addEventListener('input', (e) => { manager.vocabSet.name = e.target.value; manager.triggerAutoSave(); });
+    $('#vocab-name').addEventListener('input', (e) => {
+        manager.vocabSet.name = e.target.value;
+        manager.updateGeneratedVocabId();
+        manager.triggerAutoSave();
+        manager.updateVocabularyEditorSummary();
+    });
     $('#vocab-desc').addEventListener('input', (e) => { manager.vocabSet.description = e.target.value; manager.triggerAutoSave(); });
     $('#vocab-subject')?.addEventListener('change', (e) => {
         manager.vocabSet.subjectSlug = getVocabSubjectSlug({ subjectSlug: e.target.value });
+        manager.updateGeneratedVocabId();
         manager.triggerAutoSave();
+        manager.updateVocabularyEditorSummary();
     });
     $('#vocab-grade').addEventListener('input', (e) => {
         const val = e.target.value;
         manager.vocabSet.grades = val.split(',').map(s => s.trim()).filter(s => s !== '');
+        manager.updateGeneratedVocabId();
         manager.triggerAutoSave();
+        manager.updateVocabularyEditorSummary();
     });
     $('#vocab-assigned-date').addEventListener('change', (e) => {
         manager.setVocabAssignedDate(e.target.value);
@@ -42,70 +50,79 @@ function bindVocabularyPublishListeners(manager) {
     });
 }
 
+function bindVocabularyToolbarMenus() {
+    const menus = $$('.vocab-editor-heading .toolbar-menu');
+    if (!menus.length) return;
+
+    menus.forEach(menu => {
+        menu.addEventListener('toggle', () => {
+            if (!menu.open) return;
+            menus.forEach(otherMenu => {
+                if (otherMenu !== menu) otherMenu.removeAttribute('open');
+            });
+        });
+
+        menu.querySelectorAll('.toolbar-menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                menu.removeAttribute('open');
+            });
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        menus.forEach(menu => {
+            if (!menu.contains(event.target)) menu.removeAttribute('open');
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        menus.forEach(menu => menu.removeAttribute('open'));
+    });
+}
+
+function bindVocabularyEditorTabs() {
+    const tabs = $$('.vocab-editor-tab');
+    const panels = $$('.vocab-editor-tab-panel');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.vocabEditorTab;
+            tabs.forEach(item => {
+                const isActive = item === tab;
+                item.classList.toggle('active', isActive);
+                item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            panels.forEach(panel => {
+                const isActive = panel.dataset.vocabEditorPanel === target;
+                panel.classList.toggle('active', isActive);
+                panel.classList.toggle('hidden', !isActive);
+            });
+        });
+    });
+}
+
 function bindActivitySettingInputs(manager) {
-    $('#setting-flashcards').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).flashcards = parseInt(e.target.value) || null;
-        manager.triggerAutoSave();
-    });
-    $('#setting-matching').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).matching = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-quiz').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).quiz = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-synonym-antonym').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).synonymAntonym = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-word-search').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).wordSearch = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-illustration').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).illustration = parseInt(e.target.value) || 5;
-        manager.triggerAutoSave();
-    });
-    $('#setting-crossword').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).crossword = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-hangman').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).hangman = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-scramble').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).scramble = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-wordle').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).wordle = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-speed-match').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).speedMatch = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-fill-in-blank').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).fillInBlank = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
     $('#activity-flow-settings')?.addEventListener('change', (e) => {
         if (!e.target.classList.contains('activity-flow-select')) return;
         manager.setActivityFlowChoice(e.target.dataset.activity, e.target.value);
+        manager.updateVocabularyEditorSummary();
+    });
+    $('#activity-flow-settings')?.addEventListener('input', (e) => {
+        if (e.target.dataset.activityWordCount) {
+            manager.setActivityWordCount(e.target.dataset.activityWordCount, e.target.value);
+            return;
+        }
+        if (e.target.dataset.activityReward) {
+            manager.setActivityRewardSetting(e.target.dataset.activity, e.target.dataset.activityReward, e.target.value);
+        }
+    });
+    $('#vocab-word-filter')?.addEventListener('input', () => {
+        manager.renderWords();
     });
 
-    $('#setting-completion-bonus').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).completionBonus = parseInt(e.target.value) || 50;
-        manager.triggerAutoSave();
-    });
     $('#setting-exchange-rate').addEventListener('input', (e) => {
         ensureActivitySettings(manager).exchangeRate = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
-    $('#setting-progress-reward').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).progressReward = parseInt(e.target.value) || 1;
         manager.triggerAutoSave();
     });
 }
@@ -145,6 +162,7 @@ function bindVocabularyImportExport(manager) {
 
     $('#export-btn').addEventListener('click', () => {
         if (!manager.ensureAuthenticated()) return;
+        manager.prepareWordHuntWordsForSave();
         manager.normalizeActivityFlowSettings();
         const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manager.vocabSet, null, 2));
         const downloadAnchorNode = document.createElement('a');
@@ -169,6 +187,7 @@ function bindVocabularyImportExport(manager) {
                 const data = JSON.parse(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
                 manager.vocabSet = data;
+                manager.autoGenerateVocabId = false;
 
                 manager.updateFormUI();
                 manager.renderWords();
@@ -218,6 +237,8 @@ export function initTeacherVocabularyEditorListeners(manager) {
 
     bindVocabularyMetaListeners(manager);
     bindVocabularyPublishListeners(manager);
+    bindVocabularyToolbarMenus();
+    bindVocabularyEditorTabs();
     bindActivitySettingInputs(manager);
     bindVocabularyModalListeners(manager);
     bindVocabularyImportExport(manager);

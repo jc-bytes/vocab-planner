@@ -22,6 +22,7 @@ import {
     normalizeFlowchartTemplate
 } from '../activityFlowchartAlgorithm.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
+import { attachStructuredWritingChecker } from '../studentWritingSuggestions.js';
 
 function markEditorReady(manager, statusText) {
     manager.setSaveStatus(statusText);
@@ -43,6 +44,7 @@ export const studentClassroomActivityTypeMountMethods = {
         root.classList.add('structured-response-root');
         root.classList.remove('card-sort-response-root', 'spreadsheet-table-response-root', 'image-hotspot-response-root', 'external-artifact-response-root', 'flowchart-response-root');
         root.innerHTML = this.renderStructuredResponseForm(template, responses);
+        attachStructuredWritingChecker(root);
         root.oninput = () => {
             this.syncStructuredResponses();
             if (this.editorAutosaveReady) this.queueAutosave();
