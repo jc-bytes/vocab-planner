@@ -23,6 +23,33 @@ function getCompactClassroomText(value = '', fallback = '') {
 }
 
 export const studentClassroomActivityBrowserRenderMethods = {
+    getClassroomActivityViewMode() {
+        return this.sm.studentClassroomActivityViewMode === 'rows' ? 'rows' : 'cards';
+    },
+
+    setClassroomActivityViewMode(mode) {
+        this.sm.studentClassroomActivityViewMode = mode === 'rows' ? 'rows' : 'cards';
+        localStorage.setItem('student_classroom_activity_view_mode', this.sm.studentClassroomActivityViewMode);
+        this.renderList(this.sm.studentClassroomActivityDrilldown || {});
+    },
+
+    renderClassroomViewControls() {
+        const container = document.getElementById('classroom-view-toggle');
+        if (!container) return;
+        const currentMode = this.getClassroomActivityViewMode();
+        container.innerHTML = `
+            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-classroom-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
+                <i data-lucide="layout-grid"></i><span>Cards</span>
+            </button>
+            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-classroom-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
+                <i data-lucide="list"></i><span>Rows</span>
+            </button>
+        `;
+        container.querySelectorAll('[data-classroom-view-mode]').forEach(button => {
+            button.addEventListener('click', () => this.setClassroomActivityViewMode(button.dataset.classroomViewMode));
+        });
+    },
+
     createClassroomBreadcrumbButton(label, onClick) {
         const button = createElement('button', 'teacher-library-crumb-btn', label);
         button.type = 'button';
@@ -31,6 +58,8 @@ export const studentClassroomActivityBrowserRenderMethods = {
     },
 
     renderClassroomBreadcrumb(container, drilldown = {}) {
+        const host = document.getElementById('classroom-context-breadcrumb') || container;
+        host.innerHTML = '';
         const nav = createElement('div', 'teacher-library-breadcrumb');
         nav.appendChild(this.createClassroomBreadcrumbButton('Activities', () => {
             this.navigateToClassroomFolder({});
@@ -39,7 +68,7 @@ export const studentClassroomActivityBrowserRenderMethods = {
         if (drilldown.section === THIS_WEEK_SECTION) {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', 'This Week'));
-            container.appendChild(nav);
+            host.appendChild(nav);
             return;
         }
 
@@ -73,7 +102,7 @@ export const studentClassroomActivityBrowserRenderMethods = {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.formatWeekLabelFromKey(drilldown.week)));
         }
 
-        container.appendChild(nav);
+        host.appendChild(nav);
     },
 
     createClassroomChoiceCard({ title, count, meta, icon }) {
@@ -197,6 +226,52 @@ export const studentClassroomActivityBrowserRenderMethods = {
         container.appendChild(grid);
     },
 
+    createClassroomActivityRowList(headers = []) {
+        const list = createElement('div', 'student-vocab-row-list student-classroom-row-list');
+        const header = createElement('div', 'student-vocab-row student-vocab-row-header student-classroom-row');
+        header.setAttribute('aria-hidden', 'true');
+        header.appendChild(createElement('strong', null, headers[0] || 'Name'));
+        headers.slice(1).forEach(label => header.appendChild(createElement('span', null, label)));
+        header.appendChild(createElement('i'));
+        list.appendChild(header);
+        return list;
+    },
+
+    createClassroomActivityRow(assignment) {
+        const savedSubmission = this.getSubmissionForAssignment(assignment.id);
+        const submission = savedSubmission?.id ? savedSubmission : null;
+        const status = submission?.status || 'not-started';
+        const placement = this.getAssignmentCalendarPlacement(assignment);
+        const row = createElement('button', 'student-vocab-row student-classroom-row');
+        row.type = 'button';
+        row.dataset.assignmentId = assignment.id;
+        row.innerHTML = `
+            <strong>${escapeHtml(assignment.title || 'Classroom Activity')}</strong>
+            <span>${escapeHtml(this.getMonthLabel(placement.month))}</span>
+            <span>${escapeHtml(placement.weekLabel || this.formatWeekLabelFromKey(placement.week))}</span>
+            <span class="student-vocab-purpose">${escapeHtml(getStudentAssignmentStatusLabel(status))}</span>
+            <i data-lucide="chevron-right"></i>
+        `;
+        row.addEventListener('click', () => {
+            this.sm.navigateTo({ view: 'classroom-activity', assignmentId: assignment.id });
+        });
+        return row;
+    },
+
+    renderClassroomAssignmentRows(container, assignments, emptyText = 'No activities here yet.') {
+        if (assignments.length === 0) {
+            container.appendChild(createElement('p', 'student-empty-state', emptyText));
+            return;
+        }
+
+        const list = this.createClassroomActivityRowList(['Name', 'Month', 'Week', 'Status']);
+        assignments
+            .slice()
+            .sort((a, b) => this.getAssignmentSortValue(a) - this.getAssignmentSortValue(b))
+            .forEach(assignment => list.appendChild(this.createClassroomActivityRow(assignment)));
+        container.appendChild(list);
+    },
+
     renderClassroomAssignmentGrid(container, assignments, emptyText = 'No activities here yet.') {
         if (assignments.length === 0) {
             container.appendChild(createElement('p', 'student-empty-state', emptyText));
@@ -216,7 +291,13 @@ export const studentClassroomActivityBrowserRenderMethods = {
         container.classList.add('teacher-library-browser');
         container.innerHTML = '';
 
-        const visibleAssignments = this.filterClassroomAssignmentsForCurrentWindow(assignments);
+        this.renderClassroomViewControls();
+        const breadcrumbHost = document.getElementById('classroom-context-breadcrumb');
+        if (breadcrumbHost) breadcrumbHost.innerHTML = '';
+
+        const selectedSubjectSlug = String(this.sm.selectedSubjectSlug || 'technology');
+        const visibleAssignments = this.filterClassroomAssignmentsForCurrentWindow(assignments)
+            .filter(assignment => String(assignment.subjectSlug || 'technology') === selectedSubjectSlug);
         const drilldown = this.normalizeClassroomDrilldown(route);
         this.sm.studentClassroomActivityDrilldown = drilldown;
 
@@ -228,7 +309,11 @@ export const studentClassroomActivityBrowserRenderMethods = {
 
         if (drilldown.section === THIS_WEEK_SECTION) {
             this.renderClassroomBreadcrumb(container, drilldown);
-            this.renderClassroomAssignmentGrid(
+            const renderer = this.getClassroomActivityViewMode() === 'rows'
+                ? this.renderClassroomAssignmentRows
+                : this.renderClassroomAssignmentGrid;
+            renderer.call(
+                this,
                 container,
                 this.getThisWeekAssignments(visibleAssignments),
                 'No activities for this week.'
@@ -246,7 +331,12 @@ export const studentClassroomActivityBrowserRenderMethods = {
                     month: null,
                     week: null
                 };
-                this.renderClassroomMonthPicker(container, currentTrimester, trimesterGroups.get(currentTrimester));
+                if (this.getClassroomActivityViewMode() === 'rows') {
+                    this.renderClassroomBreadcrumb(container, { trimester: currentTrimester });
+                    this.renderClassroomAssignmentRows(container, trimesterGroups.get(currentTrimester));
+                } else {
+                    this.renderClassroomMonthPicker(container, currentTrimester, trimesterGroups.get(currentTrimester));
+                }
                 return;
             }
 
@@ -256,12 +346,29 @@ export const studentClassroomActivityBrowserRenderMethods = {
                 month: null,
                 week: null
             };
-            this.renderClassroomOverview(container, visibleAssignments);
+            if (this.getClassroomActivityViewMode() === 'rows') {
+                this.renderClassroomBreadcrumb(container);
+                this.renderClassroomAssignmentRows(container, visibleAssignments);
+            } else {
+                this.renderClassroomOverview(container, visibleAssignments);
+            }
             return;
         }
 
         const trimesterAssignments = trimesterGroups.get(drilldown.trimester);
         const monthGroups = this.buildClassroomMonthGroups(trimesterAssignments);
+        if (this.getClassroomActivityViewMode() === 'rows' && !drilldown.month) {
+            this.sm.studentClassroomActivityDrilldown = {
+                section: null,
+                trimester: drilldown.trimester,
+                month: null,
+                week: null
+            };
+            this.renderClassroomBreadcrumb(container, { trimester: drilldown.trimester });
+            this.renderClassroomAssignmentRows(container, trimesterAssignments);
+            return;
+        }
+
         if (!drilldown.month || !monthGroups.has(drilldown.month)) {
             this.sm.studentClassroomActivityDrilldown = {
                 section: null,
@@ -287,7 +394,11 @@ export const studentClassroomActivityBrowserRenderMethods = {
         }
 
         this.renderClassroomBreadcrumb(container, drilldown);
-        this.renderClassroomAssignmentGrid(container, weekGroups.get(drilldown.week));
+        if (this.getClassroomActivityViewMode() === 'rows') {
+            this.renderClassroomAssignmentRows(container, weekGroups.get(drilldown.week));
+        } else {
+            this.renderClassroomAssignmentGrid(container, weekGroups.get(drilldown.week));
+        }
     },
 
     renderAssignmentCard(container, assignment) {

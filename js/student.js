@@ -90,13 +90,14 @@ class StudentManager {
             trimester: null,
             month: null
         };
-        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
+        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'rows';
         this.studentClassroomActivityDrilldown = {
             section: null,
             trimester: null,
             month: null,
             week: null
         };
+        this.studentClassroomActivityViewMode = localStorage.getItem('student_classroom_activity_view_mode') || 'rows';
         this.studentSectionScrollPositions = {};
         this.cloudSaveTimeout = null;
         this.unitImages = {};

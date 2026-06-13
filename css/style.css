@@ -4899,6 +4899,16 @@ select:focus {
     margin-bottom: 1.15rem;
 }
 
+#student-classroom-activities-view .classroom-selection-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "crumb subject view";
+    align-items: start;
+    gap: 0.45rem;
+    margin-bottom: 1.15rem;
+}
+
 #vocab-selection-view #back-to-main-menu-btn[hidden] {
     display: none !important;
 }
@@ -10131,7 +10141,8 @@ button.activity-card {
         flex-basis: 100%;
     }
 
-    #vocab-selection-view .vocab-selection-header {
+    #vocab-selection-view .vocab-selection-header,
+    #student-classroom-activities-view .classroom-selection-header {
         grid-template-columns: 1fr;
         grid-template-areas:
             "crumb"

@@ -8,6 +8,8 @@ export const studentClassroomActivityBrowserListMethods = {
         const list = $('#student-classroom-activities-list');
         if (!list) return;
 
+        this.sm.activities?.renderSubjectPicker?.('#classroom-subject-picker');
+        this.renderClassroomViewControls();
         this.sm.logStudentDomUpdate?.('student-classroom-activities-list', { source: 'renderList:loading' });
         list.innerHTML = '<div class="loading-spinner">Loading activities...</div>';
         try {

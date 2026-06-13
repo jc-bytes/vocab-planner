@@ -26,6 +26,15 @@ class StudentSubjectMethods {
         this.resetStudentVocabularyDrilldown();
         this.activities.renderDashboard();
         this.activities.renderStudentHome();
+        if (!document.getElementById('student-classroom-activities-view')?.classList.contains('hidden')) {
+            this.studentClassroomActivityDrilldown = {
+                section: null,
+                trimester: this.activities.getCurrentTrimesterKey(),
+                month: null,
+                week: null
+            };
+            this.classroomActivities?.renderList?.(this.studentClassroomActivityDrilldown);
+        }
     }
 
     ensureSelectedSubject(vocabs = null) {
