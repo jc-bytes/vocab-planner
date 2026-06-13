@@ -78,17 +78,19 @@
 
             <!-- Login View -->
             <section id="login-view" class="view hidden">
-                <div class="login-container"
-                    style="display: flex; flex-direction: column; align-items: stretch; justify-content: center; min-height: 60vh; max-width: 520px; margin: 0 auto;">
-                    <div class="icon" style="font-size: 4rem; margin-bottom: 1rem;">🎓</div>
-                    <h2 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Student Access</h2>
+                <div class="login-container">
+                    <div class="auth-hero-icon" aria-hidden="true">
+                        <i data-lucide="graduation-cap"></i>
+                    </div>
+                    <p class="auth-kicker">Vocabulary Master</p>
+                    <h2>Student Access</h2>
 
-                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                        <button id="show-login-btn" class="btn primary-btn" style="flex: 1;">Log In</button>
-                        <button id="show-register-btn" class="btn secondary-btn" style="flex: 1;">Register</button>
+                    <div class="auth-switch">
+                        <button id="show-login-btn" class="btn primary-btn auth-toggle">Log In</button>
+                        <button id="show-register-btn" class="btn secondary-btn auth-toggle">Register</button>
                     </div>
 
-                    <div id="student-login-panel" class="card" style="padding: 1.5rem;">
+                    <div id="student-login-panel" class="card auth-panel">
                         <form id="student-login-form">
                             <div class="form-group">
                                 <label for="login-email">Email</label>
@@ -108,7 +110,7 @@
                         </form>
                     </div>
 
-                    <div id="student-register-panel" class="card" style="padding: 1.5rem; display: none;">
+                    <div id="student-register-panel" class="card auth-panel" style="display: none;">
                         <form id="student-register-form">
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                                 <div class="form-group">
@@ -178,10 +180,6 @@
                     </div>
                     <div class="student-dashboard-actions">
                         <div id="student-subject-picker" class="student-subject-picker"></div>
-                        <button id="menu-vocab-btn" class="btn secondary-btn" type="button">
-                            <i data-lucide="book-open"></i>
-                            <span class="btn-label">All Units</span>
-                        </button>
                     </div>
                 </div>
                 <div id="student-home-dashboard" class="student-home-dashboard">
@@ -191,11 +189,12 @@
 
             <!-- Vocabulary Selection View -->
             <section id="vocab-selection-view" class="view hidden">
-                <div class="section-header">
-                    <button id="back-to-main-menu-btn" class="btn text-btn">← Today</button>
-                    <h2>Choose a Unit</h2>
+                <div class="section-header vocab-selection-header">
+                    <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
+                    <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                    <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
+                    <div id="vocab-view-toggle" class="vocab-view-toggle" aria-label="Vocabulary view"></div>
                 </div>
-                <div id="vocab-subject-picker" class="student-subject-picker"></div>
                 <div id="vocab-list" class="vocab-grid">
                     <!-- Vocabulary sets will be listed here -->
                     <div class="loading-spinner">Loading vocabularies...</div>

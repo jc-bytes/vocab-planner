@@ -12,17 +12,22 @@ import {
     where
 } from '../services/studentApi.js';
 
+const LEADERBOARD_ENABLED_GAMES = [
+    'galactic-breaker',
+    'level-devil',
+    'radius-raid',
+    'packabunchas',
+    'spacepi'
+];
+
 class StudentGameLeaderboardMethods {
     async saveHighScore(gameId, score, metadata = null) {
         if (this.sm.authDisabled) {
             return;
         }
 
-        // Games with leaderboards enabled
-        const gamesWithLeaderboard = ['galactic-breaker', 'level-devil', 'radius-raid', 'packabunchas', 'spacepi'];
-        
         // Only save scores for games with leaderboards enabled
-        if (!gamesWithLeaderboard.includes(gameId)) {
+        if (!LEADERBOARD_ENABLED_GAMES.includes(gameId)) {
             return; // This game doesn't have leaderboard support
         }
         if (!this.sm.currentUser) {
@@ -92,15 +97,10 @@ class StudentGameLeaderboardMethods {
         const nameEl = $('#current-game-name');
         if (nameEl) nameEl.textContent = game.name;
         
-        // Games with score reporting enabled should show leaderboard
-        const gamesWithLeaderboard = ['level-devil', 'radius-raid', 'packabunchas', 'spacepi', 
-                                      'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021',
-                                      'mystic-valley', 'slash-knight'];
-        
         // Update leaderboard button visibility
         const leaderboardBtn = $('#show-leaderboard-btn');
         if (leaderboardBtn) {
-            if (gamesWithLeaderboard.includes(game.id) || !this.sm.htmlGames.includes(game.id)) {
+            if (LEADERBOARD_ENABLED_GAMES.includes(game.id)) {
                 leaderboardBtn.style.display = 'inline-block';
             } else {
                 leaderboardBtn.style.display = 'none';
@@ -108,7 +108,7 @@ class StudentGameLeaderboardMethods {
         }
         
         // Load leaderboard data (will be shown when modal opens)
-        if (gamesWithLeaderboard.includes(game.id) || !this.sm.htmlGames.includes(game.id)) {
+        if (LEADERBOARD_ENABLED_GAMES.includes(game.id)) {
             this.loadLeaderboard(game.id);
         }
     }

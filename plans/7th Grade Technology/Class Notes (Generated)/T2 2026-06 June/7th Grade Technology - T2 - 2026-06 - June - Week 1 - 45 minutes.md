@@ -46,6 +46,7 @@ Analyze one environmental poster using a checklist with 2 strengths, 2 weaknesse
 - Title : Waste R. C.
 - One improvement suggestion: Add more info.
 
+
 ## While Activities
 
 - Analyze one environmental poster using a checklist with 2 strengths, 2 weaknesses, audience, purpose, main image, title, and one improvement suggestion.

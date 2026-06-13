@@ -40,7 +40,8 @@ Create a vocabulary table for these 10 words: audience, purpose, poster, Canva, 
 
 ## While Activities
 
-- Complete Daily Summative #1: Create a vocabulary table for these 10 words: audience, purpose, poster, Canva, contrast, alignment, readability, copyright-free, Creative Commons, credit. Plan an environmental poster, record image credit, and build a first draft in Canva.
+- Complete Daily Summative #1: Create a vocabulary table for these 10 words: audience, purpose, poster, Canva, contrast, alignment, readability, copyright-free, Creative Commons, credit. 
+- Plan an environmental poster, record image credit, and build a first draft in Canva.
 
 ## Post-Activities
 

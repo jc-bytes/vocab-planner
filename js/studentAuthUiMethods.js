@@ -73,8 +73,14 @@ class StudentAuthUiMethods {
 
         if (loginPanel) loginPanel.style.display = panel === 'login' ? 'block' : 'none';
         if (registerPanel) registerPanel.style.display = panel === 'register' ? 'block' : 'none';
-        if (loginBtn) loginBtn.classList.toggle('primary-btn', panel === 'login');
-        if (registerBtn) registerBtn.classList.toggle('primary-btn', panel === 'register');
+        if (loginBtn) {
+            loginBtn.classList.toggle('primary-btn', panel === 'login');
+            loginBtn.classList.toggle('secondary-btn', panel !== 'login');
+        }
+        if (registerBtn) {
+            registerBtn.classList.toggle('primary-btn', panel === 'register');
+            registerBtn.classList.toggle('secondary-btn', panel !== 'register');
+        }
     }
 
     validateRegistrationForm() {

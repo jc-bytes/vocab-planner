@@ -90,6 +90,7 @@ class StudentManager {
             trimester: null,
             month: null
         };
+        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
         this.studentClassroomActivityDrilldown = {
             section: null,
             trimester: null,

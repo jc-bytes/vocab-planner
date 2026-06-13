@@ -74,11 +74,6 @@ class StudentListenerMethods {
             this.navigateTo({ view: 'units' });
         });
 
-        this.addListener('#menu-vocab-btn', 'click', () => {
-            this.setStudentVocabularyDrilldownToCurrentTrimester();
-            this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
-        });
-
         this.addListener('#student-tab-today', 'click', () => {
             this.navigateTo({ view: 'menu' });
         });

@@ -85,7 +85,7 @@ class StudentActivityHomeMethods {
         };
     }
 
-    renderStudentHome() {
+    async renderStudentHome() {
         const container = $('#student-home-dashboard');
         if (!container) return;
         this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'renderStudentHome:clear' });
@@ -101,18 +101,33 @@ class StudentActivityHomeMethods {
         const today = new Date();
         const currentMonth = today.getMonth();
         const currentWeek = Math.floor((today.getDate() - 1) / 7) + 1;
-        const decorated = vocabs.map(vocab => ({
-            vocab,
-            schedule: this.getVocabSchedule(vocab, today),
-            progress: this.getUnitProgressSummary(vocab)
-        })).sort((a, b) => {
+        const decoratedVocabs = vocabs.map(vocab => {
+            const schedule = this.getVocabSchedule(vocab, today);
+            return {
+                kind: 'vocabulary',
+                id: `vocab:${vocab.path || vocab.name || ''}`,
+                vocab,
+                schedule,
+                progress: this.getUnitProgressSummary(vocab),
+                sortTime: schedule.dueDate?.getTime?.() || 0
+            };
+        }).sort((a, b) => {
             const aTime = a.schedule.dueDate?.getTime() || 0;
             const bTime = b.schedule.dueDate?.getTime() || 0;
             if (aTime !== bTime) return aTime - bTime;
             return String(a.vocab.name || '').localeCompare(String(b.vocab.name || ''));
         });
 
-        const dueItems = decorated
+        const vocabularyThisWeekItems = decoratedVocabs
+            .filter(item => {
+                if (this.isVocabScheduleInCurrentWeek(item.schedule, today)) return true;
+                const monthIndex = MONTH_INDEX[item.schedule.month];
+                return monthIndex === currentMonth && item.schedule.week === currentWeek;
+            })
+            .slice(0, 3);
+
+        const classroomItems = await this.getHomeClassroomItems(today);
+        const vocabularyPendingItems = decoratedVocabs
             .filter(item => {
                 if (item.progress.isComplete) return false;
                 if (item.schedule.dueDate) return item.schedule.dueDate <= today;
@@ -120,22 +135,18 @@ class StudentActivityHomeMethods {
                 const monthIndex = MONTH_INDEX[item.schedule.month];
                 return monthIndex < currentMonth || (monthIndex === currentMonth && item.schedule.week <= currentWeek);
             })
-            .slice(-2)
+            .slice(-3)
             .reverse();
 
-        const weekItems = decorated
-            .filter(item => {
-                const monthIndex = MONTH_INDEX[item.schedule.month];
-                return monthIndex === currentMonth && item.schedule.week === currentWeek;
-            })
-            .slice(0, 3);
+        const pendingItems = [
+            ...classroomItems.pending,
+            ...vocabularyPendingItems
+        ].sort((a, b) => b.sortTime - a.sortTime).slice(0, 4);
 
-        const fallbackWeekItems = weekItems.length > 0
-            ? weekItems
-            : decorated
-                .filter(item => !item.progress.isComplete)
-                .slice(-3)
-                .reverse();
+        const weekItems = [
+            ...vocabularyThisWeekItems,
+            ...classroomItems.week
+        ].sort((a, b) => a.sortTime - b.sortTime).slice(0, 4);
 
         const panels = [
             {
@@ -146,16 +157,16 @@ class StudentActivityHomeMethods {
             {
                 key: 'pending',
                 title: 'Pending',
-                subtitle: 'Due this trimester',
-                items: dueItems,
-                emptyText: message || 'No pending units due yet.'
+                subtitle: 'Open work',
+                items: pendingItems,
+                emptyText: message || 'No other work is pending.'
             },
             {
                 key: 'week',
                 title: 'This Week',
-                subtitle: 'Current vocabulary',
-                items: fallbackWeekItems,
-                emptyText: 'No vocabulary is scheduled this week.'
+                subtitle: 'Current units and activities',
+                items: weekItems,
+                emptyText: 'No work is scheduled this week.'
             }
         ];
 
@@ -189,6 +200,70 @@ class StudentActivityHomeMethods {
         if (window.lucide) {
             window.lucide.createIcons();
         }
+    }
+
+    isVocabScheduleInCurrentWeek(schedule = {}, date = new Date()) {
+        if (!(schedule.dueDate instanceof Date) || Number.isNaN(schedule.dueDate.getTime())) return false;
+        const classroom = this.sm.classroomActivities;
+        const bounds = classroom?.getCurrentWeekBounds?.(date) || this.getHomeCurrentWeekBounds(date);
+        const scheduleTime = schedule.dueDate.getTime();
+        return scheduleTime >= bounds.start && scheduleTime <= bounds.end;
+    }
+
+    getHomeCurrentWeekBounds(date = new Date()) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const daysSinceMonday = (start.getDay() + 6) % 7;
+        start.setDate(start.getDate() - daysSinceMonday);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+        return { start: start.getTime(), end: end.getTime() };
+    }
+
+    async getHomeClassroomItems(today = new Date()) {
+        const classroom = this.sm.classroomActivities;
+        if (!classroom) return { pending: [], week: [] };
+
+        try {
+            const [assignments] = await Promise.all([
+                classroom.loadAssignments(),
+                classroom.loadSubmissions()
+            ]);
+            const visibleAssignments = classroom.filterClassroomAssignmentsForCurrentWindow(assignments, today);
+            const weekAssignmentIds = new Set(classroom.getThisWeekAssignments(visibleAssignments).map(assignment => assignment.id));
+            const mapAssignment = assignment => this.createHomeClassroomItem(classroom, assignment, today);
+
+            return {
+                pending: visibleAssignments
+                    .map(mapAssignment)
+                    .filter(item => !item.isComplete),
+                week: visibleAssignments
+                    .filter(assignment => weekAssignmentIds.has(assignment.id))
+                    .map(mapAssignment)
+            };
+        } catch (error) {
+            console.error('Failed to load dashboard classroom activities:', error);
+            return { pending: [], week: [] };
+        }
+    }
+
+    createHomeClassroomItem(classroom, assignment, today = new Date()) {
+        const submission = classroom.getSubmissionForAssignment(assignment.id);
+        const placement = classroom.getAssignmentCalendarPlacement(assignment, today);
+        const dueTime = assignment.dueDate ? classroom.dueDateEndMillis(assignment.dueDate) : 0;
+        const startTime = placement.scheduledStart?.getTime?.() || classroom.getAssignmentSortValue(assignment);
+        const status = submission?.status || 'not-started';
+        return {
+            kind: 'activity',
+            id: `activity:${assignment.id}`,
+            assignment,
+            submission,
+            placement,
+            status,
+            isComplete: Boolean(submission?.id && status === 'submitted'),
+            sortTime: dueTime || startTime || 0
+        };
     }
 
     normalizeSpark(spark = {}) {
@@ -377,10 +452,15 @@ class StudentActivityHomeMethods {
         if (items.length === 0) {
             list.innerHTML = `<p class="teacher-empty-state">${emptyText}</p>`;
         } else {
-            items.forEach(item => list.appendChild(this.createHomeUnitCard(item)));
+            items.forEach(item => list.appendChild(this.createHomeWorkCard(item)));
         }
         panel.appendChild(list);
         return panel;
+    }
+
+    createHomeWorkCard(item) {
+        if (item.kind === 'activity') return this.createHomeClassroomCard(item);
+        return this.createHomeUnitCard(item);
     }
 
     createHomeUnitCard(item) {
@@ -398,7 +478,7 @@ class StudentActivityHomeMethods {
             <div class="student-home-unit-icon"><i data-lucide="book-open"></i></div>
             <div class="student-home-unit-copy">
                 <strong>${escapeHtml(vocab.name || 'Vocabulary Unit')}</strong>
-                <span>${escapeHtml(subject.name)} · ${escapeHtml(schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab)))}</span>
+                <span>Vocabulary · ${escapeHtml(subject.name)} · ${escapeHtml(schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab)))}</span>
             </div>
             <div class="student-home-unit-status">
                 <span>${progressText}</span>
@@ -411,6 +491,37 @@ class StudentActivityHomeMethods {
             card.addEventListener('focus', preload, { once: true });
         }
         card.addEventListener('click', () => this.loadVocabulary(vocab));
+        return card;
+    }
+
+    createHomeClassroomCard(item) {
+        const { assignment, placement, status } = item;
+        const subject = getSubjectBySlug(this.sm.subjects, assignment.subjectSlug || this.sm.selectedSubjectSlug || 'technology');
+        const classroom = this.sm.classroomActivities;
+        const statusLabel = item.isComplete
+            ? 'Submitted'
+            : status === 'draft'
+                ? 'In progress'
+                : 'Open';
+        const context = placement.weekLabel && placement.weekLabel !== 'Unscheduled'
+            ? `${classroom.getMonthLabel(placement.month)} ${placement.weekLabel}`
+            : assignment.weekLabel || classroom.formatDueDate(assignment.dueDate);
+        const card = createElement('button', 'student-home-unit student-home-activity');
+        card.type = 'button';
+        card.innerHTML = `
+            <div class="student-home-unit-icon"><i data-lucide="clipboard-list"></i></div>
+            <div class="student-home-unit-copy">
+                <strong>${escapeHtml(assignment.title || 'Classroom Activity')}</strong>
+                <span>Activity · ${escapeHtml(subject.name)} · ${escapeHtml(context)}</span>
+            </div>
+            <div class="student-home-unit-status">
+                <span>${escapeHtml(statusLabel)}</span>
+                <i data-lucide="chevron-right"></i>
+            </div>
+        `;
+        card.addEventListener('click', () => {
+            this.sm.navigateTo({ view: 'classroom-activity', assignmentId: assignment.id });
+        });
         return card;
     }
 }

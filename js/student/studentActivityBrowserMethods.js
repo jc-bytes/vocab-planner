@@ -37,6 +37,8 @@ class StudentActivityBrowserMethods {
         const selectedTrimester = drilldown.trimester;
         const selectedMonth = drilldown.month;
 
+        this.renderStudentVocabularyViewControls();
+
         if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
             const currentTrimester = this.getCurrentTrimesterKey();
             if (trimesterGroups.has(currentTrimester)) {
@@ -52,6 +54,12 @@ class StudentActivityBrowserMethods {
 
         const monthGroups = this.buildVocabularyMonthGroups(trimesterGroups.get(selectedTrimester));
 
+        if (this.getStudentVocabularyViewMode() === 'rows' && !selectedMonth) {
+            this.sm.studentVocabularyDrilldown.month = null;
+            this.renderStudentAssignmentPicker(container, selectedTrimester, null, trimesterGroups.get(selectedTrimester));
+            return;
+        }
+
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
             this.sm.studentVocabularyDrilldown.month = null;
             this.renderStudentMonthPicker(container, selectedTrimester, monthGroups);
@@ -62,6 +70,12 @@ class StudentActivityBrowserMethods {
     }
 
     renderStudentLibraryBreadcrumb(container, selectedTrimester = null, selectedMonth = null) {
+        const headerBreadcrumb = container?.id === 'vocab-list' ? $('#vocab-context-breadcrumb') : null;
+        const target = headerBreadcrumb || container;
+        if (headerBreadcrumb) {
+            headerBreadcrumb.innerHTML = '';
+        }
+
         const nav = createElement('div', 'teacher-library-breadcrumb');
         const rootButton = this.createStudentBreadcrumbButton('Vocabulary', () => {
             this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
@@ -86,7 +100,7 @@ class StudentActivityBrowserMethods {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getMonthLabel(selectedMonth)));
         }
 
-        container.appendChild(nav);
+        target.appendChild(nav);
     }
 
     createStudentBreadcrumbButton(label, onClick) {
@@ -96,8 +110,63 @@ class StudentActivityBrowserMethods {
         return button;
     }
 
+    getStudentVocabularyViewMode() {
+        return this.sm.studentVocabularyViewMode === 'rows' ? 'rows' : 'cards';
+    }
+
+    setStudentVocabularyViewMode(mode) {
+        this.sm.studentVocabularyViewMode = mode === 'rows' ? 'rows' : 'cards';
+        localStorage.setItem('student_vocabulary_view_mode', this.sm.studentVocabularyViewMode);
+        this.renderDashboard();
+    }
+
+    renderStudentVocabularyViewControls() {
+        const container = $('#vocab-view-toggle');
+        if (!container) return;
+
+        const currentMode = this.getStudentVocabularyViewMode();
+        container.innerHTML = `
+            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
+                <i data-lucide="layout-grid"></i>
+                <span>Cards</span>
+            </button>
+            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
+                <i data-lucide="list"></i>
+                <span>Rows</span>
+            </button>
+        `;
+
+        container.querySelectorAll('[data-vocab-view-mode]').forEach(button => {
+            button.addEventListener('click', () => {
+                this.setStudentVocabularyViewMode(button.dataset.vocabViewMode);
+            });
+        });
+    }
+
     renderStudentTrimesterPicker(container, trimesterGroups) {
         this.renderStudentLibraryBreadcrumb(container);
+
+        if (this.getStudentVocabularyViewMode() === 'rows') {
+            const list = this.createStudentVocabRowList(['Trimester', 'Months', 'Units']);
+            Array.from(trimesterGroups.entries())
+                .sort(([trimesterA], [trimesterB]) => this.getTrimesterOrder(trimesterA) - this.getTrimesterOrder(trimesterB))
+                .forEach(([trimesterKey, trimesterVocabs]) => {
+                    const monthSummary = this.formatMonthSummary(this.buildVocabularyMonthGroups(trimesterVocabs)) || 'No months';
+                    const row = this.createStudentVocabRow({
+                        primary: this.getTrimesterLabel(trimesterKey),
+                        cells: [monthSummary, this.formatUnitCount(trimesterVocabs.length)],
+                        icon: 'chevron-right'
+                    });
+                    row.addEventListener('click', () => {
+                        this.sm.studentVocabularyDrilldown = { trimester: trimesterKey, month: null };
+                        this.sm.navigateTo({ view: 'units', trimester: trimesterKey });
+                    });
+                    list.appendChild(row);
+                });
+            container.appendChild(list);
+            this.refreshIcons();
+            return;
+        }
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(trimesterGroups.entries())
@@ -122,6 +191,30 @@ class StudentActivityBrowserMethods {
 
     renderStudentMonthPicker(container, selectedTrimester, monthGroups) {
         this.renderStudentLibraryBreadcrumb(container, selectedTrimester);
+
+        if (this.getStudentVocabularyViewMode() === 'rows') {
+            const list = this.createStudentVocabRowList(['Month', 'Units', 'Trimester']);
+            Array.from(monthGroups.entries())
+                .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+                .forEach(([monthKey, monthVocabs]) => {
+                    const row = this.createStudentVocabRow({
+                        primary: this.getMonthLabel(monthKey),
+                        cells: [this.formatUnitCount(monthVocabs.length), this.getTrimesterLabel(selectedTrimester)],
+                        icon: 'chevron-right'
+                    });
+                    row.addEventListener('click', () => {
+                        this.sm.studentVocabularyDrilldown = {
+                            trimester: selectedTrimester,
+                            month: monthKey
+                        };
+                        this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: monthKey });
+                    });
+                    list.appendChild(row);
+                });
+            container.appendChild(list);
+            this.refreshIcons();
+            return;
+        }
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(monthGroups.entries())
@@ -150,6 +243,18 @@ class StudentActivityBrowserMethods {
     renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs) {
         this.renderStudentLibraryBreadcrumb(container, selectedTrimester, selectedMonth);
 
+        if (this.getStudentVocabularyViewMode() === 'rows') {
+            const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type']);
+            monthVocabs
+                .sort((a, b) => this.compareVocabularySchedule(a, b))
+                .forEach(vocab => list.appendChild(this.createVocabularyRow(vocab)));
+
+            container.appendChild(list);
+            this.scheduleFirstVocabularyPreload(container);
+            this.refreshIcons();
+            return;
+        }
+
         const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
         monthVocabs
             .sort((a, b) => this.compareVocabularySchedule(a, b))
@@ -177,6 +282,32 @@ class StudentActivityBrowserMethods {
         }
 
         return card;
+    }
+
+    createStudentVocabRowList(headers = []) {
+        const list = createElement('div', 'student-vocab-row-list');
+        const header = createElement('div', 'student-vocab-row student-vocab-row-header');
+        headers.forEach(label => header.appendChild(createElement('span', null, label)));
+        while (header.children.length < 4) {
+            header.appendChild(createElement('span', null, ''));
+        }
+        header.appendChild(createElement('span', null, ''));
+        list.appendChild(header);
+        return list;
+    }
+
+    createStudentVocabRow({ primary, cells = [], icon = 'chevron-right' }) {
+        const row = createElement('button', 'student-vocab-row');
+        row.type = 'button';
+        row.appendChild(createElement('strong', null, primary));
+        cells.forEach(cell => row.appendChild(createElement('span', null, cell)));
+        while (row.children.length < 4) {
+            row.appendChild(createElement('span', null, ''));
+        }
+        const iconEl = createElement('i');
+        iconEl.setAttribute('data-lucide', icon);
+        row.appendChild(iconEl);
+        return row;
     }
 
     refreshIcons() {
@@ -273,6 +404,33 @@ class StudentActivityBrowserMethods {
         }
         card.addEventListener('click', () => this.loadVocabulary(vocab));
         return card;
+    }
+
+    createVocabularyRow(vocab) {
+        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
+        const schedule = this.getVocabSchedule(vocab);
+        const title = this.formatVocabularyCardTitle(vocab);
+        const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
+        const monthLabel = this.getMonthLabel(schedule.month);
+        const weekLabel = schedule.week ? `Week ${schedule.week}` : 'No week';
+        const row = createElement('button', 'student-vocab-row student-vocab-unit-row');
+        row.type = 'button';
+        row.style.setProperty('--subject-color', subject.color);
+        row.innerHTML = `
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(monthLabel)}</span>
+            <span>${escapeHtml(weekLabel)}</span>
+            <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+            <i data-lucide="arrow-right"></i>
+        `;
+        if (vocab.path) {
+            row.dataset.vocabPath = vocab.path;
+            const preload = () => preloadVocabularyFile(vocab.path);
+            row.addEventListener('pointerenter', preload, { once: true });
+            row.addEventListener('focus', preload, { once: true });
+        }
+        row.addEventListener('click', () => this.loadVocabulary(vocab));
+        return row;
     }
 
     formatVocabularyCardTitle(vocab) {

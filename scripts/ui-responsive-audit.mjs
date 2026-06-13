@@ -532,8 +532,7 @@ async function assertStudentMobileMenu(page, baseUrl) {
             tabsVisible: visible('.student-home-tabs'),
             activeTab: document.querySelector('.student-home-tab.active')?.dataset.panel,
             visiblePanels,
-            subject: rectFor('#student-subject-picker'),
-            allUnits: rectFor('#menu-vocab-btn')
+            subject: rectFor('#student-subject-picker')
         };
     });
 
@@ -544,9 +543,8 @@ async function assertStudentMobileMenu(page, baseUrl) {
         || dashboardState.visiblePanels[0] !== 'spark') {
         throw new Error(`Student mobile dashboard is not compacted into one active panel: ${JSON.stringify(dashboardState)}`);
     }
-    if (!dashboardState.subject || !dashboardState.allUnits
-        || Math.abs(dashboardState.subject.centerY - dashboardState.allUnits.centerY) > 8) {
-        throw new Error(`Student mobile class picker and All Units are not aligned: ${JSON.stringify(dashboardState)}`);
+    if (!dashboardState.subject) {
+        throw new Error(`Student mobile class picker is missing: ${JSON.stringify(dashboardState)}`);
     }
 
     await page.locator('#student-mobile-menu-toggle').click();
