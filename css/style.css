@@ -11584,6 +11584,47 @@ button.activity-card {
         align-self: center;
     }
 
+    .teacher-vocab-row:not(.student-vocab-row-header),
+    .word-hunt-review-row:not(.student-vocab-row-header) {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.45rem 0.65rem;
+        padding: 1rem 3rem 1rem 1rem;
+    }
+
+    .teacher-vocab-row:not(.student-vocab-row-header)>strong,
+    .word-hunt-review-row:not(.student-vocab-row-header)>strong {
+        flex: 1 0 100%;
+        max-width: 100%;
+        font-size: 1rem;
+        line-height: 1.25;
+    }
+
+    .teacher-vocab-row:not(.student-vocab-row-header)>span,
+    .word-hunt-review-row:not(.student-vocab-row-header)>span {
+        flex: 0 1 auto;
+        justify-self: auto;
+        width: auto;
+        max-width: 100%;
+        text-align: left;
+        line-height: 1.35;
+    }
+
+    .teacher-vocab-row:not(.student-vocab-row-header)>span:first-of-type::before,
+    .word-hunt-review-row:not(.student-vocab-row-header)>span:first-of-type::before {
+        content: none;
+    }
+
+    .teacher-vocab-row:not(.student-vocab-row-header)>svg,
+    .word-hunt-review-row:not(.student-vocab-row-header)>svg {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+    }
+
     .student-export-menu,
     .student-export-menu summary,
     .student-export-menu-panel {
@@ -11660,22 +11701,43 @@ button.activity-card {
     }
 
     .vocab-editor-tab {
-        flex: 1 0 155px;
+        flex: 1 1 0;
+        min-width: 112px;
     }
 
     #teacher-editor-view .word-card {
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 0.45rem 0.65rem;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.65rem;
+        padding: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: var(--radius-md);
     }
 
     #teacher-editor-view .word-card .word-header,
     #teacher-editor-view .word-card .word-definition,
-    #teacher-editor-view .word-image-path {
+    #teacher-editor-view .word-image-path,
+    #teacher-editor-view .word-card .actions,
+    #teacher-editor-view .word-hunt-card-toggle {
         grid-column: 1 / -1;
+    }
+
+    #teacher-editor-view .word-card p {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    #teacher-editor-view .word-card .actions {
+        justify-self: start;
+    }
+
+    #teacher-editor-view .word-card .actions .btn {
+        width: var(--touch-target);
+        min-height: var(--touch-target);
     }
 
     #teacher-editor-view .word-hunt-card-toggle {
         justify-self: start;
+        min-height: var(--touch-target);
     }
 
     .teacher-vocab-library-header {
@@ -11684,8 +11746,22 @@ button.activity-card {
     }
 
     .teacher-vocab-library-header .teacher-toolbar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         justify-content: flex-start;
         margin-left: 0;
+        width: 100%;
+    }
+
+    .teacher-vocab-view-toggle {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .teacher-vocab-library-header .teacher-toolbar .btn,
+    .teacher-vocab-library-header .teacher-toolbar label.btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .teacher-panel-header {
@@ -11943,6 +12019,19 @@ button.activity-card {
     .word-hunt-review-layout {
         grid-template-columns: 1fr;
         height: auto;
+    }
+
+    .word-hunt-browser-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .word-hunt-review-breadcrumb {
+        width: 100%;
+    }
+
+    .word-hunt-view-toggle {
+        width: 100%;
     }
 
     .word-hunt-review-roster {
