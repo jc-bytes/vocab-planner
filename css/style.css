@@ -1986,8 +1986,8 @@ input[readonly] {
 .teacher-vocab-library-header .teacher-toolbar .btn,
 .teacher-vocab-library-header .teacher-toolbar label.btn,
 .teacher-vocab-view-toggle {
-    min-height: 2.55rem;
-    height: 2.55rem;
+    min-height: var(--touch-target);
+    height: auto;
     box-sizing: border-box;
 }
 
@@ -1999,6 +1999,10 @@ input[readonly] {
     padding-top: 0;
     padding-bottom: 0;
     line-height: 1;
+}
+
+.teacher-vocab-view-toggle .vocab-view-toggle-btn {
+    min-height: var(--touch-target);
 }
 
 .teacher-stat-grid {
