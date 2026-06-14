@@ -105,9 +105,9 @@ async function checkFieldWriting(field, panel, token) {
     }
 }
 
-export function attachStructuredWritingChecker(root) {
+export function attachWritingChecker(root, selector = '[data-writing-check]') {
     if (!root) return;
-    root.querySelectorAll('[data-response-text]').forEach(field => {
+    root.querySelectorAll(selector).forEach(field => {
         const panel = field.parentElement?.querySelector('[data-writing-suggestions]');
         if (!panel) return;
 
@@ -125,4 +125,8 @@ export function attachStructuredWritingChecker(root) {
         field.addEventListener('blur', scheduleCheck);
         if (String(field.value || '').trim()) scheduleCheck();
     });
+}
+
+export function attachStructuredWritingChecker(root) {
+    attachWritingChecker(root, '[data-response-text]');
 }

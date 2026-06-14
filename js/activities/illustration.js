@@ -1,6 +1,7 @@
 import { createElement, $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
+import { attachWritingChecker } from '../studentWritingSuggestions.js';
 
 const WORD_HUNT_TEXT_RULES = {
     definition: { minChars: 12, minWords: 3 },
@@ -192,6 +193,7 @@ export class IllustrationActivity {
         wrapper.appendChild(this.createHuntGrid(word, entry));
         wrapper.appendChild(this.createFooter(entry));
         this.container.appendChild(wrapper);
+        attachWritingChecker(wrapper);
 
         this.previewImage = this.container.querySelector('#word-hunt-preview');
         this.removeImageButton = this.container.querySelector('[data-word-hunt-remove-image]');
@@ -335,10 +337,16 @@ export class IllustrationActivity {
         textarea.rows = field === 'definition' ? 3 : 2;
         textarea.placeholder = placeholder;
         textarea.value = value || '';
+        textarea.dataset.writingCheck = 'true';
         textarea.addEventListener('input', event => this.updateEntryField(field, event.target.value));
 
         group.appendChild(labelEl);
         group.appendChild(textarea);
+        const writingSuggestions = createElement('div', 'writing-suggestion-panel');
+        writingSuggestions.dataset.writingSuggestions = 'true';
+        writingSuggestions.setAttribute('role', 'status');
+        writingSuggestions.hidden = true;
+        group.appendChild(writingSuggestions);
         if (helper) {
             const helperText = createElement('p', 'word-hunt-field-helper', helper);
             group.appendChild(helperText);
