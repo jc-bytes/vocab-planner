@@ -2193,7 +2193,7 @@ input[readonly] {
 .subject-manager-row input[type="color"] {
     width: 48px;
     min-width: 48px;
-    height: 40px;
+    height: var(--touch-target);
     padding: 0.2rem;
 }
 
@@ -2207,7 +2207,7 @@ input[readonly] {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    min-height: 40px;
+    min-height: var(--touch-target);
     color: var(--text-muted);
     font-size: 0.86rem;
     font-weight: 700;
@@ -2817,8 +2817,17 @@ input[readonly] {
     margin-left: auto;
 }
 
-.activity-create-toggle-btn {
-    min-height: 2.55rem;
+.teacher-activity-view-toggle {
+    min-height: var(--touch-target);
+}
+
+.teacher-activity-view-toggle .vocab-view-toggle-btn {
+    min-height: var(--touch-target);
+}
+
+.activity-library-actions .activity-create-toggle-btn {
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
     padding: 0 0.8rem;
     border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: var(--radius-md);
@@ -2826,8 +2835,8 @@ input[readonly] {
     color: var(--text-main);
 }
 
-.activity-create-toggle-btn:hover,
-.activity-create-toggle-btn:focus-visible {
+.activity-library-actions .activity-create-toggle-btn:hover,
+.activity-library-actions .activity-create-toggle-btn:focus-visible {
     background: rgba(99, 102, 241, 0.22);
     color: #ffffff;
 }
@@ -5864,8 +5873,8 @@ input[readonly] {
 }
 
 .vocab-header-subject-picker .student-class-picker {
-    min-height: 2.55rem;
-    height: 2.55rem;
+    min-height: var(--touch-target);
+    height: var(--touch-target);
     gap: 0.42rem;
     padding: 0 0.56rem 0 0.62rem;
     border-color: rgba(148, 163, 184, 0.2);
@@ -5881,7 +5890,8 @@ input[readonly] {
 .vocab-header-subject-picker .student-subject-select {
     width: auto;
     min-width: 104px;
-    height: 2.1rem;
+    min-height: var(--touch-target);
+    height: var(--touch-target);
     padding: 0 1.45rem 0 0.1rem;
     font-size: 0.78rem;
     font-weight: 900;
@@ -5893,7 +5903,7 @@ input[readonly] {
     display: inline-flex;
     align-items: center;
     justify-self: end;
-    min-height: 2.55rem;
+    min-height: var(--touch-target);
     padding: 0.2rem;
     border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: var(--radius-md);
@@ -5909,7 +5919,7 @@ input[readonly] {
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    min-height: 2.1rem;
+    min-height: var(--touch-target);
     min-width: 2.2rem;
     padding: 0 0.55rem;
     border: 0;
@@ -11538,6 +11548,14 @@ button.activity-card {
 
     .vocab-view-toggle {
         width: 100%;
+        min-height: var(--touch-target);
+    }
+
+    .vocab-header-subject-picker .student-class-picker,
+    .vocab-header-subject-picker .student-subject-select,
+    .vocab-view-toggle .vocab-view-toggle-btn {
+        min-height: var(--touch-target);
+        height: var(--touch-target);
     }
 
     .vocab-view-toggle-btn {
@@ -11798,8 +11816,20 @@ button.activity-card {
     }
 
     .activity-library-actions {
-        justify-content: flex-start;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-content: stretch;
         margin-left: 0;
+        width: 100%;
+    }
+
+    .teacher-activity-view-toggle {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .activity-create-toggle-btn {
+        width: 100%;
     }
 
     #activity-template-modal .activity-template-modal-content {

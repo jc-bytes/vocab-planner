@@ -170,6 +170,7 @@ class StudentActivityHomeMethods {
             }
         ];
 
+        container.replaceChildren();
         const tabList = createElement('div', 'student-home-tabs');
         tabList.setAttribute('role', 'tablist');
         tabList.setAttribute('aria-label', 'Dashboard sections');
