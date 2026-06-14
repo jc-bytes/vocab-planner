@@ -11650,24 +11650,21 @@ button.activity-card {
         display: none;
     }
 
-    .quiz-vocab-row:not(.student-vocab-row-header)>span[data-vocab-word-count] {
+    .teacher-vocab-row:not(.student-vocab-row-header)>span[data-vocab-word-count] {
         display: none;
     }
 
-    .teacher-vocab-row:not(.quiz-vocab-row):not(.student-vocab-row-header)>span[data-vocab-word-count],
     .teacher-vocab-row:not(.student-vocab-row-header)>.quiz-vocab-row-action,
     .word-hunt-review-row:not(.student-vocab-row-header)>.word-hunt-status-pill {
         grid-area: action;
         margin-top: 0.1rem;
     }
 
-    .teacher-vocab-row:not(.quiz-vocab-row):not(.student-vocab-row-header)>span[data-vocab-word-count]::before,
     .teacher-vocab-row:not(.student-vocab-row-header)>.quiz-vocab-row-action::before,
     .word-hunt-review-row:not(.student-vocab-row-header)>.word-hunt-status-pill::before {
         content: none !important;
     }
 
-    .teacher-vocab-row:not(.quiz-vocab-row):not(.student-vocab-row-header)>span[data-vocab-word-count],
     .teacher-vocab-row:not(.student-vocab-row-header)>.quiz-vocab-row-action {
         display: inline-flex;
         align-items: center;
