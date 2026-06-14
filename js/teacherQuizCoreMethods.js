@@ -105,11 +105,16 @@ class TeacherQuizCoreMethods {
     async showQuizzesView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.quizEditorOpen = false;
-        this.switchView('teacher-quizzes-view');
+        this.vocabularyMode = 'quizzes';
+        this.switchView('teacher-dashboard-view');
+        this.setVocabularyWorkflowTab('quizzes', {
+            updateRoute: false,
+            loadQuizzes: false
+        });
         this.updateQuizHubSummary();
         await this.loadQuizPicker();
         if (options.replaceRoute) {
-            this.setRoute({ view: 'quizzes' }, { replace: true });
+            this.setRoute({ view: 'vocabulary', mode: 'quizzes' }, { replace: true });
         }
     }
 
@@ -136,6 +141,7 @@ class TeacherQuizCoreMethods {
             }
 
             this.quizLibraryItems = items;
+            this.libraryItems = items;
             this.renderQuizVocabularyBrowser(container);
             this.refreshIcons();
         } catch (error) {
@@ -157,4 +163,3 @@ class TeacherQuizCoreMethods {
 export function installTeacherQuizCoreMethods(TeacherManager) {
     installMethods(TeacherManager, TeacherQuizCoreMethods);
 }
-

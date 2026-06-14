@@ -112,6 +112,7 @@ class TeacherManager {
         this.activityAssignmentStale = false;
         this.activityAssignmentLastFetchFailed = false;
         this.activeActivityAssignment = null;
+        this.vocabularyMode = 'assign';
         this.activityMode = 'assign';
         this.activityReviewHandle = null;
         this.activeActivityReview = null;

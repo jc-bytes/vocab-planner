@@ -60,6 +60,59 @@ function setPreviewInstructionsCollapsed(collapsed) {
     if (window.lucide) window.lucide.createIcons();
 }
 
+function setPreviewActivityVisible(visible) {
+    const launch = $('#activity-student-preview-launch');
+    const activity = $('#student-classroom-activity-view');
+    if (launch) launch.hidden = Boolean(visible);
+    if (activity) activity.hidden = !visible;
+}
+
+function getPreviewSubmissionStatusLabel(submission = null) {
+    if (submission?.status === 'submitted') return 'Submitted';
+    if (submission?.startedAt) return 'In progress';
+    return 'Not started';
+}
+
+function getPreviewActionLabel(submission = null) {
+    if (submission?.status === 'submitted') return 'Review';
+    if (submission?.startedAt) return 'Continue';
+    return 'Start';
+}
+
+function setText(selector, text) {
+    const el = $(selector);
+    if (el) el.textContent = text || '';
+}
+
+function renderPreviewLaunch(manager) {
+    const preview = manager.activityStudentPreview;
+    const assignment = preview?.currentAssignment;
+    const submission = preview?.currentSubmission;
+    if (!assignment || !submission) return;
+
+    preview.cleanup?.();
+    setPreviewActivityVisible(false);
+    setText('#activity-student-preview-title', 'Student Preview');
+    setText('#activity-student-preview-subtitle', assignment.title || 'Classroom Activity');
+    setText('#activity-student-preview-status', getPreviewSubmissionStatusLabel(submission));
+    setText('#activity-student-preview-due', preview.formatDueDate?.(assignment.dueDate) || 'No due date');
+    setText('#activity-student-preview-card-title', assignment.title || 'Classroom Activity');
+    setText('#activity-student-preview-card-context', assignment.weekLabel || 'Teacher test mode');
+    setText('#activity-student-preview-card-description', assignment.description || 'Open the activity and complete the student response.');
+    setText('#activity-student-preview-card-instructions', assignment.studentInstructions || 'Complete the activity.');
+    setText('#activity-student-preview-card-output', assignment.studentOutput || 'Completed activity response');
+
+    const startButton = $('#start-activity-student-preview-btn');
+    if (startButton) {
+        startButton.innerHTML = `<i data-lucide="play-circle"></i> ${getPreviewActionLabel(submission)}`;
+    }
+    const resetButton = $('#reset-activity-student-preview-btn');
+    if (resetButton) {
+        resetButton.hidden = !submission.startedAt && submission.status !== 'submitted';
+    }
+    if (window.lucide) window.lucide.createIcons();
+}
+
 function revokePreviewArtifactUrl(preview) {
     if (!preview) return;
     const url = preview?.teacherPreviewArtifactUrl || '';
@@ -74,9 +127,9 @@ function createPreviewSubmission(preview, assignment, studentProfile) {
         assignmentId: assignment.id,
         studentId: PREVIEW_STUDENT_ID,
         studentProfile,
-        status: 'draft',
+        status: 'not-started',
         responseData: createInitialResponseData(assignment),
-        startedAt: now,
+        startedAt: '',
         updatedAt: now,
         source: 'teacher-preview'
     });
@@ -89,7 +142,11 @@ function createPreviewManagerShim(manager, closePreview) {
         studentClassroomActivityDrilldown: {},
         activityInstance: null,
         cleanupActivity() {},
-        navigateTo() {
+        navigateTo(route = {}) {
+            if (route?.view === 'classroom-activities') {
+                renderPreviewLaunch(manager);
+                return;
+            }
             closePreview();
         },
         updateHeader() {},
@@ -115,6 +172,8 @@ function installPreviewPersistence(preview) {
         this.syncEditorScene();
         this.currentSubmission = this.normalizeSubmission({
             ...this.currentSubmission,
+            status: this.currentSubmission.status === 'submitted' ? 'submitted' : 'draft',
+            startedAt: this.currentSubmission.startedAt || new Date().toISOString(),
             studentProfile: this.sm.studentProfile || {},
             updatedAt: new Date().toISOString(),
             source: 'teacher-preview'
@@ -138,6 +197,7 @@ function installPreviewPersistence(preview) {
             return;
         }
         this.currentSubmission.status = 'submitted';
+        this.currentSubmission.startedAt = this.currentSubmission.startedAt || new Date().toISOString();
         this.currentSubmission.submittedAt = new Date().toISOString();
         await this.saveCurrentSubmission({ notifyOnError: false });
         this.renderAssignmentDetails(this.currentAssignment, this.currentSubmission);
@@ -231,7 +291,13 @@ function bindPreviewControls(manager) {
         manager.closeActivityStudentPreview();
     });
     $('#back-to-classroom-activities-btn')?.addEventListener('click', () => {
-        manager.closeActivityStudentPreview();
+        renderPreviewLaunch(manager);
+    });
+    $('#start-activity-student-preview-btn')?.addEventListener('click', () => {
+        startTeacherActivityStudentPreviewAttempt(manager);
+    });
+    $('#reset-activity-student-preview-btn')?.addEventListener('click', () => {
+        resetTeacherActivityStudentPreviewAttempt(manager);
     });
     $('#student-toggle-classroom-instructions-btn')?.addEventListener('click', () => {
         manager.activityStudentPreview?.sm?.toggleClassroomInstructions?.();
@@ -248,6 +314,66 @@ function bindPreviewControls(manager) {
     $('#student-submit-classroom-activity-btn')?.addEventListener('click', () => {
         manager.activityStudentPreview?.submitCurrentActivity();
     });
+}
+
+async function startTeacherActivityStudentPreviewAttempt(manager) {
+    const preview = manager.activityStudentPreview;
+    const assignment = preview?.currentAssignment;
+    if (!preview || !assignment) return;
+
+    preview.currentSubmission = preview.normalizeSubmission({
+        ...preview.currentSubmission,
+        status: preview.currentSubmission?.status === 'submitted' ? 'submitted' : 'draft',
+        startedAt: preview.currentSubmission?.startedAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        source: 'teacher-preview'
+    });
+
+    setPreviewActivityVisible(true);
+    const title = $('#student-classroom-activity-title');
+    const status = $('#student-classroom-activity-save-status');
+    const root = $('#student-classroom-excalidraw-root');
+    if (title) title.textContent = assignment.title || 'Classroom Activity';
+    if (status) status.textContent = 'Loading activity...';
+    if (root) root.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
+
+    try {
+        preview.renderAssignmentDetails(assignment, preview.currentSubmission);
+        const meta = $('#student-classroom-activity-meta');
+        if (meta) meta.textContent = `Teacher test mode · ${meta.textContent || 'Classroom Activity'}`;
+        const backButton = $('#back-to-classroom-activities-btn');
+        if (backButton) {
+            backButton.innerHTML = '<i data-lucide="arrow-left"></i> Activities';
+        }
+        await preview.mountEditor(assignment, preview.currentSubmission);
+        setPreviewInstructionsCollapsed(false);
+        preview.setSaveStatus(assignment.activityType === EXTERNAL_ARTIFACT_TYPE
+            ? 'Student test ready. Evidence files stay local.'
+            : 'Student test ready. Nothing will be saved to student records.');
+        if (window.lucide) window.lucide.createIcons();
+    } catch (error) {
+        console.error('Failed to open student activity preview:', error);
+        if (root) {
+            root.innerHTML = `
+                <div class="activity-editor-error" role="status">
+                    <h3>Preview unavailable</h3>
+                    <p>The student activity could not be mounted.</p>
+                </div>
+            `;
+        }
+        preview.setSaveStatus('Preview unavailable.');
+        notifications.error('Could not open student preview.');
+    }
+}
+
+function resetTeacherActivityStudentPreviewAttempt(manager) {
+    const preview = manager.activityStudentPreview;
+    const assignment = preview?.currentAssignment;
+    if (!preview || !assignment) return;
+    revokePreviewArtifactUrl(preview);
+    preview.currentSubmission = createPreviewSubmission(preview, assignment, preview.sm.studentProfile);
+    renderPreviewLaunch(manager);
+    notifications.info?.('Preview attempt reset.');
 }
 
 export function initTeacherActivityStudentPreview(manager) {
@@ -311,32 +437,5 @@ export async function openTeacherActivityStudentPreview(manager, source = null) 
     preview.currentSubmission = submission;
     manager.activityStudentPreview = preview;
 
-    try {
-        preview.renderAssignmentDetails(assignment, submission);
-        const meta = $('#student-classroom-activity-meta');
-        if (meta) meta.textContent = `Teacher test mode · ${meta.textContent || 'Classroom Activity'}`;
-        const backButton = $('#back-to-classroom-activities-btn');
-        if (backButton) {
-            backButton.innerHTML = '<i data-lucide="arrow-left"></i> Close Preview';
-        }
-        await preview.mountEditor(assignment, submission);
-        setPreviewInstructionsCollapsed(false);
-        preview.setSaveStatus('Student preview ready. Nothing will be saved to student records.');
-        if (assignment.activityType === EXTERNAL_ARTIFACT_TYPE) {
-            preview.setSaveStatus('Student preview ready. Evidence files stay local.');
-        }
-        if (window.lucide) window.lucide.createIcons();
-    } catch (error) {
-        console.error('Failed to open student activity preview:', error);
-        if (root) {
-            root.innerHTML = `
-                <div class="activity-editor-error" role="status">
-                    <h3>Preview unavailable</h3>
-                    <p>The student activity could not be mounted.</p>
-                </div>
-            `;
-        }
-        preview.setSaveStatus('Preview unavailable.');
-        notifications.error('Could not open student preview.');
-    }
+    renderPreviewLaunch(manager);
 }

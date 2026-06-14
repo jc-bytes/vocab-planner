@@ -215,6 +215,27 @@ function bindLegacyQuizModalListeners() {
     });
 }
 
+function bindVocabularyWorkflowTabs(manager) {
+    $$('.activity-workflow-tab[data-vocabulary-tab]').forEach(tab => {
+        tab.addEventListener('click', () => {
+            manager.setVocabularyWorkflowTab(tab.dataset.vocabularyTab || 'assign');
+        });
+        tab.addEventListener('keydown', (event) => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const tabs = Array.from($$('.activity-workflow-tab[data-vocabulary-tab]'));
+            const currentIndex = tabs.indexOf(tab);
+            let nextIndex = currentIndex;
+            if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
+            if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+            if (event.key === 'Home') nextIndex = 0;
+            if (event.key === 'End') nextIndex = tabs.length - 1;
+            event.preventDefault();
+            tabs[nextIndex]?.focus();
+            manager.setVocabularyWorkflowTab(tabs[nextIndex]?.dataset.vocabularyTab || 'assign');
+        });
+    });
+}
+
 export function initTeacherVocabularyEditorListeners(manager) {
     $('#create-new-btn').addEventListener('click', () => {
         manager.startNewVocab();
@@ -236,6 +257,7 @@ export function initTeacherVocabularyEditorListeners(manager) {
     });
 
     bindVocabularyMetaListeners(manager);
+    bindVocabularyWorkflowTabs(manager);
     bindVocabularyPublishListeners(manager);
     bindVocabularyToolbarMenus();
     bindVocabularyEditorTabs();

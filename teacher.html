@@ -43,16 +43,6 @@
                         <i data-lucide="users"></i>
                         Students
                     </button>
-                    <button class="teacher-tab" id="tab-word-hunt-review" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-word-hunt-review-view" data-section="word-hunt-review">
-                        <i data-lucide="search-check"></i>
-                        Word Hunt
-                    </button>
-                    <button class="teacher-tab" id="tab-quizzes" type="button" role="tab" aria-selected="false"
-                        aria-controls="teacher-quizzes-view" data-section="quizzes">
-                        <i data-lucide="file-text"></i>
-                        Quizzes
-                    </button>
                     <button class="teacher-tab" id="tab-data-settings" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-data-management-view" data-section="data-settings">
                         <i data-lucide="settings"></i>
@@ -242,27 +232,74 @@
 
             <!-- View: Vocabulary -->
             <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <div class="teacher-vocab-library-header">
-                    <div id="teacher-vocab-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
-                    <div class="teacher-toolbar">
-                        <div id="teacher-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Vocabulary view"></div>
-                        <button id="create-new-btn" class="btn primary-btn">
-                            <i data-lucide="plus"></i>
-                            Create
-                        </button>
-                        <label for="import-file" class="btn secondary-btn">
-                            <i data-lucide="upload"></i>
-                            Import
-                        </label>
-                        <input type="file" id="import-file" accept=".json" hidden>
-                    </div>
+                <div class="data-tab-list activity-workflow-tabs" role="tablist" aria-label="Vocabulary workflow">
+                    <button id="vocabulary-tab-assign" class="data-tab-btn activity-workflow-tab active" type="button"
+                        role="tab" aria-selected="true" aria-controls="vocabulary-assign-panel" data-vocabulary-tab="assign">
+                        <i data-lucide="send"></i>
+                        Assign
+                    </button>
+                    <button id="vocabulary-tab-review" class="data-tab-btn activity-workflow-tab" type="button"
+                        role="tab" aria-selected="false" aria-controls="vocabulary-review-panel" data-vocabulary-tab="review">
+                        <i data-lucide="clipboard-check"></i>
+                        Review
+                    </button>
+                    <button id="vocabulary-tab-quizzes" class="data-tab-btn activity-workflow-tab" type="button"
+                        role="tab" aria-selected="false" aria-controls="vocabulary-quizzes-panel" data-vocabulary-tab="quizzes">
+                        <i data-lucide="file-text"></i>
+                        Quizzes
+                    </button>
                 </div>
 
-                <section class="library-section">
-                    <div id="library-list" class="teacher-library-browser">
-                        <div class="loading-spinner">Loading library...</div>
+                <div id="vocabulary-assign-panel" class="activity-workflow-panel" role="tabpanel" aria-labelledby="vocabulary-tab-assign">
+                    <div class="teacher-vocab-library-header">
+                        <div id="teacher-vocab-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                        <div class="teacher-toolbar">
+                            <div id="teacher-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Vocabulary view"></div>
+                            <button id="create-new-btn" class="btn primary-btn">
+                                <i data-lucide="plus"></i>
+                                Create
+                            </button>
+                            <label for="import-file" class="btn secondary-btn">
+                                <i data-lucide="upload"></i>
+                                Import
+                            </label>
+                            <input type="file" id="import-file" accept=".json" hidden>
+                        </div>
                     </div>
-                </section>
+
+                    <section class="library-section">
+                        <div id="library-list" class="teacher-library-browser">
+                            <div class="loading-spinner">Loading library...</div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="vocabulary-review-panel" class="activity-workflow-panel hidden" role="tabpanel" aria-labelledby="vocabulary-tab-review">
+                    <section class="teacher-panel">
+                        <section class="word-hunt-review-shell">
+                            <div id="word-hunt-review-content" class="word-hunt-review-content">
+                                <div class="loading-spinner">Loading Word Hunt work...</div>
+                            </div>
+                        </section>
+                    </section>
+                </div>
+
+                <div id="vocabulary-quizzes-panel" class="activity-workflow-panel hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
+                    <section class="teacher-panel">
+                        <div class="teacher-vocab-library-header">
+                            <div>
+                                <h3 id="quiz-active-vocab-name">Choose a vocabulary set</h3>
+                                <p id="quiz-active-vocab-meta">Open the builder from a specific unit card below.</p>
+                            </div>
+                            <div class="teacher-toolbar">
+                                <div id="quiz-vocab-view-toggle" class="vocab-view-toggle teacher-vocab-view-toggle" aria-label="Quiz vocabulary view"></div>
+                            </div>
+                        </div>
+                        <div id="quiz-vocab-picker" class="teacher-library-browser">
+                            <div class="loading-spinner">Loading vocabulary choices...</div>
+                        </div>
+                    </section>
+                </div>
             </section>
 
             <!-- View: Activities -->
@@ -1016,30 +1053,8 @@
                 </div>
             </section>
 
-            <!-- View: Quizzes -->
-            <section id="teacher-quizzes-view" class="view hidden" role="tabpanel" aria-labelledby="tab-quizzes">
-                <div class="teacher-page-heading">
-                    <div>
-                        <p class="teacher-eyebrow">Quizzes</p>
-                        <h2>Printable Quiz Builder</h2>
-                    </div>
-                </div>
-
-                <section class="teacher-panel">
-                    <div class="teacher-panel-header">
-                        <div>
-                            <h3 id="quiz-active-vocab-name">No vocabulary selected</h3>
-                            <p id="quiz-active-vocab-meta">Choose a vocabulary set to generate printable questions.</p>
-                        </div>
-                    </div>
-                    <div id="quiz-vocab-picker" class="teacher-library-browser">
-                        <div class="loading-spinner">Loading vocabulary choices...</div>
-                    </div>
-                </section>
-            </section>
-
             <!-- View: Quiz Maker -->
-            <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="tab-quizzes">
+            <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
                 <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
                     <!-- Sidebar -->
                     <aside class="quiz-sidebar"
@@ -1621,95 +1636,6 @@
                 </div>
             </section>
 
-            <!-- View: Word Hunt Review -->
-            <section id="teacher-word-hunt-review-view" class="view hidden" role="tabpanel" aria-labelledby="tab-word-hunt-review">
-                <div class="teacher-page-heading">
-                    <div>
-                        <p class="teacher-eyebrow">Vocabulary responses</p>
-                        <h2>Word Hunt Review</h2>
-                    </div>
-                </div>
-
-                <section class="teacher-panel">
-                    <section class="word-hunt-review-shell">
-                        <div class="word-hunt-review-header">
-                            <div>
-                                <h3>Word Hunt Review</h3>
-                                <p>Inspect vocabulary definitions, examples, images, and local review notes from student progress.</p>
-                            </div>
-                            <button id="refresh-word-hunt-review-btn" class="btn secondary-btn" type="button">
-                                <i data-lucide="refresh-cw"></i>
-                                Refresh
-                            </button>
-                        </div>
-
-                        <div class="word-hunt-review-stats" aria-label="Word Hunt review summary">
-                            <div>
-                                <strong id="word-hunt-total-count">--</strong>
-                                <span>Submissions</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-complete-count">--</strong>
-                                <span>Complete</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-needs-review-count">--</strong>
-                                <span>Needs Review</span>
-                            </div>
-                            <div>
-                                <strong id="word-hunt-reviewed-count">--</strong>
-                                <span>Reviewed</span>
-                            </div>
-                        </div>
-
-                        <div class="word-hunt-review-filters">
-                            <label>
-                                <span>Grade</span>
-                                <select id="word-hunt-grade-filter">
-                                    <option value="">All Grades</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Section</span>
-                                <select id="word-hunt-section-filter">
-                                    <option value="">All Sections</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Status</span>
-                                <select id="word-hunt-status-filter">
-                                    <option value="">All Statuses</option>
-                                    <option value="needs-review">Needs Review</option>
-                                    <option value="complete">Complete</option>
-                                    <option value="reviewed">Reviewed</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Vocabulary</span>
-                                <select id="word-hunt-unit-filter">
-                                    <option value="">All Vocabularies</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Search</span>
-                                <input type="search" id="word-hunt-search-filter" placeholder="Student or vocabulary">
-                            </label>
-                        </div>
-
-                        <div class="word-hunt-review-layout">
-                            <div class="word-hunt-review-roster" id="word-hunt-review-roster">
-                                <div class="loading-spinner">Loading Word Hunt work...</div>
-                            </div>
-                            <div class="word-hunt-review-detail" id="word-hunt-review-detail">
-                                <div class="word-hunt-review-empty">
-                                    <strong>Select a Word Hunt submission</strong>
-                                    <span>Student vocabulary responses will appear here.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </section>
-            </section>
         </main>
     </div>
 
@@ -1791,6 +1717,37 @@
                     <i data-lucide="x"></i>
                 </button>
             </div>
+
+            <section id="activity-student-preview-launch" class="activity-student-preview-launch">
+                <article class="card student-classroom-activity-card activity-student-preview-card">
+                    <div class="student-classroom-card-main">
+                        <span class="student-activity-card-topline">
+                            <span id="activity-student-preview-status" class="student-activity-status">Not started</span>
+                            <span id="activity-student-preview-due" class="student-activity-due-chip">No due date</span>
+                        </span>
+                        <h3 id="activity-student-preview-card-title">Classroom Activity</h3>
+                        <small id="activity-student-preview-card-context" class="student-activity-context">Teacher test mode</small>
+                        <div class="activity-student-preview-actions">
+                            <button id="start-activity-student-preview-btn" class="btn primary-btn" type="button">
+                                <i data-lucide="play-circle"></i>
+                                Start
+                            </button>
+                            <button id="reset-activity-student-preview-btn" class="btn secondary-btn" type="button" hidden>
+                                <i data-lucide="rotate-ccw"></i>
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                    <details class="student-classroom-card-details" open>
+                        <summary>Details</summary>
+                        <div class="student-classroom-card-detail-copy">
+                            <span><strong>Description</strong><span id="activity-student-preview-card-description">Loading activity...</span></span>
+                            <span><strong>Instructions</strong><span id="activity-student-preview-card-instructions">Loading instructions...</span></span>
+                            <span><strong>Turn in</strong><span id="activity-student-preview-card-output">Complete the activity.</span></span>
+                        </div>
+                    </details>
+                </article>
+            </section>
 
             <section id="student-classroom-activity-view" class="activity-student-preview-shell">
                 <div class="student-classroom-activity-shell">

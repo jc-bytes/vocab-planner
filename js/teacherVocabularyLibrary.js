@@ -55,10 +55,44 @@ class TeacherVocabularyLibraryMethods {
         });
     }
 
+    setVocabularyWorkflowTab(mode = 'assign', options = {}) {
+        const nextMode = ['review', 'quizzes'].includes(mode) ? mode : 'assign';
+        this.vocabularyMode = nextMode;
+
+        [
+            ['assign', '#vocabulary-tab-assign', '#vocabulary-assign-panel'],
+            ['review', '#vocabulary-tab-review', '#vocabulary-review-panel'],
+            ['quizzes', '#vocabulary-tab-quizzes', '#vocabulary-quizzes-panel']
+        ].forEach(([tabMode, tabSelector, panelSelector]) => {
+            const active = tabMode === nextMode;
+            const tab = $(tabSelector);
+            const panel = $(panelSelector);
+            tab?.classList.toggle('active', active);
+            tab?.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab && (tab.tabIndex = active ? 0 : -1);
+            panel?.classList.toggle('hidden', !active);
+        });
+
+        if (nextMode === 'review' && options.loadReview !== false) {
+            this.loadWordHuntReview({ forceRefresh: options.forceRefresh === true });
+        }
+
+        if (nextMode === 'quizzes' && options.loadQuizzes !== false) {
+            this.showQuizzesView({ updateRoute: false });
+        }
+
+        if (options.updateRoute !== false) {
+            this.updateVocabularyRoute({ replace: options.replace === true });
+        }
+        this.refreshIcons();
+    }
+
     showVocabularyLibrary() {
         if (!this.ensureAuthenticated(false)) return;
+        this.vocabularyMode = 'assign';
         this.resetLibraryDrilldown();
         this.switchView('teacher-dashboard-view');
+        this.setVocabularyWorkflowTab('assign', { updateRoute: false });
         this.loadLibrary();
     }
 
@@ -106,11 +140,11 @@ class TeacherVocabularyLibraryMethods {
                 : [];
             const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
             const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
-            const items = [
+            const items = this.dedupeTeacherVocabularyItems([
                 ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
                 ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
                 ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
-            ];
+            ]);
 
             this.teacherLibraryCache = {
                 cloudVocabs,
@@ -125,6 +159,95 @@ class TeacherVocabularyLibraryMethods {
         });
 
         return this.teacherLibraryPromise;
+    }
+
+    getTeacherVocabularyItemPriority(type = '') {
+        return { cloud: 3, local: 2, remote: 1 }[type] || 0;
+    }
+
+    getTeacherVocabularyPurpose(vocab = {}, itemType = '') {
+        const sourceLabels = new Set(['cloud', 'remote', 'local', 'repo', 'draft']);
+        const candidates = [vocab?.purpose, vocab?.assessmentPurpose, vocab?.type, itemType];
+        for (const candidate of candidates) {
+            const value = String(candidate || '').trim();
+            if (value && !sourceLabels.has(value.toLowerCase())) {
+                return value;
+            }
+        }
+        return '';
+    }
+
+    getTeacherVocabularyDedupeKeys(vocab = {}) {
+        const keys = [];
+        const id = String(vocab?.id || '').trim().toLowerCase();
+        if (id) keys.push(`id:${id}`);
+
+        const name = String(vocab?.name || vocab?.title || '').trim().toLowerCase();
+        if (!name) return keys;
+
+        const subject = getVocabSubjectSlug(vocab);
+        const grades = this.getVocabGrades(vocab).slice().sort((gradeA, gradeB) => this.compareGradeLabels(gradeA, gradeB)).join('|');
+        const trimester = this.getTeacherTrimesterKey(vocab);
+        const month = this.getTeacherMonthKey(vocab);
+        const week = String(vocab?.week || this.inferTeacherWeek(vocab) || '').trim();
+        keys.push(`placement:${subject}:${grades}:${trimester}:${month}:${week}:${name}`);
+        return keys;
+    }
+
+    mergeTeacherVocabularyMetadata(primary = {}, fallback = {}) {
+        const primaryPurpose = this.getTeacherVocabularyPurpose(primary);
+        const fallbackPurpose = this.getTeacherVocabularyPurpose(fallback);
+        const merged = {
+            ...fallback,
+            ...primary
+        };
+
+        if (primaryPurpose) {
+            merged.purpose = primaryPurpose;
+        } else if (fallbackPurpose) {
+            merged.purpose = fallbackPurpose;
+            merged.assessmentPurpose = merged.assessmentPurpose || fallbackPurpose;
+        }
+
+        merged.subjectSlug = getVocabSubjectSlug(merged);
+        return merged;
+    }
+
+    mergeTeacherVocabularyItems(existingItem, incomingItem) {
+        const existingPriority = this.getTeacherVocabularyItemPriority(existingItem?.type);
+        const incomingPriority = this.getTeacherVocabularyItemPriority(incomingItem?.type);
+        const primary = incomingPriority > existingPriority ? incomingItem : existingItem;
+        const fallback = primary === incomingItem ? existingItem : incomingItem;
+
+        return {
+            type: primary.type,
+            vocab: this.mergeTeacherVocabularyMetadata(primary.vocab, fallback.vocab)
+        };
+    }
+
+    dedupeTeacherVocabularyItems(items = []) {
+        const deduped = [];
+        const indexByKey = new Map();
+
+        items.forEach(item => {
+            const keys = this.getTeacherVocabularyDedupeKeys(item.vocab);
+            const existingIndex = keys
+                .map(key => indexByKey.get(key))
+                .find(index => Number.isInteger(index));
+
+            if (Number.isInteger(existingIndex)) {
+                const merged = this.mergeTeacherVocabularyItems(deduped[existingIndex], item);
+                deduped[existingIndex] = merged;
+                this.getTeacherVocabularyDedupeKeys(merged.vocab).forEach(key => indexByKey.set(key, existingIndex));
+                return;
+            }
+
+            const nextIndex = deduped.length;
+            deduped.push(item);
+            keys.forEach(key => indexByKey.set(key, nextIndex));
+        });
+
+        return deduped;
     }
 
     async loadLibrary() {
@@ -298,36 +421,55 @@ class TeacherVocabularyLibraryMethods {
         }
     }
 
-    createTeacherVocabularyRowList(headers = []) {
+    getTeacherVocabularyRowColumns(drilldown = this.libraryDrilldown || {}) {
+        return [
+            { key: 'grade', label: 'Grade', hidden: Boolean(drilldown.grade) },
+            { key: 'trimester', label: 'Trimester', hidden: Boolean(drilldown.trimester) },
+            { key: 'month', label: 'Month', hidden: Boolean(drilldown.month) },
+            { key: 'week', label: 'Week', hidden: false },
+            { key: 'purpose', label: 'Purpose', hidden: false },
+            { key: 'words', label: 'Words', hidden: false }
+        ].filter(column => !column.hidden);
+    }
+
+    getTeacherVocabularyRowDepthClass(drilldown = this.libraryDrilldown || {}) {
+        if (drilldown.month) return 'teacher-vocab-row-depth-month';
+        if (drilldown.trimester) return 'teacher-vocab-row-depth-trimester';
+        if (drilldown.grade) return 'teacher-vocab-row-depth-grade';
+        return 'teacher-vocab-row-depth-all';
+    }
+
+    createTeacherVocabularyRowList(columns = []) {
         const list = createElement('div', 'student-vocab-row-list teacher-vocab-row-list');
         const header = createElement('div', 'student-vocab-row student-vocab-row-header teacher-vocab-row');
+        header.classList.add(this.getTeacherVocabularyRowDepthClass());
         header.setAttribute('aria-hidden', 'true');
-        header.appendChild(createElement('strong', null, headers[0] || 'Name'));
-        headers.slice(1).forEach(label => header.appendChild(createElement('span', null, label)));
+        header.appendChild(createElement('strong', null, 'Name'));
+        columns.forEach(column => header.appendChild(createElement('span', null, column.label)));
         header.appendChild(createElement('i'));
         list.appendChild(header);
         return list;
     }
 
-    createTeacherVocabularyRow({ vocab, type }) {
+    createTeacherVocabularyRow({ vocab, type }, columns = this.getTeacherVocabularyRowColumns()) {
         const grades = this.getVocabGrades(vocab).map(grade => this.formatGradeLabel(grade)).join(', ');
         const trimester = this.getTeacherTrimesterShortLabel(this.getTeacherTrimesterKey(vocab));
         const month = this.getTeacherMonthShortLabel(this.getTeacherMonthKey(vocab));
         const week = vocab?.week || this.inferTeacherWeek(vocab) || '';
-        const purpose = String(vocab?.purpose || vocab?.assessmentPurpose || vocab?.type || type || '').trim();
+        const purpose = this.getTeacherVocabularyPurpose(vocab, type);
         const wordCount = this.getTeacherVocabularyWordCount(vocab);
         const row = createElement('button', 'student-vocab-row teacher-vocab-row');
+        row.classList.add(this.getTeacherVocabularyRowDepthClass());
         row.type = 'button';
-        row.innerHTML = `
-            <strong>${escapeHtml(vocab.name || 'Untitled')}</strong>
-            <span>${escapeHtml(grades || 'Other')}</span>
-            <span>${escapeHtml(trimester)}</span>
-            <span>${escapeHtml(month)}</span>
-            <span>${escapeHtml(week ? `Week ${week}` : 'No week')}</span>
-            <span class="student-vocab-purpose">${escapeHtml(purpose || type || 'Unit')}</span>
-            <span data-vocab-word-count>${escapeHtml(wordCount ? `${wordCount}` : '...')}</span>
-            <i data-lucide="chevron-right"></i>
-        `;
+        const values = {
+            grade: `<span>${escapeHtml(grades || 'Other')}</span>`,
+            trimester: `<span>${escapeHtml(trimester)}</span>`,
+            month: `<span>${escapeHtml(month)}</span>`,
+            week: `<span>${escapeHtml(week ? `Week ${week}` : 'No week')}</span>`,
+            purpose: `<span class="student-vocab-purpose">${escapeHtml(purpose || 'Unit')}</span>`,
+            words: `<span data-vocab-word-count>${escapeHtml(wordCount ? `${wordCount}` : '...')}</span>`
+        };
+        row.innerHTML = `<strong>${escapeHtml(vocab.name || 'Untitled')}</strong>${columns.map(column => values[column.key]).join('')}<i data-lucide="chevron-right"></i>`;
         const countNode = row.querySelector('[data-vocab-word-count]');
         if (!wordCount && vocab?.path) {
             countNode.dataset.vocabWordCountPath = vocab.path;
@@ -394,7 +536,8 @@ class TeacherVocabularyLibraryMethods {
         const weekCompare = this.getTeacherVocabularyWeekOrder(vocabA) - this.getTeacherVocabularyWeekOrder(vocabB);
         if (weekCompare) return weekCompare;
 
-        const purposeCompare = String(vocabA?.purpose || itemA.type || '').localeCompare(String(vocabB?.purpose || itemB.type || ''));
+        const purposeCompare = this.getTeacherVocabularyPurpose(vocabA, itemA.type)
+            .localeCompare(this.getTeacherVocabularyPurpose(vocabB, itemB.type));
         if (purposeCompare) return purposeCompare;
 
         return this.getVocabSortName(vocabA).localeCompare(this.getVocabSortName(vocabB));
@@ -406,11 +549,12 @@ class TeacherVocabularyLibraryMethods {
             return;
         }
 
-        const list = this.createTeacherVocabularyRowList(['Name', 'Grade', 'Trimester', 'Month', 'Week', 'Purpose', 'Words']);
+        const columns = this.getTeacherVocabularyRowColumns();
+        const list = this.createTeacherVocabularyRowList(columns);
         vocabItems
             .slice()
             .sort((itemA, itemB) => this.compareTeacherVocabularyRowOrder(itemA, itemB))
-            .forEach(item => list.appendChild(this.createTeacherVocabularyRow(item)));
+            .forEach(item => list.appendChild(this.createTeacherVocabularyRow(item, columns)));
         container.appendChild(list);
         this.hydrateTeacherVocabularyRowWordCounts(list);
     }

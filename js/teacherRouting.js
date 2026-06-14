@@ -21,7 +21,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[0] !== 'teacher') return null;
             if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
             if (parts[1] === 'students') return { view: 'students' };
-            if (parts[1] === 'word-hunt') return { view: 'word-hunt-review' };
+            if (parts[1] === 'word-hunt') return { view: 'vocabulary', mode: 'review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
             if (parts[1] === 'activities' && parts[2] === 'assignment' && parts[3]) {
                 return { view: 'activity-assignment', assignmentId: parts[3] };
@@ -53,7 +53,8 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     subject: params.get('subject') || null,
                     grade: params.get('grade') || null,
                     trimester: params.get('trimester') || null,
-                    month: params.get('month') || null
+                    month: params.get('month') || null,
+                    mode: ['review', 'quizzes'].includes(params.get('mode')) ? params.get('mode') : 'assign'
                 };
             }
 
@@ -64,7 +65,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (!route || !route.view) return '#/teacher/overview';
             if (route.view === 'overview') return '#/teacher/overview';
             if (route.view === 'students') return '#/teacher/students';
-            if (route.view === 'word-hunt-review') return '#/teacher/word-hunt';
+            if (route.view === 'word-hunt-review') return '#/teacher/vocabulary?mode=review';
             if (route.view === 'sparks') return '#/teacher/sparks';
             if (route.view === 'activities') {
                 const params = new URLSearchParams();
@@ -81,7 +82,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (route.view === 'activity-assignment' && route.assignmentId) {
                 return `#/teacher/activities/assignment/${encodeURIComponent(route.assignmentId)}`;
             }
-            if (route.view === 'quizzes') return '#/teacher/quizzes';
+            if (route.view === 'quizzes') return '#/teacher/vocabulary?mode=quizzes';
             if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
             if (route.view === 'editor') {
                 return route.vocabularyId
@@ -100,6 +101,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (route.grade) params.set('grade', route.grade);
                 if (route.trimester) params.set('trimester', route.trimester);
                 if (route.month) params.set('month', route.month);
+                if (route.mode === 'review' || route.mode === 'quizzes') params.set('mode', route.mode);
                 const query = params.toString();
                 return `#/teacher/vocabulary${query ? `?${query}` : ''}`;
             }
@@ -113,7 +115,8 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     subject: this.libraryDrilldown.subject,
                     grade: this.libraryDrilldown.grade,
                     trimester: this.libraryDrilldown.trimester,
-                    month: this.libraryDrilldown.month
+                    month: this.libraryDrilldown.month,
+                    mode: this.vocabularyMode
                 };
             }
             if (viewId === 'teacher-editor-view') {
@@ -139,8 +142,6 @@ export function installTeacherRoutingMethods(TeacherManager) {
             }
             if (viewId === 'teacher-sparks-view') return { view: 'sparks' };
             if (viewId === 'teacher-progress-view') return { view: 'students' };
-            if (viewId === 'teacher-word-hunt-review-view') return { view: 'word-hunt-review' };
-            if (viewId === 'teacher-quizzes-view') return { view: 'quizzes' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === 'teacher-data-management-view') return { view: 'data-settings' };
             return { view: 'overview' };
@@ -166,7 +167,8 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 subject: this.libraryDrilldown.subject,
                 grade: this.libraryDrilldown.grade,
                 trimester: this.libraryDrilldown.trimester,
-                month: this.libraryDrilldown.month
+                month: this.libraryDrilldown.month,
+                mode: this.vocabularyMode
             };
             this.setRoute(this.lastVocabularyRoute, options);
         },
@@ -219,9 +221,22 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 trimester: routeToApply.trimester || null,
                                 month: routeToApply.month || null
                             };
+                            this.vocabularyMode = ['review', 'quizzes'].includes(routeToApply.mode) ? routeToApply.mode : 'assign';
                             this.lastVocabularyRoute = { ...routeToApply };
                             this.switchView('teacher-dashboard-view');
-                            await this.loadLibrary();
+                            this.setVocabularyWorkflowTab(this.vocabularyMode, {
+                                updateRoute: false,
+                                replace: true,
+                                loadReview: this.vocabularyMode === 'review',
+                                loadQuizzes: this.vocabularyMode === 'quizzes'
+                            });
+                            if (this.vocabularyMode === 'assign') {
+                                await this.loadLibrary();
+                            } else if (this.vocabularyMode !== 'quizzes' && !this.libraryItems?.length) {
+                                this.getTeacherLibrary().then(({ items }) => {
+                                    this.libraryItems = items;
+                                }).catch(error => console.warn('Could not warm vocabulary library cache:', error));
+                            }
                             break;
                         case 'editor':
                             if (routeToApply.vocabularyId && routeToApply.vocabularyId !== this.vocabSet?.id) {
@@ -258,7 +273,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             await this.showSparksView();
                             break;
                         case 'quizzes':
-                            await this.showQuizzesView();
+                            await this.showQuizzesView({ replaceRoute: true });
                             break;
                         case 'quiz-editor':
                             await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });

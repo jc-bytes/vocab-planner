@@ -13,8 +13,6 @@ class TeacherShellMethods {
             'teacher-activity-assignment-view',
             'teacher-sparks-view',
             'teacher-progress-view',
-            'teacher-word-hunt-review-view',
-            'teacher-quizzes-view',
             'quiz-maker-view',
             'teacher-data-management-view'
         ];
@@ -91,9 +89,7 @@ class TeacherShellMethods {
             'teacher-activity-assignment-view': 'activities',
             'teacher-sparks-view': 'sparks',
             'teacher-progress-view': 'students',
-            'teacher-word-hunt-review-view': 'word-hunt-review',
-            'teacher-quizzes-view': 'quizzes',
-            'quiz-maker-view': 'quizzes',
+            'quiz-maker-view': 'vocabulary',
             'teacher-data-management-view': 'data-settings'
         };
         return map[viewId] || '';
