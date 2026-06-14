@@ -11795,6 +11795,21 @@ button.activity-card {
         flex-direction: column;
     }
 
+    .teacher-library-breadcrumb[data-breadcrumb-depth="grade"] [data-crumb="root"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="grade"] [data-before-crumb="subject"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="trimester"] [data-crumb="root"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="trimester"] [data-before-crumb="subject"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="trimester"] [data-crumb="subject"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="trimester"] [data-before-crumb="grade"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-crumb="root"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-before-crumb="subject"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-crumb="subject"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-before-crumb="grade"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-crumb="grade"],
+    .teacher-library-breadcrumb[data-breadcrumb-depth="month"] [data-before-crumb="trimester"] {
+        display: none;
+    }
+
     .teacher-vocab-library-header .teacher-toolbar {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -159,16 +159,24 @@ class TeacherQuizBrowserMethods {
 
     renderQuizBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
         const nav = createElement('div', 'teacher-library-breadcrumb');
+        nav.dataset.breadcrumbDepth = selectedMonth ? 'month'
+            : selectedTrimester ? 'trimester'
+                : selectedGrade ? 'grade'
+                    : selectedSubject ? 'subject'
+                        : 'root';
 
         const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
             this.resetLibraryDrilldown();
             this.updateVocabularyRoute();
             this.renderQuizVocabularyBrowser();
         });
+        subjectsButton.dataset.crumb = 'root';
         nav.appendChild(subjectsButton);
 
         if (selectedSubject) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            separator.dataset.beforeCrumb = 'subject';
+            nav.appendChild(separator);
             const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
             const subjectButton = selectedGrade || selectedTrimester || selectedMonth
                 ? this.createLibraryBreadcrumbButton(subject.name, () => {
@@ -177,11 +185,14 @@ class TeacherQuizBrowserMethods {
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+            subjectButton.dataset.crumb = 'subject';
             nav.appendChild(subjectButton);
         }
 
         if (selectedGrade) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            separator.dataset.beforeCrumb = 'grade';
+            nav.appendChild(separator);
             const gradeLabel = this.formatGradeLabel(selectedGrade);
             const gradeButton = selectedTrimester || selectedMonth
                 ? this.createLibraryBreadcrumbButton(gradeLabel, () => {
@@ -190,11 +201,14 @@ class TeacherQuizBrowserMethods {
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
+            gradeButton.dataset.crumb = 'grade';
             nav.appendChild(gradeButton);
         }
 
         if (selectedTrimester) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            separator.dataset.beforeCrumb = 'trimester';
+            nav.appendChild(separator);
             const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
             const trimesterNode = selectedMonth
                 ? this.createLibraryBreadcrumbButton(trimesterLabel, () => {
@@ -203,12 +217,17 @@ class TeacherQuizBrowserMethods {
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+            trimesterNode.dataset.crumb = 'trimester';
             nav.appendChild(trimesterNode);
         }
 
         if (selectedMonth) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth)));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            separator.dataset.beforeCrumb = 'month';
+            nav.appendChild(separator);
+            const monthNode = createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth));
+            monthNode.dataset.crumb = 'month';
+            nav.appendChild(monthNode);
         }
 
         container.appendChild(nav);
