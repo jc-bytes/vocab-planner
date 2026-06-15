@@ -234,6 +234,12 @@ function bindActivityReview(manager) {
         manager.updatePublishedActivityAssignmentFromSource();
     });
 
+    $('#archive-activity-assignment-btn')?.addEventListener('click', () => {
+        const assignment = manager.activeActivityAssignment;
+        if (!assignment?.id) return;
+        manager.setActivityAssignmentArchived(assignment.id, assignment.status !== 'archived');
+    });
+
     $('#activity-review-prev-student-btn')?.addEventListener('click', () => {
         manager.showAdjacentActivityReviewStudent(-1);
     });
@@ -263,7 +269,7 @@ function bindActivityAssignmentModal(manager) {
 
 function bindActivityEditorActions(manager) {
     $('#test-current-activity-as-student-btn')?.addEventListener('click', () => {
-        manager.openActivityStudentPreview(manager.activity);
+        manager.setActivityEditorTab('preview');
     });
 
     $('#save-activity-update-btn')?.addEventListener('click', () => {

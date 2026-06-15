@@ -10,6 +10,7 @@ import {
 import { createInitialResponseData, validateActivityResponse } from './classroomActivityRegistry.js';
 
 const PREVIEW_STUDENT_ID = 'teacher-preview-student';
+const PREVIEW_CONTENT_SELECTOR = '.activity-student-preview-content';
 
 function createPreviewAssignmentFromActivity(manager, activity = {}) {
     const source = manager.normalizeActivity(activity);
@@ -84,6 +85,27 @@ function setText(selector, text) {
     if (el) el.textContent = text || '';
 }
 
+function ensurePreviewContentLocation(mode = 'modal') {
+    const content = $(PREVIEW_CONTENT_SELECTOR);
+    if (!content) return null;
+
+    const modal = $('#activity-student-preview-modal');
+    const inlineHost = $('#activity-preview-root');
+    const target = mode === 'inline' ? inlineHost : modal;
+    if (!target || content.parentElement === target) return content;
+
+    target.appendChild(content);
+    return content;
+}
+
+function setPreviewMode(manager, mode = 'modal') {
+    manager.activityStudentPreviewMode = mode;
+    const isInline = mode === 'inline';
+    const content = ensurePreviewContentLocation(mode);
+    content?.classList.toggle('is-inline-preview', isInline);
+    $('#activity-student-preview-modal')?.classList.toggle('hidden', true);
+}
+
 function renderPreviewLaunch(manager) {
     const preview = manager.activityStudentPreview;
     const assignment = preview?.currentAssignment;
@@ -144,6 +166,10 @@ function createPreviewManagerShim(manager, closePreview) {
         cleanupActivity() {},
         navigateTo(route = {}) {
             if (route?.view === 'classroom-activities') {
+                if (manager.activityStudentPreviewMode === 'inline') {
+                    startTeacherActivityStudentPreviewAttempt(manager);
+                    return;
+                }
                 renderPreviewLaunch(manager);
                 return;
             }
@@ -291,6 +317,10 @@ function bindPreviewControls(manager) {
         manager.closeActivityStudentPreview();
     });
     $('#back-to-classroom-activities-btn')?.addEventListener('click', () => {
+        if (manager.activityStudentPreviewMode === 'inline') {
+            startTeacherActivityStudentPreviewAttempt(manager);
+            return;
+        }
         renderPreviewLaunch(manager);
     });
     $('#start-activity-student-preview-btn')?.addEventListener('click', () => {
@@ -343,7 +373,9 @@ async function startTeacherActivityStudentPreviewAttempt(manager) {
         if (meta) meta.textContent = `Teacher test mode · ${meta.textContent || 'Classroom Activity'}`;
         const backButton = $('#back-to-classroom-activities-btn');
         if (backButton) {
-            backButton.innerHTML = '<i data-lucide="arrow-left"></i> Activities';
+            backButton.innerHTML = manager.activityStudentPreviewMode === 'inline'
+                ? '<i data-lucide="refresh-cw"></i> Restart Preview'
+                : '<i data-lucide="arrow-left"></i> Activities';
         }
         await preview.mountEditor(assignment, preview.currentSubmission);
         setPreviewInstructionsCollapsed(false);
@@ -372,6 +404,11 @@ function resetTeacherActivityStudentPreviewAttempt(manager) {
     if (!preview || !assignment) return;
     revokePreviewArtifactUrl(preview);
     preview.currentSubmission = createPreviewSubmission(preview, assignment, preview.sm.studentProfile);
+    if (manager.activityStudentPreviewMode === 'inline') {
+        startTeacherActivityStudentPreviewAttempt(manager);
+        notifications.info?.('Preview attempt reset.');
+        return;
+    }
     renderPreviewLaunch(manager);
     notifications.info?.('Preview attempt reset.');
 }
@@ -384,11 +421,14 @@ export function closeTeacherActivityStudentPreview(manager) {
     manager.activityStudentPreview?.cleanup?.();
     revokePreviewArtifactUrl(manager.activityStudentPreview);
     manager.activityStudentPreview = null;
+    manager.activityStudentPreviewMode = 'modal';
+    ensurePreviewContentLocation('modal');
     closeModal('#activity-student-preview-modal');
 }
 
-export async function openTeacherActivityStudentPreview(manager, source = null) {
+export async function openTeacherActivityStudentPreview(manager, source = null, options = {}) {
     if (!manager.ensureAuthenticated(false)) return;
+    const mode = options.inline ? 'inline' : 'modal';
 
     let assignment;
     if (source?.activityData || source?.activity_data || source?.sourceActivityId || source?.source_activity_id) {
@@ -409,16 +449,21 @@ export async function openTeacherActivityStudentPreview(manager, source = null) 
     }
 
     manager.closeActivityStudentPreview?.();
-    openModal('#activity-student-preview-modal', {
-        initialFocus: '#close-activity-student-preview-modal',
-        onClose: () => {
-            if (manager.activityStudentPreview) {
-                manager.activityStudentPreview.cleanup?.();
-                revokePreviewArtifactUrl(manager.activityStudentPreview);
-                manager.activityStudentPreview = null;
+    setPreviewMode(manager, mode);
+    if (mode === 'modal') {
+        openModal('#activity-student-preview-modal', {
+            initialFocus: '#close-activity-student-preview-modal',
+            onClose: () => {
+                if (manager.activityStudentPreview) {
+                    manager.activityStudentPreview.cleanup?.();
+                    revokePreviewArtifactUrl(manager.activityStudentPreview);
+                    manager.activityStudentPreview = null;
+                }
+                manager.activityStudentPreviewMode = 'modal';
+                ensurePreviewContentLocation('modal');
             }
-        }
-    });
+        });
+    }
 
     const title = $('#student-classroom-activity-title');
     const status = $('#student-classroom-activity-save-status');
@@ -437,5 +482,9 @@ export async function openTeacherActivityStudentPreview(manager, source = null) 
     preview.currentSubmission = submission;
     manager.activityStudentPreview = preview;
 
-    renderPreviewLaunch(manager);
+    if (mode === 'inline') {
+        await startTeacherActivityStudentPreviewAttempt(manager);
+    } else {
+        renderPreviewLaunch(manager);
+    }
 }

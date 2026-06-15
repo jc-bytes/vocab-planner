@@ -330,7 +330,7 @@
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>Assigned Activities</h3>
-                                <p>Active student-facing activity assignments and submission status.</p>
+                                <p>Student-facing activity assignments, hidden items, and submission status.</p>
                             </div>
                         </div>
                         <div id="activity-assignment-list" class="teacher-library-browser">
@@ -362,7 +362,7 @@
                         </button>
                         <button id="test-current-activity-as-student-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="play-circle"></i>
-                            Test as Student
+                            Preview as Student
                         </button>
                         <button id="save-activity-update-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="cloud-upload"></i>
@@ -513,10 +513,12 @@
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>Preview</h3>
-                                <p>Student-facing view of the activity directions and response area.</p>
+                                <p>Try the exact student-facing activity here. Preview attempts do not save to student records.</p>
                             </div>
                         </div>
-                        <div id="activity-preview-root" class="activity-preview-root"></div>
+                        <div id="activity-preview-root" class="activity-preview-root">
+                            <div class="loading-spinner">Loading preview...</div>
+                        </div>
                     </section>
                 </div>
             </section>
@@ -540,6 +542,10 @@
                         <button id="update-published-activity-assignment-btn" class="btn secondary-btn" type="button" disabled>
                             <i data-lucide="cloud-upload"></i>
                             Update Published Assignment
+                        </button>
+                        <button id="archive-activity-assignment-btn" class="btn secondary-btn" type="button" disabled>
+                            <i data-lucide="eye-off"></i>
+                            Hide from Students
                         </button>
                         <button id="refresh-activity-assignment-review-btn" class="btn secondary-btn" type="button">
                             <i data-lucide="refresh-cw"></i>

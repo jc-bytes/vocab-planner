@@ -195,6 +195,7 @@ export function createTeacherActivityAssignmentCard(manager, container, assignme
     const target = manager.formatAssignmentTarget(normalized);
     const schedule = manager.formatAssignmentWindow(normalized);
     const statusLabel = normalized.status === 'archived' ? 'Archived' : 'Active';
+    const isArchived = normalized.status === 'archived';
     const isScheduled = manager.isAssignmentScheduled(normalized);
     const cueItems = getTeacherAssignmentCueItems(manager, normalized, isScheduled);
     const cueHtml = cueItems.length
@@ -220,16 +221,20 @@ export function createTeacherActivityAssignmentCard(manager, container, assignme
                 <span>${escapeHtml(schedule)}</span>
                 <span>${escapeHtml(subject.name)}</span>
                 ${isScheduled ? '<span class="teacher-card-warning">Not visible to students yet</span>' : ''}
+                <button class="archive-activity-assignment-btn" type="button" title="${isArchived ? 'Show to Students' : 'Hide from Students'}" aria-label="${isArchived ? 'Show' : 'Hide'} ${escapeHtml(normalized.title || 'assignment')} ${isArchived ? 'to' : 'from'} students">
+                    <i data-lucide="${isArchived ? 'eye' : 'eye-off'}"></i>
+                    <span>${isArchived ? 'Show to Students' : 'Hide from Students'}</span>
+                </button>
                 <button class="delete-activity-assignment-btn teacher-card-danger-action" type="button" title="Delete Assignment" aria-label="Delete ${escapeHtml(normalized.title || 'assignment')}">
                     <i data-lucide="trash-2"></i>
-                    <span>Delete</span>
+                    <span>Delete Permanently</span>
                 </button>
             </div>
         </details>
     `;
 
     card.addEventListener('click', (event) => {
-        if (event.target.closest('.delete-activity-assignment-btn, .teacher-card-details')) return;
+        if (event.target.closest('.archive-activity-assignment-btn, .delete-activity-assignment-btn, .teacher-card-details')) return;
         manager.showActivityAssignmentReview(normalized.id);
     });
     card.addEventListener('keydown', (event) => {
@@ -243,6 +248,10 @@ export function createTeacherActivityAssignmentCard(manager, container, assignme
     });
     card.querySelector('.teacher-card-details')?.addEventListener('keydown', event => {
         event.stopPropagation();
+    });
+    card.querySelector('.archive-activity-assignment-btn')?.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        await manager.setActivityAssignmentArchived(normalized.id, !isArchived);
     });
     card.querySelector('.delete-activity-assignment-btn')?.addEventListener('click', async (event) => {
         event.stopPropagation();

@@ -3154,6 +3154,53 @@ input[readonly] {
     min-width: 0;
 }
 
+.activity-preview-root>.loading-spinner {
+    min-height: 360px;
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview>.activity-student-preview-header,
+.activity-preview-root .activity-student-preview-content.is-inline-preview>.activity-student-preview-launch {
+    display: none;
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview .activity-student-preview-shell .teacher-page-heading {
+    margin-bottom: var(--spacing-sm);
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview #back-to-classroom-activities-btn {
+    display: none;
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-activity-shell {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root {
+    height: clamp(620px, calc(100svh - 300px), 920px);
+}
+
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.structured-response-root,
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.card-sort-response-root,
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.spreadsheet-table-response-root,
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.image-hotspot-response-root,
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.external-artifact-response-root,
+.activity-preview-root .activity-student-preview-content.is-inline-preview .student-classroom-excalidraw-root.flowchart-response-root {
+    height: auto;
+    min-height: 0;
+}
+
 .activity-preview-shell {
     display: grid;
     gap: var(--spacing-md);

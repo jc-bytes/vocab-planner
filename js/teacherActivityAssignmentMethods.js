@@ -53,6 +53,7 @@ import {
     openTeacherActivityAssignmentModal,
     resolveTeacherActivitySubmissionScene,
     saveTeacherActivityAssignment,
+    setTeacherActivityAssignmentArchived,
     setTeacherActivityAssignmentModalStatus,
     toggleTeacherActivityLateOverride,
     updatePublishedTeacherActivityAssignmentFromSource
@@ -174,6 +175,10 @@ const teacherActivityAssignmentMethods = {
 
         async deleteActivityAssignment(id) {
             await deleteTeacherActivityAssignment(this, id);
+        },
+
+        async setActivityAssignmentArchived(id, archived = true) {
+            await setTeacherActivityAssignmentArchived(this, id, archived);
         },
 
         formatAssignmentTarget(assignment = {}) {

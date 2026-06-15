@@ -109,6 +109,8 @@ export function setTeacherActivityEditorTab(manager, tab = 'settings', options =
 
     if (activeTab === 'preview') {
         manager.renderActivityPreviewPanel();
+    } else if (manager.activityStudentPreviewMode === 'inline') {
+        manager.closeActivityStudentPreview?.();
     }
 
     manager.updateActivityFocusButtonLabel();

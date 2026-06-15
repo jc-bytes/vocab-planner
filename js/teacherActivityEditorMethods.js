@@ -1,9 +1,7 @@
 import { $ } from './main.js';
 import { DEFAULT_ACTIVITY_TEMPLATE_ID } from './classroomActivityRegistry.js';
-import { getSubjectBySlug } from './services/vocabularyApi.js';
 import {
-    renderStructuredResponsePreview,
-    renderTeacherActivityPreviewShell
+    renderStructuredResponsePreview
 } from './teacherActivityPreviewRenderers.js';
 import {
     renderCardSortBuilder as renderTeacherCardSortBuilder,
@@ -308,9 +306,13 @@ const teacherActivityEditorMethods = {
             renderTeacherStructuredResponseBuilder(this, root);
         },
 
-        renderActivityPreviewPanel() {
+        async renderActivityPreviewPanel() {
             const root = $('#activity-preview-root');
             if (!root) return;
+
+            if (this.activityStudentPreviewMode === 'inline') {
+                this.closeActivityStudentPreview();
+            }
 
             if (!this.activity?.id) {
                 root.innerHTML = '<div class="teacher-empty-state">Open or create an activity to preview it.</div>';
@@ -319,17 +321,8 @@ const teacherActivityEditorMethods = {
 
             this.syncActivityWorkspace();
             this.readActivityFormIntoModel();
-            const activity = this.normalizeActivity(this.activity);
-            const subjectMeta = getSubjectBySlug(this.getSubjects(), activity.subjectSlug);
-            const subject = subjectMeta?.name || activity.subjectSlug || 'No subject selected';
-            root.innerHTML = renderTeacherActivityPreviewShell(activity, {
-                subject,
-                typeLabel: this.getActivityTypeLabel(activity.activityType)
-            });
-            if (this.isImageHotspotActivity(activity)) {
-                this.hydrateImageHotspotImages(root, activity.activityData?.imageHotspotTemplate || {});
-            }
-            this.refreshIcons();
+            root.innerHTML = '<div class="loading-spinner">Loading student preview...</div>';
+            await this.openActivityStudentPreview(this.activity, { inline: true });
         },
 
         refreshStructuredResponsePreview() {

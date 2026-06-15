@@ -197,41 +197,67 @@ export async function fetchTeacherActivityAssignments(manager) {
 
         if (submissionError) throw submissionError;
 
-        const assignmentIds = Array.from(new Set(
+        const submittedAssignmentIds = Array.from(new Set(
             (submissionRows || [])
                 .map(row => String(row.assignment_id || '').trim())
                 .filter(Boolean)
         ));
 
-        if (assignmentIds.length === 0) return [];
+        let activeQuery = client
+            .from('classroom_activity_assignments')
+            .select('*')
+            .order('updated_at', { ascending: false })
+            .limit(500);
 
-        const assignments = [];
-        for (const idChunk of chunkActivityIds(assignmentIds)) {
-            let queryBuilder = client
+        if (manager.activityDrilldown?.subject) {
+            activeQuery = activeQuery.eq('subject_slug', manager.activityDrilldown.subject);
+        }
+        if (manager.activityDrilldown?.grade) {
+            activeQuery = activeQuery.contains('target_grades', [manager.activityDrilldown.grade]);
+        }
+
+        const { data: activeAssignmentRows, error: activeAssignmentError } = await activeQuery;
+        if (activeAssignmentError) throw activeAssignmentError;
+
+        const assignmentMap = new Map();
+        (activeAssignmentRows || []).forEach(row => {
+            const normalized = manager.normalizeActivityAssignment(row);
+            assignmentMap.set(normalized.id, normalized);
+        });
+
+        const missingSubmittedAssignmentIds = submittedAssignmentIds.filter(id => !assignmentMap.has(id));
+        for (const idChunk of chunkActivityIds(missingSubmittedAssignmentIds)) {
+            let submittedQuery = client
                 .from('classroom_activity_assignments')
                 .select('*')
                 .in('id', idChunk)
                 .order('updated_at', { ascending: false });
 
             if (manager.activityDrilldown?.subject) {
-                queryBuilder = queryBuilder.eq('subject_slug', manager.activityDrilldown.subject);
+                submittedQuery = submittedQuery.eq('subject_slug', manager.activityDrilldown.subject);
             }
             if (manager.activityDrilldown?.grade) {
-                queryBuilder = queryBuilder.contains('target_grades', [manager.activityDrilldown.grade]);
+                submittedQuery = submittedQuery.contains('target_grades', [manager.activityDrilldown.grade]);
             }
 
-            const { data: assignmentRows, error: assignmentError } = await queryBuilder;
+            const { data: assignmentRows, error: assignmentError } = await submittedQuery;
             if (assignmentError) throw assignmentError;
 
-            assignments.push(...(assignmentRows || []).map(row => manager.normalizeActivityAssignment(row)));
+            (assignmentRows || []).forEach(row => {
+                const normalized = manager.normalizeActivityAssignment(row);
+                assignmentMap.set(normalized.id, normalized);
+            });
         }
 
-        const assignmentOrder = new Map(assignmentIds.map((id, index) => [id, index]));
-        return filterAssignmentsForReviewDrilldown(manager, assignments)
+        const submittedAssignmentOrder = new Map(submittedAssignmentIds.map((id, index) => [id, index]));
+        return filterAssignmentsForReviewDrilldown(manager, Array.from(assignmentMap.values()))
             .sort((assignmentA, assignmentB) => {
-                const orderA = assignmentOrder.get(assignmentA.id) ?? Number.MAX_SAFE_INTEGER;
-                const orderB = assignmentOrder.get(assignmentB.id) ?? Number.MAX_SAFE_INTEGER;
-                return orderA - orderB;
+                const orderA = submittedAssignmentOrder.get(assignmentA.id);
+                const orderB = submittedAssignmentOrder.get(assignmentB.id);
+                if (orderA !== undefined && orderB !== undefined) return orderA - orderB;
+                if (orderA !== undefined) return -1;
+                if (orderB !== undefined) return 1;
+                return manager.getActivityAssignmentSortValue(assignmentB) - manager.getActivityAssignmentSortValue(assignmentA);
             });
     } catch (error) {
         console.error('Failed to fetch activity assignments:', error);
@@ -336,6 +362,38 @@ export async function deleteTeacherActivityAssignment(manager, id) {
     } catch (error) {
         console.error('Failed to delete activity assignment:', error);
         notifications.error('Could not delete assignment.');
+    }
+}
+
+export async function setTeacherActivityAssignmentArchived(manager, id, archived = true) {
+    if (!manager.ensureAuthenticated()) return;
+    const assignmentId = String(id || '').trim();
+    if (!assignmentId) {
+        notifications.warning('Open an assignment before changing student visibility.');
+        return;
+    }
+
+    const status = archived ? 'archived' : 'active';
+    try {
+        const db = supabaseService.getDatabase();
+        await setDoc(doc(db, manager.ACTIVITY_ASSIGNMENT_COLLECTION, assignmentId), {
+            status,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        manager.invalidateActivityAssignmentCache();
+        notifications.success(archived
+            ? 'Assignment hidden from students.'
+            : 'Assignment visible to students again.');
+
+        if (manager.activeActivityAssignment?.id === assignmentId) {
+            await manager.showActivityAssignmentReview(assignmentId, { forceRefresh: true });
+        } else {
+            await manager.loadActivityAssignments();
+        }
+    } catch (error) {
+        console.error('Failed to update assignment visibility:', error);
+        notifications.error('Could not update assignment visibility.');
     }
 }
 

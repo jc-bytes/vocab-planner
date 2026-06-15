@@ -35,12 +35,14 @@ export async function showTeacherActivityAssignmentReview(manager, assignmentId,
     const rosterEl = $('#activity-submission-roster');
     const submissionSummaryEl = $('#activity-submission-summary');
     const updateAssignmentBtn = $('#update-published-activity-assignment-btn');
+    const archiveAssignmentBtn = $('#archive-activity-assignment-btn');
     if (titleEl) titleEl.textContent = 'Activity Review';
     if (summaryEl) summaryEl.textContent = 'Loading assignment...';
     if (statsEl) statsEl.innerHTML = '';
     if (rosterEl) rosterEl.innerHTML = '<div class="loading-spinner">Loading submissions...</div>';
     if (submissionSummaryEl) submissionSummaryEl.textContent = 'Loading submissions...';
     if (updateAssignmentBtn) updateAssignmentBtn.disabled = true;
+    if (archiveAssignmentBtn) archiveAssignmentBtn.disabled = true;
 
     try {
         let assignments = await manager.getActivityAssignments({ forceRefresh: options.forceRefresh });
@@ -59,9 +61,19 @@ export async function showTeacherActivityAssignmentReview(manager, assignmentId,
 
         manager.activeActivityAssignment = assignment;
         if (updateAssignmentBtn) updateAssignmentBtn.disabled = !assignment.sourceActivityId;
+        if (archiveAssignmentBtn) {
+            const isArchived = assignment.status === 'archived';
+            archiveAssignmentBtn.disabled = false;
+            archiveAssignmentBtn.innerHTML = isArchived
+                ? '<i data-lucide="eye"></i> Show to Students'
+                : '<i data-lucide="eye-off"></i> Hide from Students';
+            archiveAssignmentBtn.title = isArchived ? 'Show assignment to students' : 'Hide assignment from students';
+            archiveAssignmentBtn.setAttribute('aria-label', archiveAssignmentBtn.title);
+        }
         if (titleEl) titleEl.textContent = assignment.title || 'Activity Review';
         if (summaryEl) {
-            summaryEl.textContent = `${manager.formatAssignmentTarget(assignment)} · ${manager.formatAssignmentWindow(assignment)}`;
+            const visibility = assignment.status === 'archived' ? 'Hidden from students' : 'Visible to students';
+            summaryEl.textContent = `${visibility} · ${manager.formatAssignmentTarget(assignment)} · ${manager.formatAssignmentWindow(assignment)}`;
         }
 
         const [submissions, students] = await Promise.all([
@@ -75,6 +87,7 @@ export async function showTeacherActivityAssignmentReview(manager, assignmentId,
         if (summaryEl) summaryEl.textContent = 'Could not load assignment review.';
         if (rosterEl) rosterEl.innerHTML = '<p class="teacher-empty-state">Could not load assignment submissions.</p>';
         if (updateAssignmentBtn) updateAssignmentBtn.disabled = true;
+        if (archiveAssignmentBtn) archiveAssignmentBtn.disabled = true;
         notifications.error('Could not load assignment review.');
     }
 }

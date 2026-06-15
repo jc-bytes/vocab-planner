@@ -9,8 +9,8 @@ const teacherActivityStudentPreviewMethods = {
         initTeacherActivityStudentPreview(this);
     },
 
-    async openActivityStudentPreview(source = null) {
-        await openTeacherActivityStudentPreview(this, source);
+    async openActivityStudentPreview(source = null, options = {}) {
+        await openTeacherActivityStudentPreview(this, source, options);
     },
 
     closeActivityStudentPreview() {
