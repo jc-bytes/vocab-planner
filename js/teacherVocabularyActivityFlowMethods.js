@@ -48,6 +48,9 @@ class TeacherVocabularyActivityFlowMethods {
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
         const uniqueRequired = [...new Set(required)];
+        if (!uniqueRequired.includes('flashcards')) {
+            uniqueRequired.unshift('flashcards');
+        }
         const requiredSet = new Set(uniqueRequired);
         const requestedAdditional = hasExplicitFlow
             ? settings.additionalActivities
@@ -55,10 +58,6 @@ class TeacherVocabularyActivityFlowMethods {
         const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])
             .filter(id => validIds.has(id) && !requiredSet.has(id));
         const uniqueAdditional = [...new Set(additional)];
-
-        if (uniqueRequired.length === 0) {
-            uniqueRequired.push('flashcards');
-        }
 
         return {
             required: uniqueRequired,

@@ -210,6 +210,9 @@ class StudentActivityProgressFlowMethods {
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
         let uniqueRequired = [...new Set(required)];
+        if (!uniqueRequired.includes('flashcards')) {
+            uniqueRequired.unshift('flashcards');
+        }
         if (!hasExplicitRequired) {
             uniqueRequired = this.replaceUnsuitableRequiredActivities(uniqueRequired, vocab, validIds);
         }
@@ -220,10 +223,6 @@ class StudentActivityProgressFlowMethods {
         const additional = (Array.isArray(requestedAdditional) ? requestedAdditional : [])
             .filter(id => validIds.has(id) && !requiredSet.has(id));
         const uniqueAdditional = [...new Set(additional)];
-
-        if (uniqueRequired.length === 0) {
-            uniqueRequired.push('flashcards');
-        }
 
         return {
             required: uniqueRequired,

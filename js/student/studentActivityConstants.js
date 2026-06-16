@@ -21,15 +21,15 @@ export const DEFAULT_REQUIRED_BY_PURPOSE = {
 
 export const DEFAULT_PRACTICE_REQUIRED_ROTATION = [
     ['flashcards', 'matching'],
-    ['matching', 'fill-in-blank'],
+    ['flashcards', 'fill-in-blank'],
     ['flashcards', 'word-search'],
-    ['quiz', 'scramble'],
-    ['matching', 'speed-match'],
+    ['flashcards', 'quiz'],
+    ['flashcards', 'speed-match'],
     ['flashcards', 'wordle'],
-    ['crossword', 'hangman'],
-    ['matching', 'quiz'],
-    ['scramble', 'fill-in-blank'],
-    ['word-search', 'speed-match']
+    ['flashcards', 'crossword'],
+    ['flashcards', 'hangman'],
+    ['flashcards', 'scramble'],
+    ['flashcards', 'word-search']
 ];
 
 export const ACTIVITY_MODULES = {
