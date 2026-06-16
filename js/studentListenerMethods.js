@@ -2,6 +2,26 @@ import { $, $$, closeModal as closeDialog, notifications, setupModal } from './m
 import { studentApi as supabaseService } from './services/studentApi.js';
 
 class StudentListenerMethods {
+    setStudentExportButtonState(button, isLoading = false, loadingLabel = 'Generating...') {
+        if (!button) return;
+
+        if (isLoading) {
+            if (!button.dataset.idleHtml) button.dataset.idleHtml = button.innerHTML;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            button.innerHTML = `<i data-lucide="loader-circle"></i><span>${loadingLabel}</span>`;
+        } else {
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+            if (button.dataset.idleHtml) {
+                button.innerHTML = button.dataset.idleHtml;
+                delete button.dataset.idleHtml;
+            }
+        }
+
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+    }
+
     initListeners() {
         if ('scrollRestoration' in window.history) {
             window.history.scrollRestoration = 'manual';
@@ -252,9 +272,17 @@ class StudentListenerMethods {
             this.activities.downloadWordHuntSubmission();
         });
 
-        this.addListener('#generate-final-report-btn', 'click', async () => {
+        this.addListener('#generate-final-report-btn', 'click', async (event) => {
+            const button = event.currentTarget;
+            if (button?.disabled || this.finalReportExportInProgress) return;
+
+            this.finalReportExportInProgress = true;
+            this.setStudentExportButtonState(button, true, 'Generating report...');
             $('#student-vocab-export-menu')?.removeAttribute('open');
-            if (this.currentVocab) {
+
+            try {
+                if (!this.currentVocab) return;
+
                 // First, save the current activity's score if there's one active
                 if (this.activityInstance && typeof this.activityInstance.getScore === 'function' && this.currentActivityType) {
                     const result = this.activityInstance.getScore();
@@ -263,10 +291,16 @@ class StudentListenerMethods {
                 }
 
                 const { ReportGenerator } = await import('./reportGenerator.js');
-                ReportGenerator.generateReport(this.studentProfile, this.currentVocab, this.unitScores, {
+                await ReportGenerator.generateReport(this.studentProfile, this.currentVocab, this.unitScores, {
                     wordHunt: this.unitWordHunt || {},
                     loadImage: path => supabaseService.downloadWordHuntImage(path)
                 });
+            } catch (error) {
+                console.error('Failed to generate final report:', error);
+                notifications.error('Could not generate final report.');
+            } finally {
+                this.finalReportExportInProgress = false;
+                this.setStudentExportButtonState(button, false);
             }
         });
 
