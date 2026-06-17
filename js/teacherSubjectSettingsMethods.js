@@ -30,7 +30,6 @@ export const teacherSubjectSettingsMethods = {
 
         this.renderSubjectManager();
         this.updateSubjectSelect();
-        this.updateActivitySubjectSelect();
     },
 
     getSubjects() {
@@ -158,12 +157,9 @@ export const teacherSubjectSettingsMethods = {
             }
 
             this.invalidateTeacherLibraryCache();
-            this.invalidateActivityLibraryCache();
             this.renderSubjectManager();
             this.updateSubjectSelect();
-            this.updateActivitySubjectSelect();
             this.loadLibrary();
-            this.loadActivityLibrary();
             if (statusEl) statusEl.textContent = 'Subjects saved.';
             notifications.success('Subjects saved.');
         } catch (error) {

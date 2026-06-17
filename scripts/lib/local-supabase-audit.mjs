@@ -158,7 +158,8 @@ async function seedAuditUsers(admin) {
                 role: 'teacher',
                 first_name: 'Audit',
                 last_name: 'Teacher',
-                email: AUDIT_TEACHER_EMAIL
+                email: AUDIT_TEACHER_EMAIL,
+                must_change_password: false
             },
             {
                 user_id: student.id,
