@@ -96,11 +96,19 @@ export class StudentAuth {
             return;
         }
 
-        await this.finishSignedInSession();
-        this.sm.authInitialized = true;
+        const sessionFinished = await this.finishSignedInSession(user.uid);
+        if (sessionFinished) {
+            this.sm.authInitialized = true;
+        }
     }
 
-    async finishSignedInSession() {
+    isStillSignedIn(userId) {
+        return Boolean(this.sm.currentUser?.uid && (!userId || this.sm.currentUser.uid === userId));
+    }
+
+    async finishSignedInSession(userId = this.sm.currentUser?.uid) {
+        if (!this.isStillSignedIn(userId)) return false;
+
         // Try to load cloud progress (may fail offline)
         try {
             await this.sm.progress.loadCloudProgress();
@@ -111,17 +119,24 @@ export class StudentAuth {
             this.sm.setAuthStatus('🔐 Signed in (Offline - Using local data)');
         }
 
+        if (!this.isStillSignedIn(userId)) return false;
+
         this.sm.updateHeader();
         this.sm.progress.startCoinSync();
         await this.sm.loadSubjectSettings();
+        if (!this.isStillSignedIn(userId)) return false;
         await this.sm.activities.loadSchoolCalendar();
+        if (!this.isStillSignedIn(userId)) return false;
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();
+        if (!this.isStillSignedIn(userId)) return false;
         const requiresProfile = !this.sm.hasCompleteStudentProfile();
 
         if (requiresProfile) {
             this.sm.checkProfile(true);
         }
+
+        return true;
     }
 
     handleBackendSignOut() {
@@ -134,6 +149,7 @@ export class StudentAuth {
         }
         this.sm.updateGuestStatus(true);
         this.sm.setAuthStatus('Signed out');
+        this.sm.authInitialized = false;
         this.sm.routeReady = false;
         this.sm.switchView('login-view');
     }

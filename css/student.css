@@ -604,6 +604,38 @@
     padding: 0;
 }/* Forms */.form-group {
     margin-bottom: var(--spacing-md);
+}.form-group label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--text-muted);
+    font-weight: 700;
+}input,
+textarea,
+select {
+    width: 100%;
+    min-height: var(--touch-target);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.72);
+    color: var(--text-main);
+    font: inherit;
+    padding: 0.75rem 0.9rem;
+    box-sizing: border-box;
+    outline: none;
+}textarea {
+    min-height: 120px;
+    resize: vertical;
+}input::placeholder,
+textarea::placeholder {
+    color: rgba(203, 213, 245, 0.62);
+}input:focus,
+textarea:focus,
+select:focus {
+    border-color: rgba(14, 165, 233, 0.72);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}input[readonly] {
+    opacity: 0.82;
+    cursor: default;
 }.form-row {
     display: flex;
     gap: var(--spacing-md);
