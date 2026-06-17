@@ -218,13 +218,15 @@ class StudentAuthUiMethods {
     updateGuestStatus(isGuest) {
         const guestEl = $('#guest-status');
         if (guestEl) {
+            guestEl.hidden = !isGuest;
+            guestEl.setAttribute('aria-hidden', String(!isGuest));
             guestEl.style.display = isGuest ? 'flex' : 'none';
         }
         const userInfo = $('#user-info');
-        if (userInfo && isGuest) {
-            userInfo.style.display = 'none';
-        } else if (userInfo && !isGuest) {
-            userInfo.style.display = 'flex';
+        if (userInfo) {
+            userInfo.hidden = isGuest;
+            userInfo.setAttribute('aria-hidden', String(isGuest));
+            userInfo.style.display = isGuest ? 'none' : 'flex';
         }
     }
 

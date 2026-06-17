@@ -1,42 +1,81 @@
 /* Student entry stylesheet generated from style.css; includes shared primitives used by the student UI. */:root {
-    /* Updated palette */
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
-    --secondary-color: #0ea5e9;
-    --accent-color: #f97316;
-    --bg-color: #0f172a;
-    --card-bg: rgba(15, 23, 42, 0.65);
-    --text-main: #f8fafc;
-    --text-muted: #cbd5f5;
-    --border-color: rgba(255, 255, 255, 0.125);
-    --danger-color: #f87171;
-    --success-color: #34d399;
+    /* Celestial Academy tokens */
+    --color-surface: #0b1326;
+    --color-surface-container-lowest: #060e20;
+    --color-surface-container-low: #131b2e;
+    --color-surface-container: #171f33;
+    --color-surface-container-high: #222a3d;
+    --color-surface-container-highest: #2d3449;
+    --color-on-surface: #dae2fd;
+    --color-on-surface-variant: #c2c6d6;
+    --color-outline: #8c909f;
+    --color-outline-variant: #424754;
+    --color-primary: #adc6ff;
+    --color-on-primary: #002e6a;
+    --color-primary-container: #4d8eff;
+    --color-secondary: #ddb7ff;
+    --color-tertiary: #ffb786;
+    --color-success: #10b981;
+    --color-warning: #ffc800;
+    --color-danger: #ff4b4b;
+    --color-xp: #e4f222;
+    --color-glass-stroke: rgba(255, 255, 255, 0.12);
+    --glass-panel: rgba(22, 24, 58, 0.78);
+    --glass-panel-strong: rgba(25, 27, 66, 0.9);
+    --glass-panel-subtle: rgba(10, 18, 38, 0.78);
+    --glass-blur: 24px;
+
+    /* Existing semantic aliases */
+    --primary-color: var(--color-primary);
+    --primary-hover: #d8e2ff;
+    --secondary-color: var(--color-secondary);
+    --accent-color: var(--color-tertiary);
+    --bg-color: var(--color-surface);
+    --card-bg: var(--glass-panel);
+    --text-main: var(--color-on-surface);
+    --text-muted: var(--color-on-surface-variant);
+    --border-color: var(--color-glass-stroke);
+    --danger-color: var(--color-danger);
+    --success-color: var(--color-success);
 
     /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-    --spacing-xl: 3rem;
+    --spacing-1: 0.5rem;
+    --spacing-2: 1rem;
+    --spacing-3: 1.5rem;
+    --spacing-4: 2rem;
+    --spacing-5: 3rem;
+    --spacing-xs: var(--spacing-1);
+    --spacing-sm: var(--spacing-2);
+    --spacing-md: var(--spacing-3);
+    --spacing-lg: var(--spacing-4);
+    --spacing-xl: var(--spacing-5);
     --touch-target: 44px;
 
     /* Radius */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 1rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1.5rem;
+    --radius-control: 0.75rem;
+    --radius-panel: 1.5rem;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-sm: 0 8px 18px -18px rgb(0 0 0 / 0.65);
+    --shadow-md: 0 18px 42px -28px rgb(0 0 0 / 0.72);
+    --shadow-lg: 0 28px 70px -42px rgb(0 0 0 / 0.82);
+    --glow-primary: 0 18px 38px -24px rgba(173, 198, 255, 0.9);
+    --glow-secondary: 0 18px 38px -24px rgba(221, 183, 255, 0.85);
+    --glow-xp: 0 14px 34px -24px rgba(228, 242, 34, 0.95);
 }body {
+    margin: 0;
     font-family: 'Inter', sans-serif;
     background:
-        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.45), transparent 50%),
-        radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.35), transparent 55%),
-        radial-gradient(circle at 20% 80%, rgba(249, 115, 22, 0.25), transparent 45%),
+        radial-gradient(circle at 8% 14%, rgba(93, 83, 255, 0.24), transparent 38%),
+        radial-gradient(circle at 92% 12%, rgba(77, 142, 255, 0.18), transparent 42%),
+        radial-gradient(circle at 18% 86%, rgba(111, 0, 190, 0.14), transparent 34%),
+        linear-gradient(180deg, #081022 0%, #060e20 58%, #050b19 100%),
         var(--bg-color);
     color: var(--text-main);
+    font-size: 16px;
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
@@ -4449,7 +4488,9 @@ select:focus {
     }
 
     .modal-content {
-        width: 100% !important;
+        box-sizing: border-box !important;
+        width: auto !important;
+        max-width: calc(100vw - 64px) !important;
         max-height: calc(100svh - 2rem) !important;
     }
 
@@ -4700,4 +4741,3280 @@ select:focus {
         height: 42px;
         font-size: 0.82rem;
     }
+}
+
+/* Final tablet correction: no hybrid header between phone and full sidebar. */
+@media (min-width: 701px) and (max-width: 1120px) {
+    header.app-header.student-app-header {
+        position: sticky !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 80 !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-areas: "student-nav student-actions" !important;
+        grid-template-rows: auto !important;
+        align-items: center !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: min(100%, calc(100vw - 64px)) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 16px clamp(18px, 4vw, 32px) !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
+        background:
+            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
+            rgba(8, 15, 33, 0.96) !important;
+        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    header.app-header.student-app-header .header-left,
+    header.app-header.student-app-header .student-sidebar-context {
+        display: none !important;
+    }
+
+    header.app-header.student-app-header .student-tab-shell {
+        display: block !important;
+        position: relative !important;
+        grid-area: student-nav !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        order: 1 !important;
+        align-self: center !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    header.app-header.student-app-header .student-mobile-menu-toggle {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: flex-start !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(8, 14, 31, 0.58) !important;
+    }
+
+    header.app-header.student-app-header .student-tabs {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        width: min(18rem, calc(100vw - 36px)) !important;
+        max-height: min(70vh, 22rem) !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        border: 1px solid rgba(173, 198, 255, 0.16) !important;
+        border-radius: 12px !important;
+        background: rgba(7, 14, 30, 0.98) !important;
+        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    header.app-header.student-app-header .student-tab-shell.mobile-menu-open .student-tabs {
+        display: grid !important;
+    }
+
+    header.app-header.student-app-header .student-tab {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border: 1px solid transparent !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        color: rgba(218, 226, 253, 0.82) !important;
+        font-size: 0.95rem !important;
+        box-shadow: none !important;
+    }
+
+    header.app-header.student-app-header .student-tab.active {
+        border-color: rgba(173, 198, 255, 0.26) !important;
+        background: rgba(173, 198, 255, 0.14) !important;
+        color: #eef3ff !important;
+    }
+
+    header.app-header.student-app-header .header-actions {
+        position: static !important;
+        inset: auto !important;
+        grid-area: student-actions !important;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        order: 2 !important;
+        align-self: center !important;
+        justify-self: end !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    header.app-header.student-app-header #user-info {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    header.app-header.student-app-header .student-mobile-profile-btn,
+    header.app-header.student-app-header #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    header.app-header.student-app-header #auth-status {
+        position: static !important;
+        width: 0.72rem !important;
+        height: 0.72rem !important;
+        min-width: 0.72rem !important;
+        min-height: 0.72rem !important;
+    }
+
+    .app-container > main {
+        margin-left: 0 !important;
+    }
+}
+
+/* Phase 1: Celestial Academy design-system migration */
+html {
+    background: var(--color-surface);
+}
+
+body,
+button,
+input,
+textarea,
+select {
+    letter-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+.student-vocab-card h3,
+.student-vocab-row strong,
+.game-card-copy h3 {
+    font-family: 'Geist', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.teacher-eyebrow,
+.student-vocab-purpose,
+.student-vocab-schedule,
+.student-vocab-row-header,
+.game-counter,
+.game-cost,
+.progress-badge,
+.coin-badge,
+.student-spark-badge,
+.student-spark-heading,
+.word-hunt-title span {
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+.app-container {
+    box-sizing: border-box;
+    width: min(100%, 1280px);
+    max-width: 1280px;
+    padding: 40px;
+}
+
+.app-container>main {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+        var(--glass-panel);
+    border: 1px solid var(--color-glass-stroke);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(var(--glass-blur));
+}
+
+.card,
+.app-container>main .card,
+.auth-panel,
+.login-container .card,
+.student-vocab-row,
+.student-home-tab,
+.student-class-picker,
+.vocab-view-toggle,
+.teacher-tabs,
+.game-card,
+.game-header,
+.student-export-menu-panel,
+.student-spark-card {
+    border-color: var(--color-glass-stroke);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+        var(--glass-panel);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(var(--glass-blur));
+}
+
+.card {
+    border-radius: var(--radius-panel);
+    padding: var(--spacing-3);
+}
+
+.card:hover,
+.student-vocab-row:not(.student-vocab-row-header):hover,
+.student-home-unit:hover,
+.game-card:hover {
+    border-color: rgba(173, 198, 255, 0.38);
+    box-shadow: var(--shadow-lg), var(--glow-primary);
+}
+
+.header-left h1,
+.student-app-header .header-left h1 {
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.student-dashboard-heading h2,
+#activity-menu-view .section-header h2,
+.word-hunt-title h2 {
+    color: var(--text-main);
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.teacher-eyebrow {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.app-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.teacher-tabs,
+.auth-switch,
+.student-home-tabs {
+    border-radius: var(--radius-control);
+    background: rgba(6, 14, 32, 0.54);
+}
+
+.teacher-tab,
+.student-home-tab,
+.vocab-view-toggle-btn {
+    border-radius: var(--radius-control);
+    color: var(--text-muted);
+    font-weight: 800;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.teacher-tab.active,
+.student-home-tab.active,
+.vocab-view-toggle-btn.is-active {
+    background: rgba(173, 198, 255, 0.18);
+    color: var(--text-main);
+    box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.42), var(--glow-primary);
+}
+
+.teacher-tab:hover,
+.student-home-tab:hover,
+.vocab-view-toggle-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn {
+    border-radius: var(--radius-control);
+    font-weight: 800;
+    transition: transform 0.16s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.btn:active {
+    transform: translateY(1px) scale(0.99);
+}
+
+.primary-btn {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: var(--glow-primary);
+}
+
+.primary-btn:hover {
+    background: var(--primary-hover);
+    color: var(--color-on-primary);
+    box-shadow: 0 18px 42px -20px rgba(173, 198, 255, 1);
+}
+
+.secondary-btn,
+.text-btn {
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text-main);
+}
+
+.secondary-btn:hover,
+.text-btn:hover {
+    border-color: rgba(173, 198, 255, 0.46);
+    background: rgba(173, 198, 255, 0.11);
+    color: var(--text-main);
+    box-shadow: var(--glow-primary);
+}
+
+.accent-btn {
+    background: var(--color-tertiary);
+    color: var(--color-on-tertiary, #502400);
+    box-shadow: 0 16px 34px -22px rgba(255, 183, 134, 0.95);
+}
+
+.danger-btn {
+    border-color: rgba(255, 75, 75, 0.42);
+    background: rgba(255, 75, 75, 0.12);
+    color: #ffdad6;
+}
+
+.icon-btn {
+    border-radius: var(--radius-control);
+}
+
+input,
+textarea,
+select {
+    border-color: rgba(255, 255, 255, 0.13);
+    border-radius: var(--radius-control);
+    background: rgba(6, 14, 32, 0.64);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(194, 198, 214, 0.65);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.student-class-picker:focus-within {
+    border-color: rgba(173, 198, 255, 0.72);
+    box-shadow: 0 0 0 3px rgba(173, 198, 255, 0.18), var(--glow-primary);
+}
+
+.coin-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.72rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(6, 14, 32, 0.48);
+    color: var(--color-xp);
+    font-size: 0.84rem;
+    font-weight: 800;
+    box-shadow: var(--glow-xp);
+}
+
+.status-dot[data-state="synced"] {
+    background: var(--color-success);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16), 0 0 18px rgba(16, 185, 129, 0.42);
+}
+
+.progress-badge {
+    top: 0.65rem;
+    right: 0.65rem;
+    border: 1px solid rgba(173, 198, 255, 0.28);
+    background: rgba(173, 198, 255, 0.18);
+    color: var(--color-primary);
+    box-shadow: var(--glow-primary);
+}
+
+.progress-badge.complete {
+    border-color: rgba(16, 185, 129, 0.38);
+    background: rgba(16, 185, 129, 0.18);
+    color: #86efac;
+}
+
+.flashcard-study-track,
+.matching-progress-track,
+.cw-progress-track,
+.scramble-progress {
+    background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 12.5%),
+        rgba(255, 255, 255, 0.11);
+}
+
+.flashcard-study-fill,
+.matching-progress-fill,
+.cw-progress-fill,
+.scramble-progress-fill {
+    background: var(--color-xp);
+    box-shadow: var(--glow-xp);
+}
+
+.student-dashboard-heading {
+    margin-bottom: var(--spacing-3);
+}
+
+.student-home-dashboard {
+    gap: var(--spacing-3);
+}
+
+.student-home-panel {
+    border: 1px solid var(--color-glass-stroke);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-panel);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+        rgba(30, 27, 75, 0.48);
+    padding: var(--spacing-2);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(var(--glass-blur));
+}
+
+.student-home-panel .teacher-panel-header h3 {
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.student-home-panel .teacher-panel-header p,
+.student-spark-card p,
+.student-home-unit-copy span,
+.student-home-unit-status span {
+    color: var(--text-muted);
+}
+
+.student-spark-card {
+    border-radius: var(--radius-control);
+}
+
+.student-spark-badge {
+    background: rgba(221, 183, 255, 0.16);
+    color: var(--color-secondary);
+}
+
+.student-spark-question {
+    border: 1px solid rgba(255, 183, 134, 0.16);
+    background: rgba(255, 183, 134, 0.1);
+}
+
+.student-home-unit {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-control);
+    padding: 0.72rem 0.65rem;
+}
+
+.student-home-unit-icon,
+.student-vocab-icon {
+    border: 1px solid rgba(173, 198, 255, 0.22);
+    background: rgba(173, 198, 255, 0.13);
+    color: var(--color-primary);
+}
+
+.student-class-picker,
+.vocab-header-subject-picker .student-class-picker,
+.vocab-view-toggle {
+    border-radius: var(--radius-control);
+    background: rgba(6, 14, 32, 0.48);
+}
+
+#vocab-selection-view .vocab-selection-header {
+    --vocab-header-control-height: var(--touch-target);
+}
+
+.vocab-header-subject-picker .student-class-picker,
+.vocab-header-subject-picker .student-subject-select,
+.vocab-view-toggle-btn,
+.vocab-view-toggle .vocab-view-toggle-btn {
+    min-height: var(--touch-target);
+    height: var(--touch-target);
+}
+
+.vocab-view-toggle {
+    height: auto;
+    min-height: calc(var(--touch-target) + 8px);
+}
+
+.student-subject-select {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.student-vocab-month-heading,
+.vocab-trimester-heading {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.student-vocab-card {
+    min-height: 172px;
+    border-radius: var(--radius-panel);
+}
+
+.student-vocab-purpose {
+    border: 1px solid rgba(173, 198, 255, 0.22);
+    background: rgba(173, 198, 255, 0.13);
+    color: var(--color-primary);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+}
+
+.student-vocab-purpose.is-summative {
+    border-color: rgba(255, 183, 134, 0.3);
+    background: rgba(255, 183, 134, 0.15);
+    color: var(--color-tertiary);
+}
+
+.student-vocab-schedule,
+.game-counter,
+.game-cost {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+
+.student-vocab-card h3 {
+    color: var(--text-main);
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.student-vocab-card p,
+.game-card-copy p {
+    color: var(--text-muted);
+}
+
+.student-vocab-row {
+    border-radius: var(--radius-control);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        rgba(19, 27, 46, 0.68);
+}
+
+.student-vocab-row-header {
+    box-shadow: none;
+    backdrop-filter: none;
+    color: rgba(194, 198, 214, 0.78);
+}
+
+.student-vocab-row strong {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.student-vocab-row span {
+    color: var(--text-muted);
+}
+
+.student-vocab-row svg,
+.student-vocab-action,
+.teacher-library-crumb-btn,
+.student-spark-source a {
+    color: var(--color-primary);
+}
+
+.activity-card {
+    border-radius: var(--radius-panel);
+    text-align: left;
+}
+
+.activity-card .icon {
+    border: 1px solid rgba(173, 198, 255, 0.2);
+    border-radius: var(--radius-control);
+    background: rgba(173, 198, 255, 0.12);
+    color: var(--color-primary);
+}
+
+.activity-card h3 {
+    color: var(--text-main);
+    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    font-weight: 800;
+}
+
+.activity-card p {
+    color: var(--text-muted);
+}
+
+.next-activity-card {
+    border-color: rgba(173, 198, 255, 0.46);
+    box-shadow: var(--shadow-lg), var(--glow-primary);
+}
+
+.activity-locked-card,
+.activity-unavailable-card {
+    opacity: 0.64;
+}
+
+#game-selection {
+    width: min(100%, 760px);
+}
+
+.game-select-nav-btn {
+    border: 1px solid rgba(173, 198, 255, 0.24);
+    background: rgba(6, 14, 32, 0.42);
+    color: var(--color-primary);
+}
+
+.game-card {
+    border-radius: var(--radius-panel);
+}
+
+.game-card #play-current-game-btn {
+    min-height: var(--touch-target);
+}
+
+.game-icon {
+    filter: saturate(0.9);
+}
+
+.game-card-copy h3 {
+    color: var(--text-main);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.game-cost {
+    color: var(--color-xp);
+}
+
+.game-header {
+    border-radius: var(--radius-control);
+    background: rgba(6, 14, 32, 0.66);
+}
+
+#game-canvas {
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-lg);
+}
+
+.loading-spinner {
+    color: var(--text-muted);
+}
+
+@media (max-width: 700px) {
+    .app-container {
+        padding: 20px;
+    }
+
+    .app-container>main {
+        border-radius: var(--radius-control);
+        padding: var(--spacing-2);
+    }
+
+    .student-home-panel {
+        border-radius: var(--radius-control);
+    }
+
+    #vocab-selection-view .vocab-selection-header {
+        --vocab-header-control-height: var(--touch-target);
+    }
+
+    .vocab-header-subject-picker .student-subject-select,
+    .vocab-view-toggle-btn,
+    .vocab-view-toggle .vocab-view-toggle-btn {
+        min-height: var(--touch-target);
+        height: var(--touch-target);
+    }
+
+    .vocab-view-toggle {
+        height: auto;
+        min-height: calc(var(--touch-target) + 8px);
+    }
+}
+
+/* Phase 2: student shell and dashboard hierarchy */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 32px;
+        width: min(100%, 1440px);
+        max-width: 1440px;
+        min-height: 100vh;
+        padding: 0 40px 40px 0;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
+        position: sticky;
+        top: 0;
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        align-self: start;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        gap: 28px;
+        min-height: 100vh;
+        margin: 0;
+        padding: 40px 20px;
+        border-right: 1px solid rgba(173, 198, 255, 0.14);
+        border-bottom: 0;
+        background:
+            linear-gradient(90deg, rgba(8, 16, 34, 0.98), rgba(8, 16, 34, 0.74)),
+            rgba(6, 14, 32, 0.94);
+        box-shadow: 26px 0 70px -62px rgba(0, 0, 0, 0.9);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left {
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1 {
+        font-size: 2rem;
+        line-height: 1.05;
+        text-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1::after {
+        content: "Level 24 Explorer";
+        display: block;
+        margin-top: 0.45rem;
+        color: var(--text-muted);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.3;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
+        justify-self: stretch;
+        width: 100%;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        display: grid;
+        justify-content: stretch;
+        gap: 0.45rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab {
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 52px;
+        padding: 0 1rem;
+        border-radius: 0.85rem;
+        color: rgba(218, 226, 253, 0.82);
+        font-size: 1rem;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        background: rgba(173, 198, 255, 0.14);
+        box-shadow:
+            inset 0 0 0 1px rgba(173, 198, 255, 0.22),
+            inset 4px 0 0 rgba(173, 198, 255, 0.95);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions {
+        align-self: end;
+        justify-self: stretch;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info,
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info {
+        gap: 0.65rem !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .student-mobile-profile-btn {
+        display: inline-flex;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        grid-column: 2;
+        min-width: 0;
+        padding-top: 40px;
+    }
+}
+
+.student-dashboard-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.student-home-dashboard {
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.85fr);
+    align-items: stretch;
+}
+
+.student-continue-hero {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--spacing-3);
+    width: 100%;
+    min-height: 270px;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border: 1px solid rgba(173, 198, 255, 0.18);
+    border-top-color: rgba(255, 255, 255, 0.24);
+    border-radius: var(--radius-panel);
+    background:
+        linear-gradient(90deg, rgba(25, 27, 66, 0.96) 0%, rgba(25, 27, 66, 0.82) 46%, rgba(8, 16, 34, 0.34) 100%),
+        radial-gradient(circle at 82% 30%, color-mix(in srgb, var(--subject-color, var(--color-primary)) 34%, transparent), transparent 36%),
+        rgba(25, 27, 66, 0.86);
+    color: var(--text-main);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 34px 90px -58px rgba(0, 0, 0, 0.95);
+}
+
+section.student-continue-hero {
+    cursor: default;
+}
+
+.student-continue-hero:hover {
+    border-color: rgba(173, 198, 255, 0.34);
+    box-shadow: 0 38px 100px -58px rgba(0, 0, 0, 0.98), var(--glow-primary);
+}
+
+.student-continue-copy {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 760px;
+}
+
+.student-hero-kicker {
+    justify-self: start;
+    min-height: 28px;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(173, 198, 255, 0.14);
+    color: var(--color-primary);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.student-continue-copy h3 {
+    margin: 0;
+    color: #f4f7ff;
+    font-size: clamp(2rem, 5vw, 3.35rem);
+    font-weight: 800;
+    line-height: 1.05;
+}
+
+.student-continue-copy p {
+    max-width: 680px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+}
+
+.student-continue-progress {
+    display: grid;
+    gap: 0.5rem;
+    width: min(100%, 620px);
+    margin-top: 0.4rem;
+}
+
+.student-continue-progress-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.student-continue-progress-top strong {
+    color: var(--color-xp);
+}
+
+.student-continue-track {
+    height: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 999px;
+    background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 42px),
+        rgba(255, 255, 255, 0.13);
+}
+
+.student-continue-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-xp);
+    box-shadow: var(--glow-xp);
+}
+
+.student-continue-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    min-width: 180px;
+    min-height: 56px;
+    padding: 0 1.2rem;
+    border-radius: var(--radius-control);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: 900;
+    box-shadow: var(--glow-primary);
+}
+
+.student-continue-action svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.student-home-panel {
+    min-height: 230px;
+}
+
+.student-home-spark-panel {
+    min-height: 0;
+    opacity: 0.84;
+}
+
+.student-home-spark-panel .teacher-panel-header h3,
+.student-home-spark-panel .student-spark-card h3 {
+    font-size: 0.95rem;
+}
+
+.student-home-spark-panel .student-spark-card p,
+.student-home-spark-panel .student-spark-question span {
+    font-size: 0.82rem;
+}
+
+.student-home-spark-panel .student-spark-question {
+    padding: 0.55rem;
+}
+
+#student-home-panel-pending {
+    grid-column: 1;
+}
+
+#student-home-panel-week {
+    grid-column: 2;
+}
+
+#student-home-panel-spark {
+    grid-column: 2;
+}
+
+.student-vocab-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "topline"
+        "main"
+        "action";
+    min-height: 220px;
+}
+
+.student-vocab-card-main {
+    align-items: start;
+}
+
+.student-vocab-action {
+    justify-content: space-between;
+    min-height: 46px;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid rgba(173, 198, 255, 0.18);
+    border-radius: var(--radius-control);
+    background: rgba(173, 198, 255, 0.08);
+}
+
+.student-vocab-row {
+    min-height: 4.1rem;
+}
+
+.student-vocab-row strong {
+    font-size: 1.02rem;
+}
+
+@media (max-width: 900px) {
+    .student-home-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .student-continue-hero,
+    #student-home-panel-pending,
+    #student-home-panel-week,
+    #student-home-panel-spark {
+        grid-column: 1;
+    }
+
+    .student-continue-hero {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+
+    .student-continue-action {
+        justify-self: start;
+    }
+}
+
+/* Phase 1 refinement: reduce nested framing and restore contrast */
+.app-container {
+    max-width: 1240px;
+}
+
+.app-container>main {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    padding: var(--spacing-2) 0 0;
+}
+
+.app-container::before,
+.landing-container::before {
+    opacity: 0.08;
+}
+
+.app-container>main:has(#main-menu-view:not(.hidden)),
+.app-container>main:has(#vocab-selection-view:not(.hidden)),
+.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding-inline: 0;
+}
+
+.student-app-header {
+    margin-bottom: var(--spacing-2);
+    border-bottom: 1px solid rgba(173, 198, 255, 0.12);
+}
+
+.teacher-tabs {
+    background: rgba(5, 11, 25, 0.78);
+    border-color: rgba(173, 198, 255, 0.16);
+    box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.85);
+}
+
+.teacher-tab.active,
+.student-home-tab.active,
+.vocab-view-toggle-btn.is-active {
+    background: rgba(173, 198, 255, 0.22);
+    color: #f4f7ff;
+    box-shadow:
+        inset 0 0 0 1px rgba(173, 198, 255, 0.56),
+        0 14px 26px -22px rgba(173, 198, 255, 0.95);
+}
+
+.coin-badge {
+    background: rgba(5, 11, 25, 0.82);
+    color: var(--color-xp);
+    text-shadow: 0 0 16px rgba(228, 242, 34, 0.32);
+}
+
+.icon-btn {
+    background: rgba(173, 198, 255, 0.07);
+}
+
+.student-dashboard-heading {
+    align-items: center;
+    margin-bottom: var(--spacing-3);
+}
+
+.student-dashboard-heading h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    letter-spacing: 0;
+}
+
+.student-home-dashboard {
+    align-items: stretch;
+}
+
+.student-home-panel {
+    min-height: 238px;
+    border-color: rgba(173, 198, 255, 0.18);
+    border-top-color: rgba(255, 255, 255, 0.24);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.022)),
+        rgba(26, 24, 72, 0.74);
+    box-shadow: 0 24px 64px -44px rgba(0, 0, 0, 0.86);
+}
+
+.student-home-panel .teacher-panel-header {
+    margin-bottom: var(--spacing-2);
+}
+
+.student-spark-card {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.student-spark-card h3 {
+    font-size: 1rem;
+    color: #f4f7ff;
+}
+
+.student-spark-badge {
+    background: rgba(221, 183, 255, 0.22);
+    color: #e8c9ff;
+}
+
+.student-spark-question {
+    border-color: rgba(255, 183, 134, 0.24);
+    background: rgba(255, 183, 134, 0.14);
+}
+
+.student-home-unit {
+    border-top: 0;
+    background: transparent;
+}
+
+.student-home-unit:hover {
+    background: rgba(173, 198, 255, 0.06);
+}
+
+#vocab-selection-view .vocab-selection-header {
+    margin-bottom: var(--spacing-2);
+}
+
+.vocab-context-breadcrumb .teacher-library-breadcrumb {
+    color: rgba(218, 226, 253, 0.82);
+}
+
+.student-class-picker,
+.vocab-header-subject-picker .student-class-picker,
+.vocab-view-toggle {
+    border-color: rgba(173, 198, 255, 0.15);
+    background: rgba(5, 11, 25, 0.76);
+    box-shadow: 0 18px 40px -32px rgba(0, 0, 0, 0.9);
+}
+
+.student-vocab-row-list {
+    gap: 0.6rem;
+}
+
+.student-vocab-row {
+    border-color: rgba(173, 198, 255, 0.14);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.014)),
+        rgba(13, 20, 44, 0.88);
+    box-shadow: 0 14px 38px -34px rgba(0, 0, 0, 0.92);
+}
+
+.student-vocab-row-header {
+    min-height: 1.6rem;
+    background: rgba(5, 11, 25, 0.54);
+    border-radius: var(--radius-control);
+    color: rgba(218, 226, 253, 0.82);
+    box-shadow: none;
+}
+
+.student-vocab-row:not(.student-vocab-row-header):hover {
+    border-color: rgba(173, 198, 255, 0.36);
+    background:
+        linear-gradient(180deg, rgba(173, 198, 255, 0.08), rgba(255, 255, 255, 0.018)),
+        rgba(18, 25, 55, 0.94);
+}
+
+.student-vocab-purpose {
+    background: rgba(173, 198, 255, 0.14);
+    color: #c6d8ff;
+}
+
+.student-vocab-purpose.is-summative {
+    background: rgba(255, 183, 134, 0.18);
+    color: #ffcaa6;
+}
+
+.arcade-container {
+    min-height: min(560px, calc(100svh - 190px));
+    align-content: center;
+}
+
+.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) .arcade-container {
+    min-height: min(560px, calc(100svh - 190px));
+}
+
+#game-selection {
+    width: min(100%, 760px);
+}
+
+.game-selection-row {
+    grid-template-columns: 52px minmax(280px, 1fr) 52px;
+}
+
+.game-card {
+    border-color: rgba(173, 198, 255, 0.18);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018)),
+        rgba(24, 24, 66, 0.86);
+    box-shadow: 0 28px 70px -46px rgba(0, 0, 0, 0.9);
+}
+
+.game-card-copy h3,
+.student-home-unit-copy strong,
+.student-vocab-row strong {
+    color: #f4f7ff;
+}
+
+.game-cost {
+    color: var(--color-xp);
+    text-shadow: 0 0 14px rgba(228, 242, 34, 0.26);
+}
+
+.game-select-nav-btn {
+    border-color: rgba(173, 198, 255, 0.2);
+    background: rgba(5, 11, 25, 0.78);
+    box-shadow: 0 16px 34px -28px rgba(0, 0, 0, 0.9);
+}
+
+.game-selection-actions .secondary-btn {
+    background: rgba(5, 11, 25, 0.58);
+}
+
+@media (max-width: 700px) {
+    .app-container>main {
+        background: transparent;
+        border: 0;
+        padding-top: var(--spacing-1);
+    }
+
+    .student-home-panel {
+        min-height: 0;
+    }
+
+    .game-selection-row {
+        grid-template-columns: 48px minmax(0, 1fr) 48px;
+    }
+}
+
+/* Phase 2 correction: align the student shell with the reference fixed-sidebar model. */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) {
+        display: block;
+        width: 100%;
+        max-width: none;
+        min-height: 100svh;
+        padding: 0;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        width: 256px;
+        height: 100svh;
+        min-height: 0;
+        margin: 0;
+        padding: 40px 18px 24px 24px;
+        overflow-y: auto;
+        border-right: 1px solid rgba(173, 198, 255, 0.14);
+        border-bottom: 0;
+        background:
+            linear-gradient(90deg, rgba(13, 22, 48, 0.96), rgba(7, 14, 30, 0.92)),
+            rgba(5, 11, 25, 0.94);
+        box-shadow:
+            inset -1px 0 0 rgba(255, 255, 255, 0.03),
+            18px 0 44px -42px rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(18px);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left {
+        align-items: flex-start;
+        gap: 4px;
+        margin: 0 0 44px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1 {
+        font-size: 2rem;
+        line-height: 1;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1::after {
+        display: block;
+        margin-top: 8px;
+        font-size: 0.88rem;
+        line-height: 1.2;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab {
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 48px;
+        padding: 0 14px;
+        border: 1px solid transparent;
+        border-right: 4px solid transparent;
+        border-radius: 10px 4px 4px 10px;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab:hover {
+        background: rgba(173, 198, 255, 0.07);
+        border-color: rgba(173, 198, 255, 0.13);
+        border-right-color: rgba(173, 198, 255, 0.32);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        color: #eaf0ff;
+        background: rgba(173, 198, 255, 0.13);
+        border-color: rgba(173, 198, 255, 0.18);
+        border-right-color: var(--color-primary);
+        box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.08);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions {
+        align-items: flex-start;
+        width: 100%;
+        margin-top: auto;
+        padding-top: 32px;
+        gap: 12px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status[style*="display: none"] {
+        display: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status {
+        width: 100%;
+        color: rgba(218, 226, 253, 0.64);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        box-sizing: border-box;
+        width: auto;
+        min-height: 100svh;
+        margin-left: 256px;
+        padding: 48px clamp(28px, 4vw, 56px) 64px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main::before {
+        inset: 0;
+        opacity: 0.9;
+    }
+
+    .app-container>main:has(#main-menu-view:not(.hidden)),
+    .app-container>main:has(#vocab-selection-view:not(.hidden)),
+    .app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        min-height: 100svh;
+        padding-inline: clamp(28px, 4vw, 56px);
+    }
+
+    .student-dashboard-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+        align-items: end;
+        gap: 24px;
+        margin-bottom: 36px;
+    }
+
+    .student-dashboard-heading h2 {
+        max-width: 780px;
+        font-size: clamp(2.25rem, 4vw, 3.05rem);
+        line-height: 1.08;
+    }
+
+    .student-dashboard-heading .student-class-picker {
+        justify-self: end;
+        width: min(100%, 220px);
+    }
+
+    .student-home-dashboard {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+        grid-template-areas:
+            "hero hero"
+            "pending spark"
+            "week spark";
+        gap: 24px;
+        align-items: stretch;
+    }
+
+    .student-continue-hero {
+        grid-area: hero;
+        grid-template-columns: minmax(0, 1fr) minmax(176px, auto);
+        align-items: end;
+        min-height: 236px;
+        padding: 32px;
+        border-radius: 18px;
+        background:
+            linear-gradient(115deg, rgba(28, 25, 82, 0.94), rgba(26, 35, 92, 0.82)),
+            rgba(19, 20, 56, 0.9);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 26px 76px -56px rgba(0, 0, 0, 0.92);
+    }
+
+    .student-continue-copy h3 {
+        font-size: clamp(2.35rem, 4.5vw, 3.2rem);
+        line-height: 1.02;
+    }
+
+    .student-continue-progress {
+        max-width: 560px;
+    }
+
+    .student-continue-action {
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    #student-home-panel-spark {
+        grid-area: spark;
+    }
+
+    #student-home-panel-pending {
+        grid-area: pending;
+    }
+
+    #student-home-panel-week {
+        grid-area: week;
+    }
+
+    .student-home-panel {
+        min-height: 220px;
+        padding: 22px;
+        border-radius: 16px;
+    }
+
+    .student-home-spark-panel {
+        min-height: 0;
+        opacity: 0.9;
+    }
+
+    .student-home-spark-panel .student-spark-card h3 {
+        font-size: 1rem;
+    }
+
+    #vocab-selection-view .vocab-selection-header {
+        margin-bottom: 24px;
+    }
+
+    #vocab-selection-view .vocab-toolbar {
+        margin-left: auto;
+    }
+
+    .arcade-container {
+        min-height: calc(100svh - 160px);
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
+        width: 224px;
+        padding-inline: 18px 14px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        width: auto;
+        margin-left: 224px;
+        padding-inline: 28px;
+    }
+
+    .student-home-dashboard {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "hero"
+            "pending"
+            "week"
+            "spark";
+    }
+}
+
+/* Phase 2 shell follow-up: split the sidebar rail from the top status bar. */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
+        width: 248px;
+        padding: 46px 16px 24px 20px;
+        overflow: visible;
+        background:
+            linear-gradient(90deg, rgba(7, 14, 30, 0.98), rgba(8, 15, 33, 0.94)),
+            rgba(5, 11, 25, 0.96);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left {
+        margin-bottom: 46px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1 {
+        font-size: 1.7rem;
+        letter-spacing: 0;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        gap: 10px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab {
+        min-height: 44px;
+        padding-inline: 12px;
+        border-radius: 10px;
+        color: rgba(218, 226, 253, 0.78);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        border-right-width: 4px;
+        border-right-color: var(--color-primary);
+        background: rgba(173, 198, 255, 0.11);
+        box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.12);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 248px;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: auto;
+        height: 64px;
+        margin: 0;
+        padding: 0 clamp(24px, 3vw, 40px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(11, 19, 38, 0.72);
+        box-shadow: 0 12px 34px -30px rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(20px);
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info {
+        width: auto;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status[hidden],
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status[aria-hidden="true"],
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status[style*="display: none"],
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info[hidden],
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info[aria-hidden="true"],
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info[style*="display: none"] {
+        display: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #guest-status {
+        width: auto;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 248px;
+        padding: 96px clamp(24px, 3vw, 40px) 56px;
+    }
+
+    .app-container>main:has(#main-menu-view:not(.hidden)),
+    .app-container>main:has(#vocab-selection-view:not(.hidden)),
+    .app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        padding-inline: clamp(24px, 3vw, 40px);
+    }
+
+    #main-menu-view,
+    #vocab-selection-view,
+    #arcade-view {
+        max-width: 1280px;
+        margin-inline: auto;
+    }
+
+    .student-dashboard-heading {
+        margin-bottom: 32px;
+    }
+
+    .student-continue-hero {
+        min-height: 220px;
+        padding: 30px;
+    }
+
+    .student-continue-copy h3 {
+        font-size: clamp(2rem, 3.6vw, 2.75rem);
+    }
+
+    .student-home-dashboard {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 350px);
+        gap: 22px;
+    }
+
+    .student-home-panel {
+        min-height: 210px;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
+        width: 220px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions {
+        left: 220px;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 220px;
+        padding-inline: 24px;
+    }
+}
+
+/* Phase 2 sidebar context: move the student subject picker out of the page heading. */
+.student-sidebar-context {
+    display: none;
+}
+
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
+        display: grid;
+        gap: 10px;
+        width: 100%;
+        margin-top: 30px;
+        padding: 16px 12px;
+        border: 1px solid rgba(173, 198, 255, 0.12);
+        border-radius: 14px;
+        background: rgba(173, 198, 255, 0.055);
+    }
+
+    .student-sidebar-context-label {
+        margin: 0;
+        color: rgba(173, 198, 255, 0.78);
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .student-sidebar-context .student-subject-picker,
+    .student-sidebar-context .student-class-picker {
+        width: 100%;
+    }
+
+    .student-sidebar-context .student-class-picker {
+        min-height: 46px;
+        padding: 0 12px;
+        border-radius: 12px;
+        background: rgba(5, 11, 25, 0.76);
+        box-shadow: none;
+    }
+
+    .student-sidebar-context .student-class-picker-label {
+        display: none;
+    }
+
+    .student-sidebar-context .student-subject-select {
+        width: 100%;
+        min-width: 0;
+        font-size: 0.95rem;
+        font-weight: 800;
+    }
+
+    #main-menu-view .student-dashboard-heading {
+        display: none;
+    }
+
+    #main-menu-view .student-home-dashboard {
+        padding-top: 0;
+    }
+
+    #vocab-selection-view .vocab-header-subject-picker {
+        display: none;
+    }
+}
+
+/* Phase 2 rail reset: final desktop contract for a clean sidebar and top status bar. */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        z-index: 40 !important;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto auto 1fr !important;
+        align-content: start !important;
+        align-items: start !important;
+        gap: 0 !important;
+        width: 248px !important;
+        height: 100svh !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 44px 16px 22px 20px !important;
+        overflow-y: auto !important;
+        border-right: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-bottom: 0 !important;
+        background:
+            linear-gradient(90deg, rgba(7, 14, 30, 0.98), rgba(8, 15, 33, 0.94)),
+            rgba(5, 11, 25, 0.96) !important;
+        box-shadow:
+            inset -1px 0 0 rgba(255, 255, 255, 0.035),
+            16px 0 42px -42px rgba(0, 0, 0, 0.95) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left {
+        order: 1 !important;
+        display: grid !important;
+        gap: 5px !important;
+        align-items: start !important;
+        box-sizing: border-box !important;
+        width: min(100%, calc(100vw - 64px)) !important;
+        margin: 0 0 44px !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left>div,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left>div {
+        display: block !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left h1 {
+        margin: 0 !important;
+        color: #dbe6ff !important;
+        font-size: 1.52rem !important;
+        line-height: 1.05 !important;
+        letter-spacing: 0 !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1::after,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left h1::after {
+        display: block !important;
+        margin-top: 8px !important;
+        color: rgba(218, 226, 253, 0.78) !important;
+        font-family: 'Inter', system-ui, sans-serif !important;
+        font-size: 0.86rem !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        text-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab-shell,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
+        order: 2 !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tabs,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        display: grid !important;
+        gap: 10px !important;
+        width: 100% !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border: 1px solid transparent !important;
+        border-right: 4px solid transparent !important;
+        border-radius: 10px !important;
+        background: transparent !important;
+        color: rgba(218, 226, 253, 0.76) !important;
+        box-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-tab.active,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        border-color: rgba(173, 198, 255, 0.2) !important;
+        border-right-color: var(--color-primary) !important;
+        background: rgba(173, 198, 255, 0.12) !important;
+        color: #eef3ff !important;
+        box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.08) !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-sidebar-context,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
+        order: 3 !important;
+        display: grid !important;
+        gap: 9px !important;
+        width: 100% !important;
+        margin: 24px 0 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context-label {
+        margin: 0 !important;
+        color: rgba(173, 198, 255, 0.72) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context .student-class-picker {
+        min-height: 44px !important;
+        padding: 0 11px !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(5, 11, 25, 0.72) !important;
+        box-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        position: fixed !important;
+        inset: 0 0 auto 248px !important;
+        z-index: 35 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: auto !important;
+        min-width: 0 !important;
+        height: 64px !important;
+        margin: 0 !important;
+        padding: 0 clamp(24px, 3vw, 40px) !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(11, 19, 38, 0.76) !important;
+        box-shadow: 0 14px 34px -32px rgba(0, 0, 0, 0.92) !important;
+        backdrop-filter: blur(20px) !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header #user-info,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info {
+        width: auto !important;
+        min-width: 0 !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #guest-status[hidden],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #guest-status[aria-hidden="true"],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #guest-status[style*="display: none"],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[hidden],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[aria-hidden="true"],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[style*="display: none"] {
+        display: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 248px !important;
+        padding: 96px clamp(24px, 3vw, 40px) 56px !important;
+    }
+
+    #main-menu-view>.student-dashboard-heading {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #vocab-selection-view .vocab-header-subject-picker {
+        display: none !important;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
+        width: 220px !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        inset-left: 220px !important;
+        left: 220px !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 220px !important;
+    }
+}
+
+/* Phase 2 visual alignment: reference-style rail, bottom utilities, and dashboard headline. */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
+        box-sizing: border-box !important;
+        grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+        width: 256px !important;
+        padding: 32px 18px 18px !important;
+        overflow-x: visible !important;
+        overflow-y: auto !important;
+        background:
+            linear-gradient(90deg, rgba(9, 17, 37, 0.98), rgba(8, 15, 33, 0.95)),
+            #0b1326 !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left {
+        margin: 0 0 50px !important;
+        padding-left: 6px !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left h1 {
+        color: #bcd0ff !important;
+        font-size: 2.05rem !important;
+        font-weight: 800 !important;
+        line-height: 0.98 !important;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left h1::after {
+        margin-top: 11px !important;
+        color: rgba(218, 226, 253, 0.88) !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        gap: 12px !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab {
+        min-height: 48px !important;
+        padding: 0 16px !important;
+        border-radius: 14px !important;
+        color: rgba(218, 226, 253, 0.9) !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab svg {
+        width: 21px !important;
+        height: 21px !important;
+        stroke-width: 2.1 !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span {
+        font-size: 0 !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span::after,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span::after {
+        font-size: 1rem !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span::after {
+        content: "Dashboard";
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span::after {
+        content: "Units";
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        border-color: transparent !important;
+        border-right-color: var(--color-primary) !important;
+        background: rgba(173, 198, 255, 0.13) !important;
+        box-shadow:
+            inset 0 0 0 1px rgba(173, 198, 255, 0.08),
+            0 18px 34px -34px rgba(173, 198, 255, 0.85) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
+        margin-top: 28px !important;
+        padding: 0 6px !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context .student-class-picker {
+        background: rgba(7, 14, 30, 0.76) !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        position: static !important;
+        inset: auto !important;
+        order: 5 !important;
+        display: flex !important;
+        align-self: end !important;
+        justify-self: stretch !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 32px 0 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info {
+        display: grid !important;
+        grid-template-columns: 1fr auto auto !important;
+        align-items: center !important;
+        gap: 10px !important;
+        width: 100% !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-profile-btn {
+        display: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[hidden],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[aria-hidden="true"],
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info[style*="display: none"] {
+        display: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #coin-balance {
+        min-height: 42px !important;
+        min-width: 66px !important;
+        padding: 0 12px !important;
+        border-radius: 999px !important;
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace !important;
+        font-size: 0.95rem !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #auth-status {
+        position: fixed !important;
+        top: 45px !important;
+        left: 218px !important;
+        z-index: 45 !important;
+        width: 0.62rem !important;
+        height: 0.62rem !important;
+        border: 0 !important;
+        box-shadow:
+            0 0 0 6px rgba(16, 185, 129, 0.16),
+            0 0 18px rgba(16, 185, 129, 0.34) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(173, 198, 255, 0.18) !important;
+        background: rgba(173, 198, 255, 0.08) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #guest-status {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 256px !important;
+        padding: 28px clamp(24px, 3vw, 40px) 56px !important;
+    }
+
+    .app-container>main:has(#main-menu-view:not(.hidden)),
+    .app-container>main:has(#vocab-selection-view:not(.hidden)),
+    .app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        padding-inline: clamp(24px, 3vw, 40px) !important;
+    }
+
+    #main-menu-view>.student-dashboard-heading {
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        margin: 0 0 30px !important;
+        overflow: visible !important;
+    }
+
+    .student-dashboard-heading .teacher-eyebrow {
+        margin: 0 0 26px !important;
+        color: #b7caff !important;
+        font-size: 0.78rem !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    .student-dashboard-heading h2 {
+        max-width: 1000px !important;
+        margin: 0 !important;
+        color: #dce5ff !important;
+        font-size: clamp(2.25rem, 3.7vw, 3.55rem) !important;
+        font-weight: 800 !important;
+        line-height: 1.04 !important;
+        letter-spacing: 0 !important;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4) !important;
+        white-space: nowrap !important;
+    }
+
+    .student-dashboard-subtitle {
+        margin: 8px 0 0 !important;
+        color: rgba(218, 226, 253, 0.72) !important;
+        font-size: 1.08rem !important;
+        line-height: 1.35 !important;
+    }
+
+    .student-continue-hero {
+        min-height: 250px !important;
+        padding: 34px !important;
+        border-radius: 18px !important;
+        background:
+            radial-gradient(circle at 84% 38%, rgba(0, 156, 220, 0.26), transparent 30%),
+            linear-gradient(110deg, rgba(28, 25, 82, 0.96), rgba(20, 25, 76, 0.88)),
+            rgba(19, 20, 56, 0.9) !important;
+    }
+
+    .student-continue-copy h3 {
+        font-size: clamp(2.05rem, 3.2vw, 2.8rem) !important;
+    }
+
+    .student-home-dashboard {
+        gap: 24px !important;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
+        box-sizing: border-box !important;
+        width: 232px !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 232px !important;
+    }
+
+    .student-dashboard-heading h2 {
+        font-size: clamp(2rem, 4vw, 2.8rem) !important;
+        white-space: normal !important;
+    }
+}
+
+/* Phase 2 hero polish: reference-style Continue Learning card. */
+@media (min-width: 901px) {
+    .student-continue-hero {
+        position: relative !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 0.58fr) minmax(280px, 0.42fr) !important;
+        grid-template-rows: 1fr auto !important;
+        align-items: end !important;
+        min-height: 310px !important;
+        padding: 34px 34px 32px !important;
+        overflow: hidden !important;
+        border: 1px solid rgba(173, 198, 255, 0.22) !important;
+        border-top-color: rgba(255, 255, 255, 0.24) !important;
+        border-radius: 18px !important;
+        background:
+            linear-gradient(90deg, rgba(25, 23, 74, 0.98) 0%, rgba(22, 25, 72, 0.95) 42%, rgba(19, 43, 93, 0.78) 100%),
+            rgba(19, 20, 56, 0.92) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 28px 80px -56px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    .student-continue-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(90deg, rgba(25, 23, 74, 0.9) 0%, rgba(25, 23, 74, 0.64) 39%, rgba(5, 11, 25, 0.08) 66%, rgba(5, 11, 25, 0.18) 100%),
+            url("../images/ui/student-continue-data-wave.png?v=20260617k");
+        background-position: center center;
+        background-size: cover;
+        opacity: 0.86;
+    }
+
+    .student-continue-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(90deg, rgba(25, 23, 74, 0.34) 0%, rgba(25, 23, 74, 0.12) 50%, rgba(5, 11, 25, 0.4) 100%),
+            radial-gradient(circle at 88% 20%, rgba(173, 198, 255, 0.14), transparent 22%);
+    }
+
+    .student-continue-copy,
+    .student-continue-action {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+
+    .student-continue-copy {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        align-self: start !important;
+        max-width: 660px !important;
+        gap: 0 !important;
+    }
+
+    .student-hero-kicker {
+        width: max-content !important;
+        min-height: 24px !important;
+        margin-bottom: 18px !important;
+        padding: 0 11px !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 999px !important;
+        background: rgba(173, 198, 255, 0.12) !important;
+        color: rgba(205, 218, 255, 0.86) !important;
+        font-size: 0.66rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.12em !important;
+        line-height: 1 !important;
+    }
+
+    .student-continue-copy h3 {
+        margin: 0 0 12px !important;
+        color: #f1f4ff !important;
+        font-size: clamp(2.1rem, 3.1vw, 3rem) !important;
+        font-weight: 800 !important;
+        line-height: 1.04 !important;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.24) !important;
+    }
+
+    .student-continue-copy p {
+        max-width: 620px !important;
+        margin: 0 0 30px !important;
+        color: rgba(218, 226, 253, 0.78) !important;
+        font-size: 1.08rem !important;
+        font-weight: 500 !important;
+    }
+
+    .student-continue-progress {
+        width: min(100%, 640px) !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .student-continue-progress-top {
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        align-items: end !important;
+        gap: 18px !important;
+        margin-bottom: 9px !important;
+        color: rgba(218, 226, 253, 0.76) !important;
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace !important;
+        font-size: 0.76rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
+    }
+
+    .student-continue-progress-top strong {
+        color: var(--color-xp) !important;
+        font-size: 0.82rem !important;
+        font-weight: 900 !important;
+        text-shadow: 0 0 16px rgba(228, 242, 34, 0.35) !important;
+    }
+
+    .student-continue-track {
+        height: 14px !important;
+        padding: 2px !important;
+        border: 1px solid rgba(173, 198, 255, 0.13) !important;
+        border-radius: 999px !important;
+        background: rgba(45, 52, 73, 0.78) !important;
+        box-shadow:
+            inset 0 1px 2px rgba(0, 0, 0, 0.42),
+            0 0 0 1px rgba(255, 255, 255, 0.025) !important;
+    }
+
+    .student-continue-track span {
+        border-radius: inherit !important;
+        background: var(--color-xp) !important;
+        box-shadow:
+            0 0 14px rgba(228, 242, 34, 0.48),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+    }
+
+    .student-continue-action {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        justify-self: start !important;
+        min-width: 240px !important;
+        min-height: 56px !important;
+        margin-top: 28px !important;
+        border-radius: 12px !important;
+        background: var(--color-primary) !important;
+        color: #08254f !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        box-shadow:
+            0 18px 34px -24px rgba(173, 198, 255, 0.95),
+            inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1120px) {
+    .student-continue-hero {
+        grid-template-columns: minmax(0, 1fr) !important;
+        min-height: 280px !important;
+    }
+
+    .student-continue-hero::before {
+        inset-left: 36% !important;
+        opacity: 0.42 !important;
+    }
+}
+
+/* Phase 2 dashboard simplification: Continue Learning, then This Week + Spark. */
+@media (min-width: 901px) {
+    #student-home-dashboard.student-home-dashboard {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.46fr) !important;
+        grid-template-areas:
+            "hero hero"
+            "week spark" !important;
+        gap: 24px !important;
+        align-items: stretch !important;
+    }
+
+    #student-home-dashboard .student-home-tabs {
+        display: none !important;
+    }
+
+    #student-home-dashboard .student-continue-hero {
+        grid-area: hero !important;
+    }
+
+    #student-home-panel-week {
+        grid-area: week !important;
+        min-height: clamp(210px, 24svh, 300px) !important;
+    }
+
+    #student-home-panel-spark {
+        grid-area: spark !important;
+        min-height: clamp(210px, 24svh, 300px) !important;
+    }
+
+    #student-home-dashboard .student-home-panel {
+        display: block !important;
+    }
+
+    #student-home-panel-week .student-home-unit {
+        min-height: 66px !important;
+    }
+
+    #student-home-panel-spark {
+        background:
+            linear-gradient(145deg, rgba(102, 36, 160, 0.24), rgba(30, 27, 75, 0.58)),
+            rgba(30, 27, 75, 0.54) !important;
+    }
+}
+
+@media (max-width: 900px) {
+    #student-home-dashboard .student-home-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Tablet shell: use the compact student experience until the sidebar has room. */
+@media (min-width: 701px) and (max-width: 1120px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) {
+        position: sticky !important;
+        inset: 0 auto auto 0 !important;
+        z-index: 40 !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: center !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: min(100%, calc(100vw - 64px)) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 16px clamp(18px, 4vw, 32px) !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
+        background:
+            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
+            rgba(8, 15, 33, 0.96) !important;
+        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left {
+        display: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
+        position: relative !important;
+        order: 1 !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-menu-toggle {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: flex-start !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(8, 14, 31, 0.58) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tabs {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        width: min(18rem, calc(100vw - 36px)) !important;
+        max-height: min(70vh, 22rem) !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        border: 1px solid rgba(173, 198, 255, 0.16) !important;
+        border-radius: 12px !important;
+        background: rgba(7, 14, 30, 0.98) !important;
+        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell.mobile-menu-open .student-tabs {
+        display: grid !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border: 1px solid transparent !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        color: rgba(218, 226, 253, 0.82) !important;
+        font-size: 0.95rem !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab.active {
+        border-color: rgba(173, 198, 255, 0.26) !important;
+        background: rgba(173, 198, 255, 0.14) !important;
+        color: #eef3ff !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span {
+        font-size: inherit !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span::after,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span::after {
+        content: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
+        display: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        position: static !important;
+        inset: auto !important;
+        order: 2 !important;
+        justify-self: end !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-profile-btn,
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    .student-app-header:has(#student-tab-shell:not(.hidden)) #auth-status {
+        position: static !important;
+        width: 0.72rem !important;
+        height: 0.72rem !important;
+        min-width: 0.72rem !important;
+        min-height: 0.72rem !important;
+    }
+
+    .app-container:has(#student-tab-shell:not(.hidden)) main {
+        margin-left: 0 !important;
+        padding: clamp(24px, 5vw, 42px) clamp(18px, 5vw, 42px) 48px !important;
+    }
+
+    #main-menu-view>.student-dashboard-heading {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #student-home-dashboard.student-home-dashboard {
+        display: block !important;
+    }
+
+    #student-home-dashboard .student-continue-hero {
+        margin-bottom: 10px !important;
+    }
+
+    #student-home-dashboard .student-home-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+        margin: 0 0 10px !important;
+        padding: 4px !important;
+    }
+
+    #student-home-dashboard .student-home-tab {
+        min-height: 44px !important;
+        padding: 0 12px !important;
+    }
+
+    #student-home-dashboard .student-home-panel {
+        display: none !important;
+        min-height: 0 !important;
+    }
+
+    #student-home-dashboard .student-home-panel.active {
+        display: block !important;
+    }
+
+    .student-app-header.student-mobile-compact {
+        position: sticky !important;
+        inset: 0 auto auto 0 !important;
+        z-index: 40 !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: center !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: min(100%, calc(100vw - 64px)) !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 16px clamp(18px, 4vw, 32px) !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
+        background:
+            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
+            rgba(8, 15, 33, 0.96) !important;
+        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    .student-app-header.student-mobile-compact .header-left {
+        display: none !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-tab-shell {
+        position: relative !important;
+        order: 1 !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-mobile-menu-toggle {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: flex-start !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(8, 14, 31, 0.58) !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-tabs {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        width: min(18rem, calc(100vw - 36px)) !important;
+        max-height: min(70vh, 22rem) !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        border: 1px solid rgba(173, 198, 255, 0.16) !important;
+        border-radius: 12px !important;
+        background: rgba(7, 14, 30, 0.98) !important;
+        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-tab-shell.mobile-menu-open .student-tabs {
+        display: grid !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-tab {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border: 1px solid transparent !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        color: rgba(218, 226, 253, 0.82) !important;
+        font-size: 0.95rem !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-tab.active {
+        border-color: rgba(173, 198, 255, 0.26) !important;
+        background: rgba(173, 198, 255, 0.14) !important;
+        color: #eef3ff !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-sidebar-context {
+        display: none !important;
+    }
+
+    .student-app-header.student-mobile-compact .header-actions {
+        position: static !important;
+        inset: auto !important;
+        order: 2 !important;
+        justify-self: end !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .student-app-header.student-mobile-compact #user-info {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .student-app-header.student-mobile-compact .student-mobile-profile-btn,
+    .student-app-header.student-mobile-compact #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    .student-app-header.student-mobile-compact #auth-status {
+        position: static !important;
+        width: 0.72rem !important;
+        height: 0.72rem !important;
+        min-width: 0.72rem !important;
+        min-height: 0.72rem !important;
+    }
+}
+
+/* Tablet shell override: keep 701-1120px aligned with the compact phone header. */
+@media (min-width: 701px) and (max-width: 1120px) {
+    html body .app-container {
+        display: block !important;
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header {
+        position: sticky !important;
+        top: 0 !important;
+        left: 50% !important;
+        z-index: 80 !important;
+        display: grid !important;
+        grid-area: auto !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-areas: "student-nav student-actions" !important;
+        grid-template-rows: auto !important;
+        align-items: center !important;
+        align-self: auto !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: 100vw !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 0 0 -50vw !important;
+        padding: 16px clamp(18px, 4vw, 32px) !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
+        background:
+            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
+            rgba(8, 15, 33, 0.96) !important;
+        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .header-left,
+    html body .app-container > header.app-header.student-app-header .student-sidebar-context,
+    html body .app-container > header.app-header.student-app-header #welcome-header {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-tab-shell:not(.hidden) {
+        display: block !important;
+        position: relative !important;
+        grid-area: student-nav !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        order: 1 !important;
+        align-self: center !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-mobile-menu-toggle {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: flex-start !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(8, 14, 31, 0.58) !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-tabs {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        width: min(18rem, calc(100vw - 36px)) !important;
+        max-height: min(70vh, 22rem) !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        border: 1px solid rgba(173, 198, 255, 0.16) !important;
+        border-radius: 12px !important;
+        background: rgba(7, 14, 30, 0.98) !important;
+        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-tab-shell.mobile-menu-open .student-tabs {
+        display: grid !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-tab {
+        justify-content: flex-start !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 0 12px !important;
+        border: 1px solid transparent !important;
+        border-radius: 9px !important;
+        background: transparent !important;
+        color: rgba(218, 226, 253, 0.82) !important;
+        font-size: 0.95rem !important;
+        box-shadow: none !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-tab.active {
+        border-color: rgba(173, 198, 255, 0.26) !important;
+        background: rgba(173, 198, 255, 0.14) !important;
+        color: #eef3ff !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .header-actions {
+        position: static !important;
+        inset: auto !important;
+        grid-area: student-actions !important;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        order: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        align-self: center !important;
+        justify-self: end !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header.student-mobile-compact .header-actions {
+        margin: 0 !important;
+        align-self: center !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header #user-info {
+        position: static !important;
+        inset: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        transform: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-mobile-profile-btn,
+    html body .app-container > header.app-header.student-app-header #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header .student-mobile-profile-btn,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-mobile-profile-btn {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container > header.app-header.student-app-header #auth-status {
+        position: static !important;
+        width: 0.72rem !important;
+        height: 0.72rem !important;
+        min-width: 0.72rem !important;
+        min-height: 0.72rem !important;
+    }
+
+    html body .app-container > main {
+        margin-left: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) {
+        display: block !important;
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main {
+        margin-left: 0 !important;
+        padding: clamp(16px, 4vw, 32px) !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header {
+        left: 0 !important;
+        grid-area: auto !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        grid-template-areas: "student-nav student-actions" !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-rows: auto !important;
+        grid-auto-rows: auto !important;
+        align-self: auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-left,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #welcome-header {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-actions,
+    html body header.app-header.student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        grid-area: student-actions !important;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        align-self: center !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header {
+        width: calc(100% + 80px) !important;
+        margin-left: -40px !important;
+    }
+}
+
+/* Single compact student header contract for phones through small tablets. */
+@media (max-width: 1120px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) {
+        display: block !important;
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: clamp(16px, 4vw, 32px) !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header,
+    html body header.app-header.student-app-header.student-mobile-compact {
+        position: sticky !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 80 !important;
+        display: grid !important;
+        grid-area: auto !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        grid-template-areas: "student-nav student-actions" !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        grid-template-rows: auto !important;
+        grid-auto-rows: auto !important;
+        align-items: center !important;
+        align-self: auto !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 10px clamp(12px, 3vw, 20px) !important;
+        overflow: visible !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
+        background:
+            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
+            rgba(8, 15, 33, 0.96) !important;
+        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
+        backdrop-filter: blur(18px) !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-left,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-sidebar-context,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #welcome-header,
+    html body header.app-header.student-app-header.student-mobile-compact .header-left,
+    html body header.app-header.student-app-header.student-mobile-compact .student-sidebar-context,
+    html body header.app-header.student-app-header.student-mobile-compact #welcome-header {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tab-shell,
+    html body header.app-header.student-app-header.student-mobile-compact .student-tab-shell {
+        display: block !important;
+        position: relative !important;
+        grid-area: student-nav !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        order: 1 !important;
+        align-self: center !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-mobile-menu-toggle,
+    html body header.app-header.student-app-header.student-mobile-compact .student-mobile-menu-toggle {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: flex-start !important;
+        border: 1px solid rgba(173, 198, 255, 0.14) !important;
+        border-radius: 10px !important;
+        background: rgba(8, 14, 31, 0.58) !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tabs,
+    html body header.app-header.student-app-header.student-mobile-compact .student-tabs {
+        position: absolute !important;
+        top: calc(100% + 8px) !important;
+        left: 0 !important;
+        display: none !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+        width: min(18rem, calc(100vw - 36px)) !important;
+        max-height: min(70vh, 22rem) !important;
+        overflow-y: auto !important;
+        padding: 6px !important;
+        border: 1px solid rgba(173, 198, 255, 0.16) !important;
+        border-radius: 12px !important;
+        background: rgba(7, 14, 30, 0.98) !important;
+        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tab-shell.mobile-menu-open .student-tabs,
+    html body header.app-header.student-app-header.student-mobile-compact .student-tab-shell.mobile-menu-open .student-tabs {
+        display: grid !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-actions,
+    html body header.app-header.student-app-header.student-mobile-compact .header-actions,
+    html body header.app-header.student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
+        position: static !important;
+        inset: auto !important;
+        grid-area: student-actions !important;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        order: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        align-self: center !important;
+        justify-self: end !important;
+        width: auto !important;
+        min-width: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+        backdrop-filter: none !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #user-info,
+    html body header.app-header.student-app-header.student-mobile-compact #user-info {
+        position: static !important;
+        inset: auto !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #coin-balance,
+    html body header.app-header.student-app-header.student-mobile-compact #coin-balance {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        min-width: 66px !important;
+        box-sizing: border-box !important;
+        padding: 0 12px !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-mobile-profile-btn,
+    html body header.app-header.student-app-header.student-mobile-compact .student-mobile-profile-btn {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #sign-out-btn,
+    html body header.app-header.student-app-header.student-mobile-compact #sign-out-btn {
+        display: inline-flex !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border-radius: 10px !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #auth-status,
+    html body header.app-header.student-app-header.student-mobile-compact #auth-status {
+        position: static !important;
+        width: 0.72rem !important;
+        height: 0.72rem !important;
+        min-width: 0.72rem !important;
+        min-height: 0.72rem !important;
+    }
+}
+
+@media (max-width: 700px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) {
+        width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header,
+    html body header.app-header.student-app-header.student-mobile-compact {
+        width: 100vw !important;
+        margin: 0 !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main {
+        padding: 16px !important;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header,
+    html body header.app-header.student-app-header.student-mobile-compact {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
+
+html body header.app-header.student-app-header .student-mobile-profile-btn {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
 }

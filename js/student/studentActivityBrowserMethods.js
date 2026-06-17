@@ -5,6 +5,7 @@ class StudentActivityBrowserMethods {
     renderDashboard() {
         const container = $('#vocab-list');
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
+        this.renderSubjectPicker('#student-subject-picker');
         this.renderSubjectPicker('#vocab-subject-picker');
         container.innerHTML = '';
         container.className = 'vocab-groups';

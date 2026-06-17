@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css">
+    <link rel="stylesheet" href="css/student.css?v=student-shell-20260617aa">
 </head>
 
 <body>
@@ -42,6 +42,10 @@
                     </button>
                 </div>
             </nav>
+            <div class="student-sidebar-context" aria-label="Student class context">
+                <p class="student-sidebar-context-label">Class</p>
+                <div id="student-subject-picker" class="student-subject-picker"></div>
+            </div>
             <div class="header-actions">
                 <!-- Authenticated/User Status -->
                 <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
@@ -171,10 +175,8 @@
                 <div class="student-dashboard-heading">
                     <div>
                         <p class="teacher-eyebrow">Student dashboard</p>
-                        <h2>Pick up where learning left off.</h2>
-                    </div>
-                    <div class="student-dashboard-actions">
-                        <div id="student-subject-picker" class="student-subject-picker"></div>
+                        <h2>Pick up where learning left off</h2>
+                        <p class="student-dashboard-subtitle">You're making steady progress this week.</p>
                     </div>
                 </div>
                 <div id="student-home-dashboard" class="student-home-dashboard">

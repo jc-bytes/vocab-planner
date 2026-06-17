@@ -470,6 +470,7 @@ async function assertStudentMobileMenu(page, baseUrl) {
         const signOut = visibleRect('#sign-out-btn');
         const welcome = visibleRect('#welcome-header');
         const menuStyle = window.getComputedStyle(document.querySelector('#student-tabs'));
+        const headerRect = document.querySelector('.student-app-header')?.getBoundingClientRect();
 
         return {
             toggle,
@@ -478,6 +479,13 @@ async function assertStudentMobileMenu(page, baseUrl) {
             profile,
             signOut,
             welcome,
+            header: headerRect ? {
+                top: Math.round(headerRect.top),
+                left: Math.round(headerRect.left),
+                right: Math.round(headerRect.right),
+                width: Math.round(headerRect.width)
+            } : null,
+            viewportWidth: window.innerWidth,
             label: document.querySelector('#student-mobile-section-label')?.textContent?.trim(),
             expanded: document.querySelector('#student-mobile-menu-toggle')?.getAttribute('aria-expanded'),
             menuHidden: menuStyle.display === 'none'
@@ -490,12 +498,17 @@ async function assertStudentMobileMenu(page, baseUrl) {
     if (closedState.welcome) {
         throw new Error(`Student mobile header should hide the large name row: ${JSON.stringify(closedState)}`);
     }
-    if (!closedState.coin || !closedState.status || !closedState.profile || !closedState.signOut) {
-        throw new Error(`Student mobile header must keep coins, status, profile, and sign out visible: ${JSON.stringify(closedState)}`);
+    if (!closedState.header
+        || Math.abs(closedState.header.top) > 1
+        || Math.abs(closedState.header.left) > 1
+        || Math.abs(closedState.viewportWidth - closedState.header.right) > 1) {
+        throw new Error(`Student mobile header must be edge-to-edge: ${JSON.stringify(closedState)}`);
+    }
+    if (!closedState.coin || !closedState.status || closedState.profile || !closedState.signOut) {
+        throw new Error(`Student mobile header must keep coins, status, and sign out visible while hiding profile: ${JSON.stringify(closedState)}`);
     }
     if (Math.abs(closedState.toggle.centerY - closedState.coin.centerY) > 10
         || Math.abs(closedState.toggle.centerY - closedState.status.centerY) > 10
-        || Math.abs(closedState.toggle.centerY - closedState.profile.centerY) > 10
         || Math.abs(closedState.toggle.centerY - closedState.signOut.centerY) > 10) {
         throw new Error(`Student mobile header controls are not aligned on one row: ${JSON.stringify(closedState)}`);
     }

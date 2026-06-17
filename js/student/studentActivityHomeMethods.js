@@ -145,18 +145,13 @@ class StudentActivityHomeMethods {
             .sort((a, b) => a.sortTime - b.sortTime)
             .slice(0, 4);
 
+        const continueItem = pendingItems[0] || weekItems[0] || decoratedVocabs[0] || null;
+
         const panels = [
             {
                 key: 'spark',
                 title: 'Spark',
                 subtitle: 'Question of the week'
-            },
-            {
-                key: 'pending',
-                title: 'Pending',
-                subtitle: 'Open work',
-                items: pendingItems,
-                emptyText: message || 'No other work is pending.'
             },
             {
                 key: 'week',
@@ -168,6 +163,8 @@ class StudentActivityHomeMethods {
         ];
 
         container.replaceChildren();
+        container.appendChild(this.createContinueLearningHero(continueItem, message));
+
         const tabList = createElement('div', 'student-home-tabs');
         tabList.setAttribute('role', 'tablist');
         tabList.setAttribute('aria-label', 'Dashboard sections');
@@ -185,10 +182,10 @@ class StudentActivityHomeMethods {
         });
         container.appendChild(tabList);
 
-        panels.forEach((panel) => {
+        panels.forEach((panel, index) => {
             const homePanel = panel.key === 'spark'
-                ? this.createSparkHomePanel(panel.title, panel.subtitle)
-                : this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText);
+                ? this.createSparkHomePanel(panel.title, panel.subtitle, index === 0)
+                : this.createHomePanel(panel.key, panel.title, panel.subtitle, panel.items, panel.emptyText, index === 0);
             container.appendChild(homePanel);
         });
         this.bindHomePanelTabs(container);
@@ -198,6 +195,69 @@ class StudentActivityHomeMethods {
         if (window.lucide) {
             window.lucide.createIcons({ root: container });
         }
+    }
+
+    createContinueLearningHero(item, emptyText = '') {
+        const hero = createElement(item?.vocab ? 'button' : 'section', 'student-continue-hero');
+        if (item?.vocab) hero.type = 'button';
+
+        if (!item?.vocab) {
+            hero.innerHTML = `
+                <div class="student-continue-copy">
+                    <span class="student-hero-kicker">Continue Learning</span>
+                    <h3>All caught up for now.</h3>
+                    <p>${escapeHtml(emptyText || 'No current vocabulary work is available yet.')}</p>
+                </div>
+            `;
+            return hero;
+        }
+
+        const { vocab, schedule, progress } = item;
+        const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
+        const title = this.formatVocabularyCardTitle?.(vocab) || vocab.name || 'Vocabulary Unit';
+        const percent = this.getContinueLearningPercent(progress);
+        const progressText = progress.requiredTotal > 0
+            ? `${progress.completedRequired}/${progress.requiredTotal} required complete`
+            : `${progress.bestScore}% best score`;
+        const scheduleText = schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab));
+
+        hero.style.setProperty('--subject-color', subject.color);
+        hero.innerHTML = `
+            <div class="student-continue-copy">
+                <span class="student-hero-kicker">Continue Learning</span>
+                <h3>${escapeHtml(title)}</h3>
+                <p>${escapeHtml(subject.name)} · ${escapeHtml(scheduleText)}</p>
+                <div class="student-continue-progress" aria-label="${escapeHtml(progressText)}">
+                    <div class="student-continue-progress-top">
+                        <span>Unit progress</span>
+                        <strong>${percent}% complete</strong>
+                    </div>
+                    <div class="student-continue-track" aria-hidden="true">
+                        <span style="width:${percent}%"></span>
+                    </div>
+                </div>
+            </div>
+            <span class="student-continue-action">
+                <span>Continue</span>
+                <i data-lucide="play"></i>
+            </span>
+        `;
+
+        if (vocab.path) {
+            hero.dataset.vocabPath = vocab.path;
+            const preload = () => preloadVocabularyFile(vocab.path);
+            hero.addEventListener('pointerenter', preload, { once: true });
+            hero.addEventListener('focus', preload, { once: true });
+        }
+        hero.addEventListener('click', () => this.loadVocabulary(vocab));
+        return hero;
+    }
+
+    getContinueLearningPercent(progress = {}) {
+        if (progress.requiredTotal > 0) {
+            return Math.min(100, Math.round((progress.completedRequired / progress.requiredTotal) * 100));
+        }
+        return Math.min(100, Math.max(0, Math.round(Number(progress.bestScore) || 0)));
     }
 
     isVocabScheduleInCurrentWeek(schedule = {}, date = new Date()) {
@@ -341,8 +401,8 @@ class StudentActivityHomeMethods {
         }
     }
 
-    createSparkHomePanel(title, subtitle) {
-        const panel = createElement('section', 'student-home-panel student-home-spark-panel active');
+    createSparkHomePanel(title, subtitle, active = false) {
+        const panel = createElement('section', `student-home-panel student-home-spark-panel${active ? ' active' : ''}`);
         panel.id = 'student-home-panel-spark';
         panel.dataset.panel = 'spark';
         panel.setAttribute('role', 'tabpanel');

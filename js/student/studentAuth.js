@@ -264,8 +264,16 @@ export class StudentAuth {
     updateGuestStatus(isGuest) {
         const guestStatus = $('#guest-status');
         const userInfo = $('#user-info');
-        if (guestStatus) guestStatus.style.display = isGuest ? 'flex' : 'none';
-        if (userInfo) userInfo.style.display = isGuest ? 'none' : 'flex';
+        if (guestStatus) {
+            guestStatus.hidden = !isGuest;
+            guestStatus.setAttribute('aria-hidden', String(!isGuest));
+            guestStatus.style.display = isGuest ? 'flex' : 'none';
+        }
+        if (userInfo) {
+            userInfo.hidden = isGuest;
+            userInfo.setAttribute('aria-hidden', String(isGuest));
+            userInfo.style.display = isGuest ? 'none' : 'flex';
+        }
 
         if (this.sm.authDisabled) {
             const signInBtn = $('#guest-signin-btn');
