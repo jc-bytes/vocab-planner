@@ -107,10 +107,6 @@ class StudentGameLeaderboardMethods {
             }
         }
         
-        // Load leaderboard data (will be shown when modal opens)
-        if (LEADERBOARD_ENABLED_GAMES.includes(game.id)) {
-            this.loadLeaderboard(game.id);
-        }
     }
 
     showLeaderboardModal() {

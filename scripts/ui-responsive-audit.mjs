@@ -19,8 +19,7 @@ const allowedScrollableSelectors = [
     '.cw-grid',
     '.modal-body',
     '.modal-content',
-    '#activity-container',
-    '.excalidraw'
+    '#activity-container'
 ];
 
 for (const key of requiredEnv) {

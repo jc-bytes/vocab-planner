@@ -10,16 +10,20 @@ export class ImageDB {
         if (this.db) return this.db;
 
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, 3);
+            const request = indexedDB.open(this.dbName, 4);
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains(this.storeName)) {
                     db.createObjectStore(this.storeName, { keyPath: 'id' });
                 }
-                if (!db.objectStoreNames.contains(this.syncStoreName)) {
-                    const syncStore = db.createObjectStore(this.syncStoreName, { keyPath: 'id' });
+                const syncStore = db.objectStoreNames.contains(this.syncStoreName)
+                    ? event.target.transaction.objectStore(this.syncStoreName)
+                    : db.createObjectStore(this.syncStoreName, { keyPath: 'id' });
+                if (!syncStore.indexNames.contains('status')) {
                     syncStore.createIndex('status', 'status', { unique: false });
+                }
+                if (!syncStore.indexNames.contains('createdAt')) {
                     syncStore.createIndex('createdAt', 'createdAt', { unique: false });
                 }
             };
@@ -142,13 +146,11 @@ export class ImageDB {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([this.syncStoreName], 'readonly');
             const store = transaction.objectStore(this.syncStoreName);
-            const request = store.getAll();
+            const request = store.index('status').getAll('pending');
 
             request.onsuccess = () => {
                 const records = request.result || [];
-                resolve(records
-                    .filter(record => record.status === 'pending')
-                    .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt))));
+                resolve(records.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt))));
             };
             request.onerror = (e) => reject(e.target.error);
         });

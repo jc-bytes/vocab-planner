@@ -1,0 +1,318 @@
+/* Landing entry stylesheet generated from style.css. */:root {
+    /* Updated palette */
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --secondary-color: #0ea5e9;
+    --accent-color: #f97316;
+    --bg-color: #0f172a;
+    --card-bg: rgba(15, 23, 42, 0.65);
+    --text-main: #f8fafc;
+    --text-muted: #cbd5f5;
+    --border-color: rgba(255, 255, 255, 0.125);
+    --danger-color: #f87171;
+    --success-color: #34d399;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --touch-target: 44px;
+
+    /* Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}body {
+    font-family: 'Inter', sans-serif;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.45), transparent 50%),
+        radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.35), transparent 55%),
+        radial-gradient(circle at 20% 80%, rgba(249, 115, 22, 0.25), transparent 45%),
+        var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+}/* Layout */.landing-container {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+    gap: 1.2rem;
+    min-height: 100vh;
+    padding: clamp(1.25rem, 4vw, 3rem) var(--spacing-lg);
+    text-align: center;
+    max-width: 900px;
+    width: min(100%, 900px);
+    margin: 0 auto;
+}.landing-container {
+    position: relative;
+}.landing-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+    filter: blur(35px);
+    opacity: 0.18;
+}.app-container:has(#login-view:not(.hidden))>main {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+        rgba(15, 23, 42, 0.22);
+    min-height: clamp(520px, 68vh, 720px);
+    display: grid;
+    align-items: center;
+}/* Header */.landing-header h1 {
+    font-size: clamp(2.75rem, 5vw, 4.35rem);
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 0.6rem;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}.landing-header {
+    max-width: 720px;
+}.landing-header p {
+    color: #dbeafe;
+    font-size: clamp(1rem, 1.6vw, 1.12rem);
+    font-weight: 600;
+}.brand-mark,
+.option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #e0f2fe;
+    box-shadow: 0 18px 45px -24px rgba(14, 165, 233, 0.85);
+}.brand-mark {
+    width: 3.35rem;
+    height: 3.35rem;
+    margin-bottom: 0.95rem;
+    border-radius: 0.85rem;
+}.brand-mark svg {
+    width: 1.7rem;
+    height: 1.7rem;
+}/* Cards */.option-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: var(--text-main);
+    width: 100%;
+    min-height: 142px;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 1.35rem 1.45rem;
+}.option-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.75);
+}/* Activity Card Badges *//* Completion Screen *//* Overall Coverage Indicator */.option-card h2 {
+    grid-column: 2;
+    margin: 0 0 0.35rem;
+    font-size: 1.45rem;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}.option-card p,
+.landing-footer {
+    color: #d7e3f8;
+}.option-card p {
+    grid-column: 2;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.35;
+}.option-card .option-icon {
+    grid-row: 1 / span 2;
+    align-self: start;
+    width: 3.15rem;
+    height: 3.15rem;
+    margin: 0;
+    border-radius: 0.75rem;
+}.option-card .option-icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+}.landing-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+    justify-content: center;
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 720px;
+}.landing-footer {
+    font-size: 0.9rem;
+    font-weight: 600;
+    max-width: 100%;
+}.landing-footer p {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.2rem 0.45rem;
+}.landing-footer a {
+    color: #7dd3fc;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}.landing-footer a:hover {
+    color: #bae6fd;
+    text-decoration: underline;
+}/* Buttons *//* Forms */.option-card:focus-visible {
+    outline: 3px solid rgba(14, 165, 233, 0.8);
+    outline-offset: 3px;
+}/* Grid Layouts *//* Teacher Dashboard Specifics */#vocab-selection-view #back-to-main-menu-btn[hidden] {
+    display: none !important;
+}.spark-library-body {
+    display: grid;
+    gap: var(--spacing-md);
+}.word-hunt-export-table tbody tr:last-child th,
+.word-hunt-export-table tbody tr:last-child td {
+    border-bottom: 0;
+}.word-hunt-export-table tbody th {
+    min-width: 120px;
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+}/* Modal */.modal.hidden {
+    display: none;
+}@media print {
+    body *:not(.quiz-print-area):not(.quiz-print-area *) {
+        visibility: hidden;
+    }
+
+    .quiz-print-area * {
+        visibility: visible;
+    }
+}/* Stats *//* Utilities */.hidden {
+    display: none !important;
+}/* Bulk Action Toolbar *//* Selected row highlighting *//* Checkbox styling *//* Activity Styles *//* Flashcards *//* Word Hunt */.word-hunt-upload-area.hidden {
+    display: none;
+}.word-hunt-preview-frame.hidden {
+    display: none;
+}/* Matching Game */@media (max-width: 768px) {
+
+    .landing-options {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .option-card {
+        width: 100%;
+    }
+}/* Crossword Styles *//* Hangman Styles *//* Scramble Styles *//* Wordle Styles *//* Speed Match Styles *//* Fill in the Blank Styles *//* Quiz Maker Styles */.option-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}.option-input {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fff;
+    color: #111;
+}/* Document Editor Styles (WYSIWYG) *//* Override question card styles for document view *//* Rubric Grid Styles *//* Remove bottom border for the last row items if they are the last ones *//* But we have a total row at the bottom spanning full width *//* Reference Header Styles *//* View Mode Question Cards *//* Edit Mode Question Cards *//* Ensure view mode questions look clean *//* Tablet and small Chromebook responsive pass */.option-card p {
+    overflow-wrap: anywhere;
+}.modal-body {
+    max-height: calc(88vh - 9rem);
+    overflow-y: auto;
+    padding-right: 0.15rem;
+}/* Word search *//* Crossword *//* Arcade and canvas games *//* Teacher minimum tablet safety */@media (hover: none) {
+    .option-card:hover {
+        transform: none;
+    }
+}@media (max-width: 1024px) {
+    :root {
+        --cw-cell-size: 44px;
+    }
+
+    .landing-container {
+        justify-content: flex-start;
+        min-height: 100svh;
+        padding: clamp(2rem, 8vh, var(--spacing-xl)) var(--spacing-md) var(--spacing-lg);
+    }
+
+    .landing-header h1 {
+        font-size: 3rem;
+    }
+}@media (max-width: 700px) {
+    :root {
+        --cw-cell-size: 44px;
+    }
+
+    .landing-container {
+        padding: var(--spacing-sm);
+    }
+
+    .landing-header h1 {
+        font-size: clamp(2rem, 9vw, 2.5rem);
+    }
+
+    .landing-options {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 28rem;
+    }
+
+    .option-card {
+        width: 100%;
+        min-height: 0;
+    }
+
+    .modal-body {
+        max-height: calc(100svh - 11rem);
+    }
+}@media (max-width: 480px) {
+    :root {
+        --cw-cell-size: 36px;
+    }
+
+    .landing-container {
+        gap: 0.95rem;
+    }
+
+    .brand-mark {
+        width: 2.85rem;
+        height: 2.85rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .landing-header h1 {
+        font-size: clamp(1.85rem, 8vw, 2rem);
+    }
+
+    .landing-header p {
+        font-size: 0.95rem;
+    }
+
+    .option-card {
+        min-height: 0;
+        padding: 1.05rem;
+        gap: 0.85rem;
+    }
+
+    .option-card h2 {
+        font-size: 1.2rem;
+    }
+
+    .option-card p {
+        font-size: 0.9rem;
+    }
+
+    .option-card .option-icon {
+        width: 2.7rem;
+        height: 2.7rem;
+    }
+
+    .landing-footer {
+        font-size: 0.78rem;
+    }
+}

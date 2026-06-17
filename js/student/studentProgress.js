@@ -12,6 +12,10 @@ export class StudentProgress {
         this.sm = studentManager;
         this.coinRealtimeUnsubscribe = null;
         this.coinSyncInterval = null;
+        this.coinRefreshTimeout = null;
+        this.coinRefreshInFlight = false;
+        this.coinRefreshPendingOptions = null;
+        this.lastCoinRefreshAt = 0;
         this.storageSyncHandler = null;
         this.focusSyncHandler = null;
         this.visibilitySyncHandler = null;

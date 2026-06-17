@@ -2453,7 +2453,7 @@ input[readonly] {
 
 .student-vocab-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 118px 102px 112px 1.1rem;
+    grid-template-columns: minmax(260px, 1fr) 118px 102px 112px 1.1rem;
     align-items: center;
     gap: 0.75rem;
     min-height: 3.45rem;

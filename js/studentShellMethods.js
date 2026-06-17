@@ -1,6 +1,7 @@
 import { $, $$ } from './main.js';
 
 const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
+const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
 
 class StudentShellMethods {
     switchView(viewId) {
@@ -12,7 +13,7 @@ class StudentShellMethods {
             (currentSection !== nextSection || this.hasSavedStudentRouteScroll())
         );
 
-        this.saveStudentSectionScroll(currentViewId);
+        this.saveStudentSectionScroll(currentViewId, { persistRoute: false });
 
         $$('.view').forEach(el => {
             el.classList.add('hidden');
@@ -36,12 +37,11 @@ class StudentShellMethods {
     }
 
     scheduleStudentScrollSave() {
-        if (this.studentScrollSaveFrame) return;
-
-        this.studentScrollSaveFrame = requestAnimationFrame(() => {
-            this.studentScrollSaveFrame = null;
+        window.clearTimeout(this.studentScrollSaveTimer);
+        this.studentScrollSaveTimer = window.setTimeout(() => {
+            this.studentScrollSaveTimer = null;
             this.saveStudentSectionScroll($('.view.active')?.id || '');
-        });
+        }, STUDENT_SCROLL_SAVE_DELAY_MS);
     }
 
     shouldDebugStudentScroll() {
@@ -122,7 +122,8 @@ class StudentShellMethods {
         this.logStudentDomUpdate('student-home-dashboard', { source: 'MutationObserver attached' });
     }
 
-    saveStudentSectionScroll(viewId = '') {
+    saveStudentSectionScroll(viewId = '', options = {}) {
+        const { persistRoute = true } = options;
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
 
@@ -134,7 +135,7 @@ class StudentShellMethods {
         this.persistStudentScroll(this.getStudentSectionScrollKey(section), top);
 
         const routeKey = this.getStudentRouteScrollKey();
-        if (routeKey) {
+        if (persistRoute && routeKey) {
             this.persistStudentScroll(routeKey, top);
         }
         this.debugStudentScrollLifecycle('save', {

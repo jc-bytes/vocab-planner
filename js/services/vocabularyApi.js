@@ -315,14 +315,15 @@ function isManifestCacheFresh(cacheEntry) {
     return cacheEntry && Date.now() - Number(cacheEntry.cachedAt) < MANIFEST_CACHE_TTL_MS;
 }
 
-async function fetchManifestFromNetwork() {
-    return fetchJsonFromNetwork('vocabularies/manifest.json');
+async function fetchManifestFromNetwork(options = {}) {
+    return fetchJsonFromNetwork('vocabularies/manifest.json', options);
 }
 
-async function fetchJsonFromNetwork(path) {
+async function fetchJsonFromNetwork(path, { fresh = false } = {}) {
     const url = new URL(path, window.location.href);
-    url.searchParams.set('_', Date.now().toString());
-    const response = await fetch(url.toString(), { cache: 'no-store' });
+    const response = await fetch(url.toString(), {
+        cache: fresh ? 'reload' : 'default'
+    });
     if (!response.ok) throw new Error(`Failed to load ${path}`);
     return response.json();
 }
@@ -343,7 +344,7 @@ export async function loadManifest({ fresh = false } = {}) {
     }
 
     try {
-        const manifest = await fetchManifestFromNetwork();
+        const manifest = await fetchManifestFromNetwork({ fresh });
         if (manifest) {
             writeManifestCache(manifest);
         }
@@ -435,7 +436,7 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false }
         return vocabFileRequests.get(requestKey);
     }
 
-    const request = fetchJsonFromNetwork(normalizedPath)
+    const request = fetchJsonFromNetwork(normalizedPath, { fresh })
         .then(data => {
             if (data) {
                 writeCachedVocabFile(normalizedPath, data);

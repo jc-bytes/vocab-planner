@@ -24,7 +24,6 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "^0.17.6",
     "@fontsource/inter": "^5.2.8",
     "@supabase/supabase-js": "^2.49.8",
     "@xyflow/react": "^12.10.2",

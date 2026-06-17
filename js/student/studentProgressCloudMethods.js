@@ -2,6 +2,8 @@ import { notifications } from '../notifications.js';
 import { studentApi as supabaseService, doc, getDoc } from '../services/studentApi.js';
 import { imageDB } from '../db.js';
 import {
+    COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
+    COIN_REFRESH_THROTTLE_MS,
     COIN_SYNC_INTERVAL_MS
 } from './studentProgressConstants.js';
 
@@ -22,25 +24,21 @@ class StudentProgressCloudMethods {
         this.visibilitySyncHandler = () => {
             if (document.visibilityState === 'visible') {
                 if (this.sm.shouldDebugStudentDom?.()) console.log('VISIBILITY', document.visibilityState);
-                this.refreshCoinsFromCloud({ silent: true, reason: 'visibilitychange' });
+                this.scheduleCoinRefresh({ silent: true, reason: 'visibilitychange' });
             }
         };
         document.addEventListener('visibilitychange', this.visibilitySyncHandler);
 
         this.focusSyncHandler = () => {
             if (this.sm.shouldDebugStudentDom?.()) console.log('FOCUS');
-            this.refreshCoinsFromCloud({ silent: true, reason: 'focus' });
+            this.scheduleCoinRefresh({ silent: true, reason: 'focus' });
         };
         this.onlineSyncHandler = () => {
             this.flushLocalSyncQueue({ silent: true });
-            this.refreshCoinsFromCloud({ silent: true, reason: 'online' });
+            this.scheduleCoinRefresh({ silent: true, reason: 'online', force: true });
         };
         window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
-
-        this.coinSyncInterval = window.setInterval(() => {
-            this.refreshCoinsFromCloud({ silent: true, reason: 'interval' });
-        }, COIN_SYNC_INTERVAL_MS);
 
         if (typeof supabaseService.subscribeToStudentProgress === 'function') {
             this.coinRealtimeUnsubscribe = supabaseService.subscribeToStudentProgress(userId, progress => {
@@ -48,6 +46,14 @@ class StudentProgressCloudMethods {
                 this.applyRemoteCoinProgress(progress);
             });
         }
+
+        const syncInterval = this.coinRealtimeUnsubscribe
+            ? COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS
+            : COIN_SYNC_INTERVAL_MS;
+        this.coinSyncInterval = window.setInterval(() => {
+            if (document.visibilityState === 'hidden') return;
+            this.scheduleCoinRefresh({ silent: true, reason: 'interval' });
+        }, syncInterval);
 
         this.flushLocalSyncQueue({ silent: true });
     }
@@ -61,6 +67,12 @@ class StudentProgressCloudMethods {
             window.clearInterval(this.coinSyncInterval);
             this.coinSyncInterval = null;
         }
+        if (this.coinRefreshTimeout) {
+            window.clearTimeout(this.coinRefreshTimeout);
+            this.coinRefreshTimeout = null;
+        }
+        this.coinRefreshInFlight = false;
+        this.coinRefreshPendingOptions = null;
         if (this.storageSyncHandler) {
             window.removeEventListener('storage', this.storageSyncHandler);
             this.storageSyncHandler = null;
@@ -79,23 +91,62 @@ class StudentProgressCloudMethods {
         }
     }
 
+    scheduleCoinRefresh(options = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) return;
+
+        if (this.coinRefreshInFlight) {
+            this.coinRefreshPendingOptions = {
+                ...this.coinRefreshPendingOptions,
+                ...options,
+                reason: options.reason || this.coinRefreshPendingOptions?.reason
+            };
+            return;
+        }
+
+        const now = Date.now();
+        const throttleDelay = options.force
+            ? 0
+            : Math.max(0, COIN_REFRESH_THROTTLE_MS - (now - this.lastCoinRefreshAt));
+
+        if (this.coinRefreshTimeout) {
+            window.clearTimeout(this.coinRefreshTimeout);
+            this.coinRefreshTimeout = null;
+        }
+
+        this.coinRefreshTimeout = window.setTimeout(() => {
+            this.coinRefreshTimeout = null;
+            this.refreshCoinsFromCloud(options);
+        }, throttleDelay);
+    }
+
     applyRemoteCoinProgress(progress) {
         if (!progress) return;
         this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyRemoteCoinProgress' });
         const cloudCoinData = this.migrateCoinData(progress);
 
         this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
+        this.lastCoinRefreshAt = Date.now();
         this.sm.setAuthStatus('☁️ Synced');
     }
 
     async refreshCoinsFromCloud(options = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
+        if (this.coinRefreshInFlight) {
+            this.coinRefreshPendingOptions = {
+                ...this.coinRefreshPendingOptions,
+                ...options,
+                reason: options.reason || this.coinRefreshPendingOptions?.reason
+            };
+            return;
+        }
 
+        this.coinRefreshInFlight = true;
         try {
             this.sm.logStudentDomUpdate?.('student-progress', {
                 source: 'refreshCoinsFromCloud:start',
                 reason: options.reason || ''
             });
+            this.lastCoinRefreshAt = Date.now();
             const db = supabaseService.getDatabase();
             const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
             const snapshot = await getDoc(docRef);
@@ -108,6 +159,13 @@ class StudentProgressCloudMethods {
         } catch (error) {
             if (!options.silent) {
                 console.warn('Could not refresh coins from cloud:', error);
+            }
+        } finally {
+            this.coinRefreshInFlight = false;
+            const pendingOptions = this.coinRefreshPendingOptions;
+            this.coinRefreshPendingOptions = null;
+            if (pendingOptions) {
+                this.scheduleCoinRefresh(pendingOptions);
             }
         }
     }
@@ -279,7 +337,7 @@ class StudentProgressCloudMethods {
                     const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
                     this.applyProgressSnapshot(progress, { saveLocal: true });
                 } else if (record.type === 'student-progress') {
-                    await this.refreshCoinsFromCloud({ silent: true });
+                    await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
                 }
                 await imageDB.completeSyncAction(record.id);
             } catch (error) {

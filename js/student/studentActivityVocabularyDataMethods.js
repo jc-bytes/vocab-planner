@@ -285,7 +285,7 @@ class StudentActivityVocabularyDataMethods {
         const override = await this.loadVocabularyOverride(vocabMeta);
 
         if (vocabMeta.path) {
-            const fetched = await loadVocabularyFile(vocabMeta.path, { fresh: true });
+            const fetched = await loadVocabularyFile(vocabMeta.path);
             if (fetched) {
                 vocabData = this.mergeVocabularyData({ meta: vocabMeta, fileData: fetched, override });
             } else if (override) {

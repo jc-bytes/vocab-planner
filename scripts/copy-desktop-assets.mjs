@@ -18,17 +18,6 @@ const entries = [
   'format example.pdf'
 ];
 
-const packageAssets = [
-  {
-    source: 'node_modules/@excalidraw/excalidraw/dist/excalidraw-assets',
-    target: 'excalidraw-assets'
-  },
-  {
-    source: 'node_modules/@excalidraw/excalidraw/dist/excalidraw-assets',
-    target: 'dist/excalidraw-assets'
-  }
-];
-
 function shouldCopyAsset(path) {
   const normalizedPath = path.split(sep).join('/');
   const name = basename(path);
@@ -54,22 +43,6 @@ for (const entry of entries) {
       recursive: true,
       force: true,
       filter: shouldCopyAsset
-    });
-  } catch (error) {
-    if (error.code !== 'ENOENT') {
-      throw error;
-    }
-  }
-}
-
-for (const entry of packageAssets) {
-  const source = join(root, entry.source);
-  const target = join(outDir, entry.target);
-  try {
-    await stat(source);
-    await cp(source, target, {
-      recursive: true,
-      force: true
     });
   } catch (error) {
     if (error.code !== 'ENOENT') {
