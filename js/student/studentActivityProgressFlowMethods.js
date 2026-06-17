@@ -263,44 +263,11 @@ class StudentActivityProgressFlowMethods {
         const nextActivityType = completion.isComplete
             ? null
             : flow.required.find(activityType => !this.isActivityComplete(activityType));
-        const nextActivityTitle = nextActivityType
-            ? cardByType.get(nextActivityType)?.dataset.activityTitle || nextActivityType
-            : '';
-        let status = $('#required-activities-status');
-        if (!status) {
-            status = createElement('div', 'required-activities-status');
-            status.id = 'required-activities-status';
-            grid.parentNode.insertBefore(status, grid);
-        }
-        status.className = 'required-activities-status activity-menu-summary';
-        status.innerHTML = '';
+        const status = $('#required-activities-status');
+        if (status) status.remove();
 
         const staleHeaderCoverage = document.querySelector('#activity-menu-view .section-header #overall-coverage-indicator');
         if (staleHeaderCoverage) staleHeaderCoverage.remove();
-
-        const createSummaryCard = (label, value, hint, className = '') => {
-            const card = createElement('div', `activity-menu-summary-card ${className}`.trim());
-            card.appendChild(createElement('span', 'activity-menu-summary-label', label));
-            card.appendChild(createElement('strong', null, value));
-            if (hint) card.appendChild(createElement('small', null, hint));
-            return card;
-        };
-
-        status.appendChild(createSummaryCard(
-            'Next step',
-            completion.isComplete ? 'Choose extra practice' : nextActivityTitle,
-            completion.isComplete ? 'Required work is complete.' : 'Start here first.',
-            'is-next'
-        ));
-        status.appendChild(createSummaryCard(
-            'Required',
-            `${completion.completed}/${completion.total} complete`,
-            completion.isComplete ? 'Extra practice is unlocked.' : 'Complete these to unlock more games.',
-            'is-required'
-        ));
-        const coverageCard = createElement('div', 'activity-menu-summary-card overall-coverage');
-        coverageCard.id = 'overall-coverage-indicator';
-        status.appendChild(coverageCard);
 
         allCards.forEach(card => card.remove());
         grid.querySelectorAll('.activity-flow-section').forEach(section => section.remove());

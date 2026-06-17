@@ -35,6 +35,7 @@ class StudentGameLifecycleMethods {
         $('#game-selection').classList.add('hidden');
         const gameStage = $('#game-stage');
         gameStage.classList.remove('hidden');
+        gameStage.style.removeProperty('--game-frame-width');
 
         // Prevent arrow keys from scrolling the page during gameplay
         if (!this.arrowKeyHandler) {

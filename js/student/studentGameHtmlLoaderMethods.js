@@ -12,26 +12,23 @@ class StudentGameHtmlLoaderMethods {
         }
         
         // All games now have standalone HTML files, no build checks needed
+        if (gameStage) {
+            ['display', 'flex-direction', 'align-items', 'justify-content', 'width', 'min-width'].forEach((property) => {
+                gameStage.style.removeProperty(property);
+            });
+        }
         
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
         iframe.src = htmlFile;
-        
-        // Style game-stage container to center content
-        if (gameStage) {
-            gameStage.style.display = 'flex';
-            gameStage.style.flexDirection = 'column';
-            gameStage.style.alignItems = 'center';
-            gameStage.style.justifyContent = 'center';
-            gameStage.style.width = '100%';
-            gameStage.style.minWidth = '80%'; // Prevent container from becoming too narrow
-        }
+        let frameWidth = 800;
         
         // Games take the width they need and are centered
         // All games should take at least 80% of container width
         // SpacePi: 960x600 game area
         if (gameId === 'spacepi') {
+            frameWidth = 960;
             iframe.style.width = '960px';
             iframe.style.minWidth = '80%';
             iframe.style.maxWidth = '100%';
@@ -40,6 +37,7 @@ class StudentGameHtmlLoaderMethods {
             iframe.style.overflow = 'auto';
         } else if (gameId === 'radius-raid') {
             // Radius Raid: 800x600 canvas + 10px padding each side = 820x620
+            frameWidth = 820;
             iframe.style.width = '820px';
             iframe.style.minWidth = '80%';
             iframe.style.maxWidth = '100%';
@@ -71,11 +69,19 @@ class StudentGameHtmlLoaderMethods {
             iframe.style.height = '600px';
             iframe.style.display = 'block';
         }
+
+        if (gameStage) {
+            gameStage.style.setProperty('--game-frame-width', `${frameWidth}px`);
+        }
         
         iframe.style.border = 'none';
         iframe.style.borderRadius = '8px';
         iframe.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
         iframe.style.margin = '0 auto'; // Center the iframe
+        iframe.style.gridColumn = '1';
+        iframe.style.gridRow = '2';
+        iframe.style.justifySelf = 'center';
+        iframe.style.alignSelf = 'start';
         iframe.tabIndex = 0; // Make iframe focusable
         
         // Insert iframe after the canvas

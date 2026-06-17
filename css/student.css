@@ -59,9 +59,31 @@
     padding: var(--spacing-lg);
 }.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) {
     max-width: none;
-    padding: 0.5rem;
+    min-height: calc(100svh - 1rem);
+    min-height: calc(100dvh - 1rem);
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: 0.5rem 1rem;
+}.app-container:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+    min-height: 100svh;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
 }.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) .student-app-header {
-    display: none;
+    grid-template-columns: minmax(140px, max-content) minmax(0, 1fr) max-content;
+    gap: 0.75rem;
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.45rem;
+}.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) .student-app-header .header-left h1 {
+    font-size: 1.08rem;
+}.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) .student-app-header .student-tab {
+    min-height: 2.35rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.86rem;
+}.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) .student-app-header #user-info {
+    gap: 0.6rem !important;
 }.app-container>main {
     background: rgba(15, 23, 42, 0.24);
     border-radius: var(--radius-lg);
@@ -70,7 +92,13 @@
     box-shadow: none;
 }.app-container>main:has(#arcade-view:not(.hidden)) {
     padding: 0.75rem;
+}.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+    min-height: 0;
+    display: grid;
 }.app-container>main:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) {
+    min-height: 0;
+    display: grid;
+    align-items: center;
     padding: 0;
     border: 0;
     border-radius: 0;
@@ -3513,6 +3541,12 @@ select:focus {
 }.arcade-container {
     display: grid;
     justify-items: center;
+}.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) #arcade-view,
+.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) .arcade-container {
+    min-height: 0;
+    height: 100%;
+}.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) .arcade-container {
+    align-items: center;
 }#game-selection {
     width: min(100%, 720px);
     margin: 0 auto;
@@ -3535,13 +3569,13 @@ select:focus {
         "counter copy cost"
         "icon copy play";
     align-items: center;
-    gap: 0.55rem 0.85rem;
+    gap: 0.75rem 1.05rem;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
     max-width: none;
-    min-height: 0;
-    padding: 0.9rem;
+    min-height: 132px;
+    padding: 1.25rem 1.35rem;
 }.game-counter {
     grid-area: counter;
     color: var(--text-muted);
@@ -3549,7 +3583,7 @@ select:focus {
     text-align: center;
 }.game-icon {
     grid-area: icon;
-    font-size: 2.2rem;
+    font-size: 2.7rem;
     line-height: 1;
     text-align: center;
 }.game-card-copy {
@@ -3557,98 +3591,132 @@ select:focus {
     min-width: 0;
 }.game-card-copy h3 {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.2rem;
     line-height: 1.15;
 }.game-card-copy p {
-    margin: 0.22rem 0 0;
+    margin: 0.35rem 0 0;
     color: var(--text-muted);
-    font-size: 0.86rem;
+    font-size: 0.95rem;
     line-height: 1.25;
 }.game-cost {
     grid-area: cost;
     color: var(--text-main);
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     font-weight: 800;
     white-space: nowrap;
 }.game-card #play-current-game-btn {
     grid-area: play;
-    min-height: 2.25rem;
-    padding: 0.45rem 0.9rem;
+    min-height: 2.7rem;
+    padding: 0.55rem 1.2rem;
 }.game-selection-actions {
     display: flex;
     justify-content: center;
     margin-top: 0.75rem;
 }#game-stage:not(.hidden) {
+    --game-frame-width: 800px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(108px, 128px);
-    gap: 0.5rem;
+    grid-template-columns: minmax(0, var(--game-frame-width));
+    grid-template-rows: auto minmax(0, auto);
+    gap: 0.45rem;
     align-items: start;
     justify-items: center;
-    width: 100%;
+    width: min(100%, var(--game-frame-width));
     min-width: 0 !important;
     margin: 0 auto;
 }#game-stage:not(.hidden)>* {
     min-width: 0;
 }.game-header {
     display: flex;
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
     align-self: start;
-    justify-self: start;
-    align-items: stretch;
+    justify-self: stretch;
+    align-items: center;
     justify-content: flex-start;
-    flex-direction: column;
+    flex-direction: row;
     flex-wrap: nowrap;
-    gap: 0.45rem;
+    gap: 0.4rem;
     min-width: 0;
     width: 100%;
+    box-sizing: border-box;
     margin: 0;
     max-width: 100%;
-    padding: 0.45rem;
+    min-height: 2.55rem;
+    padding: 0.32rem 0.42rem;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     background: rgba(15, 23, 42, 0.62);
     backdrop-filter: blur(12px);
     box-shadow: none;
 }.game-header #game-timer,
 .game-header #game-score {
-    min-height: 1.45rem;
+    min-height: 1.9rem;
     display: inline-flex;
     align-items: center;
+    min-width: 0;
     white-space: nowrap;
     font-size: 0.78rem;
     line-height: 1.1;
+}.game-header #game-timer {
+    flex: 0 0 auto;
+    margin-right: auto;
+    font-weight: 800;
+}.game-header #game-score {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    max-width: min(48vw, 360px);
+    overflow: hidden;
+    color: var(--text-main) !important;
+    font-weight: 800 !important;
+    text-overflow: ellipsis;
 }.game-header .btn {
-    width: 100%;
-    min-height: 2rem;
-    padding: 0.3rem 0.45rem;
+    width: auto;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    min-height: 1.9rem;
+    padding: 0.28rem 0.7rem;
     border-radius: var(--radius-sm);
     font-size: 0.76rem;
     line-height: 1.1;
 }#game-canvas {
     grid-column: 1;
-    grid-row: 1;
-    justify-self: end;
+    grid-row: 2;
+    justify-self: center;
     max-width: 100%;
     display: block;
-    width: min(100%, calc((100svh - 1rem) * 4 / 3), 800px);
-    width: min(100%, calc((100dvh - 1rem) * 4 / 3), 800px);
-    max-height: min(calc(100svh - 1rem), 600px);
-    max-height: min(calc(100dvh - 1rem), 600px);
+    width: min(100%, calc((100svh - 7rem) * 4 / 3), 800px);
+    width: min(100%, calc((100dvh - 7rem) * 4 / 3), 800px);
+    max-height: min(calc(100svh - 7rem), 600px);
+    max-height: min(calc(100dvh - 7rem), 600px);
     margin: 0 auto;
     object-fit: contain;
 }@media (max-width: 760px) {
     #game-stage:not(.hidden) {
-        grid-template-columns: minmax(0, 1fr) minmax(92px, 108px);
-        gap: 0.4rem;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.5rem;
         width: 100%;
     }
 
+    .game-header {
+        flex-wrap: wrap;
+    }
+
+    .game-header #game-timer {
+        flex: 1 0 auto;
+    }
+
+    .game-header #game-score {
+        order: 2;
+        flex-basis: 100%;
+        justify-content: flex-start;
+        max-width: 100%;
+    }
+
     #game-canvas {
-        width: min(100%, calc((100svh - 1rem) * 4 / 3), 800px);
-        width: min(100%, calc((100dvh - 1rem) * 4 / 3), 800px);
-        max-height: min(calc(100svh - 1rem), 600px);
-        max-height: min(calc(100dvh - 1rem), 600px);
+        width: min(100%, calc((100svh - 7.5rem) * 4 / 3), 800px);
+        width: min(100%, calc((100dvh - 7.5rem) * 4 / 3), 800px);
+        max-height: min(calc(100svh - 7.5rem), 600px);
+        max-height: min(calc(100dvh - 7.5rem), 600px);
     }
 }/* Teacher minimum tablet safety */#detail-activity-list,
 #detail-activity-list .student-detail-activity-row,
@@ -4507,6 +4575,8 @@ select:focus {
             "copy"
             "cost"
             "play";
+        min-height: 260px;
+        padding: 1.15rem;
         text-align: center;
     }
 }@media (max-width: 480px) {

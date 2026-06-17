@@ -1,4 +1,4 @@
-import { $, createElement } from '../main.js';
+import { $ } from '../main.js';
 
 class StudentActivityCoverageMethods {
     initWordCoverage() {
@@ -112,25 +112,12 @@ class StudentActivityCoverageMethods {
     }
 
     updateOverallCoverageDisplay(coverageStats) {
-        // Create or update overall coverage indicator
         let coverageIndicator = $('#overall-coverage-indicator');
-        
+
         if (!coverageIndicator) {
-            // Create the indicator if it doesn't exist
-            const summary = document.querySelector('#required-activities-status');
-            if (summary) {
-                coverageIndicator = createElement('div', 'activity-menu-summary-card overall-coverage');
-                coverageIndicator.id = 'overall-coverage-indicator';
-                summary.appendChild(coverageIndicator);
-            } else {
-                const header = document.querySelector('#activity-menu-view .section-header');
-                if (!header) return;
-                coverageIndicator = createElement('div', 'overall-coverage');
-                coverageIndicator.id = 'overall-coverage-indicator';
-                header.appendChild(coverageIndicator);
-            }
+            return;
         }
-        
+
         if (coverageIndicator && coverageStats?.overall) {
             const { practiced, total, percentage } = coverageStats.overall;
             coverageIndicator.innerHTML = `
