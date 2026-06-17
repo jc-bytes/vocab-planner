@@ -134,10 +134,6 @@ class StudentListenerMethods {
             this.navigateTo({ view: 'menu' });
         });
 
-        this.addListener('#back-from-arcade-btn', 'click', () => {
-            this.navigateTo({ view: 'menu' });
-        });
-
         // Leaderboard Navigation
         // Removed prev-game-btn and next-game-btn listeners
 

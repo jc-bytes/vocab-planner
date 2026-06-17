@@ -36,14 +36,6 @@ class StudentGameLifecycleMethods {
         const gameStage = $('#game-stage');
         gameStage.classList.remove('hidden');
 
-        // Ensure game-stage is centered for all games
-        gameStage.style.display = 'flex';
-        gameStage.style.flexDirection = 'column';
-        gameStage.style.alignItems = 'center';
-        gameStage.style.justifyContent = 'center';
-        gameStage.style.width = '100%';
-        gameStage.style.minWidth = '80%'; // Prevent container from becoming too narrow
-
         // Prevent arrow keys from scrolling the page during gameplay
         if (!this.arrowKeyHandler) {
             this.arrowKeyHandler = (e) => {

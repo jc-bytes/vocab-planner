@@ -300,25 +300,17 @@
 
             <!-- View: Arcade -->
             <section id="arcade-view" class="view hidden">
-                <div class="section-header">
-                    <button id="back-from-arcade-btn" class="btn text-btn">← Today</button>
-                    <h2>🕹️ The Arcade</h2>
-                </div>
-
                 <!-- Game Area -->
                 <div class="arcade-container">
                     <div id="game-selection">
-                        <div
-                            style="display: flex; align-items: center; justify-content: center; gap: 2rem; margin-bottom: 2rem;">
-                            <button id="prev-game-select-btn" class="btn secondary-btn"
-                                style="padding: 1rem 1.5rem; font-size: 1.5rem;">◀</button>
-                            <div id="current-game-card" class="card game-card" style="max-width: 400px; flex: 1;">
+                        <div class="game-selection-row">
+                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn">◀</button>
+                            <div id="current-game-card" class="card game-card">
                                 <!-- Game card will be dynamically inserted here -->
                             </div>
-                            <button id="next-game-select-btn" class="btn secondary-btn"
-                                style="padding: 1rem 1.5rem; font-size: 1.5rem;">▶</button>
+                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn">▶</button>
                         </div>
-                        <div style="text-align: center; margin-top: 1rem;">
+                        <div class="game-selection-actions">
                             <button id="show-leaderboard-btn" class="btn secondary-btn">🏆 View Leaderboard</button>
                         </div>
                     </div>

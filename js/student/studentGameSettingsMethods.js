@@ -94,12 +94,14 @@ class StudentGameSettingsMethods {
         const totalGames = this.sm.gamesList.length;
 
         container.innerHTML = `
-            <div class="game-counter" style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">${currentNum} / ${totalGames}</div>
-            <div class="game-icon" style="font-size: 4rem; text-align: center; margin: 1rem 0;">${game.icon}</div>
-            <h3 style="text-align: center;">${game.name}</h3>
-            <p style="text-align: center; color: var(--text-muted);">${game.desc}</p>
-            <div class="game-cost" style="text-align: center; margin: 1rem 0; font-weight: bold;">${exchangeRate} Coins / min</div>
-            <button id="play-current-game-btn" class="btn primary-btn" style="width: 100%;">Play</button>
+            <div class="game-counter">${currentNum} / ${totalGames}</div>
+            <div class="game-icon">${game.icon}</div>
+            <div class="game-card-copy">
+                <h3>${game.name}</h3>
+                <p>${game.desc}</p>
+            </div>
+            <div class="game-cost">${exchangeRate} Coins / min</div>
+            <button id="play-current-game-btn" class="btn primary-btn">Play</button>
         `;
 
         // Re-attach the play button listener
