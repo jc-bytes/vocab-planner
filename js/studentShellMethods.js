@@ -1,6 +1,5 @@
 import { $, $$ } from './main.js';
 
-const CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY = 'student_classroom_instructions_collapsed';
 const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
 
 class StudentShellMethods {
@@ -15,10 +14,6 @@ class StudentShellMethods {
 
         this.saveStudentSectionScroll(currentViewId);
 
-        if (viewId !== 'student-classroom-activity-view') {
-            this.classroomActivities?.cleanup?.();
-        }
-
         $$('.view').forEach(el => {
             el.classList.add('hidden');
             el.classList.remove('active');
@@ -31,9 +26,6 @@ class StudentShellMethods {
         }
 
         this.updateStudentNav(viewId);
-        if (viewId === 'student-classroom-activity-view') {
-            this.applyClassroomInstructionsCollapsedState();
-        }
         if (window.lucide) {
             window.lucide.createIcons();
         }
@@ -222,10 +214,6 @@ class StudentShellMethods {
     getStudentSectionForView(viewId) {
         if (viewId === 'arcade-view') return 'arcade';
         if ([
-            'student-classroom-activities-view',
-            'student-classroom-activity-view'
-        ].includes(viewId)) return 'classroom-activities';
-        if ([
             'vocab-selection-view',
             'activity-menu-view',
             'activity-view'
@@ -281,44 +269,6 @@ class StudentShellMethods {
 
         this.setStudentMobileMenu(false);
         if (focusToggle) toggle?.focus({ preventScroll: true });
-    }
-
-    getClassroomInstructionsCollapsed() {
-        return localStorage.getItem(CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY) === '1';
-    }
-
-    applyClassroomInstructionsCollapsedState() {
-        this.setClassroomInstructionsCollapsed(this.getClassroomInstructionsCollapsed(), { persist: false });
-    }
-
-    toggleClassroomInstructions() {
-        this.setClassroomInstructionsCollapsed(!this.getClassroomInstructionsCollapsed());
-    }
-
-    setClassroomInstructionsCollapsed(collapsed, { persist = true } = {}) {
-        const layout = $('#student-classroom-activity-layout');
-        const panel = $('#student-classroom-instructions-panel');
-        const body = $('#student-classroom-instructions-body');
-        const toggle = $('#student-toggle-classroom-instructions-btn');
-        const isCollapsed = Boolean(collapsed);
-
-        layout?.classList.toggle('instructions-collapsed', isCollapsed);
-        panel?.classList.toggle('is-collapsed', isCollapsed);
-        if (panel) panel.hidden = isCollapsed;
-        if (body) body.hidden = false;
-
-        if (toggle) {
-            const label = isCollapsed ? 'Show instructions' : 'Hide instructions';
-            toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
-            toggle.setAttribute('aria-label', label);
-            toggle.title = label;
-            toggle.innerHTML = '<i data-lucide="book-open"></i> Instructions';
-        }
-
-        if (persist) {
-            localStorage.setItem(CLASSROOM_INSTRUCTIONS_COLLAPSED_KEY, isCollapsed ? '1' : '0');
-        }
-        if (window.lucide) window.lucide.createIcons();
     }
 
     cleanupActivity() {

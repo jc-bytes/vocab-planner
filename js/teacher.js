@@ -2,7 +2,6 @@ import {
     DEFAULT_SUBJECT_SLUG,
     getDefaultSchoolCalendar
 } from './services/vocabularyApi.js';
-import { installTeacherActivityMethods } from './teacherActivityMethods.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
 import { installTeacherDataManagementMethods } from './teacherDataManagement.js';
 import { installTeacherOverviewMethods } from './teacherOverview.js';
@@ -15,10 +14,6 @@ import { installTeacherStudentProgressMethods } from './teacherStudentProgress.j
 import { installTeacherVocabularyMethods } from './teacherVocabulary.js';
 import { initTeacherListeners } from './teacherListeners.js';
 
-const ACTIVITY_COLLECTION = 'classroomActivities';
-const ACTIVITY_ASSIGNMENT_COLLECTION = 'classroomActivityAssignments';
-const ACTIVITY_SUBMISSION_COLLECTION = 'classroomActivitySubmissions';
-
 class TeacherManager {
     constructor() {
         this.vocabSet = {
@@ -30,7 +25,6 @@ class TeacherManager {
             activitySettings: {},
             words: []
         };
-        this.activity = this.createDefaultActivity();
         this.currentQuiz = null;
         this.allStudentData = [];
         this.filteredStudentData = [];
@@ -40,12 +34,7 @@ class TeacherManager {
         this.isAuthenticated = this.authDisabled;
         this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
         this.cloudSaveTimeout = null;
-        this.activityCloudSaveTimeout = null;
-        this.activityLocalSaveTimeout = null;
         this.VOCAB_COLLECTION = 'vocabularies';
-        this.ACTIVITY_COLLECTION = ACTIVITY_COLLECTION;
-        this.ACTIVITY_ASSIGNMENT_COLLECTION = ACTIVITY_ASSIGNMENT_COLLECTION;
-        this.ACTIVITY_SUBMISSION_COLLECTION = ACTIVITY_SUBMISSION_COLLECTION;
         this.activeStudentId = null;
         this.currentQuiz = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
@@ -53,7 +42,6 @@ class TeacherManager {
         this.dataViewerInitialized = false;
         this.exportListenersInitialized = false;
         this.libraryItems = [];
-        this.activityLibraryItems = [];
         this.libraryDrilldown = {
             subject: null,
             grade: null,
@@ -65,18 +53,6 @@ class TeacherManager {
         } catch {
             this.teacherVocabularyViewModes = {};
         }
-        this.activityDrilldown = {
-            subject: null,
-            grade: null,
-            trimester: null,
-            month: null,
-            week: null
-        };
-        try {
-            this.teacherActivityViewModes = JSON.parse(localStorage.getItem('teacher_activity_view_modes') || '{}') || {};
-        } catch {
-            this.teacherActivityViewModes = {};
-        }
         this.quizLibraryItems = [];
         this.quizDrilldown = {
             subject: null,
@@ -87,17 +63,6 @@ class TeacherManager {
         this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
-        this.activityLibraryCache = null;
-        this.activityLibraryPromise = null;
-        this.activityLibraryLoaded = false;
-        this.activityLibraryRefreshing = false;
-        this.activityLibraryStale = false;
-        this.activityLibraryLastFetchFailed = false;
-        this.activityAssignmentCache = null;
-        this.activityAssignmentCacheKey = null;
-        this.activityAssignmentPromise = null;
-        this.activityAssignmentPromiseKey = null;
-        this.activityAssignmentItems = [];
         this.weeklySparkItems = [];
         this.weeklySparkCache = null;
         this.weeklySparkPromise = null;
@@ -107,18 +72,7 @@ class TeacherManager {
         this.weeklySparkMonth = null;
         this.editingSparkId = null;
         this.sparkModalMode = 'create';
-        this.activityAssignmentsLoaded = false;
-        this.activityAssignmentRefreshing = false;
-        this.activityAssignmentStale = false;
-        this.activityAssignmentLastFetchFailed = false;
-        this.activeActivityAssignment = null;
         this.vocabularyMode = 'assign';
-        this.activityMode = 'assign';
-        this.activityReviewHandle = null;
-        this.activeActivityReview = null;
-        this.activeActivityReviewSelectionIndex = -1;
-        this.activityStudentPreview = null;
-        this.activityStudentPreviewMode = 'modal';
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;
         this.studentProgressPromise = null;
@@ -127,15 +81,6 @@ class TeacherManager {
         this.pendingTeacherRoute = null;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
-        this.lastActivitiesRoute = null;
-        this.activityEditorHandle = null;
-        this.activityEditorMountPromise = null;
-        this.activityEditorAutosaveReady = false;
-        this.activityEditorAutosaveReadyTimeout = null;
-        this.activityEditorTab = 'settings';
-        this.activityImageUrlCache = new Map();
-        this.structuredBuilderMode = 'build';
-        this.deletedActivityIds = new Set();
         this.quizMaker = null;
         this.quizMakerVocabKey = null;
         this.quizEditorOpen = false;
@@ -162,7 +107,6 @@ class TeacherManager {
     }
 }
 
-installTeacherActivityMethods(TeacherManager);
 installTeacherAuthMethods(TeacherManager);
 installTeacherDataManagementMethods(TeacherManager);
 installTeacherOverviewMethods(TeacherManager);

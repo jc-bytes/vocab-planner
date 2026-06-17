@@ -23,21 +23,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[1] === 'students') return { view: 'students' };
             if (parts[1] === 'word-hunt') return { view: 'vocabulary', mode: 'review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
-            if (parts[1] === 'activities' && parts[2] === 'assignment' && parts[3]) {
-                return { view: 'activity-assignment', assignmentId: parts[3] };
-            }
-            if (parts[1] === 'activities' && parts[2] === 'editor') return { view: 'activity-editor' };
-            if (parts[1] === 'activities') {
-                return {
-                    view: 'activities',
-                    subject: params.get('subject') || null,
-                    grade: params.get('grade') || null,
-                    trimester: params.get('trimester') || null,
-                    month: params.get('month') || null,
-                    week: params.get('week') || null,
-                    mode: params.get('mode') === 'review' ? 'review' : 'assign'
-                };
-            }
+            if (parts[1] === 'activities') return { view: 'overview' };
             if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
             if (parts[1] === 'quizzes') return { view: 'quizzes' };
             if (parts[1] === 'data-settings') return { view: 'data-settings', tab: params.get('tab') || undefined };
@@ -67,21 +53,6 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (route.view === 'students') return '#/teacher/students';
             if (route.view === 'word-hunt-review') return '#/teacher/vocabulary?mode=review';
             if (route.view === 'sparks') return '#/teacher/sparks';
-            if (route.view === 'activities') {
-                const params = new URLSearchParams();
-                if (route.subject) params.set('subject', route.subject);
-                if (route.grade) params.set('grade', route.grade);
-                if (route.mode !== 'review' && route.trimester) params.set('trimester', route.trimester);
-                if (route.mode !== 'review' && route.month) params.set('month', route.month);
-                if (route.mode !== 'review' && route.week) params.set('week', route.week);
-                if (route.mode === 'review') params.set('mode', 'review');
-                const query = params.toString();
-                return `#/teacher/activities${query ? `?${query}` : ''}`;
-            }
-            if (route.view === 'activity-editor') return '#/teacher/activities/editor';
-            if (route.view === 'activity-assignment' && route.assignmentId) {
-                return `#/teacher/activities/assignment/${encodeURIComponent(route.assignmentId)}`;
-            }
             if (route.view === 'quizzes') return '#/teacher/vocabulary?mode=quizzes';
             if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
             if (route.view === 'editor') {
@@ -125,21 +96,6 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     vocabularyId: this.vocabSet?.id || null
                 };
             }
-            if (viewId === 'teacher-activities-view') {
-                return {
-                    view: 'activities',
-                    subject: this.activityDrilldown.subject,
-                    grade: this.activityDrilldown.grade,
-                    trimester: this.activityDrilldown.trimester,
-                    month: this.activityDrilldown.month,
-                    week: this.activityDrilldown.week,
-                    mode: this.activityMode
-                };
-            }
-            if (viewId === 'teacher-activity-editor-view') return { view: 'activity-editor' };
-            if (viewId === 'teacher-activity-assignment-view' && this.activeActivityAssignment?.id) {
-                return { view: 'activity-assignment', assignmentId: this.activeActivityAssignment.id };
-            }
             if (viewId === 'teacher-sparks-view') return { view: 'sparks' };
             if (viewId === 'teacher-progress-view') return { view: 'students' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
@@ -171,20 +127,6 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 mode: this.vocabularyMode
             };
             this.setRoute(this.lastVocabularyRoute, options);
-        },
-
-        updateActivityRoute(options = {}) {
-            if (this.isApplyingRoute || !this.isAuthenticated) return;
-            this.lastActivitiesRoute = {
-                view: 'activities',
-                subject: this.activityDrilldown.subject,
-                grade: this.activityDrilldown.grade,
-                trimester: this.activityDrilldown.trimester,
-                month: this.activityDrilldown.month,
-                week: this.activityDrilldown.week,
-                mode: this.activityMode
-            };
-            this.setRoute(this.lastActivitiesRoute, options);
         },
 
         async restoreRouteOrDefault(defaultRoute = { view: 'overview' }) {
@@ -244,24 +186,6 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             } else {
                                 this.showEditor();
                             }
-                            break;
-                        case 'activities':
-                            this.activityDrilldown = {
-                                subject: routeToApply.subject || null,
-                                grade: routeToApply.grade || null,
-                                trimester: routeToApply.trimester ? this.normalizeTeacherTrimester(routeToApply.trimester) : null,
-                                month: routeToApply.month ? this.normalizeTeacherMonth(routeToApply.month) : null,
-                                week: routeToApply.week ? this.normalizeActivityWeekKey(routeToApply.week) : null
-                            };
-                            this.activityMode = routeToApply.mode || 'assign';
-                            this.lastActivitiesRoute = { ...routeToApply };
-                            await this.showActivityLibrary();
-                            break;
-                        case 'activity-editor':
-                            await this.showActivityEditor();
-                            break;
-                        case 'activity-assignment':
-                            await this.showActivityAssignmentReview(routeToApply.assignmentId);
                             break;
                         case 'students':
                             await this.showProgressView();

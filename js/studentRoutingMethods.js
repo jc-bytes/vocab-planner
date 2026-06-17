@@ -67,21 +67,6 @@ class StudentRoutingMethods {
             return { view: 'arcade' };
         }
 
-        if (parts.length === 1 && parts[0] === 'classroom-activities') {
-            const params = new URLSearchParams(rawQuery);
-            return {
-                view: 'classroom-activities',
-                section: params.get('section') || null,
-                trimester: params.get('trimester') || null,
-                month: params.get('month') || null,
-                week: params.get('week') || null
-            };
-        }
-
-        if (parts[0] === 'classroom-activities' && parts[1]) {
-            return { view: 'classroom-activity', assignmentId: parts[1] };
-        }
-
         if (parts[0] === 'unit' && parts[1]) {
             if (parts.length === 2) {
                 return { view: 'unit', unitId: parts[1] };
@@ -121,18 +106,6 @@ class StudentRoutingMethods {
         if (!route || !route.view) return '#/menu';
 
         if (route.view === 'menu') return '#/menu';
-        if (route.view === 'classroom-activities') {
-            const params = new URLSearchParams();
-            if (route.section) params.set('section', route.section);
-            if (route.trimester) params.set('trimester', route.trimester);
-            if (route.month) params.set('month', route.month);
-            if (route.week) params.set('week', route.week);
-            const query = params.toString();
-            return query ? `#/classroom-activities?${query}` : '#/classroom-activities';
-        }
-        if (route.view === 'classroom-activity' && route.assignmentId) {
-            return `#/classroom-activities/${encodeURIComponent(route.assignmentId)}`;
-        }
         if (route.view === 'units') {
             const params = new URLSearchParams();
             if (route.all) params.set('all', '1');
@@ -236,16 +209,6 @@ class StudentRoutingMethods {
 
     async applyRoute(route) {
         const targetRoute = route && route.view ? route : { view: 'menu' };
-        const activeClassroomAssignmentId = this.classroomActivities?.currentAssignment?.id || '';
-        if (
-            activeClassroomAssignmentId
-            && (
-                targetRoute.view !== 'classroom-activity'
-                || targetRoute.assignmentId !== activeClassroomAssignmentId
-            )
-        ) {
-            await this.classroomActivities.flushLocalDraft?.({ quiet: true });
-        }
         this.isApplyingRoute = true;
 
         try {
@@ -270,20 +233,6 @@ class StudentRoutingMethods {
 
             if (targetRoute.view === 'arcade') {
                 await this.showArcadeView();
-                return;
-            }
-
-            if (targetRoute.view === 'classroom-activities') {
-                this.cleanupActivity();
-                this.currentVocab = null;
-                await this.classroomActivities.renderList(targetRoute);
-                return;
-            }
-
-            if (targetRoute.view === 'classroom-activity') {
-                this.cleanupActivity();
-                this.currentVocab = null;
-                await this.classroomActivities.showAssignment(targetRoute.assignmentId);
                 return;
             }
 

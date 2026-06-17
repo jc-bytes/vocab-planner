@@ -1,8 +1,5 @@
 export const TABLE_ALIASES = {
     appSettings: 'app_settings',
-    classroomActivityAssignments: 'classroom_activity_assignments',
-    classroomActivitySubmissions: 'classroom_activity_submissions',
-    classroomActivities: 'classroom_activities',
     exportLogs: 'export_logs',
     studentProgress: 'student_progress',
     weeklySparks: 'weekly_sparks',
@@ -11,9 +8,6 @@ export const TABLE_ALIASES = {
 
 export const PRIMARY_KEYS = {
     app_settings: 'key',
-    classroom_activity_assignments: 'id',
-    classroom_activity_submissions: 'id',
-    classroom_activities: 'id',
     export_logs: 'id',
     profiles: 'user_id',
     scores: 'id',
@@ -25,54 +19,6 @@ export const PRIMARY_KEYS = {
 
 export const FIELD_ALIASES = {
     app_settings: {
-        updatedAt: 'updated_at'
-    },
-    classroom_activities: {
-        activityData: 'activity_data',
-        activityType: 'activity_type',
-        assessmentPurpose: 'assessment_purpose',
-        estimatedMinutes: 'estimated_minutes',
-        makeupInstructions: 'makeup_instructions',
-        ownerId: 'owner_id',
-        studentInstructions: 'student_instructions',
-        studentOutput: 'student_output',
-        subjectSlug: 'subject_slug',
-        teacherInstructions: 'teacher_instructions',
-        updatedAt: 'updated_at'
-    },
-    classroom_activity_assignments: {
-        activityData: 'activity_data',
-        activityType: 'activity_type',
-        assignedBy: 'assigned_by',
-        assessmentPurpose: 'assessment_purpose',
-        availableFrom: 'available_from',
-        dueDate: 'due_date',
-        estimatedMinutes: 'estimated_minutes',
-        makeupInstructions: 'makeup_instructions',
-        sourceActivityId: 'source_activity_id',
-        studentInstructions: 'student_instructions',
-        studentOutput: 'student_output',
-        subjectSlug: 'subject_slug',
-        targetGrades: 'target_grades',
-        targetSections: 'target_sections',
-        teacherInstructions: 'teacher_instructions',
-        updatedAt: 'updated_at',
-        weekLabel: 'week_label'
-    },
-    classroom_activity_submissions: {
-        assignmentId: 'assignment_id',
-        lateOverride: 'late_override',
-        lateOverrideAt: 'late_override_at',
-        lateOverrideBy: 'late_override_by',
-        lateOverrideReason: 'late_override_reason',
-        responseData: 'response_data',
-        responseDataStoragePath: 'response_data_storage_path',
-        responseDataStorageSizeBytes: 'response_data_storage_size_bytes',
-        responseDataStorageUpdatedAt: 'response_data_storage_updated_at',
-        startedAt: 'started_at',
-        studentId: 'student_id',
-        studentProfile: 'student_profile',
-        submittedAt: 'submitted_at',
         updatedAt: 'updated_at'
     },
     export_logs: {
@@ -139,18 +85,6 @@ export const DEFAULT_COIN_DATA = {
 };
 
 export const WORD_HUNT_IMAGE_BUCKET = 'word-hunt-images';
-export const CLASSROOM_SCENE_BUCKET = 'classroom-activity-scenes';
-export const CLASSROOM_SCENE_MAX_BYTES = 1024 * 1024;
-export const CLASSROOM_ACTIVITY_IMAGE_BUCKET = 'classroom-activity-images';
-export const CLASSROOM_ACTIVITY_IMAGE_MAX_BYTES = 1024 * 1024;
-export const EXTERNAL_ARTIFACT_BUCKET = 'classroom-activity-artifacts';
-export const EXTERNAL_ARTIFACT_MAX_BYTES = 5 * 1024 * 1024;
-export const EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES = [
-    'image/png',
-    'image/jpeg',
-    'image/webp',
-    'application/pdf'
-];
 
 export const resolveTable = (collectionName) => TABLE_ALIASES[collectionName] || collectionName;
 
@@ -328,79 +262,6 @@ export const toClientRow = (tableName, row) => {
         };
     }
 
-    if (tableName === 'classroom_activities') {
-        return {
-            id: row.id,
-            title: row.title || '',
-            description: row.description || '',
-            activityType: row.activity_type || 'map-diagram',
-            subjectSlug: row.subject_slug || 'technology',
-            grades: row.grades || [],
-            teacherInstructions: row.teacher_instructions || '',
-            studentInstructions: row.student_instructions || '',
-            materials: row.materials || '',
-            estimatedMinutes: row.estimated_minutes ?? '',
-            studentOutput: row.student_output || '',
-            makeupInstructions: row.makeup_instructions || '',
-            assessmentPurpose: row.assessment_purpose || 'formative',
-            activityData: row.activity_data || {},
-            ownerId: row.owner_id || null,
-            createdAt: toTimestamp(row.created_at),
-            updatedAt: toTimestamp(row.updated_at)
-        };
-    }
-
-    if (tableName === 'classroom_activity_assignments') {
-        return {
-            id: row.id,
-            sourceActivityId: row.source_activity_id || '',
-            title: row.title || '',
-            description: row.description || '',
-            activityType: row.activity_type || 'map-diagram',
-            subjectSlug: row.subject_slug || 'technology',
-            grades: row.grades || [],
-            teacherInstructions: row.teacher_instructions || '',
-            studentInstructions: row.student_instructions || '',
-            materials: row.materials || '',
-            estimatedMinutes: row.estimated_minutes ?? '',
-            studentOutput: row.student_output || '',
-            makeupInstructions: row.makeup_instructions || '',
-            assessmentPurpose: row.assessment_purpose || 'formative',
-            activityData: row.activity_data || {},
-            targetGrades: row.target_grades || [],
-            targetSections: row.target_sections || [],
-            availableFrom: row.available_from || '',
-            dueDate: row.due_date || '',
-            weekLabel: row.week_label || '',
-            status: row.status || 'active',
-            assignedBy: row.assigned_by || null,
-            createdAt: toTimestamp(row.created_at),
-            updatedAt: toTimestamp(row.updated_at)
-        };
-    }
-
-    if (tableName === 'classroom_activity_submissions') {
-        return {
-            id: row.id,
-            assignmentId: row.assignment_id || '',
-            studentId: row.student_id || '',
-            studentProfile: normalizeProfile(row.student_profile || {}),
-            status: row.status || 'draft',
-            responseData: row.response_data || {},
-            responseDataStoragePath: row.response_data_storage_path || '',
-            responseDataStorageSizeBytes: row.response_data_storage_size_bytes ?? null,
-            responseDataStorageUpdatedAt: toTimestamp(row.response_data_storage_updated_at),
-            startedAt: toTimestamp(row.started_at),
-            submittedAt: toTimestamp(row.submitted_at),
-            lateOverride: Boolean(row.late_override),
-            lateOverrideReason: row.late_override_reason || '',
-            lateOverrideBy: row.late_override_by || null,
-            lateOverrideAt: toTimestamp(row.late_override_at),
-            createdAt: toTimestamp(row.created_at),
-            updatedAt: toTimestamp(row.updated_at)
-        };
-    }
-
     if (tableName === 'subjects') {
         return {
             id: row.slug,
@@ -524,97 +385,6 @@ export const fromClientPayload = (tableName, payload = {}, id = null) => {
             activity_settings: payload.activitySettings,
             words: payload.words,
             owner_id: payload.ownerId,
-            updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
-        });
-    }
-
-    if (tableName === 'classroom_activities') {
-        const estimatedMinutes = payload.estimatedMinutes ?? payload.estimated_minutes;
-        const parsedEstimatedMinutes = Number.parseInt(String(estimatedMinutes), 10);
-        return cleanUndefined({
-            id: id || payload.id,
-            title: payload.title,
-            description: payload.description,
-            activity_type: payload.activityType || payload.activity_type || 'map-diagram',
-            subject_slug: payload.subjectSlug || payload.subject_slug || payload.subject || 'technology',
-            grades: Array.isArray(payload.grades)
-                ? payload.grades.map(String)
-                : payload.grade
-                    ? [String(payload.grade)]
-                    : undefined,
-            teacher_instructions: payload.teacherInstructions ?? payload.teacher_instructions,
-            student_instructions: payload.studentInstructions ?? payload.student_instructions,
-            materials: payload.materials,
-            estimated_minutes: estimatedMinutes === '' || estimatedMinutes === null || estimatedMinutes === undefined
-                ? null
-                : Number.isInteger(parsedEstimatedMinutes)
-                    ? parsedEstimatedMinutes
-                    : null,
-            student_output: payload.studentOutput ?? payload.student_output,
-            makeup_instructions: payload.makeupInstructions ?? payload.makeup_instructions,
-            assessment_purpose: payload.assessmentPurpose || payload.assessment_purpose || 'formative',
-            activity_data: payload.activityData || payload.activity_data || {},
-            owner_id: payload.ownerId || payload.owner_id || null,
-            updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
-        });
-    }
-
-    if (tableName === 'classroom_activity_assignments') {
-        const estimatedMinutes = payload.estimatedMinutes ?? payload.estimated_minutes;
-        const parsedEstimatedMinutes = Number.parseInt(String(estimatedMinutes), 10);
-        const targetGrades = payload.targetGrades ?? payload.target_grades;
-        const targetSections = payload.targetSections ?? payload.target_sections;
-
-        return cleanUndefined({
-            id: id || payload.id,
-            source_activity_id: payload.sourceActivityId || payload.source_activity_id || null,
-            title: payload.title,
-            description: payload.description,
-            activity_type: payload.activityType || payload.activity_type || 'map-diagram',
-            subject_slug: payload.subjectSlug || payload.subject_slug || payload.subject || 'technology',
-            grades: normalizeTextArray(payload.grades ?? payload.grade),
-            teacher_instructions: payload.teacherInstructions ?? payload.teacher_instructions,
-            student_instructions: payload.studentInstructions ?? payload.student_instructions,
-            materials: payload.materials,
-            estimated_minutes: estimatedMinutes === '' || estimatedMinutes === null || estimatedMinutes === undefined
-                ? null
-                : Number.isInteger(parsedEstimatedMinutes)
-                    ? parsedEstimatedMinutes
-                    : null,
-            student_output: payload.studentOutput ?? payload.student_output,
-            makeup_instructions: payload.makeupInstructions ?? payload.makeup_instructions,
-            assessment_purpose: payload.assessmentPurpose || payload.assessment_purpose || 'formative',
-            activity_data: payload.activityData || payload.activity_data || {},
-            target_grades: normalizeTextArray(targetGrades),
-            target_sections: normalizeTextArray(targetSections, { uppercase: true }),
-            available_from: payload.availableFrom || payload.available_from || null,
-            due_date: payload.dueDate || payload.due_date || null,
-            week_label: payload.weekLabel || payload.week_label || '',
-            status: payload.status || 'active',
-            assigned_by: payload.assignedBy || payload.assigned_by || null,
-            updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
-        });
-    }
-
-    if (tableName === 'classroom_activity_submissions') {
-        return cleanUndefined({
-            id: id || payload.id,
-            assignment_id: payload.assignmentId || payload.assignment_id,
-            student_id: payload.studentId || payload.student_id,
-            student_profile: payload.studentProfile ? normalizeProfile(payload.studentProfile) : payload.student_profile,
-            status: payload.status || 'draft',
-            response_data: payload.responseData || payload.response_data || {},
-            response_data_storage_path: payload.responseDataStoragePath ?? payload.response_data_storage_path,
-            response_data_storage_size_bytes: payload.responseDataStorageSizeBytes ?? payload.response_data_storage_size_bytes,
-            response_data_storage_updated_at: payload.responseDataStorageUpdatedAt || payload.response_data_storage_updated_at
-                ? timestampToIso(payload.responseDataStorageUpdatedAt || payload.response_data_storage_updated_at)
-                : undefined,
-            started_at: payload.startedAt ? timestampToIso(payload.startedAt) : undefined,
-            submitted_at: payload.submittedAt === null || payload.submitted_at === null
-                ? null
-                : payload.submittedAt || payload.submitted_at
-                    ? timestampToIso(payload.submittedAt || payload.submitted_at)
-                    : undefined,
             updated_at: payload.updatedAt ? timestampToIso(payload.updatedAt) : undefined
         });
     }

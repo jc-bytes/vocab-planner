@@ -64,7 +64,6 @@ function bindOverviewListeners(manager) {
     $('#overview-create-vocab-btn')?.addEventListener('click', () => manager.startNewVocab());
     $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection('students'));
     $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection('vocabulary'));
-    $('#overview-activities-btn')?.addEventListener('click', () => manager.showTeacherSection('activities'));
     $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
     $('#overview-settings-btn')?.addEventListener('click', () => manager.showTeacherSection('data-settings'));
     $('#overview-export-btn')?.addEventListener('click', () => {
@@ -91,8 +90,6 @@ export function initTeacherGlobalListeners(manager) {
         }
     });
     setupModal('#quiz-modal', { dismissible: true });
-    setupModal('#activity-template-modal', { dismissible: true });
-    setupModal('#activity-assignment-modal', { dismissible: true });
     setupModal('#spark-modal', {
         dismissible: true,
         onClose: () => {

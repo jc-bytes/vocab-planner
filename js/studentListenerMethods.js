@@ -30,17 +30,11 @@ class StudentListenerMethods {
 
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
-        window.addEventListener('storage', event => {
-            this.classroomActivities?.handleLocalSubmissionStorageEvent?.(event)?.catch(error => {
-                console.warn('Could not process classroom draft storage event:', error);
-            });
-        });
         window.addEventListener('resize', () => this.setStudentMobileMenu(false));
         window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
         window.addEventListener('pagehide', (event) => {
             this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
             this.saveStudentSectionScroll($('.view.active')?.id || '');
-            this.classroomActivities?.flushLocalDraft?.({ quiet: true });
         });
         window.addEventListener('pageshow', (event) => {
             if (this.shouldDebugStudentDom()) console.log('PAGESHOW', event.persisted);
@@ -56,7 +50,6 @@ class StudentListenerMethods {
             });
             if (document.hidden) {
                 this.saveStudentSectionScroll(activeViewId);
-                this.classroomActivities?.flushLocalDraft?.({ quiet: true });
             }
         });
 
@@ -103,44 +96,8 @@ class StudentListenerMethods {
             this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
         });
 
-        this.addListener('#student-tab-classroom-activities', 'click', () => {
-            this.navigateTo({ view: 'classroom-activities' });
-        });
-
-        this.addListener('#back-to-classroom-activities-btn', 'click', async () => {
-            await this.classroomActivities?.flushLocalDraft?.({ statusText: 'Draft saved on this device.' });
-            this.navigateTo({
-                view: 'classroom-activities',
-                ...this.studentClassroomActivityDrilldown
-            });
-        });
-
-        this.addListener('#student-save-classroom-activity-btn', 'click', () => {
-            this.classroomActivities.saveCurrentSubmission({ notifyOnError: true });
-        });
-
-        this.addListener('#student-export-classroom-activity-pdf-btn', 'click', () => {
-            this.classroomActivities.exportCurrentActivityPdf();
-        });
-
-        this.addListener('#student-submit-classroom-activity-btn', 'click', () => {
-            this.classroomActivities.submitCurrentActivity();
-        });
-
         this.addListener('#mobile-edit-profile-btn', 'click', () => {
             this.auth.checkProfile(true);
-        });
-
-        this.addListener('#student-load-newer-classroom-draft-btn', 'click', () => {
-            this.classroomActivities.reloadNewestDraft();
-        });
-
-        this.addListener('#student-toggle-classroom-instructions-btn', 'click', () => {
-            this.toggleClassroomInstructions();
-        });
-
-        this.addListener('#student-close-classroom-instructions-btn', 'click', () => {
-            this.setClassroomInstructionsCollapsed(true);
         });
 
         this.addListener('#student-tab-arcade', 'click', () => {

@@ -1,8 +1,8 @@
 import { createElement, $ } from './main.js';
 import { imageDB } from './db.js';
 import { jsPDF } from 'jspdf';
-import { PDF_PAGE_FORMAT } from './classroomActivityPdfStyles.js';
 
+const PDF_PAGE_FORMAT = 'letter';
 const WORD_HUNT_TEXT_RULES = {
     definition: { minChars: 12, minWords: 3 },
     example: { minChars: 18, minWords: 4 }

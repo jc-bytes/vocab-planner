@@ -5,13 +5,6 @@ import { installSupabaseStudentWriteMethods } from './supabaseStudentWriteMethod
 import { installSupabaseStorageMethods } from './supabaseStorageMethods.js';
 
 export {
-    CLASSROOM_ACTIVITY_IMAGE_BUCKET,
-    CLASSROOM_ACTIVITY_IMAGE_MAX_BYTES,
-    CLASSROOM_SCENE_BUCKET,
-    CLASSROOM_SCENE_MAX_BYTES,
-    EXTERNAL_ARTIFACT_ALLOWED_MIME_TYPES,
-    EXTERNAL_ARTIFACT_BUCKET,
-    EXTERNAL_ARTIFACT_MAX_BYTES,
     WORD_HUNT_IMAGE_BUCKET,
     getCurrentSchoolYear,
     slugifyStoragePart

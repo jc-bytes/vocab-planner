@@ -126,7 +126,6 @@ class StudentActivityHomeMethods {
             })
             .slice(0, 3);
 
-        const classroomItems = await this.getHomeClassroomItems(today);
         const vocabularyPendingItems = decoratedVocabs
             .filter(item => {
                 if (item.progress.isComplete) return false;
@@ -138,15 +137,13 @@ class StudentActivityHomeMethods {
             .slice(-3)
             .reverse();
 
-        const pendingItems = [
-            ...classroomItems.pending,
-            ...vocabularyPendingItems
-        ].sort((a, b) => b.sortTime - a.sortTime).slice(0, 4);
+        const pendingItems = vocabularyPendingItems
+            .sort((a, b) => b.sortTime - a.sortTime)
+            .slice(0, 4);
 
-        const weekItems = [
-            ...vocabularyThisWeekItems,
-            ...classroomItems.week
-        ].sort((a, b) => a.sortTime - b.sortTime).slice(0, 4);
+        const weekItems = vocabularyThisWeekItems
+            .sort((a, b) => a.sortTime - b.sortTime)
+            .slice(0, 4);
 
         const panels = [
             {
@@ -164,7 +161,7 @@ class StudentActivityHomeMethods {
             {
                 key: 'week',
                 title: 'This Week',
-                subtitle: 'Current units and activities',
+                subtitle: 'Current vocabulary units',
                 items: weekItems,
                 emptyText: 'No work is scheduled this week.'
             }
@@ -205,8 +202,7 @@ class StudentActivityHomeMethods {
 
     isVocabScheduleInCurrentWeek(schedule = {}, date = new Date()) {
         if (!(schedule.dueDate instanceof Date) || Number.isNaN(schedule.dueDate.getTime())) return false;
-        const classroom = this.sm.classroomActivities;
-        const bounds = classroom?.getCurrentWeekBounds?.(date) || this.getHomeCurrentWeekBounds(date);
+        const bounds = this.getHomeCurrentWeekBounds(date);
         const scheduleTime = schedule.dueDate.getTime();
         return scheduleTime >= bounds.start && scheduleTime <= bounds.end;
     }
@@ -220,51 +216,6 @@ class StudentActivityHomeMethods {
         end.setDate(end.getDate() + 6);
         end.setHours(23, 59, 59, 999);
         return { start: start.getTime(), end: end.getTime() };
-    }
-
-    async getHomeClassroomItems(today = new Date()) {
-        const classroom = this.sm.classroomActivities;
-        if (!classroom) return { pending: [], week: [] };
-
-        try {
-            const [assignments] = await Promise.all([
-                classroom.loadAssignments(),
-                classroom.loadSubmissions()
-            ]);
-            const visibleAssignments = classroom.filterClassroomAssignmentsForCurrentWindow(assignments, today);
-            const weekAssignmentIds = new Set(classroom.getThisWeekAssignments(visibleAssignments).map(assignment => assignment.id));
-            const mapAssignment = assignment => this.createHomeClassroomItem(classroom, assignment, today);
-
-            return {
-                pending: visibleAssignments
-                    .map(mapAssignment)
-                    .filter(item => !item.isComplete),
-                week: visibleAssignments
-                    .filter(assignment => weekAssignmentIds.has(assignment.id))
-                    .map(mapAssignment)
-            };
-        } catch (error) {
-            console.error('Failed to load dashboard classroom activities:', error);
-            return { pending: [], week: [] };
-        }
-    }
-
-    createHomeClassroomItem(classroom, assignment, today = new Date()) {
-        const submission = classroom.getSubmissionForAssignment(assignment.id);
-        const placement = classroom.getAssignmentCalendarPlacement(assignment, today);
-        const dueTime = assignment.dueDate ? classroom.dueDateEndMillis(assignment.dueDate) : 0;
-        const startTime = placement.scheduledStart?.getTime?.() || classroom.getAssignmentSortValue(assignment);
-        const status = submission?.status || 'not-started';
-        return {
-            kind: 'activity',
-            id: `activity:${assignment.id}`,
-            assignment,
-            submission,
-            placement,
-            status,
-            isComplete: Boolean(submission?.id && status === 'submitted'),
-            sortTime: dueTime || startTime || 0
-        };
     }
 
     normalizeSpark(spark = {}) {
@@ -460,7 +411,6 @@ class StudentActivityHomeMethods {
     }
 
     createHomeWorkCard(item) {
-        if (item.kind === 'activity') return this.createHomeClassroomCard(item);
         return this.createHomeUnitCard(item);
     }
 
@@ -495,36 +445,6 @@ class StudentActivityHomeMethods {
         return card;
     }
 
-    createHomeClassroomCard(item) {
-        const { assignment, placement, status } = item;
-        const subject = getSubjectBySlug(this.sm.subjects, assignment.subjectSlug || this.sm.selectedSubjectSlug || 'technology');
-        const classroom = this.sm.classroomActivities;
-        const statusLabel = item.isComplete
-            ? 'Submitted'
-            : status === 'draft'
-                ? 'In progress'
-                : 'Open';
-        const context = placement.weekLabel && placement.weekLabel !== 'Unscheduled'
-            ? `${classroom.getMonthLabel(placement.month)} ${placement.weekLabel}`
-            : assignment.weekLabel || classroom.formatDueDate(assignment.dueDate);
-        const card = createElement('button', 'student-home-unit student-home-activity');
-        card.type = 'button';
-        card.innerHTML = `
-            <div class="student-home-unit-icon"><i data-lucide="clipboard-list"></i></div>
-            <div class="student-home-unit-copy">
-                <strong>${escapeHtml(assignment.title || 'Classroom Activity')}</strong>
-                <span>Activity · ${escapeHtml(subject.name)} · ${escapeHtml(context)}</span>
-            </div>
-            <div class="student-home-unit-status">
-                <span>${escapeHtml(statusLabel)}</span>
-                <i data-lucide="chevron-right"></i>
-            </div>
-        `;
-        card.addEventListener('click', () => {
-            this.sm.navigateTo({ view: 'classroom-activity', assignmentId: assignment.id });
-        });
-        return card;
-    }
 }
 
 export function installStudentActivityHomeMethods(StudentActivities) {

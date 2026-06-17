@@ -1,35 +1,14 @@
 import { execFile, spawn } from 'node:child_process';
-import { Buffer } from 'node:buffer';
 import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
-
-import { createDefaultCardSortTemplate } from '../../js/activityCardSort.js';
-import { createDefaultSpreadsheetTemplate } from '../../js/activitySpreadsheetTable.js';
-import { normalizeImageHotspotTemplate } from '../../js/activityImageHotspot.js';
-import { createDefaultExternalArtifactTemplate } from '../../js/activityExternalArtifact.js';
-import { createDefaultFlowchartTemplate } from '../../js/activityFlowchartAlgorithm.js';
 
 export const AUDIT_PASSWORD = 'AuditPass123!';
 export const AUDIT_TEACHER_EMAIL = 'audit.teacher@aid.edu.pa';
 export const AUDIT_STUDENT_EMAIL = 'audit.student@aid.edu.pa';
-export const AUDIT_ASSIGNMENT_IDS = [
-    'audit-card-sort',
-    'audit-spreadsheet-table',
-    'audit-image-hotspot',
-    'audit-external-artifact',
-    'audit-flowchart-algorithm'
-];
 export const AUDIT_SPARK_IDS = [
     'audit-current-spark',
     'audit-future-spark'
 ];
-
-const AUDIT_IMAGE_BUCKET = 'classroom-activity-images';
-const AUDIT_IMAGE_PATH = 'audit/release-hardening.webp';
-const AUDIT_IMAGE_WEBP = Buffer.from(
-    'UklGRjoAAABXRUJQVlA4IC4AAACQAQCdASoCAAIAAgA0JQBOgB6No3QA/sIQ9ivQIgL+1T1RXCZ2rY+z4THomAAA',
-    'base64'
-);
 
 function execFileText(command, args, options = {}) {
     return new Promise((resolve, reject) => {
@@ -123,66 +102,34 @@ export function createLocalAdminClient(status) {
     });
 }
 
-async function findUserByEmail(admin, email) {
-    const target = String(email).toLowerCase();
-    let page = 1;
-    while (page < 20) {
-        const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
-        if (error) throw error;
-        const user = (data?.users || []).find(item => String(item.email || '').toLowerCase() === target);
-        if (user) return user;
-        if (!data?.users?.length || data.users.length < 1000) return null;
-        page += 1;
-    }
-    throw new Error(`Could not find user ${email}; local Auth user list exceeded audit search limit.`);
-}
+async function upsertAuthUser(admin, { email, password, metadata = {} }) {
+    const { data: existing, error: listError } = await admin.auth.admin.listUsers();
+    if (listError) throw listError;
 
-async function ensureAuditUser(admin, { email, password, firstName, lastName }) {
-    let user = await findUserByEmail(admin, email);
-    const attributes = {
+    const current = existing.users.find(user => user.email?.toLowerCase() === email.toLowerCase());
+    if (current) {
+        const { data, error } = await admin.auth.admin.updateUserById(current.id, {
+            password,
+            email_confirm: true,
+            user_metadata: metadata
+        });
+        if (error) throw error;
+        return data.user;
+    }
+
+    const { data, error } = await admin.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: {
-            first_name: firstName,
-            last_name: lastName,
-            full_name: `${firstName} ${lastName}`
-        }
-    };
-
-    if (!user) {
-        const { data, error } = await admin.auth.admin.createUser(attributes);
-        if (error) {
-            const message = String(error.message || '').toLowerCase();
-            if (!message.includes('already') && !message.includes('registered')) throw error;
-            user = await findUserByEmail(admin, email);
-        } else {
-            user = data?.user;
-        }
-    } else {
-        const { data, error } = await admin.auth.admin.updateUserById(user.id, attributes);
-        if (error) throw error;
-        user = data?.user || user;
-    }
-
-    if (!user?.id) throw new Error(`Could not create or update local audit user ${email}.`);
-    return user;
-}
-
-function auditStudentProfile() {
-    return {
-        firstName: 'Audit',
-        lastName: 'Student',
-        name: 'Audit Student',
-        email: AUDIT_STUDENT_EMAIL,
-        grade: '6',
-        group: 'A'
-    };
+        user_metadata: metadata
+    });
+    if (error) throw error;
+    return data.user;
 }
 
 function auditVisibleFromDate() {
     const date = new Date();
-    date.setUTCDate(date.getUTCDate() - 1);
+    date.setDate(date.getDate() - 1);
     return date.toISOString().slice(0, 10);
 }
 
@@ -192,17 +139,15 @@ async function seedAuditUsers(admin) {
         .upsert({ email: AUDIT_TEACHER_EMAIL, active: true }, { onConflict: 'email' })
         .throwOnError();
 
-    const teacher = await ensureAuditUser(admin, {
+    const teacher = await upsertAuthUser(admin, {
         email: AUDIT_TEACHER_EMAIL,
         password: AUDIT_PASSWORD,
-        firstName: 'Audit',
-        lastName: 'Teacher'
+        metadata: { first_name: 'Audit', last_name: 'Teacher' }
     });
-    const student = await ensureAuditUser(admin, {
+    const student = await upsertAuthUser(admin, {
         email: AUDIT_STUDENT_EMAIL,
         password: AUDIT_PASSWORD,
-        firstName: 'Audit',
-        lastName: 'Student'
+        metadata: { first_name: 'Audit', last_name: 'Student' }
     });
 
     await admin
@@ -213,10 +158,7 @@ async function seedAuditUsers(admin) {
                 role: 'teacher',
                 first_name: 'Audit',
                 last_name: 'Teacher',
-                email: AUDIT_TEACHER_EMAIL,
-                grade_level: null,
-                section_letter: null,
-                must_change_password: false
+                email: AUDIT_TEACHER_EMAIL
             },
             {
                 user_id: student.id,
@@ -232,188 +174,20 @@ async function seedAuditUsers(admin) {
         .throwOnError();
 
     await admin
-        .from('student_progress')
-        .upsert({
-            user_id: student.id,
-            student_profile: auditStudentProfile(),
-            units: {},
-            coins: 0,
-            coin_data: {
-                balance: 0,
-                giftCoins: 0,
-                totalEarned: 0,
-                totalSpent: 0,
-                totalGifted: 0
-            },
-            coin_history: []
-        }, { onConflict: 'user_id' })
+        .rpc('provision_student_progress_for_account', {
+            p_student_id: student.id,
+            p_student_profile: {
+                firstName: 'Audit',
+                lastName: 'Student',
+                name: 'Audit Student',
+                email: AUDIT_STUDENT_EMAIL,
+                grade: '6',
+                group: 'A'
+            }
+        })
         .throwOnError();
 
     return { teacher, student };
-}
-
-async function seedAuditImage(admin) {
-    const { error } = await admin
-        .storage
-        .from(AUDIT_IMAGE_BUCKET)
-        .upload(AUDIT_IMAGE_PATH, AUDIT_IMAGE_WEBP, {
-            cacheControl: '3600',
-            contentType: 'image/webp',
-            upsert: true
-        });
-    if (error) throw error;
-    return {
-        storagePath: AUDIT_IMAGE_PATH,
-        width: 1,
-        height: 1,
-        altText: 'Release audit image',
-        sizeBytes: AUDIT_IMAGE_WEBP.length,
-        uploadedAt: new Date().toISOString()
-    };
-}
-
-function buildAuditAssignments({ teacherId, image }) {
-    const cardSortTemplate = {
-        ...createDefaultCardSortTemplate('category-sort'),
-        prompt: 'Sort the audit cards.',
-        helperText: 'Release audit seed data.',
-        categories: [
-            { id: 'hardware', title: 'Hardware', helperText: 'Physical technology.' },
-            { id: 'software', title: 'Software', helperText: 'Programs and apps.' }
-        ],
-        cards: [
-            { id: 'keyboard', text: 'Keyboard', helperText: '', expectedCategoryId: 'hardware', expectedOrder: 1 },
-            { id: 'browser', text: 'Web browser', helperText: '', expectedCategoryId: 'software', expectedOrder: 1 }
-        ]
-    };
-    const spreadsheetTemplate = {
-        ...createDefaultSpreadsheetTemplate('data-table'),
-        columns: [
-            { id: 'item', title: 'Item', type: 'text', width: 150 },
-            { id: 'value', title: 'Value', type: 'number', width: 110 }
-        ],
-        seedData: [['', '']],
-        minRows: 1,
-        maxRows: 4,
-        allowAddRows: true,
-        chart: { enabled: true, type: 'bar', labelColumnId: 'item', valueColumnId: 'value' },
-        reflectionPrompts: [
-            { id: 'pattern', prompt: 'What does the audit data show?', required: true }
-        ]
-    };
-    const imageHotspotTemplate = normalizeImageHotspotTemplate({
-        templateId: 'label-image-parts',
-        image,
-        labels: [
-            { id: 'audit_marker', text: 'Audit marker', hint: '', required: true, color: '#2563eb' }
-        ],
-        minPins: 1,
-        maxPins: 1,
-        allowExtraPins: false,
-        requireNotes: false,
-        reflectionPrompts: [
-            { id: 'evidence', prompt: 'What did you label?', required: true }
-        ]
-    });
-    const externalArtifactTemplate = {
-        ...createDefaultExternalArtifactTemplate('project-evidence'),
-        prompt: 'Submit local audit evidence.',
-        helperText: 'Upload the tiny audit file and include the audit link.',
-        evidenceMode: 'both',
-        linkLabel: 'Audit evidence link',
-        uploadLabel: 'Audit screenshot or PDF',
-        checklistItems: [
-            { id: 'audit_ready', text: 'My audit evidence is ready.', required: true }
-        ],
-        reflectionPrompts: [
-            { id: 'audit_reflection', prompt: 'What evidence did you submit?', required: true }
-        ]
-    };
-    const flowchartTemplate = {
-        ...createDefaultFlowchartTemplate('sensor-response'),
-        prompt: 'Build the local audit sensor-response algorithm.',
-        helperText: 'Confirm the starter nodes and explain the audit condition.',
-        checklistItems: [
-            { id: 'audit_flow_ready', text: 'My audit flowchart has input, condition, output, and end.', required: true }
-        ],
-        reflectionPrompts: [
-            { id: 'audit_flow_reflection', prompt: 'What does the audit flowchart check?', required: true }
-        ]
-    };
-
-    const base = {
-        source_activity_id: null,
-        description: 'Local release audit assignment.',
-        subject_slug: 'technology',
-        grades: ['6'],
-        teacher_instructions: 'Local release audit only.',
-        student_instructions: 'Complete the local release audit check.',
-        materials: 'Audit seed data',
-        estimated_minutes: 5,
-        student_output: 'Submitted audit response.',
-        makeup_instructions: '',
-        assessment_purpose: 'formative',
-        target_grades: ['6'],
-        target_sections: ['A'],
-        available_from: auditVisibleFromDate(),
-        due_date: null,
-        week_label: 'Local release audit',
-        status: 'active',
-        assigned_by: teacherId
-    };
-
-    return [
-        {
-            ...base,
-            id: 'audit-card-sort',
-            title: 'Audit Card Sort',
-            activity_type: 'card-sort',
-            activity_data: {
-                templateId: 'category-sort',
-                cardSortTemplate
-            }
-        },
-        {
-            ...base,
-            id: 'audit-spreadsheet-table',
-            title: 'Audit Spreadsheet Table',
-            activity_type: 'spreadsheet-table',
-            activity_data: {
-                templateId: 'data-table',
-                spreadsheetTemplate
-            }
-        },
-        {
-            ...base,
-            id: 'audit-image-hotspot',
-            title: 'Audit Image Hotspot',
-            activity_type: 'image-hotspot',
-            activity_data: {
-                templateId: 'label-image-parts',
-                imageHotspotTemplate
-            }
-        },
-        {
-            ...base,
-            id: 'audit-external-artifact',
-            title: 'Audit External Artifact',
-            activity_type: 'external-artifact',
-            activity_data: {
-                templateId: 'project-evidence',
-                externalArtifactTemplate
-            }
-        },
-        {
-            ...base,
-            id: 'audit-flowchart-algorithm',
-            title: 'Audit Flowchart Algorithm',
-            activity_type: 'flowchart-algorithm',
-            activity_data: {
-                templateId: 'sensor-response',
-                flowchartTemplate
-            }
-        }
-    ];
 }
 
 function buildAuditSparks({ teacherId }) {
@@ -421,10 +195,10 @@ function buildAuditSparks({ teacherId }) {
         {
             id: 'audit-current-spark',
             spark_type: 'cool_fact',
-            title: 'Audit Spark',
-            spark_text: 'Technology can help a class turn one small idea into something everyone can test.',
-            why_it_matters: 'Students practice noticing how tools solve real classroom problems.',
-            question: 'What classroom problem could technology help us improve this week?',
+            title: 'Current Audit Spark',
+            spark_text: 'This Spark is visible to the audit student.',
+            why_it_matters: 'Students practice connecting vocabulary to real technology ideas.',
+            question: 'What technology word helped you explain an idea this week?',
             source_title: 'Local audit seed',
             source_url: '',
             subject_slug: 'technology',
@@ -439,7 +213,7 @@ function buildAuditSparks({ teacherId }) {
             title: 'Future Audit Spark',
             spark_text: 'This Spark should stay hidden until its scheduled date arrives.',
             why_it_matters: 'Future scheduled Sparks should not appear early for students.',
-            question: 'Why is scheduling useful for classroom routines?',
+            question: 'Why is scheduling useful for class routines?',
             source_title: 'Local audit seed',
             source_url: '',
             subject_slug: 'technology',
@@ -451,32 +225,18 @@ function buildAuditSparks({ teacherId }) {
     ];
 }
 
-export async function resetAuditSubmissions(admin) {
-    await admin
-        .from('classroom_activity_submissions')
-        .delete()
-        .in('assignment_id', AUDIT_ASSIGNMENT_IDS)
-        .throwOnError();
-}
-
-export async function seedLocalAuditData({ resetSubmissions = false } = {}) {
+export async function seedLocalAuditData() {
     const status = await readLocalSupabaseStatus();
     await runCommand('supabase', ['migration', 'up', '--local'], { stdio: 'ignore' });
     const admin = createLocalAdminClient(status);
     const users = await seedAuditUsers(admin);
-    const image = await seedAuditImage(admin);
-
-    await admin
-        .from('classroom_activity_assignments')
-        .upsert(buildAuditAssignments({ teacherId: users.teacher.id, image }), { onConflict: 'id' })
-        .throwOnError();
 
     const auditSparks = buildAuditSparks({ teacherId: users.teacher.id });
     await admin
         .from('weekly_sparks')
         .delete()
         .eq('subject_slug', 'technology')
-        .in('scheduled_date', auditSparks.map(spark => spark.scheduled_date))
+        .in('id', AUDIT_SPARK_IDS)
         .throwOnError();
 
     await admin
@@ -484,13 +244,10 @@ export async function seedLocalAuditData({ resetSubmissions = false } = {}) {
         .upsert(auditSparks, { onConflict: 'id' })
         .throwOnError();
 
-    if (resetSubmissions) await resetAuditSubmissions(admin);
-
     return {
         status,
         admin,
-        browserConfig: getBrowserSupabaseConfig(status),
         users,
-        assignmentIds: [...AUDIT_ASSIGNMENT_IDS]
+        browserConfig: getBrowserSupabaseConfig(status)
     };
 }

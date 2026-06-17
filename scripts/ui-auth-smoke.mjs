@@ -4,7 +4,6 @@ import process from 'node:process';
 import { chromium } from 'playwright';
 
 import {
-    AUDIT_ASSIGNMENT_IDS,
     AUDIT_PASSWORD,
     AUDIT_STUDENT_EMAIL,
     AUDIT_TEACHER_EMAIL,
@@ -123,189 +122,12 @@ async function loginStudent(page) {
     if (errorText?.trim()) throw new Error(`Student login failed: ${errorText.trim()}`);
 }
 
-async function getStudentActivityStatus(page) {
-    return page.locator('#student-classroom-activity-save-status').textContent().catch(() => '');
-}
-
-async function openStudentAssignment(page, assignmentId, titlePattern, readyPattern, options = {}) {
-    await page.goto(`${baseUrl}/student.html#/classroom-activities/${encodeURIComponent(assignmentId)}`, {
-        waitUntil: 'domcontentloaded'
-    });
-    await waitForApp(page);
-    await page.locator('#student-classroom-activity-view:not(.hidden)').waitFor({ timeout: 15000 });
-    await page.locator('#student-classroom-activity-title').filter({ hasText: titlePattern }).waitFor({ timeout: 15000 });
-    try {
-        await page.waitForFunction(expectedAssignmentId => {
-            return window.studentApp?.classroomActivities?.currentSubmission?.assignmentId === expectedAssignmentId;
-        }, assignmentId, { timeout: 15000 });
-    } catch (error) {
-        const state = await page.evaluate(() => {
-            const activity = window.studentApp?.classroomActivities;
-            return {
-                hash: window.location.hash,
-                title: document.querySelector('#student-classroom-activity-title')?.textContent || '',
-                currentAssignmentId: activity?.currentAssignment?.id || '',
-                currentSubmissionId: activity?.currentSubmission?.id || '',
-                currentSubmissionAssignmentId: activity?.currentSubmission?.assignmentId || '',
-                activeAssignmentLoadId: activity?.activeAssignmentLoadId || ''
-            };
-        });
-        throw new Error(`${assignmentId} app state did not become active. State: ${JSON.stringify(state)}. ${error.message}`);
-    }
-    try {
-        await page.waitForFunction(pattern => {
-            const text = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
-            return new RegExp(pattern).test(text)
-                || /Saved locally|Cloud sync pending|Cloud retry pending|Draft saved/i.test(text);
-        }, readyPattern.source, { timeout: 30000 });
-    } catch (error) {
-        const statusText = (await getStudentActivityStatus(page))?.trim();
-        if (options.readySelector && await page.locator(options.readySelector).first().isVisible().catch(() => false)) {
-            return;
-        }
-        throw new Error(`${assignmentId} did not become ready. Current status: ${statusText || 'empty'}. ${error.message}`);
-    }
-
-    if (options.readySelector) {
-        await page.locator(options.readySelector).first().waitFor({ state: 'visible', timeout: 15000 });
-    }
-}
-
-async function submitOpenAssignment(page, label) {
-    const submitButton = page.locator('#student-submit-classroom-activity-btn');
-    await submitButton.scrollIntoViewIfNeeded();
-    await page.evaluate(async () => {
-        await window.studentApp?.classroomActivities?.submitCurrentActivity?.();
-    });
-    try {
-        await page.waitForFunction(() => {
-            const status = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
-            const submit = document.querySelector('#student-submit-classroom-activity-btn')?.textContent || '';
-            return /Submission saved|Activity submitted|Submitted/i.test(status)
-                || /Resubmit/i.test(submit)
-                || /Complete:|failed|unavailable|locally/i.test(status);
-        }, null, { timeout: 30000 });
-    } catch (error) {
-        const statusText = (await getStudentActivityStatus(page))?.trim();
-        const buttonText = (await submitButton.textContent().catch(() => ''))?.trim();
-        const buttonDisabled = await submitButton.isDisabled().catch(() => false);
-        const detail = problems.length ? `\nBrowser problems:\n${problems.join('\n')}` : '';
-        throw new Error(`${label} submit did not finish. Status: ${statusText || 'empty'}. Button: ${buttonText || 'empty'} (${buttonDisabled ? 'disabled' : 'enabled'}). ${error.message}${detail}`);
-    }
-
-    const statusText = await page.locator('#student-classroom-activity-save-status').textContent().catch(() => '');
-    if (/complete|required|failed|unavailable|locally/i.test(statusText || '')) {
-        const detail = problems.length ? `\nBrowser problems:\n${problems.join('\n')}` : '';
-        throw new Error(`${label} did not submit cleanly: ${statusText}${detail}`);
-    }
-}
-
-async function submitCardSort(page) {
-    await openStudentAssignment(page, 'audit-card-sort', /Audit Card Sort/, /Card sort ready/i);
-    await page.locator('[data-card-sort-target-select="keyboard"]').selectOption('hardware');
-    await page.locator('[data-card-sort-target-select="browser"]').selectOption('software');
-    await submitOpenAssignment(page, 'Card sort');
-}
-
-async function submitSpreadsheet(page) {
-    await openStudentAssignment(page, 'audit-spreadsheet-table', /Audit Spreadsheet Table/, /Spreadsheet ready/i);
-    await page.locator('[data-spreadsheet-cell][data-spreadsheet-row="1"][data-spreadsheet-column="0"]').fill('Audit row');
-    await page.locator('[data-spreadsheet-cell][data-spreadsheet-row="1"][data-spreadsheet-column="1"]').fill('7');
-    await page.locator('[data-spreadsheet-reflection-id="pattern"]').fill('The local audit row saved correctly.');
-    await page.locator('[data-spreadsheet-generate-chart]').click();
-    await page.waitForTimeout(500);
-    await submitOpenAssignment(page, 'Spreadsheet');
-}
-
-async function submitImageHotspot(page) {
-    await openStudentAssignment(page, 'audit-image-hotspot', /Audit Image Hotspot/, /Image activity ready/i, {
-        readySelector: '[data-image-hotspot-stage]'
-    });
-    const image = page.locator('[data-image-hotspot-stage] img');
-    await image.waitFor({ state: 'visible', timeout: 15000 });
-    const box = await image.boundingBox();
-    if (!box) throw new Error('Image hotspot image is not clickable.');
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-    await page.locator('[data-image-hotspot-pin-id]').first().waitFor({ state: 'visible', timeout: 10000 });
-    await page.locator('[data-image-hotspot-reflection="evidence"]').fill('The audit marker was placed.');
-    await submitOpenAssignment(page, 'Image hotspot');
-}
-
-async function submitExternalArtifact(page) {
-    await openStudentAssignment(page, 'audit-external-artifact', /Audit External Artifact/, /Evidence activity ready/i);
-    await page.locator('[data-external-artifact-link]').fill('https://example.com/audit-evidence');
-    await page.locator('[data-external-artifact-upload]').setInputFiles({
-        name: 'audit-evidence.png',
-        mimeType: 'image/png',
-        buffer: Buffer.from(
-            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
-            'base64'
-        )
-    });
-    await page.waitForFunction(() => {
-        const status = document.querySelector('#student-classroom-activity-save-status')?.textContent || '';
-        return /Evidence uploaded|Evidence activity ready|Draft saved|Submission saved/i.test(status);
-    }, null, { timeout: 30000 });
-    await page.locator('[data-external-artifact-check="audit_ready"]').check();
-    await page.locator('[data-external-artifact-reflection="audit_reflection"]').fill('The audit link and file were submitted.');
-    await submitOpenAssignment(page, 'External artifact');
-}
-
-async function submitFlowchart(page) {
-    await openStudentAssignment(page, 'audit-flowchart-algorithm', /Audit Flowchart Algorithm/, /Flowchart ready/i);
-    await page.locator('[data-flowchart-editor] .react-flow').waitFor({ state: 'visible', timeout: 15000 });
-    await page.locator('[data-flowchart-check="audit_flow_ready"]').check();
-    await page.locator('[data-flowchart-reflection="audit_flow_reflection"]').fill('The audit flowchart checks an input and chooses an output.');
-    await submitOpenAssignment(page, 'Flowchart');
-}
-
-async function waitForSubmitted(admin, assignmentId) {
-    const started = Date.now();
-    let latestRows = [];
-    while (Date.now() - started < 15000) {
-        const { data, error } = await admin
-            .from('classroom_activity_submissions')
-            .select('id,status,submitted_at,updated_at')
-            .eq('assignment_id', assignmentId);
-        if (error) throw error;
-        latestRows = data || [];
-        if (latestRows.some(row => row.status === 'submitted')) return;
-        await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    const detail = problems.length ? ` Browser problems: ${problems.join(' | ')}` : '';
-    throw new Error(`No submitted audit response found for ${assignmentId}. Rows: ${JSON.stringify(latestRows)}.${detail}`);
-}
-
-async function verifyTeacherReview(page, assignmentId, titlePattern) {
-    await page.goto(`${baseUrl}/teacher.html#/teacher/activities/assignment/${encodeURIComponent(assignmentId)}`, {
-        waitUntil: 'domcontentloaded'
-    });
-    await waitForApp(page);
-    await page.locator('#teacher-activity-assignment-view:not(.hidden)').waitFor({ timeout: 15000 });
-    await page.locator('#activity-assignment-title').filter({ hasText: titlePattern }).waitFor({ timeout: 15000 });
-    await page.waitForFunction(() => {
-        const summary = document.querySelector('#activity-submission-summary')?.textContent || '';
-        return /1 submitted/i.test(summary);
-    }, null, { timeout: 30000 });
-    await page.locator('.activity-submission-row.status-submitted').filter({ hasText: /Audit Student/ }).first().waitFor({ timeout: 15000 });
-}
-
-async function verifyTeacherEditor(page) {
-    await page.goto(`${baseUrl}/teacher.html#/teacher/activities/editor`, { waitUntil: 'domcontentloaded' });
-    await waitForApp(page);
-    await page.locator('#activity-type').waitFor({ state: 'visible', timeout: 15000 });
-    const values = await page.locator('#activity-type option').evaluateAll(options => options.map(option => option.value));
-    for (const value of ['card-sort', 'spreadsheet-table', 'image-hotspot', 'external-artifact', 'flowchart-algorithm']) {
-        if (!values.includes(value)) throw new Error(`Teacher editor missing activity type option: ${value}`);
-    }
-}
-
+const problems = [];
 let server = null;
 let browser = null;
-const problems = [];
 
 try {
-    const seeded = await seedLocalAuditData({ resetSubmissions: true });
+    const seeded = await seedLocalAuditData();
     server = await resolveServer();
     browser = await chromium.launch();
 
@@ -320,32 +142,22 @@ try {
     trackPageProblems(studentPage, 'student', problems);
 
     await loginTeacher(teacherPage);
+    await teacherPage.locator('#tab-vocabulary').click();
+    await teacherPage.locator('#teacher-dashboard-view:not(.hidden)').waitFor({ timeout: 15000 });
+    await teacherPage.locator('#tab-sparks').click();
+    await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
+
     await loginStudent(studentPage);
-    await verifyTeacherEditor(teacherPage);
+    await studentPage.locator('#main-menu-view:not(.hidden), #vocab-selection-view:not(.hidden)').first().waitFor({ timeout: 15000 });
+    await studentPage.goto(`${baseUrl}/student.html#/units?all=1`, { waitUntil: 'domcontentloaded' });
+    await studentPage.locator('#vocab-selection-view:not(.hidden)').waitFor({ timeout: 15000 });
 
-    await submitCardSort(studentPage);
-    await waitForSubmitted(seeded.admin, 'audit-card-sort');
-    await submitSpreadsheet(studentPage);
-    await waitForSubmitted(seeded.admin, 'audit-spreadsheet-table');
-    await submitImageHotspot(studentPage);
-    await waitForSubmitted(seeded.admin, 'audit-image-hotspot');
-    await submitExternalArtifact(studentPage);
-    await waitForSubmitted(seeded.admin, 'audit-external-artifact');
-    await submitFlowchart(studentPage);
-    await waitForSubmitted(seeded.admin, 'audit-flowchart-algorithm');
-
-    await verifyTeacherReview(teacherPage, 'audit-card-sort', /Audit Card Sort/);
-    await verifyTeacherReview(teacherPage, 'audit-spreadsheet-table', /Audit Spreadsheet Table/);
-    await verifyTeacherReview(teacherPage, 'audit-image-hotspot', /Audit Image Hotspot/);
-    await verifyTeacherReview(teacherPage, 'audit-external-artifact', /Audit External Artifact/);
-    await verifyTeacherReview(teacherPage, 'audit-flowchart-algorithm', /Audit Flowchart Algorithm/);
-
-    if (problems.length > 0) {
-        throw new Error(`Authenticated UI smoke emitted browser problems:\n${problems.join('\n')}`);
+    if (problems.length) {
+        throw new Error(`Browser errors during auth smoke:\n${problems.join('\n')}`);
     }
 
-    console.log(`Authenticated UI smoke passed for ${AUDIT_ASSIGNMENT_IDS.join(', ')} at ${baseUrl}`);
+    console.log('Authenticated UI smoke passed.');
 } finally {
-    if (browser) await browser.close();
+    await browser?.close().catch(() => {});
     if (server) server.kill();
 }

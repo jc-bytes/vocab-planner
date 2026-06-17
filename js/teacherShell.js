@@ -8,9 +8,6 @@ class TeacherShellMethods {
             'teacher-overview-view',
             'teacher-dashboard-view',
             'teacher-editor-view',
-            'teacher-activities-view',
-            'teacher-activity-editor-view',
-            'teacher-activity-assignment-view',
             'teacher-sparks-view',
             'teacher-progress-view',
             'quiz-maker-view',
@@ -84,9 +81,6 @@ class TeacherShellMethods {
             'teacher-overview-view': 'overview',
             'teacher-dashboard-view': 'vocabulary',
             'teacher-editor-view': 'vocabulary',
-            'teacher-activities-view': 'activities',
-            'teacher-activity-editor-view': 'activities',
-            'teacher-activity-assignment-view': 'activities',
             'teacher-sparks-view': 'sparks',
             'teacher-progress-view': 'students',
             'quiz-maker-view': 'vocabulary',
@@ -150,13 +144,6 @@ class TeacherShellMethods {
                     break;
                 }
                 this.showVocabularyLibrary();
-                break;
-            case 'activities':
-                if (options.editor) {
-                    this.showActivityEditor();
-                    break;
-                }
-                this.showActivityLibrary();
                 break;
             case 'sparks':
                 this.showSparksView();

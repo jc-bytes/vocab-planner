@@ -20,7 +20,6 @@ const allowedScrollableSelectors = [
     '.modal-body',
     '.modal-content',
     '#activity-container',
-    '.activity-excalidraw-root',
     '.excalidraw'
 ];
 
@@ -603,68 +602,18 @@ async function main() {
             ['Teacher Overview', `${baseUrl}/teacher.html#/teacher/overview`],
             ['Teacher Students', `${baseUrl}/teacher.html#/teacher/students`],
             ['Teacher Vocabulary', `${baseUrl}/teacher.html#/teacher/vocabulary`],
-            ['Teacher Activities', `${baseUrl}/teacher.html#/teacher/activities`],
-            ['Teacher Activity Editor', `${baseUrl}/teacher.html#/teacher/activities/editor`, {
-                beforeAudit: async (page) => {
-                    await page.waitForFunction(() => {
-                        const status = document.querySelector('#activity-excalidraw-status')?.textContent?.trim();
-                        return status === 'Editor ready.'
-                            || status === 'Builder ready.'
-                            || status?.startsWith('Editor unavailable.');
-                    }, null, { timeout: 20000 });
-                }
-            }],
             ['Teacher Sparks', `${baseUrl}/teacher.html#/teacher/sparks`],
             ['Teacher Quizzes', `${baseUrl}/teacher.html#/teacher/quizzes`],
             ['Teacher Data Settings', `${baseUrl}/teacher.html#/teacher/data-settings`]
         ];
-        const teacherAssignmentId = await findFirstAssignmentId(
-            teacherPage,
-            `${baseUrl}/teacher.html#/teacher/activities`,
-            '.activity-assignment-card[data-assignment-id]'
-        );
-        if (teacherAssignmentId) {
-            teacherRoutes.push([
-                'Teacher Activity Review',
-                `${baseUrl}/teacher.html#/teacher/activities/assignment/${encodeURIComponent(teacherAssignmentId)}`
-            ]);
-        }
 
         const studentRoutes = [
             ['Student Dashboard', `${baseUrl}/student.html#/menu`],
             ['Student Units', `${baseUrl}/student.html#/units?all=1`],
             ['Student Unit Menu', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`],
             ['Student Flashcards', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product/activity/flashcards`],
-            ['Student Classroom Activities', `${baseUrl}/student.html#/classroom-activities`],
             ['Student Arcade', `${baseUrl}/student.html#/arcade`]
         ];
-        const studentAssignmentId = await findFirstAssignmentId(
-            studentPage,
-            `${baseUrl}/student.html#/classroom-activities`,
-            '.student-classroom-activity-card[data-assignment-id]'
-        );
-        if (studentAssignmentId) {
-            studentRoutes.push([
-                'Student Classroom Activity',
-                `${baseUrl}/student.html#/classroom-activities/${encodeURIComponent(studentAssignmentId)}`,
-                {
-                    beforeAudit: async (page) => {
-                        await page.waitForFunction(() => {
-                            const status = document.querySelector('#student-classroom-activity-save-status')?.textContent?.trim() || '';
-                            return status.includes('Canvas ready')
-                                || status.includes('Response ready')
-                                || status.includes('Card sort ready')
-                                || status.includes('Spreadsheet ready')
-                                || status.includes('Image activity ready')
-                                || status.includes('Draft ready')
-                                || status.includes('Submitted')
-                                || status.includes('Saved locally')
-                                || status.includes('unavailable');
-                        }, null, { timeout: 20000 });
-                    }
-                }
-            ]);
-        }
 
         for (const [label, url, options] of teacherRoutes) {
             await auditRoute(teacherPage, url, label, options);

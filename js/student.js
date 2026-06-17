@@ -3,7 +3,6 @@ import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
 import { StudentActivities } from './student/studentActivities.js';
-import { StudentClassroomActivities } from './student/studentClassroomActivities.js';
 import { installStudentActivityDelegateMethods } from './studentActivityDelegateMethods.js';
 import { installStudentAuthDelegateMethods } from './studentAuthDelegateMethods.js';
 import { installStudentAuthUiMethods } from './studentAuthUiMethods.js';
@@ -91,13 +90,6 @@ class StudentManager {
             month: null
         };
         this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'rows';
-        this.studentClassroomActivityDrilldown = {
-            section: null,
-            trimester: null,
-            month: null,
-            week: null
-        };
-        this.studentClassroomActivityViewMode = localStorage.getItem('student_classroom_activity_view_mode') || 'rows';
         this.studentSectionScrollPositions = {};
         this.cloudSaveTimeout = null;
         this.unitImages = {};
@@ -122,7 +114,6 @@ class StudentManager {
         this.auth = new StudentAuth(this);
         this.progress = new StudentProgress(this);
         this.activities = new StudentActivities(this);
-        this.classroomActivities = new StudentClassroomActivities(this);
         this.games = null;
         this.gamesPromise = null;
 

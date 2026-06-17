@@ -1,43 +1,10 @@
 import JSZip from 'jszip';
 import { Packer } from 'docx';
-import { evaluateFormulaValue, valueToNumber } from '../js/activitySpreadsheetFormula.js';
 import { buildQuizWordDocument } from '../js/quizMakerWordExportMethods.js';
-
-function assertEqual(actual, expected, label) {
-    if (Object.is(actual, expected)) return;
-    throw new Error(`${label}: expected ${expected}, got ${actual}`);
-}
-
-function assertNear(actual, expected, label) {
-    if (Math.abs(actual - expected) < 0.000001) return;
-    throw new Error(`${label}: expected ${expected}, got ${actual}`);
-}
 
 function assertIncludes(text, needle, label) {
     if (text.includes(needle)) return;
     throw new Error(`${label}: expected generated DOCX XML to include "${needle}"`);
-}
-
-function runFormulaTests() {
-    const data = [
-        ['Item', 'Value A', 'Value B', 'Total'],
-        ['Example 1', '4', '3', '=B2+C2'],
-        ['Example 2', '8', '2', '=B3+C3'],
-        ['Example 3', '1', '5', '=B4+C4']
-    ];
-
-    assertEqual(valueToNumber('12', data), 12, 'plain number');
-    assertEqual(valueToNumber('1,200', data), 1200, 'comma number');
-    assertEqual(valueToNumber('', data), null, 'blank number');
-    assertEqual(valueToNumber('not a number', data), null, 'nonnumeric text');
-    assertEqual(evaluateFormulaValue('=B2+C2', data), 7, 'formula addition');
-    assertEqual(evaluateFormulaValue('B2*C2', data), 12, 'formula without equals');
-    assertNear(evaluateFormulaValue('=(B2+C2)/2', data), 3.5, 'parenthesized formula');
-    assertEqual(evaluateFormulaValue('=SUM(B2:B4)', data), 13, 'SUM range');
-    assertNear(evaluateFormulaValue('=AVERAGE(B2:C3)', data), 4.25, 'AVERAGE range');
-    assertEqual(evaluateFormulaValue('=D2*2', data), 14, 'nested formula reference');
-    assertEqual(evaluateFormulaValue('=SUM(', data), null, 'invalid formula');
-    assertEqual(valueToNumber('=A1', [['=A1']]), 0, 'circular formula fallback');
 }
 
 function createQuizFixture() {
@@ -167,7 +134,6 @@ async function runDocxTests() {
     assertIncludes(documentXml, 'Complete the crossword.', 'DOCX crossword');
 }
 
-runFormulaTests();
 await runDocxTests();
 
 console.log('Package refactor tests passed.');
