@@ -1,6 +1,16 @@
 import { $, $$, setupModal } from './main.js';
 import { teacherApi as supabaseService } from './services/teacherApi.js';
 
+const TEACHER_RESIZE_DEBOUNCE_MS = 120;
+
+function debounceTeacherResize(callback) {
+    let timer = null;
+    return () => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(callback, TEACHER_RESIZE_DEBOUNCE_MS);
+    };
+}
+
 function bindTeacherTabs(manager) {
     $$('.teacher-tab').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -74,7 +84,7 @@ function bindOverviewListeners(manager) {
 export function initTeacherGlobalListeners(manager) {
     window.addEventListener('hashchange', () => manager.handleRouteChange());
     window.addEventListener('popstate', () => manager.handleRouteChange());
-    window.addEventListener('resize', () => manager.setTeacherMobileMenu(false));
+    window.addEventListener('resize', debounceTeacherResize(() => manager.setTeacherMobileMenu(false)));
 
     setupModal('#student-detail-modal', {
         dismissible: true,

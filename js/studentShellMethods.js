@@ -27,8 +27,8 @@ class StudentShellMethods {
         }
 
         this.updateStudentNav(viewId);
-        if (window.lucide) {
-            window.lucide.createIcons();
+        if (window.lucide && targetView) {
+            window.lucide.createIcons({ root: targetView });
         }
 
         if (shouldRestoreSectionScroll) {

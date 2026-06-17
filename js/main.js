@@ -228,9 +228,10 @@ export async function fetchJSON(path, options = {}) {
     }
 }
 
-function refreshLucideIcons() {
+function refreshLucideIcons(root = document) {
     if (window.lucide?.createIcons) {
-        window.lucide.createIcons();
+        const iconRoot = root?.querySelectorAll ? root : document;
+        window.lucide.createIcons({ root: iconRoot });
     }
 }
 
@@ -250,7 +251,7 @@ function initPasswordToggles() {
             button.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
             button.title = shouldShow ? 'Hide password' : 'Show password';
             button.innerHTML = `<i data-lucide="${shouldShow ? 'eye-off' : 'eye'}"></i>`;
-            refreshLucideIcons();
+            refreshLucideIcons(button);
             input.focus({ preventScroll: true });
         });
     });

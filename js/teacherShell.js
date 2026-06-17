@@ -2,6 +2,7 @@ import { $, $$ } from './main.js';
 
 class TeacherShellMethods {
     switchView(viewId) {
+        const targetView = document.getElementById(viewId);
         const views = [
             'teacher-loading-view',
             'teacher-login-view',
@@ -29,7 +30,7 @@ class TeacherShellMethods {
         this.setActiveTeacherTab(this.getSectionForView(viewId));
         this.closeTeacherMobileMenu();
         this.updateTeacherRouteForView(viewId);
-        this.refreshIcons();
+        this.refreshIcons(targetView);
     }
 
     showDashboard() {
@@ -70,9 +71,9 @@ class TeacherShellMethods {
         el.setAttribute('aria-label', label);
     }
 
-    refreshIcons() {
+    refreshIcons(root = document) {
         if (window.lucide?.createIcons) {
-            window.lucide.createIcons();
+            window.lucide.createIcons({ root });
         }
     }
 

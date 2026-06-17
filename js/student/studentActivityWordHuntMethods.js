@@ -95,7 +95,7 @@ class StudentActivityWordHuntMethods {
         button.innerHTML = isExporting
             ? '<i data-lucide="loader-circle"></i><span>Generating PDF...</span>'
             : '<i data-lucide="file-down"></i><span>Word Hunt PDF</span>';
-        if (window.lucide?.createIcons) window.lucide.createIcons();
+        if (window.lucide?.createIcons) window.lucide.createIcons({ root: button });
     }
 
     async downloadWordHuntSubmission() {

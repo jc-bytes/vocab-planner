@@ -164,7 +164,7 @@ class StudentActivityBrowserMethods {
                     list.appendChild(row);
                 });
             container.appendChild(list);
-            this.refreshIcons();
+            this.refreshIcons(container);
             return;
         }
 
@@ -186,7 +186,7 @@ class StudentActivityBrowserMethods {
             });
 
         container.appendChild(grid);
-        this.refreshIcons();
+        this.refreshIcons(container);
     }
 
     renderStudentMonthPicker(container, selectedTrimester, monthGroups) {
@@ -212,7 +212,7 @@ class StudentActivityBrowserMethods {
                     list.appendChild(row);
                 });
             container.appendChild(list);
-            this.refreshIcons();
+            this.refreshIcons(container);
             return;
         }
 
@@ -237,7 +237,7 @@ class StudentActivityBrowserMethods {
             });
 
         container.appendChild(grid);
-        this.refreshIcons();
+        this.refreshIcons(container);
     }
 
     renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs) {
@@ -251,7 +251,7 @@ class StudentActivityBrowserMethods {
 
             container.appendChild(list);
             this.scheduleFirstVocabularyPreload(container);
-            this.refreshIcons();
+            this.refreshIcons(container);
             return;
         }
 
@@ -262,7 +262,7 @@ class StudentActivityBrowserMethods {
 
         container.appendChild(grid);
         this.scheduleFirstVocabularyPreload(container);
-        this.refreshIcons();
+        this.refreshIcons(container);
     }
 
     createStudentLibraryChoiceCard({ title, count, meta, icon }) {
@@ -310,9 +310,9 @@ class StudentActivityBrowserMethods {
         return row;
     }
 
-    refreshIcons() {
+    refreshIcons(root = document) {
         if (window.lucide) {
-            window.lucide.createIcons();
+            window.lucide.createIcons({ root });
         }
     }
 
@@ -362,7 +362,7 @@ class StudentActivityBrowserMethods {
             group.appendChild(monthList);
             container.appendChild(group);
         });
-        this.refreshIcons();
+        this.refreshIcons(container);
     }
 
     createVocabularyCard(vocab) {

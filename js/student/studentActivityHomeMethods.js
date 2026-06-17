@@ -196,7 +196,7 @@ class StudentActivityHomeMethods {
         this.scheduleFirstVocabularyPreload(container);
 
         if (window.lucide) {
-            window.lucide.createIcons();
+            window.lucide.createIcons({ root: container });
         }
     }
 
@@ -245,23 +245,31 @@ class StudentActivityHomeMethods {
 
     async fetchCurrentSpark() {
         if (this.sm.authDisabled || !this.sm.currentUser) return null;
-        const db = supabaseService.getDatabase();
         const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
+        const dateValue = getPanamaDateValue();
+        const grade = this.getStudentGradeLevel();
+        const cacheKey = `${subjectSlug}:${grade || 'all'}:${dateValue}`;
+        if (this.sm.currentSparkSessionCache?.has(cacheKey)) {
+            return this.sm.currentSparkSessionCache.get(cacheKey);
+        }
+        const db = supabaseService.getDatabase();
         const snapshot = await getDocs(query(
             collection(db, SPARK_COLLECTION),
             where('subjectSlug', '==', subjectSlug),
             where('status', '==', 'scheduled'),
-            where('scheduledDate', '<=', getPanamaDateValue()),
+            where('scheduledDate', '<=', dateValue),
             orderBy('scheduledDate', 'desc'),
             limit(40)
         ));
         const sparks = snapshot.docs.map(docSnap => this.normalizeSpark({ id: docSnap.id, ...docSnap.data() }));
-        const grade = this.getStudentGradeLevel();
+        let currentSpark = null;
         if (grade) {
             const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
-            if (gradeMatch) return gradeMatch;
+            if (gradeMatch) currentSpark = gradeMatch;
         }
-        return sparks.find(isAllGradeSpark) || null;
+        currentSpark = currentSpark || sparks.find(isAllGradeSpark) || null;
+        this.sm.currentSparkSessionCache?.set(cacheKey, currentSpark);
+        return currentSpark;
     }
 
     async loadAndRenderCurrentSpark(host) {
@@ -275,7 +283,7 @@ class StudentActivityHomeMethods {
             }
             this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:replaceChildren' });
             host.replaceChildren(this.createStudentSparkCard(spark));
-            if (window.lucide) window.lucide.createIcons();
+            if (window.lucide) window.lucide.createIcons({ root: host });
         } catch {
             this.removeSparkHomePanel(host);
         }

@@ -91,6 +91,7 @@ class StudentManager {
         };
         this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'rows';
         this.studentSectionScrollPositions = {};
+        this.currentSparkSessionCache = new Map();
         this.cloudSaveTimeout = null;
         this.unitImages = {};
         this.routeReady = false;

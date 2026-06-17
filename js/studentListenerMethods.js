@@ -1,6 +1,16 @@
 import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 
+const STUDENT_RESIZE_DEBOUNCE_MS = 120;
+
+function debounceStudentResize(callback) {
+    let timer = null;
+    return () => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(callback, STUDENT_RESIZE_DEBOUNCE_MS);
+    };
+}
+
 class StudentListenerMethods {
     setStudentExportButtonState(button, isLoading = false, loadingLabel = 'Generating...') {
         if (!button) return;
@@ -19,7 +29,7 @@ class StudentListenerMethods {
             }
         }
 
-        if (window.lucide?.createIcons) window.lucide.createIcons();
+        if (window.lucide?.createIcons) window.lucide.createIcons({ root: button });
     }
 
     initListeners() {
@@ -30,7 +40,7 @@ class StudentListenerMethods {
 
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
-        window.addEventListener('resize', () => this.setStudentMobileMenu(false));
+        window.addEventListener('resize', debounceStudentResize(() => this.setStudentMobileMenu(false)));
         window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
         window.addEventListener('pagehide', (event) => {
             this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
