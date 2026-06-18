@@ -273,18 +273,34 @@ class StudentActivityProgressFlowMethods {
         grid.querySelectorAll('.activity-flow-section').forEach(section => section.remove());
         grid.style.display = 'block';
 
-        const createSection = (title, className) => {
+        const createSection = (title, className, description = '') => {
             const section = createElement('section', `activity-flow-section ${className}`);
-            const heading = createElement('h3');
-            heading.textContent = title;
+            const headingBlock = createElement('div', 'activity-flow-heading');
+            const heading = createElement('h3', null, title);
+            headingBlock.appendChild(heading);
+            if (description) headingBlock.appendChild(createElement('p', null, description));
             const innerGrid = createElement('div', 'activities-grid-inner');
-            section.appendChild(heading);
+            section.appendChild(headingBlock);
             section.appendChild(innerGrid);
             grid.appendChild(section);
             return innerGrid;
         };
 
-        const requiredGrid = createSection('Required Activities', 'required-activity-section');
+        const requiredGrid = createSection(
+            'Required Path',
+            'required-activity-section',
+            'Complete these activities to unlock the full practice library.'
+        );
+        requiredGrid.classList.add('required-activity-path');
+        requiredGrid.style.setProperty('--required-count', Math.max(flow.required.length, 1));
+        const pathTrack = createElement('div', 'required-path-track');
+        const pathTrackFill = createElement('span');
+        pathTrack.style.setProperty(
+            '--path-progress',
+            `${completion.total > 0 ? (completion.completed / completion.total) * 100 : 0}%`
+        );
+        pathTrack.appendChild(pathTrackFill);
+        requiredGrid.appendChild(pathTrack);
         const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure');
         additionalDetails.open = true;
         const additionalSummary = createElement(
@@ -306,7 +322,7 @@ class StudentActivityProgressFlowMethods {
         additionalDetails.appendChild(additionalGrid);
 
         const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure');
-        unavailableDetails.open = true;
+        unavailableDetails.open = false;
         const unavailableSummary = createElement('summary', null, `Not Required (${flow.hidden.length})`);
         const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
         unavailableDetails.appendChild(unavailableSummary);
@@ -329,8 +345,10 @@ class StudentActivityProgressFlowMethods {
             card.classList.toggle('activity-locked-card', isLockedAdditional);
             card.classList.toggle('activity-unavailable-card', isHidden);
             const isNext = activityType === nextActivityType;
+            const isComplete = this.isActivityComplete(activityType);
             card.classList.toggle('next-activity-card', isNext);
             card.classList.toggle('activity-flow-card-compact', !isNext);
+            card.classList.toggle('activity-path-complete', isRequired && isComplete);
             card.disabled = isHidden;
             card.setAttribute('aria-disabled', isHidden ? 'true' : 'false');
             card.title = isHidden
@@ -345,6 +363,10 @@ class StudentActivityProgressFlowMethods {
             }
             if (isLockedAdditional && !card.querySelector('.activity-lock-label')) {
                 card.prepend(createElement('span', 'activity-lock-label', 'Locked'));
+            }
+            if (isRequired) {
+                const statusText = isComplete ? 'Complete' : (isNext ? 'Next' : 'Ready');
+                card.appendChild(createElement('span', 'activity-path-status', statusText));
             }
         };
 

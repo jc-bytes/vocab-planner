@@ -3,12 +3,22 @@ import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi
 
 class StudentActivityMenuMethods {
     showActivityMenu(options = {}) {
-        $('#current-unit-title').textContent = this.sm.currentVocab.name;
+        const unitTitle = this.formatVocabularyCardTitle?.(this.sm.currentVocab)
+            || this.sm.currentVocab.name;
+        $('#current-unit-title').textContent = unitTitle;
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(this.sm.currentVocab));
         const subjectEl = $('#current-unit-subject');
         if (subjectEl) {
-            subjectEl.textContent = subject.name;
+            const purpose = this.formatVocabularyPurpose?.(this.sm.currentVocab.purpose) || 'Unit';
+            const schedule = this.formatVocabularyScheduleLabel?.(this.sm.currentVocab) || '';
+            subjectEl.textContent = [subject.name, purpose, schedule].filter(Boolean).join(' · ');
             subjectEl.style.setProperty('--subject-color', subject.color);
+        }
+        const descriptionEl = $('#current-unit-description');
+        if (descriptionEl) {
+            descriptionEl.textContent = this.formatVocabularyCardDescription?.(this.sm.currentVocab, unitTitle)
+                || this.sm.currentVocab.description
+                || '';
         }
 
         // Get word coverage stats
@@ -34,13 +44,15 @@ class StudentActivityMenuMethods {
             card.querySelector('.next-activity-label')?.remove();
             card.querySelector('.activity-lock-label')?.remove();
             card.querySelector('.activity-unavailable-label')?.remove();
+            card.querySelector('.activity-path-status')?.remove();
             card.classList.remove(
                 'next-activity-card',
                 'activity-flow-card-compact',
                 'activity-locked-card',
                 'activity-unavailable-card',
                 'required-activity-card',
-                'additional-activity-card'
+                'additional-activity-card',
+                'activity-path-complete'
             );
             card.disabled = false;
             card.removeAttribute('aria-disabled');
@@ -79,6 +91,19 @@ class StudentActivityMenuMethods {
         });
         this.updateActivityGateDisplay(cards, activityFlow);
 
+        const completion = this.getRequiredCompletion(activityFlow);
+        const percent = completion.total > 0
+            ? Math.round((completion.completed / completion.total) * 100)
+            : 0;
+        const percentEl = $('#current-unit-progress-percent');
+        const fillEl = $('#current-unit-progress-fill');
+        const progressCopyEl = $('#current-unit-progress-copy');
+        if (percentEl) percentEl.textContent = `${percent}%`;
+        if (fillEl) fillEl.style.width = `${percent}%`;
+        if (progressCopyEl) {
+            progressCopyEl.textContent = `${completion.completed} of ${completion.total} required complete`;
+        }
+
         // Update overall coverage display if element exists
         this.updateOverallCoverageDisplay(coverageStats);
 
@@ -91,6 +116,7 @@ class StudentActivityMenuMethods {
 
         this.sm.switchView('activity-menu-view');
         this.scheduleActivityPreload(activityFlow);
+        if (window.lucide) window.lucide.createIcons({ root: $('#activity-menu-view') });
     }
 }
 

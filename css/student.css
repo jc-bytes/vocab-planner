@@ -5607,18 +5607,28 @@ section.student-continue-hero {
     max-width: 760px;
 }
 
-.student-hero-kicker {
+.student-hero-purpose {
+    display: inline-flex;
+    align-items: center;
     justify-self: start;
     min-height: 28px;
     padding: 0.28rem 0.65rem;
+    border: 1px solid rgba(173, 198, 255, 0.22);
     border-radius: 999px;
     background: rgba(173, 198, 255, 0.14);
-    color: var(--color-primary);
+    color: #c6d8ff;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem;
     font-weight: 800;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    line-height: 1;
     text-transform: uppercase;
+}
+
+.student-hero-purpose.is-summative {
+    border-color: rgba(255, 183, 134, 0.3);
+    background: rgba(255, 183, 134, 0.18);
+    color: #ffcaa6;
 }
 
 .student-continue-copy h3 {
@@ -7009,19 +7019,12 @@ section.student-continue-hero {
         gap: 0 !important;
     }
 
-    .student-hero-kicker {
-        width: max-content !important;
+    .student-hero-purpose {
         min-height: 24px !important;
         margin-bottom: 18px !important;
         padding: 0 11px !important;
-        border: 1px solid rgba(173, 198, 255, 0.14) !important;
-        border-radius: 999px !important;
-        background: rgba(173, 198, 255, 0.12) !important;
-        color: rgba(205, 218, 255, 0.86) !important;
         font-size: 0.66rem !important;
-        font-weight: 800 !important;
         letter-spacing: 0.12em !important;
-        line-height: 1 !important;
     }
 
     .student-continue-copy h3 {
@@ -8017,4 +8020,841 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
+}
+
+/* Keep the complete Today dashboard visible on shorter desktop viewports. */
+@media (min-width: 1121px) and (max-height: 850px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#main-menu-view:not(.hidden)) {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    #main-menu-view:not(.hidden) {
+        display: grid !important;
+        align-content: safe center !important;
+        min-height: 100svh !important;
+    }
+
+    #main-menu-view > .student-dashboard-heading {
+        margin-bottom: 16px !important;
+    }
+
+    .student-dashboard-heading .teacher-eyebrow,
+    .student-dashboard-heading .student-dashboard-subtitle {
+        display: none !important;
+    }
+
+    .student-dashboard-heading h2 {
+        font-size: clamp(2rem, 3vw, 2.65rem) !important;
+    }
+
+    #student-home-dashboard.student-home-dashboard {
+        gap: 14px !important;
+    }
+
+    #student-home-panel-week,
+    #student-home-panel-spark {
+        min-height: 180px !important;
+        padding: 12px 16px !important;
+    }
+
+    #student-home-dashboard .student-home-panel .teacher-panel-header {
+        margin-bottom: 6px !important;
+    }
+
+    #student-home-panel-spark .student-spark-question {
+        padding: 7px !important;
+    }
+}
+
+/* Vocabulary library: compact rows with the Celestial Academy visual hierarchy. */
+#vocab-selection-view {
+    width: min(100%, 1180px);
+    margin-inline: auto;
+}
+
+#vocab-selection-view .vocab-selection-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: "intro subject view";
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+#vocab-selection-view #vocab-list {
+    margin-top: 0;
+}
+
+#vocab-selection-view .vocab-page-intro {
+    grid-area: intro;
+    min-width: 0;
+}
+
+#vocab-selection-view .vocab-page-intro h2 {
+    margin: 0;
+    color: var(--color-on-surface);
+    font-family: 'Geist', 'Inter', system-ui, sans-serif;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+#vocab-selection-view .vocab-page-intro > p {
+    margin: 6px 0 0;
+    color: rgba(194, 198, 214, 0.86);
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+#vocab-selection-view .vocab-context-breadcrumb {
+    margin-top: 10px;
+}
+
+#vocab-selection-view .vocab-context-breadcrumb .teacher-library-breadcrumb {
+    color: var(--color-primary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+#vocab-selection-view .vocab-header-subject-picker {
+    grid-area: subject;
+}
+
+#vocab-selection-view .vocab-view-toggle {
+    grid-area: view;
+    min-height: 52px;
+    padding: 3px;
+    border-color: rgba(173, 198, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(13, 20, 44, 0.92);
+    box-shadow: none;
+    backdrop-filter: blur(16px);
+}
+
+#vocab-selection-view .vocab-view-toggle-btn,
+#vocab-selection-view .vocab-view-toggle .vocab-view-toggle-btn {
+    min-height: 44px;
+    height: 44px;
+    padding-inline: 12px;
+    border-radius: 9px;
+    color: rgba(194, 198, 214, 0.82);
+    font-size: 0.8rem;
+}
+
+#vocab-selection-view .vocab-view-toggle-btn.is-active {
+    background: rgba(173, 198, 255, 0.2);
+    color: var(--color-primary);
+    box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.4);
+}
+
+#vocab-selection-view .student-vocab-row-list {
+    gap: 8px;
+    margin-top: 4px;
+}
+
+#vocab-selection-view .student-vocab-row {
+    box-sizing: border-box;
+    min-height: 54px;
+    padding: 9px 14px;
+    border-color: rgba(173, 198, 255, 0.14);
+    border-radius: 11px;
+    background:
+        linear-gradient(180deg, rgba(173, 198, 255, 0.055), rgba(255, 255, 255, 0.012)),
+        rgba(22, 24, 58, 0.82);
+    box-shadow: 0 14px 34px -30px rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(14px);
+    transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+#vocab-selection-view .student-vocab-row-header {
+    min-height: 28px;
+    padding: 4px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(6, 14, 32, 0.74);
+    color: rgba(194, 198, 214, 0.76);
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+#vocab-selection-view .student-vocab-row:not(.student-vocab-row-header):hover {
+    transform: translateY(-1px);
+    border-color: rgba(173, 198, 255, 0.38);
+    background:
+        linear-gradient(180deg, rgba(173, 198, 255, 0.1), rgba(255, 255, 255, 0.02)),
+        rgba(27, 29, 70, 0.92);
+    box-shadow: 0 18px 42px -32px rgba(173, 198, 255, 0.5);
+}
+
+#vocab-selection-view .student-vocab-row strong {
+    color: #eef3ff;
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+#vocab-selection-view .student-vocab-row span {
+    color: rgba(218, 226, 253, 0.78);
+    font-size: 0.8rem;
+}
+
+#vocab-selection-view .student-vocab-row .student-vocab-purpose {
+    min-height: 24px;
+    padding: 3px 9px;
+    border-color: rgba(221, 183, 255, 0.26);
+    background: rgba(221, 183, 255, 0.13);
+    color: var(--color-secondary);
+    font-size: 0.67rem;
+}
+
+#vocab-selection-view .student-vocab-row .student-vocab-purpose.is-summative {
+    border-color: rgba(255, 183, 134, 0.3);
+    background: rgba(255, 183, 134, 0.14);
+    color: var(--color-tertiary);
+}
+
+#vocab-selection-view .student-vocab-row svg {
+    color: var(--color-primary);
+}
+
+@media (max-width: 900px) {
+    #vocab-selection-view .vocab-selection-header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "intro intro"
+            "subject view";
+        align-items: end;
+        gap: 14px 10px;
+        margin-bottom: 20px;
+    }
+
+    #vocab-selection-view .vocab-context-breadcrumb {
+        margin-top: 8px;
+    }
+
+    #vocab-selection-view .vocab-header-subject-picker,
+    #vocab-selection-view .vocab-view-toggle {
+        width: auto;
+        justify-self: start;
+    }
+
+    #vocab-selection-view .student-vocab-row {
+        min-height: 58px;
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 560px) {
+    #vocab-selection-view .vocab-selection-header {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "intro"
+            "subject"
+            "view";
+    }
+
+    #vocab-selection-view .vocab-page-intro > p {
+        max-width: 32rem;
+        font-size: 0.88rem;
+    }
+
+    #vocab-selection-view .vocab-view-toggle {
+        width: 100%;
+    }
+
+    #vocab-selection-view .vocab-view-toggle-btn {
+        flex: 1;
+    }
+}
+
+/* Vocabulary card view: substantial tiles inspired by the unit dashboard concept. */
+#vocab-selection-view .trimester-vocab-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
+    justify-content: start;
+    gap: 18px;
+    margin-top: 0;
+}
+
+#vocab-selection-view .student-vocab-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 280px;
+    padding: 20px;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(173, 198, 255, 0.2);
+    border-top-color: rgba(173, 198, 255, 0.38);
+    border-radius: 22px;
+    background:
+        linear-gradient(155deg, rgba(173, 198, 255, 0.075), transparent 52%),
+        rgba(26, 24, 72, 0.9);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 22px 54px -42px rgba(0, 0, 0, 0.94);
+    text-align: left;
+    transform: none;
+}
+
+#vocab-selection-view .student-vocab-card.is-summative {
+    border-top-color: rgba(255, 183, 134, 0.48);
+}
+
+#vocab-selection-view .student-vocab-card.is-practice {
+    border-top-color: rgba(221, 183, 255, 0.46);
+}
+
+#vocab-selection-view .student-vocab-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(173, 198, 255, 0.4);
+    background:
+        linear-gradient(155deg, rgba(173, 198, 255, 0.11), transparent 54%),
+        rgba(29, 27, 78, 0.96);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        0 26px 58px -40px rgba(173, 198, 255, 0.38);
+}
+
+#vocab-selection-view .student-vocab-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-icon {
+    display: inline-flex;
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    border: 1px solid rgba(173, 198, 255, 0.26);
+    border-radius: 16px;
+    background: rgba(173, 198, 255, 0.12);
+    color: var(--color-primary);
+}
+
+#vocab-selection-view .student-vocab-card.is-summative .student-vocab-icon {
+    border-color: rgba(255, 183, 134, 0.28);
+    background: rgba(255, 183, 134, 0.1);
+    color: var(--color-tertiary);
+}
+
+#vocab-selection-view .student-vocab-card.is-practice .student-vocab-icon {
+    border-color: rgba(221, 183, 255, 0.28);
+    background: rgba(221, 183, 255, 0.1);
+    color: var(--color-secondary);
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-schedule {
+    max-width: 190px;
+    padding-top: 5px;
+    color: var(--color-secondary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    line-height: 1.35;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    min-width: 0;
+}
+
+#vocab-selection-view .student-vocab-card h3 {
+    margin: 0;
+    color: #eef3ff;
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-purpose {
+    min-height: 24px;
+    margin-top: 10px;
+    padding: 3px 9px;
+    font-size: 0.66rem;
+}
+
+#vocab-selection-view .student-vocab-card p {
+    margin: 14px 0 20px;
+    color: rgba(218, 226, 253, 0.78);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-action {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    margin-top: auto;
+    padding: 0 15px;
+    border: 1px solid rgba(173, 198, 255, 0.24);
+    border-radius: 13px;
+    background: rgba(173, 198, 255, 0.1);
+    color: var(--color-primary);
+    font-size: 0.86rem;
+    font-weight: 800;
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+#vocab-selection-view .student-vocab-card:hover .student-vocab-action {
+    border-color: rgba(173, 198, 255, 0.44);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+#vocab-selection-view .student-vocab-card .student-vocab-action svg {
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 760px) {
+    #vocab-selection-view .trimester-vocab-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #vocab-selection-view .student-vocab-card {
+        min-height: 260px;
+    }
+}
+
+/* Unit activity menu: required learning path followed by the practice library. */
+#activity-menu-view {
+    width: min(100%, 1180px);
+    margin-inline: auto;
+}
+
+#activity-menu-view .section-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "back export"
+        "hero hero";
+    max-width: none;
+    margin-bottom: 34px;
+    gap: 16px 24px;
+}
+
+#activity-menu-view .activity-menu-hero {
+    grid-area: hero;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+    align-items: end;
+    gap: 36px;
+}
+
+#activity-menu-view .activity-menu-title-block {
+    grid-area: auto;
+}
+
+#activity-menu-view .unit-subject-label {
+    color: var(--color-primary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#activity-menu-view .section-header h2 {
+    max-width: 780px;
+    margin: 8px 0 0;
+    color: #eef3ff;
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    line-height: 1.08;
+}
+
+#activity-menu-view .activity-menu-unit-description {
+    max-width: 760px;
+    margin: 12px 0 0;
+    color: rgba(218, 226, 253, 0.76);
+    font-size: 0.98rem;
+    line-height: 1.55;
+}
+
+#activity-menu-view .activity-menu-progress {
+    min-width: 0;
+    padding-bottom: 4px;
+}
+
+#activity-menu-view .activity-menu-progress-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: rgba(218, 226, 253, 0.76);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+#activity-menu-view .activity-menu-progress-heading strong {
+    color: var(--color-xp);
+}
+
+#activity-menu-view .activity-menu-progress-track {
+    height: 10px;
+    margin-top: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(173, 198, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(45, 52, 73, 0.9);
+}
+
+#activity-menu-view .activity-menu-progress-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-xp);
+    box-shadow: 0 0 14px rgba(228, 242, 34, 0.34);
+    transition: width 240ms ease;
+}
+
+#activity-menu-view .activity-menu-progress > p {
+    margin: 8px 0 0;
+    color: rgba(194, 198, 214, 0.68);
+    font-size: 0.78rem;
+    text-align: right;
+}
+
+#activity-menu-view .activity-flow-section {
+    max-width: none;
+    margin-bottom: 30px;
+}
+
+#activity-menu-view .activity-flow-heading {
+    margin-bottom: 18px;
+}
+
+#activity-menu-view .activity-flow-heading h3 {
+    margin: 0;
+    color: #eef3ff;
+    font-size: 1.15rem;
+}
+
+#activity-menu-view .activity-flow-heading p {
+    margin: 5px 0 0;
+    color: rgba(194, 198, 214, 0.72);
+    font-size: 0.86rem;
+}
+
+#activity-menu-view .required-activity-path {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--required-count), minmax(180px, 1fr));
+    align-items: start;
+    gap: 28px;
+    isolation: isolate;
+}
+
+#activity-menu-view .required-path-track {
+    position: absolute;
+    z-index: 0;
+    top: 51px;
+    left: calc(50% / var(--required-count));
+    right: calc(50% / var(--required-count));
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: repeating-linear-gradient(90deg, rgba(228, 242, 34, 0.2) 0 14px, transparent 14px 24px);
+    pointer-events: none;
+}
+
+#activity-menu-view .required-path-track span {
+    display: block;
+    width: var(--path-progress);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-xp);
+    box-shadow: 0 0 14px rgba(228, 242, 34, 0.34);
+}
+
+#activity-menu-view .required-activity-card {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 210px;
+    padding: 0 12px 14px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    text-align: center;
+    overflow: visible;
+}
+
+#activity-menu-view .required-activity-card:hover {
+    transform: translateY(-2px);
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+#activity-menu-view .required-activity-card .icon {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    order: -2;
+    width: 96px;
+    height: 96px;
+    margin-bottom: 14px;
+    border: 3px solid rgba(173, 198, 255, 0.36);
+    border-radius: 50%;
+    background:
+        linear-gradient(155deg, rgba(173, 198, 255, 0.16), rgba(221, 183, 255, 0.05)),
+        rgba(26, 24, 72, 0.98);
+    color: var(--color-primary);
+    box-shadow: 0 18px 42px -30px rgba(173, 198, 255, 0.7);
+    opacity: 1;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#activity-menu-view .required-activity-card:hover .icon {
+    transform: scale(1.04);
+}
+
+#activity-menu-view .required-activity-card .icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+#activity-menu-view .required-activity-card.next-activity-card .icon {
+    width: 108px;
+    height: 108px;
+    margin-top: -6px;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 28px rgba(173, 198, 255, 0.34);
+}
+
+#activity-menu-view .required-activity-card.activity-path-complete .icon {
+    border-color: var(--color-xp);
+    color: var(--color-xp);
+    box-shadow: 0 0 20px rgba(228, 242, 34, 0.24);
+}
+
+#activity-menu-view .required-activity-card h3 {
+    margin: 0;
+    color: #eef3ff;
+    font-size: 1.05rem;
+}
+
+#activity-menu-view .required-activity-card p {
+    max-width: 230px;
+    margin: 6px 0 0;
+    color: rgba(194, 198, 214, 0.72);
+    font-size: 0.8rem;
+}
+
+#activity-menu-view .required-activity-card .progress-badge {
+    display: none;
+}
+
+#activity-menu-view .required-activity-card .next-activity-label {
+    order: -1;
+    margin: -28px 0 12px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+#activity-menu-view .activity-path-status {
+    margin-top: 8px;
+    color: rgba(194, 198, 214, 0.66);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+#activity-menu-view .activity-path-complete .activity-path-status {
+    color: var(--color-xp);
+}
+
+#activity-menu-view .additional-activity-section {
+    padding-top: 20px;
+    border-top-color: rgba(173, 198, 255, 0.16);
+}
+
+#activity-menu-view .additional-activity-section > summary,
+#activity-menu-view .unavailable-activity-section > summary {
+    font-size: 1.05rem;
+}
+
+#activity-menu-view .activity-secondary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    min-height: 102px;
+    padding: 14px;
+    gap: 5px 12px;
+    border-color: rgba(173, 198, 255, 0.16);
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, rgba(173, 198, 255, 0.055), transparent),
+        rgba(22, 24, 58, 0.78);
+    box-shadow: 0 14px 34px -30px rgba(0, 0, 0, 0.9);
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card .icon {
+    grid-row: 1 / span 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(173, 198, 255, 0.22);
+    border-radius: 12px;
+    background: rgba(173, 198, 255, 0.1);
+    color: var(--color-primary);
+    font-size: 0;
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card .icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card h3 {
+    align-self: end;
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.2;
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card .progress-badge,
+#activity-menu-view .activity-secondary-grid .activity-card .activity-lock-label,
+#activity-menu-view .activity-secondary-grid .activity-card .activity-unavailable-label {
+    grid-column: 2;
+    justify-self: start;
+    margin: 0;
+    font-size: 0.62rem;
+}
+
+@media (max-width: 900px) {
+    #activity-menu-view .activity-menu-hero {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    #activity-menu-view .activity-menu-progress {
+        max-width: 420px;
+    }
+
+    #activity-menu-view .activity-menu-progress > p {
+        text-align: left;
+    }
+
+    #activity-menu-view .activity-secondary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    #activity-menu-view .section-header {
+        grid-template-areas:
+            "back export"
+            "hero hero";
+        gap: 14px 10px;
+        margin-bottom: 26px;
+    }
+
+    #activity-menu-view .required-activity-path {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    #activity-menu-view .required-path-track {
+        top: 42px;
+        bottom: 42px;
+        left: 42px;
+        right: auto;
+        width: 6px;
+        height: auto;
+        background: repeating-linear-gradient(180deg, rgba(228, 242, 34, 0.2) 0 14px, transparent 14px 24px);
+    }
+
+    #activity-menu-view .required-path-track span {
+        width: 100% !important;
+        height: var(--path-progress);
+    }
+
+    #activity-menu-view .required-activity-card,
+    #activity-menu-view .required-activity-card.next-activity-card {
+        display: grid;
+        grid-template-columns: 84px minmax(0, 1fr);
+        align-content: center;
+        justify-items: start;
+        min-height: 112px;
+        padding: 10px 8px 10px 0;
+        gap: 4px 16px;
+        text-align: left;
+    }
+
+    #activity-menu-view .required-activity-card .icon,
+    #activity-menu-view .required-activity-card.next-activity-card .icon {
+        grid-column: 1;
+        grid-row: 1 / span 4;
+        width: 78px;
+        height: 78px;
+        margin: 0;
+    }
+
+    #activity-menu-view .required-activity-card .icon svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    #activity-menu-view .required-activity-card h3,
+    #activity-menu-view .required-activity-card p,
+    #activity-menu-view .required-activity-card .activity-path-status,
+    #activity-menu-view .required-activity-card .next-activity-label {
+        grid-column: 2;
+        margin-left: 0;
+        text-align: left;
+    }
+
+    #activity-menu-view .required-activity-card .next-activity-label {
+        order: initial;
+        margin: 0 0 2px;
+    }
+
+    #activity-menu-view .required-activity-card p {
+        margin-top: 2px;
+    }
+
+    #activity-menu-view .activity-path-status {
+        margin-top: 2px;
+    }
+
+    #activity-menu-view .activity-secondary-grid {
+        grid-template-columns: 1fr;
+    }
 }

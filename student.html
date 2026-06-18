@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-shell-20260617aa">
+    <link rel="stylesheet" href="css/student.css?v=student-shell-20260618c">
 </head>
 
 <body>
@@ -188,7 +188,11 @@
             <section id="vocab-selection-view" class="view hidden">
                 <div class="section-header vocab-selection-header">
                     <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
-                    <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                    <div class="vocab-page-intro">
+                        <h2>Vocabulary Units</h2>
+                        <p>Master the language of technology through interactive challenges.</p>
+                        <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                    </div>
                     <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
                     <div id="vocab-view-toggle" class="vocab-view-toggle" aria-label="Vocabulary view"></div>
                 </div>
@@ -202,10 +206,6 @@
             <section id="activity-menu-view" class="view hidden">
                 <div class="section-header">
                     <button id="back-to-vocab" class="btn text-btn">← Back to Units</button>
-                    <div class="activity-menu-title-block">
-                        <div id="current-unit-subject" class="unit-subject-label"></div>
-                        <h2 id="current-unit-title">Unit Title</h2>
-                    </div>
                     <details id="student-vocab-export-menu" class="student-export-menu">
                         <summary class="btn accent-btn">
                             <i data-lucide="download"></i>
@@ -223,66 +223,83 @@
                             </button>
                         </div>
                     </details>
+                    <div class="activity-menu-hero">
+                        <div class="activity-menu-title-block">
+                            <div id="current-unit-subject" class="unit-subject-label"></div>
+                            <h2 id="current-unit-title">Unit Title</h2>
+                            <p id="current-unit-description" class="activity-menu-unit-description"></p>
+                        </div>
+                        <div class="activity-menu-progress" aria-label="Required activity progress">
+                            <div class="activity-menu-progress-heading">
+                                <span>Unit progress</span>
+                                <strong id="current-unit-progress-percent">0%</strong>
+                            </div>
+                            <div class="activity-menu-progress-track" aria-hidden="true">
+                                <span id="current-unit-progress-fill"></span>
+                            </div>
+                            <p id="current-unit-progress-copy">0 of 0 required complete</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="activities-grid">
                     <!-- Activity cards -->
                     <button type="button" class="card activity-card" data-activity="illustration">
-                        <div class="icon">🧭</div>
+                        <div class="icon"><i data-lucide="compass"></i></div>
                         <h3>Word Hunt</h3>
                         <p>Find a definition, image, and two examples.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="matching">
-                        <div class="icon">🧩</div>
+                        <div class="icon"><i data-lucide="puzzle"></i></div>
                         <h3>Matching</h3>
                         <p>Match words to definitions.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="flashcards">
-                        <div class="icon">📇</div>
+                        <div class="icon"><i data-lucide="layers-3"></i></div>
                         <h3>Flashcards</h3>
                         <p>Study words and images.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="quiz">
-                        <div class="icon">❓</div>
+                        <div class="icon"><i data-lucide="circle-help"></i></div>
                         <h3>Quiz</h3>
                         <p>Test your knowledge.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="synonym-antonym">
-                        <div class="icon">🔄</div>
+                        <div class="icon"><i data-lucide="repeat-2"></i></div>
                         <h3>Synonym & Antonym</h3>
                         <p>Challenge your word knowledge.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="word-search">
-                        <div class="icon">🔍</div>
+                        <div class="icon"><i data-lucide="search"></i></div>
                         <h3>Word Search</h3>
                         <p>Find hidden vocabulary words.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="crossword">
-                        <div class="icon">📝</div>
+                        <div class="icon"><i data-lucide="grid-3x3"></i></div>
                         <h3>Crossword</h3>
                         <p>Solve definitions.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="hangman">
-                        <div class="icon">🕵️‍♀️</div>
+                        <div class="icon"><i data-lucide="scan-face"></i></div>
                         <h3>Hangman</h3>
                         <p>Guess the word.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="scramble">
-                        <div class="icon">🌪️</div>
+                        <div class="icon"><i data-lucide="shuffle"></i></div>
                         <h3>Word Scramble</h3>
                         <p>Unscramble the letters.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="wordle">
-                        <div class="icon">🟩</div>
+                        <div class="icon"><i data-lucide="layout-grid"></i></div>
                         <h3>Vocabulary Wordle</h3>
                         <p>Guess words from clues.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="speed-match">
-                        <div class="icon">⏱️</div>
+                        <div class="icon"><i data-lucide="timer"></i></div>
                         <h3>Speed Match</h3>
                         <p>Race against time.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="fill-in-blank">
-                        <div class="icon">✍️</div>
+                        <div class="icon"><i data-lucide="text-cursor-input"></i></div>
                         <h3>Fill in Blank</h3>
                         <p>Complete the sentence.</p>
                     </button>

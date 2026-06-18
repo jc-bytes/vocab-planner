@@ -379,18 +379,17 @@ class StudentActivityBrowserMethods {
             : 'book-open';
 
         card.style.setProperty('--subject-color', subject.color);
+        card.classList.add(this.getVocabularyPurposeClass(vocab.purpose));
 
         card.innerHTML = `
-            <div class="student-vocab-topline">
-                <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+            <div class="student-vocab-card-head">
+                <span class="student-vocab-icon" aria-hidden="true"><i data-lucide="${iconName}"></i></span>
                 <span class="student-vocab-schedule">${escapeHtml(scheduleLabel)}</span>
             </div>
-            <div class="student-vocab-card-main">
-                <span class="student-vocab-icon" aria-hidden="true"><i data-lucide="${iconName}"></i></span>
-                <div class="student-vocab-copy">
-                    <h3>${escapeHtml(title)}</h3>
-                    <p data-vocab-description>${escapeHtml(description)}</p>
-                </div>
+            <div class="student-vocab-copy">
+                <h3>${escapeHtml(title)}</h3>
+                <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+                <p data-vocab-description>${escapeHtml(description)}</p>
             </div>
             <span class="student-vocab-action">
                 Start unit

@@ -204,7 +204,6 @@ class StudentActivityHomeMethods {
         if (!item?.vocab) {
             hero.innerHTML = `
                 <div class="student-continue-copy">
-                    <span class="student-hero-kicker">Continue Learning</span>
                     <h3>All caught up for now.</h3>
                     <p>${escapeHtml(emptyText || 'No current vocabulary work is available yet.')}</p>
                 </div>
@@ -215,6 +214,8 @@ class StudentActivityHomeMethods {
         const { vocab, schedule, progress } = item;
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
         const title = this.formatVocabularyCardTitle?.(vocab) || vocab.name || 'Vocabulary Unit';
+        const purposeLabel = this.formatVocabularyPurpose?.(vocab.purpose) || 'Unit';
+        const purposeClass = this.getVocabularyPurposeClass?.(vocab.purpose) || 'is-unit';
         const percent = this.getContinueLearningPercent(progress);
         const progressText = progress.requiredTotal > 0
             ? `${progress.completedRequired}/${progress.requiredTotal} required complete`
@@ -224,7 +225,7 @@ class StudentActivityHomeMethods {
         hero.style.setProperty('--subject-color', subject.color);
         hero.innerHTML = `
             <div class="student-continue-copy">
-                <span class="student-hero-kicker">Continue Learning</span>
+                <span class="student-hero-purpose ${escapeHtml(purposeClass)}">${escapeHtml(purposeLabel)}</span>
                 <h3>${escapeHtml(title)}</h3>
                 <p>${escapeHtml(subject.name)} · ${escapeHtml(scheduleText)}</p>
                 <div class="student-continue-progress" aria-label="${escapeHtml(progressText)}">
