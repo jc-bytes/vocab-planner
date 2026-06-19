@@ -8220,7 +8220,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .student-vocab-month-nav-btn {
-    min-height: 36px;
+    min-height: 44px;
     padding: 6px 10px;
     border: 0;
     border-radius: 8px;
@@ -8246,7 +8246,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .student-vocab-month-back {
-    min-height: 28px;
+    min-height: 44px;
     margin: 0;
     padding: 2px 0;
     color: rgba(173, 198, 255, 0.78);
