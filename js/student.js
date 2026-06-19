@@ -89,7 +89,7 @@ class StudentManager {
             trimester: null,
             month: null
         };
-        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'rows';
+        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
         this.studentSectionScrollPositions = {};
         this.currentSparkSessionCache = new Map();
         this.cloudSaveTimeout = null;
