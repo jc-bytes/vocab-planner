@@ -6,6 +6,9 @@ import {
     loadSubjects
 } from './services/vocabularyApi.js';
 
+const STUDENT_VOCABULARY_TRIMESTER_KEY = 'student_vocabulary_last_trimester';
+const STUDENT_VOCABULARY_MONTH_KEY = 'student_vocabulary_last_month';
+
 class StudentSubjectMethods {
     async loadSubjectSettings() {
         this.subjects = await loadSubjects(this.authDisabled || !this.currentUser ? null : supabaseService);
@@ -24,6 +27,10 @@ class StudentSubjectMethods {
         this.selectedSubjectSlug = getVocabSubjectSlug({ subjectSlug });
         localStorage.setItem('student_selected_subject', this.selectedSubjectSlug);
         this.resetStudentVocabularyDrilldown();
+        this.studentVocabularyAutoSelect = true;
+        if (this.parseRoute()?.view === 'units') {
+            this.setRoute({ view: 'units' }, { replace: true });
+        }
         this.activities.renderDashboard();
         this.activities.renderStudentHome();
     }
@@ -57,6 +64,19 @@ class StudentSubjectMethods {
             trimester: this.activities.getCurrentTrimesterKey(),
             month: null
         };
+    }
+
+    getStoredStudentVocabularyLocation() {
+        return {
+            trimester: localStorage.getItem(STUDENT_VOCABULARY_TRIMESTER_KEY),
+            month: localStorage.getItem(STUDENT_VOCABULARY_MONTH_KEY)
+        };
+    }
+
+    rememberStudentVocabularyLocation(trimester, month) {
+        if (!trimester || !month) return;
+        localStorage.setItem(STUDENT_VOCABULARY_TRIMESTER_KEY, trimester);
+        localStorage.setItem(STUDENT_VOCABULARY_MONTH_KEY, month);
     }
 }
 

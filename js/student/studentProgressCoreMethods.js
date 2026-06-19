@@ -2,8 +2,26 @@ import {
     DEFAULT_COIN_DATA,
     LOCAL_COIN_AUTHORITY_MS
 } from './studentProgressConstants.js';
+import { getStudentExperience } from './studentExperience.js';
 
 class StudentProgressCoreMethods {
+    getExperience() {
+        return getStudentExperience(this.sm.progressData);
+    }
+
+    updateLevelDisplay() {
+        const levelDisplay = document.querySelector('#student-level-display');
+        if (!levelDisplay) return;
+
+        const experience = this.getExperience();
+        levelDisplay.textContent = `Level ${experience.level} Explorer`;
+        levelDisplay.title = `${experience.completedCount} activities completed | ${experience.totalXp} XP total | ${experience.xpIntoLevel}/${experience.xpPerLevel} XP toward next level`;
+        levelDisplay.setAttribute(
+            'aria-label',
+            `Level ${experience.level} Explorer. ${experience.completedCount} activities completed. ${experience.xpIntoLevel} of ${experience.xpPerLevel} experience points toward the next level.`
+        );
+    }
+
     migrateCoinData(data) {
         // If already new format, return as-is
         if (data.coinData) {
@@ -133,6 +151,7 @@ class StudentProgressCoreMethods {
                     // Legacy support
                     this.sm.coins = this.sm.coinData.balance;
                     this.sm.updateCoinDisplay();
+                    this.updateLevelDisplay();
                 }
             }
         } catch (e) {
@@ -155,6 +174,7 @@ class StudentProgressCoreMethods {
             this.sm.progressData.coinData = this.sm.coinData;
             this.sm.progressData.coinHistory = this.sm.coinHistory;
             localStorage.setItem('student_progress', JSON.stringify(this.sm.progressData));
+            this.updateLevelDisplay();
             if (!navigator.onLine && this.sm.currentUser) {
                 this.sm.setAuthStatus('Saved locally - offline');
             }
@@ -217,6 +237,7 @@ class StudentProgressCoreMethods {
         }
 
         this.sm.updateCoinDisplay();
+        this.updateLevelDisplay();
         if (options.saveLocal !== false) {
             this.saveLocalProgress(true);
         }

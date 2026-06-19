@@ -11,6 +11,14 @@ class StudentProgressDelegateMethods {
         return this.progress.saveLocalProgress(skipCloud);
     }
 
+    getExperience() {
+        return this.progress.getExperience();
+    }
+
+    updateLevelDisplay() {
+        return this.progress.updateLevelDisplay();
+    }
+
     async loadCloudProgress() {
         return this.progress.loadCloudProgress();
     }

@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import { Packer } from 'docx';
 import { buildQuizWordDocument } from '../js/quizMakerWordExportMethods.js';
+import { getStudentExperience } from '../js/student/studentExperience.js';
 
 function assertIncludes(text, needle, label) {
     if (text.includes(needle)) return;
@@ -134,6 +135,41 @@ async function runDocxTests() {
     assertIncludes(documentXml, 'Complete the crossword.', 'DOCX crossword');
 }
 
+function runStudentExperienceTests() {
+    const experience = getStudentExperience({
+        units: {
+            'technology:week-1': {
+                unitId: 'week-1',
+                scores: {
+                    matching: { score: 100, isComplete: true },
+                    quiz: { score: 80, isComplete: false },
+                    flashcards: { score: 100 }
+                }
+            },
+            'Week 1': {
+                unitId: 'week-1',
+                scores: {
+                    matching: { score: 100, isComplete: true }
+                }
+            },
+            'technology:week-2': {
+                unitId: 'week-2',
+                scores: {
+                    matching: { score: 100, isComplete: true },
+                    quiz: { score: 100, isComplete: true },
+                    flashcards: { score: 100, isComplete: true }
+                }
+            }
+        }
+    });
+
+    if (experience.completedCount !== 5) throw new Error('XP should count unique completed activities.');
+    if (experience.totalXp !== 100) throw new Error('Five completed activities should earn 100 XP.');
+    if (experience.level !== 2) throw new Error('A student should reach level 2 at 100 XP.');
+    if (experience.xpIntoLevel !== 0) throw new Error('XP progress should reset at a new level.');
+}
+
 await runDocxTests();
+runStudentExperienceTests();
 
 console.log('Package refactor tests passed.');

@@ -2716,11 +2716,11 @@ select:focus {
     flex-wrap: wrap;
 }.matching-hud-copy h2 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
 }.matching-hud-copy p {
     color: var(--text-muted);
     margin: 0;
-    font-size: 0.88rem;
+    font-size: 0.94rem;
 }.matching-stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -2740,11 +2740,11 @@ select:focus {
 }.matching-stat span {
     display: block;
     color: var(--text-muted);
-    font-size: 0.68rem;
+    font-size: 0.74rem;
     margin: 0;
 }.matching-stat strong {
     display: block;
-    font-size: 0.9rem;
+    font-size: 1rem;
     white-space: nowrap;
 }.matching-progress {
     grid-column: 1 / -1;
@@ -2755,7 +2755,7 @@ select:focus {
     gap: var(--spacing-sm);
     margin-bottom: 0.22rem;
     color: var(--text-muted);
-    font-size: 0.76rem;
+    font-size: 0.82rem;
 }.matching-progress-track {
     height: 6px;
     border-radius: 999px;
@@ -2784,13 +2784,13 @@ select:focus {
     color: var(--text-muted);
 }.matching-column-heading h3 {
     color: var(--text-main);
-    font-size: 1rem;
+    font-size: 1.08rem;
 }.matching-column-heading span {
-    font-size: 0.8rem;
+    font-size: 0.86rem;
 }.matching-card {
     appearance: none;
     width: 100%;
-    min-height: 64px;
+    min-height: 68px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: var(--radius-md);
     background: rgba(15, 23, 42, 0.56);
@@ -2822,12 +2822,12 @@ select:focus {
     justify-content: center;
     text-align: center;
     font-weight: 750;
-    font-size: 1.05rem;
+    font-size: 1.14rem;
     background: rgba(99, 102, 241, 0.13);
 }.matching-card.definition-card {
     justify-content: flex-start;
     text-align: left;
-    font-size: 0.96rem;
+    font-size: 1.04rem;
     background: rgba(15, 23, 42, 0.64);
 }.matching-card.definition-card img {
     display: block;
@@ -3501,6 +3501,23 @@ select:focus {
 .activity-header h2 {
     min-width: 0;
     overflow-wrap: anywhere;
+}#activity-view:is(
+    .activity-type-quiz,
+    .activity-type-synonym-antonym,
+    .activity-type-hangman,
+    .activity-type-scramble,
+    .activity-type-speed-match,
+    .activity-type-fill-in-blank
+) #activity-container {
+    min-height: clamp(430px, calc(100svh - 225px), 640px);
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
+
+#activity-view.activity-type-speed-match #activity-container:has(.speed-match-wrapper) {
+    min-height: 0;
+    display: block;
 }.menu-card,
 .activity-card,
 .word-card {
@@ -3574,7 +3591,27 @@ select:focus {
 }.cw-clues {
     flex: 1 1 260px;
     max-width: min(100%, 420px);
-}/* Arcade and canvas games */.arcade-container,
+}
+
+@media (min-width: 901px) {
+    #activity-view.activity-type-crossword {
+        --cw-cell-size: clamp(26px, calc((100svh - 212px) / 15), 44px);
+    }
+
+    #activity-view.activity-type-crossword .crossword-game-area {
+        flex-wrap: nowrap;
+    }
+
+    #activity-view.activity-type-crossword .cw-clues {
+        max-height: calc(100svh - 212px);
+    }
+
+    #activity-view.activity-type-crossword .cw-cell {
+        font-size: clamp(0.9rem, 2.2svh, 1.2rem);
+    }
+}
+
+/* Arcade and canvas games */.arcade-container,
 #game-stage {
     width: 100%;
 }.arcade-container {
@@ -4112,16 +4149,13 @@ select:focus {
         white-space: nowrap;
     }
 
-    #activity-menu-view .section-header,
-#activity-menu-view .activity-menu-summary {
+    #activity-menu-view .activity-menu-summary {
         grid-template-columns: 1fr;
     }
 
     #activity-menu-view .section-header {
-        grid-template-areas:
-            "back"
-            "title"
-            "export";
+        grid-template-areas: "hero";
+        grid-template-columns: 1fr;
         gap: 0.45rem;
     }
 
@@ -4130,7 +4164,7 @@ select:focus {
     }
 
     #activity-menu-view .student-export-menu {
-        justify-self: stretch;
+        justify-self: start;
     }
 
     .student-home-dashboard {
@@ -4235,6 +4269,18 @@ select:focus {
 
     .activity-header {
         grid-template-columns: 1fr;
+    }
+
+    #activity-view:is(
+        .activity-type-quiz,
+        .activity-type-synonym-antonym,
+        .activity-type-hangman,
+        .activity-type-scramble,
+        .activity-type-speed-match,
+        .activity-type-fill-in-blank
+    ) #activity-container {
+        min-height: auto;
+        display: block;
     }
 
     .activity-header-title,
@@ -5445,6 +5491,24 @@ select:focus,
     }
 }
 
+.student-identity {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.student-level-display {
+    display: none;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.app-container:has(#student-tab-shell:not(.hidden)) .student-level-display {
+    display: block;
+}
+
 /* Phase 2: student shell and dashboard hierarchy */
 @media (min-width: 901px) {
     .app-container:has(#student-tab-shell:not(.hidden)) {
@@ -5487,17 +5551,6 @@ select:focus,
         font-size: 2rem;
         line-height: 1.05;
         text-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-left h1::after {
-        content: "Level 24 Explorer";
-        display: block;
-        margin-top: 0.45rem;
-        color: var(--text-muted);
-        font-family: 'Inter', sans-serif;
-        font-size: 0.95rem;
-        font-weight: 500;
-        line-height: 1.3;
     }
 
     .app-container:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
@@ -8120,6 +8173,97 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     text-transform: uppercase;
 }
 
+#vocab-selection-view .student-current-month-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 2px 7px;
+    border: 1px solid rgba(173, 198, 255, 0.28);
+    border-radius: 999px;
+    background: rgba(173, 198, 255, 0.1);
+    color: var(--color-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+#vocab-selection-view .teacher-library-breadcrumb > .student-current-month-badge {
+    display: inline-flex;
+    margin-left: 2px;
+}
+
+#vocab-selection-view .student-vocab-month-navigation {
+    margin: 0 0 12px;
+}
+
+#vocab-selection-view .student-vocab-month-nav-strip {
+    display: grid;
+    grid-template-columns: minmax(140px, auto) minmax(100px, 1fr) minmax(140px, auto);
+    align-items: center;
+    min-height: 40px;
+    border-block: 1px solid rgba(173, 198, 255, 0.1);
+}
+
+#vocab-selection-view .student-vocab-month-nav-btn {
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(218, 226, 253, 0.9);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#vocab-selection-view .student-vocab-month-nav-btn:hover:not(:disabled) {
+    background: rgba(173, 198, 255, 0.09);
+    color: var(--color-primary);
+}
+
+#vocab-selection-view .student-vocab-month-nav-btn:disabled {
+    border-color: transparent;
+    background: transparent;
+    color: rgba(194, 198, 214, 0.42);
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+#vocab-selection-view .student-vocab-month-back {
+    min-height: 28px;
+    margin: 0 0 2px;
+    padding: 2px 0;
+    color: rgba(173, 198, 255, 0.78);
+    font-size: 0.72rem;
+}
+
+#vocab-selection-view .student-vocab-month-nav-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--color-on-surface);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    #vocab-selection-view .student-vocab-month-nav-strip {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    }
+
+    #vocab-selection-view .student-vocab-month-nav-btn {
+        padding-inline: 6px;
+        font-size: 0.7rem;
+    }
+}
+
 #vocab-selection-view .vocab-header-subject-picker {
     grid-area: subject;
 }
@@ -8443,21 +8587,48 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #activity-menu-view .section-header {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-        "back export"
-        "hero hero";
+    grid-template-columns: 1fr;
+    grid-template-areas: "hero";
     max-width: none;
-    margin-bottom: 34px;
-    gap: 16px 24px;
+    margin-bottom: 30px;
+    gap: 0;
+    align-items: start;
+}
+
+#activity-menu-view .activity-menu-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+#activity-menu-view #back-to-vocab {
+    min-height: 0;
+    padding: 0 12px 0 0;
+    border: 0;
+    border-right: 1px solid rgba(173, 198, 255, 0.3);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-primary);
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+#activity-menu-view #back-to-vocab:hover,
+#activity-menu-view #back-to-vocab:focus-visible {
+    color: #eef3ff;
 }
 
 #activity-menu-view .activity-menu-hero {
     grid-area: hero;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
-    align-items: end;
-    gap: 36px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 42px;
+    padding: 8px 0 4px;
 }
 
 #activity-menu-view .activity-menu-title-block {
@@ -8475,23 +8646,38 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 #activity-menu-view .section-header h2 {
     max-width: 780px;
-    margin: 8px 0 0;
+    margin: 10px 0 0;
     color: #eef3ff;
-    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    font-size: clamp(2.05rem, 3.45vw, 3.1rem);
     line-height: 1.08;
 }
 
 #activity-menu-view .activity-menu-unit-description {
     max-width: 760px;
-    margin: 12px 0 0;
+    margin: 14px 0 0;
     color: rgba(218, 226, 253, 0.76);
-    font-size: 0.98rem;
+    font-size: clamp(0.98rem, 1.25vw, 1.15rem);
     line-height: 1.55;
 }
 
 #activity-menu-view .activity-menu-progress {
     min-width: 0;
-    padding-bottom: 4px;
+    flex: 1 1 280px;
+}
+
+#activity-menu-view .activity-menu-status {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 18px;
+    width: 480px;
+    max-width: 100%;
+    padding-top: 28px;
+}
+
+#activity-menu-view .student-export-menu {
+    flex: 0 0 auto;
+    margin: 0;
 }
 
 #activity-menu-view .activity-menu-progress-heading {
@@ -8569,23 +8755,41 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #activity-menu-view .required-path-track {
     position: absolute;
     z-index: 0;
-    top: 51px;
+    top: 0;
     left: calc(50% / var(--required-count));
     right: calc(50% / var(--required-count));
-    height: 7px;
-    overflow: hidden;
-    border-radius: 999px;
-    background: repeating-linear-gradient(90deg, rgba(228, 242, 34, 0.2) 0 14px, transparent 14px 24px);
+    height: 104px;
+    overflow: visible;
     pointer-events: none;
 }
 
-#activity-menu-view .required-path-track span {
+#activity-menu-view .required-path-svg {
     display: block;
-    width: var(--path-progress);
+    width: 100%;
     height: 100%;
-    border-radius: inherit;
-    background: var(--color-xp);
-    box-shadow: 0 0 14px rgba(228, 242, 34, 0.34);
+    overflow: visible;
+}
+
+#activity-menu-view .required-path-svg-mobile {
+    display: none;
+}
+
+#activity-menu-view .required-path-svg path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 7;
+    vector-effect: non-scaling-stroke;
+}
+
+#activity-menu-view .required-path-base {
+    stroke: rgba(173, 198, 255, 0.34);
+    stroke-dasharray: 2.5 2.25;
+}
+
+#activity-menu-view .required-path-progress {
+    stroke: var(--color-xp);
+    filter: drop-shadow(0 0 5px rgba(228, 242, 34, 0.36));
+    transition: stroke-dashoffset 240ms ease;
 }
 
 #activity-menu-view .required-activity-card {
@@ -8638,6 +8842,36 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #activity-menu-view .required-activity-card .icon svg {
     width: 40px;
     height: 40px;
+}
+
+#activity-menu-view .activity-art-icon {
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+}
+
+#activity-menu-view .activity-art-icon text {
+    fill: currentColor;
+    stroke: none;
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+#activity-menu-view .activity-art-icon .activity-token-small {
+    font-size: 8.8px;
+}
+
+#activity-menu-view .required-activity-card .activity-art-icon {
+    width: 50px;
+    height: 50px;
+    stroke-width: 2.15;
 }
 
 #activity-menu-view .required-activity-card.next-activity-card .icon {
@@ -8709,7 +8943,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 #activity-menu-view .activity-secondary-grid .activity-card {
     display: grid;
-    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-columns: 52px minmax(0, 1fr);
     grid-template-rows: auto auto;
     align-items: center;
     min-height: 102px;
@@ -8728,18 +8962,26 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 50px;
+    height: 50px;
     border: 1px solid rgba(173, 198, 255, 0.22);
     border-radius: 12px;
-    background: rgba(173, 198, 255, 0.1);
+    background:
+        radial-gradient(circle at 50% 42%, rgba(173, 198, 255, 0.16), transparent 68%),
+        rgba(173, 198, 255, 0.08);
     color: var(--color-primary);
     font-size: 0;
 }
 
 #activity-menu-view .activity-secondary-grid .activity-card .icon svg {
-    width: 21px;
-    height: 21px;
+    width: 26px;
+    height: 26px;
+}
+
+#activity-menu-view .activity-secondary-grid .activity-card .icon .activity-art-icon {
+    width: 34px;
+    height: 34px;
+    stroke-width: 2.25;
 }
 
 #activity-menu-view .activity-secondary-grid .activity-card h3 {
@@ -8764,6 +9006,13 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
         gap: 22px;
     }
 
+    #activity-menu-view .activity-menu-status {
+        justify-content: flex-start;
+        max-width: 560px;
+        min-width: 0;
+        padding-top: 0;
+    }
+
     #activity-menu-view .activity-menu-progress {
         max-width: 420px;
     }
@@ -8779,11 +9028,19 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 @media (max-width: 640px) {
     #activity-menu-view .section-header {
-        grid-template-areas:
-            "back export"
-            "hero hero";
+        grid-template-areas: "hero";
         gap: 14px 10px;
         margin-bottom: 26px;
+    }
+
+    #activity-menu-view .activity-menu-status {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #activity-menu-view .activity-menu-progress {
+        flex-basis: auto;
+        max-width: none;
     }
 
     #activity-menu-view .required-activity-path {
@@ -8792,18 +9049,20 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     }
 
     #activity-menu-view .required-path-track {
-        top: 42px;
-        bottom: 42px;
-        left: 42px;
+        top: 49px;
+        bottom: 49px;
+        left: -3px;
         right: auto;
-        width: 6px;
+        width: 84px;
         height: auto;
-        background: repeating-linear-gradient(180deg, rgba(228, 242, 34, 0.2) 0 14px, transparent 14px 24px);
     }
 
-    #activity-menu-view .required-path-track span {
-        width: 100% !important;
-        height: var(--path-progress);
+    #activity-menu-view .required-path-svg-desktop {
+        display: none;
+    }
+
+    #activity-menu-view .required-path-svg-mobile {
+        display: block;
     }
 
     #activity-menu-view .required-activity-card,
@@ -8856,5 +9115,210 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #activity-menu-view .activity-secondary-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Arcade landing: make the selected game the primary decision on the page. */
+#arcade-view #game-selection {
+    display: grid;
+    gap: 22px;
+    width: min(100%, 920px);
+}
+
+#arcade-view .arcade-selection-intro {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 28px;
+    padding-inline: 68px;
+}
+
+#arcade-view .arcade-selection-eyebrow {
+    color: var(--color-primary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+#arcade-view .arcade-selection-intro h2 {
+    margin: 8px 0 6px;
+    color: #f4f7ff;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1.05;
+}
+
+#arcade-view .arcade-selection-intro p {
+    max-width: 620px;
+    margin: 0;
+    color: rgba(218, 226, 253, 0.72);
+    font-size: 1rem;
+}
+
+#arcade-view .arcade-game-count {
+    display: grid;
+    justify-items: end;
+    flex: 0 0 auto;
+    color: var(--color-primary);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    text-transform: uppercase;
+}
+
+#arcade-view .arcade-game-count strong {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+#arcade-view .arcade-game-count span {
+    margin-top: 4px;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+}
+
+#arcade-view .game-selection-row {
+    grid-template-columns: 56px minmax(0, 1fr) 56px;
+    gap: 16px;
+}
+
+#arcade-view .game-select-nav-btn {
+    width: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    font-size: 1.35rem;
+}
+
+#arcade-view .game-card {
+    grid-template-columns: 180px minmax(0, 1fr) auto;
+    grid-template-areas:
+        "counter counter cost"
+        "icon copy copy"
+        "icon play play";
+    gap: 16px 28px;
+    min-height: 330px;
+    padding: 30px 34px;
+    overflow: hidden;
+    border-color: rgba(173, 198, 255, 0.26);
+    background:
+        radial-gradient(circle at 17% 54%, rgba(221, 183, 255, 0.17), transparent 25%),
+        linear-gradient(145deg, rgba(40, 41, 92, 0.96), rgba(17, 25, 57, 0.94));
+    box-shadow: 0 32px 80px -46px rgba(0, 0, 0, 0.95), var(--glow-primary);
+}
+
+#arcade-view .game-counter {
+    justify-self: start;
+    color: rgba(218, 226, 253, 0.7);
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+#arcade-view .game-icon {
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    min-height: 190px;
+    border: 1px solid rgba(173, 198, 255, 0.2);
+    border-radius: 24px;
+    background: rgba(6, 14, 32, 0.38);
+    font-size: 6rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+#arcade-view .game-card-copy {
+    align-self: end;
+}
+
+#arcade-view .game-card-copy h3 {
+    font-size: clamp(1.75rem, 3vw, 2.45rem);
+    line-height: 1.05;
+}
+
+#arcade-view .game-card-copy p {
+    margin-top: 10px;
+    font-size: 1.05rem;
+    line-height: 1.45;
+}
+
+#arcade-view .game-cost {
+    display: grid;
+    justify-items: end;
+    gap: 3px;
+    text-transform: none;
+}
+
+#arcade-view .game-cost span {
+    color: rgba(218, 226, 253, 0.62);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#arcade-view .game-cost strong {
+    color: var(--color-xp);
+    font-size: 0.9rem;
+}
+
+#arcade-view .game-card #play-current-game-btn {
+    justify-self: start;
+    min-width: 190px;
+    min-height: 52px;
+    padding-inline: 24px;
+    font-size: 1rem;
+}
+
+#arcade-view .game-selection-actions {
+    margin-top: 0;
+    position: relative;
+    z-index: 2;
+}
+
+#arcade-view .game-selection-actions .secondary-btn {
+    min-height: 44px;
+    padding-inline: 18px;
+    border-color: rgba(173, 198, 255, 0.32);
+    background: rgba(173, 198, 255, 0.12);
+    color: var(--color-primary);
+    box-shadow: 0 18px 36px -28px rgba(173, 198, 255, 0.8);
+}
+
+@media (max-width: 760px) {
+    #arcade-view .arcade-selection-intro {
+        align-items: start;
+        padding-inline: 0;
+    }
+
+    #arcade-view .arcade-game-count {
+        display: none;
+    }
+
+    #arcade-view .game-selection-row {
+        grid-template-columns: 44px minmax(0, 1fr) 44px;
+        gap: 8px;
+    }
+
+    #arcade-view .game-select-nav-btn {
+        width: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    #arcade-view .game-card {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "counter cost"
+            "icon icon"
+            "copy copy"
+            "play play";
+        min-height: 0;
+        padding: 20px;
+    }
+
+    #arcade-view .game-icon {
+        min-height: 120px;
+        font-size: 4.5rem;
     }
 }

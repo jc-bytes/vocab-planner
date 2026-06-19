@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-shell-20260618c">
+    <link rel="stylesheet" href="css/student.css?v=student-shell-20260619b">
+    <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260619b">
 </head>
 
 <body>
@@ -13,8 +14,9 @@
         <header class="app-header student-app-header">
             <div class="header-left">
                 <a href="index.html" class="back-link" style="display:none;">← Home</a>
-                <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div class="student-identity">
                     <h1 id="welcome-header">Welcome!</h1>
+                    <span id="student-level-display" class="student-level-display">Level 1 Explorer</span>
                 </div>
             </div>
             <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
@@ -205,39 +207,43 @@
             <!-- View: Activity Menu -->
             <section id="activity-menu-view" class="view hidden">
                 <div class="section-header">
-                    <button id="back-to-vocab" class="btn text-btn">← Back to Units</button>
-                    <details id="student-vocab-export-menu" class="student-export-menu">
-                        <summary class="btn accent-btn">
-                            <i data-lucide="download"></i>
-                            <span>Export</span>
-                            <i data-lucide="chevron-down"></i>
-                        </summary>
-                        <div class="student-export-menu-panel" role="menu" aria-label="Export options">
-                            <button id="download-word-hunt-btn" class="student-export-menu-item" type="button" role="menuitem">
-                                <i data-lucide="file-down"></i>
-                                <span>Word Hunt PDF</span>
-                            </button>
-                            <button id="generate-final-report-btn" class="student-export-menu-item" type="button" role="menuitem">
-                                <i data-lucide="file-text"></i>
-                                <span>Final Report</span>
-                            </button>
-                        </div>
-                    </details>
                     <div class="activity-menu-hero">
                         <div class="activity-menu-title-block">
-                            <div id="current-unit-subject" class="unit-subject-label"></div>
+                            <div class="activity-menu-meta-row">
+                                <button id="back-to-vocab" class="activity-menu-back-link" type="button">← Back to Units</button>
+                                <div id="current-unit-subject" class="unit-subject-label"></div>
+                            </div>
                             <h2 id="current-unit-title">Unit Title</h2>
                             <p id="current-unit-description" class="activity-menu-unit-description"></p>
                         </div>
-                        <div class="activity-menu-progress" aria-label="Required activity progress">
-                            <div class="activity-menu-progress-heading">
-                                <span>Unit progress</span>
-                                <strong id="current-unit-progress-percent">0%</strong>
+                        <div class="activity-menu-status">
+                            <div class="activity-menu-progress" aria-label="Required activity progress">
+                                <div class="activity-menu-progress-heading">
+                                    <span>Unit progress</span>
+                                    <strong id="current-unit-progress-percent">0%</strong>
+                                </div>
+                                <div class="activity-menu-progress-track" aria-hidden="true">
+                                    <span id="current-unit-progress-fill"></span>
+                                </div>
+                                <p id="current-unit-progress-copy">0 of 0 required complete</p>
                             </div>
-                            <div class="activity-menu-progress-track" aria-hidden="true">
-                                <span id="current-unit-progress-fill"></span>
-                            </div>
-                            <p id="current-unit-progress-copy">0 of 0 required complete</p>
+                            <details id="student-vocab-export-menu" class="student-export-menu">
+                                <summary class="btn accent-btn">
+                                    <i data-lucide="download"></i>
+                                    <span>Export</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </summary>
+                                <div class="student-export-menu-panel" role="menu" aria-label="Export options">
+                                    <button id="download-word-hunt-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                        <i data-lucide="file-down"></i>
+                                        <span>Word Hunt PDF</span>
+                                    </button>
+                                    <button id="generate-final-report-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                        <i data-lucide="file-text"></i>
+                                        <span>Final Report</span>
+                                    </button>
+                                </div>
+                            </details>
                         </div>
                     </div>
                 </div>
@@ -274,12 +280,26 @@
                         <p>Find hidden vocabulary words.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="crossword">
-                        <div class="icon"><i data-lucide="grid-3x3"></i></div>
+                        <div class="icon">
+                            <svg class="activity-art-icon" viewBox="0 0 32 32" aria-hidden="true">
+                                <rect x="13" y="5" width="6" height="22" rx="1.2"></rect>
+                                <rect x="5" y="13" width="22" height="6" rx="1.2"></rect>
+                                <path d="M13 13h6v6h-6z"></path>
+                            </svg>
+                        </div>
                         <h3>Crossword</h3>
                         <p>Solve definitions.</p>
                     </button>
                     <button type="button" class="card activity-card" data-activity="hangman">
-                        <div class="icon"><i data-lucide="scan-face"></i></div>
+                        <div class="icon">
+                            <svg class="activity-art-icon" viewBox="0 0 32 32" aria-hidden="true">
+                                <path d="M8 26h9"></path>
+                                <path d="M11 26V7"></path>
+                                <path d="M11 7h13"></path>
+                                <path d="M11 12l5-5"></path>
+                                <path d="M24 7v5"></path>
+                            </svg>
+                        </div>
                         <h3>Hangman</h3>
                         <p>Guess the word.</p>
                     </button>
@@ -322,15 +342,23 @@
                 <!-- Game Area -->
                 <div class="arcade-container">
                     <div id="game-selection">
+                        <header class="arcade-selection-intro">
+                            <div>
+                                <span class="arcade-selection-eyebrow">Arcade</span>
+                                <h2>Choose your next challenge</h2>
+                                <p>Pick a game, spend coins by the minute, and climb the leaderboard.</p>
+                            </div>
+                            <div class="arcade-game-count"><strong id="arcade-game-total">22</strong><span>games</span></div>
+                        </header>
                         <div class="game-selection-row">
-                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn">◀</button>
+                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Previous game">←</button>
                             <div id="current-game-card" class="card game-card">
                                 <!-- Game card will be dynamically inserted here -->
                             </div>
-                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn">▶</button>
+                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Next game">→</button>
                         </div>
                         <div class="game-selection-actions">
-                            <button id="show-leaderboard-btn" class="btn secondary-btn">🏆 View Leaderboard</button>
+                            <button id="show-leaderboard-btn" class="btn secondary-btn">View leaderboard <span aria-hidden="true">↗</span></button>
                         </div>
                     </div>
                     <div id="game-stage" class="hidden">

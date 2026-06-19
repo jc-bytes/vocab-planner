@@ -14,6 +14,12 @@ import {
 
 const LEADERBOARD_ENABLED_GAMES = [
     'galactic-breaker',
+    'snake',
+    'flappy-bird',
+    'space-invaders',
+    'target-shooter',
+    'pong',
+    'whack-a-mole',
     'level-devil',
     'radius-raid',
     'packabunchas',

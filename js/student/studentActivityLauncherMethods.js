@@ -40,6 +40,15 @@ class StudentActivityLauncherMethods {
         }
 
         this.sm.currentActivityType = type; // Track current activity type
+        const activityView = $('#activity-view');
+        if (activityView) {
+            activityView.classList.forEach(className => {
+                if (className.startsWith('activity-type-')) {
+                    activityView.classList.remove(className);
+                }
+            });
+            activityView.classList.add(`activity-type-${type}`);
+        }
         this.sm.switchView('activity-view');
         this.setActivityHeaderTitle(type);
 

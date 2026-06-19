@@ -92,16 +92,18 @@ class StudentGameSettingsMethods {
         // Game counter (e.g., "3/20")
         const currentNum = this.sm.currentGameIndex + 1;
         const totalGames = this.sm.gamesList.length;
+        const totalEl = $('#arcade-game-total');
+        if (totalEl) totalEl.textContent = totalGames;
 
         container.innerHTML = `
-            <div class="game-counter">${currentNum} / ${totalGames}</div>
-            <div class="game-icon">${game.icon}</div>
+            <div class="game-counter">Game ${currentNum} of ${totalGames}</div>
+            <div class="game-icon" aria-hidden="true">${game.icon}</div>
             <div class="game-card-copy">
                 <h3>${game.name}</h3>
                 <p>${game.desc}</p>
             </div>
-            <div class="game-cost">${exchangeRate} Coins / min</div>
-            <button id="play-current-game-btn" class="btn primary-btn">Play</button>
+            <div class="game-cost"><span>Play rate</span><strong>${exchangeRate} coins / min</strong></div>
+            <button id="play-current-game-btn" class="btn primary-btn">Play game <span aria-hidden="true">→</span></button>
         `;
 
         // Re-attach the play button listener

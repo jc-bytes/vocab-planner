@@ -283,7 +283,15 @@ class StudentShellMethods {
             activityContainer.classList.remove('flashcards-activity-container');
         }
 
-        $('#activity-view')?.classList.remove('flashcards-active');
+        const activityView = $('#activity-view');
+        if (activityView) {
+            activityView.classList.remove('flashcards-active');
+            activityView.classList.forEach(className => {
+                if (className.startsWith('activity-type-')) {
+                    activityView.classList.remove(className);
+                }
+            });
+        }
         const indicator = $('#activity-progress-indicator');
         if (indicator) {
             indicator.textContent = 'Progress: 0%';

@@ -294,12 +294,56 @@ class StudentActivityProgressFlowMethods {
         requiredGrid.classList.add('required-activity-path');
         requiredGrid.style.setProperty('--required-count', Math.max(flow.required.length, 1));
         const pathTrack = createElement('div', 'required-path-track');
-        const pathTrackFill = createElement('span');
-        pathTrack.style.setProperty(
-            '--path-progress',
-            `${completion.total > 0 ? (completion.completed / completion.total) * 100 : 0}%`
+        const pathProgress = completion.total > 0
+            ? (completion.completed / completion.total) * 100
+            : 0;
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        const createPathSvg = (className, viewBox, pathData, clipId, vertical = false) => {
+            const svg = document.createElementNS(svgNamespace, 'svg');
+            svg.setAttribute('class', className);
+            svg.setAttribute('viewBox', viewBox);
+            svg.setAttribute('preserveAspectRatio', 'none');
+
+            const defs = document.createElementNS(svgNamespace, 'defs');
+            const clipPath = document.createElementNS(svgNamespace, 'clipPath');
+            const clipRect = document.createElementNS(svgNamespace, 'rect');
+            clipPath.setAttribute('id', clipId);
+            clipRect.setAttribute('x', '0');
+            clipRect.setAttribute('y', '0');
+            clipRect.setAttribute('width', vertical ? '100%' : `${pathProgress}%`);
+            clipRect.setAttribute('height', vertical ? `${pathProgress}%` : '100%');
+            clipPath.appendChild(clipRect);
+            defs.appendChild(clipPath);
+
+            const basePath = document.createElementNS(svgNamespace, 'path');
+            basePath.setAttribute('class', 'required-path-base');
+            basePath.setAttribute('d', pathData);
+            basePath.setAttribute('pathLength', '100');
+
+            const progressPath = document.createElementNS(svgNamespace, 'path');
+            progressPath.setAttribute('class', 'required-path-progress');
+            progressPath.setAttribute('d', pathData);
+            progressPath.setAttribute('pathLength', '100');
+            progressPath.setAttribute('clip-path', `url(#${clipId})`);
+
+            svg.append(defs, basePath, progressPath);
+            return svg;
+        };
+        pathTrack.append(
+            createPathSvg(
+                'required-path-svg required-path-svg-desktop',
+                '0 0 1000 104',
+                'M 0 52 C 210 -8 360 -8 500 52 S 790 112 1000 52',
+                'required-path-clip-desktop'
+            ),
+            createPathSvg(
+                'required-path-svg required-path-svg-mobile',
+                '0 0 84 1000',
+                'M 42 0 C -8 210 -8 360 42 500 S 92 790 42 1000',
+                'required-path-clip-mobile',
+                true
+            )
         );
-        pathTrack.appendChild(pathTrackFill);
         requiredGrid.appendChild(pathTrack);
         const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure');
         additionalDetails.open = true;

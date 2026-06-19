@@ -1,0 +1,20 @@
+/* Route-specific corrections loaded after the generated student bundle. */
+@media (min-width: 901px) {
+    .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        margin-left: 0 !important;
+    }
+}
+
+/* Let the selected game card be the only dominant container. */
+#arcade-view .game-icon {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    text-shadow: 0 18px 30px rgba(0, 0, 0, 0.34);
+}
+
+@media (max-width: 760px) {
+    #arcade-view .game-icon {
+        min-height: 104px;
+    }
+}

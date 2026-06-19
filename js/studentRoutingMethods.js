@@ -183,6 +183,7 @@ class StudentRoutingMethods {
     showUnitsView(route = {}) {
         this.cleanupActivity();
         this.currentVocab = null;
+        this.studentVocabularyAutoSelect = !route.all && !route.trimester;
         if (route.all) {
             this.resetStudentVocabularyDrilldown();
         } else if (route.trimester) {
@@ -190,8 +191,8 @@ class StudentRoutingMethods {
                 trimester: route.trimester,
                 month: route.month || null
             };
-        } else if (!this.studentVocabularyDrilldown?.trimester) {
-            this.setStudentVocabularyDrilldownToCurrentTrimester();
+        } else {
+            this.resetStudentVocabularyDrilldown();
         }
         this.activities.renderDashboard();
         this.switchView('vocab-selection-view');

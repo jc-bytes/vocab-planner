@@ -40,14 +40,27 @@ class StudentActivityBrowserMethods {
 
         this.renderStudentVocabularyViewControls();
 
-        if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
-            const currentTrimester = this.getCurrentTrimesterKey();
-            if (trimesterGroups.has(currentTrimester)) {
-                this.sm.studentVocabularyDrilldown = { trimester: currentTrimester, month: null };
-                this.renderStudentMonthPicker(container, currentTrimester, this.buildVocabularyMonthGroups(trimesterGroups.get(currentTrimester)));
+        if (!selectedTrimester && this.sm.studentVocabularyAutoSelect) {
+            const automaticLocation = this.getAutomaticStudentVocabularyLocation(trimesterGroups);
+            if (automaticLocation) {
+                this.sm.studentVocabularyDrilldown = automaticLocation;
+                this.sm.rememberStudentVocabularyLocation(automaticLocation.trimester, automaticLocation.month);
+                this.sm.setRoute({ view: 'units', ...automaticLocation }, { replace: true });
+                this.renderStudentAssignmentPicker(
+                    container,
+                    automaticLocation.trimester,
+                    automaticLocation.month,
+                    this.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester)).get(automaticLocation.month),
+                    this.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester))
+                );
                 return;
             }
 
+            this.renderStudentTrimesterPicker(container, trimesterGroups);
+            return;
+        }
+
+        if (!trimesterGroups.has(selectedTrimester)) {
             this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
             this.renderStudentTrimesterPicker(container, trimesterGroups);
             return;
@@ -55,19 +68,54 @@ class StudentActivityBrowserMethods {
 
         const monthGroups = this.buildVocabularyMonthGroups(trimesterGroups.get(selectedTrimester));
 
-        if (this.getStudentVocabularyViewMode() === 'rows' && !selectedMonth) {
-            this.sm.studentVocabularyDrilldown.month = null;
-            this.renderStudentAssignmentPicker(container, selectedTrimester, null, trimesterGroups.get(selectedTrimester));
-            return;
-        }
-
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
             this.sm.studentVocabularyDrilldown.month = null;
             this.renderStudentMonthPicker(container, selectedTrimester, monthGroups);
             return;
         }
 
-        this.renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth));
+        this.sm.rememberStudentVocabularyLocation(selectedTrimester, selectedMonth);
+        this.renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthGroups.get(selectedMonth), monthGroups);
+    }
+
+    getAutomaticStudentVocabularyLocation(trimesterGroups) {
+        const stored = this.sm.getStoredStudentVocabularyLocation();
+        const storedMonths = trimesterGroups.has(stored.trimester)
+            ? this.buildVocabularyMonthGroups(trimesterGroups.get(stored.trimester))
+            : null;
+        if (storedMonths?.has(stored.month)) return stored;
+
+        const currentMonth = this.normalizeMonthKey(new Date().toLocaleString('en-US', { month: 'long' }));
+        const currentTrimester = this.getCurrentTrimesterKey();
+        const currentTrimesterMonths = trimesterGroups.has(currentTrimester)
+            ? this.buildVocabularyMonthGroups(trimesterGroups.get(currentTrimester))
+            : null;
+
+        if (currentTrimesterMonths?.has(currentMonth)) {
+            return { trimester: currentTrimester, month: currentMonth };
+        }
+
+        const candidates = [];
+        trimesterGroups.forEach((vocabs, trimester) => {
+            this.buildVocabularyMonthGroups(vocabs).forEach((_monthVocabs, month) => {
+                if (month !== 'other') candidates.push({ trimester, month });
+            });
+        });
+        candidates.sort((a, b) => {
+            const distance = Math.abs(this.getMonthOrder(a.month) - this.getMonthOrder(currentMonth))
+                - Math.abs(this.getMonthOrder(b.month) - this.getMonthOrder(currentMonth));
+            return distance || this.getMonthOrder(a.month) - this.getMonthOrder(b.month);
+        });
+        return candidates[0] || null;
+    }
+
+    isCurrentAcademicMonth(monthKey) {
+        return monthKey === this.normalizeMonthKey(new Date().toLocaleString('en-US', { month: 'long' }));
+    }
+
+    appendCurrentMonthBadge(target, monthKey) {
+        if (!target || !this.isCurrentAcademicMonth(monthKey)) return;
+        target.appendChild(createElement('span', 'student-current-month-badge', 'Current Month'));
     }
 
     renderStudentLibraryBreadcrumb(container, selectedTrimester = null, selectedMonth = null) {
@@ -98,7 +146,9 @@ class StudentActivityBrowserMethods {
 
         if (selectedMonth) {
             nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-current', this.getMonthLabel(selectedMonth)));
+            const monthNode = createElement('span', 'teacher-library-breadcrumb-current', this.getMonthLabel(selectedMonth));
+            nav.appendChild(monthNode);
+            this.appendCurrentMonthBadge(nav, selectedMonth);
         }
 
         target.appendChild(nav);
@@ -203,6 +253,7 @@ class StudentActivityBrowserMethods {
                         cells: [this.formatUnitCount(monthVocabs.length), this.getTrimesterLabel(selectedTrimester)],
                         icon: 'chevron-right'
                     });
+                    this.appendCurrentMonthBadge(row.querySelector('strong'), monthKey);
                     row.addEventListener('click', () => {
                         this.sm.studentVocabularyDrilldown = {
                             trimester: selectedTrimester,
@@ -227,6 +278,7 @@ class StudentActivityBrowserMethods {
                     meta: this.getTrimesterLabel(selectedTrimester),
                     icon: 'chevron-right'
                 });
+                this.appendCurrentMonthBadge(card.querySelector('strong'), monthKey);
                 card.addEventListener('click', () => {
                     this.sm.studentVocabularyDrilldown = {
                         trimester: selectedTrimester,
@@ -241,8 +293,49 @@ class StudentActivityBrowserMethods {
         this.refreshIcons(container);
     }
 
-    renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs) {
+    renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups) {
+        const sortedMonths = Array.from(monthGroups.keys())
+            .sort((monthA, monthB) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB));
+        const currentIndex = sortedMonths.indexOf(selectedMonth);
+        const previousMonth = currentIndex > 0 ? sortedMonths[currentIndex - 1] : null;
+        const nextMonth = currentIndex >= 0 && currentIndex < sortedMonths.length - 1
+            ? sortedMonths[currentIndex + 1]
+            : null;
+        const toolbar = createElement('nav', 'student-vocab-month-navigation');
+        toolbar.setAttribute('aria-label', 'Vocabulary month navigation');
+
+        const backButton = createElement('button', 'student-vocab-month-nav-btn student-vocab-month-back', 'Back to Months');
+        backButton.type = 'button';
+        backButton.addEventListener('click', () => {
+            this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
+        });
+
+        const monthStrip = createElement('div', 'student-vocab-month-nav-strip');
+        const previousButton = createElement('button', 'student-vocab-month-nav-btn', '← Previous Month');
+        previousButton.type = 'button';
+        previousButton.disabled = !previousMonth;
+        previousButton.addEventListener('click', () => {
+            if (previousMonth) this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: previousMonth });
+        });
+
+        const currentLabel = createElement('div', 'student-vocab-month-nav-current');
+        currentLabel.appendChild(createElement('span', null, this.getMonthLabel(selectedMonth)));
+
+        const nextButton = createElement('button', 'student-vocab-month-nav-btn', 'Next Month →');
+        nextButton.type = 'button';
+        nextButton.disabled = !nextMonth;
+        nextButton.addEventListener('click', () => {
+            if (nextMonth) this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: nextMonth });
+        });
+
+        monthStrip.append(previousButton, currentLabel, nextButton);
+        toolbar.append(backButton, monthStrip);
+        container.appendChild(toolbar);
+    }
+
+    renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs, monthGroups) {
         this.renderStudentLibraryBreadcrumb(container, selectedTrimester, selectedMonth);
+        this.renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups);
 
         if (this.getStudentVocabularyViewMode() === 'rows') {
             const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type']);

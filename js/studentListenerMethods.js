@@ -102,8 +102,7 @@ class StudentListenerMethods {
         });
 
         this.addListener('#student-tab-vocabulary', 'click', () => {
-            this.setStudentVocabularyDrilldownToCurrentTrimester();
-            this.navigateTo({ view: 'units', ...this.studentVocabularyDrilldown });
+            this.navigateTo({ view: 'units' });
         });
 
         this.addListener('#mobile-edit-profile-btn', 'click', () => {

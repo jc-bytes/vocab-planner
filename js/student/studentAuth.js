@@ -204,6 +204,7 @@ export class StudentAuth {
         const profile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
         const studentName = profile.name || this.sm.currentUser?.displayName || 'Student';
         headerTitle.textContent = studentName;
+        this.sm.updateLevelDisplay();
     }
 
     checkProfile(force = false) {
