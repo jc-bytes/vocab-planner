@@ -8139,6 +8139,10 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin-top: 0;
 }
 
+#vocab-selection-view #vocab-list.teacher-library-browser {
+    gap: 12px;
+}
+
 #vocab-selection-view .vocab-page-intro {
     grid-area: intro;
     min-width: 0;
@@ -8202,7 +8206,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     justify-content: space-between;
     gap: 12px;
     min-height: 30px;
-    margin: 0 0 12px;
+    margin: 0;
 }
 
 #vocab-selection-view .student-vocab-month-nav-strip {
@@ -8440,6 +8444,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin-top: 0;
 }
 
+@media (min-width: 720px) and (max-width: 900px) {
+    #vocab-selection-view .trimester-vocab-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 #vocab-selection-view .student-vocab-card {
     box-sizing: border-box;
     display: flex;
@@ -8588,7 +8598,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     height: 18px;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 640px) {
     #vocab-selection-view .trimester-vocab-grid {
         grid-template-columns: minmax(0, 1fr);
     }

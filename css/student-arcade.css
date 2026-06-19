@@ -17,4 +17,14 @@
     #arcade-view .game-icon {
         min-height: 104px;
     }
+
+    #arcade-view .game-card-copy {
+        justify-self: center;
+        max-width: 28rem;
+        text-align: center;
+    }
+
+    #arcade-view .game-card #play-current-game-btn {
+        justify-self: center;
+    }
 }
