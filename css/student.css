@@ -8197,15 +8197,22 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .student-vocab-month-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 30px;
     margin: 0 0 12px;
 }
 
 #vocab-selection-view .student-vocab-month-nav-strip {
     display: grid;
-    grid-template-columns: minmax(140px, auto) minmax(100px, 1fr) minmax(140px, auto);
+    grid-template-columns: minmax(125px, auto) minmax(72px, 1fr) minmax(125px, auto);
     align-items: center;
-    min-height: 40px;
-    border-block: 1px solid rgba(173, 198, 255, 0.1);
+    width: min(100%, 430px);
+    min-height: 36px;
+    border-radius: 9px;
+    background: rgba(173, 198, 255, 0.035);
 }
 
 #vocab-selection-view .student-vocab-month-nav-btn {
@@ -8236,7 +8243,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 #vocab-selection-view .student-vocab-month-back {
     min-height: 28px;
-    margin: 0 0 2px;
+    margin: 0;
     padding: 2px 0;
     color: rgba(173, 198, 255, 0.78);
     font-size: 0.72rem;
@@ -8254,8 +8261,19 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 @media (max-width: 720px) {
+    #vocab-selection-view .student-vocab-month-navigation {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 4px;
+    }
+
     #vocab-selection-view .student-vocab-month-nav-strip {
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        width: 100%;
+    }
+
+    #vocab-selection-view .student-vocab-month-back {
+        align-self: flex-start;
     }
 
     #vocab-selection-view .student-vocab-month-nav-btn {

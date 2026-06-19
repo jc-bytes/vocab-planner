@@ -304,7 +304,7 @@ class StudentActivityBrowserMethods {
         const toolbar = createElement('nav', 'student-vocab-month-navigation');
         toolbar.setAttribute('aria-label', 'Vocabulary month navigation');
 
-        const backButton = createElement('button', 'student-vocab-month-nav-btn student-vocab-month-back', 'Back to Months');
+        const backButton = createElement('button', 'student-vocab-month-nav-btn student-vocab-month-back', '← Back to Months');
         backButton.type = 'button';
         backButton.addEventListener('click', () => {
             this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
@@ -328,8 +328,11 @@ class StudentActivityBrowserMethods {
             if (nextMonth) this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: nextMonth });
         });
 
-        monthStrip.append(previousButton, currentLabel, nextButton);
-        toolbar.append(backButton, monthStrip);
+        toolbar.appendChild(backButton);
+        if (sortedMonths.length > 1) {
+            monthStrip.append(previousButton, currentLabel, nextButton);
+            toolbar.appendChild(monthStrip);
+        }
         container.appendChild(toolbar);
     }
 
