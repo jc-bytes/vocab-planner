@@ -326,6 +326,7 @@ class StudentGameLifecycleMethods {
                 iframe.remove();
             }
         });
+        document.querySelectorAll('[id$="-frame-shell"]').forEach(frameShell => frameShell.remove());
         
         // Show canvas again
         const canvas = $('#game-canvas');

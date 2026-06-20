@@ -1,6 +1,6 @@
 /* Route-specific corrections loaded after the generated student bundle. */
 @media (min-width: 901px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+    .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#arcade-view:not(.hidden)) {
         margin-left: 0 !important;
     }
 }

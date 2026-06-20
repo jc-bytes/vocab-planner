@@ -5,7 +5,11 @@ class StudentGameHtmlLoaderMethods {
         // Hide canvas and create iframe for the HTML game
         canvas.style.display = 'none';
         
-        // Remove existing iframe if any
+        // Remove any previous frame for this game.
+        const existingFrameShell = gameStage.querySelector(`#${gameId}-frame-shell`);
+        if (existingFrameShell) {
+            existingFrameShell.remove();
+        }
         const existingIframe = gameStage.querySelector(`#${gameId}-iframe`);
         if (existingIframe) {
             existingIframe.remove();
@@ -23,51 +27,49 @@ class StudentGameHtmlLoaderMethods {
         iframe.id = `${gameId}-iframe`;
         iframe.src = htmlFile;
         let frameWidth = 800;
+        let frameHeight = 600;
+        let scaleFixedFrame = true;
         
-        // Games take the width they need and are centered
-        // All games should take at least 80% of container width
+        // The stage owns each game's maximum width. Fill it so the iframe stays
+        // aligned with the timer bar instead of collapsing to its 80% minimum.
+        iframe.style.width = '100%';
+        iframe.style.maxWidth = '100%';
+
         // SpacePi: 960x600 game area
         if (gameId === 'spacepi') {
             frameWidth = 960;
-            iframe.style.width = '960px';
-            iframe.style.minWidth = '80%';
-            iframe.style.maxWidth = '100%';
-            iframe.style.height = '600px';
+            frameHeight = 600;
             iframe.style.display = 'block';
             iframe.style.overflow = 'auto';
         } else if (gameId === 'radius-raid') {
             // Radius Raid: 800x600 canvas + 10px padding each side = 820x620
             frameWidth = 820;
-            iframe.style.width = '820px';
-            iframe.style.minWidth = '80%';
-            iframe.style.maxWidth = '100%';
-            iframe.style.height = '620px';
+            frameHeight = 620;
             iframe.style.display = 'block';
             iframe.style.overflow = 'auto';
         } else if (gameId === 'mystic-valley' || gameId === 'slash-knight') {
             // Full-screen Scratch/TurboWarp games - let them size themselves
-            iframe.style.width = '100%';
-            iframe.style.minWidth = '80%';
+            scaleFixedFrame = false;
             iframe.style.height = '100%';
             iframe.style.minHeight = '600px';
             iframe.style.display = 'block';
             iframe.style.overflow = 'hidden';
         } else if (gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
-            // Responsive games - let them size themselves but center them
-            iframe.style.width = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? '100%' : 'auto';
-            iframe.style.minWidth = '80%';
-            iframe.style.maxWidth = '100%';
-            iframe.style.height = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? '900px' : '600px';
+            // Responsive games fill the stage and size their own content within it.
+            scaleFixedFrame = false;
+            frameHeight = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? 900 : 600;
+            iframe.style.height = `${frameHeight}px`;
             iframe.style.minHeight = '400px';
             iframe.style.display = 'block';
             iframe.style.overflow = 'auto';
         } else {
-            // Default: let game size itself, centered
-            iframe.style.width = 'auto';
-            iframe.style.minWidth = '80%';
-            iframe.style.maxWidth = '100%';
-            iframe.style.height = '600px';
             iframe.style.display = 'block';
+        }
+
+        if (scaleFixedFrame) {
+            iframe.style.width = `${frameWidth}px`;
+            iframe.style.maxWidth = 'none';
+            iframe.style.height = `${frameHeight}px`;
         }
 
         if (gameStage) {
@@ -77,15 +79,53 @@ class StudentGameHtmlLoaderMethods {
         iframe.style.border = 'none';
         iframe.style.borderRadius = '8px';
         iframe.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-        iframe.style.margin = '0 auto'; // Center the iframe
-        iframe.style.gridColumn = '1';
-        iframe.style.gridRow = '2';
-        iframe.style.justifySelf = 'center';
-        iframe.style.alignSelf = 'start';
+        iframe.style.margin = '0 auto';
         iframe.tabIndex = 0; // Make iframe focusable
-        
-        // Insert iframe after the canvas
-        canvas.parentNode.insertBefore(iframe, canvas.nextSibling);
+
+        let frameShell = null;
+        let frameResizeObserver = null;
+
+        if (scaleFixedFrame) {
+            frameShell = document.createElement('div');
+            frameShell.id = `${gameId}-frame-shell`;
+            frameShell.style.position = 'relative';
+            frameShell.style.gridColumn = '1';
+            frameShell.style.gridRow = '2';
+            frameShell.style.justifySelf = 'stretch';
+            frameShell.style.alignSelf = 'start';
+            frameShell.style.width = '100%';
+            frameShell.style.maxWidth = '100%';
+            frameShell.style.overflow = 'hidden';
+            frameShell.style.borderRadius = '8px';
+
+            iframe.style.position = 'absolute';
+            iframe.style.top = '0';
+            iframe.style.left = '0';
+            iframe.style.margin = '0';
+            iframe.style.transformOrigin = 'top left';
+
+            const updateFixedFrameScale = () => {
+                const availableWidth = frameShell.clientWidth || frameWidth;
+                const scale = Math.min(1, availableWidth / frameWidth);
+                iframe.style.transform = `scale(${scale})`;
+                frameShell.style.height = `${frameHeight * scale}px`;
+            };
+
+            frameShell.appendChild(iframe);
+            canvas.parentNode.insertBefore(frameShell, canvas.nextSibling);
+            updateFixedFrameScale();
+
+            if (typeof ResizeObserver !== 'undefined') {
+                frameResizeObserver = new ResizeObserver(updateFixedFrameScale);
+                frameResizeObserver.observe(frameShell);
+            }
+        } else {
+            iframe.style.gridColumn = '1';
+            iframe.style.gridRow = '2';
+            iframe.style.justifySelf = 'center';
+            iframe.style.alignSelf = 'start';
+            canvas.parentNode.insertBefore(iframe, canvas.nextSibling);
+        }
         
         // Focus iframe when clicked
         iframe.addEventListener('mouseenter', () => {
@@ -263,10 +303,15 @@ class StudentGameHtmlLoaderMethods {
             iframe: iframe,
             messageHandler: messageHandler,
             stop: () => {
+                if (frameResizeObserver) {
+                    frameResizeObserver.disconnect();
+                }
                 if (messageHandler) {
                     window.removeEventListener('message', messageHandler);
                 }
-                if (iframe && iframe.parentNode) {
+                if (frameShell && frameShell.parentNode) {
+                    frameShell.remove();
+                } else if (iframe && iframe.parentNode) {
                     iframe.remove();
                 }
                 canvas.style.display = 'block';
