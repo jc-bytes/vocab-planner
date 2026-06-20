@@ -123,8 +123,10 @@ class StudentProgressCloudMethods {
         if (!progress) return;
         this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyRemoteCoinProgress' });
         const cloudCoinData = this.migrateCoinData(progress);
+        this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
 
         this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
+        this.updateLevelDisplay();
         this.lastCoinRefreshAt = Date.now();
         this.sm.setAuthStatus('☁️ Synced');
     }
@@ -211,6 +213,7 @@ class StudentProgressCloudMethods {
             this.sm.progressData = {
                 studentProfile: mergedStudentProfile,
                 units: data.units || {},
+                totalXp: Number(data.totalXp) || 0,
                 coins: this.sm.coins,
                 coinData: this.sm.coinData,
                 coinHistory: this.sm.coinHistory

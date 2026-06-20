@@ -116,6 +116,7 @@ class StudentActivityProgressPersistenceMethods {
     buildActivityProgressPayload(activityType, scoreData = {}, settings = {}) {
         const unitProgress = this.getCurrentUnitProgress();
         if (!unitProgress || !this.sm.currentVocab) return null;
+        const flow = this.getActivityFlowConfig(this.sm.currentVocab);
         return {
             unitKey: this.getUnitProgressKey(this.sm.currentVocab),
             unitContext: {
@@ -127,6 +128,9 @@ class StudentActivityProgressPersistenceMethods {
                 grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
             },
             activityType,
+            isRequired: flow.required.includes(activityType),
+            attemptId: globalThis.crypto?.randomUUID?.()
+                || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
             score: Number(scoreData.score) || 0,
             isComplete: Boolean(scoreData.isComplete) || Number(scoreData.score) >= 100,
             details: scoreData.details || {},

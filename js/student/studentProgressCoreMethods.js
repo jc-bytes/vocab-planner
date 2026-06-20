@@ -14,11 +14,11 @@ class StudentProgressCoreMethods {
         if (!levelDisplay) return;
 
         const experience = this.getExperience();
-        levelDisplay.textContent = `Level ${experience.level} Explorer`;
+        levelDisplay.textContent = `Level ${experience.level} ${experience.title}`;
         levelDisplay.title = `${experience.completedCount} activities completed | ${experience.totalXp} XP total | ${experience.xpIntoLevel}/${experience.xpPerLevel} XP toward next level`;
         levelDisplay.setAttribute(
             'aria-label',
-            `Level ${experience.level} Explorer. ${experience.completedCount} activities completed. ${experience.xpIntoLevel} of ${experience.xpPerLevel} experience points toward the next level.`
+            `Level ${experience.level} ${experience.title}. ${experience.completedCount} activities completed. ${experience.xpIntoLevel} of ${experience.xpPerLevel} experience points toward the next level.`
         );
     }
 
@@ -217,6 +217,7 @@ class StudentProgressCoreMethods {
         this.sm.progressData = {
             studentProfile: mergedStudentProfile,
             units: progress.units || {},
+            totalXp: Number(progress.totalXp) || 0,
             coins: migrated.coinData.balance,
             coinData: migrated.coinData,
             coinHistory: migrated.coinHistory

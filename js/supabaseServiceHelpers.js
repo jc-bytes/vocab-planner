@@ -47,6 +47,7 @@ export const FIELD_ALIASES = {
         coinData: 'coin_data',
         coinHistory: 'coin_history',
         studentProfile: 'student_profile',
+        totalXp: 'total_xp',
         updatedAt: 'updated_at',
         userId: 'user_id'
     },
@@ -236,6 +237,7 @@ export const toClientRow = (tableName, row) => {
             coins: row.coins ?? row.coin_data?.balance ?? 0,
             coinData: row.coin_data || { ...DEFAULT_COIN_DATA },
             coinHistory: row.coin_history || [],
+            totalXp: Number(row.total_xp) || 0,
             email: studentProfile.email || '',
             role: 'student',
             createdAt: toTimestamp(row.created_at),

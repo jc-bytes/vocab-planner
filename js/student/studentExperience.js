@@ -1,5 +1,34 @@
-export const XP_PER_COMPLETED_ACTIVITY = 20;
-export const XP_PER_LEVEL = 100;
+export const REQUIRED_ACTIVITY_XP = 50;
+export const OPTIONAL_ACTIVITY_XP = 10;
+export const FIRST_LEVEL_XP = 100;
+export const LEVEL_XP_INCREMENT = 50;
+
+export function getLevelTitle(level) {
+    if (level >= 10) return 'Innovator';
+    if (level >= 6) return 'Creator';
+    if (level >= 3) return 'Builder';
+    return 'Explorer';
+}
+
+export function getLevelProgress(totalXp = 0) {
+    let remainingXp = Math.max(0, Math.floor(Number(totalXp) || 0));
+    let level = 1;
+    let xpForNextLevel = FIRST_LEVEL_XP;
+
+    while (remainingXp >= xpForNextLevel) {
+        remainingXp -= xpForNextLevel;
+        level += 1;
+        xpForNextLevel += LEVEL_XP_INCREMENT;
+    }
+
+    return {
+        level,
+        title: getLevelTitle(level),
+        xpIntoLevel: remainingXp,
+        xpForNextLevel,
+        xpToNextLevel: xpForNextLevel - remainingXp
+    };
+}
 
 export function getStudentExperience(progressData = {}) {
     const completedActivities = new Set();
@@ -23,16 +52,17 @@ export function getStudentExperience(progressData = {}) {
     });
 
     const completedCount = completedActivities.size;
-    const totalXp = completedCount * XP_PER_COMPLETED_ACTIVITY;
-    const level = Math.floor(totalXp / XP_PER_LEVEL) + 1;
-    const xpIntoLevel = totalXp % XP_PER_LEVEL;
+    // Older/offline snapshots have no XP summary, so preserve their original
+    // 20-XP-per-completion estimate until Supabase returns the authoritative total.
+    const totalXp = Number.isFinite(Number(progressData?.totalXp))
+        ? Math.max(0, Math.floor(Number(progressData.totalXp)))
+        : completedCount * 20;
+    const levelProgress = getLevelProgress(totalXp);
 
     return {
         completedCount,
         totalXp,
-        level,
-        xpIntoLevel,
-        xpPerLevel: XP_PER_LEVEL,
-        xpToNextLevel: XP_PER_LEVEL - xpIntoLevel
+        ...levelProgress,
+        xpPerLevel: levelProgress.xpForNextLevel
     };
 }

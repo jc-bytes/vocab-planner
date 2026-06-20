@@ -26,7 +26,9 @@ export function installSupabaseStudentWriteMethods(service) {
             p_is_complete: Boolean(payload.isComplete),
             p_details: payload.details || {},
             p_activity_settings: payload.activitySettings || {},
-            p_client_id: payload.clientId || ''
+            p_client_id: payload.clientId || '',
+            p_is_required: Boolean(payload.isRequired),
+            p_attempt_id: payload.attemptId || ''
         });
         return requireRpcResult('student_progress', data, error);
     };

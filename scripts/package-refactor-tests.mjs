@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import { Packer } from 'docx';
 import { buildQuizWordDocument } from '../js/quizMakerWordExportMethods.js';
-import { getStudentExperience } from '../js/student/studentExperience.js';
+import { getLevelProgress, getStudentExperience } from '../js/student/studentExperience.js';
 
 function assertIncludes(text, needle, label) {
     if (text.includes(needle)) return;
@@ -167,6 +167,18 @@ function runStudentExperienceTests() {
     if (experience.totalXp !== 100) throw new Error('Five completed activities should earn 100 XP.');
     if (experience.level !== 2) throw new Error('A student should reach level 2 at 100 XP.');
     if (experience.xpIntoLevel !== 0) throw new Error('XP progress should reset at a new level.');
+    if (experience.xpForNextLevel !== 150) throw new Error('Level 2 should require 150 XP.');
+
+    const progressed = getLevelProgress(450);
+    if (progressed.level !== 4 || progressed.xpIntoLevel !== 0 || progressed.xpForNextLevel !== 250) {
+        throw new Error('Progressive XP thresholds should be 100, 150, 200, 250...');
+    }
+    if (progressed.title !== 'Builder') throw new Error('Levels 3-5 should use the Builder title.');
+
+    const authoritative = getStudentExperience({ totalXp: 249, units: {} });
+    if (authoritative.level !== 2 || authoritative.xpIntoLevel !== 149) {
+        throw new Error('Supabase total XP should be authoritative when present.');
+    }
 }
 
 await runDocxTests();
