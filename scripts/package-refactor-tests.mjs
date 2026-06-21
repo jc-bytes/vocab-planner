@@ -191,7 +191,9 @@ async function runLeaderboardContractTests() {
         readFile(new URL('../supabase/migrations/20260620133911_enable_trapdoor_trials_leaderboard.sql', import.meta.url), 'utf8'),
         readFile(new URL('../supabase/migrations/20260620020403_enable_canvas_game_leaderboards.sql', import.meta.url), 'utf8'),
         readFile(new URL('../supabase/migrations/20260620135443_remove_level_devil_game_score.sql', import.meta.url), 'utf8'),
-        readFile(new URL('../supabase/migrations/20260621004928_enable_tilt_maze_basic_platformer_leaderboards.sql', import.meta.url), 'utf8')
+        readFile(new URL('../supabase/migrations/20260621004928_enable_tilt_maze_basic_platformer_leaderboards.sql', import.meta.url), 'utf8'),
+        readFile(new URL('../supabase/migrations/20260621010445_enable_tower_platformer_leaderboard.sql', import.meta.url), 'utf8'),
+        readFile(new URL('../supabase/migrations/20260621011648_replace_scratch_arcade_games.sql', import.meta.url), 'utf8')
     ]);
     const migrationSource = migrationSources.join('\n');
     const canvasGames = [
@@ -204,7 +206,8 @@ async function runLeaderboardContractTests() {
         'whack-a-mole',
         'trapdoor-trials',
         'tilt-maze',
-        'basic-platformer'
+        'basic-platformer',
+        'tower-platformer'
     ];
 
     for (const gameId of canvasGames) {
@@ -316,15 +319,26 @@ async function runBasicPlatformerContractTests() {
 
     const tiltMazeIndex = studentSource.indexOf("id: 'tilt-maze'");
     const platformerIndex = studentSource.indexOf("id: 'basic-platformer'");
-    const ballBlastIndex = studentSource.indexOf("id: 'ball-blast'");
-    if (!(tiltMazeIndex < platformerIndex && platformerIndex < ballBlastIndex)) {
-        throw new Error('BasicPlatformer must replace Appel between Tilt Maze and Ball Blast.');
+    const towerIndex = studentSource.indexOf("id: 'tower-platformer'");
+    if (!(tiltMazeIndex < platformerIndex && platformerIndex < towerIndex)) {
+        throw new Error('BasicPlatformer must remain between Tilt Maze and Tower Climb.');
     }
     if (/id: 'appel'|type === 'appel'|Appel v1\.html/.test(`${studentSource}\n${lifecycleSource}`)) {
         throw new Error('Removed Appel integration is still referenced by the student app.');
     }
     if (!lifecycleSource.includes("'js/games/basic-platformer/index.html'")) {
         throw new Error('BasicPlatformer launch path is missing.');
+    }
+    if (!studentSource.includes("name: 'Circuit Sprint'") || !gameHtml.includes('Checkpoint Runner: Circuit Sprint')) {
+        throw new Error('Circuit Sprint naming must stay visible in the arcade and game shell.');
+    }
+    for (const hook of ['__basicPlatformerStartLevel', '__basicPlatformerReportAttempt', '__basicPlatformerReportCheckpoint', '__basicPlatformerReportScore']) {
+        if (!gameHtml.includes(hook) || !gameBundle.includes(hook)) {
+            throw new Error(`Circuit Sprint scoring hook is missing: ${hook}.`);
+        }
+    }
+    if (!gameHtml.includes('runner-hud') || !gameHtml.includes('speedBonus') || !gameBundle.includes('Warmup Circuit')) {
+        throw new Error('Circuit Sprint HUD, speed scoring, and level names must remain wired.');
     }
     if (!/gameId === 'basic-platformer'[\s\S]*?frameWidth = 1280;[\s\S]*?frameHeight = 720;/.test(loaderSource)) {
         throw new Error('BasicPlatformer must retain its 1280x720 frame ratio.');
@@ -347,11 +361,67 @@ async function runBasicPlatformerContractTests() {
     }
 }
 
+async function runTowerPlatformerContractTests() {
+    const [studentSource, lifecycleSource, loaderSource, gameHtml, gameSource, gameLicense, readme] = await Promise.all([
+        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tower-platformer/index.html', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tower-platformer/js/tower.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tower-platformer/license', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tower-platformer/readme.md', import.meta.url), 'utf8')
+    ]);
+
+    const platformerIndex = studentSource.indexOf("id: 'basic-platformer'");
+    const towerIndex = studentSource.indexOf("id: 'tower-platformer'");
+    const radiusIndex = studentSource.indexOf("id: 'radius-raid'");
+    if (!(platformerIndex < towerIndex && towerIndex < radiusIndex)) {
+        throw new Error('Tower Climb must replace Ball Blast between Circuit Sprint and Radius Raid.');
+    }
+    if (/id: 'ball-blast'|type === 'ball-blast'|Ball Blast - Mobile friendly/.test(`${studentSource}\n${lifecycleSource}`)) {
+        throw new Error('Removed Ball Blast integration is still referenced by the student app.');
+    }
+    if (!studentSource.includes("name: 'Tower Climb'") || !lifecycleSource.includes("'js/games/tower-platformer/index.html'")) {
+        throw new Error('Tower Climb arcade card or launch path is missing.');
+    }
+    if (!loaderSource.includes("gameId === 'tower-platformer'")) {
+        throw new Error('Tower Climb responsive iframe sizing is missing.');
+    }
+    if (/(?:src|href)=["']https?:\/\//.test(gameHtml)) {
+        throw new Error('Tower Climb HTML must not load remote resources.');
+    }
+    if (!gameSource.includes("type: 'tower-platformer-score'") || !gameSource.includes('window.parent.postMessage')) {
+        throw new Error('Tower Climb leaderboard score reporting is missing.');
+    }
+    if (!gameLicense.startsWith('Copyright (c) 2013') || !readme.includes('MIT')) {
+        throw new Error('Tower Climb must retain its upstream MIT license/readme.');
+    }
+}
+
+async function runRemovedArcadeGamesContractTests() {
+    const [studentSource, lifecycleSource, loaderSource] = await Promise.all([
+        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8')
+    ]);
+
+    const spacePiIndex = studentSource.indexOf("id: 'spacepi'");
+    const blackHoleIndex = studentSource.indexOf("id: 'black-hole-square'");
+    if (!(spacePiIndex < blackHoleIndex)) {
+        throw new Error('Black Hole Square must follow SpacePi after the removed Scratch replacement slots.');
+    }
+    if (/id: 'mystic-valley'|id: 'slash-knight'|id: 'coin-runner'|id: 'relic-runner'|type === 'mystic-valley'|type === 'slash-knight'|type === 'coin-runner'|type === 'relic-runner'|Mystic Valley\.html|Slash Knight\.html|coin-runner-score|relic-runner-score/.test(`${studentSource}\n${lifecycleSource}\n${loaderSource}`)) {
+        throw new Error('Removed Scratch replacement integrations are still referenced by the active student app.');
+    }
+}
+
 await runDocxTests();
 runStudentExperienceTests();
 await runLeaderboardContractTests();
 await runTrapdoorTrialsContractTests();
 await runTiltMazeContractTests();
 await runBasicPlatformerContractTests();
+await runTowerPlatformerContractTests();
+await runRemovedArcadeGamesContractTests();
 
 console.log('Package refactor tests passed.');

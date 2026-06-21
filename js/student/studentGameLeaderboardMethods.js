@@ -23,6 +23,7 @@ const LEADERBOARD_ENABLED_GAMES = [
     'trapdoor-trials',
     'tilt-maze',
     'basic-platformer',
+    'tower-platformer',
     'radius-raid',
     'packabunchas',
     'spacepi'

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+  <title>Tower Climb</title>
+
+  <style>
+    html, body      { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #090b16; }
+    body            { display: grid; place-items: center; font-family: Arial, sans-serif; }
+    #tower          { position: relative; width: min(100vw, 960px); aspect-ratio: 4 / 3; border: 4px solid #C080C0; box-sizing: border-box; background: #111; overflow: hidden; }
+    #hud            { position: absolute; bottom: 0; left: 0; width: 8em; background-color: rgba(160, 24, 48, 0.86); border: 4px solid black; box-sizing: border-box; }
+    #score          { color: yellow; font-size: 2em; font-family: Georgia, serif; font-weight: 700; }
+    #canvas         { display: inline-block; width: 100%; height: 100%; }
+    #instructions   { position: absolute; right: 10px; bottom: 8px; font-style: italic; color: #d7d7e8; font-size: 9pt; padding: 4px 8px; border-radius: 6px; background: rgba(0, 0, 0, 0.42); }
+    #instructions b { color: #DDD; }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="tower">
+
+    <div id="hud">
+      <table>
+        <tr><td><img src="images/coin.png"></td><td><span id="score"></span></td></tr>
+      </table>
+    </div>
+
+    <canvas id="canvas">
+      <div class="unsupported">
+        Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+      </div>
+    </canvas>
+
+    <div id="instructions">
+      <b>LEFT/RIGHT</b> move, <b>UP/DOWN</b> climb, <b>SPACE</b> jump
+      <span id="debug"></span>
+    </div>
+
+  </div>
+
+  <script src="js/fpsmeter.min.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/tower.js"></script>
+
+</body>
+</html>

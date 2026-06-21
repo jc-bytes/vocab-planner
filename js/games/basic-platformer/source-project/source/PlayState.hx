@@ -58,6 +58,11 @@ class PlayState extends FlxState
 		super.create();
 
 		Content.load();
+#if js
+		var levelStarter:Dynamic = Reflect.field(Browser.window, "__basicPlatformerStartLevel");
+		if (Reflect.isFunction(levelStarter))
+			levelStarter(area_i, level_i, checkpoint_i);
+#end
 
 		if (sound != null)
 			sound.play();
@@ -185,7 +190,14 @@ class PlayState extends FlxState
 
 		// collision with red spikes
 		if (level.collideWithSpikes(player) || FlxG.keys.justPressed.R)
+		{
+#if js
+			var attemptReporter:Dynamic = Reflect.field(Browser.window, "__basicPlatformerReportAttempt");
+			if (Reflect.isFunction(attemptReporter))
+				attemptReporter(area_i, level_i);
+#end
 			FlxG.switchState(new PlayState(area_i, level_i, checkpoint_i, Content.sound_damage));
+		}
 
 		if (FlxG.keys.justPressed.ESCAPE)
 			FlxG.switchState(new MenuState());
@@ -212,6 +224,11 @@ class PlayState extends FlxState
 	public function checkpoint(i:Int)
 	{
 		Content.sound_checkpoint.play();
+#if js
+		var checkpointReporter:Dynamic = Reflect.field(Browser.window, "__basicPlatformerReportCheckpoint");
+		if (Reflect.isFunction(checkpointReporter))
+			checkpointReporter(i);
+#end
 		checkpoints.members[i].active = false;
 		checkpoints.members[i].visible = false;
 		checkpoint_i = i;

@@ -57,14 +57,7 @@ class StudentGameHtmlLoaderMethods {
             frameHeight = 620;
             iframe.style.display = 'block';
             iframe.style.overflow = 'auto';
-        } else if (gameId === 'mystic-valley' || gameId === 'slash-knight') {
-            // Full-screen Scratch/TurboWarp games - let them size themselves
-            scaleFixedFrame = false;
-            iframe.style.height = '100%';
-            iframe.style.minHeight = '600px';
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'hidden';
-        } else if (gameId === 'tilt-maze' || gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
+        } else if (gameId === 'tilt-maze' || gameId === 'tower-platformer' || gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
             // Responsive games fill the stage and size their own content within it.
             scaleFixedFrame = false;
             if (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
@@ -173,60 +166,7 @@ class StudentGameHtmlLoaderMethods {
             try {
                 const iframeWindow = iframe.contentWindow;
                 const iframeDoc = iframe.contentDocument || iframeWindow.document;
-                
-                // Performance optimizations for TurboWarp games
-                if (gameId === 'mystic-valley') {
-                    // Try multiple times to catch the VM when it's ready
-                    let attempts = 0;
-                    const maxAttempts = 20; // Try for up to 4 seconds (20 * 200ms)
-                    
-                    const optimizePerformance = () => {
-                        attempts++;
-                        try {
-                            let vm = null;
-                            
-                            // Try to find VM in various locations
-                            if (iframeWindow.vm) {
-                                vm = iframeWindow.vm;
-                            } else if (iframeWindow.Scratch && iframeWindow.Scratch.vm) {
-                                vm = iframeWindow.Scratch.vm;
-                            } else if (iframeWindow.packager && iframeWindow.packager.vm) {
-                                vm = iframeWindow.packager.vm;
-                            }
-                            
-                            if (vm) {
-                                // Don't enable turbo mode (game may not support it)
-                                // Just increase framerate from 10 to 60 FPS for better performance
-                                if (vm.setFramerate) {
-                                    vm.setFramerate(30);
-                                    console.log(`[${gameId}] Framerate set to 60 FPS`);
-                                }
-                                
-                                // Enable interpolation for smoother animation
-                                if (vm.setInterpolation) {
-                                    vm.setInterpolation(true);
-                                    console.log(`[${gameId}] Interpolation enabled`);
-                                }
-                                
-                                return true; // Success
-                            }
-                        } catch (error) {
-                            // Silently continue trying
-                        }
-                        
-                        // Try again if we haven't exceeded max attempts
-                        if (attempts < maxAttempts) {
-                            setTimeout(optimizePerformance, 200);
-                        } else {
-                            console.warn(`[${gameId}] Could not optimize performance after ${maxAttempts} attempts`);
-                        }
-                        return false;
-                    };
-                    
-                    // Start trying after a short delay
-                    setTimeout(optimizePerformance, 500);
-                }
-                
+
                 // Inject score reporting script (if scoreMessageType is provided)
                 if (scoreMessageType && gameId !== 'trapdoor-trials') {
                     try {

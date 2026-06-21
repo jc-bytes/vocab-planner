@@ -2,40 +2,40 @@
 <data>
     <include name="common"/>
 
-    <text name="title" center_x="true" y="50pt" width="screen.width" align="center" size="40pt" text="Checkpoint Runner" color="0xff4169e1">
+    <text name="title" center_x="true" y="50pt" width="screen.width" align="center" size="40pt" text="Circuit Sprint" color="0xff4169e1">
     </text>
 
-    <button name="level_0_0" center_y="true" label="0" height="30pt">
+    <button name="level_0_0" center_y="true" label="Warmup" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="0" />
         <text size="20pt" />
     </button>
-    <button name="level_0_1" label="1" height="30pt">
+    <button name="level_0_1" label="Spikes" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="1" />
         <text size="20pt" />
     </button>
-    <button name="level_0_2" label="2" height="30pt">
+    <button name="level_0_2" label="Climb" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="2" />
         <text size="20pt" />
     </button>
-    <button name="level_0_3" label="3" height="30pt">
+    <button name="level_0_3" label="Relay" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="3" />
         <text size="20pt" />
     </button>
-    <button name="level_0_4" label="4" height="30pt">
+    <button name="level_0_4" label="Lab" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="4" />
         <text size="20pt" />
     </button>
-    <button name="level_0_5" label="5" height="30pt">
+    <button name="level_0_5" label="Final" height="30pt">
         <param type="string" value="play" />
         <param type="int" value="0" />
         <param type="int" value="5" />
@@ -63,12 +63,12 @@
         <param type="int" value="0" />
         <text size="35pt" />
     </button>
-    <text name="play_text" size="10pt" width="screen.width" align="center" text="Level 0" color="0xff4169e1">
+    <text name="play_text" size="10pt" width="screen.width" align="center" text="Warmup Circuit" color="0xff4169e1">
         <anchor y="play_btn.bottom" y-flush="top" />
     </text>
 
 
-    <text name="area0" size="20pt" width="500pt" text="Select level:" color="0xff4169e1">
+    <text name="area0" size="20pt" width="500pt" text="Select circuit:" color="0xff4169e1">
         <anchor x="level_0_0.left" y="level_0_0.top" x-flush="left" y-flush="bottom" />
     </text>
 </data>

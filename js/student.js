@@ -60,13 +60,11 @@ class StudentManager {
             { id: 'whack-a-mole', name: 'Whack-a-Mole', icon: '🎪', desc: 'Whack the moles!' },
             { id: 'trapdoor-trials', name: 'Trapdoor Trials', icon: '🚪', desc: 'Outsmart every surprise trap!' },
             { id: 'tilt-maze', name: 'Tilt Maze', icon: '🎲', desc: 'Tilt a 3D maze to reach the goal!' },
-            { id: 'basic-platformer', name: 'Checkpoint Runner', icon: '🏁', desc: 'Run, jump, and master six levels!' },
-            { id: 'ball-blast', name: 'Ball Blast', icon: '💥', desc: 'Blast the balls!' },
+            { id: 'basic-platformer', name: 'Circuit Sprint', icon: '🏁', desc: 'Run the checkpoint course and chase a clean time!' },
+            { id: 'tower-platformer', name: 'Tower Climb', icon: '🗼', desc: 'Circle the tower, climb ladders, and collect coins!' },
             { id: 'radius-raid', name: 'Radius Raid', icon: '🚀', desc: 'Blast enemies in space!' },
             { id: 'packabunchas', name: 'Packabunchas', icon: '🧩', desc: 'Solve tiling puzzles!' },
             { id: 'spacepi', name: 'SpacePi', icon: '🛡️', desc: 'Defend your base!' },
-            { id: 'mystic-valley', name: 'Mystic Valley', icon: '🏔️', desc: 'Multiplayer platformer!' },
-            { id: 'slash-knight', name: 'Slash Knight', icon: '⚔️', desc: 'Adventure platformer!' },
             { id: 'black-hole-square', name: 'Black Hole Square', icon: '⬛', desc: 'Clean up the squares!' },
             { id: 'glitch-buster', name: 'Glitch Buster', icon: '💥', desc: 'Bust the glitches!' },
             { id: 'callisto', name: 'Callisto', icon: '🌌', desc: '3D space action!' },
@@ -75,7 +73,7 @@ class StudentManager {
             { id: 'grow-your-garden', name: 'Grow Your Garden', icon: '🌱', desc: 'Plant, harvest, and upgrade your garden!' }
         ];
         // HTML/Scratch games that don't have leaderboards.
-        this.htmlGames = ['tilt-maze', 'basic-platformer', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
+        this.htmlGames = ['tilt-maze', 'basic-platformer', 'tower-platformer', 'radius-raid', 'packabunchas', 'spacepi', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
         this.currentGameIndex = 0;
         this.authInitialized = false;
         this.authDisabled = DEV_AUTH_DISABLED;

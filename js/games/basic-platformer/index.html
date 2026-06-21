@@ -4,7 +4,7 @@
 	
 	<meta charset="utf-8">
 	
-	<title>Checkpoint Runner</title>
+	<title>Checkpoint Runner: Circuit Sprint</title>
 	
 	<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,17 +16,84 @@
 	<script type="text/javascript" src="./BasicPlatformer.js"></script>
 	
 	<script>
+		var checkpointRunner = {
+			levelStartedAt: Date.now(),
+			currentLevelKey: '',
+			attempts: 0,
+			checkpoints: {},
+			lastScore: 0
+		};
+		var levelNames = [
+			'Warmup Circuit',
+			'Spike Switchback',
+			'Checkpoint Climb',
+			'Wall-Hop Relay',
+			'Double-Jump Lab',
+			'Final Sprint'
+		];
+
+		function updateRunnerHud() {
+			var levelEl = document.getElementById('runner-level');
+			var scoreEl = document.getElementById('runner-score');
+			var attemptsEl = document.getElementById('runner-attempts');
+			var timerEl = document.getElementById('runner-timer');
+			if (!levelEl || !scoreEl || !attemptsEl || !timerEl) return;
+
+			var elapsed = Math.max(0, Math.floor((Date.now() - checkpointRunner.levelStartedAt) / 1000));
+			levelEl.textContent = checkpointRunner.levelName || 'Warmup Circuit';
+			scoreEl.textContent = checkpointRunner.lastScore.toLocaleString();
+			attemptsEl.textContent = checkpointRunner.attempts.toString();
+			timerEl.textContent = elapsed + 's';
+		}
+
+		window.__basicPlatformerStartLevel = function (area, level, checkpoint) {
+			var levelNumber = Number(level) || 0;
+			var key = (Number(area) || 0) + '-' + levelNumber;
+			if (checkpointRunner.currentLevelKey !== key) {
+				checkpointRunner.currentLevelKey = key;
+				checkpointRunner.levelStartedAt = Date.now();
+				checkpointRunner.attempts = 0;
+				checkpointRunner.checkpoints = {};
+			}
+			checkpointRunner.levelName = levelNames[levelNumber] || ('Circuit ' + (levelNumber + 1));
+			if ((Number(checkpoint) || -1) >= 0) {
+				checkpointRunner.checkpoints[checkpoint] = true;
+			}
+			updateRunnerHud();
+		};
+
+		window.__basicPlatformerReportAttempt = function () {
+			checkpointRunner.attempts += 1;
+			updateRunnerHud();
+		};
+
+		window.__basicPlatformerReportCheckpoint = function (checkpoint) {
+			checkpointRunner.checkpoints[checkpoint] = true;
+			updateRunnerHud();
+		};
+
 		window.__basicPlatformerReportScore = function (area, level, completed) {
 			var completedLevels = Number.isFinite(completed) ? completed : (Number(area) || 0) * 6 + (Number(level) || 0) + 1;
+			var elapsed = Math.max(0, Math.floor((Date.now() - checkpointRunner.levelStartedAt) / 1000));
+			var speedBonus = Math.max(0, 600 - elapsed * 10);
+			var checkpointBonus = Object.keys(checkpointRunner.checkpoints).length * 100;
+			var attemptPenalty = checkpointRunner.attempts * 75;
+			var score = Math.max(0, completedLevels * 1000 + speedBonus + checkpointBonus - attemptPenalty);
+			checkpointRunner.lastScore = score;
+			updateRunnerHud();
 			window.parent.postMessage({
 				type: 'basic-platformer-score',
-				score: Math.max(0, completedLevels) * 1000,
+				score: score,
 				level: (Number(level) || 0) + 1,
 				completedLevels: completedLevels,
 				totalLevels: 6,
+				time: elapsed,
+				attempts: checkpointRunner.attempts,
 				gameOver: false
 			}, '*');
 		};
+
+		window.setInterval(updateRunnerHud, 1000);
 
 		window.addEventListener ("touchmove", function (event) { event.preventDefault (); }, { capture: false, passive: false });
 		if (typeof window.devicePixelRatio != 'undefined' && window.devicePixelRatio > 2) {
@@ -37,7 +104,38 @@
 	
 	<style>
 		html,body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+		body { background: #07070a; }
 		#openfl-content { background: #000000; width: 100%; height: 100%; }
+		.runner-hud {
+			position: fixed;
+			left: 14px;
+			top: 12px;
+			z-index: 20;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 10px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			border-radius: 8px;
+			background: rgba(10, 12, 18, 0.74);
+			color: #f8fafc;
+			font: 700 12px/1.2 Arial, sans-serif;
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+			pointer-events: none;
+		}
+		.runner-hud strong {
+			color: #8be9fd;
+			font-size: 13px;
+			white-space: nowrap;
+		}
+		.runner-hud span {
+			white-space: nowrap;
+		}
+		.runner-hud .runner-divider {
+			width: 1px;
+			height: 16px;
+			background: rgba(255, 255, 255, 0.22);
+		}
 		@font-face {
 			font-family: 'Nokia Cellphone FC Small';
 			src: url('flixel/fonts/nokiafc22.eot?#iefix') format('embedded-opentype'),
@@ -64,6 +162,13 @@
 	
 	<noscript>This webpage makes extensive use of JavaScript. Please enable JavaScript in your web browser to view this page.</noscript>
 	
+	<div class="runner-hud" aria-hidden="true">
+		<strong id="runner-level">Warmup Circuit</strong>
+		<span class="runner-divider"></span>
+		<span>Score <b id="runner-score">0</b></span>
+		<span>Attempts <b id="runner-attempts">0</b></span>
+		<span>Time <b id="runner-timer">0s</b></span>
+	</div>
 	<div id="openfl-content"></div>
 	
 	<script type="text/javascript">

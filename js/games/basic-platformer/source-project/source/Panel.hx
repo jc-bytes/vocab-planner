@@ -38,9 +38,19 @@ class ControlPanel extends FlxTypedGroup<FlxText>
 
 class InfoPanel extends FlxText
 {
+	static var levelNames:Array<String> = [
+		"Warmup Circuit",
+		"Spike Switchback",
+		"Checkpoint Climb",
+		"Wall-Hop Relay",
+		"Double-Jump Lab",
+		"Final Sprint"
+	];
+
 	override public function new(area_i:Int, level_i:Int)
 	{
-		super(0, 0, 0, 'Area $area_i - Level $level_i', 16);
+		var label = level_i >= 0 && level_i < levelNames.length ? levelNames[level_i] : 'Circuit ${level_i + 1}';
+		super(0, 0, 0, label, 16);
 		scrollFactor.set(0, 0);
 		setFormat(null, 16, FlxColor.fromInt(0xFF444444));
 		alignment = RIGHT;

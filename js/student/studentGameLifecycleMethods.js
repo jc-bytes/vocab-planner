@@ -161,11 +161,11 @@ class StudentGameLifecycleMethods {
                 canvas,
                 gameStage
             );
-        } else if (type === 'ball-blast') {
+        } else if (type === 'tower-platformer') {
             this.loadHTMLGame(
-                'ball-blast',
-                encodeURI('js/games/Ball Blast - Mobile friendly.html'),
-                null, // No score reporting for this game
+                'tower-platformer',
+                'js/games/tower-platformer/index.html',
+                'tower-platformer-score',
                 gameOverCallback,
                 canvas,
                 gameStage
@@ -193,24 +193,6 @@ class StudentGameLifecycleMethods {
                 'spacepi',
                 'js/games/spacepi-master/index.html',
                 'spacepi-score', // Score reporting enabled
-                gameOverCallback,
-                canvas,
-                gameStage
-            );
-        } else if (type === 'mystic-valley') {
-            this.loadHTMLGame(
-                'mystic-valley',
-                encodeURI('js/games/Mystic Valley.html'),
-                null, // No score reporting initially
-                gameOverCallback,
-                canvas,
-                gameStage
-            );
-        } else if (type === 'slash-knight') {
-            this.loadHTMLGame(
-                'slash-knight',
-                encodeURI('js/games/Slash Knight.html'),
-                null, // No score reporting initially
                 gameOverCallback,
                 canvas,
                 gameStage
