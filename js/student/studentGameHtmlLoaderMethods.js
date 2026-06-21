@@ -35,8 +35,18 @@ class StudentGameHtmlLoaderMethods {
         iframe.style.width = '100%';
         iframe.style.maxWidth = '100%';
 
+        if (gameId === 'trapdoor-trials') {
+            frameWidth = 960;
+            frameHeight = 540;
+            iframe.style.display = 'block';
+            iframe.style.overflow = 'hidden';
+        } else if (gameId === 'basic-platformer') {
+            frameWidth = 1280;
+            frameHeight = 720;
+            iframe.style.display = 'block';
+            iframe.style.overflow = 'hidden';
         // SpacePi: 960x600 game area
-        if (gameId === 'spacepi') {
+        } else if (gameId === 'spacepi') {
             frameWidth = 960;
             frameHeight = 600;
             iframe.style.display = 'block';
@@ -54,10 +64,14 @@ class StudentGameHtmlLoaderMethods {
             iframe.style.minHeight = '600px';
             iframe.style.display = 'block';
             iframe.style.overflow = 'hidden';
-        } else if (gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
+        } else if (gameId === 'tilt-maze' || gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
             // Responsive games fill the stage and size their own content within it.
             scaleFixedFrame = false;
-            frameHeight = (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') ? 900 : 600;
+            if (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
+                frameHeight = 900;
+            } else {
+                frameHeight = 600;
+            }
             iframe.style.height = `${frameHeight}px`;
             iframe.style.minHeight = '400px';
             iframe.style.display = 'block';
@@ -214,7 +228,7 @@ class StudentGameHtmlLoaderMethods {
                 }
                 
                 // Inject score reporting script (if scoreMessageType is provided)
-                if (scoreMessageType) {
+                if (scoreMessageType && gameId !== 'trapdoor-trials') {
                     try {
                         const script = iframeDoc.createElement('script');
                         script.textContent = this.getScoreMonitoringScript(gameId, scoreMessageType);
@@ -239,15 +253,19 @@ class StudentGameHtmlLoaderMethods {
         if (scoreMessageType) {
             messageHandler = (event) => {
                 // Verify message is from our iframe (security check)
-                if (event.data && event.data.type === scoreMessageType) {
+                if (event.source === iframe.contentWindow && event.data && event.data.type === scoreMessageType) {
                     // Ensure score is a number
                     const score = Number(event.data.score) || 0;
                     const isGameOver = event.data.gameOver || false;
                     
-                    // Extract metadata for Level Devil
+                    // Extract optional progress metadata from HTML games.
                     const metadata = {
                         level: event.data.level,
                         deaths: event.data.deaths,
+                        totalDeaths: event.data.totalDeaths,
+                        completedLevels: event.data.completedLevels,
+                        totalLevels: event.data.totalLevels,
+                        completed: event.data.completed,
                         time: event.data.time,
                         originalScore: event.data.originalScore
                     };
@@ -256,9 +274,9 @@ class StudentGameHtmlLoaderMethods {
                     const scoreDisplay = $('#game-score');
                     if (scoreDisplay) {
                         scoreDisplay.style.display = 'block';
-                        // For Level Devil, show formatted info
-                        if (gameId === 'level-devil' && metadata.level) {
-                            scoreDisplay.textContent = `Level ${metadata.level} | Deaths: ${metadata.deaths} | Time: ${this.formatTime(metadata.time)}`;
+                        if (gameId === 'trapdoor-trials' && metadata.level) {
+                            const progress = `${metadata.completedLevels || 0}/${metadata.totalLevels || 30}`;
+                            scoreDisplay.textContent = `${metadata.completed ? 'Complete' : `Level ${metadata.level}`} | Cleared ${progress} | Attempts: ${metadata.deaths || 0}`;
                         } else {
                             scoreDisplay.textContent = `Score: ${score.toLocaleString()}`;
                         }

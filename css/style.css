@@ -120,6 +120,34 @@ body {
     align-items: center;
 }
 
+.app-container:has(#login-view:not(.hidden))>main {
+    min-height: calc(100vh - (2 * var(--spacing-lg)));
+    min-height: calc(100dvh - (2 * var(--spacing-lg)));
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.app-container:has(#login-view:not(.hidden))>.student-app-header {
+    display: none;
+}
+
+.app-container:has(#teacher-login-view:not(.hidden))>.teacher-main {
+    min-height: calc(100vh - (2 * var(--spacing-lg)));
+    min-height: calc(100dvh - (2 * var(--spacing-lg)));
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.app-container:has(#teacher-login-view:not(.hidden))>.teacher-app-header {
+    display: none;
+}
+
 /* Header */
 .landing-header h1 {
     font-size: clamp(2.75rem, 5vw, 4.35rem);
@@ -2694,6 +2722,13 @@ input[readonly] {
     width: min(100%, 520px);
     min-height: 0;
     margin: 0 auto;
+    padding: clamp(1.35rem, 4vw, 2rem);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
+        rgba(15, 23, 42, 0.76);
+    box-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85);
 }
 
 .login-container h2 {
@@ -2752,6 +2787,14 @@ input[readonly] {
         linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
         rgba(15, 23, 42, 0.76);
     box-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85);
+}
+
+#login-view .auth-panel {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .student-dashboard-heading {

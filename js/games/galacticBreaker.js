@@ -1,8 +1,9 @@
 export class GalacticBreaker {
-    constructor(canvas, onGameOver, onScoreChange = null) {
+    constructor(canvas, onGameOver, onScoreChange = null, getTimeRemaining = null) {
         this.canvas = canvas;
         this.onGameOver = onGameOver;
         this.onScoreChange = onScoreChange;
+        this.getTimeRemaining = getTimeRemaining;
         this.ctx = canvas.getContext('2d');
         this.width = canvas.width;
         this.height = canvas.height;
@@ -11,6 +12,11 @@ export class GalacticBreaker {
         this.isRunning = false;
         this.isServing = true;
         this.lastReportedScore = null;
+        this.effectTimers = new Map();
+        this.minuteBonusText = '';
+        this.minuteBonusTimer = 0;
+        this.slowActive = false;
+        this.fireballActive = false;
 
         // Game Objects
         this.paddle = {
@@ -21,7 +27,6 @@ export class GalacticBreaker {
             speed: 8,
             dx: 0,
             color: '#8b5cf6',
-            magnetActive: false,
             expandActive: false
         };
 
@@ -40,7 +45,7 @@ export class GalacticBreaker {
         this.bricks = [];
         this.powerUps = [];
         this.particles = [];
-        this.brickRowCount = 5;
+        this.brickRowCount = 4;
         this.brickColumnCount = 9;
         this.brickWidth = 75;
         this.brickHeight = 25;
@@ -52,7 +57,6 @@ export class GalacticBreaker {
         this.lives = 3;
         this.level = 1;
         this.combo = 0;
-        this.comboTimer = 0;
 
         // Brick types
         this.brickTypes = [
@@ -67,13 +71,9 @@ export class GalacticBreaker {
         // Power-up types
         this.powerUpTypes = [
             { type: 'expand', color: '#10b981', symbol: '▬', duration: 10000 },
-            { type: 'shrink', color: '#ef4444', symbol: '―', duration: 8000 },
             { type: 'slow', color: '#3b82f6', symbol: '◐', duration: 7000 },
-            { type: 'fast', color: '#f59e0b', symbol: '◑', duration: 6000 },
             { type: 'multiball', color: '#8b5cf6', symbol: '●●', duration: 0 },
-            { type: 'extralife', color: '#ec4899', symbol: '♥', duration: 0 },
-            { type: 'fireball', color: '#fbbf24', symbol: '🔥', duration: 12000 },
-            { type: 'magnet', color: '#06b6d4', symbol: '⬇', duration: 8000 }
+            { type: 'fireball', color: '#fbbf24', symbol: 'F', duration: 10000 }
         ];
 
         this.balls = [this.ball]; // Support multiple balls
@@ -89,6 +89,62 @@ export class GalacticBreaker {
                 this.onScoreChange(this.score);
             }
         }
+    }
+
+    getRemainingSeconds() {
+        if (!this.getTimeRemaining) return null;
+        const remaining = Number(this.getTimeRemaining());
+        return Number.isFinite(remaining) ? Math.max(0, remaining) : null;
+    }
+
+    isFinalRush() {
+        const remaining = this.getRemainingSeconds();
+        return remaining !== null && remaining > 0 && remaining <= 10;
+    }
+
+    getComboMultiplier() {
+        return 1 + Math.min(4, Math.floor(this.combo / 4));
+    }
+
+    getScoreMultiplier() {
+        return this.getComboMultiplier() * (this.isFinalRush() ? 2 : 1);
+    }
+
+    addBrickScore(points) {
+        this.score += Math.round(points * this.getScoreMultiplier());
+        this.combo++;
+    }
+
+    resetCombo() {
+        this.combo = 0;
+    }
+
+    completeMinute() {
+        const bonus = this.lives * 50;
+        this.score += bonus;
+        this.minuteBonusText = `MINUTE CLEAR +${bonus}`;
+        this.minuteBonusTimer = 120;
+        this.reportScoreIfChanged();
+    }
+
+    setTimedEffect(name, duration, activate, deactivate) {
+        const existing = this.effectTimers.get(name);
+        if (existing) {
+            clearTimeout(existing.timeoutId);
+        } else {
+            activate();
+        }
+
+        const timeoutId = setTimeout(() => {
+            this.effectTimers.delete(name);
+            if (this.isRunning) deactivate();
+        }, duration);
+        this.effectTimers.set(name, { timeoutId, deactivate });
+    }
+
+    clearTimedEffects() {
+        this.effectTimers.forEach(({ timeoutId }) => clearTimeout(timeoutId));
+        this.effectTimers.clear();
     }
 
     clampPaddle() {
@@ -131,30 +187,35 @@ export class GalacticBreaker {
         if (!this.isServing || this.balls.length !== 1) return;
         const ball = this.balls[0];
         const hitPos = (ball.x - this.paddle.x) / this.paddle.width;
-        ball.dx = (hitPos - 0.5) * 8 || 4;
-        ball.dy = -4;
+        const speedScale = this.slowActive ? 0.7 : 1;
+        const launchSpeed = Math.min(6.5, 4 + (this.level - 1) * 0.4);
+        ball.dx = ((hitPos - 0.5) * launchSpeed * 2 || launchSpeed) * speedScale;
+        ball.dy = -launchSpeed * speedScale;
         this.isServing = false;
     }
 
     initBricks() {
         this.bricks = [];
+        const specialOffset = this.level % 2;
+        const guaranteedSpecials = new Map([
+            [1 + specialOffset, 3],
+            [4, 4],
+            [7 - specialOffset, 5]
+        ]);
+
         for (let c = 0; c < this.brickColumnCount; c++) {
             this.bricks[c] = [];
             for (let r = 0; r < this.brickRowCount; r++) {
                 const brickX = c * (this.brickWidth + this.brickPadding) + this.brickOffsetLeft;
                 const brickY = r * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
 
-                // Determine brick type based on row with some randomness
                 let typeIndex;
-                if (Math.random() < 0.1) {
-                    // 10% chance for special bricks
-                    typeIndex = Math.floor(Math.random() * 3) + 3; // Blue, Purple, or Pink
+                if (r === this.brickRowCount - 1 && guaranteedSpecials.has(c)) {
+                    typeIndex = guaranteedSpecials.get(c);
                 } else if (r === 0) {
-                    typeIndex = 2; // Top row - Green (3 hits)
-                } else if (r === 1 || r === 2) {
-                    typeIndex = 1; // Middle rows - Orange (2 hits)
+                    typeIndex = 1; // One armored row keeps the board achievable in a minute.
                 } else {
-                    typeIndex = 0; // Bottom rows - Red (1 hit)
+                    typeIndex = 0;
                 }
 
                 const type = this.brickTypes[typeIndex];
@@ -186,6 +247,36 @@ export class GalacticBreaker {
         }
     }
 
+    destroyBrick(column, row, { points = null, triggerSpecial = true } = {}) {
+        const brick = this.bricks[column]?.[row];
+        if (!brick || brick.status === 0) return false;
+
+        const brickType = this.brickTypes[brick.type];
+        brick.status = 0;
+        this.addBrickScore(points ?? brickType.points);
+        this.createParticles(
+            brick.x + this.brickWidth / 2,
+            brick.y + this.brickHeight / 2,
+            brickType.color
+        );
+
+        if (!triggerSpecial) return true;
+
+        if (brickType.special === 'explode') {
+            for (let c = Math.max(0, column - 1); c <= Math.min(this.brickColumnCount - 1, column + 1); c++) {
+                for (let r = Math.max(0, row - 1); r <= Math.min(this.brickRowCount - 1, row + 1); r++) {
+                    this.destroyBrick(c, r, { points: 5, triggerSpecial: false });
+                }
+            }
+        } else if (brickType.special === 'multiball') {
+            this.applyPowerUp({ type: 'multiball' });
+        } else if (brickType.special === 'powerup') {
+            this.spawnPowerUp(brick.x + this.brickWidth / 2, brick.y + this.brickHeight);
+        }
+
+        return true;
+    }
+
     spawnPowerUp(x, y) {
         const powerUp = this.powerUpTypes[Math.floor(Math.random() * this.powerUpTypes.length)];
         this.powerUps.push({
@@ -202,84 +293,58 @@ export class GalacticBreaker {
     applyPowerUp(powerUp) {
         switch (powerUp.type) {
             case 'expand':
-                this.paddle.expandActive = true;
-                this.paddle.width = 150;
-                setTimeout(() => {
-                    if (this.isRunning) {
-                        this.paddle.width = 100;
-                        this.paddle.expandActive = false;
-                    }
-                }, powerUp.duration);
-                break;
-            case 'shrink':
-                this.paddle.width = 60;
-                setTimeout(() => {
-                    if (this.isRunning) this.paddle.width = 100;
-                }, powerUp.duration);
+                this.setTimedEffect('expand', powerUp.duration, () => {
+                    this.paddle.expandActive = true;
+                    this.paddle.width = 150;
+                    this.clampPaddle();
+                }, () => {
+                    this.paddle.width = 100;
+                    this.paddle.expandActive = false;
+                    this.clampPaddle();
+                });
                 break;
             case 'slow':
-                this.balls.forEach(b => {
-                    b.speed *= 0.6;
-                    b.dx *= 0.6;
-                    b.dy *= 0.6;
+                this.setTimedEffect('slow', powerUp.duration, () => {
+                    this.slowActive = true;
+                    this.balls.forEach(b => {
+                        b.dx *= 0.7;
+                        b.dy *= 0.7;
+                    });
+                }, () => {
+                    this.slowActive = false;
+                    this.balls.forEach(b => {
+                        b.dx /= 0.7;
+                        b.dy /= 0.7;
+                    });
                 });
-                setTimeout(() => {
-                    if (this.isRunning) {
-                        this.balls.forEach(b => {
-                            b.speed /= 0.6;
-                            b.dx /= 0.6;
-                            b.dy /= 0.6;
-                        });
-                    }
-                }, powerUp.duration);
                 break;
-            case 'fast':
-                this.balls.forEach(b => {
-                    b.speed *= 1.5;
-                    b.dx *= 1.5;
-                    b.dy *= 1.5;
-                });
-                setTimeout(() => {
-                    if (this.isRunning) {
-                        this.balls.forEach(b => {
-                            b.speed /= 1.5;
-                            b.dx /= 1.5;
-                            b.dy /= 1.5;
-                        });
-                    }
-                }, powerUp.duration);
-                break;
-            case 'multiball':
-                // Create 2 extra balls
+            case 'multiball': {
+                const sourceBall = this.balls[0];
+                if (!sourceBall) break;
                 for (let i = 0; i < 2; i++) {
                     const newBall = {
-                        x: this.balls[0].x,
-                        y: this.balls[0].y,
-                        radius: this.balls[0].radius,
-                        speed: this.balls[0].speed,
-                        dx: (Math.random() - 0.5) * 8,
-                        dy: -Math.abs(this.balls[0].dy),
+                        x: sourceBall.x,
+                        y: sourceBall.y,
+                        radius: sourceBall.radius,
+                        speed: sourceBall.speed,
+                        dx: (i === 0 ? -1 : 1) * Math.max(3, Math.abs(sourceBall.dx)),
+                        dy: -Math.max(3, Math.abs(sourceBall.dy)),
                         color: '#fbbf24',
                         trail: [],
-                        fireball: false
+                        fireball: this.fireballActive
                     };
                     this.balls.push(newBall);
                 }
                 break;
-            case 'extralife':
-                this.lives++;
-                break;
+            }
             case 'fireball':
-                this.balls.forEach(b => b.fireball = true);
-                setTimeout(() => {
-                    if (this.isRunning) this.balls.forEach(b => b.fireball = false);
-                }, powerUp.duration);
-                break;
-            case 'magnet':
-                this.paddle.magnetActive = true;
-                setTimeout(() => {
-                    if (this.isRunning) this.paddle.magnetActive = false;
-                }, powerUp.duration);
+                this.setTimedEffect('fireball', powerUp.duration, () => {
+                    this.fireballActive = true;
+                    this.balls.forEach(b => b.fireball = true);
+                }, () => {
+                    this.fireballActive = false;
+                    this.balls.forEach(b => b.fireball = false);
+                });
                 break;
         }
     }
@@ -393,6 +458,7 @@ export class GalacticBreaker {
     stop() {
         this.isRunning = false;
         if (this.animationId) cancelAnimationFrame(this.animationId);
+        this.clearTimedEffects();
         document.removeEventListener('keydown', this.keyDownHandler);
         document.removeEventListener('keyup', this.keyUpHandler);
         document.removeEventListener('mousedown', this.documentMouseDownHandler);
@@ -454,9 +520,6 @@ export class GalacticBreaker {
                 ball.dx = (hitPos - 0.5) * 10;
                 ball.dy = -Math.abs(ball.dy);
 
-                if (this.paddle.magnetActive) {
-                    ball.dy *= 0.5; // Slow ball if magnet active
-                }
             }
 
             // Bottom collision - lose life
@@ -464,6 +527,7 @@ export class GalacticBreaker {
                 this.balls.splice(i, 1);
                 if (this.balls.length === 0) {
                     this.lives--;
+                    this.resetCombo();
                     if (this.lives > 0) {
                         this.resetBall();
                     } else {
@@ -484,48 +548,16 @@ export class GalacticBreaker {
                             ball.y > b.y &&
                             ball.y < b.y + this.brickHeight
                         ) {
-                            const brickType = this.brickTypes[b.type];
-
                             if (ball.fireball) {
-                                // Fireball destroys instantly
-                                b.status = 0;
-                                this.score += brickType.points * (1 + this.combo * 0.5);
+                                this.destroyBrick(c, r);
                             } else {
                                 ball.dy = -ball.dy;
                                 b.hits--;
 
                                 if (b.hits <= 0) {
-                                    b.status = 0;
-                                    this.score += brickType.points * (1 + this.combo * 0.5);
-                                    this.combo++;
-                                    this.comboTimer = 120;
-
-                                    // Special brick effects
-                                    if (brickType.special === 'explode') {
-                                        // Destroy adjacent bricks
-                                        for (let ec = Math.max(0, c - 1); ec <= Math.min(this.brickColumnCount - 1, c + 1); ec++) {
-                                            for (let er = Math.max(0, r - 1); er <= Math.min(this.brickRowCount - 1, r + 1); er++) {
-                                                if (this.bricks[ec][er].status === 1) {
-                                                    this.bricks[ec][er].status = 0;
-                                                    this.score += 5;
-                                                    this.createParticles(
-                                                        this.bricks[ec][er].x + this.brickWidth / 2,
-                                                        this.bricks[ec][er].y + this.brickHeight / 2,
-                                                        '#3b82f6',
-                                                        8
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    } else if (brickType.special === 'multiball') {
-                                        this.applyPowerUp({ type: 'multiball' });
-                                    } else if (brickType.special === 'powerup') {
-                                        this.spawnPowerUp(b.x + this.brickWidth / 2, b.y + this.brickHeight);
-                                    }
+                                    this.destroyBrick(c, r);
                                 }
                             }
-
-                            this.createParticles(b.x + this.brickWidth / 2, b.y + this.brickHeight / 2, brickType.color);
                         }
                     }
                 }
@@ -568,12 +600,7 @@ export class GalacticBreaker {
             }
         }
 
-        // Update combo
-        if (this.comboTimer > 0) {
-            this.comboTimer--;
-        } else if (this.combo > 0) {
-            this.combo = 0;
-        }
+        if (this.minuteBonusTimer > 0) this.minuteBonusTimer--;
 
         // Check for level completion
         let activeBricks = 0;
@@ -586,16 +613,14 @@ export class GalacticBreaker {
         if (activeBricks === 0) {
             this.level++;
             this.score += 200 * this.level;
-            this.ball.speed += 0.5;
-            this.brickRowCount = Math.min(this.brickRowCount + 1, 8);
             this.initBricks();
-            this.resetBall();
+            this.resetBall({ autoLaunch: true });
         }
 
         this.reportScoreIfChanged();
     }
 
-    resetBall() {
+    resetBall({ autoLaunch = false } = {}) {
         this.isServing = true;
         this.balls = [{
             x: this.width / 2,
@@ -606,18 +631,25 @@ export class GalacticBreaker {
             dy: 0,
             color: '#fbbf24',
             trail: [],
-            fireball: false
+            fireball: this.fireballActive
         }];
         this.attachServeBallToPaddle();
+        if (autoLaunch) this.launchServeBall();
     }
 
     draw() {
         // Space background
         const gradient = this.ctx.createLinearGradient(0, 0, 0, this.height);
-        gradient.addColorStop(0, '#1e1b4b');
-        gradient.addColorStop(1, '#0f172a');
+        gradient.addColorStop(0, this.isFinalRush() ? '#4c0519' : '#1e1b4b');
+        gradient.addColorStop(1, this.isFinalRush() ? '#1e1b4b' : '#0f172a');
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(0, 0, this.width, this.height);
+
+        if (this.isFinalRush()) {
+            this.ctx.strokeStyle = '#fb7185';
+            this.ctx.lineWidth = 8;
+            this.ctx.strokeRect(4, 4, this.width - 8, this.height - 8);
+        }
 
         // Stars
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
@@ -692,11 +724,6 @@ export class GalacticBreaker {
         this.ctx.fillRect(this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
 
         // Paddle effects
-        if (this.paddle.magnetActive) {
-            this.ctx.strokeStyle = '#06b6d4';
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeRect(this.paddle.x - 2, this.paddle.y - 2, this.paddle.width + 4, this.paddle.height + 4);
-        }
         if (this.paddle.expandActive) {
             this.ctx.strokeStyle = '#10b981';
             this.ctx.lineWidth = 2;
@@ -766,7 +793,8 @@ export class GalacticBreaker {
         if (this.combo > 0) {
             this.ctx.fillStyle = '#10b981';
             this.ctx.shadowColor = '#10b981';
-            this.ctx.fillText(`COMBO x${this.combo}!`, this.width / 2 - 60, 30);
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(`COMBO ${this.combo}  •  SCORE x${this.getScoreMultiplier()}`, this.width / 2, 30);
         }
 
         this.ctx.shadowBlur = 0;
@@ -778,6 +806,26 @@ export class GalacticBreaker {
         if (this.balls.length > 1) {
             this.ctx.fillStyle = '#8b5cf6';
             this.ctx.fillText(`BALLS: ${this.balls.length}`, this.width - 10, 55);
+        }
+
+        if (this.isFinalRush()) {
+            this.ctx.textAlign = 'center';
+            this.ctx.font = 'bold 22px Arial';
+            this.ctx.fillStyle = '#fda4af';
+            this.ctx.shadowColor = '#fb7185';
+            this.ctx.shadowBlur = 12;
+            this.ctx.fillText('FINAL RUSH • DOUBLE SCORE', this.width / 2, 55);
+            this.ctx.shadowBlur = 0;
+        }
+
+        if (this.minuteBonusTimer > 0) {
+            this.ctx.textAlign = 'center';
+            this.ctx.font = 'bold 30px Arial';
+            this.ctx.fillStyle = '#fbbf24';
+            this.ctx.shadowColor = '#fbbf24';
+            this.ctx.shadowBlur = 16;
+            this.ctx.fillText(this.minuteBonusText, this.width / 2, this.height / 2);
+            this.ctx.shadowBlur = 0;
         }
 
         if (this.isServing) {

@@ -20,7 +20,9 @@ const LEADERBOARD_ENABLED_GAMES = [
     'target-shooter',
     'pong',
     'whack-a-mole',
-    'level-devil',
+    'trapdoor-trials',
+    'tilt-maze',
+    'basic-platformer',
     'radius-raid',
     'packabunchas',
     'spacepi'
@@ -72,9 +74,13 @@ class StudentGameLeaderboardMethods {
             
             if (isNewHighScore) {
                 const scoreMetadata = {};
-                if (gameId === 'level-devil' && metadata) {
+                if (gameId === 'trapdoor-trials' && metadata) {
                     scoreMetadata.level = metadata.level || 0;
                     scoreMetadata.deaths = metadata.deaths || 0;
+                    scoreMetadata.totalDeaths = metadata.totalDeaths || 0;
+                    scoreMetadata.completedLevels = metadata.completedLevels || 0;
+                    scoreMetadata.totalLevels = metadata.totalLevels || 0;
+                    scoreMetadata.completed = Boolean(metadata.completed);
                     scoreMetadata.time = metadata.time || 0;
                 }
 
@@ -195,19 +201,18 @@ class StudentGameLeaderboardMethods {
                 row.style.border = '1px solid var(--border-color)';
                 row.style.marginBottom = '0.5rem';
 
-                // For Level Devil, show metadata
-                if (gameId === 'level-devil' && data.metadata) {
+                if (gameId === 'trapdoor-trials' && data.metadata) {
                     const meta = data.metadata;
                     row.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                             <span style="font-weight: bold; width: 30px;">#${rank}</span>
                             <span style="flex-grow: 1; font-weight: 500;">${data.name}</span>
-                            <span style="font-weight: bold; color: var(--primary-color); font-size: 0.9rem;">Score: ${score.toLocaleString()}</span>
+                            <span style="font-weight: bold; color: var(--primary-color); font-size: 0.9rem;">${meta.completed ? 'Complete' : `Level ${meta.level || 1}`}</span>
                         </div>
                         <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-left: 30px;">
-                            <span>Level: <strong>${meta.level || 0}</strong></span>
-                            <span>Deaths: <strong>${meta.deaths || 0}</strong></span>
-                            <span>Time: <strong>${this.formatTime(meta.time || 0)}</strong></span>
+                            <span>Cleared: <strong>${meta.completedLevels || 0}/${meta.totalLevels || 30}</strong></span>
+                            <span>Attempts: <strong>${meta.deaths || 0}</strong></span>
+                            <span>Score: <strong>${score.toLocaleString()}</strong></span>
                         </div>
                     `;
                 } else {

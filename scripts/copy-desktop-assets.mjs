@@ -10,7 +10,6 @@ const entries = [
   'js/games',
   'js/libs',
   'join',
-  'LvL-Devil-main',
   'PolyDash-main',
   'favicon.ico',
   'logo.jpeg',

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Tilt Maze — tilt-maze puzzle</title>
+  <meta name="description" content="Tilt a transparent 3D cube to roll a ball through the maze hidden inside it. Find the path to the green goal." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <header class="hud">
+    <h1>Tilt Maze</h1>
+    <p class="tag">Rotate the cube — gravity rolls the ball through the maze inside</p>
+    <p class="lvl">Level <b id="level">1</b></p>
+  </header>
+
+  <button id="reset" class="reset">↺ Restart level</button>
+  <p class="controls">Drag to tilt the cube · gravity rolls the ball to the <b>green</b> goal</p>
+  <div id="flash" class="flash"></div>
+  <div id="loading" class="loading">Loading engine…</div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

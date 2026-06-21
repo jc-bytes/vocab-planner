@@ -159,12 +159,17 @@
     filter: blur(35px);
     opacity: 0.18;
 }.app-container:has(#login-view:not(.hidden))>main {
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
-        rgba(15, 23, 42, 0.22);
-    min-height: clamp(520px, 68vh, 720px);
+    min-height: calc(100vh - (2 * var(--spacing-lg)));
+    min-height: calc(100dvh - (2 * var(--spacing-lg)));
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
     display: grid;
     align-items: center;
+    box-shadow: none;
+}.app-container:has(#login-view:not(.hidden))>.student-app-header {
+    display: none;
 }/* Header */.landing-header h1 {
     font-size: clamp(2.75rem, 5vw, 4.35rem);
     line-height: 1;
@@ -1375,6 +1380,13 @@ select:focus {
     width: min(100%, 520px);
     min-height: 0;
     margin: 0 auto;
+    padding: clamp(1.35rem, 4vw, 2rem);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
+        rgba(15, 23, 42, 0.76);
+    box-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85);
 }.login-container h2 {
     margin-bottom: var(--spacing-md);
     text-align: center;
@@ -1410,11 +1422,11 @@ select:focus {
     border-radius: 999px;
 }.auth-panel,
 .login-container .card {
-    padding: clamp(1.1rem, 3vw, 1.5rem);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
-        rgba(15, 23, 42, 0.76);
-    box-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 }.student-dashboard-heading {
     display: flex;
     align-items: flex-end;

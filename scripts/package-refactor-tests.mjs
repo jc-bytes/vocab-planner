@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 import { Packer } from 'docx';
+import { readFile } from 'node:fs/promises';
 import { buildQuizWordDocument } from '../js/quizMakerWordExportMethods.js';
 import { getLevelProgress, getStudentExperience } from '../js/student/studentExperience.js';
 
@@ -181,7 +182,176 @@ function runStudentExperienceTests() {
     }
 }
 
+async function runLeaderboardContractTests() {
+    const leaderboardSource = await readFile(
+        new URL('../js/student/studentGameLeaderboardMethods.js', import.meta.url),
+        'utf8'
+    );
+    const migrationSources = await Promise.all([
+        readFile(new URL('../supabase/migrations/20260620133911_enable_trapdoor_trials_leaderboard.sql', import.meta.url), 'utf8'),
+        readFile(new URL('../supabase/migrations/20260620020403_enable_canvas_game_leaderboards.sql', import.meta.url), 'utf8'),
+        readFile(new URL('../supabase/migrations/20260620135443_remove_level_devil_game_score.sql', import.meta.url), 'utf8'),
+        readFile(new URL('../supabase/migrations/20260621004928_enable_tilt_maze_basic_platformer_leaderboards.sql', import.meta.url), 'utf8')
+    ]);
+    const migrationSource = migrationSources.join('\n');
+    const canvasGames = [
+        'galactic-breaker',
+        'snake',
+        'flappy-bird',
+        'space-invaders',
+        'target-shooter',
+        'pong',
+        'whack-a-mole',
+        'trapdoor-trials',
+        'tilt-maze',
+        'basic-platformer'
+    ];
+
+    for (const gameId of canvasGames) {
+        if (!leaderboardSource.includes(`'${gameId}'`)) {
+            throw new Error(`Client leaderboard allowlist is missing ${gameId}.`);
+        }
+        if (!migrationSource.includes(`'${gameId}'`)) {
+            throw new Error(`Database leaderboard allowlist is missing ${gameId}.`);
+        }
+    }
+}
+
+async function runTrapdoorTrialsContractTests() {
+    const [studentSource, lifecycleSource, loaderSource, trialHtml, trialStyles, trialGame, trialLicense] = await Promise.all([
+        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/trapdoor-trials/index.html', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/trapdoor-trials/style.css', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/trapdoor-trials/game.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/trapdoor-trials/LICENSE', import.meta.url), 'utf8')
+    ]);
+
+    const whackIndex = studentSource.indexOf("id: 'whack-a-mole'");
+    const trialIndex = studentSource.indexOf("id: 'trapdoor-trials'");
+    const tiltMazeIndex = studentSource.indexOf("id: 'tilt-maze'");
+    if (!(whackIndex < trialIndex && trialIndex < tiltMazeIndex)) {
+        throw new Error('Trapdoor Trials must appear between Whack-a-Mole and Tilt Maze.');
+    }
+    if (/level.?devil/i.test(`${studentSource}\n${lifecycleSource}\n${loaderSource}`)) {
+        throw new Error('Removed Level Devil integration is still referenced by the student app.');
+    }
+    if (!lifecycleSource.includes("'js/games/trapdoor-trials/index.html'")) {
+        throw new Error('Trapdoor Trials launch path is missing.');
+    }
+    if (/https?:\/\//.test(trialHtml)) {
+        throw new Error('Trapdoor Trials HTML must not load remote resources.');
+    }
+    if (/\b(?:fd|ld)_/.test(trialGame)) {
+        throw new Error('Trapdoor Trials must use isolated tt_* storage keys.');
+    }
+    if (/fable|devil|blood|stain/i.test(`${trialHtml}\n${trialStyles}\n${trialGame}`)) {
+        throw new Error('Trapdoor Trials contains retired branding or effects.');
+    }
+    if (!trialGame.includes('type: "trapdoor-trials-score"') || !loaderSource.includes("gameId === 'trapdoor-trials'")) {
+        throw new Error('Trapdoor Trials leaderboard reporting contract is incomplete.');
+    }
+    if (!trialLicense.startsWith('MIT License')) {
+        throw new Error('Trapdoor Trials must retain its upstream MIT license.');
+    }
+}
+
+async function runTiltMazeContractTests() {
+    const [studentSource, lifecycleSource, loaderSource, tiltHtml, tiltStyles, tiltGame, tiltLicense, threeLicense] = await Promise.all([
+        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tilt-maze/index.html', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tilt-maze/styles.css', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tilt-maze/src/main.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tilt-maze/LICENSE', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/tilt-maze/vendor/THREE-LICENSE', import.meta.url), 'utf8')
+    ]);
+
+    const tiltMazeIndex = studentSource.indexOf("id: 'tilt-maze'");
+    if (tiltMazeIndex < 0) {
+        throw new Error('Tilt Maze is missing from the arcade.');
+    }
+    if (/ball-roll-3d|3D Ball Roll|\[3D\]ボールころころ2/.test(`${studentSource}\n${lifecycleSource}`)) {
+        throw new Error('Removed 3D Ball Roll integration is still referenced by the student app.');
+    }
+    if (/neverball|play\.neverball\.org/i.test(`${studentSource}\n${lifecycleSource}\n${loaderSource}`)) {
+        throw new Error('Removed Neverball integration is still referenced by the student app.');
+    }
+    if (!lifecycleSource.includes("'js/games/tilt-maze/index.html'")) {
+        throw new Error('Tilt Maze launch path is missing.');
+    }
+    if (!loaderSource.includes("gameId === 'tilt-maze'")) {
+        throw new Error('Tilt Maze responsive iframe sizing is incomplete.');
+    }
+    if (/(?:src|href)=["']https?:\/\//.test(tiltHtml)) {
+        throw new Error('Tilt Maze HTML must not load remote resources.');
+    }
+    if (!/#stage\s*\{[\s\S]*?width:\s*100%;[\s\S]*?height:\s*100%;/.test(tiltStyles)) {
+        throw new Error('Tilt Maze canvas must keep its CSS size independent of device pixel ratio.');
+    }
+    if (!tiltGame.includes('g.index ? g.toNonIndexed() : g')) {
+        throw new Error('Tilt Maze must flatten indexed wall geometry before merging it.');
+    }
+    if (!tiltGame.includes('opacity: 0.06, depthWrite: false') || !tiltGame.includes('opacity: 0.85, depthTest: false')) {
+        throw new Error('Tilt Maze shell and goal depth settings must keep the maze visible.');
+    }
+    if (!tiltLicense.startsWith('MIT License') || !threeLicense.startsWith('The MIT License')) {
+        throw new Error('Tilt Maze and Three.js must retain their MIT licenses.');
+    }
+}
+
+async function runBasicPlatformerContractTests() {
+    const [studentSource, lifecycleSource, loaderSource, gameHtml, gameBundle, gameLicense, attribution, contentSource] = await Promise.all([
+        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/basic-platformer/index.html', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/basic-platformer/BasicPlatformer.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/basic-platformer/LICENSE', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/basic-platformer/ATTRIBUTION.md', import.meta.url), 'utf8'),
+        readFile(new URL('../js/games/basic-platformer/source-project/source/Content.hx', import.meta.url), 'utf8')
+    ]);
+
+    const tiltMazeIndex = studentSource.indexOf("id: 'tilt-maze'");
+    const platformerIndex = studentSource.indexOf("id: 'basic-platformer'");
+    const ballBlastIndex = studentSource.indexOf("id: 'ball-blast'");
+    if (!(tiltMazeIndex < platformerIndex && platformerIndex < ballBlastIndex)) {
+        throw new Error('BasicPlatformer must replace Appel between Tilt Maze and Ball Blast.');
+    }
+    if (/id: 'appel'|type === 'appel'|Appel v1\.html/.test(`${studentSource}\n${lifecycleSource}`)) {
+        throw new Error('Removed Appel integration is still referenced by the student app.');
+    }
+    if (!lifecycleSource.includes("'js/games/basic-platformer/index.html'")) {
+        throw new Error('BasicPlatformer launch path is missing.');
+    }
+    if (!/gameId === 'basic-platformer'[\s\S]*?frameWidth = 1280;[\s\S]*?frameHeight = 720;/.test(loaderSource)) {
+        throw new Error('BasicPlatformer must retain its 1280x720 frame ratio.');
+    }
+    if (/(?:src|href)=["']https?:\/\//.test(gameHtml)) {
+        throw new Error('BasicPlatformer HTML must not load remote resources.');
+    }
+    if (gameBundle.includes('simple_tileset_32.tsx') || !gameBundle.includes('simple_tileset_32.xml')) {
+        throw new Error('BasicPlatformer tileset must use its Vite-safe XML extension.');
+    }
+    if (!gameLicense.startsWith('MIT License')) {
+        throw new Error('BasicPlatformer must retain its upstream MIT license.');
+    }
+    if (!attribution.includes('Creative Commons Attribution 4.0 International') || !attribution.includes('Avace')) {
+        throw new Error('BasicPlatformer must retain its asset attribution.');
+    }
+    const levelCount = (contentSource.match(/AssetPaths\.Area_0_Level_\d+__tmx/g) || []).length;
+    if (levelCount !== 6) {
+        throw new Error(`BasicPlatformer source snapshot should contain six levels, found ${levelCount}.`);
+    }
+}
+
 await runDocxTests();
 runStudentExperienceTests();
+await runLeaderboardContractTests();
+await runTrapdoorTrialsContractTests();
+await runTiltMazeContractTests();
+await runBasicPlatformerContractTests();
 
 console.log('Package refactor tests passed.');

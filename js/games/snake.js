@@ -674,6 +674,8 @@ export class Snake {
         this.ctx.shadowBlur = 10;
         this.ctx.fillStyle = '#22d3ee';
         this.ctx.font = 'bold 24px Arial';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'alphabetic';
         this.ctx.fillText(`Score: ${this.score}`, 15, 35);
 
         if (this.combo > 0) {

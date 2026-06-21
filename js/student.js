@@ -47,6 +47,7 @@ class StudentManager {
         this.currentGame = null;
         this.gameTimeRemaining = 0;
         this.gameTimerInterval = null;
+        this.isHandlingGameMinute = false;
 
         // Leaderboard variables
         this.gamesList = [
@@ -57,9 +58,9 @@ class StudentManager {
             { id: 'target-shooter', name: 'Target Shooter', icon: '🎯', desc: 'Hit the targets!' },
             { id: 'pong', name: 'Pong', icon: '🏓', desc: 'Use W/S keys to move!' },
             { id: 'whack-a-mole', name: 'Whack-a-Mole', icon: '🎪', desc: 'Whack the moles!' },
-            { id: 'level-devil', name: 'Level Devil', icon: '👺', desc: 'Expect the unexpected!' },
-            { id: 'ball-roll-3d', name: '3D Ball Roll', icon: '⚽', desc: 'Roll the ball in 3D!' },
-            { id: 'appel', name: 'Appel', icon: '🍎', desc: 'Catch the apples!' },
+            { id: 'trapdoor-trials', name: 'Trapdoor Trials', icon: '🚪', desc: 'Outsmart every surprise trap!' },
+            { id: 'tilt-maze', name: 'Tilt Maze', icon: '🎲', desc: 'Tilt a 3D maze to reach the goal!' },
+            { id: 'basic-platformer', name: 'Checkpoint Runner', icon: '🏁', desc: 'Run, jump, and master six levels!' },
             { id: 'ball-blast', name: 'Ball Blast', icon: '💥', desc: 'Blast the balls!' },
             { id: 'radius-raid', name: 'Radius Raid', icon: '🚀', desc: 'Blast enemies in space!' },
             { id: 'packabunchas', name: 'Packabunchas', icon: '🧩', desc: 'Solve tiling puzzles!' },
@@ -73,8 +74,8 @@ class StudentManager {
             { id: 'my-digital-garden', name: 'My Magical Garden', icon: '🌸', desc: 'Breed flowers and fill the garden!' },
             { id: 'grow-your-garden', name: 'Grow Your Garden', icon: '🌱', desc: 'Plant, harvest, and upgrade your garden!' }
         ];
-        // HTML/Scratch games that don't have leaderboards (Level Devil has leaderboard now)
-        this.htmlGames = ['ball-roll-3d', 'appel', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
+        // HTML/Scratch games that don't have leaderboards.
+        this.htmlGames = ['tilt-maze', 'basic-platformer', 'ball-blast', 'radius-raid', 'packabunchas', 'spacepi', 'mystic-valley', 'slash-knight', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
         this.currentGameIndex = 0;
         this.authInitialized = false;
         this.authDisabled = DEV_AUTH_DISABLED;

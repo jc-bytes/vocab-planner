@@ -95,7 +95,12 @@ class StudentGameLifecycleMethods {
                 this.sm.currentGameMetadata = null;
                 updateGalacticBreakerScore(0);
 
-                this.sm.currentGame = new module.GalacticBreaker(canvas, gameOverCallback, updateGalacticBreakerScore);
+                this.sm.currentGame = new module.GalacticBreaker(
+                    canvas,
+                    gameOverCallback,
+                    updateGalacticBreakerScore,
+                    () => this.sm.gameTimeRemaining
+                );
                 this.sm.currentGame.gameType = type;
                 this.sm.currentGame.start();
             });
@@ -129,29 +134,29 @@ class StudentGameLifecycleMethods {
                 this.sm.currentGame = new module.WhackAMole(canvas, gameOverCallback);
                 this.sm.currentGame.start();
             });
-        } else if (type === 'level-devil') {
+        } else if (type === 'trapdoor-trials') {
             this.loadHTMLGame(
-                'level-devil',
-                'js/games/Level Devil - NOT A Troll Game.html',
-                'level-devil-score',
+                'trapdoor-trials',
+                'js/games/trapdoor-trials/index.html',
+                'trapdoor-trials-score',
                 gameOverCallback,
                 canvas,
                 gameStage
             );
-        } else if (type === 'ball-roll-3d') {
+        } else if (type === 'tilt-maze') {
             this.loadHTMLGame(
-                'ball-roll-3d',
-                encodeURI('js/games/[3D]ボールころころ2.html'),
-                null, // No score reporting for this game
+                'tilt-maze',
+                'js/games/tilt-maze/index.html',
+                'tilt-maze-score',
                 gameOverCallback,
                 canvas,
                 gameStage
             );
-        } else if (type === 'appel') {
+        } else if (type === 'basic-platformer') {
             this.loadHTMLGame(
-                'appel',
-                encodeURI('js/games/Appel v1.html'),
-                null, // No score reporting for this game
+                'basic-platformer',
+                'js/games/basic-platformer/index.html',
+                'basic-platformer-score',
                 gameOverCallback,
                 canvas,
                 gameStage
@@ -356,42 +361,48 @@ class StudentGameLifecycleMethods {
 
     async pauseGame() {
         if (!this.sm.currentGame) return;
+        if (this.sm.isHandlingGameMinute) return;
 
-        // Check if we can auto-extend BEFORE pausing
-        const settings = (this.sm.currentVocab && this.sm.currentVocab.activitySettings) ? this.sm.currentVocab.activitySettings : {};
-        const exchangeRate = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
+        this.sm.isHandlingGameMinute = true;
+        try {
+            if (typeof this.sm.currentGame.completeMinute === 'function') {
+                this.sm.currentGame.completeMinute();
+            }
 
-        if (this.sm.coins >= exchangeRate) {
-            // Auto-deduct and add time - NO PAUSE, game continues seamlessly
-            await this.sm.progress.deductCoins(exchangeRate);
-            this.addGameTime(60);
+            // Check if we can auto-extend BEFORE pausing
+            const settings = (this.sm.currentVocab && this.sm.currentVocab.activitySettings) ? this.sm.currentVocab.activitySettings : {};
+            const exchangeRate = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
 
-            // Visual feedback for extension (non-blocking)
-            const timerEl = $('#game-timer');
-            const originalColor = timerEl.style.color;
-            timerEl.style.color = '#4ade80'; // Green
-            timerEl.textContent = 'Time Extended! -' + exchangeRate + ' Coins';
-            setTimeout(() => {
-                timerEl.style.color = originalColor;
-                this.updateGameTimer();
-            }, 1500);
+            if (this.sm.coins >= exchangeRate && await this.sm.progress.deductCoins(exchangeRate)) {
+                this.addGameTime(60);
 
-            return; // Continue game without any interruption
+                // Visual feedback for extension (non-blocking)
+                const timerEl = $('#game-timer');
+                const originalColor = timerEl.style.color;
+                timerEl.style.color = '#4ade80'; // Green
+                timerEl.textContent = 'Time Extended! -' + exchangeRate + ' Coins';
+                setTimeout(() => {
+                    timerEl.style.color = originalColor;
+                    this.updateGameTimer();
+                }, 1500);
+
+                return; // Continue game without any interruption
+            }
+
+            // Only pause if there are not enough coins or the deduction failed.
+            if (this.sm.currentGame.pause) {
+                this.sm.currentGame.pause();
+            }
+            this.sm.isGamePaused = true;
+
+            this.clearGameTimer();
+
+            notifications.warning('Time up! The next minute could not be started.');
+            this.stopCurrentGame();
+            this.showGameSelection();
+        } finally {
+            this.sm.isHandlingGameMinute = false;
         }
-
-        // Only pause if not enough coins
-        if (this.sm.currentGame.pause) {
-            this.sm.currentGame.pause();
-        }
-        this.sm.isGamePaused = true;
-
-        // Stop the timer
-        this.clearGameTimer();
-
-        // Not enough coins - end game
-        notifications.warning('Time up! Not enough coins to continue.');
-        this.stopCurrentGame();
-        this.showGameSelection();
     }
 
     addGameTime(seconds = 60) {

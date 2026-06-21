@@ -16,14 +16,16 @@ const routes = [
     {
         path: '/student.html',
         label: 'Student',
-        shellSelector: '.student-app-header',
+        shellSelector: '#login-view .login-container',
+        hiddenSelector: '.student-app-header',
         expectedTitle: 'Vocabulary Master - Student',
         expectLucide: true
     },
     {
         path: '/teacher.html',
         label: 'Teacher',
-        shellSelector: '.teacher-app-header',
+        shellSelector: '#teacher-login-view .teacher-login-card',
+        hiddenSelector: '.teacher-app-header',
         expectedTitle: 'Vocabulary Master - Teacher',
         expectLucide: true
     }
@@ -81,6 +83,9 @@ async function smokeRoute(page, route, problems) {
 
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.locator(route.shellSelector).first().waitFor({ state: 'visible', timeout: 10000 });
+    if (route.hiddenSelector) {
+        await page.locator(route.hiddenSelector).first().waitFor({ state: 'hidden', timeout: 10000 });
+    }
     await page.waitForTimeout(500);
 
     const title = await page.title();
