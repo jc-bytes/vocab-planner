@@ -95,9 +95,13 @@ class StudentGameSettingsMethods {
         const totalEl = $('#arcade-game-total');
         if (totalEl) totalEl.textContent = totalGames;
 
+        const gameArt = game.art
+            ? `<img class="game-art" src="${game.art}" alt="" loading="lazy">`
+            : game.icon;
+
         container.innerHTML = `
             <div class="game-counter">Game ${currentNum} of ${totalGames}</div>
-            <div class="game-icon" aria-hidden="true">${game.icon}</div>
+            <div class="game-icon${game.art ? ' has-art' : ''}" aria-hidden="true">${gameArt}</div>
             <div class="game-card-copy">
                 <h3>${game.name}</h3>
                 <p>${game.desc}</p>

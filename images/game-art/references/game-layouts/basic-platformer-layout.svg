@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#111936"/><stop offset="1" stop-color="#050914"/></linearGradient>
+    <radialGradient id="cyan"><stop stop-color="#0891b2" stop-opacity=".25"/><stop offset="1" stop-color="#0f172a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="violet"><stop stop-color="#7c3aed" stop-opacity=".22"/><stop offset="1" stop-color="#0f172a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="768" height="1024" fill="url(#bg)"/><ellipse cx="120" cy="400" rx="360" ry="430" fill="url(#cyan)"/><ellipse cx="670" cy="650" rx="390" ry="450" fill="url(#violet)"/>
+  <g fill="#fff" opacity=".5"><circle cx="72" cy="70" r="2"/><circle cx="690" cy="105" r="2"/><circle cx="105" cy="540" r="2"/><circle cx="650" cy="580" r="2"/><circle cx="55" cy="900" r="2"/><circle cx="710" cy="920" r="2"/></g>
+  <rect x="40" y="720" width="260" height="60" rx="12" fill="#20e3d2"/><rect x="470" y="610" width="260" height="60" rx="12" fill="#20e3d2"/><circle cx="370" cy="510" r="35" fill="#ffe66d"/><path d="M350 548l-25 85M390 548l35 75M350 578l-60 10M390 578l60-25" stroke="#ffe66d" stroke-width="16" stroke-linecap="round"/><path d="M235 650Q370 350 540 550" fill="none" stroke="#ff4fb8" stroke-width="8" stroke-dasharray="5 25"/><path d="M650 380v230M650 390l90 45-90 45" stroke="#ffe66d" stroke-width="15" fill="none"/></svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1024" viewBox="0 0 768 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#111936"/><stop offset="1" stop-color="#050914"/></linearGradient>
+    <radialGradient id="cyan"><stop stop-color="#0891b2" stop-opacity=".25"/><stop offset="1" stop-color="#0f172a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="violet"><stop stop-color="#7c3aed" stop-opacity=".22"/><stop offset="1" stop-color="#0f172a" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="768" height="1024" fill="url(#bg)"/><ellipse cx="120" cy="400" rx="360" ry="430" fill="url(#cyan)"/><ellipse cx="670" cy="650" rx="390" ry="450" fill="url(#violet)"/>
+  <g fill="#fff" opacity=".5"><circle cx="72" cy="70" r="2"/><circle cx="690" cy="105" r="2"/><circle cx="105" cy="540" r="2"/><circle cx="650" cy="580" r="2"/><circle cx="55" cy="900" r="2"/><circle cx="710" cy="920" r="2"/></g>
+  <ellipse cx="384" cy="220" rx="220" ry="70" fill="#17334b" stroke="#22e8ff" stroke-width="15"/><path d="M164 220v580q220 120 440 0V220" fill="#102338" stroke="#24546d" stroke-width="12"/><g fill="none" stroke="#22e8ff" stroke-width="30"><path d="M160 380q224 100 448 0"/><path d="M160 560q224 100 448 0"/><path d="M160 740q224 100 448 0"/></g><path d="M340 690v-150M420 710V560M340 570h80M340 610h80M340 650h80" stroke="#ff4fb8" stroke-width="14"/><circle cx="300" cy="500" r="28" fill="#ffe66d"/><circle cx="520" cy="330" r="22" fill="#ffe66d"/></svg>
