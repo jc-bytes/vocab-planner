@@ -8450,9 +8450,10 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 /* Vocabulary card view: substantial tiles inspired by the unit dashboard concept. */
 #vocab-selection-view .trimester-vocab-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     justify-content: start;
-    gap: 18px;
+    max-width: 920px;
+    gap: 16px;
     margin-top: 0;
 }
 
@@ -8467,13 +8468,13 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    min-height: 280px;
-    padding: 20px;
+    min-height: 244px;
+    padding: 18px;
     gap: 0;
     overflow: hidden;
     border: 1px solid rgba(173, 198, 255, 0.2);
     border-top-color: rgba(173, 198, 255, 0.38);
-    border-radius: 22px;
+    border-radius: 18px;
     background:
         linear-gradient(155deg, rgba(173, 198, 255, 0.075), transparent 52%),
         rgba(26, 24, 72, 0.9);
@@ -8507,15 +8508,15 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 #vocab-selection-view .student-vocab-card .student-vocab-icon {
     display: inline-flex;
-    flex: 0 0 56px;
-    width: 56px;
-    height: 56px;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
     border: 1px solid rgba(173, 198, 255, 0.26);
     border-radius: 16px;
     background: rgba(173, 198, 255, 0.12);
@@ -8535,8 +8536,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .student-vocab-card .student-vocab-icon svg {
-    width: 26px;
-    height: 26px;
+    width: 23px;
+    height: 23px;
 }
 
 #vocab-selection-view .student-vocab-card .student-vocab-schedule {
@@ -8544,7 +8545,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     padding-top: 5px;
     color: var(--color-secondary);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.09em;
     line-height: 1.35;
@@ -8563,20 +8564,20 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #vocab-selection-view .student-vocab-card h3 {
     margin: 0;
     color: #eef3ff;
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 800;
     line-height: 1.2;
 }
 
 #vocab-selection-view .student-vocab-card .student-vocab-purpose {
     min-height: 24px;
-    margin-top: 10px;
+    margin-top: 8px;
     padding: 3px 9px;
     font-size: 0.66rem;
 }
 
 #vocab-selection-view .student-vocab-card p {
-    margin: 14px 0 20px;
+    margin: 12px 0 16px;
     color: rgba(218, 226, 253, 0.78);
     font-size: 0.88rem;
     line-height: 1.5;
@@ -8586,12 +8587,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    min-height: 48px;
+    min-height: 44px;
     box-sizing: border-box;
     margin-top: auto;
     padding: 0 15px;
     border: 1px solid rgba(173, 198, 255, 0.24);
-    border-radius: 13px;
+    border-radius: 12px;
     background: rgba(173, 198, 255, 0.1);
     color: var(--color-primary);
     font-size: 0.86rem;
