@@ -294,9 +294,36 @@ class StudentActivityProgressFlowMethods {
         requiredGrid.classList.add('required-activity-path');
         requiredGrid.style.setProperty('--required-count', Math.max(flow.required.length, 1));
         const pathTrack = createElement('div', 'required-path-track');
-        const pathProgress = completion.total > 0
-            ? (completion.completed / completion.total) * 100
-            : 0;
+        const requiredCompletionStates = flow.required.map(activityType => this.isActivityComplete(activityType));
+        const getCompletedPathRanges = (completionStates) => {
+            const count = completionStates.length;
+            if (count === 0) return [];
+
+            const ranges = completionStates
+                .map((isComplete, index) => {
+                    if (!isComplete) return null;
+                    if (count === 1) return [0, 100];
+
+                    const current = (index / (count - 1)) * 100;
+                    const previous = index === 0 ? 0 : (((index - 1) / (count - 1)) * 100);
+                    const next = index === count - 1 ? 100 : (((index + 1) / (count - 1)) * 100);
+                    const start = index === 0 ? 0 : (previous + current) / 2;
+                    const end = index === count - 1 ? 100 : (current + next) / 2;
+                    return [start, end];
+                })
+                .filter(Boolean);
+
+            return ranges.reduce((merged, range) => {
+                const last = merged[merged.length - 1];
+                if (last && range[0] <= last[1]) {
+                    last[1] = Math.max(last[1], range[1]);
+                } else {
+                    merged.push([...range]);
+                }
+                return merged;
+            }, []);
+        };
+        const completedPathRanges = getCompletedPathRanges(requiredCompletionStates);
         const svgNamespace = 'http://www.w3.org/2000/svg';
         const createPathSvg = (className, viewBox, pathData, clipId, vertical = false) => {
             const svg = document.createElementNS(svgNamespace, 'svg');
@@ -306,13 +333,15 @@ class StudentActivityProgressFlowMethods {
 
             const defs = document.createElementNS(svgNamespace, 'defs');
             const clipPath = document.createElementNS(svgNamespace, 'clipPath');
-            const clipRect = document.createElementNS(svgNamespace, 'rect');
             clipPath.setAttribute('id', clipId);
-            clipRect.setAttribute('x', '0');
-            clipRect.setAttribute('y', '0');
-            clipRect.setAttribute('width', vertical ? '100%' : `${pathProgress}%`);
-            clipRect.setAttribute('height', vertical ? `${pathProgress}%` : '100%');
-            clipPath.appendChild(clipRect);
+            completedPathRanges.forEach(([start, end]) => {
+                const clipRect = document.createElementNS(svgNamespace, 'rect');
+                clipRect.setAttribute('x', vertical ? '0' : `${start}%`);
+                clipRect.setAttribute('y', vertical ? `${start}%` : '0');
+                clipRect.setAttribute('width', vertical ? '100%' : `${end - start}%`);
+                clipRect.setAttribute('height', vertical ? `${end - start}%` : '100%');
+                clipPath.appendChild(clipRect);
+            });
             defs.appendChild(clipPath);
 
             const basePath = document.createElementNS(svgNamespace, 'path');
@@ -399,9 +428,6 @@ class StudentActivityProgressFlowMethods {
                 ? 'Not required for this vocabulary unit.'
                 : (isLockedAdditional ? 'Finish the required activities to unlock this practice.' : '');
 
-            if (isNext && !card.querySelector('.next-activity-label')) {
-                card.prepend(createElement('span', 'next-activity-label', 'Next'));
-            }
             if (isHidden && !card.querySelector('.activity-unavailable-label')) {
                 card.prepend(createElement('span', 'activity-unavailable-label', 'Not required'));
             }

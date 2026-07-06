@@ -3392,6 +3392,42 @@ select:focus {
     width: 100%;
     height: 100%;
     position: relative;
+}.falling-word {
+    position: absolute;
+    background: white;
+    color: #0f172a;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}.falling-word:hover {
+    background: #e0e7ff;
+    transform: scale(1.05);
+}.sm-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: bold;
+    animation: fadeUp 1s forwards;
+    pointer-events: none;
+}.sm-feedback.success {
+    color: #4ade80;
+}.sm-feedback.danger {
+    color: #f87171;
+}@keyframes fadeUp {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -100%);
+    }
 }/* Fill in the Blank Styles */.fib-wrapper {
     display: flex;
     flex-direction: column;
@@ -8451,8 +8487,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 /* Vocabulary card view: substantial tiles inspired by the unit dashboard concept. */
 #vocab-selection-view .trimester-vocab-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    justify-content: start;
-    max-width: 920px;
+    justify-content: stretch;
+    width: 100%;
     gap: 16px;
     margin-top: 0;
 }

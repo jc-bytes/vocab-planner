@@ -16,6 +16,7 @@ export class SpeedMatchActivity {
         this.spawnRate = 2000;
         this.lastSpawn = 0;
         this.animationFrame = null;
+        this.feedbackTimeouts = [];
         this.currentDefinition = null;
         this.highScore = 0;
 
@@ -65,10 +66,23 @@ export class SpeedMatchActivity {
     }
 
     startGame() {
+        if (!Array.isArray(this.words) || this.words.length === 0) {
+            this.container.innerHTML = `
+                <div class="speed-match-intro">
+                    <h2>Speed Match</h2>
+                    <p>No vocabulary words are available for this game yet.</p>
+                </div>
+            `;
+            return;
+        }
+
+        this.stopLoop();
         this.score = 0;
         this.lives = 3;
         this.isPlaying = true;
         this.fallingWords = [];
+        this.spawnRate = 2000;
+        this.lastSpawn = 0;
         this.container.innerHTML = '';
 
         // Game UI
@@ -93,16 +107,18 @@ export class SpeedMatchActivity {
         this.container.appendChild(wrapper);
 
         this.pickNewDefinition();
-        this.loop();
+        this.animationFrame = requestAnimationFrame((t) => this.loop(t));
     }
 
     pickNewDefinition() {
         const randomWord = this.words[Math.floor(Math.random() * this.words.length)];
         this.currentDefinition = randomWord;
-        this.defText.textContent = randomWord.definition;
+        this.defText.textContent = randomWord.definition || randomWord.matchText || 'Match the correct word.';
     }
 
     spawnWord() {
+        if (!this.currentDefinition || !this.gameArea) return;
+
         // 30% chance to spawn correct word, 70% random wrong word
         let wordObj;
         if (Math.random() < 0.3) {
@@ -113,7 +129,8 @@ export class SpeedMatchActivity {
         }
 
         const el = createElement('div', 'falling-word', wordObj.word);
-        el.style.left = Math.random() * (this.gameArea.offsetWidth - 100) + 'px';
+        const maxLeft = Math.max(0, this.gameArea.offsetWidth - 120);
+        el.style.left = Math.random() * maxLeft + 'px';
         el.style.top = '-50px';
 
         // Store data
@@ -172,16 +189,22 @@ export class SpeedMatchActivity {
     }
 
     updateHUD() {
-        $('#sm-score').textContent = this.score;
-        $('#sm-lives').textContent = '❤️'.repeat(this.lives);
+        const scoreEl = $('#sm-score');
+        const livesEl = $('#sm-lives');
+        if (scoreEl) scoreEl.textContent = this.score;
+        if (livesEl) livesEl.textContent = '❤️'.repeat(Math.max(0, this.lives));
     }
 
     showFeedback(text, type) {
+        if (!this.gameArea) return;
+
         const fb = createElement('div', `sm-feedback ${type}`, text);
         this.gameArea.appendChild(fb);
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             if (fb.parentNode) fb.parentNode.removeChild(fb);
+            this.feedbackTimeouts = this.feedbackTimeouts.filter(id => id !== timeoutId);
         }, 1000);
+        this.feedbackTimeouts.push(timeoutId);
     }
 
     loop(timestamp) {
@@ -197,7 +220,9 @@ export class SpeedMatchActivity {
         }
 
         // Move words
-        this.fallingWords.forEach(w => {
+        [...this.fallingWords].forEach(w => {
+            if (!this.isPlaying) return;
+
             w.y += w.speed;
             w.el.style.top = w.y + 'px';
 
@@ -223,7 +248,7 @@ export class SpeedMatchActivity {
 
     endGame() {
         this.isPlaying = false;
-        cancelAnimationFrame(this.animationFrame);
+        this.stopLoop();
 
         this.saveState(); // Save high score
 
@@ -257,5 +282,20 @@ export class SpeedMatchActivity {
             details: `Score: ${this.score} `,
             isComplete: true // Always "complete" when game over
         };
+    }
+
+    stopLoop() {
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
+        }
+    }
+
+    destroy() {
+        this.isPlaying = false;
+        this.stopLoop();
+        this.feedbackTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+        this.feedbackTimeouts = [];
+        this.clearFallingWords();
     }
 }
