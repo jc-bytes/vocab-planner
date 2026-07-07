@@ -43,7 +43,7 @@ export const ACTIVITY_MODULES = {
     hangman: () => import('../activities/hangman.js'),
     scramble: () => import('../activities/scramble.js'),
     wordle: () => import('../activities/wordle.js'),
-    'speed-match': () => import('../activities/speedMatch.js'),
+    'speed-match': () => import('../activities/speedMatch.js?v=20260706a'),
     'fill-in-blank': () => import('../activities/fillInBlank.js')
 };
 

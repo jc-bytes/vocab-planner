@@ -127,10 +127,15 @@ async function upsertAuthUser(admin, { email, password, metadata = {} }) {
     return data.user;
 }
 
-function auditVisibleFromDate() {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    return date.toISOString().slice(0, 10);
+function getPanamaDateValue(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Panama',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
+    const valueByType = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
 }
 
 async function seedAuditUsers(admin) {
@@ -204,7 +209,7 @@ function buildAuditSparks({ teacherId }) {
             source_url: '',
             subject_slug: 'technology',
             target_grades: ['6'],
-            scheduled_date: auditVisibleFromDate(),
+            scheduled_date: getPanamaDateValue(),
             status: 'scheduled',
             owner_id: teacherId
         },

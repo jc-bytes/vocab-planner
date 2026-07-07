@@ -320,6 +320,7 @@ class StudentActivityHomeMethods {
             where('status', '==', 'scheduled'),
             where('scheduledDate', '<=', dateValue),
             orderBy('scheduledDate', 'desc'),
+            orderBy('updatedAt', 'desc'),
             limit(40)
         ));
         const sparks = snapshot.docs.map(docSnap => this.normalizeSpark({ id: docSnap.id, ...docSnap.data() }));

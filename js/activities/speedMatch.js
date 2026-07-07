@@ -129,8 +129,6 @@ export class SpeedMatchActivity {
         }
 
         const el = createElement('div', 'falling-word', wordObj.word);
-        const maxLeft = Math.max(0, this.gameArea.offsetWidth - 120);
-        el.style.left = Math.random() * maxLeft + 'px';
         el.style.top = '-50px';
 
         // Store data
@@ -150,6 +148,11 @@ export class SpeedMatchActivity {
         });
 
         this.gameArea.appendChild(el);
+        const horizontalPadding = 12;
+        const wordWidth = el.offsetWidth || 120;
+        const maxLeft = Math.max(horizontalPadding, this.gameArea.clientWidth - wordWidth - horizontalPadding);
+        const left = horizontalPadding + (Math.random() * Math.max(0, maxLeft - horizontalPadding));
+        el.style.left = `${left}px`;
         this.fallingWords.push(wordData);
     }
 
