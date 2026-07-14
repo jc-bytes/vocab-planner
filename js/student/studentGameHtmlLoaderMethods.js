@@ -1,6 +1,12 @@
 import { $ } from '../main.js';
+import { getStudentGame } from './studentGameRegistry.js';
 
-class StudentGameHtmlLoaderMethods {
+export class StudentGameHtmlLoader {
+    constructor(games) {
+        this.games = games;
+        this.sm = games.sm;
+    }
+
     async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
         // Hide canvas and create iframe for the HTML game
         canvas.style.display = 'none';
@@ -26,51 +32,25 @@ class StudentGameHtmlLoaderMethods {
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
         iframe.src = htmlFile;
-        let frameWidth = 800;
-        let frameHeight = 600;
-        let scaleFixedFrame = true;
+        const game = getStudentGame(gameId);
+        const frame = game?.launch?.frame || {};
+        const frameWidth = frame.width || 800;
+        const frameHeight = frame.height || 600;
+        const scaleFixedFrame = frame.responsive !== true;
         
         // The stage owns each game's maximum width. Fill it so the iframe stays
         // aligned with the timer bar instead of collapsing to its 80% minimum.
         iframe.style.width = '100%';
         iframe.style.maxWidth = '100%';
 
-        if (gameId === 'trapdoor-trials') {
-            frameWidth = 960;
-            frameHeight = 540;
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'hidden';
-        } else if (gameId === 'basic-platformer') {
-            frameWidth = 1280;
-            frameHeight = 720;
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'hidden';
-        // SpacePi: 960x600 game area
-        } else if (gameId === 'spacepi') {
-            frameWidth = 960;
-            frameHeight = 600;
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'auto';
-        } else if (gameId === 'radius-raid') {
-            // Radius Raid: 800x600 canvas + 10px padding each side = 820x620
-            frameWidth = 820;
-            frameHeight = 620;
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'auto';
-        } else if (gameId === 'tilt-maze' || gameId === 'tower-platformer' || gameId === 'black-hole-square' || gameId === 'glitch-buster' || gameId === 'callisto' || gameId === 'js13k2021' || gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
+        iframe.style.display = 'block';
+        if (frame.overflow) iframe.style.overflow = frame.overflow;
+
+        if (!scaleFixedFrame) {
             // Responsive games fill the stage and size their own content within it.
-            scaleFixedFrame = false;
-            if (gameId === 'my-digital-garden' || gameId === 'grow-your-garden') {
-                frameHeight = 900;
-            } else {
-                frameHeight = 600;
-            }
             iframe.style.height = `${frameHeight}px`;
             iframe.style.minHeight = '400px';
-            iframe.style.display = 'block';
-            iframe.style.overflow = 'auto';
-        } else {
-            iframe.style.display = 'block';
+            iframe.style.overflow = frame.overflow || 'auto';
         }
 
         if (scaleFixedFrame) {
@@ -168,7 +148,7 @@ class StudentGameHtmlLoaderMethods {
                 const iframeDoc = iframe.contentDocument || iframeWindow.document;
 
                 // Inject score reporting script (if scoreMessageType is provided)
-                if (scoreMessageType && gameId !== 'trapdoor-trials') {
+                if (scoreMessageType && frame.injectScoreMonitor !== false) {
                     try {
                         const script = iframeDoc.createElement('script');
                         script.textContent = this.getScoreMonitoringScript(gameId, scoreMessageType);
@@ -233,7 +213,7 @@ class StudentGameHtmlLoaderMethods {
                     if (score > 0 && score !== lastSaved) {
                         this.sm.lastSavedScore = score;
                         console.log(`[Game] Saving score for ${gameId}: ${score} (previous saved: ${lastSaved})`);
-                        this.saveHighScore(gameId, score, metadata).catch(err => {
+                        this.games.saveHighScore(gameId, score, metadata).catch(err => {
                             console.error('Error saving score:', err);
                         });
                     }
@@ -445,16 +425,5 @@ class StudentGameHtmlLoaderMethods {
         }
         
         return ''; // No script for unknown games
-    }
-}
-
-export function installStudentGameHtmlLoaderMethods(StudentGames) {
-    for (const name of Object.getOwnPropertyNames(StudentGameHtmlLoaderMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentGames.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentGameHtmlLoaderMethods.prototype, name)
-        );
     }
 }

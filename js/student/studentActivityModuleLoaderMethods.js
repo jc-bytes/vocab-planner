@@ -1,6 +1,11 @@
 import { ACTIVITY_EXPORTS, ACTIVITY_MODULES } from './studentActivityConstants.js';
 
-class StudentActivityModuleLoaderMethods {
+export class StudentActivityModuleLoader {
+    constructor(activities) {
+        this.activities = activities;
+        this.activityModulePromises = new Map();
+    }
+
     async loadActivityClass(type) {
         const loadModule = ACTIVITY_MODULES[type];
         const exportName = ACTIVITY_EXPORTS[type];
@@ -22,16 +27,5 @@ class StudentActivityModuleLoaderMethods {
         }
 
         return ActivityClass;
-    }
-}
-
-export function installStudentActivityModuleLoaderMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityModuleLoaderMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityModuleLoaderMethods.prototype, name)
-        );
     }
 }

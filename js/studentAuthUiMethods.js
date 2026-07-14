@@ -3,7 +3,13 @@ import { studentApi as supabaseService } from './services/studentApi.js';
 
 const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
 
-class StudentAuthUiMethods {
+export class StudentAuthUi {
+    constructor(auth) {
+        this.auth = auth;
+        this.sm = auth.sm;
+        this.joinGrade = this.getJoinGradeFromUrl();
+    }
+
     getJoinGradeFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const grade = params.get('grade') || params.get('join');
@@ -55,7 +61,7 @@ class StudentAuthUiMethods {
         };
     }
 
-    hasCompleteStudentProfile(profile = this.studentProfile) {
+    hasCompleteStudentProfile(profile = this.sm.studentProfile) {
         const normalized = this.normalizeStudentProfile(profile);
         return Boolean(
             normalized.firstName &&
@@ -135,21 +141,21 @@ class StudentAuthUiMethods {
         const password = $('#login-password')?.value || '';
 
         if (!email || !password) {
-            this.showLoginError('Enter your email and password.');
+            this.auth.showLoginError('Enter your email and password.');
             return;
         }
 
-        this.showLoginError('');
-        this.switchView('loading-view');
+        this.auth.showLoginError('');
+        this.sm.switchView('loading-view');
 
         try {
             const result = await supabaseService.signInWithPassword(email, password);
             await this.auth.handleBackendSignIn(result.user);
         } catch (error) {
             console.error('Student login failed:', error);
-            this.switchView('login-view');
+            this.sm.switchView('login-view');
             this.showAuthPanel('login');
-            this.showLoginError(error.message || 'Could not sign in.');
+            this.auth.showLoginError(error.message || 'Could not sign in.');
         }
     }
 
@@ -160,12 +166,12 @@ class StudentAuthUiMethods {
         try {
             profile = this.validateRegistrationForm();
         } catch (error) {
-            this.showLoginError(error.message);
+            this.auth.showLoginError(error.message);
             return;
         }
 
-        this.showLoginError('');
-        this.switchView('loading-view');
+        this.auth.showLoginError('');
+        this.sm.switchView('loading-view');
 
         try {
             const result = await supabaseService.signUpStudent(profile, $('#register-password').value);
@@ -173,9 +179,9 @@ class StudentAuthUiMethods {
             notifications.success('Registration complete. Welcome!');
         } catch (error) {
             console.error('Student registration failed:', error);
-            this.switchView('login-view');
+            this.sm.switchView('login-view');
             this.showAuthPanel('register');
-            this.showLoginError(error.message || 'Could not register.');
+            this.auth.showLoginError(error.message || 'Could not register.');
         }
     }
 
@@ -205,62 +211,13 @@ class StudentAuthUiMethods {
         try {
             if (status) status.textContent = 'Updating password...';
             await supabaseService.updatePasswordAndClearFlag(password);
-            this.mustChangePassword = false;
+            this.sm.mustChangePassword = false;
             closeDialog('#force-password-modal', { restoreFocus: false });
             await this.auth.finishSignedInSession();
             notifications.success('Password updated.');
         } catch (error) {
             console.error('Password change failed:', error);
             if (status) status.textContent = error.message || 'Could not update password.';
-        }
-    }
-
-    updateGuestStatus(isGuest) {
-        const guestEl = $('#guest-status');
-        if (guestEl) {
-            guestEl.hidden = !isGuest;
-            guestEl.setAttribute('aria-hidden', String(!isGuest));
-            guestEl.style.display = isGuest ? 'flex' : 'none';
-        }
-        const userInfo = $('#user-info');
-        if (userInfo) {
-            userInfo.hidden = isGuest;
-            userInfo.setAttribute('aria-hidden', String(isGuest));
-            userInfo.style.display = isGuest ? 'none' : 'flex';
-        }
-    }
-
-    setAuthStatus(text) {
-        this.logStudentDomUpdate?.('auth-status', { source: 'setAuthStatus', text });
-        const statusEl = $('#auth-status');
-        if (!statusEl) return;
-        const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';
-        const normalized = label.toLowerCase();
-        const state = !navigator.onLine || normalized.includes('offline')
-            ? 'offline'
-            : normalized.includes('failed') || normalized.includes('fail')
-                ? 'error'
-                : normalized.includes('syncing') || normalized.includes('saving') || normalized.includes('signed in') || normalized.includes('ready')
-                    ? 'pending'
-                    : normalized.includes('synced') || normalized.includes('saved locally') || normalized.includes('local development')
-                        ? 'synced'
-                        : 'pending';
-        statusEl.textContent = '';
-        statusEl.dataset.state = state;
-        statusEl.title = label;
-        statusEl.setAttribute('aria-label', label);
-    }
-
-    showLoginError(message) {
-        const errorEl = $('#login-error');
-        if (errorEl) {
-            if (message) {
-                errorEl.textContent = message;
-                errorEl.style.display = 'block';
-            } else {
-                errorEl.textContent = '';
-                errorEl.style.display = 'none';
-            }
         }
     }
 
@@ -354,17 +311,6 @@ class StudentAuthUiMethods {
         }, 0);
         
         // Clear any error message
-        this.showLoginError('');
-    }
-}
-
-export function installStudentAuthUiMethods(StudentManager) {
-    for (const name of Object.getOwnPropertyNames(StudentAuthUiMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentAuthUiMethods.prototype, name)
-        );
+        this.auth.showLoginError('');
     }
 }

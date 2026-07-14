@@ -1,23 +1,17 @@
-import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 // Import modular components
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
 import { StudentActivities } from './student/studentActivities.js';
-import { installStudentActivityDelegateMethods } from './studentActivityDelegateMethods.js';
-import { installStudentAuthDelegateMethods } from './studentAuthDelegateMethods.js';
-import { installStudentAuthUiMethods } from './studentAuthUiMethods.js';
-import { installStudentCoinNotificationMethods } from './studentCoinNotificationMethods.js';
-import { installStudentGameDelegateMethods } from './studentGameDelegateMethods.js';
-import { installStudentLegacyProgressMethods } from './studentLegacyProgressMethods.js';
-import { installStudentListenerMethods } from './studentListenerMethods.js';
-import { installStudentProgressDelegateMethods } from './studentProgressDelegateMethods.js';
-import { installStudentRoutingMethods } from './studentRoutingMethods.js';
-import { installStudentShellMethods } from './studentShellMethods.js';
-import { installStudentSubjectMethods } from './studentSubjectMethods.js';
+import { StudentRouting } from './studentRoutingMethods.js';
+import { StudentShell } from './studentShellMethods.js';
+import { StudentListeners } from './studentListenerMethods.js';
+import { StudentSubjects } from './studentSubjectMethods.js';
+import { getStudentActivityIds, renderStudentActivityCards } from './student/studentActivityRegistry.js';
+import { STUDENT_GAME_REGISTRY } from './student/studentGameRegistry.js';
 
 const DEV_AUTH_DISABLED = false;
 
-class StudentManager {
+export class StudentManager {
     constructor() {
         this.currentVocab = null;
         this.manifest = null;
@@ -49,195 +43,519 @@ class StudentManager {
         this.gameTimerInterval = null;
         this.isHandlingGameMinute = false;
 
-        // Leaderboard variables
-        this.gamesList = [
-            {
-                id: 'galactic-breaker',
-                name: 'Galactic Breaker',
-                icon: '🧱',
-                art: 'images/game-art/galactic-breaker-cover-neon-cyberpunk-v1.webp',
-                desc: 'Break bricks in space!'
-            },
-            {
-                id: 'snake',
-                name: 'Snake',
-                icon: '🐍',
-                art: 'images/game-art/snake-cover-neon-cyberpunk-friendly-v8.webp',
-                desc: 'Grow and avoid yourself!'
-            },
-            {
-                id: 'flappy-bird',
-                name: 'Flappy Bird',
-                icon: '🐦',
-                art: 'images/game-art/flappy-bird-cover-neon-cyberpunk-readable-v2.webp',
-                desc: 'Fly through pipes!'
-            },
-            {
-                id: 'space-invaders',
-                name: 'Space Invaders',
-                icon: '👾',
-                art: 'images/game-art/space-invaders-cover-neon-cyberpunk-v1.webp',
-                desc: 'Defend Earth!'
-            },
-            {
-                id: 'target-shooter',
-                name: 'Target Shooter',
-                icon: '🎯',
-                art: 'images/game-art/target-shooter-cover-neon-cyberpunk-v1.webp',
-                desc: 'Hit the targets!'
-            },
-            {
-                id: 'pong',
-                name: 'Pong',
-                icon: '🏓',
-                art: 'images/game-art/pong-cover-neon-cyberpunk-v1.webp',
-                desc: 'Use W/S keys to move!'
-            },
-            {
-                id: 'whack-a-mole',
-                name: 'Whack-a-Mole',
-                icon: '🎪',
-                art: 'images/game-art/whack-a-mole-cover-neon-cyberpunk-v1.webp',
-                desc: 'Whack the moles!'
-            },
-            {
-                id: 'trapdoor-trials',
-                name: 'Trapdoor Trials',
-                icon: '🚪',
-                art: 'images/game-art/trapdoor-trials-cover-neon-cyberpunk-v1.webp',
-                desc: 'Outsmart every surprise trap!'
-            },
-            {
-                id: 'tilt-maze',
-                name: 'Tilt Maze',
-                icon: '🎲',
-                art: 'images/game-art/tilt-maze-cover-neon-cyberpunk-v1.webp',
-                desc: 'Tilt a 3D maze to reach the goal!'
-            },
-            {
-                id: 'basic-platformer',
-                name: 'Circuit Sprint',
-                icon: '🏁',
-                art: 'images/game-art/circuit-sprint-cover-neon-cyberpunk-v1.webp',
-                desc: 'Run the checkpoint course and chase a clean time!'
-            },
-            {
-                id: 'tower-platformer',
-                name: 'Tower Climb',
-                icon: '🗼',
-                art: 'images/game-art/tower-climb-cover-neon-cyberpunk-v1.webp',
-                desc: 'Circle the tower, climb ladders, and collect coins!'
-            },
-            {
-                id: 'radius-raid',
-                name: 'Radius Raid',
-                icon: '🚀',
-                art: 'images/game-art/radius-raid-cover-neon-cyberpunk-v1.webp',
-                desc: 'Blast enemies in space!'
-            },
-            {
-                id: 'packabunchas',
-                name: 'Packabunchas',
-                icon: '🧩',
-                art: 'images/game-art/packabunchas-cover-neon-cyberpunk-v1.webp',
-                desc: 'Solve tiling puzzles!'
-            },
-            {
-                id: 'spacepi',
-                name: 'SpacePi',
-                icon: '🛡️',
-                art: 'images/game-art/spacepi-cover-neon-cyberpunk-v1.webp',
-                desc: 'Defend your base!'
-            },
-            {
-                id: 'black-hole-square',
-                name: 'Black Hole Square',
-                icon: '⬛',
-                art: 'images/game-art/black-hole-square-cover-neon-cyberpunk-v1.webp',
-                desc: 'Clean up the squares!'
-            },
-            {
-                id: 'glitch-buster',
-                name: 'Glitch Buster',
-                icon: '💥',
-                art: 'images/game-art/glitch-buster-cover-neon-cyberpunk-v1.webp',
-                desc: 'Bust the glitches!'
-            },
-            {
-                id: 'callisto',
-                name: 'Callisto',
-                icon: '🌌',
-                art: 'images/game-art/callisto-cover-neon-cyberpunk-v1.webp',
-                desc: 'Run, jump, and collect stars in space!'
-            },
-            {
-                id: 'js13k2021',
-                name: 'JS13K 2021',
-                icon: '🎮',
-                art: 'images/game-art/js13k2021-cover-neon-cyberpunk-v1.webp',
-                desc: 'Leap across space platforms and collect orbs!'
-            },
-            {
-                id: 'my-digital-garden',
-                name: 'My Magical Garden',
-                icon: '🌸',
-                art: 'images/game-art/my-magical-garden-cover-neon-cyberpunk-v1.webp',
-                desc: 'Breed flowers and fill the garden!'
-            },
-            {
-                id: 'grow-your-garden',
-                name: 'Grow Your Garden',
-                icon: '🌱',
-                art: 'images/game-art/grow-your-garden-cover-neon-cyberpunk-v1.webp',
-                desc: 'Plant, harvest, and upgrade your garden!'
-            }
-        ];
-        // HTML/Scratch games that don't have leaderboards.
-        this.htmlGames = ['tilt-maze', 'basic-platformer', 'tower-platformer', 'radius-raid', 'packabunchas', 'spacepi', 'black-hole-square', 'glitch-buster', 'callisto', 'js13k2021', 'my-digital-garden', 'grow-your-garden'];
+        // Registry-derived arcade metadata retained for existing UI consumers.
+        this.gamesList = STUDENT_GAME_REGISTRY;
         this.currentGameIndex = 0;
         this.authInitialized = false;
         this.authDisabled = DEV_AUTH_DISABLED;
-        this.joinGrade = this.getJoinGradeFromUrl();
         this.mustChangePassword = false;
         this.cloudVocabs = [];
         this.availableVocabs = [];
-        this.schoolCalendar = null;
-        this.subjects = [];
-        this.selectedSubjectSlug = localStorage.getItem('student_selected_subject') || DEFAULT_SUBJECT_SLUG;
-        this.studentVocabularyDrilldown = {
-            trimester: null,
-            month: null
-        };
         this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
-        this.studentSectionScrollPositions = {};
-        this.currentSparkSessionCache = new Map();
-        this.cloudSaveTimeout = null;
         this.unitImages = {};
-        this.routeReady = false;
-        this.isApplyingRoute = false;
-        this.activityRouteTypes = [
-            'illustration',
-            'matching',
-            'flashcards',
-            'quiz',
-            'synonym-antonym',
-            'word-search',
-            'crossword',
-            'hangman',
-            'scramble',
-            'wordle',
-            'speed-match',
-            'fill-in-blank'
-        ];
+        this.activityRouteTypes = getStudentActivityIds();
 
         // Initialize modular components
         this.auth = new StudentAuth(this);
         this.progress = new StudentProgress(this);
+        this.subjectSelection = new StudentSubjects(this);
         this.activities = new StudentActivities(this);
-        this.games = null;
-        this.gamesPromise = null;
-
+        this.routing = new StudentRouting(this);
+        this.shell = new StudentShell(this);
+        this.listeners = new StudentListeners(this);
+        renderStudentActivityCards(document.querySelector('#activity-menu-view .activities-grid'));
         this.init();
+    }
+
+    slugifyRouteId(value) {
+        return this.routing.slugifyRouteId(value);
+    }
+
+    getVocabRouteId(vocab) {
+        return this.routing.getVocabRouteId(vocab);
+    }
+
+    getCurrentVocabRouteId() {
+        return this.routing.getCurrentVocabRouteId();
+    }
+
+    getGames() {
+        return this.routing.getGames();
+    }
+
+    safeDecodeRoutePart(value) {
+        return this.routing.safeDecodeRoutePart(value);
+    }
+
+    parseRoute(hash) {
+        return this.routing.parseRoute(hash);
+    }
+
+    buildRoute(route) {
+        return this.routing.buildRoute(route);
+    }
+
+    setRoute(route, options) {
+        return this.routing.setRoute(route, options);
+    }
+
+    navigateTo(route, options) {
+        return this.routing.navigateTo(route, options);
+    }
+
+    restoreRouteOrDefault(defaultRoute) {
+        return this.routing.restoreRouteOrDefault(defaultRoute);
+    }
+
+    handleRouteChange() {
+        return this.routing.handleRouteChange();
+    }
+
+    findVocabByRouteId(unitId) {
+        return this.routing.findVocabByRouteId(unitId);
+    }
+
+    isKnownActivityType(activityType) {
+        return this.routing.isKnownActivityType(activityType);
+    }
+
+    showUnitsView(route) {
+        return this.routing.showUnitsView(route);
+    }
+
+    showArcadeView() {
+        return this.routing.showArcadeView();
+    }
+
+    applyRoute(route) {
+        return this.routing.applyRoute(route);
+    }
+
+    resetRouteState() {
+        this.routing.reset();
+    }
+
+    setStudentWideShellMediaQuery(mediaQuery) {
+        this.shell.setWideShellMediaQuery(mediaQuery);
+    }
+
+    switchView(viewId) {
+        return this.shell.switchView(viewId);
+    }
+
+    scheduleStudentScrollSave() {
+        return this.shell.scheduleStudentScrollSave();
+    }
+
+    shouldDebugStudentScroll() {
+        return this.shell.shouldDebugStudentScroll();
+    }
+
+    debugStudentScrollLifecycle(eventName, details) {
+        return this.shell.debugStudentScrollLifecycle(eventName, details);
+    }
+
+    shouldDebugStudentDom() {
+        return this.shell.shouldDebugStudentDom();
+    }
+
+    logStudentDomUpdate(containerId, details) {
+        return this.shell.logStudentDomUpdate(containerId, details);
+    }
+
+    getStudentMutationTargetLabel(target) {
+        return this.shell.getStudentMutationTargetLabel(target);
+    }
+
+    startStudentDashboardMutationObserver() {
+        return this.shell.startStudentDashboardMutationObserver();
+    }
+
+    saveStudentSectionScroll(viewId, options) {
+        return this.shell.saveStudentSectionScroll(viewId, options);
+    }
+
+    restoreStudentSectionScroll(viewId) {
+        return this.shell.restoreStudentSectionScroll(viewId);
+    }
+
+    getStudentSectionScrollKey(section) {
+        return this.shell.getStudentSectionScrollKey(section);
+    }
+
+    getStudentRouteScrollKey() {
+        return this.shell.getStudentRouteScrollKey();
+    }
+
+    hasSavedStudentRouteScroll() {
+        return this.shell.hasSavedStudentRouteScroll();
+    }
+
+    persistStudentScroll(key, top) {
+        return this.shell.persistStudentScroll(key, top);
+    }
+
+    readStudentScroll(key) {
+        return this.shell.readStudentScroll(key);
+    }
+
+    getStudentSectionForView(viewId) {
+        return this.shell.getStudentSectionForView(viewId);
+    }
+
+    isStudentWideShell() {
+        return this.shell.isStudentWideShell();
+    }
+
+    syncStudentShellState(section) {
+        return this.shell.syncStudentShellState(section);
+    }
+
+    updateStudentNav(viewId) {
+        return this.shell.updateStudentNav(viewId);
+    }
+
+    setStudentMobileMenu(open) {
+        return this.shell.setStudentMobileMenu(open);
+    }
+
+    closeStudentMobileMenu(options) {
+        return this.shell.closeStudentMobileMenu(options);
+    }
+
+    cleanupActivity() {
+        return this.shell.cleanupActivity();
+    }
+
+    showToast(message, duration) {
+        return this.shell.showToast(message, duration);
+    }
+
+    initListeners() {
+        return this.listeners.initListeners();
+    }
+
+    addListener(selector, event, handler) {
+        return this.listeners.addListener(selector, event, handler);
+    }
+
+    setStudentExportButtonState(button, isLoading, loadingLabel) {
+        return this.listeners.setStudentExportButtonState(button, isLoading, loadingLabel);
+    }
+
+    destroyStudentListeners() {
+        return this.listeners.destroy();
+    }
+
+    get subjects() {
+        return this.subjectSelection.subjects;
+    }
+
+    set subjects(subjects) {
+        this.subjectSelection.subjects = subjects;
+    }
+
+    get selectedSubjectSlug() {
+        return this.subjectSelection.selectedSubjectSlug;
+    }
+
+    set selectedSubjectSlug(subjectSlug) {
+        this.subjectSelection.selectedSubjectSlug = subjectSlug;
+    }
+
+    get studentVocabularyDrilldown() {
+        return this.subjectSelection.vocabularyDrilldown;
+    }
+
+    set studentVocabularyDrilldown(drilldown) {
+        this.subjectSelection.vocabularyDrilldown = drilldown;
+    }
+
+    get studentVocabularyAutoSelect() {
+        return this.subjectSelection.vocabularyAutoSelect;
+    }
+
+    set studentVocabularyAutoSelect(autoSelect) {
+        this.subjectSelection.vocabularyAutoSelect = autoSelect;
+    }
+
+    loadSubjectSettings() {
+        return this.subjectSelection.loadSubjectSettings();
+    }
+
+    getActiveSubjects() {
+        return this.subjectSelection.getActiveSubjects();
+    }
+
+    getSelectedSubject() {
+        return this.subjectSelection.getSelectedSubject();
+    }
+
+    selectSubject(subjectSlug) {
+        return this.subjectSelection.selectSubject(subjectSlug);
+    }
+
+    ensureSelectedSubject(vocabs) {
+        return this.subjectSelection.ensureSelectedSubject(vocabs);
+    }
+
+    resetStudentVocabularyDrilldown() {
+        return this.subjectSelection.resetStudentVocabularyDrilldown();
+    }
+
+    setStudentVocabularyDrilldownToCurrentTrimester() {
+        return this.subjectSelection.setStudentVocabularyDrilldownToCurrentTrimester();
+    }
+
+    getStoredStudentVocabularyLocation() {
+        return this.subjectSelection.getStoredStudentVocabularyLocation();
+    }
+
+    rememberStudentVocabularyLocation(trimester, month) {
+        return this.subjectSelection.rememberStudentVocabularyLocation(trimester, month);
+    }
+
+    get joinGrade() {
+        return this.auth.ui.joinGrade;
+    }
+
+    set joinGrade(grade) {
+        this.auth.ui.joinGrade = grade;
+    }
+
+    getJoinGradeFromUrl() {
+        return this.auth.getJoinGradeFromUrl();
+    }
+
+    prefillRegistrationFromJoinLink() {
+        return this.auth.prefillRegistrationFromJoinLink();
+    }
+
+    normalizeStudentProfile(profile) {
+        return this.auth.normalizeStudentProfile(profile);
+    }
+
+    mergeStudentProfile(primary, fallback) {
+        return this.auth.mergeStudentProfile(primary, fallback);
+    }
+
+    hasCompleteStudentProfile(profile) {
+        return this.auth.hasCompleteStudentProfile(profile);
+    }
+
+    showAuthPanel(panel) {
+        return this.auth.showAuthPanel(panel);
+    }
+
+    validateRegistrationForm() {
+        return this.auth.validateRegistrationForm();
+    }
+
+    handleStudentLogin(event) {
+        return this.auth.handleStudentLogin(event);
+    }
+
+    handleStudentRegister(event) {
+        return this.auth.handleStudentRegister(event);
+    }
+
+    showForcedPasswordChange() {
+        return this.auth.showForcedPasswordChange();
+    }
+
+    handleForcedPasswordChange(event) {
+        return this.auth.handleForcedPasswordChange(event);
+    }
+
+    showElectronAuthMessage(loginBtn) {
+        return this.auth.showElectronAuthMessage(loginBtn);
+    }
+
+    updateHeader() {
+        return this.auth.updateHeader();
+    }
+
+    checkProfile(force) {
+        return this.auth.checkProfile(force);
+    }
+
+    initBackendAuth() {
+        return this.auth.initBackendAuth();
+    }
+
+    fetchAndSetRole(user) {
+        return this.auth.fetchAndSetRole(user);
+    }
+
+    handleBackendSignIn(user) {
+        return this.auth.handleBackendSignIn(user);
+    }
+
+    handleBackendSignOut() {
+        return this.auth.handleBackendSignOut();
+    }
+
+    updateGuestStatus(isGuest) {
+        return this.auth.updateGuestStatus(isGuest);
+    }
+
+    setAuthStatus(text) {
+        return this.auth.setAuthStatus(text);
+    }
+
+    showLoginError(message) {
+        return this.auth.showLoginError(message);
+    }
+
+    loadManifest() {
+        return this.activities.loadManifest();
+    }
+
+    renderDashboard() {
+        return this.activities.renderDashboard();
+    }
+
+    loadVocabulary(vocabMeta, options = {}) {
+        return this.activities.loadVocabulary(vocabMeta, options);
+    }
+
+    showActivityMenu(options = {}) {
+        return this.activities.showActivityMenu(options);
+    }
+
+    loadCloudVocabularies() {
+        return this.activities.loadCloudVocabularies();
+    }
+
+    startActivity(type, options = {}) {
+        return this.activities.startActivity(type, options);
+    }
+
+    async formatTime(seconds) {
+        return (await this.getGames()).formatTime(seconds);
+    }
+
+    async updateArcadeUI() {
+        return (await this.getGames()).updateArcadeUI();
+    }
+
+    async updateGameSelectionUI() {
+        return (await this.getGames()).updateGameSelectionUI();
+    }
+
+    async saveHighScore(gameId, score, metadata = null) {
+        return (await this.getGames()).saveHighScore(gameId, score, metadata);
+    }
+
+    async updateLeaderboardGame() {
+        return (await this.getGames()).updateLeaderboardGame();
+    }
+
+    async loadLeaderboard(gameId) {
+        return (await this.getGames()).loadLeaderboard(gameId);
+    }
+
+    async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
+        return (await this.getGames()).loadHTMLGame(
+            gameId,
+            htmlFile,
+            scoreMessageType,
+            gameOverCallback,
+            canvas,
+            gameStage
+        );
+    }
+
+    async startGame(type) {
+        return (await this.getGames()).startGame(type);
+    }
+
+    async stopCurrentGame() {
+        return (await this.getGames()).stopCurrentGame();
+    }
+
+    async pauseGame() {
+        return (await this.getGames()).pauseGame();
+    }
+
+    async addGameTime(seconds = 60) {
+        return (await this.getGames()).addGameTime(seconds);
+    }
+
+    async updateGameTimer() {
+        return (await this.getGames()).updateGameTimer();
+    }
+
+    migrateCoinData(data) {
+        return this.progress.migrateCoinData(data);
+    }
+
+    loadLocalProgress() {
+        return this.progress.loadLocalProgress();
+    }
+
+    saveLocalProgress(skipCloud = false) {
+        return this.progress.saveLocalProgress(skipCloud);
+    }
+
+    getExperience() {
+        return this.progress.getExperience();
+    }
+
+    updateLevelDisplay() {
+        return this.progress.updateLevelDisplay();
+    }
+
+    loadCloudProgress() {
+        return this.progress.loadCloudProgress();
+    }
+
+    scheduleCloudSync() {
+        return this.progress.scheduleCloudSync();
+    }
+
+    addCoinHistory(type, amount, source, description = '') {
+        return this.progress.addCoinHistory(type, amount, source, description);
+    }
+
+    saveProgressToCloud() {
+        return this.progress.saveProgressToCloud();
+    }
+
+    restoreImagesFromProgress() {
+        return this.progress.restoreImagesFromProgress();
+    }
+
+    dataURLToBlob(dataUrl) {
+        return this.progress.dataURLToBlob(dataUrl);
+    }
+
+    addCoins(amount, source = 'activity', description = '') {
+        return this.progress.addCoins(amount, source, description);
+    }
+
+    deductCoins(amount) {
+        return this.progress.deductCoins(amount);
+    }
+
+    acceptGiftCoins() {
+        return this.progress.acceptGiftCoins();
+    }
+
+    updateCoinDisplay() {
+        return this.progress.updateCoinDisplay();
+    }
+
+    showNotificationBadge() {
+        return this.progress.showNotificationBadge();
+    }
+
+    hideNotificationBadge() {
+        return this.progress.hideNotificationBadge();
+    }
+
+    showNotificationPanel() {
+        return this.progress.showNotificationPanel();
     }
 
     async init() {
@@ -275,18 +593,6 @@ class StudentManager {
     }
 
 }
-
-installStudentActivityDelegateMethods(StudentManager);
-installStudentAuthDelegateMethods(StudentManager);
-installStudentAuthUiMethods(StudentManager);
-installStudentCoinNotificationMethods(StudentManager);
-installStudentGameDelegateMethods(StudentManager);
-installStudentLegacyProgressMethods(StudentManager);
-installStudentListenerMethods(StudentManager);
-installStudentProgressDelegateMethods(StudentManager);
-installStudentRoutingMethods(StudentManager);
-installStudentShellMethods(StudentManager);
-installStudentSubjectMethods(StudentManager);
 
 // Initialize immediately if DOM is already ready, otherwise wait
 const startStudentApp = () => {

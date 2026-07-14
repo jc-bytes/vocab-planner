@@ -1,20 +1,25 @@
 import { $ } from '../main.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 
-class StudentProgressCoinMethods {
+export class StudentProgressCoins {
+    constructor(progress) {
+        this.progress = progress;
+        this.sm = progress.sm;
+    }
+
     addCoinHistory(type, amount, source, description = '') {
         const timestamp = new Date().toISOString();
         this.sm.coinHistory.push({
-            id: `${this.clientId}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
+            id: `${this.progress.clientId}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
             type,
             amount,
             source,
             description,
             timestamp,
-            clientId: this.clientId
+            clientId: this.progress.clientId
         });
         // Keep only last 100 entries
-        this.sm.coinHistory = this.normalizeCoinHistory(this.sm.coinHistory);
+        this.sm.coinHistory = this.progress.normalizeCoinHistory(this.sm.coinHistory);
     }
 
     addCoins(amount, source = 'activity', description = '') {
@@ -23,7 +28,7 @@ class StudentProgressCoinMethods {
         this.sm.coins = this.sm.coinData.balance; // Legacy support
         this.addCoinHistory('earn', amount, source, description);
         this.sm.updateCoinDisplay();
-        this.saveLocalProgress();
+        this.progress.saveLocalProgress();
 
         // Visual feedback
         const coinEl = $('#coin-balance');
@@ -41,7 +46,7 @@ class StudentProgressCoinMethods {
             this.sm.coins = this.sm.coinData.balance;
             this.addCoinHistory('spend', amount, 'game', 'Spent on game');
             this.sm.updateCoinDisplay();
-            this.saveLocalProgress(true);
+            this.progress.saveLocalProgress(true);
             return true;
         }
 
@@ -52,9 +57,9 @@ class StudentProgressCoinMethods {
                 amount,
                 source: 'game',
                 description: 'Spent on game',
-                clientId: this.clientId
+                clientId: this.progress.clientId
             });
-            this.applyProgressSnapshot(progress, { saveLocal: true });
+            this.progress.applyProgressSnapshot(progress, { saveLocal: true });
             this.sm.setAuthStatus('☁️ Synced');
             return true;
         } catch (error) {
@@ -66,23 +71,23 @@ class StudentProgressCoinMethods {
 
     async acceptGiftCoins() {
         if (this.sm.authDisabled) {
-            this.sm.hideNotificationBadge();
+            this.progress.hideNotificationBadge();
             return;
         }
 
         if (this.sm.coinData.giftCoins <= 0) {
-            this.sm.hideNotificationBadge();
+            this.progress.hideNotificationBadge();
             return;
         }
 
         const amount = this.sm.coinData.giftCoins;
 
         // Immediately hide badge to prevent multiple clicks
-        this.sm.hideNotificationBadge();
+        this.progress.hideNotificationBadge();
 
         try {
-            const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.clientId });
-            this.applyProgressSnapshot(progress, { saveLocal: true });
+            const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.progress.clientId });
+            this.progress.applyProgressSnapshot(progress, { saveLocal: true });
             this.sm.showToast(`🎉 You received ${amount} coins!`);
             this.sm.setAuthStatus('☁️ Synced');
         } catch (error) {
@@ -102,20 +107,9 @@ class StudentProgressCoinMethods {
         
         // Update notification badge
         if (this.sm.coinData.giftCoins > 0) {
-            this.sm.showNotificationBadge();
+            this.progress.showNotificationBadge();
         } else {
-            this.sm.hideNotificationBadge();
+            this.progress.hideNotificationBadge();
         }
-    }
-}
-
-export function installStudentProgressCoinMethods(StudentProgress) {
-    for (const name of Object.getOwnPropertyNames(StudentProgressCoinMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentProgress.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentProgressCoinMethods.prototype, name)
-        );
     }
 }

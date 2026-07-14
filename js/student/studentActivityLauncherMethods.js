@@ -2,7 +2,12 @@ import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 
-class StudentActivityLauncherMethods {
+export class StudentActivityLauncher {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+    }
+
     async startActivity(type, options = {}) {
         if (!this.sm.currentVocab) {
             this.sm.navigateTo({ view: 'units' });
@@ -10,12 +15,12 @@ class StudentActivityLauncherMethods {
         }
 
         if (!this.sm.isKnownActivityType(type)) {
-            this.showActivityMenu({ fromRoute: true });
+            this.activities.showActivityMenu({ fromRoute: true });
             return;
         }
 
-        if (!this.isActivityUnlocked(type)) {
-            const flow = this.getActivityFlowConfig();
+        if (!this.activities.isActivityUnlocked(type)) {
+            const flow = this.activities.getActivityFlowConfig();
             const warning = flow.hidden?.includes(type)
                 ? 'This activity is not required for this vocabulary unit.'
                 : 'Finish the required activities first to unlock additional practice.';
@@ -24,7 +29,7 @@ class StudentActivityLauncherMethods {
             if (unitId) {
                 this.sm.setRoute({ view: 'unit', unitId }, { replace: true });
             }
-            this.showActivityMenu({ fromRoute: true });
+            this.activities.showActivityMenu({ fromRoute: true });
             return;
         }
 
@@ -61,14 +66,14 @@ class StudentActivityLauncherMethods {
         $('#activity-view')?.classList.remove('flashcards-active');
         container.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
 
-        const onProgress = this.handleAutoSave.bind(this);
-        const onSaveState = this.handleStateSave.bind(this);
+        const onProgress = this.activities.handleAutoSave.bind(this.activities);
+        const onSaveState = this.activities.handleStateSave.bind(this.activities);
         const initialState = this.sm.unitStates ? this.sm.unitStates[type] : null;
         const settings = this.sm.currentVocab.activitySettings || {};
         let ActivityClass;
 
         try {
-            ActivityClass = await this.loadActivityClass(type);
+            ActivityClass = await this.activities.loadActivityClass(type);
         } catch (error) {
             console.error('Failed to load activity module:', error);
             container.innerHTML = '<p class="error">Could not load this activity. Please try again.</p>';
@@ -90,20 +95,20 @@ class StudentActivityLauncherMethods {
             let words = filter
                 ? this.sm.currentVocab.words.filter(filter)
                 : [...this.sm.currentVocab.words];
-            return this.getPrioritizedWords(type, Math.min(limit, words.length), words);
+            return this.activities.getPrioritizedWords(type, Math.min(limit, words.length), words);
         };
 
         switch (type) {
             case 'matching':
                 const matchingLimit = getActivityWordLimit('matching');
-                const matchingWords = this.restoreWordsFromState(
+                const matchingWords = this.activities.restoreWordsFromState(
                     initialState,
                     getPrioritized(matchingLimit, w => w.word.length >= 2),
                     w => w.word.length >= 2
                 );
                 this.sm.activityInstance = new ActivityClass(container, matchingWords, onProgress, onSaveState, initialState);
                 // Mark words as used when activity starts
-                this.markWordsPracticed(type, matchingWords);
+                this.activities.markWordsPracticed(type, matchingWords);
                 break;
             case 'flashcards':
                 // Flashcards: use all words (non-replayable, study mode)
@@ -113,24 +118,24 @@ class StudentActivityLauncherMethods {
                 break;
             case 'quiz':
                 const quizLimit = getActivityWordLimit('quiz');
-                const quizWords = this.restoreWordsFromState(initialState, getPrioritized(quizLimit));
+                const quizWords = this.activities.restoreWordsFromState(initialState, getPrioritized(quizLimit));
                 this.sm.activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, quizWords);
+                this.activities.markWordsPracticed(type, quizWords);
                 break;
             case 'synonym-antonym':
                 const synonymLimit = getActivityWordLimit('synonymAntonym');
                 const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);
-                const synonymWords = this.restoreWordsFromState(
+                const synonymWords = this.activities.restoreWordsFromState(
                     initialState,
                     getPrioritized(synonymLimit, synonymFilter),
                     synonymFilter
                 );
                 this.sm.activityInstance = new ActivityClass(container, synonymWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, synonymWords);
+                this.activities.markWordsPracticed(type, synonymWords);
                 break;
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
-                const illustrationWords = this.getWordHuntWords(settings);
+                const illustrationWords = this.activities.getWordHuntWords(settings);
                 const wordHuntSubjectSlug = getVocabSubjectSlug(this.sm.currentVocab);
                 const wordHuntSubject = getSubjectBySlug(this.sm.subjects, wordHuntSubjectSlug);
                 this.sm.activityInstance = new ActivityClass(
@@ -138,7 +143,7 @@ class StudentActivityLauncherMethods {
                     illustrationWords,
                     this.sm.currentVocab.name,
                     onProgress,
-                    this.handleIllustrationSave.bind(this),
+                    this.activities.handleIllustrationSave.bind(this.activities),
                     this.sm.unitWordHunt,
                     {
                         initialIndex: options.initialWordIndex || 0,
@@ -152,11 +157,11 @@ class StudentActivityLauncherMethods {
                                 word: index + 1
                             }, { replace: true });
                         },
-                        uploadImage: (word, blob, imageInfo) => this.uploadWordHuntImage(word, blob, imageInfo),
-                        loadImage: path => this.loadWordHuntImage(path),
-                        onDownloadWordHunt: () => this.downloadWordHuntSubmission(),
+                        uploadImage: (word, blob, imageInfo) => this.activities.uploadWordHuntImage(word, blob, imageInfo),
+                        loadImage: path => this.activities.loadWordHuntImage(path),
+                        onDownloadWordHunt: () => this.activities.downloadWordHuntSubmission(),
                         researchContext: {
-                            grade: this.getUnitGrade(this.sm.currentVocab),
+                            grade: this.activities.getUnitGrade(this.sm.currentVocab),
                             subjectName: wordHuntSubject.name,
                             subjectSlug: wordHuntSubjectSlug,
                             unitName: this.sm.currentVocab.name || ''
@@ -166,7 +171,7 @@ class StudentActivityLauncherMethods {
                 break;
             case 'word-search':
                 const wordSearchLimit = getActivityWordLimit('wordSearch');
-                const wordSearchWords = this.restoreWordsFromState(
+                const wordSearchWords = this.activities.restoreWordsFromState(
                     initialState,
                     getPrioritized(wordSearchLimit, w => w.word.length >= 4),
                     w => w.word.length >= 4
@@ -182,33 +187,33 @@ class StudentActivityLauncherMethods {
                     initialState,
                     {
                         onNewPuzzle: () => {
-                            this.resetActivityState('word-search');
+                            this.activities.resetActivityState('word-search');
                             this.startActivity('word-search', { fromRoute: true }).catch(error => {
                                 console.error('Failed to restart word search:', error);
                             });
                         }
                     }
                 );
-                this.markWordsPracticed(type, this.sm.activityInstance.words);
+                this.activities.markWordsPracticed(type, this.sm.activityInstance.words);
                 break;
             case 'crossword':
                 const crosswordWords = getPrioritized(getActivityWordLimit('crossword'));
                 this.sm.activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, this.sm.activityInstance.placedWords);
+                this.activities.markWordsPracticed(type, this.sm.activityInstance.placedWords);
                 break;
             case 'hangman':
                 const hangmanWords = getPrioritized(getActivityWordLimit('hangman'));
                 this.sm.activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, hangmanWords);
+                this.activities.markWordsPracticed(type, hangmanWords);
                 break;
             case 'scramble':
                 const scrambleWords = getPrioritized(getActivityWordLimit('scramble'));
                 this.sm.activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, scrambleWords);
+                this.activities.markWordsPracticed(type, scrambleWords);
                 break;
             case 'wordle':
                 const wordleLimit = getActivityWordLimit('wordle');
-                const wordleWords = this.restoreWordsFromState(
+                const wordleWords = this.activities.restoreWordsFromState(
                     initialState,
                     getPrioritized(wordleLimit, w => {
                         const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
@@ -220,17 +225,17 @@ class StudentActivityLauncherMethods {
                     }
                 );
                 this.sm.activityInstance = new ActivityClass(container, wordleWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, wordleWords);
+                this.activities.markWordsPracticed(type, wordleWords);
                 break;
             case 'speed-match':
                 const speedMatchWords = getPrioritized(getActivityWordLimit('speedMatch'));
                 this.sm.activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, speedMatchWords);
+                this.activities.markWordsPracticed(type, speedMatchWords);
                 break;
             case 'fill-in-blank':
                 const fibWords = getPrioritized(getActivityWordLimit('fillInBlank'), w => w.example);
                 this.sm.activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, initialState);
-                this.markWordsPracticed(type, fibWords);
+                this.activities.markWordsPracticed(type, fibWords);
                 break;
             default:
                 container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
@@ -259,16 +264,5 @@ class StudentActivityLauncherMethods {
 
         title.textContent = labels[type] || '';
         title.classList.toggle('hidden', !title.textContent);
-    }
-}
-
-export function installStudentActivityLauncherMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityLauncherMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityLauncherMethods.prototype, name)
-        );
     }
 }

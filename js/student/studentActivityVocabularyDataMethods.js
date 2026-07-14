@@ -1,5 +1,6 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
+import { studentApi } from '../services/studentApi.js';
 import { vocabularyRepository } from '../services/vocabularyRepository.js';
 import {
     getVocabSubjectSlug,
@@ -8,7 +9,44 @@ import {
     loadVocabularyFile
 } from '../services/vocabularyApi.js';
 
-class StudentActivityVocabularyDataMethods {
+export class StudentActivityVocabularyData {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+    }
+
+    getCurrentTrimesterKey(...args) {
+        return this.activities.getCurrentTrimesterKey(...args);
+    }
+
+    getVocabTrimesterKey(...args) {
+        return this.activities.getVocabTrimesterKey(...args);
+    }
+
+    getTrimesterLabel(...args) {
+        return this.activities.getTrimesterLabel(...args);
+    }
+
+    filterStudentAvailableVocabulary(...args) {
+        return this.activities.filterStudentAvailableVocabulary(...args);
+    }
+
+    ensureUnitProgress(...args) {
+        return this.activities.ensureUnitProgress(...args);
+    }
+
+    initWordCoverage(...args) {
+        return this.activities.initWordCoverage(...args);
+    }
+
+    migrateLegacyWordHuntImages(...args) {
+        return this.activities.migrateLegacyWordHuntImages(...args);
+    }
+
+    showActivityMenu(...args) {
+        return this.activities.showActivityMenu(...args);
+    }
+
     async loadManifest() {
         const data = await loadManifest();
         if (data) {
@@ -219,7 +257,7 @@ class StudentActivityVocabularyDataMethods {
         }
 
         try {
-            this.sm.cloudVocabs = await loadCloudVocabularyList(supabaseService);
+            this.sm.cloudVocabs = await loadCloudVocabularyList(studentApi);
         } catch (error) {
             console.error('Failed to load cloud vocabularies:', error);
             const isOffline = !navigator.onLine;
@@ -318,16 +356,5 @@ class StudentActivityVocabularyDataMethods {
         }
 
         this.showActivityMenu(options);
-    }
-}
-
-export function installStudentActivityVocabularyDataMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityVocabularyDataMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityVocabularyDataMethods.prototype, name)
-        );
     }
 }

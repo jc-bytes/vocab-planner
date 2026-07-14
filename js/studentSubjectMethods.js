@@ -9,9 +9,20 @@ import {
 const STUDENT_VOCABULARY_TRIMESTER_KEY = 'student_vocabulary_last_trimester';
 const STUDENT_VOCABULARY_MONTH_KEY = 'student_vocabulary_last_month';
 
-class StudentSubjectMethods {
+export class StudentSubjects {
+    constructor(studentManager) {
+        this.sm = studentManager;
+        this.subjects = [];
+        this.selectedSubjectSlug = localStorage.getItem('student_selected_subject') || DEFAULT_SUBJECT_SLUG;
+        this.vocabularyDrilldown = {
+            trimester: null,
+            month: null
+        };
+        this.vocabularyAutoSelect = false;
+    }
+
     async loadSubjectSettings() {
-        this.subjects = await loadSubjects(this.authDisabled || !this.currentUser ? null : supabaseService);
+        this.subjects = await loadSubjects(this.sm.authDisabled || !this.sm.currentUser ? null : supabaseService);
         this.ensureSelectedSubject();
     }
 
@@ -27,12 +38,12 @@ class StudentSubjectMethods {
         this.selectedSubjectSlug = getVocabSubjectSlug({ subjectSlug });
         localStorage.setItem('student_selected_subject', this.selectedSubjectSlug);
         this.resetStudentVocabularyDrilldown();
-        this.studentVocabularyAutoSelect = true;
-        if (this.parseRoute()?.view === 'units') {
-            this.setRoute({ view: 'units' }, { replace: true });
+        this.vocabularyAutoSelect = true;
+        if (this.sm.parseRoute()?.view === 'units') {
+            this.sm.setRoute({ view: 'units' }, { replace: true });
         }
-        this.activities.renderDashboard();
-        this.activities.renderStudentHome();
+        this.sm.activities.renderDashboard();
+        this.sm.activities.renderStudentHome();
     }
 
     ensureSelectedSubject(vocabs = null) {
@@ -53,15 +64,15 @@ class StudentSubjectMethods {
     }
 
     resetStudentVocabularyDrilldown() {
-        this.studentVocabularyDrilldown = {
+        this.vocabularyDrilldown = {
             trimester: null,
             month: null
         };
     }
 
     setStudentVocabularyDrilldownToCurrentTrimester() {
-        this.studentVocabularyDrilldown = {
-            trimester: this.activities.getCurrentTrimesterKey(),
+        this.vocabularyDrilldown = {
+            trimester: this.sm.activities.getCurrentTrimesterKey(),
             month: null
         };
     }
@@ -77,16 +88,5 @@ class StudentSubjectMethods {
         if (!trimester || !month) return;
         localStorage.setItem(STUDENT_VOCABULARY_TRIMESTER_KEY, trimester);
         localStorage.setItem(STUDENT_VOCABULARY_MONTH_KEY, month);
-    }
-}
-
-export function installStudentSubjectMethods(StudentManager) {
-    for (const name of Object.getOwnPropertyNames(StudentSubjectMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentSubjectMethods.prototype, name)
-        );
     }
 }

@@ -2,25 +2,16 @@ import { $, closeModal, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { leaderboardRepository } from '../services/leaderboardRepository.js';
+import { getLeaderboardGameIds } from './studentGameRegistry.js';
 
-const LEADERBOARD_ENABLED_GAMES = [
-    'galactic-breaker',
-    'snake',
-    'flappy-bird',
-    'space-invaders',
-    'target-shooter',
-    'pong',
-    'whack-a-mole',
-    'trapdoor-trials',
-    'tilt-maze',
-    'basic-platformer',
-    'tower-platformer',
-    'radius-raid',
-    'packabunchas',
-    'spacepi'
-];
+const LEADERBOARD_ENABLED_GAMES = getLeaderboardGameIds();
 
-class StudentGameLeaderboardMethods {
+export class StudentGameLeaderboard {
+    constructor(games) {
+        this.games = games;
+        this.sm = games.sm;
+    }
+
     async saveHighScore(gameId, score, metadata = null) {
         if (this.sm.authDisabled) {
             return;
@@ -213,16 +204,5 @@ class StudentGameLeaderboardMethods {
             console.error('Error loading leaderboard:', error);
             container.innerHTML = '<p style="text-align: center; color: var(--danger-color);">Could not load leaderboard. (Index might be building)</p>';
         }
-    }
-}
-
-export function installStudentGameLeaderboardMethods(StudentGames) {
-    for (const name of Object.getOwnPropertyNames(StudentGameLeaderboardMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentGames.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentGameLeaderboardMethods.prototype, name)
-        );
     }
 }

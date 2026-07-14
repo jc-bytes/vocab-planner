@@ -2,7 +2,12 @@ import { $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 
-class StudentActivityProgressPersistenceMethods {
+export class StudentActivityProgressPersistence {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+    }
+
     getActivityCoinRewards(activityType, settings = {}) {
         const activityRewards = settings.activityRewards?.[activityType] || {};
         return {
@@ -101,7 +106,7 @@ class StudentActivityProgressPersistenceMethods {
                 progressReward,
                 completionBonus
             });
-            this.scheduleActivityPreload();
+            this.activities.scheduleActivityPreload();
 
             // Update in-game progress indicator
             const indicator = $('#activity-progress-indicator');
@@ -114,11 +119,11 @@ class StudentActivityProgressPersistenceMethods {
     }
 
     buildActivityProgressPayload(activityType, scoreData = {}, settings = {}) {
-        const unitProgress = this.getCurrentUnitProgress();
+        const unitProgress = this.activities.getCurrentUnitProgress();
         if (!unitProgress || !this.sm.currentVocab) return null;
-        const flow = this.getActivityFlowConfig(this.sm.currentVocab);
+        const flow = this.activities.getActivityFlowConfig(this.sm.currentVocab);
         return {
-            unitKey: this.getUnitProgressKey(this.sm.currentVocab),
+            unitKey: this.activities.getUnitProgressKey(this.sm.currentVocab),
             unitContext: {
                 unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
                 unitName: unitProgress.unitName || this.sm.currentVocab.name || '',
@@ -196,7 +201,7 @@ class StudentActivityProgressPersistenceMethods {
 
         if (activityType === 'illustration') {
             localStorage.removeItem(`word_hunt_state_${vocabName}_${this.sm.currentVocab.words.length}`);
-            const progressKey = this.getUnitProgressKey(this.sm.currentVocab);
+            const progressKey = this.activities.getUnitProgressKey(this.sm.currentVocab);
             if (this.sm.progressData.units[progressKey]?.wordHunt) {
                 delete this.sm.progressData.units[progressKey].wordHunt;
             }
@@ -239,7 +244,7 @@ class StudentActivityProgressPersistenceMethods {
             const sanitizedState = this.sanitizeActivityState(stateData);
             if (sanitizedState === undefined) return;
 
-            const unitProgress = this.getCurrentUnitProgress();
+            const unitProgress = this.activities.getCurrentUnitProgress();
             if (!unitProgress.states) unitProgress.states = {};
 
             if (sanitizedState === null) {
@@ -251,16 +256,5 @@ class StudentActivityProgressPersistenceMethods {
             this.sm.unitStates = unitProgress.states;
             this.sm.progress.saveLocalProgress();
         }
-    }
-}
-
-export function installStudentActivityProgressPersistenceMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityProgressPersistenceMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityProgressPersistenceMethods.prototype, name)
-        );
     }
 }

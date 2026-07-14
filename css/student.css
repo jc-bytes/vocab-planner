@@ -1389,6 +1389,7 @@ select:focus {
 }.compact-vocab-grid {
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
 }.login-container {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: stretch;

@@ -4,7 +4,12 @@ import {
 } from './studentProgressConstants.js';
 import { getStudentExperience } from './studentExperience.js';
 
-class StudentProgressCoreMethods {
+export class StudentProgressCore {
+    constructor(progress) {
+        this.progress = progress;
+        this.sm = progress.sm;
+    }
+
     getExperience() {
         return getStudentExperience(this.sm.progressData);
     }
@@ -275,16 +280,5 @@ class StudentProgressCoreMethods {
         } catch (error) {
             console.warn('Ignored invalid local coin sync payload:', error);
         }
-    }
-}
-
-export function installStudentProgressCoreMethods(StudentProgress) {
-    for (const name of Object.getOwnPropertyNames(StudentProgressCoreMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentProgress.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentProgressCoreMethods.prototype, name)
-        );
     }
 }

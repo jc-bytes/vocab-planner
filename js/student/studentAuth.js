@@ -6,10 +6,60 @@
 import { $, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
+import { StudentAuthUi } from '../studentAuthUiMethods.js';
 
 export class StudentAuth {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
+        this.ui = new StudentAuthUi(this);
+    }
+
+    getJoinGradeFromUrl() {
+        return this.ui.getJoinGradeFromUrl();
+    }
+
+    prefillRegistrationFromJoinLink() {
+        return this.ui.prefillRegistrationFromJoinLink();
+    }
+
+    normalizeStudentProfile(profile) {
+        return this.ui.normalizeStudentProfile(profile);
+    }
+
+    mergeStudentProfile(primary, fallback) {
+        return this.ui.mergeStudentProfile(primary, fallback);
+    }
+
+    hasCompleteStudentProfile(profile) {
+        return this.ui.hasCompleteStudentProfile(profile);
+    }
+
+    showAuthPanel(panel) {
+        return this.ui.showAuthPanel(panel);
+    }
+
+    validateRegistrationForm() {
+        return this.ui.validateRegistrationForm();
+    }
+
+    handleStudentLogin(event) {
+        return this.ui.handleStudentLogin(event);
+    }
+
+    handleStudentRegister(event) {
+        return this.ui.handleStudentRegister(event);
+    }
+
+    showForcedPasswordChange() {
+        return this.ui.showForcedPasswordChange();
+    }
+
+    handleForcedPasswordChange(event) {
+        return this.ui.handleForcedPasswordChange(event);
+    }
+
+    showElectronAuthMessage(loginBtn) {
+        return this.ui.showElectronAuthMessage(loginBtn);
     }
 
     async initBackendAuth() {
@@ -58,7 +108,7 @@ export class StudentAuth {
             });
         } catch (error) {
             console.error('backend auth init failed:', error);
-            this.sm.showLoginError(error.message || 'Authentication service unavailable.');
+            this.showLoginError(error.message || 'Authentication service unavailable.');
             this.sm.switchView('login-view');
         }
     }
@@ -68,8 +118,8 @@ export class StudentAuth {
         localStorage.setItem('was_logged_in', 'true');
         
         // Update UI immediately (works offline)
-        this.sm.setAuthStatus('🔐 Signed in');
-        this.sm.updateGuestStatus(false);
+        this.setAuthStatus('🔐 Signed in');
+        this.updateGuestStatus(false);
 
         // Try to fetch role and profile.
         try {
@@ -78,21 +128,21 @@ export class StudentAuth {
             console.error('Failed to fetch role:', error);
             const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
             this.sm.currentRole = cachedRole || 'student';
-            this.sm.setAuthStatus('Signed in');
+            this.setAuthStatus('Signed in');
         }
 
         if (this.sm.currentRole !== 'student') {
             const message = this.sm.currentRole === 'teacher'
                 ? 'This page is for student accounts. Please use the teacher dashboard.'
                 : 'No student profile was found for this account. Please ask your teacher to check the account setup.';
-            this.sm.showLoginError(message);
+            this.showLoginError(message);
             await supabaseService.signOut();
             return;
         }
 
         if (this.sm.mustChangePassword) {
             this.sm.switchView('loading-view');
-            this.sm.showForcedPasswordChange();
+            this.showForcedPasswordChange();
             return;
         }
 
@@ -116,12 +166,12 @@ export class StudentAuth {
             console.error('Failed to load cloud progress (may be offline):', error);
             // Use local progress instead
             this.sm.progress.loadLocalProgress();
-            this.sm.setAuthStatus('🔐 Signed in (Offline - Using local data)');
+            this.setAuthStatus('🔐 Signed in (Offline - Using local data)');
         }
 
         if (!this.isStillSignedIn(userId)) return false;
 
-        this.sm.updateHeader();
+        this.updateHeader();
         this.sm.progress.startCoinSync();
         await this.sm.loadSubjectSettings();
         if (!this.isStillSignedIn(userId)) return false;
@@ -130,10 +180,10 @@ export class StudentAuth {
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();
         if (!this.isStillSignedIn(userId)) return false;
-        const requiresProfile = !this.sm.hasCompleteStudentProfile();
+        const requiresProfile = !this.hasCompleteStudentProfile();
 
         if (requiresProfile) {
-            this.sm.checkProfile(true);
+            this.checkProfile(true);
         }
 
         return true;
@@ -143,14 +193,11 @@ export class StudentAuth {
         this.sm.progress.stopCoinSync();
         this.sm.currentUser = null;
         localStorage.removeItem('was_logged_in');
-        if (this.sm.cloudSaveTimeout) {
-            clearTimeout(this.sm.cloudSaveTimeout);
-            this.sm.cloudSaveTimeout = null;
-        }
-        this.sm.updateGuestStatus(true);
-        this.sm.setAuthStatus('Signed out');
+        this.sm.progress.cancelScheduledCloudSync();
+        this.updateGuestStatus(true);
+        this.setAuthStatus('Signed out');
         this.sm.authInitialized = false;
-        this.sm.routeReady = false;
+        this.sm.resetRouteState();
         this.sm.switchView('login-view');
     }
 
@@ -160,7 +207,7 @@ export class StudentAuth {
             if (!profile) {
                 this.sm.currentRole = 'student';
                 this.sm.mustChangePassword = false;
-                this.sm.studentProfile = this.sm.normalizeStudentProfile({
+                this.sm.studentProfile = this.normalizeStudentProfile({
                     firstName: user.user_metadata?.first_name || '',
                     lastName: user.user_metadata?.last_name || '',
                     name: user.displayName || '',
@@ -173,7 +220,7 @@ export class StudentAuth {
             this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
 
             if (profile && this.sm.currentRole === 'student') {
-                this.sm.studentProfile = this.sm.normalizeStudentProfile({
+                this.sm.studentProfile = this.normalizeStudentProfile({
                     firstName: profile.firstName || '',
                     lastName: profile.lastName || '',
                     name: profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim(),
@@ -201,15 +248,15 @@ export class StudentAuth {
     updateHeader() {
         this.sm.logStudentDomUpdate?.('welcome-header', { source: 'updateHeader' });
         const headerTitle = $('.header-left h1');
-        const profile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
+        const profile = this.normalizeStudentProfile(this.sm.studentProfile);
         const studentName = profile.name || this.sm.currentUser?.displayName || 'Student';
         headerTitle.textContent = studentName;
         this.sm.updateLevelDisplay();
     }
 
     checkProfile(force = false) {
-        this.sm.studentProfile = this.sm.normalizeStudentProfile(this.sm.studentProfile);
-        const isComplete = this.sm.hasCompleteStudentProfile();
+        this.sm.studentProfile = this.normalizeStudentProfile(this.sm.studentProfile);
+        const isComplete = this.hasCompleteStudentProfile();
 
         if (isComplete) {
             return;

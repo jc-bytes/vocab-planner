@@ -1,7 +1,84 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
 
-class StudentActivityBrowserMethods {
+export class StudentActivityBrowser {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+    }
+
+    renderSubjectPicker(...args) {
+        return this.activities.renderSubjectPicker(...args);
+    }
+
+    getVisibleVocabularyList(...args) {
+        return this.activities.getVisibleVocabularyList(...args);
+    }
+
+    filterStudentAvailableVocabulary(...args) {
+        return this.activities.filterStudentAvailableVocabulary(...args);
+    }
+
+    buildVocabularyTrimesterGroups(...args) {
+        return this.activities.buildVocabularyTrimesterGroups(...args);
+    }
+
+    buildVocabularyMonthGroups(...args) {
+        return this.activities.buildVocabularyMonthGroups(...args);
+    }
+
+    getCurrentTrimesterKey(...args) {
+        return this.activities.getCurrentTrimesterKey(...args);
+    }
+
+    normalizeMonthKey(...args) {
+        return this.activities.normalizeMonthKey(...args);
+    }
+
+    getMonthLabel(...args) {
+        return this.activities.getMonthLabel(...args);
+    }
+
+    getMonthOrder(...args) {
+        return this.activities.getMonthOrder(...args);
+    }
+
+    getTrimesterLabel(...args) {
+        return this.activities.getTrimesterLabel(...args);
+    }
+
+    getTrimesterOrder(...args) {
+        return this.activities.getTrimesterOrder(...args);
+    }
+
+    formatMonthSummary(...args) {
+        return this.activities.formatMonthSummary(...args);
+    }
+
+    formatUnitCount(...args) {
+        return this.activities.formatUnitCount(...args);
+    }
+
+    compareVocabularySchedule(...args) {
+        return this.activities.compareVocabularySchedule(...args);
+    }
+
+    getVocabTrimesterKey(...args) {
+        return this.activities.getVocabTrimesterKey(...args);
+    }
+
+    getVocabSchedule(...args) {
+        return this.activities.getVocabSchedule(...args);
+    }
+
+    loadVocabulary(...args) {
+        return this.activities.loadVocabulary(...args);
+    }
+
+    scheduleIdleTask(...args) {
+        return this.activities.scheduleIdleTask(...args);
+    }
+
     renderDashboard() {
         const container = $('#vocab-list');
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
@@ -608,16 +685,5 @@ class StudentActivityBrowserMethods {
         this.scheduleIdleTask(() => {
             preloadVocabularyFile(path);
         }, 1200);
-    }
-}
-
-export function installStudentActivityBrowserMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityBrowserMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityBrowserMethods.prototype, name)
-        );
     }
 }

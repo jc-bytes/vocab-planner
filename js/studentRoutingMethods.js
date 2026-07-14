@@ -1,4 +1,17 @@
-class StudentRoutingMethods {
+export class StudentRouting {
+    constructor(studentManager) {
+        this.sm = studentManager;
+        this.routeReady = false;
+        this.isApplyingRoute = false;
+        this.games = null;
+        this.gamesPromise = null;
+    }
+
+    reset() {
+        this.routeReady = false;
+        this.isApplyingRoute = false;
+    }
+
     slugifyRouteId(value) {
         return String(value || '')
             .trim()
@@ -12,7 +25,7 @@ class StudentRoutingMethods {
     }
 
     getCurrentVocabRouteId() {
-        return this.getVocabRouteId(this.currentVocab);
+        return this.getVocabRouteId(this.sm.currentVocab);
     }
 
     async getGames() {
@@ -21,7 +34,7 @@ class StudentRoutingMethods {
         if (!this.gamesPromise) {
             this.gamesPromise = import('./student/studentGames.js')
                 .then(({ StudentGames }) => {
-                    this.games = new StudentGames(this);
+                    this.games = new StudentGames(this.sm);
                     return this.games;
                 })
                 .finally(() => {
@@ -161,7 +174,7 @@ class StudentRoutingMethods {
 
     handleRouteChange() {
         if (!this.routeReady || this.isApplyingRoute) return;
-        if (!this.authDisabled && !this.currentUser) return;
+        if (!this.sm.authDisabled && !this.sm.currentUser) return;
         this.applyRoute(this.parseRoute());
     }
 
@@ -169,39 +182,39 @@ class StudentRoutingMethods {
         const normalized = String(unitId || '').trim();
         if (!normalized) return null;
 
-        if (!Array.isArray(this.availableVocabs) || this.availableVocabs.length === 0) {
-            this.activities.renderDashboard();
+        if (!Array.isArray(this.sm.availableVocabs) || this.sm.availableVocabs.length === 0) {
+            this.sm.activities.renderDashboard();
         }
 
-        return (this.availableVocabs || []).find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+        return (this.sm.availableVocabs || []).find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
     }
 
     isKnownActivityType(activityType) {
-        return this.activityRouteTypes.includes(activityType);
+        return this.sm.activityRouteTypes.includes(activityType);
     }
 
     showUnitsView(route = {}) {
-        this.cleanupActivity();
-        this.currentVocab = null;
-        this.studentVocabularyAutoSelect = !route.all && !route.trimester;
+        this.sm.cleanupActivity();
+        this.sm.currentVocab = null;
+        this.sm.studentVocabularyAutoSelect = !route.all && !route.trimester;
         if (route.all) {
-            this.resetStudentVocabularyDrilldown();
+            this.sm.resetStudentVocabularyDrilldown();
         } else if (route.trimester) {
-            this.studentVocabularyDrilldown = {
+            this.sm.studentVocabularyDrilldown = {
                 trimester: route.trimester,
                 month: route.month || null
             };
         } else {
-            this.resetStudentVocabularyDrilldown();
+            this.sm.resetStudentVocabularyDrilldown();
         }
-        this.activities.renderDashboard();
-        this.switchView('vocab-selection-view');
+        this.sm.activities.renderDashboard();
+        this.sm.switchView('vocab-selection-view');
     }
 
     async showArcadeView() {
-        this.cleanupActivity();
-        this.currentVocab = null;
-        this.switchView('arcade-view');
+        this.sm.cleanupActivity();
+        this.sm.currentVocab = null;
+        this.sm.switchView('arcade-view');
         const games = await this.getGames();
         games.updateArcadeUI();
         games.updateGameSelectionUI();
@@ -220,10 +233,10 @@ class StudentRoutingMethods {
             }
 
             if (targetRoute.view === 'menu') {
-                this.cleanupActivity();
-                this.currentVocab = null;
-                this.activities.renderStudentHome();
-                this.switchView('main-menu-view');
+                this.sm.cleanupActivity();
+                this.sm.currentVocab = null;
+                this.sm.activities.renderStudentHome();
+                this.sm.switchView('main-menu-view');
                 return;
             }
 
@@ -245,7 +258,7 @@ class StudentRoutingMethods {
                     return;
                 }
 
-                await this.activities.loadVocabulary(vocab, { fromRoute: true });
+                await this.sm.activities.loadVocabulary(vocab, { fromRoute: true });
 
                 if (targetRoute.view === 'unit') {
                     return;
@@ -260,7 +273,7 @@ class StudentRoutingMethods {
                     ? (Number.isFinite(targetRoute.word) ? targetRoute.word : 1)
                     : null;
 
-                await this.activities.startActivity(targetRoute.activityType, {
+                await this.sm.activities.startActivity(targetRoute.activityType, {
                     fromRoute: true,
                     initialWordIndex: requestedWord ? requestedWord - 1 : 0,
                     requestedWord,
@@ -269,7 +282,7 @@ class StudentRoutingMethods {
                 });
 
                 if (targetRoute.activityType === 'illustration') {
-                    const restoredWord = (this.activityInstance?.currentIndex || 0) + 1;
+                    const restoredWord = (this.sm.activityInstance?.currentIndex || 0) + 1;
                     if (targetRoute.wordWasInvalid || !targetRoute.hasWordParam || requestedWord !== restoredWord) {
                         this.setRoute({
                             view: 'activity',
@@ -283,16 +296,5 @@ class StudentRoutingMethods {
         } finally {
             this.isApplyingRoute = false;
         }
-    }
-}
-
-export function installStudentRoutingMethods(StudentManager) {
-    for (const name of Object.getOwnPropertyNames(StudentRoutingMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentRoutingMethods.prototype, name)
-        );
     }
 }

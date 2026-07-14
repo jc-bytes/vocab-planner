@@ -6,7 +6,25 @@ import {
     VOCAB_ACTIVITY_IDS
 } from './studentActivityConstants.js';
 
-class StudentActivityProgressFlowMethods {
+export class StudentActivityProgressFlow {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+        this.activityPreloadKeys = new Set();
+    }
+
+    getVocabTrimesterKey(...args) {
+        return this.activities.getVocabTrimesterKey(...args);
+    }
+
+    scheduleIdleTask(...args) {
+        return this.activities.scheduleIdleTask(...args);
+    }
+
+    loadActivityClass(...args) {
+        return this.activities.loadActivityClass(...args);
+    }
+
     getUnitGrade(vocab = this.sm.currentVocab) {
         const profileGrade = this.sm.studentProfile?.grade;
         if (profileGrade) return String(profileGrade);
@@ -487,16 +505,5 @@ class StudentActivityProgressFlowMethods {
         this.scheduleIdleTask(() => {
             this.loadActivityClass(activityType).catch(() => {});
         }, 900);
-    }
-}
-
-export function installStudentActivityProgressFlowMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityProgressFlowMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityProgressFlowMethods.prototype, name)
-        );
     }
 }

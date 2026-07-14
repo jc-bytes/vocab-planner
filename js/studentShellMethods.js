@@ -6,7 +6,19 @@ const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
 // Import this value instead of creating another shell-state media query.
 export const STUDENT_WIDE_SHELL_MEDIA_QUERY = '(min-width: 1121px)';
 
-class StudentShellMethods {
+export class StudentShell {
+    constructor(studentManager) {
+        this.sm = studentManager;
+        this.scrollSaveTimer = null;
+        this.dashboardMutationObserver = null;
+        this.sectionScrollPositions = {};
+        this.wideShellMediaQuery = null;
+    }
+
+    setWideShellMediaQuery(mediaQuery) {
+        this.wideShellMediaQuery = mediaQuery;
+    }
+
     switchView(viewId) {
         const currentViewId = $('.view.active')?.id || '';
         const currentSection = this.getStudentSectionForView(currentViewId);
@@ -40,9 +52,9 @@ class StudentShellMethods {
     }
 
     scheduleStudentScrollSave() {
-        window.clearTimeout(this.studentScrollSaveTimer);
-        this.studentScrollSaveTimer = window.setTimeout(() => {
-            this.studentScrollSaveTimer = null;
+        window.clearTimeout(this.scrollSaveTimer);
+        this.scrollSaveTimer = window.setTimeout(() => {
+            this.scrollSaveTimer = null;
             this.saveStudentSectionScroll($('.view.active')?.id || '');
         }, STUDENT_SCROLL_SAVE_DELAY_MS);
     }
@@ -100,11 +112,11 @@ class StudentShellMethods {
     }
 
     startStudentDashboardMutationObserver() {
-        if (this.studentDashboardMutationObserver || !this.shouldDebugStudentDom()) return;
+        if (this.dashboardMutationObserver || !this.shouldDebugStudentDom()) return;
         const dashboard = $('#student-home-dashboard');
         if (!dashboard) return;
 
-        this.studentDashboardMutationObserver = new MutationObserver(mutations => {
+        this.dashboardMutationObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 console.log('DOM UPDATE', 'student-home-dashboard', {
                     mutationType: mutation.type,
@@ -117,7 +129,7 @@ class StudentShellMethods {
                 });
             });
         });
-        this.studentDashboardMutationObserver.observe(dashboard, {
+        this.dashboardMutationObserver.observe(dashboard, {
             childList: true,
             subtree: true,
             attributes: true
@@ -130,11 +142,8 @@ class StudentShellMethods {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
 
-        if (!this.studentSectionScrollPositions) {
-            this.studentSectionScrollPositions = {};
-        }
         const top = window.scrollY || document.documentElement.scrollTop || 0;
-        this.studentSectionScrollPositions[section] = top;
+        this.sectionScrollPositions[section] = top;
         this.persistStudentScroll(this.getStudentSectionScrollKey(section), top);
 
         const routeKey = this.getStudentRouteScrollKey();
@@ -153,8 +162,8 @@ class StudentShellMethods {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
         const routeTop = this.readStudentScroll(this.getStudentRouteScrollKey());
-        const sectionTop = Number.isFinite(this.studentSectionScrollPositions?.[section])
-            ? this.studentSectionScrollPositions[section]
+        const sectionTop = Number.isFinite(this.sectionScrollPositions[section])
+            ? this.sectionScrollPositions[section]
             : this.readStudentScroll(this.getStudentSectionScrollKey(section));
         const savedTop = Number.isFinite(routeTop) ? routeTop : (Number.isFinite(sectionTop) ? sectionTop : 0);
         this.debugStudentScrollLifecycle('restore:start', {
@@ -227,7 +236,7 @@ class StudentShellMethods {
     }
 
     isStudentWideShell() {
-        return this.studentWideShellMediaQuery?.matches
+        return this.wideShellMediaQuery?.matches
             ?? window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY).matches;
     }
 
@@ -285,8 +294,8 @@ class StudentShellMethods {
     }
 
     cleanupActivity() {
-        if (this.activityInstance && typeof this.activityInstance.destroy === 'function') {
-            this.activityInstance.destroy();
+        if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
+            this.sm.activityInstance.destroy();
         }
 
         const activityContainer = $('#activity-container');
@@ -315,8 +324,8 @@ class StudentShellMethods {
             activityTitle.classList.add('hidden');
         }
 
-        this.currentActivityType = null;
-        this.activityInstance = null;
+        this.sm.currentActivityType = null;
+        this.sm.activityInstance = null;
     }
 
     showToast(message, duration = 3000) {
@@ -351,16 +360,5 @@ class StudentShellMethods {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-50%) translateY(-20px)';
         }, duration);
-    }
-}
-
-export function installStudentShellMethods(StudentManager) {
-    for (const name of Object.getOwnPropertyNames(StudentShellMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentShellMethods.prototype, name)
-        );
     }
 }

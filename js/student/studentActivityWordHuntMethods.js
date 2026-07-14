@@ -1,14 +1,24 @@
 import { imageDB } from '../db.js';
 import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
 import { $, notifications } from '../main.js';
-import { studentApi as supabaseService } from '../services/studentApi.js';
+import { studentApi } from '../services/studentApi.js';
 
-class StudentActivityWordHuntMethods {
+export class StudentActivityWordHunt {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+        this.wordHuntExportInProgress = false;
+    }
+
+    getCurrentUnitProgress(...args) {
+        return this.activities.getCurrentUnitProgress(...args);
+    }
+
     async uploadWordHuntImage(word, blob, imageInfo = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return null;
 
         const unitProgress = this.getCurrentUnitProgress();
-        const path = supabaseService.buildWordHuntImagePath({
+        const path = studentApi.buildWordHuntImagePath({
             userId: this.sm.currentUser.uid,
             schoolYear: unitProgress.schoolYear,
             trimesterKey: unitProgress.trimester,
@@ -18,7 +28,7 @@ class StudentActivityWordHuntMethods {
             word
         });
 
-        await supabaseService.uploadWordHuntImage({ path, blob });
+        await studentApi.uploadWordHuntImage({ path, blob });
 
         const now = new Date().toISOString();
         return {
@@ -35,7 +45,7 @@ class StudentActivityWordHuntMethods {
 
     async loadWordHuntImage(path) {
         if (this.sm.authDisabled || !path) return null;
-        return supabaseService.downloadWordHuntImage(path);
+        return studentApi.downloadWordHuntImage(path);
     }
 
     getLocalWordHuntEntries(vocab = this.sm.currentVocab) {
@@ -202,16 +212,5 @@ class StudentActivityWordHuntMethods {
             this.sm.unitWordHunt = unitProgress.wordHunt;
         }
         this.sm.progress.saveLocalProgress();
-    }
-}
-
-export function installStudentActivityWordHuntMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityWordHuntMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityWordHuntMethods.prototype, name)
-        );
     }
 }

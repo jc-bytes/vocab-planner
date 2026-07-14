@@ -184,7 +184,7 @@ function runStudentExperienceTests() {
 
 async function runLeaderboardContractTests() {
     const leaderboardSource = await readFile(
-        new URL('../js/student/studentGameLeaderboardMethods.js', import.meta.url),
+        new URL('../js/student/studentGameRegistry.js', import.meta.url),
         'utf8'
     );
     const migrationSources = await Promise.all([
@@ -222,8 +222,8 @@ async function runLeaderboardContractTests() {
 
 async function runTrapdoorTrialsContractTests() {
     const [studentSource, lifecycleSource, loaderSource, trialHtml, trialStyles, trialGame, trialLicense] = await Promise.all([
-        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/trapdoor-trials/index.html', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/trapdoor-trials/style.css', import.meta.url), 'utf8'),
@@ -252,7 +252,7 @@ async function runTrapdoorTrialsContractTests() {
     if (/fable|devil|blood|stain/i.test(`${trialHtml}\n${trialStyles}\n${trialGame}`)) {
         throw new Error('Trapdoor Trials contains retired branding or effects.');
     }
-    if (!trialGame.includes('type: "trapdoor-trials-score"') || !loaderSource.includes("gameId === 'trapdoor-trials'")) {
+    if (!trialGame.includes('type: "trapdoor-trials-score"') || !studentSource.includes("scoreMessageType: 'trapdoor-trials-score'")) {
         throw new Error('Trapdoor Trials leaderboard reporting contract is incomplete.');
     }
     if (!trialLicense.startsWith('MIT License')) {
@@ -262,8 +262,8 @@ async function runTrapdoorTrialsContractTests() {
 
 async function runTiltMazeContractTests() {
     const [studentSource, lifecycleSource, loaderSource, tiltHtml, tiltStyles, tiltGame, tiltLicense, threeLicense] = await Promise.all([
-        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/tilt-maze/index.html', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/tilt-maze/styles.css', import.meta.url), 'utf8'),
@@ -285,7 +285,7 @@ async function runTiltMazeContractTests() {
     if (!lifecycleSource.includes("'js/games/tilt-maze/index.html'")) {
         throw new Error('Tilt Maze launch path is missing.');
     }
-    if (!loaderSource.includes("gameId === 'tilt-maze'")) {
+    if (!studentSource.includes("id: 'tilt-maze'") || !studentSource.includes('responsive: true')) {
         throw new Error('Tilt Maze responsive iframe sizing is incomplete.');
     }
     if (/(?:src|href)=["']https?:\/\//.test(tiltHtml)) {
@@ -307,8 +307,8 @@ async function runTiltMazeContractTests() {
 
 async function runBasicPlatformerContractTests() {
     const [studentSource, lifecycleSource, loaderSource, gameHtml, gameBundle, gameLicense, attribution, contentSource] = await Promise.all([
-        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/basic-platformer/index.html', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/basic-platformer/BasicPlatformer.js', import.meta.url), 'utf8'),
@@ -340,7 +340,7 @@ async function runBasicPlatformerContractTests() {
     if (!gameHtml.includes('runner-hud') || !gameHtml.includes('speedBonus') || !gameBundle.includes('Warmup Circuit')) {
         throw new Error('Circuit Sprint HUD, speed scoring, and level names must remain wired.');
     }
-    if (!/gameId === 'basic-platformer'[\s\S]*?frameWidth = 1280;[\s\S]*?frameHeight = 720;/.test(loaderSource)) {
+    if (!/id: 'basic-platformer'[\s\S]*?width: 1280, height: 720/.test(studentSource)) {
         throw new Error('BasicPlatformer must retain its 1280x720 frame ratio.');
     }
     if (/(?:src|href)=["']https?:\/\//.test(gameHtml)) {
@@ -363,8 +363,8 @@ async function runBasicPlatformerContractTests() {
 
 async function runTowerPlatformerContractTests() {
     const [studentSource, lifecycleSource, loaderSource, gameHtml, gameSource, gameLicense, readme] = await Promise.all([
-        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/tower-platformer/index.html', import.meta.url), 'utf8'),
         readFile(new URL('../js/games/tower-platformer/js/tower.js', import.meta.url), 'utf8'),
@@ -384,7 +384,7 @@ async function runTowerPlatformerContractTests() {
     if (!studentSource.includes("name: 'Tower Climb'") || !lifecycleSource.includes("'js/games/tower-platformer/index.html'")) {
         throw new Error('Tower Climb arcade card or launch path is missing.');
     }
-    if (!loaderSource.includes("gameId === 'tower-platformer'")) {
+    if (!/id: 'tower-platformer'[\s\S]*?responsive: true/.test(studentSource)) {
         throw new Error('Tower Climb responsive iframe sizing is missing.');
     }
     if (/(?:src|href)=["']https?:\/\//.test(gameHtml)) {
@@ -400,8 +400,8 @@ async function runTowerPlatformerContractTests() {
 
 async function runRemovedArcadeGamesContractTests() {
     const [studentSource, lifecycleSource, loaderSource] = await Promise.all([
-        readFile(new URL('../js/student.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/student/studentGameLifecycleMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/student/studentGameRegistry.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/student/studentGameHtmlLoaderMethods.js', import.meta.url), 'utf8')
     ]);
 

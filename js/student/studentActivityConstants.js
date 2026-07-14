@@ -1,17 +1,6 @@
-export const VOCAB_ACTIVITY_IDS = [
-    'illustration',
-    'matching',
-    'flashcards',
-    'quiz',
-    'synonym-antonym',
-    'word-search',
-    'crossword',
-    'hangman',
-    'scramble',
-    'wordle',
-    'speed-match',
-    'fill-in-blank'
-];
+import { STUDENT_ACTIVITY_REGISTRY } from './studentActivityRegistry.js';
+
+export const VOCAB_ACTIVITY_IDS = STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id);
 
 export const DEFAULT_REQUIRED_BY_PURPOSE = {
     summative: ['flashcards', 'illustration'],
@@ -32,35 +21,13 @@ export const DEFAULT_PRACTICE_REQUIRED_ROTATION = [
     ['flashcards', 'word-search']
 ];
 
-export const ACTIVITY_MODULES = {
-    matching: () => import('../activities/matching.js'),
-    flashcards: () => import('../activities/flashcards.js'),
-    quiz: () => import('../activities/quiz.js'),
-    illustration: () => import('../activities/illustration.js'),
-    'synonym-antonym': () => import('../activities/synonymAntonym.js'),
-    'word-search': () => import('../activities/wordSearch.js'),
-    crossword: () => import('../activities/crossword.js'),
-    hangman: () => import('../activities/hangman.js'),
-    scramble: () => import('../activities/scramble.js'),
-    wordle: () => import('../activities/wordle.js'),
-    'speed-match': () => import('../activities/speedMatch.js?v=20260706a'),
-    'fill-in-blank': () => import('../activities/fillInBlank.js')
-};
+export const ACTIVITY_MODULES = Object.fromEntries(
+    STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity.load])
+);
 
-export const ACTIVITY_EXPORTS = {
-    matching: 'MatchingActivity',
-    flashcards: 'FlashcardsActivity',
-    quiz: 'QuizActivity',
-    illustration: 'IllustrationActivity',
-    'synonym-antonym': 'SynonymAntonymActivity',
-    'word-search': 'WordSearchActivity',
-    crossword: 'CrosswordActivity',
-    hangman: 'HangmanActivity',
-    scramble: 'ScrambleActivity',
-    wordle: 'WordleActivity',
-    'speed-match': 'SpeedMatchActivity',
-    'fill-in-blank': 'FillInBlankActivity'
-};
+export const ACTIVITY_EXPORTS = Object.fromEntries(
+    STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity.exportName])
+);
 
 export const MONTH_INDEX = {
     january: 0,

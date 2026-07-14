@@ -8,7 +8,22 @@ import {
     COIN_SYNC_INTERVAL_MS
 } from './studentProgressConstants.js';
 
-class StudentProgressCloudMethods {
+export class StudentProgressCloud {
+    constructor(progress) {
+        this.progress = progress;
+        this.sm = progress.sm;
+        this.coinRealtimeUnsubscribe = null;
+        this.coinSyncInterval = null;
+        this.coinRefreshTimeout = null;
+        this.coinRefreshInFlight = false;
+        this.coinRefreshPendingOptions = null;
+        this.lastCoinRefreshAt = 0;
+        this.storageSyncHandler = null;
+        this.focusSyncHandler = null;
+        this.visibilitySyncHandler = null;
+        this.onlineSyncHandler = null;
+    }
+
     startCoinSync() {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
 
@@ -17,7 +32,7 @@ class StudentProgressCloudMethods {
 
         this.storageSyncHandler = event => {
             if (event.key === 'student_progress') {
-                this.applyLocalProgressFromStorage(event.newValue);
+                this.progress.applyLocalProgressFromStorage(event.newValue);
             }
         };
         window.addEventListener('storage', this.storageSyncHandler);
@@ -121,11 +136,11 @@ class StudentProgressCloudMethods {
     applyRemoteCoinProgress(progress) {
         if (!progress) return;
         this.sm.logStudentDomUpdate?.('student-progress', { source: 'applyRemoteCoinProgress' });
-        const cloudCoinData = this.migrateCoinData(progress);
+        const cloudCoinData = this.progress.migrateCoinData(progress);
         this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
 
-        this.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
-        this.updateLevelDisplay();
+        this.progress.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
+        this.progress.updateLevelDisplay();
         this.lastCoinRefreshAt = Date.now();
         this.sm.setAuthStatus('☁️ Synced');
     }
@@ -186,7 +201,7 @@ class StudentProgressCloudMethods {
                 return;
             }
 
-            const cloudCoinData = this.migrateCoinData(data);
+            const cloudCoinData = this.progress.migrateCoinData(data);
             const cloudGiftCoins = cloudCoinData.coinData.giftCoins || 0;
             const localGiftCoins = this.sm.coinData.giftCoins || 0;
             const hasWelcomeBonus = cloudCoinData.coinHistory.some(entry => entry?.source === 'welcome');
@@ -194,7 +209,7 @@ class StudentProgressCloudMethods {
             this.sm.coinHistory = cloudCoinData.coinHistory;
 
             if (cloudGiftCoins > localGiftCoins) {
-                this.sm.showNotificationBadge();
+                this.progress.showNotificationBadge();
             }
 
             this.sm.coins = this.sm.coinData.balance;
@@ -217,16 +232,16 @@ class StudentProgressCloudMethods {
             await this.restoreImagesFromProgress();
 
             if (!hasWelcomeBonus && this.sm.coinData.balance === 0 && typeof supabaseService.claimStudentWelcomeBonus === 'function') {
-                const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.clientId });
+                const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.progress.clientId });
                 if (progress) {
-                    this.applyProgressSnapshot(progress, { saveLocal: true });
-                    const bonusCoinData = this.migrateCoinData(progress);
+                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                    const bonusCoinData = this.progress.migrateCoinData(progress);
                     if (bonusCoinData.coinHistory.some(entry => entry?.source === 'welcome')) {
                         this.sm.showToast('🎉 Welcome! You received 100 starting coins!');
                     }
                 }
             } else {
-                this.saveLocalProgress(true);
+                this.progress.saveLocalProgress(true);
             }
 
             this.sm.setAuthStatus('☁️ Synced');
@@ -261,7 +276,7 @@ class StudentProgressCloudMethods {
             }
 
             if (progress) {
-                this.applyProgressSnapshot(progress, { saveLocal: true });
+                this.progress.applyProgressSnapshot(progress, { saveLocal: true });
             }
 
             this.sm.setAuthStatus('☁️ Synced');
@@ -329,10 +344,10 @@ class StudentProgressCloudMethods {
             try {
                 if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
                     const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
-                    this.applyProgressSnapshot(progress, { saveLocal: true });
+                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
                 } else if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
                     const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
-                    this.applyProgressSnapshot(progress, { saveLocal: true });
+                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
                 } else if (record.type === 'student-progress') {
                     await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
                 }
@@ -367,16 +382,5 @@ class StudentProgressCloudMethods {
 
     dataURLToBlob(dataUrl) {
         return fetch(dataUrl).then(res => res.blob());
-    }
-}
-
-export function installStudentProgressCloudMethods(StudentProgress) {
-    for (const name of Object.getOwnPropertyNames(StudentProgressCloudMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentProgress.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentProgressCloudMethods.prototype, name)
-        );
     }
 }

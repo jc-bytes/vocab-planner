@@ -1,29 +1,34 @@
 import { $, $$, createElement } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 
-class StudentActivityMenuMethods {
+export class StudentActivityMenu {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+    }
+
     showActivityMenu(options = {}) {
-        const unitTitle = this.formatVocabularyCardTitle?.(this.sm.currentVocab)
+        const unitTitle = this.activities.formatVocabularyCardTitle?.(this.sm.currentVocab)
             || this.sm.currentVocab.name;
         $('#current-unit-title').textContent = unitTitle;
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(this.sm.currentVocab));
         const subjectEl = $('#current-unit-subject');
         if (subjectEl) {
-            const purpose = this.formatVocabularyPurpose?.(this.sm.currentVocab.purpose) || 'Unit';
-            const schedule = this.formatVocabularyScheduleLabel?.(this.sm.currentVocab) || '';
+            const purpose = this.activities.formatVocabularyPurpose?.(this.sm.currentVocab.purpose) || 'Unit';
+            const schedule = this.activities.formatVocabularyScheduleLabel?.(this.sm.currentVocab) || '';
             subjectEl.textContent = [subject.name, purpose, schedule].filter(Boolean).join(' · ');
             subjectEl.style.setProperty('--subject-color', subject.color);
         }
         const descriptionEl = $('#current-unit-description');
         if (descriptionEl) {
-            descriptionEl.textContent = this.formatVocabularyCardDescription?.(this.sm.currentVocab, unitTitle)
+            descriptionEl.textContent = this.activities.formatVocabularyCardDescription?.(this.sm.currentVocab, unitTitle)
                 || this.sm.currentVocab.description
                 || '';
         }
 
         // Get word coverage stats
-        const coverageStats = this.getWordCoverageStats();
-        const activityFlow = this.getActivityFlowConfig();
+        const coverageStats = this.activities.getWordCoverageStats();
+        const activityFlow = this.activities.getActivityFlowConfig();
 
         // Update progress on cards
         const cards = $$('.activity-card');
@@ -89,9 +94,9 @@ class StudentActivityMenuMethods {
                 }
             }
         });
-        this.updateActivityGateDisplay(cards, activityFlow);
+        this.activities.updateActivityGateDisplay(cards, activityFlow);
 
-        const completion = this.getRequiredCompletion(activityFlow);
+        const completion = this.activities.getRequiredCompletion(activityFlow);
         const percent = completion.total > 0
             ? Math.round((completion.completed / completion.total) * 100)
             : 0;
@@ -105,7 +110,7 @@ class StudentActivityMenuMethods {
         }
 
         // Update overall coverage display if element exists
-        this.updateOverallCoverageDisplay(coverageStats);
+        this.activities.updateOverallCoverageDisplay(coverageStats);
 
         if (!options.fromRoute) {
             const unitId = this.sm.getCurrentVocabRouteId();
@@ -115,18 +120,7 @@ class StudentActivityMenuMethods {
         }
 
         this.sm.switchView('activity-menu-view');
-        this.scheduleActivityPreload(activityFlow);
+        this.activities.scheduleActivityPreload(activityFlow);
         if (window.lucide) window.lucide.createIcons({ root: $('#activity-menu-view') });
-    }
-}
-
-export function installStudentActivityMenuMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityMenuMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityMenuMethods.prototype, name)
-        );
     }
 }

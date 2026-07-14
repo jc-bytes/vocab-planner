@@ -12,7 +12,26 @@ function debounceStudentResize(callback) {
     };
 }
 
-class StudentListenerMethods {
+export class StudentListeners {
+    constructor(studentManager) {
+        this.sm = studentManager;
+        this.initialized = false;
+        this.finalReportExportInProgress = false;
+        this.disposers = [];
+    }
+
+    listen(target, event, handler, options) {
+        if (!target?.addEventListener) return null;
+        target.addEventListener(event, handler, options);
+        this.disposers.push(() => target.removeEventListener(event, handler, options));
+        return target;
+    }
+
+    destroy() {
+        this.disposers.splice(0).reverse().forEach(dispose => dispose());
+        this.initialized = false;
+    }
+
     setStudentExportButtonState(button, isLoading = false, loadingLabel = 'Generating...') {
         if (!button) return;
 
@@ -34,35 +53,39 @@ class StudentListenerMethods {
     }
 
     initListeners() {
+        if (this.initialized) return;
+        this.initialized = true;
+
         if ('scrollRestoration' in window.history) {
             window.history.scrollRestoration = 'manual';
         }
-        this.startStudentDashboardMutationObserver();
+        this.sm.startStudentDashboardMutationObserver();
 
-        window.addEventListener('hashchange', () => this.handleRouteChange());
-        window.addEventListener('popstate', () => this.handleRouteChange());
-        window.addEventListener('resize', debounceStudentResize(() => this.setStudentMobileMenu(false)));
-        this.studentWideShellMediaQuery = window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY);
-        this.studentWideShellMediaQuery.addEventListener('change', () => this.syncStudentShellState());
-        window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
-        window.addEventListener('pagehide', (event) => {
-            this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
-            this.saveStudentSectionScroll($('.view.active')?.id || '');
+        this.listen(window, 'hashchange', () => this.sm.handleRouteChange());
+        this.listen(window, 'popstate', () => this.sm.handleRouteChange());
+        this.listen(window, 'resize', debounceStudentResize(() => this.sm.setStudentMobileMenu(false)));
+        const wideShellMediaQuery = window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY);
+        this.sm.setStudentWideShellMediaQuery(wideShellMediaQuery);
+        this.listen(wideShellMediaQuery, 'change', () => this.sm.syncStudentShellState());
+        this.listen(window, 'scroll', () => this.sm.scheduleStudentScrollSave(), { passive: true });
+        this.listen(window, 'pagehide', (event) => {
+            this.sm.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
+            this.sm.saveStudentSectionScroll($('.view.active')?.id || '');
         });
-        window.addEventListener('pageshow', (event) => {
-            if (this.shouldDebugStudentDom()) console.log('PAGESHOW', event.persisted);
-            this.debugStudentScrollLifecycle('pageshow', { persisted: event.persisted });
-            this.startStudentDashboardMutationObserver();
+        this.listen(window, 'pageshow', (event) => {
+            if (this.sm.shouldDebugStudentDom()) console.log('PAGESHOW', event.persisted);
+            this.sm.debugStudentScrollLifecycle('pageshow', { persisted: event.persisted });
+            this.sm.startStudentDashboardMutationObserver();
         });
-        document.addEventListener('visibilitychange', () => {
+        this.listen(document, 'visibilitychange', () => {
             const activeViewId = $('.view.active')?.id || '';
-            if (this.shouldDebugStudentDom()) console.log('VISIBILITY', document.visibilityState);
-            this.debugStudentScrollLifecycle('visibilitychange', {
+            if (this.sm.shouldDebugStudentDom()) console.log('VISIBILITY', document.visibilityState);
+            this.sm.debugStudentScrollLifecycle('visibilitychange', {
                 state: document.visibilityState,
                 activeViewId
             });
             if (document.hidden) {
-                this.saveStudentSectionScroll(activeViewId);
+                this.sm.saveStudentSectionScroll(activeViewId);
             }
         });
 
@@ -74,20 +97,20 @@ class StudentListenerMethods {
         this.addListener('#student-mobile-menu-toggle', 'click', (event) => {
             event.stopPropagation();
             const isOpen = $('#student-mobile-menu-toggle')?.getAttribute('aria-expanded') === 'true';
-            this.setStudentMobileMenu(!isOpen);
+            this.sm.setStudentMobileMenu(!isOpen);
         });
 
-        document.addEventListener('click', (event) => {
+        this.listen(document, 'click', (event) => {
             const shell = $('#student-tab-shell');
-            if (shell && !shell.contains(event.target)) this.closeStudentMobileMenu();
+            if (shell && !shell.contains(event.target)) this.sm.closeStudentMobileMenu();
 
             const exportMenu = $('#student-vocab-export-menu');
             if (exportMenu && !exportMenu.contains(event.target)) exportMenu.open = false;
         });
 
-        document.addEventListener('keydown', (event) => {
+        this.listen(document, 'keydown', (event) => {
             if (event.key === 'Escape') {
-                this.closeStudentMobileMenu({ focusToggle: true });
+                this.sm.closeStudentMobileMenu({ focusToggle: true });
                 const exportMenu = $('#student-vocab-export-menu');
                 if (exportMenu?.open) {
                     exportMenu.open = false;
@@ -97,27 +120,27 @@ class StudentListenerMethods {
         });
 
         this.addListener('#back-to-vocab', 'click', () => {
-            this.navigateTo({ view: 'units' });
+            this.sm.navigateTo({ view: 'units' });
         });
 
         this.addListener('#student-tab-today', 'click', () => {
-            this.navigateTo({ view: 'menu' });
+            this.sm.navigateTo({ view: 'menu' });
         });
 
         this.addListener('#student-tab-vocabulary', 'click', () => {
-            this.navigateTo({ view: 'units' });
+            this.sm.navigateTo({ view: 'units' });
         });
 
         this.addListener('#mobile-edit-profile-btn', 'click', () => {
-            this.auth.checkProfile(true);
+            this.sm.auth.checkProfile(true);
         });
 
         this.addListener('#student-tab-arcade', 'click', () => {
-            this.navigateTo({ view: 'arcade' });
+            this.sm.navigateTo({ view: 'arcade' });
         });
 
         $$('.student-tab').forEach(tab => {
-            tab.addEventListener('keydown', (event) => {
+            this.listen(tab, 'keydown', (event) => {
                 if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                 const tabs = Array.from($$('.student-tab'));
                 const currentIndex = tabs.indexOf(tab);
@@ -133,7 +156,7 @@ class StudentListenerMethods {
         });
 
         this.addListener('#back-to-main-menu-btn', 'click', () => {
-            this.navigateTo({ view: 'menu' });
+            this.sm.navigateTo({ view: 'menu' });
         });
 
         // Leaderboard Navigation
@@ -141,15 +164,15 @@ class StudentListenerMethods {
 
         // Game Selection Navigation
         this.addListener('#prev-game-select-btn', 'click', async () => {
-            const games = await this.getGames();
-            this.currentGameIndex = (this.currentGameIndex - 1 + this.gamesList.length) % this.gamesList.length;
+            const games = await this.sm.getGames();
+            this.sm.currentGameIndex = (this.sm.currentGameIndex - 1 + this.sm.gamesList.length) % this.sm.gamesList.length;
             games.updateGameSelectionUI();
             games.updateLeaderboardGame();
         });
 
         this.addListener('#next-game-select-btn', 'click', async () => {
-            const games = await this.getGames();
-            this.currentGameIndex = (this.currentGameIndex + 1) % this.gamesList.length;
+            const games = await this.sm.getGames();
+            this.sm.currentGameIndex = (this.sm.currentGameIndex + 1) % this.sm.gamesList.length;
             games.updateGameSelectionUI();
             games.updateLeaderboardGame();
         });
@@ -158,13 +181,13 @@ class StudentListenerMethods {
 
 
         this.addListener('#add-time-btn', 'click', async () => {
-            const games = await this.getGames();
+            const games = await this.sm.getGames();
             // Use global gamification settings
             await games.loadGlobalSettings();
             const exchangeRate = games.getExchangeRate();
             const extensionSeconds = 60;
 
-            if (await this.progress.deductCoins(exchangeRate)) {
+            if (await this.sm.progress.deductCoins(exchangeRate)) {
                 games.addGameTime(extensionSeconds);
             } else {
                 notifications.warning(`You need ${exchangeRate} coins to add time.`);
@@ -172,60 +195,60 @@ class StudentListenerMethods {
         });
 
         this.addListener('#exit-game-btn', 'click', async () => {
-            const games = await this.getGames();
+            const games = await this.sm.getGames();
             games.stopCurrentGame();
             games.showGameSelection();
         });
 
         // Leaderboard Modal
         this.addListener('#show-leaderboard-btn', 'click', async () => {
-            const games = await this.getGames();
+            const games = await this.sm.getGames();
             games.showLeaderboardModal();
         });
 
         this.addListener('#close-leaderboard-modal', 'click', async () => {
-            const games = await this.getGames();
+            const games = await this.sm.getGames();
             games.hideLeaderboardModal();
         });
 
         // Close modal when clicking outside
         this.addListener('#leaderboard-modal', 'click', async (e) => {
             if (e.target.id === 'leaderboard-modal') {
-                const games = await this.getGames();
+                const games = await this.sm.getGames();
                 games.hideLeaderboardModal();
             }
         });
 
         this.addListener('#back-to-menu-btn', 'click', () => {
-            this.cleanupActivity();
-            const unitId = this.getCurrentVocabRouteId();
+            this.sm.cleanupActivity();
+            const unitId = this.sm.getCurrentVocabRouteId();
             if (unitId) {
-                this.navigateTo({ view: 'unit', unitId });
+                this.sm.navigateTo({ view: 'unit', unitId });
             } else {
-                this.navigateTo({ view: 'units' });
+                this.sm.navigateTo({ view: 'units' });
             }
         });
 
-        this.addListener('#student-login-form', 'submit', (e) => this.handleStudentLogin(e));
-        this.addListener('#student-register-form', 'submit', (e) => this.handleStudentRegister(e));
-        this.addListener('#show-login-btn', 'click', () => this.showAuthPanel('login'));
-        this.addListener('#show-register-btn', 'click', () => this.showAuthPanel('register'));
+        this.addListener('#student-login-form', 'submit', (e) => this.sm.handleStudentLogin(e));
+        this.addListener('#student-register-form', 'submit', (e) => this.sm.handleStudentRegister(e));
+        this.addListener('#show-login-btn', 'click', () => this.sm.showAuthPanel('login'));
+        this.addListener('#show-register-btn', 'click', () => this.sm.showAuthPanel('register'));
         this.addListener('#guest-signin-btn', 'click', () => {
-            this.switchView('login-view');
-            this.showAuthPanel('login');
+            this.sm.switchView('login-view');
+            this.sm.showAuthPanel('login');
         });
 
         this.addListener('#sign-out-btn', 'click', async () => {
             await supabaseService.signOut();
         });
 
-        this.addListener('#change-password-form', 'submit', (e) => this.handleForcedPasswordChange(e));
+        this.addListener('#change-password-form', 'submit', (e) => this.sm.handleForcedPasswordChange(e));
 
         // Activity Selection
         $$('.activity-card').forEach(card => {
-            card.addEventListener('click', async () => {
+            this.listen(card, 'click', async () => {
                 const activityType = card.dataset.activity;
-                await this.activities.startActivity(activityType);
+                await this.sm.activities.startActivity(activityType);
             });
         });
 
@@ -234,7 +257,7 @@ class StudentListenerMethods {
         // Generate Final Report
         this.addListener('#download-word-hunt-btn', 'click', () => {
             $('#student-vocab-export-menu')?.removeAttribute('open');
-            this.activities.downloadWordHuntSubmission();
+            this.sm.activities.downloadWordHuntSubmission();
         });
 
         this.addListener('#generate-final-report-btn', 'click', async (event) => {
@@ -246,18 +269,18 @@ class StudentListenerMethods {
             $('#student-vocab-export-menu')?.removeAttribute('open');
 
             try {
-                if (!this.currentVocab) return;
+                if (!this.sm.currentVocab) return;
 
                 // First, save the current activity's score if there's one active
-                if (this.activityInstance && typeof this.activityInstance.getScore === 'function' && this.currentActivityType) {
-                    const result = this.activityInstance.getScore();
-                    this.unitScores[this.currentActivityType] = result;
-                    this.progress.saveLocalProgress();
+                if (this.sm.activityInstance && typeof this.sm.activityInstance.getScore === 'function' && this.sm.currentActivityType) {
+                    const result = this.sm.activityInstance.getScore();
+                    this.sm.unitScores[this.sm.currentActivityType] = result;
+                    this.sm.progress.saveLocalProgress();
                 }
 
                 const { ReportGenerator } = await import('./reportGenerator.js');
-                await ReportGenerator.generateReport(this.studentProfile, this.currentVocab, this.unitScores, {
-                    wordHunt: this.unitWordHunt || {},
+                await ReportGenerator.generateReport(this.sm.studentProfile, this.sm.currentVocab, this.sm.unitScores, {
+                    wordHunt: this.sm.unitWordHunt || {},
                     loadImage: path => supabaseService.downloadWordHuntImage(path)
                 });
             } catch (error) {
@@ -271,7 +294,7 @@ class StudentListenerMethods {
 
         // Profile Save
         this.addListener('#save-profile-btn', 'click', async () => {
-            if (this.hasCompleteStudentProfile()) {
+            if (this.sm.hasCompleteStudentProfile()) {
                 notifications.warning('Ask your teacher to update your profile.');
                 closeDialog('#profile-modal', { restoreFocus: false });
                 return;
@@ -302,21 +325,21 @@ class StudentListenerMethods {
                 group = group.toUpperCase();
             }
 
-            this.studentProfile = this.normalizeStudentProfile({
+            this.sm.studentProfile = this.sm.normalizeStudentProfile({
                 firstName,
                 lastName,
                 name: `${firstName} ${lastName}`.trim(), // For backward compatibility
                 grade,
                 group,
                 sectionLetter: group,
-                email: this.currentUser?.email || this.studentProfile.email || ''
+                email: this.sm.currentUser?.email || this.sm.studentProfile.email || ''
             });
 
             try {
-                if (this.currentUser && !this.authDisabled) {
-                    await supabaseService.updateStudentProfile(this.studentProfile);
+                if (this.sm.currentUser && !this.sm.authDisabled) {
+                    await supabaseService.updateStudentProfile(this.sm.studentProfile);
                 }
-                this.progress.saveLocalProgress(); // Save to local storage
+                this.sm.progress.saveLocalProgress(); // Save to local storage
             } catch (error) {
                 console.error('Failed to update Supabase profile:', error);
                 notifications.error('Could not save your profile. Please try again.');
@@ -324,8 +347,8 @@ class StudentListenerMethods {
             }
 
             closeDialog('#profile-modal', { restoreFocus: false });
-            this.auth.updateHeader();
-            this.activities.renderDashboard();
+            this.sm.auth.updateHeader();
+            this.sm.activities.renderDashboard();
         });
     }
 
@@ -335,18 +358,6 @@ class StudentListenerMethods {
             console.warn(`Element not found for listener: ${selector}`);
             return null;
         }
-        element.addEventListener(event, handler);
-        return element;
-    }
-}
-
-export function installStudentListenerMethods(StudentManager) {
-    for (const name of Object.getOwnPropertyNames(StudentListenerMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentListenerMethods.prototype, name)
-        );
+        return this.listen(element, event, handler);
     }
 }

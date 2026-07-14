@@ -4,14 +4,22 @@ import {
 } from '../services/vocabularyApi.js';
 import { MONTH_INDEX } from './studentActivityConstants.js';
 
-class StudentActivityScheduleMethods {
+export class StudentActivitySchedule {
+    constructor(activities) {
+        this.activities = activities;
+    }
+
+    getCurrentTrimesterKey(...args) {
+        return this.activities.getCurrentTrimesterKey(...args);
+    }
+
     getVocabSchedule(vocab, date = new Date()) {
         let assignedDate = vocab.assignedDate || '';
         let month = String(vocab.month || '').trim().toLowerCase();
         let week = Number.parseInt(vocab.week, 10);
 
         if (assignedDate) {
-            const placement = calculateVocabularyPlacement(assignedDate, this.sm?.schoolCalendar || null);
+            const placement = calculateVocabularyPlacement(assignedDate, this.activities.schoolCalendar);
             month = placement?.month || month;
             week = Number.parseInt(placement?.week, 10) || week;
         }
@@ -94,7 +102,7 @@ class StudentActivityScheduleMethods {
 
     getVocabTrimesterKey(vocab) {
         if (vocab?.assignedDate) {
-            const placement = calculateVocabularyPlacement(vocab.assignedDate, this.sm?.schoolCalendar || null);
+            const placement = calculateVocabularyPlacement(vocab.assignedDate, this.activities.schoolCalendar);
             if (placement?.trimester) return placement.trimester;
         }
 
@@ -302,7 +310,7 @@ class StudentActivityScheduleMethods {
             if (scheduleStart && currentStart) {
                 if (!Number.isFinite(monthIndex)) return scheduleStart <= currentStart;
 
-                const calendar = normalizeSchoolCalendar(this.sm?.schoolCalendar || null, date);
+                const calendar = normalizeSchoolCalendar(this.activities.schoolCalendar, date);
                 const schoolYear = Number.parseInt(calendar.schoolYear, 10) || date.getFullYear();
                 const scheduledMonthStart = new Date(schedule.dueDate.getFullYear() || schoolYear, monthIndex, 1, 12);
                 return scheduleStart <= currentStart && scheduledMonthStart <= currentMonthStart;
@@ -313,7 +321,7 @@ class StudentActivityScheduleMethods {
             return true;
         }
 
-        const calendar = normalizeSchoolCalendar(this.sm?.schoolCalendar || null, date);
+        const calendar = normalizeSchoolCalendar(this.activities.schoolCalendar, date);
         const schoolYear = Number.parseInt(calendar.schoolYear, 10) || date.getFullYear();
         const scheduledYear = schedule.dueDate instanceof Date && !Number.isNaN(schedule.dueDate.getTime())
             ? schedule.dueDate.getFullYear()
@@ -330,7 +338,7 @@ class StudentActivityScheduleMethods {
             return null;
         }
 
-        const calendar = normalizeSchoolCalendar(this.sm?.schoolCalendar || null, date);
+        const calendar = normalizeSchoolCalendar(this.activities.schoolCalendar, date);
         const startDate = this.parseLocalDateOnly(calendar.trimesters?.[trimesterKey]?.startDate);
         if (!startDate) return null;
 
@@ -368,7 +376,7 @@ class StudentActivityScheduleMethods {
             return null;
         }
 
-        const calendar = normalizeSchoolCalendar(this.sm?.schoolCalendar || null, date);
+        const calendar = normalizeSchoolCalendar(this.activities.schoolCalendar, date);
         const year = Number.parseInt(calendar.schoolYear, 10) || date.getFullYear();
         const range = calendar.trimesters?.[this.getTrimesterKey(trimester)];
         const rangeStart = this.parseLocalDateOnly(range?.startDate);
@@ -437,15 +445,4 @@ class StudentActivityScheduleMethods {
         return date;
     }
 
-}
-
-export function installStudentActivityScheduleMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityScheduleMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityScheduleMethods.prototype, name)
-        );
-    }
 }

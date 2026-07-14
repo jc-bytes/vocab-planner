@@ -1,6 +1,16 @@
 import { $ } from '../main.js';
 
-class StudentActivityCoverageMethods {
+export class StudentActivityCoverage {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+        this.wordCoverage = {};
+    }
+
+    getUnitProgressKey(...args) {
+        return this.activities.getUnitProgressKey(...args);
+    }
+
     initWordCoverage() {
         if (!this.sm.currentVocab) return;
         
@@ -129,16 +139,5 @@ class StudentActivityCoverageMethods {
                 </div>
             `;
         }
-    }
-}
-
-export function installStudentActivityCoverageMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityCoverageMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityCoverageMethods.prototype, name)
-        );
     }
 }

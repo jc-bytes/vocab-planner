@@ -46,7 +46,61 @@ function isAllGradeSpark(spark) {
     return SPARK_GRADE_LEVELS.every(grade => targetGrades.includes(grade));
 }
 
-class StudentActivityHomeMethods {
+export class StudentActivityHome {
+    constructor(activities) {
+        this.activities = activities;
+        this.sm = activities.sm;
+        this.currentSparkSessionCache = new Map();
+    }
+
+    getUnitProgressKey(...args) {
+        return this.activities.getUnitProgressKey(...args);
+    }
+
+    getActivityFlowConfig(...args) {
+        return this.activities.getActivityFlowConfig(...args);
+    }
+
+    renderSubjectPicker(...args) {
+        return this.activities.renderSubjectPicker(...args);
+    }
+
+    getVisibleVocabularyList(...args) {
+        return this.activities.getVisibleVocabularyList(...args);
+    }
+
+    getVocabSchedule(...args) {
+        return this.activities.getVocabSchedule(...args);
+    }
+
+    getVocabTrimesterKey(...args) {
+        return this.activities.getVocabTrimesterKey(...args);
+    }
+
+    getTrimesterLabel(...args) {
+        return this.activities.getTrimesterLabel(...args);
+    }
+
+    formatVocabularyCardTitle(...args) {
+        return this.activities.formatVocabularyCardTitle(...args);
+    }
+
+    formatVocabularyPurpose(...args) {
+        return this.activities.formatVocabularyPurpose(...args);
+    }
+
+    getVocabularyPurposeClass(...args) {
+        return this.activities.getVocabularyPurposeClass(...args);
+    }
+
+    loadVocabulary(...args) {
+        return this.activities.loadVocabulary(...args);
+    }
+
+    scheduleFirstVocabularyPreload(...args) {
+        return this.activities.scheduleFirstVocabularyPreload(...args);
+    }
+
     getUnitProgressSummary(vocab) {
         const unitProgress = this.sm.progressData?.units?.[this.getUnitProgressKey(vocab)]
             || this.sm.progressData?.units?.[vocab.name]
@@ -304,8 +358,8 @@ class StudentActivityHomeMethods {
         const dateValue = getPanamaDateValue();
         const grade = this.getStudentGradeLevel();
         const cacheKey = `${subjectSlug}:${grade || 'all'}:${dateValue}`;
-        if (this.sm.currentSparkSessionCache?.has(cacheKey)) {
-            return this.sm.currentSparkSessionCache.get(cacheKey);
+        if (this.currentSparkSessionCache.has(cacheKey)) {
+            return this.currentSparkSessionCache.get(cacheKey);
         }
         const sparks = (await sparksRepository.listScheduledForStudent({
             subjectSlug,
@@ -318,7 +372,7 @@ class StudentActivityHomeMethods {
             if (gradeMatch) currentSpark = gradeMatch;
         }
         currentSpark = currentSpark || sparks.find(isAllGradeSpark) || null;
-        this.sm.currentSparkSessionCache?.set(cacheKey, currentSpark);
+        this.currentSparkSessionCache.set(cacheKey, currentSpark);
         return currentSpark;
     }
 
@@ -504,15 +558,4 @@ class StudentActivityHomeMethods {
         return card;
     }
 
-}
-
-export function installStudentActivityHomeMethods(StudentActivities) {
-    for (const name of Object.getOwnPropertyNames(StudentActivityHomeMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentActivities.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentActivityHomeMethods.prototype, name)
-        );
-    }
 }

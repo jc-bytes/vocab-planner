@@ -1,7 +1,13 @@
 import { $ } from '../main.js';
 import { settingsRepository } from '../services/settingsRepository.js';
 
-class StudentGameSettingsMethods {
+export class StudentGameSettings {
+    constructor(games) {
+        this.games = games;
+        this.sm = games.sm;
+        this.globalSettings = null;
+    }
+
     formatTime(seconds) {
         if (!seconds) return '0s';
         const mins = Math.floor(seconds / 60);
@@ -109,18 +115,7 @@ class StudentGameSettingsMethods {
 
         // Re-attach the play button listener
         this.sm.addListener('#play-current-game-btn', 'click', () => {
-            this.startGame(game.id);
+            this.games.startGame(game.id);
         });
-    }
-}
-
-export function installStudentGameSettingsMethods(StudentGames) {
-    for (const name of Object.getOwnPropertyNames(StudentGameSettingsMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            StudentGames.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(StudentGameSettingsMethods.prototype, name)
-        );
     }
 }
