@@ -379,7 +379,7 @@ async function assertDataSettingsUnifiedTabs(page, baseUrl) {
             .filter(panel => window.getComputedStyle(panel).display !== 'none')
             .map(panel => panel.id);
         return {
-            selectedTab: document.querySelector('.data-tab-btn[aria-selected="true"]')?.dataset.tab,
+            selectedTab: document.querySelector('#teacher-data-management-view .data-tab-btn[data-tab][aria-selected="true"]')?.dataset.tab,
             visiblePanels
         };
     });
