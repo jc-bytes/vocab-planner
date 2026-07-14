@@ -1,4 +1,6 @@
-import { collection, getCurrentSchoolYear, getDocs } from '../supabaseService.js';
+import { getCurrentSchoolYear } from './supabaseValues.js';
+import { subjectsRepository } from './subjectsRepository.js';
+import { vocabularyRepository } from './vocabularyRepository.js';
 
 export { getCurrentSchoolYear };
 
@@ -118,9 +120,7 @@ export async function loadSubjects(api = null) {
 
     try {
         await api.init();
-        const db = api.getDatabase();
-        const snapshot = await getDocs(collection(db, 'subjects'));
-        return normalizeSubjects(snapshot.docs.map(docSnap => docSnap.data()));
+        return normalizeSubjects(await subjectsRepository.list());
     } catch (error) {
         console.warn('Could not load subjects, using defaults:', error);
         return normalizeSubjects();
@@ -466,12 +466,9 @@ export function preloadVocabularyFile(path) {
 
 export async function loadCloudVocabularyList(api) {
     await api.init();
-    const db = api.getDatabase();
-    const snapshot = await getDocs(collection(db, 'vocabularies'));
-    return snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-        subjectSlug: getVocabSubjectSlug(docSnap.data()),
+    return (await vocabularyRepository.list()).map(vocabulary => ({
+        ...vocabulary,
+        subjectSlug: getVocabSubjectSlug(vocabulary),
         __source: 'cloud'
     }));
 }

@@ -1,5 +1,12 @@
 import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
-import { DEFAULT_COIN_DATA, fromClientPayload, normalizeProfile, normalizeUser, toClientRow } from './supabaseServiceHelpers.js';
+import {
+    DEFAULT_COIN_DATA,
+    mapProfileRow,
+    mapStudentProgressRow,
+    normalizeProfile,
+    normalizeUser,
+    profilePayload
+} from './services/supabaseValues.js';
 
 export function installSupabaseAuthProfileMethods(supabaseService) {
     Object.assign(supabaseService, {
@@ -16,13 +23,6 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         this.currentSession = data.session || null;
         this.currentUser = normalizeUser(this.currentSession?.user || null);
         return this;
-    },
-
-    getDatabase() {
-        if (!this.client) {
-            throw new Error('Supabase client has not been initialized.');
-        }
-        return { kind: 'supabase' };
     },
 
     getClient() {
@@ -129,7 +129,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     async upsertStudentProfile(userId, profile) {
         await this.init();
         const normalized = normalizeProfile(profile);
-        const payload = fromClientPayload('profiles', {
+        const payload = profilePayload({
             ...normalized,
             role: 'student'
         }, userId);
@@ -171,7 +171,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
             .eq('user_id', id)
             .maybeSingle();
         if (error) throw error;
-        return toClientRow('profiles', data);
+        return mapProfileRow(data);
     },
 
     async ensureAllowlistedTeacherProfile() {
@@ -180,7 +180,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
 
         const { data, error } = await this.client.rpc('ensure_allowlisted_teacher_profile');
         if (error) throw error;
-        return toClientRow('profiles', Array.isArray(data) ? data[0] : data);
+        return mapProfileRow(Array.isArray(data) ? data[0] : data);
     },
 
     async getStudentsWithProgress() {
@@ -203,11 +203,11 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         if (progressError) throw progressError;
 
         const progressByUserId = new Map(
-            (progressRows || []).map((row) => [row.user_id, toClientRow('student_progress', row)])
+            (progressRows || []).map((row) => [row.user_id, mapStudentProgressRow(row)])
         );
 
         return (profiles || []).map((profileRow) => {
-            const profile = toClientRow('profiles', profileRow);
+            const profile = mapProfileRow(profileRow);
             const progress = progressByUserId.get(profile.userId) || {
                 id: profile.userId,
                 userId: profile.userId,

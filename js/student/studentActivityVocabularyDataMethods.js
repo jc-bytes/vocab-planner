@@ -1,6 +1,6 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
-import { doc, getDoc, studentApi as supabaseService } from '../services/studentApi.js';
+import { vocabularyRepository } from '../services/vocabularyRepository.js';
 import {
     getVocabSubjectSlug,
     loadCloudVocabularyList,
@@ -239,13 +239,8 @@ class StudentActivityVocabularyDataMethods {
         if (this.sm.authDisabled || !vocabMeta?.id) return null;
 
         try {
-            const db = supabaseService.getDatabase();
-            const snapshot = await getDoc(doc(db, 'vocabularies', vocabMeta.id));
-            if (!snapshot.exists()) return null;
-            return {
-                ...snapshot.data(),
-                __source: 'cloud'
-            };
+            const vocabulary = await vocabularyRepository.get(vocabMeta.id);
+            return vocabulary ? { ...vocabulary, __source: 'cloud' } : null;
         } catch (error) {
             console.warn('Could not load live vocabulary settings:', error);
             return null;

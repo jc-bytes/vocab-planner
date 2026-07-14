@@ -1,5 +1,5 @@
 import { $ } from '../main.js';
-import { doc, getDoc, studentApi as supabaseService } from '../services/studentApi.js';
+import { settingsRepository } from '../services/settingsRepository.js';
 
 class StudentGameSettingsMethods {
     formatTime(seconds) {
@@ -36,12 +36,9 @@ class StudentGameSettingsMethods {
         }
 
         try {
-            const db = supabaseService.getDatabase();
-            const settingsRef = doc(db, 'appSettings', 'gamification');
-            const settingsSnap = await getDoc(settingsRef);
-            
-            if (settingsSnap.exists()) {
-                this.globalSettings = settingsSnap.data();
+            const settings = await settingsRepository.get('gamification');
+            if (settings) {
+                this.globalSettings = settings;
             } else {
                 // Default settings if none exist
                 this.globalSettings = {

@@ -1,18 +1,7 @@
 import { $ } from './main.js';
-import {
-    teacherApi as supabaseService,
-    addDoc,
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    serverTimestamp,
-    where
-} from './services/teacherApi.js';
+import { teacherExportRepository } from './services/teacherExportRepository.js';
 
 export async function fetchPreviewData(studentIds, dataTypes) {
-    const db = supabaseService.getDatabase();
     const preview = {
         studentProgress: [],
         scores: [],
@@ -31,10 +20,9 @@ export async function fetchPreviewData(studentIds, dataTypes) {
     if (dataTypes.includes('studentProgress')) {
         for (const studentId of studentIds) {
             try {
-                const docRef = doc(db, 'studentProgress', studentId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = { studentId, ...docSnap.data() };
+                const progress = await teacherExportRepository.getStudentProgress(studentId);
+                if (progress) {
+                    const data = { studentId, ...progress };
                     preview.studentProgress.push(data);
                     preview.summary.totalProgressRecords++;
 
@@ -58,16 +46,14 @@ export async function fetchPreviewData(studentIds, dataTypes) {
     }
 
     if (dataTypes.includes('scores')) {
-        const scoresRef = collection(db, 'scores');
         for (const studentId of studentIds) {
             try {
-                const q = query(scoresRef, where('userId', '==', studentId));
-                const snapshot = await getDocs(q);
-                snapshot.forEach(doc => {
-                    preview.scores.push({ scoreId: doc.id, ...doc.data() });
+                const scores = await teacherExportRepository.listScores(studentId);
+                scores.forEach(score => {
+                    preview.scores.push({ scoreId: score.id, ...score });
                     preview.summary.totalScores++;
-                    if (doc.data().gameId) {
-                        preview.summary.gamesPlayed.add(doc.data().gameId);
+                    if (score.gameId) {
+                        preview.summary.gamesPlayed.add(score.gameId);
                     }
                 });
             } catch (error) {
@@ -79,10 +65,9 @@ export async function fetchPreviewData(studentIds, dataTypes) {
     if (dataTypes.includes('userRoles')) {
         for (const studentId of studentIds) {
             try {
-                const docRef = doc(db, 'userRoles', studentId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    preview.userRoles.push({ userId: studentId, ...docSnap.data() });
+                const profile = await teacherExportRepository.getProfile(studentId);
+                if (profile) {
+                    preview.userRoles.push({ userId: studentId, ...profile });
                     preview.summary.totalRoles++;
                 }
             } catch (error) {
@@ -95,17 +80,15 @@ export async function fetchPreviewData(studentIds, dataTypes) {
 }
 
 export async function exportStudentProgress(studentIds) {
-    const db = supabaseService.getDatabase();
     const progressData = [];
 
     for (const studentId of studentIds) {
         try {
-            const docRef = doc(db, 'studentProgress', studentId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
+            const progress = await teacherExportRepository.getStudentProgress(studentId);
+            if (progress) {
                 progressData.push({
                     studentId: studentId,
-                    ...docSnap.data()
+                    ...progress
                 });
             }
         } catch (error) {
@@ -117,18 +100,15 @@ export async function exportStudentProgress(studentIds) {
 }
 
 export async function exportScores(studentIds) {
-    const db = supabaseService.getDatabase();
-    const scoresRef = collection(db, 'scores');
     const allScores = [];
 
     for (const studentId of studentIds) {
         try {
-            const q = query(scoresRef, where('userId', '==', studentId));
-            const snapshot = await getDocs(q);
-            snapshot.forEach(doc => {
+            const scores = await teacherExportRepository.listScores(studentId);
+            scores.forEach(score => {
                 allScores.push({
-                    scoreId: doc.id,
-                    ...doc.data()
+                    scoreId: score.id,
+                    ...score
                 });
             });
         } catch (error) {
@@ -140,17 +120,15 @@ export async function exportScores(studentIds) {
 }
 
 export async function exportUserRoles(studentIds) {
-    const db = supabaseService.getDatabase();
     const rolesData = [];
 
     for (const studentId of studentIds) {
         try {
-            const docRef = doc(db, 'userRoles', studentId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
+            const profile = await teacherExportRepository.getProfile(studentId);
+            if (profile) {
                 rolesData.push({
                     userId: studentId,
-                    ...docSnap.data()
+                    ...profile
                 });
             }
         } catch (error) {
@@ -183,10 +161,9 @@ export async function markExportComplete(dataTypes, studentIds, exportFormat) {
     this.enableResetSection();
 
     try {
-        const db = supabaseService.getDatabase();
-        await addDoc(collection(db, 'exportLogs'), {
+        await teacherExportRepository.logExport({
             ...exportRecord,
-            timestamp: serverTimestamp()
+            timestamp: new Date().toISOString()
         });
     } catch (error) {
         console.error('Error logging export:', error);

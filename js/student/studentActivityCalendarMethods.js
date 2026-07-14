@@ -1,4 +1,4 @@
-import { doc, getDoc, studentApi as supabaseService } from '../services/studentApi.js';
+import { settingsRepository } from '../services/settingsRepository.js';
 import {
     SCHOOL_CALENDAR_LOCAL_KEY,
     SCHOOL_CALENDAR_SETTINGS_KEY,
@@ -44,9 +44,8 @@ class StudentActivityCalendarMethods {
         }
 
         try {
-            const db = supabaseService.getDatabase();
-            const settingsSnap = await getDoc(doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY));
-            this.sm.schoolCalendar = settingsSnap.exists() ? normalizeSchoolCalendar(settingsSnap.data()) : null;
+            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY);
+            this.sm.schoolCalendar = settings ? normalizeSchoolCalendar(settings) : null;
         } catch (error) {
             console.error('Failed to load school calendar:', error);
             this.sm.schoolCalendar = null;

@@ -1,10 +1,10 @@
-import { toClientRow } from './supabaseServiceHelpers.js';
+import { mapScoreRow, mapStudentProgressRow } from './services/supabaseValues.js';
 
 const firstRow = (data) => Array.isArray(data) ? data[0] : data;
 
-const requireRpcResult = (tableName, data, error) => {
+const requireRpcResult = (mapper, data, error) => {
     if (error) throw error;
-    return toClientRow(tableName, firstRow(data));
+    return mapper(firstRow(data));
 };
 
 export function installSupabaseStudentWriteMethods(service) {
@@ -13,7 +13,7 @@ export function installSupabaseStudentWriteMethods(service) {
         const { data, error } = await this.client.rpc('ensure_own_student_progress', {
             p_student_profile: studentProfile || {}
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.submitStudentActivityProgress = async function submitStudentActivityProgress(payload = {}) {
@@ -30,7 +30,7 @@ export function installSupabaseStudentWriteMethods(service) {
             p_is_required: Boolean(payload.isRequired),
             p_attempt_id: payload.attemptId || ''
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.syncStudentUnitWork = async function syncStudentUnitWork(payload = {}) {
@@ -40,7 +40,7 @@ export function installSupabaseStudentWriteMethods(service) {
             p_unit_context: payload.unitContext || {},
             p_work_patch: payload.workPatch || {}
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.spendStudentCoins = async function spendStudentCoins(payload = {}) {
@@ -51,7 +51,7 @@ export function installSupabaseStudentWriteMethods(service) {
             p_description: payload.description || 'Spent on game',
             p_client_id: payload.clientId || ''
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.acceptStudentGiftCoins = async function acceptStudentGiftCoins(payload = {}) {
@@ -59,7 +59,7 @@ export function installSupabaseStudentWriteMethods(service) {
         const { data, error } = await this.client.rpc('accept_student_gift_coins', {
             p_client_id: payload.clientId || ''
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.claimStudentWelcomeBonus = async function claimStudentWelcomeBonus(payload = {}) {
@@ -67,7 +67,7 @@ export function installSupabaseStudentWriteMethods(service) {
         const { data, error } = await this.client.rpc('claim_student_welcome_bonus', {
             p_client_id: payload.clientId || ''
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.giftStudentCoins = async function giftStudentCoins(payload = {}) {
@@ -77,7 +77,7 @@ export function installSupabaseStudentWriteMethods(service) {
             p_amount: Number(payload.amount) || 0,
             p_message: payload.message || 'Gift from teacher'
         });
-        return requireRpcResult('student_progress', data, error);
+        return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
     service.submitStudentGameScore = async function submitStudentGameScore(payload = {}) {
@@ -87,6 +87,6 @@ export function installSupabaseStudentWriteMethods(service) {
             p_score: Number(payload.score) || 0,
             p_metadata: payload.metadata || {}
         });
-        return requireRpcResult('scores', data, error);
+        return requireRpcResult(mapScoreRow, data, error);
     };
 }

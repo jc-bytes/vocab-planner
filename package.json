@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
-    "test": "npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke",
+    "test": "npm run test:repositories && npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke",
+    "test:repositories": "node --test tests/repository-contracts.test.mjs",
+    "test:acceptance:supabase": "node --test tests/local-supabase-acceptance.test.mjs",
     "test:games": "node scripts/galactic-breaker-tests.mjs",
     "test:package-refactor": "node scripts/package-refactor-tests.mjs",
     "test:ui:student-shell": "node scripts/student-shell-regression-tests.mjs",

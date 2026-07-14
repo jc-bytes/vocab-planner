@@ -1,5 +1,6 @@
 import { notifications } from '../notifications.js';
-import { studentApi as supabaseService, doc, getDoc } from '../services/studentApi.js';
+import { studentApi as supabaseService } from '../services/studentApi.js';
+import { studentProgressRepository } from '../services/studentProgressRepository.js';
 import { imageDB } from '../db.js';
 import {
     COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
@@ -40,12 +41,10 @@ class StudentProgressCloudMethods {
         window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
 
-        if (typeof supabaseService.subscribeToStudentProgress === 'function') {
-            this.coinRealtimeUnsubscribe = supabaseService.subscribeToStudentProgress(userId, progress => {
-                this.sm.logStudentDomUpdate?.('student-progress-realtime', { source: 'subscribeToStudentProgress' });
-                this.applyRemoteCoinProgress(progress);
-            });
-        }
+        this.coinRealtimeUnsubscribe = studentProgressRepository.subscribe(userId, progress => {
+            this.sm.logStudentDomUpdate?.('student-progress-realtime', { source: 'studentProgressRepository.subscribe' });
+            this.applyRemoteCoinProgress(progress);
+        });
 
         const syncInterval = this.coinRealtimeUnsubscribe
             ? COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS
@@ -149,15 +148,13 @@ class StudentProgressCloudMethods {
                 reason: options.reason || ''
             });
             this.lastCoinRefreshAt = Date.now();
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-            const snapshot = await getDoc(docRef);
-            if (!snapshot.exists()) return;
+            const progress = await studentProgressRepository.get(this.sm.currentUser.uid);
+            if (!progress) return;
             this.sm.logStudentDomUpdate?.('student-progress', {
                 source: 'refreshCoinsFromCloud:snapshot',
                 reason: options.reason || ''
             });
-            this.applyRemoteCoinProgress(snapshot.data());
+            this.applyRemoteCoinProgress(progress);
         } catch (error) {
             if (!options.silent) {
                 console.warn('Could not refresh coins from cloud:', error);
@@ -181,10 +178,7 @@ class StudentProgressCloudMethods {
             if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
                 data = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             } else {
-                const db = supabaseService.getDatabase();
-                const docRef = doc(db, 'studentProgress', this.sm.currentUser.uid);
-                const snapshot = await getDoc(docRef);
-                data = snapshot.exists() ? snapshot.data() : null;
+                data = await studentProgressRepository.get(this.sm.currentUser.uid);
             }
 
             if (!data) {

@@ -1,10 +1,6 @@
 import { $, createElement, escapeHtml, notifications } from './main.js';
-import {
-    teacherApi as supabaseService,
-    doc,
-    serverTimestamp,
-    setDoc
-} from './services/teacherApi.js';
+import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { subjectsRepository } from './services/subjectsRepository.js';
 import {
     DEFAULT_SUBJECT_SLUG,
     SUBJECTS_LOCAL_KEY,
@@ -149,11 +145,10 @@ export const teacherSubjectSettingsMethods = {
             if (this.authDisabled) {
                 localStorage.setItem(SUBJECTS_LOCAL_KEY, JSON.stringify(subjects));
             } else {
-                const db = supabaseService.getDatabase();
-                await Promise.all(subjects.map(subject => setDoc(doc(db, 'subjects', subject.slug), {
+                await subjectsRepository.saveAll(subjects.map(subject => ({
                     ...subject,
-                    updatedAt: serverTimestamp()
-                }, { merge: true })));
+                    updatedAt: new Date().toISOString()
+                })));
             }
 
             this.invalidateTeacherLibraryCache();

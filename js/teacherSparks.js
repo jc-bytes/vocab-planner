@@ -1,15 +1,6 @@
 import { $, closeModal as closeDialog, createElement, escapeHtml, notifications, openModal } from './main.js';
-import {
-    teacherApi as supabaseService,
-    collection,
-    doc,
-    getDocs,
-    serverTimestamp,
-    setDoc
-} from './services/teacherApi.js';
+import { sparksRepository } from './services/sparksRepository.js';
 import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
-
-const SPARK_COLLECTION = 'weeklySparks';
 
 const SPARK_TYPE_META = {
     cool_fact: { label: 'Fact', pluralLabel: 'Facts', icon: 'lightbulb' },
@@ -206,10 +197,8 @@ class TeacherSparkMethods {
         if (this.authDisabled) return [];
         if (!this.ensureAuthenticated(false)) return [];
 
-        const db = supabaseService.getDatabase();
-        const snapshot = await getDocs(collection(db, SPARK_COLLECTION));
-        return snapshot.docs
-            .map(docSnap => this.normalizeSpark({ id: docSnap.id, ...docSnap.data() }))
+        return (await sparksRepository.list())
+            .map(spark => this.normalizeSpark(spark))
             .sort(compareSparkSchedule);
     }
 
@@ -893,10 +882,9 @@ class TeacherSparkMethods {
 
         this.setSparkModalStatus('Saving Spark...', 'info');
         try {
-            const db = supabaseService.getDatabase();
-            await setDoc(doc(db, SPARK_COLLECTION, spark.id), {
+            await sparksRepository.save(spark.id, {
                 ...spark,
-                updatedAt: serverTimestamp()
+                updatedAt: new Date().toISOString()
             });
             this.invalidateWeeklySparkCache();
             closeDialog('#spark-modal');
@@ -918,11 +906,10 @@ class TeacherSparkMethods {
         if (!spark) return;
 
         try {
-            const db = supabaseService.getDatabase();
-            await setDoc(doc(db, SPARK_COLLECTION, id), {
+            await sparksRepository.save(id, {
                 ...spark,
                 status: 'archived',
-                updatedAt: serverTimestamp()
+                updatedAt: new Date().toISOString()
             });
             this.invalidateWeeklySparkCache();
             notifications.success('Spark archived.');

@@ -1,13 +1,5 @@
 import { createElement, escapeHtml, notifications } from './main.js';
-import {
-    teacherApi as supabaseService,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    serverTimestamp,
-    setDoc
-} from './services/teacherApi.js';
+import { vocabularyRepository } from './services/vocabularyRepository.js';
 import {
     getVocabSubjectSlug,
     loadVocabularyFile
@@ -19,17 +11,9 @@ class TeacherVocabularyStorageMethods {
         if (!this.ensureAuthenticated(false)) return [];
 
         try {
-            const db = supabaseService.getDatabase();
-            const snapshot = await getDocs(collection(db, this.VOCAB_COLLECTION));
+            const vocabularies = await vocabularyRepository.list();
             this.setCloudStatus('Ready', 'info');
-            return snapshot.docs.map(docSnap => {
-                const data = docSnap.data();
-                return {
-                    id: docSnap.id,
-                    ...data,
-                    source: 'cloud'
-                };
-            });
+            return vocabularies.map(vocabulary => ({ ...vocabulary, source: 'cloud' }));
         } catch (error) {
             console.error('Failed to fetch cloud vocabularies:', error);
             this.setCloudStatus('Cloud load failed', 'error');
@@ -152,9 +136,7 @@ class TeacherVocabularyStorageMethods {
     async deleteCloudVocab(id) {
         if (!this.ensureAuthenticated()) return;
         try {
-            const db = supabaseService.getDatabase();
-            const ref = doc(db, this.VOCAB_COLLECTION, id);
-            await deleteDoc(ref);
+            await vocabularyRepository.remove(id);
             this.invalidateTeacherLibraryCache();
         } catch (err) {
             console.error('Failed to delete cloud vocab', err);
@@ -268,15 +250,13 @@ class TeacherVocabularyStorageMethods {
         this.normalizeActivityFlowSettings();
 
         try {
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, this.VOCAB_COLLECTION, this.vocabSet.id);
             const { __source, source, ...rest } = this.vocabSet;
             const payload = {
                 ...rest,
                 ownerId: this.currentUser ? this.currentUser.uid : null,
-                updatedAt: serverTimestamp()
+                updatedAt: new Date().toISOString()
             };
-            await setDoc(docRef, payload);
+            await vocabularyRepository.save(this.vocabSet.id, payload);
             this.vocabSet.source = 'cloud';
             this.removeLocalVocab(this.vocabSet.id);
             this.invalidateTeacherLibraryCache();

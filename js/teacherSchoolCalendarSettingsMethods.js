@@ -1,11 +1,6 @@
 import { $, notifications } from './main.js';
-import {
-    teacherApi as supabaseService,
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc
-} from './services/teacherApi.js';
+import { settingsRepository } from './services/settingsRepository.js';
+import { vocabularyRepository } from './services/vocabularyRepository.js';
 import {
     SCHOOL_CALENDAR_LOCAL_KEY,
     SCHOOL_CALENDAR_SETTINGS_KEY,
@@ -38,10 +33,8 @@ export const teacherSchoolCalendarSettingsMethods = {
         }
 
         try {
-            const db = supabaseService.getDatabase();
-            const settingsRef = doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY);
-            const settingsSnap = await getDoc(settingsRef);
-            this.schoolCalendar = normalizeSchoolCalendar(settingsSnap.exists() ? settingsSnap.data() : null);
+            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY);
+            this.schoolCalendar = normalizeSchoolCalendar(settings);
             this.updateSchoolCalendarUI();
         } catch (error) {
             console.error('Error loading school calendar:', error);
@@ -218,13 +211,11 @@ export const teacherSchoolCalendarSettingsMethods = {
                 return;
             }
 
-            const db = supabaseService.getDatabase();
-            const settingsRef = doc(db, 'appSettings', SCHOOL_CALENDAR_SETTINGS_KEY);
-            await setDoc(settingsRef, {
+            await settingsRepository.save(SCHOOL_CALENDAR_SETTINGS_KEY, {
                 ...calendar,
-                updatedAt: serverTimestamp(),
+                updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
-            }, { merge: true });
+            });
 
             const result = await this.recalculateCloudVocabularyPlacements(calendar);
             this.invalidateTeacherLibraryCache();
@@ -296,7 +287,6 @@ export const teacherSchoolCalendarSettingsMethods = {
 
     async recalculateCloudVocabularyPlacements(calendar) {
         const cloudVocabs = await this.fetchCloudVocabs();
-        const db = supabaseService.getDatabase();
         let updated = 0;
         let skipped = 0;
 
@@ -307,11 +297,10 @@ export const teacherSchoolCalendarSettingsMethods = {
             }
 
             updated += 1;
-            const ref = doc(db, this.VOCAB_COLLECTION, vocab.id);
-            await setDoc(ref, {
+            await vocabularyRepository.update(vocab.id, {
                 ...this.buildPlacementPatch(vocab.assignedDate, calendar),
-                updatedAt: serverTimestamp()
-            }, { merge: true });
+                updatedAt: new Date().toISOString()
+            });
         }));
 
         if (this.vocabSet?.assignedDate) {

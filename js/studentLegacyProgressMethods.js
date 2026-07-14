@@ -1,16 +1,13 @@
 import { notifications } from './main.js';
-import { studentApi as supabaseService, doc, getDoc } from './services/studentApi.js';
+import { studentProgressRepository } from './services/studentProgressRepository.js';
 
 class StudentLegacyProgressMethods {
     async _loadCloudProgress_OLD() {
         if (!this.currentUser) return;
         try {
-            const db = supabaseService.getDatabase();
-            const docRef = doc(db, 'studentProgress', this.currentUser.uid);
-            const snapshot = await getDoc(docRef);
+            const data = await studentProgressRepository.get(this.currentUser.uid);
 
-            if (snapshot.exists()) {
-                const data = snapshot.data();
+            if (data) {
 
                 // Migrate coin data from cloud
                 const cloudCoinData = this.progress.migrateCoinData(data);

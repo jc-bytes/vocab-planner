@@ -1,16 +1,3 @@
 export {
-    supabaseService as teacherApi,
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    setDoc,
-    addDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    limit,
-    serverTimestamp,
-    writeBatch
+    supabaseService as teacherApi
 } from '../supabaseService.js';

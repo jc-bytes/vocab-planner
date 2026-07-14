@@ -3,7 +3,7 @@ import { SUPABASE_CONFIG, isSupabaseConfigured } from '../../config/supabase-con
 
 export { isSupabaseConfigured };
 
-export const resolveSupabaseConfig = () => window.SUPABASE_CONFIG || SUPABASE_CONFIG;
+export const resolveSupabaseConfig = () => globalThis.window?.SUPABASE_CONFIG || SUPABASE_CONFIG;
 
 export function createSupabaseClient() {
     const config = resolveSupabaseConfig();

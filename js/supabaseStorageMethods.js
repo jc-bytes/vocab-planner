@@ -2,7 +2,7 @@ import {
     WORD_HUNT_IMAGE_BUCKET,
     getCurrentSchoolYear,
     slugifyStoragePart
-} from './supabaseServiceHelpers.js';
+} from './services/supabaseValues.js';
 
 export function installSupabaseStorageMethods(supabaseService) {
     Object.assign(supabaseService, {

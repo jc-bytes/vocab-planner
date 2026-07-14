@@ -1,16 +1,7 @@
 import { $, closeModal, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
-import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    studentApi as supabaseService,
-    where
-} from '../services/studentApi.js';
+import { studentApi as supabaseService } from '../services/studentApi.js';
+import { leaderboardRepository } from '../services/leaderboardRepository.js';
 
 const LEADERBOARD_ENABLED_GAMES = [
     'galactic-breaker',
@@ -54,24 +45,18 @@ class StudentGameLeaderboardMethods {
         }
 
         try {
-            const db = supabaseService.getDatabase();
-            const scoresRef = collection(db, 'scores');
-
             // Use a deterministic document ID: userId-gameId
             // This ensures each player has only one entry per game
             const scoreDocId = `${this.sm.currentUser.uid}-${gameId}`;
-            const scoreDocRef = doc(scoresRef, scoreDocId);
-
-            // Check if we already have a score
-            const existingDoc = await getDoc(scoreDocRef);
+            const existingScoreRow = await leaderboardRepository.get(scoreDocId);
 
             // Only update if this is a new high score or first time playing
             // Note: SpacePi uses "lower is better" scoring, so invert the comparison
-            const existingScore = existingDoc.exists() ? (Number(existingDoc.data().score) || 0) : 0;
+            const existingScore = existingScoreRow ? (Number(existingScoreRow.score) || 0) : 0;
             const isLowerBetter = gameId === 'spacepi';
             const isNewHighScore = isLowerBetter 
-                ? (!existingDoc.exists() || numericScore < existingScore)
-                : (!existingDoc.exists() || numericScore > existingScore);
+                ? (!existingScoreRow || numericScore < existingScore)
+                : (!existingScoreRow || numericScore > existingScore);
             
             if (isNewHighScore) {
                 const scoreMetadata = {};
@@ -160,34 +145,27 @@ class StudentGameLeaderboardMethods {
         container.innerHTML = '<div class="loading-spinner">Loading scores...</div>';
 
         try {
-            const db = supabaseService.getDatabase();
-            const scoresRef = collection(db, 'scores');
-
             // Query: Same grade, same game, order by score (desc for higher=better, asc for lower=better)
             // Note: This requires a composite index in Supabase.
             // If it fails, check console for index creation link.
             // SpacePi uses "lower is better" scoring
             const isLowerBetter = gameId === 'spacepi';
-            const q = query(
-                scoresRef,
-                where('grade', '==', this.sm.studentProfile.grade),
-                where('gameId', '==', gameId),
-                orderBy('score', isLowerBetter ? 'asc' : 'desc'),
-                limit(5)
-            );
-
-            const querySnapshot = await getDocs(q);
+            const scores = await leaderboardRepository.listTop({
+                grade: this.sm.studentProfile.grade,
+                gameId,
+                lowerIsBetter: isLowerBetter,
+                limit: 5
+            });
 
             container.innerHTML = '';
 
-            if (querySnapshot.empty) {
+            if (scores.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">No scores yet. Be the first!</p>';
                 return;
             }
 
             let rank = 1;
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
+            scores.forEach((data) => {
                 // Ensure score is a number for display
                 const score = Number(data.score) || 0;
                 const isMe = this.sm.currentUser && data.userId === this.sm.currentUser.uid;

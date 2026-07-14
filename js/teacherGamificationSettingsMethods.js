@@ -1,11 +1,5 @@
 import { $, notifications } from './main.js';
-import {
-    teacherApi as supabaseService,
-    doc,
-    getDoc,
-    serverTimestamp,
-    setDoc
-} from './services/teacherApi.js';
+import { settingsRepository } from './services/settingsRepository.js';
 
 const DEV_GAMIFICATION_SETTINGS_KEY = 'dev_gamification_settings';
 const DEV_TEACHER_USER = { email: 'teacher@local.dev' };
@@ -57,13 +51,8 @@ export const teacherGamificationSettingsMethods = {
         }
 
         try {
-            const db = supabaseService.getDatabase();
-            const settingsRef = doc(db, 'appSettings', 'gamification');
-            const settingsSnap = await getDoc(settingsRef);
-
-            if (settingsSnap.exists()) {
-                applyGamificationSettings(settingsSnap.data());
-            }
+            const settings = await settingsRepository.get('gamification');
+            if (settings) applyGamificationSettings(settings);
         } catch (error) {
             console.error('Error loading gamification settings:', error);
         }
@@ -98,15 +87,13 @@ export const teacherGamificationSettingsMethods = {
                 return;
             }
 
-            const db = supabaseService.getDatabase();
-            const settingsRef = doc(db, 'appSettings', 'gamification');
-            await setDoc(settingsRef, {
+            await settingsRepository.save('gamification', {
                 exchangeRate,
                 completionBonus,
                 progressReward,
-                updatedAt: serverTimestamp(),
+                updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
-            }, { merge: true });
+            });
 
             showTransientGamificationStatus(statusEl, 'Settings saved successfully.', 'var(--success-color)');
             notifications.success('Gamification settings saved!');

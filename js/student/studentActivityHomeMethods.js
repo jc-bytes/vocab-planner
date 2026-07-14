@@ -1,17 +1,8 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
-import {
-    studentApi as supabaseService,
-    collection,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    where
-} from '../services/studentApi.js';
+import { sparksRepository } from '../services/sparksRepository.js';
 import { MONTH_INDEX } from './studentActivityConstants.js';
 
-const SPARK_COLLECTION = 'weeklySparks';
 const SPARK_TYPE_LABELS = {
     cool_fact: 'Cool Fact',
     trivia: 'Trivia',
@@ -316,17 +307,11 @@ class StudentActivityHomeMethods {
         if (this.sm.currentSparkSessionCache?.has(cacheKey)) {
             return this.sm.currentSparkSessionCache.get(cacheKey);
         }
-        const db = supabaseService.getDatabase();
-        const snapshot = await getDocs(query(
-            collection(db, SPARK_COLLECTION),
-            where('subjectSlug', '==', subjectSlug),
-            where('status', '==', 'scheduled'),
-            where('scheduledDate', '<=', dateValue),
-            orderBy('scheduledDate', 'desc'),
-            orderBy('updatedAt', 'desc'),
-            limit(40)
-        ));
-        const sparks = snapshot.docs.map(docSnap => this.normalizeSpark({ id: docSnap.id, ...docSnap.data() }));
+        const sparks = (await sparksRepository.listScheduledForStudent({
+            subjectSlug,
+            onOrBefore: dateValue,
+            limit: 40
+        })).map(spark => this.normalizeSpark(spark));
         let currentSpark = null;
         if (grade) {
             const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
