@@ -56,12 +56,10 @@ npm run test:ui:student-shell
 
 The guardrail loads `student.html` through the real application renderer, injects deterministic in-browser subject and vocabulary fixture data, and exercises Today, Vocabulary, the activity menu, the activity runner view, and Arcade at 1280, 1121, 1120, 1024, 901, 900, 768, 390, and 320px. It also performs a live 1120 -> 1121 -> 1120 resize sequence.
 
-The assertions cover effective compact/wide ownership, header/sidebar geometry, normal and Arcade rail placement, navigation ownership, exactly one visible Vocabulary subject picker, control heights, document overflow, hidden controls rejecting programmatic focus, and hidden controls remaining outside sequential keyboard navigation. The two existing activity-menu overflows at 390px and 320px are pinned as a baseline; this guardrail prevents new overflow but does not claim that historical content overflow has been repaired.
+The assertions cover effective compact/wide ownership, header/sidebar geometry, normal and Arcade rail placement, navigation ownership, exactly one visible Vocabulary subject picker, control heights, zero document overflow, hidden controls rejecting programmatic focus, and hidden controls remaining outside sequential keyboard navigation. The Activity menu additionally verifies that all activity choices render and that its enabled narrow-width controls remain available to pointer and keyboard interaction.
 
 This test is not authenticated validation. Its fixture uses the real renderer but bypasses authentication and injects local data at runtime; it does not replace a seeded Supabase smoke test when a compatible local stack is available. Setting `STUDENT_SHELL_TEST_BASE_URL` runs the same assertions against an already served source or production build. Setting `STUDENT_SHELL_SNAPSHOT_DIR` additionally writes diagnostic screenshots and a state manifest to the chosen directory.
 
 ## Architectural observations
 
 The student shell has one shared JavaScript shell boundary: `STUDENT_WIDE_SHELL_MEDIA_QUERY`. The historical CSS queries at 700/701 and 900/901 remain independent presentation boundaries, but the later canonical max-1120/min-1121 pair determines effective shell ownership. Teacher layout and game-internal media queries are separate interfaces and are not student-shell state definitions.
-
-The accepted activity-menu content is wider than the document at 390px and 320px. That pre-existing content issue is recorded by the guardrail and intentionally deferred because correcting it would change behavior outside this documentation milestone.

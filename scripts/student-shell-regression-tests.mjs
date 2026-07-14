@@ -89,6 +89,7 @@ async function installFixture(page) {
         localStorage.setItem('student_selected_subject', 'technology');
         app.activities.renderDashboard();
         await app.activities.renderStudentHome();
+        await app.activities.loadVocabulary(source, { fromRoute: true });
 
         const style = document.createElement('style');
         style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';
@@ -119,6 +120,7 @@ async function readShellState(page, width, view) {
         const pagePicker = document.querySelector('#vocab-subject-picker');
         const toggle = document.querySelector('#student-mobile-menu-toggle');
         const tabs = document.querySelector('#student-tabs');
+        const activityChoices = [...document.querySelectorAll('#activity-menu-view [data-activity]')];
         const appStyle = window.getComputedStyle(app);
         const mainStyle = window.getComputedStyle(main);
         const hiddenControls = [
@@ -162,6 +164,15 @@ async function readShellState(page, width, view) {
                 toggle: Math.round(toggle.getBoundingClientRect().height),
                 pagePicker: Math.round(pagePicker.getBoundingClientRect().height),
                 sidebarPicker: Math.round(sidebarPicker.getBoundingClientRect().height)
+            },
+            activityMenu: {
+                choiceCount: activityChoices.length,
+                visibleChoiceCount: activityChoices.filter(isVisible).length,
+                enabledChoiceCount: activityChoices.filter(choice => isVisible(choice) && !choice.disabled).length,
+                elementsPastRightEdge: [...document.querySelectorAll('#activity-menu-view *')]
+                    .filter(isVisible)
+                    .filter(element => element.getBoundingClientRect().right > document.documentElement.clientWidth + 0.5)
+                    .map(element => element.id || element.className || element.tagName)
             },
             overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth
         };
@@ -213,19 +224,72 @@ function assertShellState(state) {
     }
     if (!state.hiddenControlsRejectFocus) failures.push('a hidden shell control accepted programmatic focus');
 
-    // These two Activity-menu overflows predate the canonical shell and are intentionally
-    // pinned so this documentation-only milestone cannot conceal a geometry change.
-    const expectedOverflow = state.view === 'Activity menu' && state.width === 390
-        ? 146
-        : state.view === 'Activity menu' && state.width === 320
-            ? 216
-            : 0;
-    if (state.overflow !== expectedOverflow) {
-        failures.push(`document overflow changed: expected ${expectedOverflow}px, got ${state.overflow}px`);
+    if (state.view === 'Activity menu') {
+        if (state.activityMenu.choiceCount !== 12 || state.activityMenu.visibleChoiceCount !== 12) {
+            failures.push(`Activity choices are missing: ${JSON.stringify(state.activityMenu)}`);
+        }
+        if (state.activityMenu.enabledChoiceCount < 1) failures.push('Activity menu has no enabled activity choice');
+        if (state.activityMenu.elementsPastRightEdge.length) {
+            failures.push(`Activity elements extend past the viewport: ${state.activityMenu.elementsPastRightEdge.join(', ')}`);
+        }
+    }
+
+    if (state.overflow !== 0) {
+        failures.push(`document overflow changed: expected 0px, got ${state.overflow}px`);
     }
 
     if (failures.length) {
         throw new Error(`${state.view} at ${state.width}px: ${failures.join('; ')}`);
+    }
+}
+
+async function assertNarrowActivityControlsReachable(page, width) {
+    const controls = await page.evaluate(() => {
+        const candidates = [
+            document.querySelector('#back-to-vocab'),
+            document.querySelector('#student-vocab-export-menu summary'),
+            ...document.querySelectorAll('#activity-menu-view [data-activity]:not(:disabled)')
+        ].filter(Boolean);
+        return candidates.map((control, index) => {
+            const auditId = `activity-control-${index}`;
+            control.dataset.activityAuditId = auditId;
+            control.scrollIntoView({ block: 'center' });
+            const rect = control.getBoundingClientRect();
+            const target = document.elementFromPoint(
+                Math.min(window.innerWidth - 1, Math.max(0, rect.left + rect.width / 2)),
+                Math.min(window.innerHeight - 1, Math.max(0, rect.top + rect.height / 2))
+            );
+            control.focus();
+            return {
+                auditId,
+                acceptsFocus: document.activeElement === control,
+                pointerTarget: Boolean(target && (target === control || control.contains(target))),
+                width: rect.width,
+                height: rect.height
+            };
+        });
+    });
+    const unusable = controls.filter(control => (
+        !control.acceptsFocus
+        || !control.pointerTarget
+    ));
+    if (unusable.length) {
+        throw new Error(`Activity menu at ${width}px has unreachable controls: ${JSON.stringify(unusable)}`);
+    }
+
+    await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        document.activeElement?.blur();
+    });
+    const tabbed = new Set();
+    for (let index = 0; index < 80; index += 1) {
+        await page.keyboard.press('Tab');
+        const auditId = await page.evaluate(() => document.activeElement?.dataset?.activityAuditId || '');
+        if (auditId) tabbed.add(auditId);
+    }
+    const missingFromTabOrder = controls.filter(control => !tabbed.has(control.auditId));
+    if (missingFromTabOrder.length) {
+        throw new Error(`Activity menu at ${width}px has controls outside Tab order: ${JSON.stringify(missingFromTabOrder)}`);
     }
 }
 
@@ -286,6 +350,9 @@ try {
             const state = await readShellState(page, width, view);
             assertShellState(state);
             if (view === 'Vocabulary') await assertHiddenControlsOutsideTabOrder(page, state);
+            if (view === 'Activity menu' && width <= 390) {
+                await assertNarrowActivityControlsReachable(page, width);
+            }
             const key = `${width}-${view.toLowerCase()}`;
             manifest[key] = state;
             if (snapshotDir) {

@@ -8424,6 +8424,15 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     #activity-menu-view .activity-menu-status {
         flex-direction: column;
         align-items: stretch;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #activity-menu-view .student-export-menu,
+    #activity-menu-view .student-export-menu summary,
+    #activity-menu-view .student-export-menu-panel {
+        box-sizing: border-box;
+        max-width: 100%;
     }
 
     #activity-menu-view .activity-menu-progress {
