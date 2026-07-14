@@ -95,6 +95,7 @@ class TeacherShellMethods {
         $$('.teacher-tab').forEach(tab => {
             const active = tab.dataset.section === sectionId;
             tab.classList.toggle('active', active);
+            tab.classList.toggle('primary-nav__item--active', active);
             tab.setAttribute('aria-selected', active ? 'true' : 'false');
             tab.tabIndex = active ? 0 : -1;
             if (active) activeLabel = tab.textContent.trim().replace(/\s+/g, ' ');

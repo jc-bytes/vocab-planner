@@ -115,7 +115,7 @@ class StudentActivityBrowserMethods {
 
     appendCurrentMonthBadge(target, monthKey) {
         if (!target || !this.isCurrentAcademicMonth(monthKey)) return;
-        target.appendChild(createElement('span', 'student-current-month-badge', 'Current Month'));
+        target.appendChild(createElement('span', 'student-current-month-badge context-badge', 'Current Month'));
     }
 
     renderStudentLibraryBreadcrumb(container, selectedTrimester = null, selectedMonth = null) {
@@ -125,28 +125,40 @@ class StudentActivityBrowserMethods {
             headerBreadcrumb.innerHTML = '';
         }
 
-        const nav = createElement('div', 'teacher-library-breadcrumb');
+        const nav = createElement('nav', 'teacher-library-breadcrumb breadcrumb');
+        nav.setAttribute('aria-label', 'Vocabulary location');
         const rootButton = this.createStudentBreadcrumbButton('Vocabulary', () => {
             this.sm.studentVocabularyDrilldown = { trimester: null, month: null };
             this.sm.navigateTo({ view: 'units', all: true });
         });
+        if (!selectedTrimester) rootButton.setAttribute('aria-current', 'page');
         nav.appendChild(rootButton);
 
         if (selectedTrimester) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
+            separator.setAttribute('aria-hidden', 'true');
+            nav.appendChild(separator);
             const trimesterLabel = this.getTrimesterLabel(selectedTrimester);
             const trimesterNode = selectedMonth
                 ? this.createStudentBreadcrumbButton(trimesterLabel, () => {
                     this.sm.studentVocabularyDrilldown = { trimester: selectedTrimester, month: null };
                     this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
                 })
-                : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+                : createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', trimesterLabel);
+            if (!selectedMonth) trimesterNode.setAttribute('aria-current', 'page');
             nav.appendChild(trimesterNode);
         }
 
         if (selectedMonth) {
-            nav.appendChild(createElement('span', 'teacher-library-breadcrumb-separator', '/'));
-            const monthNode = createElement('span', 'teacher-library-breadcrumb-current', this.getMonthLabel(selectedMonth));
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
+            separator.setAttribute('aria-hidden', 'true');
+            nav.appendChild(separator);
+            const monthNode = createElement(
+                'span',
+                'teacher-library-breadcrumb-current breadcrumb__current',
+                this.getMonthLabel(selectedMonth)
+            );
+            monthNode.setAttribute('aria-current', 'page');
             nav.appendChild(monthNode);
             this.appendCurrentMonthBadge(nav, selectedMonth);
         }
@@ -155,7 +167,7 @@ class StudentActivityBrowserMethods {
     }
 
     createStudentBreadcrumbButton(label, onClick) {
-        const button = createElement('button', 'teacher-library-crumb-btn', label);
+        const button = createElement('button', 'teacher-library-crumb-btn breadcrumb__item', label);
         button.type = 'button';
         button.addEventListener('click', onClick);
         return button;
@@ -177,11 +189,11 @@ class StudentActivityBrowserMethods {
 
         const currentMode = this.getStudentVocabularyViewMode();
         container.innerHTML = `
-            <button class="vocab-view-toggle-btn ${currentMode === 'cards' ? 'is-active' : ''}" type="button" data-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
+            <button class="vocab-view-toggle-btn segmented-control__item ${currentMode === 'cards' ? 'is-active segmented-control__item--active' : ''}" type="button" data-vocab-view-mode="cards" aria-pressed="${currentMode === 'cards'}" aria-label="Show cards">
                 <i data-lucide="layout-grid"></i>
                 <span>Cards</span>
             </button>
-            <button class="vocab-view-toggle-btn ${currentMode === 'rows' ? 'is-active' : ''}" type="button" data-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
+            <button class="vocab-view-toggle-btn segmented-control__item ${currentMode === 'rows' ? 'is-active segmented-control__item--active' : ''}" type="button" data-vocab-view-mode="rows" aria-pressed="${currentMode === 'rows'}" aria-label="Show rows">
                 <i data-lucide="list"></i>
                 <span>Rows</span>
             </button>
@@ -301,27 +313,40 @@ class StudentActivityBrowserMethods {
         const nextMonth = currentIndex >= 0 && currentIndex < sortedMonths.length - 1
             ? sortedMonths[currentIndex + 1]
             : null;
-        const toolbar = createElement('nav', 'student-vocab-month-navigation');
+        const toolbar = createElement('nav', 'student-vocab-month-navigation month-navigation');
         toolbar.setAttribute('aria-label', 'Vocabulary month navigation');
 
-        const backButton = createElement('button', 'student-vocab-month-nav-btn student-vocab-month-back', '← Back to Months');
+        const backButton = createElement(
+            'button',
+            'student-vocab-month-nav-btn student-vocab-month-back month-navigation__action month-navigation__action--back',
+            '← Back to Months'
+        );
         backButton.type = 'button';
         backButton.addEventListener('click', () => {
             this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
         });
 
         const monthStrip = createElement('div', 'student-vocab-month-nav-strip');
-        const previousButton = createElement('button', 'student-vocab-month-nav-btn', '← Previous Month');
+        const previousButton = createElement(
+            'button',
+            'student-vocab-month-nav-btn month-navigation__action',
+            '← Previous Month'
+        );
         previousButton.type = 'button';
         previousButton.disabled = !previousMonth;
         previousButton.addEventListener('click', () => {
             if (previousMonth) this.sm.navigateTo({ view: 'units', trimester: selectedTrimester, month: previousMonth });
         });
 
-        const currentLabel = createElement('div', 'student-vocab-month-nav-current');
+        const currentLabel = createElement('div', 'student-vocab-month-nav-current month-navigation__current');
+        currentLabel.setAttribute('aria-current', 'date');
         currentLabel.appendChild(createElement('span', null, this.getMonthLabel(selectedMonth)));
 
-        const nextButton = createElement('button', 'student-vocab-month-nav-btn', 'Next Month →');
+        const nextButton = createElement(
+            'button',
+            'student-vocab-month-nav-btn month-navigation__action',
+            'Next Month →'
+        );
         nextButton.type = 'button';
         nextButton.disabled = !nextMonth;
         nextButton.addEventListener('click', () => {

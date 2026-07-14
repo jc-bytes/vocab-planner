@@ -621,12 +621,12 @@ class TeacherSparkMethods {
     renderSparkSection(container, { title, description, items, emptyText, currentId }) {
         const section = createElement('section', 'spark-section');
         section.innerHTML = `
-            <div class="spark-section-header">
+            <div class="spark-section-header section-heading">
                 <div>
-                    <h3>${escapeHtml(title)}</h3>
-                    <p>${escapeHtml(description)}</p>
+                    <h3 class="section-header__title">${escapeHtml(title)}</h3>
+                    <p class="section-header__description">${escapeHtml(description)}</p>
                 </div>
-                <span class="spark-section-count">${items.length}</span>
+                <span class="spark-section-count section-header__metric">${items.length}</span>
             </div>
         `;
 
@@ -668,8 +668,8 @@ class TeacherSparkMethods {
                 <span class="spark-type-pill"><i data-lucide="${meta.icon}"></i>${escapeHtml(meta.label)}</span>
                 <span class="spark-status-pill">${escapeHtml(statusLabel)}</span>
             </div>
-            <h4>${escapeHtml(spark.title || 'Untitled Spark')}</h4>
-            <p>${escapeHtml(spark.sparkText || 'No Spark text yet.')}</p>
+            <h4 class="card-title">${escapeHtml(spark.title || 'Untitled Spark')}</h4>
+            <p class="card-secondary">${escapeHtml(spark.sparkText || 'No Spark text yet.')}</p>
             ${spark.whyItMatters ? `
                 <div class="spark-detail">
                     <strong>Why it matters</strong>

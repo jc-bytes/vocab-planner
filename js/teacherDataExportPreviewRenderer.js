@@ -14,36 +14,36 @@ export function renderPreview(preview, summaryEl, tablesEl) {
     }
 
     summaryEl.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+            <div class="runtime-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Total Students</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${preview.summary.totalStudents}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Students</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalStudents}</div>
                 </div>
                 ${preview.summary.totalProgressRecords > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Progress Records</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${preview.summary.totalProgressRecords}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Progress Records</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalProgressRecords}</div>
                 </div>
                 ${totalVocabUnits > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Vocabulary Units</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${totalVocabUnits}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Vocabulary Units</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${totalVocabUnits}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Total Coins</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${preview.summary.totalCoins.toLocaleString()}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Coins</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalCoins.toLocaleString()}</div>
                 </div>
                 ` : ''}
                 ${preview.summary.totalScores > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Game Scores</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${preview.summary.totalScores}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Game Scores</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalScores}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Date Range</div>
-                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-main, #f8fafc);">${dateStr}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Date Range</div>
+                    <div class="runtime-summary__value runtime-summary__value--compact" style="color: var(--text-main, #f8fafc);">${dateStr}</div>
                 </div>
             </div>
         `;

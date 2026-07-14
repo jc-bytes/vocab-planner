@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-shell-20260706a">
+    <link rel="stylesheet" href="css/student.css?v=student-activity-controls-20260713f">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
+    <link rel="stylesheet" href="css/typography.css?v=typography-activity-controls-20260713i">
 </head>
 
 <body>
@@ -62,7 +63,7 @@
                 </div>
                 <div id="guest-status" style="display:none; align-items: center; gap: 1rem;">
                     <span style="font-size:0.85rem; color:var(--text-muted);">Signed out</span>
-                    <button id="guest-signin-btn" class="btn text-btn" style="font-size: 0.875rem; display:none;">Sign In</button>
+                    <button id="guest-signin-btn" class="btn text-btn btn-compact" style="display:none;">Sign In</button>
                 </div>
             </div>
         </header>
@@ -167,7 +168,7 @@
                         </form>
                     </div>
 
-                    <div id="login-error" role="alert" aria-live="assertive" style="color: var(--danger-color); margin-top: 1rem; display: none;">
+                    <div id="login-error" class="form-feedback" role="alert" aria-live="assertive" style="color: var(--danger-color); margin-top: 1rem; display: none;">
                     </div>
                 </div>
             </section>
@@ -188,15 +189,15 @@
 
             <!-- Vocabulary Selection View -->
             <section id="vocab-selection-view" class="view hidden">
-                <div class="section-header vocab-selection-header">
+                <div class="section-header vocab-selection-header page-header">
                     <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
-                    <div class="vocab-page-intro">
-                        <h2>Vocabulary Units</h2>
-                        <p>Master the language of technology through interactive challenges.</p>
-                        <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb" aria-label="Vocabulary location"></div>
+                    <div class="vocab-page-intro page-header__content">
+                        <h2 class="page-header__title">Vocabulary Units</h2>
+                        <p class="page-header__description">Master the language of technology through interactive challenges.</p>
+                        <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb"></div>
                     </div>
                     <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
-                    <div id="vocab-view-toggle" class="vocab-view-toggle" aria-label="Vocabulary view"></div>
+                    <div id="vocab-view-toggle" class="vocab-view-toggle segmented-control" role="group" aria-label="Vocabulary view"></div>
                 </div>
                 <div id="vocab-list" class="vocab-grid">
                     <!-- Vocabulary sets will be listed here -->
@@ -210,7 +211,7 @@
                     <div class="activity-menu-hero">
                         <div class="activity-menu-title-block">
                             <div class="activity-menu-meta-row">
-                                <button id="back-to-vocab" class="activity-menu-back-link" type="button">← Back to Units</button>
+                                <button id="back-to-vocab" class="activity-menu-back-link activity-back-control" type="button">← Back to Units</button>
                                 <div id="current-unit-subject" class="unit-subject-label"></div>
                             </div>
                             <h2 id="current-unit-title">Unit Title</h2>
@@ -400,7 +401,7 @@
                 <h3 id="profile-modal-title">Student Profile</h3>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 1rem; color: var(--text-muted);">Please enter your details to start.</p>
+                <p class="modal-secondary" style="margin-bottom: 1rem; color: var(--text-muted);">Please enter your details to start.</p>
                 <div class="form-group">
                     <label for="student-firstname">First Name</label>
                     <input type="text" id="student-firstname" placeholder="First Name">
@@ -458,7 +459,7 @@
                             </button>
                         </div>
                     </div>
-                    <div id="change-password-status" style="color: var(--danger-color); font-size: 0.9rem;"></div>
+                    <div id="change-password-status" class="form-feedback" style="color: var(--danger-color);"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn primary-btn">Update Password</button>

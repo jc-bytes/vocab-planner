@@ -1,4 +1,5 @@
 /* Student entry stylesheet generated from style.css; includes shared primitives used by the student UI. */:root {
+    --form-control-line-height: var(--line-height-body);
     /* Celestial Academy tokens */
     --color-surface: #0b1326;
     --color-surface-container-lowest: #060e20;
@@ -318,20 +319,21 @@
     background: rgba(59, 130, 246, 0.12);
 }#activity-menu-view .activity-menu-summary-label {
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
-    line-height: 1.1;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
     text-transform: uppercase;
 }#activity-menu-view .activity-menu-summary-card strong {
     color: #ffffff;
-    font-size: 1.05rem;
-    line-height: 1.2;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
     overflow-wrap: anywhere;
 }#activity-menu-view .activity-menu-summary-card small {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
-    line-height: 1.25;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }#activity-menu-view .activity-menu-summary-meter {
     width: 100%;
     height: 6px;
@@ -363,12 +365,15 @@
 }#activity-menu-view .activity-card .icon {
     font-size: 2rem;
 }#activity-menu-view .activity-card h3 {
-    font-size: 1rem;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }#activity-menu-view .activity-card p {
     margin: 0;
     color: var(--text-muted);
-    font-size: 0.88rem;
-    line-height: 1.35;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }#activity-menu-view .activity-secondary-grid .activity-card p {
     display: none;
 }#activity-menu-view .progress-badge {
@@ -395,8 +400,8 @@
     border-radius: 999px;
     background: rgba(96, 165, 250, 0.18);
     color: #bfdbfe;
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }#activity-menu-view .activity-lock-label,
 #activity-menu-view .activity-unavailable-label {
@@ -406,8 +411,8 @@
     min-height: 1.55rem;
     padding: 0.15rem 0.5rem;
     border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }#activity-menu-view .activity-lock-label {
     background: rgba(148, 163, 184, 0.14);
@@ -442,7 +447,6 @@
     min-height: var(--touch-target);
     border-radius: var(--radius-sm);
     color: var(--text-main);
-    font-weight: 900;
     cursor: pointer;
 }#activity-menu-view .activity-secondary-disclosure:not([open]) {
     margin-bottom: 0.25rem;
@@ -483,7 +487,7 @@
     gap: 0.25rem;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: right;
 }/* Completion Screen */.completion-screen {
     text-align: center;
@@ -569,12 +573,12 @@
     min-height: var(--touch-target);
     min-width: var(--touch-target);
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: var(--type-button-weight);
     cursor: pointer;
     border: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    font-size: 1rem;
-    line-height: 1.2;
+    font-size: var(--type-button-size);
+    line-height: var(--type-button-line-height);
     touch-action: manipulation;
 }.status-dot {
     display: inline-flex;
@@ -656,7 +660,7 @@
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: left;
     cursor: pointer;
 }.student-export-menu-item:hover,
@@ -692,7 +696,7 @@
     display: block;
     margin-bottom: 0.45rem;
     color: var(--text-muted);
-    font-weight: 700;
+    font-weight: var(--type-form-label-weight);
 }input,
 textarea,
 select {
@@ -703,6 +707,10 @@ select {
     background: rgba(15, 23, 42, 0.72);
     color: var(--text-main);
     font: inherit;
+    font-size: var(--type-form-control-size);
+    font-weight: var(--type-form-control-weight);
+    line-height: var(--type-form-control-line-height);
+    letter-spacing: var(--type-form-control-letter-spacing);
     padding: 0.75rem 0.9rem;
     box-sizing: border-box;
     outline: none;
@@ -712,6 +720,11 @@ select {
 }input::placeholder,
 textarea::placeholder {
     color: rgba(203, 213, 245, 0.62);
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-placeholder-size);
+    font-weight: var(--type-form-placeholder-weight);
+    line-height: var(--type-form-placeholder-line-height);
+    letter-spacing: var(--type-form-placeholder-letter-spacing);
 }input:focus,
 textarea:focus,
 select:focus {
@@ -791,6 +804,7 @@ select:focus {
     gap: 0.45rem;
     min-height: 34px;
     color: var(--text-muted);
+}.teacher-library-breadcrumb:not(.breadcrumb) {
     font-size: 0.9rem;
     font-weight: 700;
 }.teacher-library-crumb-btn {
@@ -799,10 +813,11 @@ select:focus {
     border: 0;
     background: transparent;
     color: var(--secondary-color);
-    font: inherit;
-    font-weight: 800;
     padding: 0.35rem 0.5rem;
     cursor: pointer;
+}.teacher-library-crumb-btn:not(.breadcrumb__item) {
+    font: inherit;
+    font-weight: var(--font-weight-bold);
 }.teacher-library-crumb-btn:hover {
     color: var(--text-main);
 }.teacher-library-crumb-btn:focus-visible {
@@ -895,7 +910,7 @@ select:focus {
 }.student-vocab-month-heading h4 {
     color: var(--text-main);
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
 }.student-vocab-month-heading span {
     color: var(--text-muted);
     font-size: 0.82rem;
@@ -923,7 +938,7 @@ select:focus {
     background: rgba(15, 23, 42, 0.55);
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
     touch-action: manipulation;
 }.teacher-mobile-menu-toggle span {
@@ -977,7 +992,7 @@ select:focus {
 }.teacher-eyebrow {
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--type-caption-weight);
     letter-spacing: 0.08em;
     margin-bottom: 0.15rem;
     text-transform: uppercase;
@@ -1021,7 +1036,7 @@ select:focus {
     color: var(--text-main);
     font: inherit;
     font-size: 0.88rem;
-    font-weight: 800;
+    font-weight: var(--type-button-weight);
     text-align: left;
     cursor: pointer;
 }.toolbar-menu-item svg {
@@ -1084,7 +1099,7 @@ select:focus {
     min-width: 0;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--type-form-label-weight);
 }.vocab-count-grid input {
     max-width: none;
     min-height: 2.35rem;
@@ -1106,8 +1121,8 @@ select:focus {
     align-items: center;
     padding: 0 0.55rem 0.45rem;
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }.activity-flow-choice {
     display: grid;
@@ -1125,7 +1140,7 @@ select:focus {
     margin-bottom: 0;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--type-form-label-weight);
 }.activity-flow-choice select,
 .activity-flow-choice input {
     min-height: 2.25rem;
@@ -1180,11 +1195,12 @@ select:focus {
     margin-bottom: var(--spacing-md);
 }.teacher-panel-header h3 {
     margin: 0;
-    font-size: 1.1rem;
 }.teacher-panel-header p {
     margin: 0.15rem 0 0;
     color: var(--text-muted);
-    font-size: 0.88rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }.calendar-range-preview {
     align-self: end;
     min-height: 40px;
@@ -1322,8 +1338,8 @@ select:focus {
     border: 0;
     background: transparent;
     color: rgba(203, 213, 245, 0.72);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }.student-vocab-row strong,
@@ -1502,9 +1518,10 @@ select:focus {
     max-height: calc(var(--vocab-header-control-height) - 2px);
     padding: 0 1.35rem 0 0.1rem;
     font-size: 0.86rem;
-    font-weight: 900;
+    font-weight: var(--font-weight-bold);
     line-height: 1;
 }.vocab-view-toggle {
+    --segmented-control-size: 0.8rem;
     grid-area: view;
     align-self: center;
     display: inline-flex;
@@ -1535,10 +1552,6 @@ select:focus {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-muted);
-    font: inherit;
-    font-size: 0.86rem;
-    font-weight: 900;
-    line-height: 1;
     cursor: pointer;
 }.vocab-view-toggle-btn svg {
     flex: 0 0 auto;
@@ -1581,7 +1594,7 @@ select:focus {
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     line-height: 1.2;
 }.student-subject-btn {
     display: inline-grid;
@@ -1599,7 +1612,7 @@ select:focus {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: left;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -1642,8 +1655,9 @@ select:focus {
     min-height: 28px;
     padding: 0.2rem 0.5rem;
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--type-caption-line-height);
 }.student-spark-badge {
     background: rgba(14, 165, 233, 0.16);
     color: #bae6fd;
@@ -1662,13 +1676,16 @@ select:focus {
     gap: 0.2rem;
 }.student-spark-detail strong {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
     letter-spacing: 0;
     text-transform: uppercase;
 }.student-spark-detail span {
     color: var(--text-muted);
-    font-size: 0.86rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }.student-spark-question {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -1704,15 +1721,18 @@ select:focus {
     justify-content: space-between;
     gap: 0.5rem;
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--type-caption-line-height);
 }.student-spark-card h3 {
-    font-size: 1rem;
-    line-height: 1.2;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }.student-spark-card p {
     color: var(--text-muted);
-    font-size: 0.88rem;
-    line-height: 1.35;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }.student-spark-detail {
     display: none;
 }.student-spark-question {
@@ -1893,8 +1913,8 @@ select:focus {
     min-height: 28px;
     padding: 0.22rem 0.55rem;
     border-radius: 999px;
-    font-size: 0.73rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     white-space: nowrap;
 }.word-hunt-status-pill.is-complete {
     background: rgba(16, 185, 129, 0.14);
@@ -2103,12 +2123,9 @@ select:focus {
     min-height: var(--touch-target);
     min-width: var(--touch-target);
 }.student-card-name {
-    font-weight: 800;
-    line-height: 1.25;
     overflow-wrap: anywhere;
 }.student-card-email {
     color: var(--text-muted);
-    font-size: 0.86rem;
     overflow-wrap: anywhere;
 }.student-card-meta {
     display: grid;
@@ -2119,11 +2136,8 @@ select:focus {
     gap: 0.1rem;
     min-width: 0;
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
 }.student-card-meta strong {
     color: var(--text-main);
-    font-size: 0.95rem;
     overflow-wrap: anywhere;
 }.student-card-actions {
     display: grid;
@@ -2145,7 +2159,7 @@ select:focus {
     background: rgba(99, 102, 241, 0.15);
     padding: 0.12rem 0.38rem;
     border-radius: var(--radius-sm);
-    font-size: 0.7rem;
+    font-size: var(--type-caption-size);
     color: var(--text-muted);
     margin: 0;
     justify-self: start;
@@ -2168,15 +2182,20 @@ select:focus {
     flex-wrap: wrap;
     gap: 0.45rem;
 }.word-hunt-selection-summary strong {
-    font-size: 0.88rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--type-secondary-line-height);
 }.word-hunt-selection-summary span {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }.word-hunt-selection-summary .btn {
     min-height: 2rem;
     padding: 0.3rem 0.55rem;
-    font-size: 0.78rem;
+    font-size: var(--type-button-compact-size);
+    font-weight: var(--type-button-compact-weight);
+    line-height: var(--type-button-compact-line-height);
 }.word-hunt-badge {
     display: inline-flex;
     align-items: center;
@@ -2254,7 +2273,8 @@ select:focus {
 }.close-modal {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: var(--type-button-icon-size);
+    line-height: var(--type-button-icon-line-height);
     cursor: pointer;
     color: var(--text-muted);
     min-width: var(--touch-target);
@@ -2288,12 +2308,8 @@ select:focus {
     padding: 0.85rem 1rem;
     box-shadow: var(--shadow-sm);
 }.mini-stat-label {
-    font-size: 0.8rem;
     color: var(--text-muted);
     margin-bottom: 0.25rem;
-}.mini-stat-value {
-    font-weight: 700;
-    font-size: 1.3rem;
 }.detail-summary-grid .mini-stat {
     padding: 0.65rem 0;
     border: 0;
@@ -2540,8 +2556,9 @@ select:focus {
 }.word-hunt-field-helper {
     margin: 0.35rem 0 0;
     color: var(--text-muted);
-    font-size: 0.76rem;
-    line-height: 1.25;
+    font-size: var(--type-form-helper-size);
+    font-weight: var(--type-form-helper-weight);
+    line-height: var(--type-form-helper-line-height);
 }.word-hunt-image-label {
     display: block;
     font-weight: 600;
@@ -3868,7 +3885,7 @@ select:focus {
         transform: none;
     }
 }@media (max-width: 1024px) {
-    :root {
+:root {
         --cw-cell-size: 44px;
     }
 
@@ -4223,6 +4240,8 @@ select:focus {
     }
 
     .student-home-tabs {
+        --secondary-tab-size: var(--type-secondary-tab-compact-size);
+        --secondary-tab-compact-size: var(--type-secondary-tab-compact-size);
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 0.35rem;
@@ -4244,9 +4263,6 @@ select:focus {
         border-radius: var(--radius-sm);
         background: transparent;
         color: var(--text-muted);
-        font: inherit;
-        font-size: 0.85rem;
-        font-weight: 800;
         cursor: pointer;
         touch-action: manipulation;
     }
@@ -4305,7 +4321,7 @@ select:focus {
 
     .student-home-unit-copy span,
 .student-home-unit-status span {
-        font-size: 0.74rem;
+        font-size: var(--type-caption-size);
     }
 
     .header-left h1 {
@@ -4841,162 +4857,6 @@ select:focus {
 }
 
 /* Final tablet correction: no hybrid header between phone and full sidebar. */
-@media (min-width: 701px) and (max-width: 1120px) {
-    header.app-header.student-app-header {
-        position: sticky !important;
-        top: 0 !important;
-        left: 0 !important;
-        z-index: 80 !important;
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        grid-template-areas: "student-nav student-actions" !important;
-        grid-template-rows: auto !important;
-        align-items: center !important;
-        gap: 12px !important;
-        box-sizing: border-box !important;
-        width: min(100%, calc(100vw - 64px)) !important;
-        height: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 16px clamp(18px, 4vw, 32px) !important;
-        overflow: visible !important;
-        border-right: 0 !important;
-        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
-        background:
-            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
-            rgba(8, 15, 33, 0.96) !important;
-        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
-        backdrop-filter: blur(18px) !important;
-    }
-
-    header.app-header.student-app-header .header-left,
-    header.app-header.student-app-header .student-sidebar-context {
-        display: none !important;
-    }
-
-    header.app-header.student-app-header .student-tab-shell {
-        display: block !important;
-        position: relative !important;
-        grid-area: student-nav !important;
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        order: 1 !important;
-        align-self: center !important;
-        justify-self: stretch !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    header.app-header.student-app-header .student-mobile-menu-toggle {
-        display: inline-flex !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        justify-content: flex-start !important;
-        border: 1px solid rgba(173, 198, 255, 0.14) !important;
-        border-radius: 10px !important;
-        background: rgba(8, 14, 31, 0.58) !important;
-    }
-
-    header.app-header.student-app-header .student-tabs {
-        position: absolute !important;
-        top: calc(100% + 8px) !important;
-        left: 0 !important;
-        display: none !important;
-        grid-template-columns: 1fr !important;
-        gap: 6px !important;
-        width: min(18rem, calc(100vw - 36px)) !important;
-        max-height: min(70vh, 22rem) !important;
-        overflow-y: auto !important;
-        padding: 6px !important;
-        border: 1px solid rgba(173, 198, 255, 0.16) !important;
-        border-radius: 12px !important;
-        background: rgba(7, 14, 30, 0.98) !important;
-        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
-    }
-
-    header.app-header.student-app-header .student-tab-shell.mobile-menu-open .student-tabs {
-        display: grid !important;
-    }
-
-    header.app-header.student-app-header .student-tab {
-        justify-content: flex-start !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        padding: 0 12px !important;
-        border: 1px solid transparent !important;
-        border-radius: 9px !important;
-        background: transparent !important;
-        color: rgba(218, 226, 253, 0.82) !important;
-        font-size: 0.95rem !important;
-        box-shadow: none !important;
-    }
-
-    header.app-header.student-app-header .student-tab.active {
-        border-color: rgba(173, 198, 255, 0.26) !important;
-        background: rgba(173, 198, 255, 0.14) !important;
-        color: #eef3ff !important;
-    }
-
-    header.app-header.student-app-header .header-actions {
-        position: static !important;
-        inset: auto !important;
-        grid-area: student-actions !important;
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        order: 2 !important;
-        align-self: center !important;
-        justify-self: end !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-    }
-
-    header.app-header.student-app-header #user-info {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 10px !important;
-        width: auto !important;
-        min-width: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    header.app-header.student-app-header .student-mobile-profile-btn,
-    header.app-header.student-app-header #sign-out-btn {
-        display: inline-flex !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 0 !important;
-        border-radius: 10px !important;
-    }
-
-    header.app-header.student-app-header #auth-status {
-        position: static !important;
-        width: 0.72rem !important;
-        height: 0.72rem !important;
-        min-width: 0.72rem !important;
-        min-height: 0.72rem !important;
-    }
-
-    .app-container > main {
-        margin-left: 0 !important;
-    }
-}
 
 /* Phase 1: Celestial Academy design-system migration */
 html {
@@ -5091,7 +4951,7 @@ h3,
 .student-app-header .header-left h1 {
     color: var(--text-main);
     font-size: 1.25rem;
-    font-weight: 800;
+    font-weight: var(--type-page-title-weight);
     line-height: 1.2;
 }
 
@@ -5100,7 +4960,7 @@ h3,
 .word-hunt-title h2 {
     color: var(--text-main);
     font-size: clamp(1.5rem, 2.8vw, 2rem);
-    font-weight: 800;
+    font-weight: var(--type-page-title-weight);
     line-height: 1.25;
 }
 
@@ -5127,8 +4987,11 @@ h3,
 .vocab-view-toggle-btn {
     border-radius: var(--radius-control);
     color: var(--text-muted);
-    font-weight: 800;
     transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.teacher-tab {
+    font-weight: var(--font-weight-bold);
 }
 
 .teacher-tab.active,
@@ -5148,7 +5011,7 @@ h3,
 
 .btn {
     border-radius: var(--radius-control);
-    font-weight: 800;
+    font-weight: var(--type-button-weight);
     transition: transform 0.16s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
@@ -5210,7 +5073,7 @@ select {
 input::placeholder,
 textarea::placeholder {
     color: rgba(194, 198, 214, 0.65);
-    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-family: var(--font-family-sans);
 }
 
 input:focus,
@@ -5231,7 +5094,7 @@ select:focus,
     background: rgba(6, 14, 32, 0.48);
     color: var(--color-xp);
     font-size: 0.84rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     box-shadow: var(--glow-xp);
 }
 
@@ -5294,7 +5157,7 @@ select:focus,
 
 .student-home-panel .teacher-panel-header h3 {
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: var(--type-panel-title-weight);
 }
 
 .student-home-panel .teacher-panel-header p,
@@ -5357,7 +5220,7 @@ select:focus,
 
 .student-subject-select {
     color: var(--text-main);
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 .student-vocab-month-heading,
@@ -5374,7 +5237,7 @@ select:focus,
     border: 1px solid rgba(173, 198, 255, 0.22);
     background: rgba(173, 198, 255, 0.13);
     color: var(--color-primary);
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
     letter-spacing: 0.05em;
 }
 
@@ -5389,14 +5252,14 @@ select:focus,
 .game-cost {
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.05em;
 }
 
 .student-vocab-card h3 {
     color: var(--text-main);
     font-size: 1.2rem;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
 }
 
 .student-vocab-card p,
@@ -5419,7 +5282,7 @@ select:focus,
 
 .student-vocab-row strong {
     color: var(--text-main);
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 .student-vocab-row span {
@@ -5448,7 +5311,7 @@ select:focus,
 .activity-card h3 {
     color: var(--text-main);
     font-family: 'Geist', 'Inter', system-ui, sans-serif;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
 }
 
 .activity-card p {
@@ -5490,7 +5353,7 @@ select:focus,
 .game-card-copy h3 {
     color: var(--text-main);
     font-size: 1.25rem;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
 }
 
 .game-cost {
@@ -5996,7 +5859,9 @@ section.student-continue-hero {
 }
 
 .student-spark-card h3 {
-    font-size: 1rem;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
     color: #f4f7ff;
 }
 
@@ -6369,17 +6234,6 @@ section.student-continue-hero {
 }
 
 @media (min-width: 901px) and (max-width: 1120px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
-        width: 224px;
-        padding-inline: 18px 14px;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) main {
-        width: auto;
-        margin-left: 224px;
-        padding-inline: 28px;
-    }
-
     .student-home-dashboard {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -6389,6 +6243,7 @@ section.student-continue-hero {
             "spark";
     }
 }
+
 
 /* Phase 2 shell follow-up: split the sidebar rail from the top status bar. */
 @media (min-width: 901px) {
@@ -6511,20 +6366,6 @@ section.student-continue-hero {
     }
 }
 
-@media (min-width: 901px) and (max-width: 1120px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
-        width: 220px;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions {
-        left: 220px;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) main {
-        margin-left: 220px;
-        padding-inline: 24px;
-    }
-}
 
 /* Phase 2 sidebar context: move the student subject picker out of the page heading. */
 .student-sidebar-context {
@@ -6533,7 +6374,6 @@ section.student-continue-hero {
 
 @media (min-width: 901px) {
     .app-container:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
-        display: grid;
         gap: 10px;
         width: 100%;
         margin-top: 30px;
@@ -6547,7 +6387,7 @@ section.student-continue-hero {
         margin: 0;
         color: rgba(173, 198, 255, 0.78);
         font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-        font-size: 0.68rem;
+        font-size: var(--type-caption-size);
         font-weight: 700;
         letter-spacing: 0.08em;
         line-height: 1;
@@ -6586,9 +6426,6 @@ section.student-continue-hero {
         padding-top: 0;
     }
 
-    #vocab-selection-view .vocab-header-subject-picker {
-        display: none;
-    }
 }
 
 /* Phase 2 rail reset: final desktop contract for a clean sidebar and top status bar. */
@@ -6707,7 +6544,6 @@ section.student-continue-hero {
     .app-container:has(#student-tab-shell:not(.hidden)) .student-sidebar-context,
     .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
         order: 3 !important;
-        display: grid !important;
         gap: 9px !important;
         width: 100% !important;
         margin: 24px 0 0 !important;
@@ -6782,27 +6618,8 @@ section.student-continue-hero {
         overflow: hidden !important;
     }
 
-    #vocab-selection-view .vocab-header-subject-picker {
-        display: none !important;
-    }
 }
 
-@media (min-width: 901px) and (max-width: 1120px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
-    .student-app-header:has(#student-tab-shell:not(.hidden)) {
-        width: 220px !important;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header .header-actions,
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
-        inset-left: 220px !important;
-        left: 220px !important;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) main {
-        margin-left: 220px !important;
-    }
-}
 
 /* Phase 2 visual alignment: reference-style rail, bottom utilities, and dashboard headline. */
 @media (min-width: 901px) {
@@ -7046,21 +6863,12 @@ section.student-continue-hero {
 }
 
 @media (min-width: 901px) and (max-width: 1120px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
-    .student-app-header:has(#student-tab-shell:not(.hidden)) {
-        box-sizing: border-box !important;
-        width: 232px !important;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) main {
-        margin-left: 232px !important;
-    }
-
     .student-dashboard-heading h2 {
         font-size: clamp(2rem, 4vw, 2.8rem) !important;
         white-space: normal !important;
     }
 }
+
 
 /* Phase 2 hero polish: reference-style Continue Learning card. */
 @media (min-width: 901px) {
@@ -7127,7 +6935,7 @@ section.student-continue-hero {
         min-height: 24px !important;
         margin-bottom: 18px !important;
         padding: 0 11px !important;
-        font-size: 0.66rem !important;
+        font-size: var(--type-caption-size) !important;
         letter-spacing: 0.12em !important;
     }
 
@@ -7276,81 +7084,8 @@ section.student-continue-hero {
     }
 }
 
-/* Tablet shell: use the compact student experience until the sidebar has room. */
+/* Compact-tablet navigation presentation and Today content; shell ownership is canonical below. */
 @media (min-width: 701px) and (max-width: 1120px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header,
-    .student-app-header:has(#student-tab-shell:not(.hidden)) {
-        position: sticky !important;
-        inset: 0 auto auto 0 !important;
-        z-index: 40 !important;
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        align-items: center !important;
-        gap: 12px !important;
-        box-sizing: border-box !important;
-        width: min(100%, calc(100vw - 64px)) !important;
-        height: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 16px clamp(18px, 4vw, 32px) !important;
-        overflow: visible !important;
-        border-right: 0 !important;
-        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
-        background:
-            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
-            rgba(8, 15, 33, 0.96) !important;
-        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
-        backdrop-filter: blur(18px) !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-left {
-        display: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell {
-        position: relative !important;
-        order: 1 !important;
-        justify-self: stretch !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-menu-toggle {
-        display: inline-flex !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        justify-content: flex-start !important;
-        border: 1px solid rgba(173, 198, 255, 0.14) !important;
-        border-radius: 10px !important;
-        background: rgba(8, 14, 31, 0.58) !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tabs {
-        position: absolute !important;
-        top: calc(100% + 8px) !important;
-        left: 0 !important;
-        display: none !important;
-        grid-template-columns: 1fr !important;
-        gap: 6px !important;
-        width: min(18rem, calc(100vw - 36px)) !important;
-        max-height: min(70vh, 22rem) !important;
-        overflow-y: auto !important;
-        padding: 6px !important;
-        border: 1px solid rgba(173, 198, 255, 0.16) !important;
-        border-radius: 12px !important;
-        background: rgba(7, 14, 30, 0.98) !important;
-        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab-shell.mobile-menu-open .student-tabs {
-        display: grid !important;
-    }
-
     .student-app-header:has(#student-tab-shell:not(.hidden)) .student-tab {
         justify-content: flex-start !important;
         width: 100% !important;
@@ -7378,62 +7113,6 @@ section.student-continue-hero {
     .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-today span::after,
     .student-app-header:has(#student-tab-shell:not(.hidden)) #student-tab-vocabulary span::after {
         content: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-sidebar-context {
-        display: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
-        position: static !important;
-        inset: auto !important;
-        order: 2 !important;
-        justify-self: end !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) #user-info {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 10px !important;
-        width: auto !important;
-        min-width: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) .student-mobile-profile-btn,
-    .student-app-header:has(#student-tab-shell:not(.hidden)) #sign-out-btn {
-        display: inline-flex !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 0 !important;
-        border-radius: 10px !important;
-    }
-
-    .student-app-header:has(#student-tab-shell:not(.hidden)) #auth-status {
-        position: static !important;
-        width: 0.72rem !important;
-        height: 0.72rem !important;
-        min-width: 0.72rem !important;
-        min-height: 0.72rem !important;
-    }
-
-    .app-container:has(#student-tab-shell:not(.hidden)) main {
-        margin-left: 0 !important;
-        padding: clamp(24px, 5vw, 42px) clamp(18px, 5vw, 42px) 48px !important;
     }
 
     #main-menu-view>.student-dashboard-heading {
@@ -7473,409 +7152,13 @@ section.student-continue-hero {
     #student-home-dashboard .student-home-panel.active {
         display: block !important;
     }
-
-    .student-app-header.student-mobile-compact {
-        position: sticky !important;
-        inset: 0 auto auto 0 !important;
-        z-index: 40 !important;
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        align-items: center !important;
-        gap: 12px !important;
-        box-sizing: border-box !important;
-        width: min(100%, calc(100vw - 64px)) !important;
-        height: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 16px clamp(18px, 4vw, 32px) !important;
-        overflow: visible !important;
-        border-right: 0 !important;
-        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
-        background:
-            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
-            rgba(8, 15, 33, 0.96) !important;
-        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
-        backdrop-filter: blur(18px) !important;
-    }
-
-    .student-app-header.student-mobile-compact .header-left {
-        display: none !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-tab-shell {
-        position: relative !important;
-        order: 1 !important;
-        justify-self: stretch !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-mobile-menu-toggle {
-        display: inline-flex !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        justify-content: flex-start !important;
-        border: 1px solid rgba(173, 198, 255, 0.14) !important;
-        border-radius: 10px !important;
-        background: rgba(8, 14, 31, 0.58) !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-tabs {
-        position: absolute !important;
-        top: calc(100% + 8px) !important;
-        left: 0 !important;
-        display: none !important;
-        grid-template-columns: 1fr !important;
-        gap: 6px !important;
-        width: min(18rem, calc(100vw - 36px)) !important;
-        max-height: min(70vh, 22rem) !important;
-        overflow-y: auto !important;
-        padding: 6px !important;
-        border: 1px solid rgba(173, 198, 255, 0.16) !important;
-        border-radius: 12px !important;
-        background: rgba(7, 14, 30, 0.98) !important;
-        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-tab-shell.mobile-menu-open .student-tabs {
-        display: grid !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-tab {
-        justify-content: flex-start !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        padding: 0 12px !important;
-        border: 1px solid transparent !important;
-        border-radius: 9px !important;
-        background: transparent !important;
-        color: rgba(218, 226, 253, 0.82) !important;
-        font-size: 0.95rem !important;
-        box-shadow: none !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-tab.active {
-        border-color: rgba(173, 198, 255, 0.26) !important;
-        background: rgba(173, 198, 255, 0.14) !important;
-        color: #eef3ff !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-sidebar-context {
-        display: none !important;
-    }
-
-    .student-app-header.student-mobile-compact .header-actions {
-        position: static !important;
-        inset: auto !important;
-        order: 2 !important;
-        justify-self: end !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-    }
-
-    .student-app-header.student-mobile-compact #user-info {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 10px !important;
-        width: auto !important;
-        min-width: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .student-app-header.student-mobile-compact .student-mobile-profile-btn,
-    .student-app-header.student-mobile-compact #sign-out-btn {
-        display: inline-flex !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 0 !important;
-        border-radius: 10px !important;
-    }
-
-    .student-app-header.student-mobile-compact #auth-status {
-        position: static !important;
-        width: 0.72rem !important;
-        height: 0.72rem !important;
-        min-width: 0.72rem !important;
-        min-height: 0.72rem !important;
-    }
 }
 
-/* Tablet shell override: keep 701-1120px aligned with the compact phone header. */
-@media (min-width: 701px) and (max-width: 1120px) {
-    html body .app-container {
-        display: block !important;
-        grid-template-columns: none !important;
-        grid-template-rows: none !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header {
-        position: sticky !important;
-        top: 0 !important;
-        left: 50% !important;
-        z-index: 80 !important;
-        display: grid !important;
-        grid-area: auto !important;
-        grid-column: auto !important;
-        grid-row: auto !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        grid-template-areas: "student-nav student-actions" !important;
-        grid-template-rows: auto !important;
-        align-items: center !important;
-        align-self: auto !important;
-        gap: 12px !important;
-        box-sizing: border-box !important;
-        width: 100vw !important;
-        height: auto !important;
-        min-height: 0 !important;
-        margin: 0 0 0 -50vw !important;
-        padding: 16px clamp(18px, 4vw, 32px) !important;
-        overflow: visible !important;
-        border-right: 0 !important;
-        border-bottom: 1px solid rgba(173, 198, 255, 0.12) !important;
-        background:
-            linear-gradient(90deg, rgba(18, 20, 66, 0.96), rgba(13, 31, 62, 0.92)),
-            rgba(8, 15, 33, 0.96) !important;
-        box-shadow: 0 18px 48px -44px rgba(0, 0, 0, 0.96) !important;
-        backdrop-filter: blur(18px) !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .header-left,
-    html body .app-container > header.app-header.student-app-header .student-sidebar-context,
-    html body .app-container > header.app-header.student-app-header #welcome-header {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        height: 0 !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-tab-shell:not(.hidden) {
-        display: block !important;
-        position: relative !important;
-        grid-area: student-nav !important;
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        order: 1 !important;
-        align-self: center !important;
-        justify-self: stretch !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-mobile-menu-toggle {
-        display: inline-flex !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        justify-content: flex-start !important;
-        border: 1px solid rgba(173, 198, 255, 0.14) !important;
-        border-radius: 10px !important;
-        background: rgba(8, 14, 31, 0.58) !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-tabs {
-        position: absolute !important;
-        top: calc(100% + 8px) !important;
-        left: 0 !important;
-        display: none !important;
-        grid-template-columns: 1fr !important;
-        gap: 6px !important;
-        width: min(18rem, calc(100vw - 36px)) !important;
-        max-height: min(70vh, 22rem) !important;
-        overflow-y: auto !important;
-        padding: 6px !important;
-        border: 1px solid rgba(173, 198, 255, 0.16) !important;
-        border-radius: 12px !important;
-        background: rgba(7, 14, 30, 0.98) !important;
-        box-shadow: 0 24px 60px -32px rgba(0, 0, 0, 0.95) !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-tab-shell.mobile-menu-open .student-tabs {
-        display: grid !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-tab {
-        justify-content: flex-start !important;
-        width: 100% !important;
-        min-height: 44px !important;
-        padding: 0 12px !important;
-        border: 1px solid transparent !important;
-        border-radius: 9px !important;
-        background: transparent !important;
-        color: rgba(218, 226, 253, 0.82) !important;
-        font-size: 0.95rem !important;
-        box-shadow: none !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-tab.active {
-        border-color: rgba(173, 198, 255, 0.26) !important;
-        background: rgba(173, 198, 255, 0.14) !important;
-        color: #eef3ff !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .header-actions {
-        position: static !important;
-        inset: auto !important;
-        grid-area: student-actions !important;
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        order: 2 !important;
-        display: flex !important;
-        align-items: center !important;
-        align-self: center !important;
-        justify-self: end !important;
-        width: auto !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header.student-mobile-compact .header-actions {
-        margin: 0 !important;
-        align-self: center !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header #user-info {
-        position: static !important;
-        inset: auto !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-end !important;
-        gap: 10px !important;
-        width: auto !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        transform: none !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-mobile-profile-btn,
-    html body .app-container > header.app-header.student-app-header #sign-out-btn {
-        display: inline-flex !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 0 !important;
-        border-radius: 10px !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header .student-mobile-profile-btn,
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-mobile-profile-btn {
-        display: none !important;
-        visibility: hidden !important;
-        width: 0 !important;
-        min-width: 0 !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: hidden !important;
-    }
-
-    html body .app-container > header.app-header.student-app-header #auth-status {
-        position: static !important;
-        width: 0.72rem !important;
-        height: 0.72rem !important;
-        min-width: 0.72rem !important;
-        min-height: 0.72rem !important;
-    }
-
-    html body .app-container > main {
-        margin-left: 0 !important;
-    }
-
-    html body .app-container:has(#student-tab-shell:not(.hidden)) {
-        display: block !important;
-        grid-template-columns: none !important;
-        grid-template-rows: none !important;
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > main {
-        margin-left: 0 !important;
-        padding: clamp(16px, 4vw, 32px) !important;
-    }
-
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header {
-        left: 0 !important;
-        grid-area: auto !important;
-        grid-column: auto !important;
-        grid-row: auto !important;
-        grid-template-areas: "student-nav student-actions" !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        grid-template-rows: auto !important;
-        grid-auto-rows: auto !important;
-        align-self: auto !important;
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        height: auto !important;
-        min-height: 0 !important;
-    }
-
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-left,
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header #welcome-header {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        overflow: hidden !important;
-    }
-
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-actions,
-    html body header.app-header.student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
-        grid-area: student-actions !important;
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        align-self: center !important;
-        margin: 0 !important;
-        transform: none !important;
-    }
-}
-
-@media (min-width: 701px) and (max-width: 900px) {
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header {
-        width: calc(100% + 80px) !important;
-        margin-left: -40px !important;
-    }
-}
-
-/* Single compact student header contract for phones through small tablets. */
+/*
+ * Canonical responsive student shell ownership
+ * Compact: through 1120px. Wide: beginning at 1121px.
+ * Historical blocks above may still provide visual styling, but do not own this state switch.
+ */
 @media (max-width: 1120px) {
     html body .app-container:has(#student-tab-shell:not(.hidden)) {
         display: block !important;
@@ -7898,8 +7181,7 @@ section.student-continue-hero {
     html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header,
     html body header.app-header.student-app-header.student-mobile-compact {
         position: sticky !important;
-        top: 0 !important;
-        left: 0 !important;
+        inset: 0 auto auto 0 !important;
         z-index: 80 !important;
         display: grid !important;
         grid-area: auto !important;
@@ -7999,6 +7281,10 @@ section.student-continue-hero {
         display: grid !important;
     }
 
+    #vocab-selection-view .vocab-header-subject-picker:not(:empty) {
+        display: flex !important;
+    }
+
     html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-actions,
     html body header.app-header.student-app-header.student-mobile-compact .header-actions,
     html body header.app-header.student-app-header:has(#student-tab-shell:not(.hidden)) .header-actions {
@@ -8085,6 +7371,46 @@ section.student-continue-hero {
         height: 0.72rem !important;
         min-width: 0.72rem !important;
         min-height: 0.72rem !important;
+    }
+}
+
+@media (min-width: 1121px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header {
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        display: grid !important;
+        width: 256px !important;
+        height: 100svh !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .header-left,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-sidebar-context,
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tabs {
+        display: grid !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tab-shell {
+        display: block !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-mobile-menu-toggle,
+    #vocab-selection-view .vocab-header-subject-picker {
+        display: none !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main {
+        margin-left: 256px !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)):has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        display: grid !important;
+        grid-template-columns: 260px minmax(0, 1fr) !important;
+        gap: 32px !important;
+    }
+
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
+        grid-column: 2 !important;
+        margin-left: 0 !important;
     }
 }
 
@@ -8178,6 +7504,11 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .vocab-selection-header {
+    --page-header-title-family: var(--font-family-sans);
+    --page-header-title-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    --page-header-title-line-height: 1.15;
+    --page-header-description-size: 0.95rem;
+    --page-header-description-line-height: 1.45;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas: "intro subject view";
@@ -8202,17 +7533,11 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #vocab-selection-view .vocab-page-intro h2 {
     margin: 0;
     color: var(--color-on-surface);
-    font-family: 'Geist', 'Inter', system-ui, sans-serif;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
-    font-weight: 800;
-    line-height: 1.15;
 }
 
 #vocab-selection-view .vocab-page-intro > p {
     margin: 6px 0 0;
     color: rgba(194, 198, 214, 0.86);
-    font-size: 0.95rem;
-    line-height: 1.45;
 }
 
 #vocab-selection-view .vocab-context-breadcrumb {
@@ -8220,12 +7545,11 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 #vocab-selection-view .vocab-context-breadcrumb .teacher-library-breadcrumb {
+    --breadcrumb-family: var(--font-family-mono);
+    --breadcrumb-size: var(--type-caption-size);
+    --breadcrumb-letter-spacing: 0.05em;
+    --breadcrumb-text-transform: uppercase;
     color: var(--color-primary);
-    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
 }
 
 #vocab-selection-view .student-current-month-badge {
@@ -8237,13 +7561,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-radius: 999px;
     background: rgba(173, 198, 255, 0.1);
     color: var(--color-primary);
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1.35;
-    text-transform: none;
-    white-space: nowrap;
 }
 
 #vocab-selection-view .teacher-library-breadcrumb > .student-current-month-badge {
@@ -8277,9 +7594,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-radius: 8px;
     background: transparent;
     color: rgba(218, 226, 253, 0.9);
-    font: inherit;
-    font-size: 0.78rem;
-    font-weight: 700;
     cursor: pointer;
 }
 
@@ -8301,7 +7615,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin: 0;
     padding: 2px 0;
     color: rgba(173, 198, 255, 0.78);
-    font-size: 0.72rem;
 }
 
 #vocab-selection-view .student-vocab-month-nav-current {
@@ -8310,13 +7623,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     justify-content: center;
     gap: 8px;
     color: var(--color-on-surface);
-    font-size: 0.9rem;
-    font-weight: 800;
     text-align: center;
 }
 
 @media (max-width: 720px) {
     #vocab-selection-view .student-vocab-month-navigation {
+        --month-navigation-action-size: var(--type-caption-size);
         align-items: stretch;
         flex-direction: column;
         gap: 4px;
@@ -8333,7 +7645,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #vocab-selection-view .student-vocab-month-nav-btn {
         padding-inline: 6px;
-        font-size: 0.7rem;
     }
 }
 
@@ -8359,7 +7670,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     padding-inline: 12px;
     border-radius: 9px;
     color: rgba(194, 198, 214, 0.82);
-    font-size: 0.8rem;
 }
 
 #vocab-selection-view .vocab-view-toggle-btn.is-active {
@@ -8410,7 +7720,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #vocab-selection-view .student-vocab-row strong {
     color: #eef3ff;
     font-size: 0.95rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 #vocab-selection-view .student-vocab-row span {
@@ -8424,7 +7734,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-color: rgba(221, 183, 255, 0.26);
     background: rgba(221, 183, 255, 0.13);
     color: var(--color-secondary);
-    font-size: 0.67rem;
+    font-size: var(--type-caption-size);
 }
 
 #vocab-selection-view .student-vocab-row .student-vocab-purpose.is-summative {
@@ -8466,6 +7776,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 @media (max-width: 560px) {
     #vocab-selection-view .vocab-selection-header {
+        --page-header-description-size: 0.88rem;
         grid-template-columns: 1fr;
         grid-template-areas:
             "intro"
@@ -8475,7 +7786,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #vocab-selection-view .vocab-page-intro > p {
         max-width: 32rem;
-        font-size: 0.88rem;
     }
 
     #vocab-selection-view .vocab-view-toggle {
@@ -8584,8 +7894,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     padding-top: 5px;
     color: var(--color-secondary);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.09em;
     line-height: 1.35;
     text-align: right;
@@ -8604,7 +7914,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin: 0;
     color: #eef3ff;
     font-size: 1.15rem;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
     line-height: 1.2;
 }
 
@@ -8612,7 +7922,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     min-height: 24px;
     margin-top: 8px;
     padding: 3px 9px;
-    font-size: 0.66rem;
+    font-size: var(--type-caption-size);
 }
 
 #vocab-selection-view .student-vocab-card p {
@@ -8635,7 +7945,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     background: rgba(173, 198, 255, 0.1);
     color: var(--color-primary);
     font-size: 0.86rem;
-    font-weight: 800;
+    font-weight: var(--type-button-weight);
     transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
@@ -8690,10 +8000,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-radius: 0;
     background: transparent;
     color: var(--color-primary);
-    font: inherit;
-    font-size: 0.76rem;
-    font-weight: 800;
-    line-height: 1.4;
     cursor: pointer;
 }
 
@@ -8718,7 +8024,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #activity-menu-view .unit-subject-label {
     color: var(--color-primary);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -8767,7 +8073,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     gap: 16px;
     color: rgba(218, 226, 253, 0.76);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
     font-weight: 700;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -8971,14 +8277,18 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #activity-menu-view .required-activity-card h3 {
     margin: 0;
     color: #eef3ff;
-    font-size: 1.05rem;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }
 
 #activity-menu-view .required-activity-card p {
     max-width: 230px;
     margin: 6px 0 0;
     color: rgba(194, 198, 214, 0.72);
-    font-size: 0.8rem;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }
 
 #activity-menu-view .required-activity-card .progress-badge {
@@ -8996,8 +8306,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin-top: 8px;
     color: rgba(194, 198, 214, 0.66);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.66rem;
-    font-weight: 700;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.07em;
     text-transform: uppercase;
 }
@@ -9009,11 +8319,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #activity-menu-view .additional-activity-section {
     padding-top: 20px;
     border-top-color: rgba(173, 198, 255, 0.16);
-}
-
-#activity-menu-view .additional-activity-section > summary,
-#activity-menu-view .unavailable-activity-section > summary {
-    font-size: 1.05rem;
 }
 
 #activity-menu-view .activity-secondary-grid {
@@ -9077,7 +8382,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     grid-column: 2;
     justify-self: start;
     margin: 0;
-    font-size: 0.62rem;
+    font-size: var(--type-caption-size);
 }
 
 @media (max-width: 900px) {
@@ -9216,8 +8521,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 #arcade-view .arcade-selection-eyebrow {
     color: var(--color-primary);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.74rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -9252,7 +8557,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 #arcade-view .arcade-game-count span {
     margin-top: 4px;
-    font-size: 0.68rem;
+    font-size: var(--type-caption-size);
     letter-spacing: 0.1em;
 }
 
@@ -9289,8 +8594,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     justify-self: start;
     color: rgba(218, 226, 253, 0.7);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
@@ -9331,8 +8636,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 #arcade-view .game-cost span {
     color: rgba(218, 226, 253, 0.62);
-    font-size: 0.68rem;
-    font-weight: 700;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }

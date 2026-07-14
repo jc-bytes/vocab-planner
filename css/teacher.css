@@ -316,7 +316,7 @@ body {
 .plays-badge {
     position: absolute;
     bottom: 0.5rem;
-    font-size: 0.7rem;
+    font-size: var(--type-caption-size);
     color: var(--text-muted);
     background: rgba(0, 0, 0, 0.3);
     padding: 0.2rem 0.4rem;
@@ -401,9 +401,9 @@ body {
 
 #activity-menu-view .activity-menu-summary-label {
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
-    line-height: 1.1;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
     text-transform: uppercase;
 }
 
@@ -510,8 +510,8 @@ body {
     border-radius: 999px;
     background: rgba(96, 165, 250, 0.18);
     color: #bfdbfe;
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }
 
@@ -523,8 +523,8 @@ body {
     min-height: 1.55rem;
     padding: 0.15rem 0.5rem;
     border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }
 
@@ -636,7 +636,7 @@ body {
     gap: 0.25rem;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: right;
 }
 
@@ -775,12 +775,12 @@ body {
     min-height: var(--touch-target);
     min-width: var(--touch-target);
     border-radius: 999px;
-    font-weight: 600;
+    font-weight: var(--type-button-weight);
     cursor: pointer;
     border: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    font-size: 1rem;
-    line-height: 1.2;
+    font-size: var(--type-button-size);
+    line-height: var(--type-button-line-height);
     touch-action: manipulation;
 }
 
@@ -919,7 +919,7 @@ body {
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: left;
     cursor: pointer;
 }
@@ -983,10 +983,11 @@ body {
 
 label {
     display: block;
-    font-weight: 600;
+    font-weight: var(--type-form-label-weight);
     margin-bottom: var(--spacing-xs);
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
+    font-size: var(--type-form-label-size);
+    line-height: var(--type-form-label-line-height);
+    letter-spacing: var(--letter-spacing-label);
 }
 
 input,
@@ -999,8 +1000,11 @@ select {
     min-height: var(--touch-target);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: 1rem;
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-control-size);
+    font-weight: var(--type-form-control-weight);
+    line-height: var(--type-form-control-line-height);
+    letter-spacing: var(--type-form-control-letter-spacing);
     background: rgba(15, 23, 42, 0.45);
     color: var(--text-main);
 }
@@ -1025,6 +1029,11 @@ select:disabled {
 input::placeholder,
 textarea::placeholder {
     color: rgba(255, 255, 255, 0.55);
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-placeholder-size);
+    font-weight: var(--type-form-placeholder-weight);
+    line-height: var(--type-form-placeholder-line-height);
+    letter-spacing: var(--type-form-placeholder-letter-spacing);
 }
 
 input:focus,
@@ -1133,6 +1142,10 @@ input[readonly] {
     gap: 0.45rem;
     min-height: 34px;
     color: var(--text-muted);
+}
+
+/* Transitional typography for excluded student and quiz breadcrumb renderers. */
+.teacher-library-breadcrumb:not(.breadcrumb) {
     font-size: 0.9rem;
     font-weight: 700;
 }
@@ -1143,10 +1156,13 @@ input[readonly] {
     border: 0;
     background: transparent;
     color: var(--secondary-color);
-    font: inherit;
-    font-weight: 800;
     padding: 0.35rem 0.5rem;
     cursor: pointer;
+}
+
+.teacher-library-crumb-btn:not(.breadcrumb__item) {
+    font: inherit;
+    font-weight: var(--font-weight-bold);
 }
 
 .teacher-library-crumb-btn:hover {
@@ -1208,18 +1224,23 @@ input[readonly] {
 }
 
 .teacher-library-choice-text strong {
-    font-size: 1.1rem;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }
 
 .teacher-library-choice-count {
     color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--type-secondary-line-height);
 }
 
 .teacher-library-choice-text small {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }
 
 .teacher-library-choice-card svg {
@@ -1247,7 +1268,7 @@ input[readonly] {
 .teacher-grade-heading h3 {
     color: var(--text-main);
     font-size: 1.25rem;
-    font-weight: 800;
+    font-weight: var(--type-section-title-weight);
 }
 
 .teacher-grade-heading span {
@@ -1316,7 +1337,7 @@ input[readonly] {
 .student-vocab-month-heading h4 {
     color: var(--text-main);
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: var(--type-card-title-weight);
 }
 
 .student-vocab-month-heading span {
@@ -1352,8 +1373,6 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: rgba(15, 23, 42, 0.55);
     color: var(--text-main);
-    font: inherit;
-    font-weight: 800;
     cursor: pointer;
     touch-action: manipulation;
 }
@@ -1394,8 +1413,6 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-muted);
-    font: inherit;
-    font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     text-align: center;
@@ -1431,18 +1448,9 @@ input[readonly] {
     margin-bottom: var(--spacing-md);
 }
 
-.teacher-page-heading h2 {
-    font-size: 1.45rem;
-    line-height: 1.1;
-}
-
 .teacher-eyebrow {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
     margin-bottom: 0.15rem;
-    text-transform: uppercase;
 }
 
 .teacher-toolbar {
@@ -1461,7 +1469,7 @@ input[readonly] {
     margin: 0;
     color: var(--text-muted);
     font-size: 0.82rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 .teacher-toolbar-select select {
@@ -1475,6 +1483,9 @@ input[readonly] {
 }
 
 .vocab-editor-heading {
+    --page-header-description-size: 0.86rem;
+    --page-header-description-weight: var(--font-weight-bold);
+    --page-header-description-line-height: normal;
     align-items: flex-start;
     margin-bottom: 0.7rem;
 }
@@ -1488,7 +1499,9 @@ input[readonly] {
 .vocab-editor-heading .toolbar-menu-trigger {
     min-height: 2.35rem;
     padding: 0.45rem 0.75rem;
-    font-size: 0.9rem;
+    font-size: var(--type-button-compact-size);
+    font-weight: var(--type-button-compact-weight);
+    line-height: var(--type-button-compact-line-height);
 }
 
 .toolbar-menu {
@@ -1552,8 +1565,9 @@ input[readonly] {
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-size: 0.88rem;
-    font-weight: 800;
+    font-size: var(--type-button-compact-size);
+    font-weight: var(--type-button-weight);
+    line-height: var(--type-button-compact-line-height);
     text-align: left;
     cursor: pointer;
 }
@@ -1614,8 +1628,6 @@ input[readonly] {
     max-width: 620px;
     margin-top: 0.2rem;
     color: var(--text-muted);
-    font-size: 0.86rem;
-    font-weight: 700;
 }
 
 .vocab-editor-subtitle:empty {
@@ -1645,8 +1657,8 @@ input[readonly] {
 
 .vocab-editor-stat span {
     color: var(--text-muted);
-    font-size: 0.66rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
@@ -1654,8 +1666,9 @@ input[readonly] {
 .vocab-editor-stat strong {
     min-width: 0;
     color: var(--text-main);
-    font-size: 0.86rem;
-    line-height: 1.2;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--type-secondary-line-height);
     overflow-wrap: anywhere;
 }
 
@@ -1819,14 +1832,17 @@ input[readonly] {
 .vocab-editor-panel-header h3,
 .vocab-words-header h2 {
     margin: 0;
-    font-size: 1.05rem;
-    line-height: 1.2;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }
 
 .vocab-editor-panel-header p,
 .vocab-words-header p {
     color: var(--text-muted);
-    font-size: 0.84rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }
 
 .vocab-editor-field-grid,
@@ -1848,7 +1864,7 @@ input[readonly] {
     min-width: 0;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--type-form-label-weight);
 }
 
 .vocab-count-grid input {
@@ -1882,8 +1898,8 @@ input[readonly] {
     align-items: center;
     padding: 0 0.55rem 0.45rem;
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     text-transform: uppercase;
 }
 
@@ -1907,7 +1923,7 @@ input[readonly] {
     margin-bottom: 0;
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--type-form-label-weight);
 }
 
 .activity-flow-choice select,
@@ -2073,14 +2089,15 @@ input[readonly] {
 
 .teacher-panel-header h3 {
     margin: 0;
-    font-size: 1.1rem;
 }
 
 .teacher-panel-header p,
 .teacher-settings-grid small,
 .teacher-empty-state {
     color: var(--text-muted);
-    font-size: 0.88rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }
 
 .teacher-action-grid {
@@ -2102,7 +2119,9 @@ input[readonly] {
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-weight: 700;
+    font-size: var(--type-button-size);
+    font-weight: var(--type-button-weight);
+    line-height: var(--type-button-line-height);
     text-align: left;
     cursor: pointer;
 }
@@ -2124,7 +2143,7 @@ input[readonly] {
     background: rgba(255, 255, 255, 0.04);
     color: var(--text-main);
     font: inherit;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-align: left;
     cursor: pointer;
 }
@@ -2268,9 +2287,9 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: var(--card-bg);
     color: var(--text-muted);
-    font-size: 0.82rem;
-    font-weight: 700;
-    line-height: 1.25;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--type-secondary-line-height);
 }
 
 .teacher-back-btn {
@@ -2294,8 +2313,8 @@ input[readonly] {
     color: white;
     padding: 0.2rem 0.45rem;
     border-radius: var(--radius-sm);
-    font-size: 0.7rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     line-height: 1;
 }
 
@@ -2314,8 +2333,8 @@ input[readonly] {
     border-radius: 999px;
     background: color-mix(in srgb, var(--subject-color, var(--secondary-color)) 18%, transparent);
     color: #f8fafc;
-    font-size: 0.74rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     line-height: 1.15;
     overflow-wrap: anywhere;
 }
@@ -2497,8 +2516,8 @@ input[readonly] {
     border: 0;
     background: transparent;
     color: rgba(203, 213, 245, 0.72);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
@@ -2604,7 +2623,9 @@ input[readonly] {
 }
 .teacher-vocab-card h3 {
     margin-top: auto;
-    font-size: 1.05rem;
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
 }
 
 .teacher-vocab-card h3,
@@ -2620,8 +2641,9 @@ input[readonly] {
     gap: 0.4rem;
     margin-top: auto;
     color: var(--secondary-color);
-    font-size: 0.86rem;
-    font-weight: 900;
+    font-size: var(--type-button-compact-size);
+    font-weight: var(--type-button-compact-weight);
+    line-height: var(--type-button-compact-line-height);
 }
 
 .teacher-pick-action svg {
@@ -2869,7 +2891,7 @@ input[readonly] {
     height: var(--touch-target);
     padding: 0 1.45rem 0 0.1rem;
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--font-weight-bold);
 }
 
 .vocab-view-toggle {
@@ -2903,7 +2925,7 @@ input[readonly] {
     color: var(--text-muted);
     font: inherit;
     font-size: 0.78rem;
-    font-weight: 900;
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
 }
 
@@ -2959,7 +2981,7 @@ input[readonly] {
     background: transparent;
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     line-height: 1.2;
 }
 
@@ -2979,7 +3001,7 @@ input[readonly] {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-main);
     font: inherit;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     text-align: left;
     cursor: pointer;
     transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -3048,8 +3070,8 @@ input[readonly] {
 
 .spark-command-kicker {
     color: #fbbf24;
-    font-size: 0.74rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0;
     text-transform: uppercase;
 }
@@ -3083,8 +3105,8 @@ input[readonly] {
     min-width: 0;
     overflow: hidden;
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -3112,8 +3134,8 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.08);
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
 }
 
 .spark-library-body,
@@ -3143,7 +3165,7 @@ input[readonly] {
 .spark-month-select-label span {
     color: var(--text-muted);
     font-size: 0.82rem;
-    font-weight: 900;
+    font-weight: var(--type-form-label-weight);
 }
 
 .spark-month-select-label select {
@@ -3192,8 +3214,8 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.08);
     color: var(--text-muted);
-    font-size: 0.72rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
 }
 
 .spark-spotlight {
@@ -3255,13 +3277,11 @@ input[readonly] {
 
 .spark-section-header h3 {
     margin: 0;
-    font-size: 1rem;
 }
 
 .spark-section-header p {
     margin: 0.1rem 0 0;
     color: var(--text-muted);
-    font-size: 0.86rem;
 }
 
 .spark-section-count {
@@ -3273,8 +3293,6 @@ input[readonly] {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 900;
 }
 
 .spark-card-grid {
@@ -3322,8 +3340,9 @@ input[readonly] {
     min-height: 28px;
     padding: 0.2rem 0.5rem;
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--type-caption-line-height);
 }
 
 .spark-type-pill,
@@ -3343,6 +3362,12 @@ input[readonly] {
     overflow-wrap: anywhere;
 }
 
+.spark-card h4 {
+    font-size: var(--type-card-title-size);
+    font-weight: var(--type-card-title-weight);
+    line-height: var(--type-card-title-line-height);
+}
+
 .spark-card p,
 .spark-detail span,
 .spark-question span,
@@ -3356,6 +3381,9 @@ input[readonly] {
 .student-spark-card p {
     margin: 0;
     color: var(--text-main);
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }
 
 .spark-detail,
@@ -3367,8 +3395,9 @@ input[readonly] {
 .spark-detail strong,
 .student-spark-detail strong {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
     letter-spacing: 0;
     text-transform: uppercase;
 }
@@ -3377,7 +3406,9 @@ input[readonly] {
 .spark-card-meta,
 .student-spark-detail span {
     color: var(--text-muted);
-    font-size: 0.86rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--type-secondary-weight);
+    line-height: var(--type-secondary-line-height);
 }
 
 .spark-question,
@@ -3455,7 +3486,7 @@ input[readonly] {
     border-radius: var(--radius-sm);
     background: rgba(15, 23, 42, 0.42);
     color: var(--text-primary);
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
 }
 
@@ -3486,8 +3517,9 @@ input[readonly] {
     justify-content: space-between;
     gap: 0.5rem;
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 900;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--type-caption-line-height);
 }
 
 .student-spark-card h3 {
@@ -3672,10 +3704,14 @@ input[readonly] {
     border-bottom: 2px solid transparent;
     background: transparent;
     color: var(--text-muted);
-    font: inherit;
-    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Transitional typography for excluded Data & Settings tabs. */
+.data-tab-btn:not(.secondary-tab) {
+    font: inherit;
+    font-weight: 700;
 }
 
 .data-tab-btn.active {
@@ -3837,7 +3873,7 @@ input[readonly] {
 .word-hunt-evidence-block span {
     color: var(--text-muted);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--type-form-label-weight);
     letter-spacing: 0;
     text-transform: uppercase;
 }
@@ -4007,8 +4043,9 @@ input[readonly] {
 .word-hunt-review-group-heading span,
 .word-hunt-review-unit summary small {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }
 
 .word-hunt-review-group {
@@ -4045,7 +4082,7 @@ input[readonly] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 .word-hunt-review-student-list {
@@ -4114,8 +4151,8 @@ input[readonly] {
     min-height: 28px;
     padding: 0.22rem 0.55rem;
     border-radius: 999px;
-    font-size: 0.73rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     white-space: nowrap;
 }
 
@@ -4354,7 +4391,7 @@ input[readonly] {
 
 .word-hunt-teacher-note label {
     color: var(--text-main);
-    font-weight: 800;
+    font-weight: var(--type-form-label-weight);
 }
 
 .word-hunt-teacher-note textarea {
@@ -4451,14 +4488,11 @@ input[readonly] {
 }
 
 .student-card-name {
-    font-weight: 800;
-    line-height: 1.25;
     overflow-wrap: anywhere;
 }
 
 .student-card-email {
     color: var(--text-muted);
-    font-size: 0.86rem;
     overflow-wrap: anywhere;
 }
 
@@ -4473,13 +4507,10 @@ input[readonly] {
     gap: 0.1rem;
     min-width: 0;
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
 }
 
 .student-card-meta strong {
     color: var(--text-main);
-    font-size: 0.95rem;
     overflow-wrap: anywhere;
 }
 
@@ -4574,7 +4605,7 @@ input[readonly] {
     background: rgba(99, 102, 241, 0.15);
     padding: 0.12rem 0.38rem;
     border-radius: var(--radius-sm);
-    font-size: 0.7rem;
+    font-size: var(--type-caption-size);
     color: var(--text-muted);
     margin: 0;
     justify-self: start;
@@ -4605,19 +4636,24 @@ input[readonly] {
 }
 
 .word-hunt-selection-summary strong {
-    font-size: 0.88rem;
+    font-size: var(--type-secondary-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--type-secondary-line-height);
 }
 
 .word-hunt-selection-summary span {
     color: var(--text-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
+    font-size: var(--type-caption-size);
+    font-weight: var(--type-caption-weight);
+    line-height: var(--type-caption-line-height);
 }
 
 .word-hunt-selection-summary .btn {
     min-height: 2rem;
     padding: 0.3rem 0.55rem;
-    font-size: 0.78rem;
+    font-size: var(--type-button-compact-size);
+    font-weight: var(--type-button-compact-weight);
+    line-height: var(--type-button-compact-line-height);
 }
 
 .word-hunt-badge {
@@ -4678,7 +4714,7 @@ input[readonly] {
     min-height: 24px;
     margin: 0;
     padding: 0.18rem 0.5rem;
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
 }
 
 .vocab-words-empty {
@@ -4778,7 +4814,8 @@ input[readonly] {
 .close-modal {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: var(--type-button-icon-size);
+    line-height: var(--type-button-icon-line-height);
     cursor: pointer;
     color: var(--text-muted);
     min-width: var(--touch-target);
@@ -4819,6 +4856,10 @@ input[readonly] {
 
 .student-detail-activity-row:first-child {
     border-top: 0;
+}
+
+.modal-activity-name {
+    text-transform: capitalize;
 }
 
 .quiz-preview {
@@ -4996,14 +5037,8 @@ input[readonly] {
 }
 
 .mini-stat-label {
-    font-size: 0.8rem;
     color: var(--text-muted);
     margin-bottom: 0.25rem;
-}
-
-.mini-stat-value {
-    font-weight: 700;
-    font-size: 1.3rem;
 }
 
 .detail-summary-grid {
@@ -5411,8 +5446,9 @@ input[type="checkbox"] {
 .word-hunt-field-helper {
     margin: 0.35rem 0 0;
     color: var(--text-muted);
-    font-size: 0.76rem;
-    line-height: 1.25;
+    font-size: var(--type-form-helper-size);
+    font-weight: var(--type-form-helper-weight);
+    line-height: var(--type-form-helper-line-height);
 }
 
 .word-hunt-image-label {
@@ -5539,7 +5575,7 @@ input[type="checkbox"] {
     background: rgba(15, 23, 42, 0.86);
     color: #fecaca;
     font-size: 1.1rem;
-    font-weight: 900;
+    font-weight: var(--font-weight-bold);
     line-height: 1;
     display: inline-flex;
     align-items: center;
@@ -6773,7 +6809,7 @@ input[type="checkbox"] {
 .quiz-maker-header .btn {
     min-height: 2.75rem;
     border-radius: var(--radius-md);
-    font-weight: 800;
+    font-weight: var(--type-button-weight);
     white-space: nowrap;
 }
 
@@ -6857,7 +6893,7 @@ input[type="checkbox"] {
 .quiz-section-kicker {
     display: block;
     color: var(--text-muted);
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
     font-weight: 700;
     line-height: 1.1;
     text-transform: uppercase;
@@ -6891,7 +6927,7 @@ input[type="checkbox"] {
     flex-direction: column;
     gap: 0.25rem;
     color: var(--text-muted);
-    font-size: 0.72rem;
+    font-size: var(--type-caption-size);
     font-weight: 700;
 }
 
@@ -6930,8 +6966,8 @@ input[type="checkbox"] {
     background: transparent;
     color: var(--text-muted);
     font: inherit;
-    font-size: 0.72rem;
-    font-weight: 800;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
 }
 
@@ -7020,7 +7056,7 @@ input[type="checkbox"] {
     margin: 0;
     color: #475569;
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: var(--type-form-label-weight);
 }
 
 .rubric-row-edit input,
@@ -8429,7 +8465,7 @@ button.activity-card {
 
     .student-home-unit-copy span,
     .student-home-unit-status span {
-        font-size: 0.74rem;
+        font-size: var(--type-caption-size);
     }
 
     .header-left h1 {
@@ -9254,6 +9290,10 @@ button.activity-card {
     .data-tab-btn {
         gap: 0.35rem;
         padding-inline: 0.5rem;
+    }
+
+    .student-tab,
+    .data-tab-btn:not(.secondary-tab) {
         font-size: 0.86rem;
     }
 

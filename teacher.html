@@ -5,40 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Teacher</title>
-    <link rel="stylesheet" href="css/teacher.css?v=teacher-shell-20260620a">
+    <link rel="stylesheet" href="css/teacher.css?v=teacher-typography-20260713d">
+    <link rel="stylesheet" href="css/typography.css?v=typography-runtime-ui-20260713f">
 </head>
 
 <body>
     <div class="app-container">
         <header class="app-header teacher-app-header">
-            <nav id="teacher-tab-shell" class="teacher-tab-shell hidden" aria-label="Teacher sections">
-                <button id="teacher-mobile-menu-toggle" class="teacher-mobile-menu-toggle" type="button"
+            <nav id="teacher-tab-shell" class="teacher-tab-shell primary-nav hidden" aria-label="Teacher sections">
+                <button id="teacher-mobile-menu-toggle" class="teacher-mobile-menu-toggle mobile-nav__item" type="button"
                     aria-expanded="false" aria-controls="teacher-tabs" aria-label="Open teacher sections menu">
                     <i data-lucide="menu"></i>
                     <span id="teacher-mobile-section-label">Overview</span>
                 </button>
                 <div id="teacher-tabs" class="teacher-tabs" role="tablist" aria-label="Teacher tools">
-                    <button class="teacher-tab active" id="tab-overview" type="button" role="tab" aria-selected="true"
+                    <button class="teacher-tab primary-nav__item primary-nav__item--active active" id="tab-overview" type="button" role="tab" aria-selected="true"
                         aria-controls="teacher-overview-view" data-section="overview">
                         <i data-lucide="layout-dashboard"></i>
                         Overview
                     </button>
-                    <button class="teacher-tab" id="tab-vocabulary" type="button" role="tab" aria-selected="false"
+                    <button class="teacher-tab primary-nav__item" id="tab-vocabulary" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-dashboard-view" data-section="vocabulary">
                         <i data-lucide="book-open"></i>
                         Vocabulary
                     </button>
-                    <button class="teacher-tab" id="tab-sparks" type="button" role="tab" aria-selected="false"
+                    <button class="teacher-tab primary-nav__item" id="tab-sparks" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-sparks-view" data-section="sparks">
                         <i data-lucide="sparkles"></i>
                         Sparks
                     </button>
-                    <button class="teacher-tab" id="tab-students" type="button" role="tab" aria-selected="false"
+                    <button class="teacher-tab primary-nav__item" id="tab-students" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-progress-view" data-section="students">
                         <i data-lucide="users"></i>
                         Students
                     </button>
-                    <button class="teacher-tab" id="tab-data-settings" type="button" role="tab" aria-selected="false"
+                    <button class="teacher-tab primary-nav__item" id="tab-data-settings" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-data-management-view" data-section="data-settings">
                         <i data-lucide="settings"></i>
                         Data & Settings
@@ -132,17 +133,17 @@
                             <button type="submit" class="btn secondary-btn" style="width:100%;">Create Teacher Account</button>
                         </form>
                     </div>
-                    <div id="teacher-login-error" role="alert" aria-live="assertive" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
+                    <div id="teacher-login-error" class="form-feedback" role="alert" aria-live="assertive" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
                     </div>
                 </div>
             </section>
 
             <!-- View: Overview -->
             <section id="teacher-overview-view" class="view hidden" role="tabpanel" aria-labelledby="tab-overview">
-                <div class="teacher-page-heading">
+                <div class="teacher-page-heading page-header">
                     <div>
-                        <p class="teacher-eyebrow">Daily teaching</p>
-                        <h2>Overview</h2>
+                        <p class="teacher-eyebrow page-header__eyebrow">Daily teaching</p>
+                        <h2 class="page-header__title">Overview</h2>
                     </div>
                     <div class="teacher-toolbar">
                         <button id="overview-create-vocab-btn" class="btn primary-btn">
@@ -215,7 +216,7 @@
                             </div>
                         </div>
                         <div id="overview-recent-activity" class="teacher-activity-list">
-                            <div class="loading-spinner">Loading activity...</div>
+                            <div class="loading-spinner runtime-status">Loading activity...</div>
                         </div>
                     </section>
                 </div>
@@ -223,18 +224,18 @@
 
             <!-- View: Vocabulary -->
             <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <div class="data-tab-list activity-workflow-tabs" role="tablist" aria-label="Vocabulary workflow">
-                    <button id="vocabulary-tab-assign" class="data-tab-btn activity-workflow-tab active" type="button"
+                <div class="data-tab-list activity-workflow-tabs secondary-tabs" role="tablist" aria-label="Vocabulary workflow">
+                    <button id="vocabulary-tab-assign" class="data-tab-btn activity-workflow-tab secondary-tab secondary-tab--active active" type="button"
                         role="tab" aria-selected="true" aria-controls="vocabulary-assign-panel" data-vocabulary-tab="assign">
                         <i data-lucide="send"></i>
                         Assign
                     </button>
-                    <button id="vocabulary-tab-review" class="data-tab-btn activity-workflow-tab" type="button"
+                    <button id="vocabulary-tab-review" class="data-tab-btn activity-workflow-tab secondary-tab" type="button"
                         role="tab" aria-selected="false" aria-controls="vocabulary-review-panel" data-vocabulary-tab="review">
                         <i data-lucide="clipboard-check"></i>
                         Review
                     </button>
-                    <button id="vocabulary-tab-quizzes" class="data-tab-btn activity-workflow-tab" type="button"
+                    <button id="vocabulary-tab-quizzes" class="data-tab-btn activity-workflow-tab secondary-tab" type="button"
                         role="tab" aria-selected="false" aria-controls="vocabulary-quizzes-panel" data-vocabulary-tab="quizzes">
                         <i data-lucide="file-text"></i>
                         Quizzes
@@ -295,10 +296,10 @@
 
             <!-- View: Sparks -->
             <section id="teacher-sparks-view" class="view hidden" role="tabpanel" aria-labelledby="tab-sparks">
-                <div class="teacher-page-heading">
+                <div class="teacher-page-heading page-header">
                     <div>
-                        <p class="teacher-eyebrow">Spark of the Week</p>
-                        <h2>Sparks</h2>
+                        <p class="teacher-eyebrow page-header__eyebrow">Spark of the Week</p>
+                        <h2 class="page-header__title">Sparks</h2>
                     </div>
                     <div class="teacher-toolbar">
                         <button id="add-spark-btn" class="btn primary-btn" type="button">
@@ -315,10 +316,10 @@
 
             <!-- View: Student Progress -->
             <section id="teacher-progress-view" class="view hidden" role="tabpanel" aria-labelledby="tab-students">
-                <div class="teacher-page-heading">
+                <div class="teacher-page-heading page-header">
                     <div>
-                        <p class="teacher-eyebrow">Students</p>
-                        <h2>Progress</h2>
+                        <p class="teacher-eyebrow page-header__eyebrow">Students</p>
+                        <h2 class="page-header__title">Progress</h2>
                     </div>
                     <div class="teacher-toolbar">
                         <button id="open-add-student-modal-btn" class="btn primary-btn">
@@ -341,19 +342,19 @@
                 <div class="card student-filter-card">
                     <div class="student-filter-grid">
                         <div class="form-group">
-                            <label for="filter-grade" style="font-size: 0.8rem;">Grade</label>
+                            <label for="filter-grade">Grade</label>
                             <select id="filter-grade" style="width: 100%; padding: 0.5rem;">
                                 <option value="">All Grades</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="filter-group" style="font-size: 0.8rem;">Section</label>
+                            <label for="filter-group">Section</label>
                             <select id="filter-group" style="width: 100%; padding: 0.5rem;">
                                 <option value="">All Sections</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="filter-search" style="font-size: 0.8rem;">Search Name</label>
+                            <label for="filter-search">Search Name</label>
                             <input type="text" id="filter-search" placeholder="Search student..."
                                 style="width: 100%; padding: 0.5rem;">
                         </div>
@@ -368,19 +369,19 @@
                         </label>
                     </div>
                     <div class="student-progress-table-wrap table-scroll-wrapper">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                             <thead style="position: sticky; top: 0; background: var(--card-bg, rgba(15, 23, 42, 0.55)); z-index: 10;">
                                 <tr style="border-bottom: 2px solid var(--border-color);">
-                                    <th style="padding: 1rem; width: 50px;">
+                                    <th class="data-table__header-cell" style="padding: 1rem; width: 50px;">
                                         <input type="checkbox" id="select-all-students" title="Select All">
                                     </th>
-                                    <th style="padding: 1rem;">Name</th>
-                                    <th style="padding: 1rem;">Email</th>
-                                    <th style="padding: 1rem;">Grade</th>
-                                    <th style="padding: 1rem;">Section</th>
-                                    <th style="padding: 1rem;">Coins</th>
-                                    <th style="padding: 1rem;">Last Active</th>
-                                    <th style="padding: 1rem;">Actions</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Name</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Email</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Grade</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Section</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Coins</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Last Active</th>
+                                    <th class="data-table__header-cell" style="padding: 1rem;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="student-progress-list">
@@ -389,7 +390,7 @@
                         </table>
                     </div>
                     <div id="student-progress-cards" class="student-progress-cards" aria-live="polite"></div>
-                    <div id="progress-loading" class="loading-spinner hidden">Loading data...</div>
+                    <div id="progress-loading" class="loading-spinner data-table__status hidden">Loading data...</div>
                 </div>
 
                 <!-- Bulk Action Toolbar -->
@@ -411,7 +412,7 @@
                 <div class="modal-content" style="max-width: 620px; width: 92%;">
                     <div class="modal-header">
                         <h2 id="add-student-modal-title">Add Student</h2>
-                        <button id="close-add-student-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close add student">&times;</button>
+                        <button id="close-add-student-modal" class="btn text-btn btn-icon-only" aria-label="Close add student">&times;</button>
                     </div>
                     <form id="add-student-form">
                         <div class="modal-body">
@@ -467,7 +468,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="add-student-status" role="status" aria-live="polite" style="font-size:0.9rem; color:var(--text-muted);"></div>
+                            <div id="add-student-status" class="form-feedback" role="status" aria-live="polite" style="color:var(--text-muted);"></div>
                         </div>
                         <div class="modal-footer">
                             <button id="cancel-add-student-btn" type="button" class="btn secondary-btn">Cancel</button>
@@ -482,7 +483,7 @@
                 <div class="modal-content" style="max-width: 800px; width: 90%;">
                     <div class="modal-header">
                         <h2 id="detail-student-name">Student Name</h2>
-                        <button id="close-detail-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close student details">&times;</button>
+                        <button id="close-detail-modal" class="btn text-btn btn-icon-only" aria-label="Close student details">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="detail-summary-grid">
@@ -516,12 +517,12 @@
                             </div>
                         </div>
                         <section class="student-detail-section">
-                            <h4 style="margin-bottom:0.5rem;">Adjust Coins</h4>
+                            <h4 class="modal-section-title" style="margin-bottom:0.5rem;">Adjust Coins</h4>
                             <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                                 <input type="number" id="coin-adjust-input" value="10" min="1" style="width:90px;">
                                 <button id="coin-adjust-btn" class="btn primary-btn" style="padding:0.5rem 1rem;">Add
                                     Coins</button>
-                                <div id="coin-adjust-status" style="font-size:0.85rem; color:var(--text-muted);"></div>
+                                <div id="coin-adjust-status" class="form-feedback" style="color:var(--text-muted);"></div>
                             </div>
                             <div style="display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="5">+5</button>
@@ -530,14 +531,14 @@
                             </div>
                         </section>
                         <section class="student-detail-section">
-                            <h4 style="margin-bottom:0.5rem;">Password Reset</h4>
+                            <h4 class="modal-section-title" style="margin-bottom:0.5rem;">Password Reset</h4>
                             <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
                                 <button id="reset-student-password-btn" class="btn secondary-btn" style="padding:0.5rem 1rem;">Reset Password</button>
-                                <div id="reset-password-status" style="font-size:0.85rem; color:var(--text-muted);"></div>
+                                <div id="reset-password-status" class="form-feedback" style="color:var(--text-muted);"></div>
                             </div>
-                            <div id="temporary-password-output" style="display:none; margin-top:0.75rem; padding:0.75rem 0; border-top:1px solid rgba(255,255,255,0.1); font-family:monospace; font-size:1rem; color:var(--text-color);"></div>
+                            <div id="temporary-password-output" class="modal-code" style="display:none; margin-top:0.75rem; padding:0.75rem 0; border-top:1px solid rgba(255,255,255,0.1); color:var(--text-color);"></div>
                         </section>
-                        <h3>Activity Progress</h3>
+                        <h3 class="modal-section-title">Activity Progress</h3>
                         <div id="detail-activity-list" style="display: grid; gap: 0; margin-top: 1rem;">
                             <!-- Activity details populated here -->
                         </div>
@@ -547,14 +548,14 @@
 
             <!-- View: Editor -->
             <section id="teacher-editor-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <div class="teacher-page-heading vocab-editor-heading">
+                <div class="teacher-page-heading vocab-editor-heading page-header">
                     <div>
                         <button id="back-to-dashboard" class="btn text-btn teacher-back-btn">
                             <i data-lucide="arrow-left"></i>
                             Back to Library
                         </button>
-                        <h2 style="margin: 0.35rem 0 0 0;">Vocabulary Editor</h2>
-                        <p id="vocab-editor-subtitle" class="vocab-editor-subtitle"></p>
+                        <h2 class="page-header__title" style="margin: 0.35rem 0 0 0;">Vocabulary Editor</h2>
+                        <p id="vocab-editor-subtitle" class="vocab-editor-subtitle page-header__description"></p>
                     </div>
                     <div class="teacher-toolbar">
                         <button id="generate-quiz-btn" class="btn secondary-btn" type="button">
@@ -874,46 +875,46 @@
 
             <!-- View: Data Management -->
             <section id="teacher-data-management-view" class="view hidden" role="tabpanel" aria-labelledby="tab-data-settings">
-                <div class="teacher-page-heading">
+                <div class="teacher-page-heading page-header">
                     <div>
-                        <p class="teacher-eyebrow">Data & Settings</p>
-                        <h2>Management</h2>
+                        <p class="teacher-eyebrow page-header__eyebrow">Data & Settings</p>
+                        <h2 class="page-header__title">Management</h2>
                     </div>
                 </div>
 
-                <div class="data-tab-list" role="tablist" aria-label="Data and settings sections">
-                    <button class="data-tab-btn active" id="data-tab-subjects" type="button" role="tab"
-                        aria-selected="true" aria-controls="data-subjects-section" data-tab="subjects">
+                <div id="data-settings-tab-list" class="data-tab-list secondary-tabs" role="tablist" aria-label="Data and settings sections">
+                    <button class="data-tab-btn secondary-tab secondary-tab--active active" id="data-tab-subjects" type="button" role="tab"
+                        aria-selected="true" aria-controls="data-subjects-section" data-tab="subjects" tabindex="0">
                         <i data-lucide="layers"></i>
                         Subjects
                     </button>
-                    <button class="data-tab-btn" id="data-tab-gamification" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-gamification-section" data-tab="gamification">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-gamification" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-gamification-section" data-tab="gamification" tabindex="-1">
                         <i data-lucide="coins"></i>
                         Coins
                     </button>
-                    <button class="data-tab-btn" id="data-tab-calendar" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-calendar-section" data-tab="calendar">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-calendar" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-calendar-section" data-tab="calendar" tabindex="-1">
                         <i data-lucide="calendar-days"></i>
                         Calendar
                     </button>
-                    <button class="data-tab-btn" id="data-tab-dashboard" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-dashboard-section" data-tab="dashboard">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-dashboard" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-dashboard-section" data-tab="dashboard" tabindex="-1">
                         <i data-lucide="chart-no-axes-combined"></i>
                         Dashboard
                     </button>
-                    <button class="data-tab-btn" id="data-tab-export" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-export-section" data-tab="export">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-export" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-export-section" data-tab="export" tabindex="-1">
                         <i data-lucide="download"></i>
                         Export
                     </button>
-                    <button class="data-tab-btn" id="data-tab-view" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-viewer-section" data-tab="view">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-view" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-viewer-section" data-tab="view" tabindex="-1">
                         <i data-lucide="folder-open"></i>
                         View Data
                     </button>
-                    <button class="data-tab-btn" id="data-tab-reset" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-reset-section" data-tab="reset">
+                    <button class="data-tab-btn secondary-tab" id="data-tab-reset" type="button" role="tab"
+                        aria-selected="false" aria-controls="data-reset-section" data-tab="reset" tabindex="-1">
                         <i data-lucide="trash-2"></i>
                         Reset
                     </button>
@@ -1065,23 +1066,23 @@
                     <div class="data-summary-grid">
                         <div class="data-summary-stat">
                             <i data-lucide="users" class="teacher-stat-icon"></i>
-                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-total-students">--</div>
-                            <div style="color: var(--text-muted); font-size: 0.9rem;">Total Students</div>
+                            <div class="card-metric" style="color: var(--primary-color);" id="dashboard-total-students">--</div>
+                            <div class="card-secondary" style="color: var(--text-muted);">Total Students</div>
                         </div>
                         <div class="data-summary-stat">
                             <i data-lucide="activity" class="teacher-stat-icon"></i>
-                            <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);" id="dashboard-active-students">--</div>
-                            <div style="color: var(--text-muted); font-size: 0.9rem;">Active (7 days)</div>
+                            <div class="card-metric" style="color: var(--success-color);" id="dashboard-active-students">--</div>
+                            <div class="card-secondary" style="color: var(--text-muted);">Active (7 days)</div>
                         </div>
                         <div class="data-summary-stat">
                             <i data-lucide="coins" class="teacher-stat-icon"></i>
-                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-avg-coins">--</div>
-                            <div style="color: var(--text-muted); font-size: 0.9rem;">Avg Coins</div>
+                            <div class="card-metric" style="color: var(--primary-color);" id="dashboard-avg-coins">--</div>
+                            <div class="card-secondary" style="color: var(--text-muted);">Avg Coins</div>
                         </div>
                         <div class="data-summary-stat">
                             <i data-lucide="book-open" class="teacher-stat-icon"></i>
-                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="dashboard-vocab-count">--</div>
-                            <div style="color: var(--text-muted); font-size: 0.9rem;">Vocabularies</div>
+                            <div class="card-metric" style="color: var(--primary-color);" id="dashboard-vocab-count">--</div>
+                            <div class="card-secondary" style="color: var(--text-muted);">Vocabularies</div>
                         </div>
                     </div>
 
@@ -1089,7 +1090,7 @@
                     <div class="data-chart-grid">
                         <!-- Activity Completion Chart -->
                         <div class="data-chart-card">
-                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Activity Completion</h4>
+                            <h4 class="card-title" style="margin: 0 0 1rem 0; color: var(--text-main);">Activity Completion</h4>
                             <div class="data-chart-frame">
                                 <canvas id="activity-chart"></canvas>
                             </div>
@@ -1097,7 +1098,7 @@
 
                         <!-- Progress by Grade Chart -->
                         <div class="data-chart-card">
-                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Progress by Grade</h4>
+                            <h4 class="card-title" style="margin: 0 0 1rem 0; color: var(--text-main);">Progress by Grade</h4>
                             <div class="data-chart-frame">
                                 <canvas id="grade-progress-chart"></canvas>
                             </div>
@@ -1105,7 +1106,7 @@
 
                         <!-- Coin Distribution Chart -->
                         <div class="data-chart-card">
-                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Coin Distribution</h4>
+                            <h4 class="card-title" style="margin: 0 0 1rem 0; color: var(--text-main);">Coin Distribution</h4>
                             <div class="data-chart-frame">
                                 <canvas id="coin-distribution-chart"></canvas>
                             </div>
@@ -1113,7 +1114,7 @@
 
                         <!-- Activity Usage Chart -->
                         <div class="data-chart-card">
-                            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Most Used Activities</h4>
+                            <h4 class="card-title" style="margin: 0 0 1rem 0; color: var(--text-main);">Most Used Activities</h4>
                             <div class="data-chart-frame">
                                 <canvas id="activity-usage-chart"></canvas>
                             </div>
@@ -1122,9 +1123,9 @@
 
                     <!-- Recent Activity Table -->
                     <div class="data-recent-card">
-                        <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main);">Recent Activity</h4>
+                        <h4 class="card-title" style="margin: 0 0 1rem 0; color: var(--text-main);">Recent Activity</h4>
                         <div id="recent-activity-table" class="table-scroll-wrapper data-table-region">
-                            <div class="loading-spinner">Loading activity data...</div>
+                            <div class="loading-spinner data-table__status">Loading activity data...</div>
                         </div>
                     </div>
                 </div>
@@ -1210,8 +1211,8 @@
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <div class="export-spinner" style="width: 24px; height: 24px; border: 3px solid rgba(99, 102, 241, 0.3); border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Exporting Data...</div>
-                                <div id="export-loading-text" style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5);">Preparing your data for download</div>
+                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Exporting Data...</div>
+                                <div id="export-loading-text" class="runtime-status__description" style="color: var(--text-muted, #cbd5f5);">Preparing your data for download</div>
                             </div>
                         </div>
                         <div style="margin-top: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 6px; overflow: hidden;">
@@ -1233,15 +1234,15 @@
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
                             <i data-lucide="circle-check"></i>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-main, #f8fafc);">Export Completed</div>
-                                <div id="export-status-text" style="font-size: 0.9rem; color: #34d399;">Ready to proceed with reset</div>
+                                <div class="runtime-status__title" style="margin-bottom: 0.25rem; color: var(--text-main, #f8fafc);">Export Completed</div>
+                                <div id="export-status-text" class="runtime-status__description" style="color: #34d399;">Ready to proceed with reset</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Preview Section -->
-                    <div id="data-preview-section" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Data Preview</h4>
+                    <div id="data-preview-section" class="runtime-section-shell" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Data Preview</h4>
                         <div id="preview-summary" style="margin-bottom: 1.5rem;"></div>
                         <div id="preview-tables" class="table-scroll-wrapper data-table-region" style="max-height: 500px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
                     </div>
@@ -1249,9 +1250,9 @@
 
                 <!-- View Data Tab -->
                 <div id="data-viewer-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-view" style="display: none;">
-                    <div style="margin-bottom: 2rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--text-main, #f8fafc);">View Exported Data</h3>
-                        <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                    <div class="runtime-section-shell" style="margin-bottom: 2rem;">
+                        <h3 class="section-header__title" style="margin: 0 0 0.5rem 0; color: var(--text-main, #f8fafc);">View Exported Data</h3>
+                        <p class="section-header__description" style="color: var(--text-muted, #cbd5f5); margin: 0;">
                             Load a previously exported JSON file to view all progress data, vocabulary scores, and student information.
                         </p>
                     </div>
@@ -1263,7 +1264,7 @@
                         <button id="choose-file-btn" class="btn primary-btn" style="padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 0.75rem;">
                             Choose JSON File
                         </button>
-                        <p style="margin: 0; color: var(--text-muted, #cbd5f5); font-size: 0.9rem;">or drag and drop file here</p>
+                        <p class="runtime-status__description" style="margin: 0; color: var(--text-muted, #cbd5f5);">or drag and drop file here</p>
                     </div>
 
                     <!-- File Info -->
@@ -1271,10 +1272,10 @@
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
                             <i data-lucide="circle-check"></i>
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">
+                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">
                                     <span id="file-name"></span>
                                 </div>
-                                <div id="file-size" style="font-size: 0.9rem; color: #34d399;"></div>
+                                <div id="file-size" class="runtime-status__description" style="color: #34d399;"></div>
                             </div>
                             <button id="clear-file-btn" class="btn text-btn" style="padding: 0.5rem 1rem;">Clear</button>
                         </div>
@@ -1285,21 +1286,21 @@
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #f87171;">
                             <i data-lucide="circle-x"></i>
                             <div>
-                                <div style="font-weight: 600; color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Error Loading File</div>
-                                <div id="error-message" style="font-size: 0.9rem; color: #fca5a5;"></div>
+                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Error Loading File</div>
+                                <div id="error-message" class="runtime-status__description" style="color: #fca5a5;"></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Data Summary (shown after successful load) -->
-                    <div id="viewer-summary" style="display: none; margin-top: 2rem;">
-                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Data Summary</h4>
+                    <div id="viewer-summary" class="runtime-section-shell" style="display: none; margin-top: 2rem;">
+                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Data Summary</h4>
                         <div id="viewer-summary-stats" style="margin-bottom: 1.5rem;"></div>
                     </div>
 
                     <!-- Data Tables (shown after successful load) -->
-                    <div id="viewer-tables" style="display: none; margin-top: 2rem;">
-                        <h4 style="margin: 0 0 1.5rem 0; font-size: 1.2rem; font-weight: 600; color: var(--text-main, #f8fafc);">Student Data</h4>
+                    <div id="viewer-tables" class="runtime-section-shell" style="display: none; margin-top: 2rem;">
+                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Student Data</h4>
                         <div id="viewer-tables-content" class="table-scroll-wrapper data-table-region" style="max-height: 600px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
                     </div>
                 </div>
@@ -1315,7 +1316,7 @@
                     <div id="reset-export-status" style="padding: 1rem 1.25rem; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.75rem; color: #fbbf24;">
                             <i data-lucide="triangle-alert"></i>
-                            <span style="font-weight: 500; color: var(--text-main, #f8fafc);">Export required before reset</span>
+                            <span class="runtime-status__description" style="color: var(--text-main, #f8fafc);">Export required before reset</span>
                         </div>
                     </div>
                     <div style="padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
@@ -1493,7 +1494,7 @@
                         <input type="text" id="image-input" placeholder="images/unitX/word.png">
                         <div id="image-preview" class="image-preview-box">No Image</div>
                     </div>
-                    <small>Images must be uploaded to the repo manually.</small>
+                    <small class="modal-caption">Images must be uploaded to the repo manually.</small>
                 </div>
                 <label class="word-hunt-modal-toggle">
                     <input type="checkbox" id="word-hunt-input">

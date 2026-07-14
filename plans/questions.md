@@ -2,6 +2,14 @@
 altieri.collect.admin.test@example.com
 AltieriTest!Admin-2026
 
+| Role      | Email                          | Password            |
+| --------- | ------------------------------ | ------------------- |
+| Admin     | `sense.admin@example.com`      | `AltieriSense2026!` |
+| Evaluator | `sense.evaluator1@example.com` | `AltieriSense2026!` |
+| Evaluator | `sense.evaluator2@example.com` | `AltieriSense2026!` |
+
+
+
 - Final classification list: 1ra, 2da, 3ra, selected green coffee, others?
 	its always 1ra, 2da, or 3ra and it could be a % eg someone brough 30lb both only 70% is 1ra and 10 2da and 5 3ra 
 - Are variety, process, classification all required per delivery?

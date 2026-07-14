@@ -59,7 +59,6 @@ class NotificationManager {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
             color: white;
-            font-size: 0.95rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
@@ -69,13 +68,12 @@ class NotificationManager {
         `;
 
         toast.innerHTML = `
-            <span style="font-size: 1.25rem;">${icons[type] || icons.info}</span>
+            <span class="toast-icon">${icons[type] || icons.info}</span>
             <span style="flex: 1;">${message}</span>
-            <button class="toast-close" type="button" aria-label="Dismiss notification" style="
+            <button class="toast-close btn-icon-only" type="button" aria-label="Dismiss notification" style="
                 background: none;
                 border: none;
                 color: white;
-                font-size: 1.25rem;
                 cursor: pointer;
                 padding: 0;
                 width: 44px;

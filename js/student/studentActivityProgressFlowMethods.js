@@ -374,11 +374,11 @@ class StudentActivityProgressFlowMethods {
             )
         );
         requiredGrid.appendChild(pathTrack);
-        const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure');
+        const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure activity-disclosure');
         additionalDetails.open = true;
         const additionalSummary = createElement(
             'summary',
-            null,
+            'activity-disclosure__summary',
             completion.isComplete
                 ? `Additional Practice (${flow.additional.length})`
                 : `Additional Practice (${flow.additional.length}) · locked`
@@ -394,9 +394,9 @@ class StudentActivityProgressFlowMethods {
         }
         additionalDetails.appendChild(additionalGrid);
 
-        const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure');
+        const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure activity-disclosure');
         unavailableDetails.open = false;
-        const unavailableSummary = createElement('summary', null, `Not Required (${flow.hidden.length})`);
+        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Not Required (${flow.hidden.length})`);
         const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
         unavailableDetails.appendChild(unavailableSummary);
         unavailableDetails.appendChild(createElement(

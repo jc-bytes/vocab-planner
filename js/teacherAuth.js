@@ -287,22 +287,22 @@ class TeacherAuthMethods {
         
         electronMsg.innerHTML = `
             <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
-            <h3 style="margin: 0 0 0.75rem 0; color: var(--text-main, #f8fafc);">Sign In via Browser</h3>
-            <p style="margin: 0 0 1rem 0; color: var(--text-muted, #94a3b8); font-size: 0.9rem; line-height: 1.5;">
+            <h3 class="card-title" style="margin: 0 0 0.75rem 0; color: var(--text-main, #f8fafc);">Sign In via Browser</h3>
+            <p class="card-secondary" style="margin: 0 0 1rem 0; color: var(--text-muted, #94a3b8);">
                 External sign-in doesn't work in the Cursor browser. Please use one of these options:
             </p>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <a href="${deployedUrl}" target="_blank" 
+                <a class="card-action" href="${deployedUrl}" target="_blank"
                    style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
                           background: var(--primary-color, #6366f1); color: white; padding: 0.75rem 1.5rem; 
-                          border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;">
+                          border-radius: 8px; text-decoration: none; transition: all 0.2s;">
                     🔗 Open in Browser
                 </a>
-                <button id="copy-url-btn" 
+                <button id="copy-url-btn" class="card-action"
                         style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
                                background: transparent; border: 1px solid var(--border-color, rgba(255,255,255,0.2)); 
                                color: var(--text-main, #f8fafc); padding: 0.75rem 1.5rem; border-radius: 8px; 
-                               cursor: pointer; font-weight: 500; transition: all 0.2s;">
+                               cursor: pointer; transition: all 0.2s;">
                     📋 Copy URL
                 </button>
             </div>

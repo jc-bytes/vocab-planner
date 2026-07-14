@@ -109,7 +109,7 @@ const teacherDataExportMethods = {
         if (!previewSection || !previewSummary || !previewTables) return;
 
         previewSection.style.display = 'block';
-        previewSummary.innerHTML = '<div class="loading-spinner">Loading preview...</div>';
+        previewSummary.innerHTML = '<div class="loading-spinner runtime-status">Loading preview...</div>';
         previewTables.innerHTML = '';
 
         try {
@@ -118,7 +118,7 @@ const teacherDataExportMethods = {
         } catch (error) {
             console.error('Error previewing data:', error);
             notifications.error('Failed to load preview. Please try again.');
-            previewSummary.innerHTML = '<p style="color: var(--danger-color);">Error loading preview.</p>';
+            previewSummary.innerHTML = '<p class="runtime-status" style="color: var(--danger-color);">Error loading preview.</p>';
         }
     },
 
@@ -227,7 +227,7 @@ const teacherDataExportMethods = {
             resetSection.style.opacity = '1';
             resetSection.style.pointerEvents = 'auto';
             resetBtn.disabled = false;
-            resetStatus.innerHTML = '<span style="color: var(--success-color);">Export completed. Reset is now enabled.</span>';
+            resetStatus.innerHTML = '<span class="runtime-status" style="color: var(--success-color);">Export completed. Reset is now enabled.</span>';
         }
     },
 };

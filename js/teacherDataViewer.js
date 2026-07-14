@@ -5,10 +5,12 @@ const teacherDataViewerMethods = {
     initDataViewer() {
         // Check if already initialized to prevent duplicate listeners
         if (this.dataViewerInitialized) return;
+        const tabList = document.getElementById('data-settings-tab-list');
+        if (!tabList) return;
         this.dataViewerInitialized = true;
 
         // Tab switching
-        const tabButtons = document.querySelectorAll('.data-tab-btn');
+        const tabButtons = Array.from(tabList.querySelectorAll('.data-tab-btn[data-tab]'));
         tabButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tab = btn.dataset.tab;
@@ -16,16 +18,15 @@ const teacherDataViewerMethods = {
             });
             btn.addEventListener('keydown', (event) => {
                 if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                const tabs = Array.from(document.querySelectorAll('.data-tab-btn'));
-                const currentIndex = tabs.indexOf(btn);
+                const currentIndex = tabButtons.indexOf(btn);
                 let nextIndex = currentIndex;
-                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
-                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabButtons.length;
+                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabButtons.length) % tabButtons.length;
                 if (event.key === 'Home') nextIndex = 0;
-                if (event.key === 'End') nextIndex = tabs.length - 1;
+                if (event.key === 'End') nextIndex = tabButtons.length - 1;
                 event.preventDefault();
-                tabs[nextIndex].focus();
-                this.switchDataTab(tabs[nextIndex].dataset.tab);
+                tabButtons[nextIndex].focus();
+                this.switchDataTab(tabButtons[nextIndex].dataset.tab);
             });
         });
         
@@ -114,17 +115,20 @@ const teacherDataViewerMethods = {
         };
         const activeTab = sections[tab] ? tab : 'subjects';
         const activeSectionId = sections[activeTab];
+        const dataView = document.getElementById('teacher-data-management-view');
+        const tabList = dataView?.querySelector('#data-settings-tab-list');
 
         // Update tab buttons
-        document.querySelectorAll('.data-tab-btn').forEach(btn => {
+        tabList?.querySelectorAll('.data-tab-btn[data-tab]').forEach(btn => {
             const isActive = btn.dataset.tab === activeTab;
             btn.classList.toggle('active', isActive);
+            btn.classList.toggle('secondary-tab--active', isActive);
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
             btn.tabIndex = isActive ? 0 : -1;
         });
 
         // Update tab content
-        document.querySelectorAll('.data-tab-content').forEach(content => {
+        dataView?.querySelectorAll('.data-tab-content').forEach(content => {
             const isActive = content.id === activeSectionId;
             content.classList.toggle('active', isActive);
             content.style.display = isActive ? 'block' : 'none';
@@ -277,36 +281,36 @@ const teacherDataViewerMethods = {
         if (!summaryEl) return;
 
         summaryEl.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+            <div class="runtime-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Total Students</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${summary.totalStudents}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Students</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${summary.totalStudents}</div>
                 </div>
                 ${summary.totalProgressRecords > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Progress Records</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${summary.totalProgressRecords}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Progress Records</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${summary.totalProgressRecords}</div>
                 </div>
                 ${summary.totalVocabUnits > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Vocabulary Units</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${summary.totalVocabUnits}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Vocabulary Units</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${summary.totalVocabUnits}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Total Coins</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${summary.totalCoins.toLocaleString()}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Coins</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${summary.totalCoins.toLocaleString()}</div>
                 </div>
                 ` : ''}
                 ${summary.totalScores > 0 ? `
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Game Scores</div>
-                    <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main, #f8fafc);">${summary.totalScores}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Game Scores</div>
+                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${summary.totalScores}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted, #cbd5f5);">Date Range</div>
-                    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-main, #f8fafc);">${dateStr}</div>
+                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Date Range</div>
+                    <div class="runtime-summary__value runtime-summary__value--compact" style="color: var(--text-main, #f8fafc);">${dateStr}</div>
                 </div>
             </div>
         `;
@@ -325,16 +329,16 @@ const teacherDataViewerMethods = {
         // Student Progress Table
         if (this.loadedData.students.length > 0) {
             html += `
-                <h5 style="margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main, #f8fafc);">Student Progress (${this.loadedData.students.length} records)</h5>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+                <h5 class="data-table__caption" style="margin: 0 0 1rem 0; color: var(--text-main, #f8fafc);">Student Progress (${this.loadedData.students.length} records)</h5>
+                <table class="data-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Student ID</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Name</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Grade</th>
-                            <th style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">Coins</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Vocab Units</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Last Active</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Student ID</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Name</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Grade</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">Coins</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Vocab Units</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Last Active</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -350,12 +354,12 @@ const teacherDataViewerMethods = {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.studentId}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${name}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${profile.grade || '-'}</td>
-                                    <td style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${coins}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${vocabUnits}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${lastActive}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.studentId}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${name}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${profile.grade || '-'}</td>
+                                    <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${coins}</td>
+                                    <td class="data-table__cell data-table__metric" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${vocabUnits}</td>
+                                    <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${lastActive}</td>
                                 </tr>
                             `;
                         }).join('')}
@@ -367,14 +371,14 @@ const teacherDataViewerMethods = {
         // Game Scores Table
         if (this.loadedData.scores.length > 0) {
             html += `
-                <h5 style="margin: 1.5rem 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--text-main, #f8fafc);">Game Scores (${this.loadedData.scores.length} records)</h5>
-                <table style="width: 100%; border-collapse: collapse;">
+                <h5 class="data-table__caption" style="margin: 1.5rem 0 1rem 0; color: var(--text-main, #f8fafc);">Game Scores (${this.loadedData.scores.length} records)</h5>
+                <table class="data-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Student</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Game</th>
-                            <th style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">Score</th>
-                            <th style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Date</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Student</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Game</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">Score</th>
+                            <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-main, #f8fafc);">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -384,16 +388,16 @@ const teacherDataViewerMethods = {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.name || item.userId}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.gameId || '-'}</td>
-                                    <td style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${(item.score || 0).toLocaleString()}</td>
-                                    <td style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${date}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.name || item.userId}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.gameId || '-'}</td>
+                                    <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${(item.score || 0).toLocaleString()}</td>
+                                    <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${date}</td>
                                 </tr>
                             `;
                         }).join('')}
                         ${this.loadedData.scores.length > 50 ? `
                             <tr>
-                                <td colspan="4" style="padding: 0.75rem; text-align: center; color: var(--text-muted, #cbd5f5);">
+                                <td class="data-table__cell data-table__status" colspan="4" style="padding: 0.75rem; text-align: center; color: var(--text-muted, #cbd5f5);">
                                     ... and ${this.loadedData.scores.length - 50} more records
                                 </td>
                             </tr>
@@ -403,7 +407,7 @@ const teacherDataViewerMethods = {
             `;
         }
 
-        tablesContent.innerHTML = html || '<p style="color: var(--text-muted, #cbd5f5);">No data to display.</p>';
+        tablesContent.innerHTML = html || '<p class="data-table__empty" style="color: var(--text-muted, #cbd5f5);">No data to display.</p>';
         $('#viewer-tables').style.display = 'block';
     }
 };

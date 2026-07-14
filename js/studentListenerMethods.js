@@ -1,5 +1,6 @@
 import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
+import { STUDENT_WIDE_SHELL_MEDIA_QUERY } from './studentShellMethods.js';
 
 const STUDENT_RESIZE_DEBOUNCE_MS = 120;
 
@@ -41,6 +42,8 @@ class StudentListenerMethods {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('popstate', () => this.handleRouteChange());
         window.addEventListener('resize', debounceStudentResize(() => this.setStudentMobileMenu(false)));
+        this.studentWideShellMediaQuery = window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY);
+        this.studentWideShellMediaQuery.addEventListener('change', () => this.syncStudentShellState());
         window.addEventListener('scroll', () => this.scheduleStudentScrollSave(), { passive: true });
         window.addEventListener('pagehide', (event) => {
             this.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });

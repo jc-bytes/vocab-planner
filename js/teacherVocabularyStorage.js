@@ -101,9 +101,9 @@ class TeacherVocabularyStorageMethods {
         card.innerHTML = `
             <div class="badge" style="background:${badge.color};">${badge.text}</div>
             <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
-            <h3>${escapeHtml(vocab.name || 'Untitled')}</h3>
-            <small style="color:var(--text-muted)">${escapeHtml(vocab.id)}</small>
-            ${this.formatVocabPlacementLabel(vocab) ? `<small style="color:var(--text-muted); display:block; margin-top:0.35rem;">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
+            <h3 class="card-title">${escapeHtml(vocab.name || 'Untitled')}</h3>
+            <small class="card-caption" style="color:var(--text-muted)">${escapeHtml(vocab.id)}</small>
+            ${this.formatVocabPlacementLabel(vocab) ? `<small class="card-caption" style="color:var(--text-muted); display:block; margin-top:0.35rem;">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
             ${deleteBtnHtml}
         `;
 

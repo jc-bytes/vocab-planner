@@ -13,7 +13,7 @@ class TeacherStudentProgressRenderMethods {
             if (tbody) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="padding: 1rem; color: var(--text-muted);">No students match the current filters.</td>
+                        <td class="data-table__cell data-table__empty" colspan="8" style="padding: 1rem; color: var(--text-muted);">No students match the current filters.</td>
                     </tr>
                 `;
             }
@@ -37,16 +37,16 @@ class TeacherStudentProgressRenderMethods {
             }
 
             tr.innerHTML = `
-                <td style="padding: 1rem;">
+                <td class="data-table__cell" style="padding: 1rem;">
                     <input type="checkbox" class="student-checkbox student-select-control" data-id="${escapeHtml(student.id)}" aria-label="Select ${details.name}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
                 </td>
-                <td style="padding: 1rem;">${details.name}</td>
-                <td style="padding: 1rem; color: var(--text-muted);">${details.email}</td>
-                <td style="padding: 1rem;">${details.grade}</td>
-                <td style="padding: 1rem;">${details.group}</td>
-                <td style="padding: 1rem;">${details.coins}</td>
-                <td style="padding: 1rem;">${details.lastActive}</td>
-                <td style="padding: 1rem;">
+                <td class="data-table__cell" style="padding: 1rem;">${details.name}</td>
+                <td class="data-table__cell data-table__secondary" style="padding: 1rem; color: var(--text-muted);">${details.email}</td>
+                <td class="data-table__cell" style="padding: 1rem;">${details.grade}</td>
+                <td class="data-table__cell" style="padding: 1rem;">${details.group}</td>
+                <td class="data-table__cell data-table__metric" style="padding: 1rem;">${details.coins}</td>
+                <td class="data-table__cell data-table__secondary" style="padding: 1rem;">${details.lastActive}</td>
+                <td class="data-table__cell data-table__action" style="padding: 1rem;">
                     <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
                     <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}" style="margin-left:0.5rem;">Add Coins</button>
                 </td>
@@ -196,7 +196,7 @@ class TeacherStudentProgressRenderMethods {
         let scoreCount = 0;
         let totalActivities = 0;
         if (Object.keys(units).length === 0) {
-            list.innerHTML = '<p style="color: var(--text-muted);">No activity data recorded.</p>';
+            list.innerHTML = '<p class="modal-secondary" style="color: var(--text-muted);">No activity data recorded.</p>';
         } else {
             for (const [unitName, unitData] of Object.entries(units)) {
                 const card = createElement('div', 'student-detail-activity-row');
@@ -210,18 +210,18 @@ class TeacherStudentProgressRenderMethods {
                             scoreCount++;
                         }
                         scoresHtml += `
-                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.9rem;">
-                                <span style="text-transform: capitalize;">${activity}</span>
-                                <span style="font-weight: bold; color: var(--primary-color);">${data.score}%</span>
+                            <div class="modal-activity-meta" style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                <span class="modal-activity-name">${activity}</span>
+                                <span class="modal-inline-metric" style="color: var(--primary-color);">${data.score}%</span>
                             </div>
                         `;
                     }
                 }
 
                 card.innerHTML = `
-                    <h4 style="margin-bottom: 0.5rem;">${unitName}</h4>
+                    <h4 class="modal-section-title" style="margin-bottom: 0.5rem;">${unitName}</h4>
                     <div style="border-top: 1px solid var(--border-color); padding-top: 0.5rem;">
-                        ${scoresHtml || '<span style="color: var(--text-muted); font-size: 0.9rem;">No scores yet</span>'}
+                        ${scoresHtml || '<span class="modal-secondary" style="color: var(--text-muted);">No scores yet</span>'}
                     </div>
                 `;
                 list.appendChild(card);

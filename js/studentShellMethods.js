@@ -2,6 +2,7 @@ import { $, $$ } from './main.js';
 
 const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
 const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
+export const STUDENT_WIDE_SHELL_MEDIA_QUERY = '(min-width: 1121px)';
 
 class StudentShellMethods {
     switchView(viewId) {
@@ -223,14 +224,23 @@ class StudentShellMethods {
         return '';
     }
 
+    isStudentWideShell() {
+        return this.studentWideShellMediaQuery?.matches
+            ?? window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY).matches;
+    }
+
+    syncStudentShellState(section = this.getStudentSectionForView($('.view.active')?.id || '')) {
+        const compactShellActive = Boolean(section) && !this.isStudentWideShell();
+        $('.student-app-header')?.classList.toggle('student-mobile-compact', compactShellActive);
+        this.closeStudentMobileMenu();
+    }
+
     updateStudentNav(viewId) {
         const section = this.getStudentSectionForView(viewId);
         const shell = $('#student-tab-shell');
         if (shell) {
             shell.classList.toggle('hidden', !section);
         }
-        $('.student-app-header')?.classList.toggle('student-mobile-compact', Boolean(section));
-
         let activeLabel = 'Today';
         $$('.student-tab').forEach(tab => {
             const isActive = tab.dataset.section === section;
@@ -241,7 +251,7 @@ class StudentShellMethods {
         });
         const mobileLabel = $('#student-mobile-section-label');
         if (mobileLabel) mobileLabel.textContent = activeLabel;
-        this.closeStudentMobileMenu();
+        this.syncStudentShellState(section);
     }
 
     setStudentMobileMenu(open) {
@@ -255,8 +265,8 @@ class StudentShellMethods {
         toggle.setAttribute('aria-label', open ? 'Close student sections menu' : 'Open student sections menu');
 
         if (tabs) {
-            const mobileLayout = window.matchMedia('(max-width: 850px)').matches;
-            tabs.setAttribute('aria-hidden', mobileLayout && !open ? 'true' : 'false');
+            const compactShellActive = !this.isStudentWideShell();
+            tabs.setAttribute('aria-hidden', compactShellActive && !open ? 'true' : 'false');
         }
     }
 
@@ -312,6 +322,7 @@ class StudentShellMethods {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'student-toast';
+            toast.className = 'toast toast-emphasis';
             toast.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -321,7 +332,6 @@ class StudentShellMethods {
                 color: white;
                 padding: 12px 24px;
                 border-radius: 50px;
-                font-weight: bold;
                 box-shadow: 0 10px 25px rgba(0,0,0,0.2);
                 z-index: 10000;
                 opacity: 0;

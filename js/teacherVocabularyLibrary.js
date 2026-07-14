@@ -68,6 +68,7 @@ class TeacherVocabularyLibraryMethods {
             const tab = $(tabSelector);
             const panel = $(panelSelector);
             tab?.classList.toggle('active', active);
+            tab?.classList.toggle('secondary-tab--active', active);
             tab?.setAttribute('aria-selected', active ? 'true' : 'false');
             tab && (tab.tabIndex = active ? 0 : -1);
             panel?.classList.toggle('hidden', !active);
@@ -562,7 +563,7 @@ class TeacherVocabularyLibraryMethods {
     renderLibraryBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
         const host = $('#teacher-vocab-breadcrumb') || container;
         host.innerHTML = '';
-        const nav = createElement('div', 'teacher-library-breadcrumb');
+        const nav = createElement('div', 'teacher-library-breadcrumb breadcrumb');
         nav.dataset.breadcrumbDepth = selectedMonth ? 'month'
             : selectedTrimester ? 'trimester'
                 : selectedGrade ? 'grade'
@@ -573,12 +574,13 @@ class TeacherVocabularyLibraryMethods {
             this.resetLibraryDrilldown();
             this.updateVocabularyRoute();
             this.renderLibraryBrowser();
-        });
+        }, 'breadcrumb__item');
+        if (!selectedSubject) subjectsButton.setAttribute('aria-current', 'page');
         subjectsButton.dataset.crumb = 'root';
         nav.appendChild(subjectsButton);
 
         if (selectedSubject) {
-            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
             separator.dataset.beforeCrumb = 'subject';
             nav.appendChild(separator);
             const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
@@ -587,14 +589,15 @@ class TeacherVocabularyLibraryMethods {
                     this.libraryDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
-                })
-                : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
+                }, 'breadcrumb__item')
+                : createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', subject.name);
+            if (!selectedGrade && !selectedTrimester && !selectedMonth) subjectButton.setAttribute('aria-current', 'page');
             subjectButton.dataset.crumb = 'subject';
             nav.appendChild(subjectButton);
         }
 
         if (selectedGrade) {
-            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
             separator.dataset.beforeCrumb = 'grade';
             nav.appendChild(separator);
             const gradeLabel = this.formatGradeLabel(selectedGrade);
@@ -603,14 +606,15 @@ class TeacherVocabularyLibraryMethods {
                     this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
-                })
-                : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
+                }, 'breadcrumb__item')
+                : createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', gradeLabel);
+            if (!selectedTrimester && !selectedMonth) gradeButton.setAttribute('aria-current', 'page');
             gradeButton.dataset.crumb = 'grade';
             nav.appendChild(gradeButton);
         }
 
         if (selectedTrimester) {
-            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
             separator.dataset.beforeCrumb = 'trimester';
             nav.appendChild(separator);
             const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
@@ -619,17 +623,19 @@ class TeacherVocabularyLibraryMethods {
                     this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester, month: null };
                     this.updateVocabularyRoute();
                     this.renderLibraryBrowser();
-                })
-                : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
+                }, 'breadcrumb__item')
+                : createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', trimesterLabel);
+            if (!selectedMonth) trimesterNode.setAttribute('aria-current', 'page');
             trimesterNode.dataset.crumb = 'trimester';
             nav.appendChild(trimesterNode);
         }
 
         if (selectedMonth) {
-            const separator = createElement('span', 'teacher-library-breadcrumb-separator', '/');
+            const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
             separator.dataset.beforeCrumb = 'month';
             nav.appendChild(separator);
-            const monthNode = createElement('span', 'teacher-library-breadcrumb-current', this.getTeacherMonthLabel(selectedMonth));
+            const monthNode = createElement('span', 'teacher-library-breadcrumb-current breadcrumb__current', this.getTeacherMonthLabel(selectedMonth));
+            monthNode.setAttribute('aria-current', 'page');
             monthNode.dataset.crumb = 'month';
             nav.appendChild(monthNode);
         }
@@ -637,8 +643,8 @@ class TeacherVocabularyLibraryMethods {
         host.appendChild(nav);
     }
 
-    createLibraryBreadcrumbButton(label, onClick) {
-        const button = createElement('button', 'teacher-library-crumb-btn', label);
+    createLibraryBreadcrumbButton(label, onClick, semanticClass = '') {
+        const button = createElement('button', ['teacher-library-crumb-btn', semanticClass].filter(Boolean).join(' '), label);
         button.type = 'button';
         button.addEventListener('click', onClick);
         return button;
@@ -796,8 +802,8 @@ class TeacherVocabularyLibraryMethods {
         card.type = 'button';
 
         const text = createElement('span', 'teacher-library-choice-text');
-        const titleEl = createElement('strong', null, title);
-        const countEl = createElement('span', 'teacher-library-choice-count', count);
+        const titleEl = createElement('strong', 'card-title', title);
+        const countEl = createElement('span', 'teacher-library-choice-count card-secondary', count);
         if (color) {
             const dot = createElement('span', 'subject-color-dot');
             dot.style.background = color;
@@ -806,7 +812,7 @@ class TeacherVocabularyLibraryMethods {
         text.append(titleEl, countEl);
 
         if (meta) {
-            text.appendChild(createElement('small', null, meta));
+            text.appendChild(createElement('small', 'card-caption', meta));
         }
 
         card.appendChild(text);

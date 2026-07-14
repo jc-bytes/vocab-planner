@@ -23,7 +23,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
             $('#overview-avg-coins').textContent = this.studentProgressCache ? $('#overview-avg-coins').textContent : '--';
             const recentContainer = $('#overview-recent-activity');
             if (recentContainer && !this.studentProgressCache) {
-                recentContainer.innerHTML = '<div class="loading-spinner">Loading recent activity...</div>';
+                recentContainer.innerHTML = '<div class="loading-spinner runtime-status">Loading recent activity...</div>';
             }
         },
 

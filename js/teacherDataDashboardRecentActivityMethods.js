@@ -73,29 +73,29 @@ const teacherDataDashboardRecentActivityMethods = {
         recentActivities.splice(30); // Keep only 30 most recent
 
         if (recentActivities.length === 0) {
-            table.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No vocabulary activity completed yet</p>';
+            table.innerHTML = '<p class="data-table__empty" style="color: var(--text-muted); text-align: center; padding: 2rem;">No vocabulary activity completed yet</p>';
             return;
         }
 
         table.innerHTML = `
-            <table style="width: 100%; border-collapse: collapse;">
+            <table class="data-table" style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="border-bottom: 1px solid var(--border-color);">
-                        <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Student</th>
-                        <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Vocabulary</th>
-                        <th style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Activity</th>
-                        <th style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Score</th>
-                        <th style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Date</th>
+                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Student</th>
+                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Vocabulary</th>
+                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Activity</th>
+                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Score</th>
+                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${recentActivities.map(activity => `
                         <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <td style="padding: 0.75rem;">${activity.student}</td>
-                            <td style="padding: 0.75rem; color: var(--text-muted); font-size: 0.9rem;">${activity.unit}</td>
-                            <td style="padding: 0.75rem;">${activity.activity}</td>
-                            <td style="padding: 0.75rem; text-align: right; color: var(--primary-color);">${activity.score}</td>
-                            <td style="padding: 0.75rem; text-align: right; color: var(--text-muted);">${activity.dateStr}</td>
+                            <td class="data-table__cell" style="padding: 0.75rem;">${activity.student}</td>
+                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-muted);">${activity.unit}</td>
+                            <td class="data-table__cell" style="padding: 0.75rem;">${activity.activity}</td>
+                            <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--primary-color);">${activity.score}</td>
+                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">${activity.dateStr}</td>
                         </tr>
                     `).join('')}
                 </tbody>

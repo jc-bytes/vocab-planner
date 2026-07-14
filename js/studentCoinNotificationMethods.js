@@ -16,6 +16,7 @@ class StudentCoinNotificationMethods {
             if (coinEl && coinEl.parentElement) {
                 badge = document.createElement('div');
                 badge.id = 'coin-notification-badge';
+                badge.className = 'card-caption';
                 badge.style.cssText = `
                     position: absolute;
                     top: -8px;
@@ -28,8 +29,6 @@ class StudentCoinNotificationMethods {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 11px;
-                    font-weight: bold;
                     cursor: pointer;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                     z-index: 100;
@@ -71,6 +70,8 @@ class StudentCoinNotificationMethods {
         // Create notification panel
         panel = document.createElement('div');
         panel.id = 'coin-notification-panel';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-labelledby', 'coin-notification-title');
         panel.style.cssText = `
             position: fixed;
             top: 60px;
@@ -87,18 +88,18 @@ class StudentCoinNotificationMethods {
 
         panel.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="margin: 0; color: var(--primary-color);">💰 Pending Coins</h3>
-                <button id="close-notification-panel" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+                <h3 id="coin-notification-title" class="notification-panel-title" style="margin: 0; color: var(--primary-color);">💰 Pending Coins</h3>
+                <button id="close-notification-panel" class="btn-icon-only" type="button" aria-label="Close coin notification" style="background: none; border: none; cursor: pointer; color: #666;">&times;</button>
             </div>
             <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
-                <div style="font-size: 18px; font-weight: bold; color: #1e40af; margin-bottom: 0.5rem;">
+                <div class="notification-panel-metric" style="color: #1e40af; margin-bottom: 0.5rem;">
                     +${this.coinData.giftCoins} Coins
                 </div>
-                <div style="color: #64748b; font-size: 14px;">
+                <div class="notification-panel-secondary" style="color: #64748b;">
                     From your teacher
                 </div>
             </div>
-            <button id="accept-gift-coins" class="btn primary-btn" style="width: 100%; padding: 0.75rem; font-size: 16px; font-weight: bold;">
+            <button id="accept-gift-coins" class="btn primary-btn" style="width: 100%; padding: 0.75rem;">
                 Accept ${this.coinData.giftCoins} Coins
             </button>
         `;

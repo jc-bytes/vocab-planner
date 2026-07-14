@@ -165,11 +165,14 @@ class StudentActivityHomeMethods {
         container.replaceChildren();
         container.appendChild(this.createContinueLearningHero(continueItem, message));
 
-        const tabList = createElement('div', 'student-home-tabs');
+        const tabList = createElement('div', 'student-home-tabs secondary-tabs');
         tabList.setAttribute('role', 'tablist');
         tabList.setAttribute('aria-label', 'Dashboard sections');
         panels.forEach((panel, index) => {
-            const tab = createElement('button', `student-home-tab${index === 0 ? ' active' : ''}`);
+            const tab = createElement(
+                'button',
+                `student-home-tab secondary-tab${index === 0 ? ' active secondary-tab--active' : ''}`
+            );
             tab.type = 'button';
             tab.id = `student-home-tab-${panel.key}`;
             tab.dataset.panel = panel.key;
@@ -395,7 +398,7 @@ class StudentActivityHomeMethods {
         tab?.remove();
         const firstTab = $('.student-home-tab');
         if (firstTab) {
-            firstTab.classList.add('active');
+            firstTab.classList.add('active', 'secondary-tab--active');
             firstTab.setAttribute('aria-selected', 'true');
             firstTab.tabIndex = 0;
             const firstPanel = $(`#${firstTab.getAttribute('aria-controls')}`);
@@ -430,6 +433,7 @@ class StudentActivityHomeMethods {
             tabs.forEach(tab => {
                 const active = tab.dataset.panel === key;
                 tab.classList.toggle('active', active);
+                tab.classList.toggle('secondary-tab--active', active);
                 tab.setAttribute('aria-selected', active ? 'true' : 'false');
                 tab.tabIndex = active ? 0 : -1;
                 if (active && focus) tab.focus({ preventScroll: true });
