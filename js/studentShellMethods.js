@@ -2,6 +2,8 @@ import { $, $$ } from './main.js';
 
 const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
 const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
+// JavaScript mirror of the canonical CSS boundary documented in docs/student-shell-architecture.md.
+// Import this value instead of creating another shell-state media query.
 export const STUDENT_WIDE_SHELL_MEDIA_QUERY = '(min-width: 1121px)';
 
 class StudentShellMethods {

@@ -7155,9 +7155,12 @@ section.student-continue-hero {
 }
 
 /*
- * Canonical responsive student shell ownership
- * Compact: through 1120px. Wide: beginning at 1121px.
- * Historical blocks above may still provide visual styling, but do not own this state switch.
+ * Canonical responsive student shell ownership (see docs/student-shell-architecture.md).
+ * Compact through 1120px: compact header, no sidebar rail, and the page Vocabulary picker.
+ * Wide beginning at 1121px: fixed sidebar, sidebar picker, 256px content rail, and the
+ * explicit Arcade grid placement below. These two queries own the shell state boundary.
+ * The retained 700/701px and 900/901px rules are historical presentation refinements;
+ * they are not alternative shell breakpoints and must not override this state contract.
  */
 @media (max-width: 1120px) {
     html body .app-container:has(#student-tab-shell:not(.hidden)) {
