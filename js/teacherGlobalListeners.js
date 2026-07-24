@@ -72,6 +72,8 @@ function bindTeacherMobileMenu(manager) {
 
 function bindOverviewListeners(manager) {
     $('#overview-create-vocab-btn')?.addEventListener('click', () => manager.startNewVocab());
+    $('#overview-groups-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
+    $('#overview-groups-action-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
     $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection('students'));
     $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection('vocabulary'));
     $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
@@ -113,4 +115,20 @@ export function initTeacherGlobalListeners(manager) {
     bindTeacherMobileMenu(manager);
     bindTeacherTabs(manager);
     bindOverviewListeners(manager);
+
+    $('#group-class-select')?.addEventListener('change', event => {
+        manager.handleGroupClassChange(event.currentTarget.value);
+    });
+    $('#group-student-list')?.addEventListener('change', event => {
+        const checkbox = event.target.closest('input[data-student-id]');
+        if (checkbox) manager.toggleGroupStudentAbsent(checkbox.dataset.studentId, checkbox.checked);
+    });
+    $('#clear-group-absences-btn')?.addEventListener('click', () => manager.clearGroupAbsences());
+    $('#save-group-restriction-btn')?.addEventListener('click', () => manager.saveGroupPairRestriction());
+    $('#group-restriction-list')?.addEventListener('click', event => {
+        const button = event.target.closest('button[data-restriction-id]');
+        if (button) manager.removeGroupPairRestriction(button.dataset.restrictionId);
+    });
+    $('#randomize-groups-btn')?.addEventListener('click', () => manager.generateRandomGroups());
+    $('#copy-groups-btn')?.addEventListener('click', () => manager.copyRandomGroups());
 }

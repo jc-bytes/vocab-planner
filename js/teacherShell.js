@@ -11,6 +11,7 @@ class TeacherShellMethods {
             'teacher-editor-view',
             'teacher-sparks-view',
             'teacher-progress-view',
+            'teacher-groups-view',
             'quiz-maker-view',
             'teacher-data-management-view'
         ];
@@ -84,6 +85,7 @@ class TeacherShellMethods {
             'teacher-editor-view': 'vocabulary',
             'teacher-sparks-view': 'sparks',
             'teacher-progress-view': 'students',
+            'teacher-groups-view': 'groups',
             'quiz-maker-view': 'vocabulary',
             'teacher-data-management-view': 'data-settings'
         };
@@ -152,6 +154,9 @@ class TeacherShellMethods {
                 break;
             case 'students':
                 this.showProgressView();
+                break;
+            case 'groups':
+                this.showGroupsView();
                 break;
             case 'word-hunt-review':
                 this.showWordHuntReviewView();

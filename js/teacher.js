@@ -5,6 +5,7 @@ import {
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
 import { installTeacherDataManagementMethods } from './teacherDataManagement.js';
 import { installTeacherOverviewMethods } from './teacherOverview.js';
+import { installTeacherGroupsMethods } from './teacherGroups.js';
 import { installTeacherQuizMethods } from './teacherQuiz.js';
 import { installTeacherRoutingMethods } from './teacherRouting.js';
 import { installTeacherSettingsMethods } from './teacherSettings.js';
@@ -39,6 +40,11 @@ class TeacherManager {
         this.currentQuiz = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
+        this.selectedGroupClass = '';
+        this.groupAbsentStudents = new Set();
+        this.currentRandomGroups = [];
+        this.groupPairRestrictions = [];
+        this.groupRestrictionsLocalFallback = false;
         this.dataViewerInitialized = false;
         this.exportListenersInitialized = false;
         this.libraryItems = [];
@@ -110,6 +116,7 @@ class TeacherManager {
 installTeacherAuthMethods(TeacherManager);
 installTeacherDataManagementMethods(TeacherManager);
 installTeacherOverviewMethods(TeacherManager);
+installTeacherGroupsMethods(TeacherManager);
 installTeacherQuizMethods(TeacherManager);
 installTeacherRoutingMethods(TeacherManager);
 installTeacherSettingsMethods(TeacherManager);

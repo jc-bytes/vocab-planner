@@ -21,6 +21,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[0] !== 'teacher') return null;
             if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
             if (parts[1] === 'students') return { view: 'students' };
+            if (parts[1] === 'groups') return { view: 'groups' };
             if (parts[1] === 'word-hunt') return { view: 'vocabulary', mode: 'review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
             if (parts[1] === 'activities') return { view: 'overview' };
@@ -51,6 +52,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (!route || !route.view) return '#/teacher/overview';
             if (route.view === 'overview') return '#/teacher/overview';
             if (route.view === 'students') return '#/teacher/students';
+            if (route.view === 'groups') return '#/teacher/groups';
             if (route.view === 'word-hunt-review') return '#/teacher/vocabulary?mode=review';
             if (route.view === 'sparks') return '#/teacher/sparks';
             if (route.view === 'quizzes') return '#/teacher/vocabulary?mode=quizzes';
@@ -98,6 +100,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             }
             if (viewId === 'teacher-sparks-view') return { view: 'sparks' };
             if (viewId === 'teacher-progress-view') return { view: 'students' };
+            if (viewId === 'teacher-groups-view') return { view: 'groups' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === 'teacher-data-management-view') return { view: 'data-settings' };
             return { view: 'overview' };
@@ -189,6 +192,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             break;
                         case 'students':
                             await this.showProgressView();
+                            break;
+                        case 'groups':
+                            await this.showGroupsView();
                             break;
                         case 'word-hunt-review':
                             await this.showWordHuntReviewView();

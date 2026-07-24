@@ -39,6 +39,11 @@
                         <i data-lucide="users"></i>
                         Students
                     </button>
+                    <button class="teacher-tab primary-nav__item" id="tab-groups" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-groups-view" data-section="groups">
+                        <i data-lucide="shuffle"></i>
+                        Groups
+                    </button>
                     <button class="teacher-tab primary-nav__item" id="tab-data-settings" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-data-management-view" data-section="data-settings">
                         <i data-lucide="settings"></i>
@@ -150,6 +155,10 @@
                             <i data-lucide="plus"></i>
                             New Vocabulary
                         </button>
+                        <button id="overview-groups-btn" class="btn secondary-btn">
+                            <i data-lucide="shuffle"></i>
+                            Randomize Groups
+                        </button>
                         <button id="overview-students-btn" class="btn secondary-btn">
                             <i data-lucide="users"></i>
                             View Students
@@ -185,6 +194,10 @@
                             </div>
                         </div>
                         <div class="teacher-action-grid">
+                            <button class="teacher-action-card" id="overview-groups-action-btn" type="button">
+                                <i data-lucide="shuffle"></i>
+                                <span>Randomize groups</span>
+                            </button>
                             <button class="teacher-action-card" id="overview-vocabulary-btn" type="button">
                                 <i data-lucide="book-open"></i>
                                 <span>Manage vocabulary</span>
@@ -404,6 +417,123 @@
                             <button id="bulk-clear-selection-btn" class="btn text-btn">Clear Selection</button>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- View: Group Generator -->
+            <section id="teacher-groups-view" class="view hidden" role="tabpanel" aria-labelledby="tab-groups">
+                <div class="teacher-page-heading page-header">
+                    <div>
+                        <p class="teacher-eyebrow page-header__eyebrow">Classroom tools</p>
+                        <h2 class="page-header__title">Group Generator</h2>
+                        <p class="page-header__description">Choose a class, mark today’s absences, and make fair random groups.</p>
+                    </div>
+                </div>
+
+                <div class="group-generator-layout">
+                    <section class="card group-setup-card" aria-labelledby="group-setup-title">
+                        <div class="group-section-heading">
+                            <div>
+                                <span class="group-step">1</span>
+                                <h3 id="group-setup-title">Set up the class</h3>
+                            </div>
+                            <span id="group-roster-summary" class="group-count-badge">Loading roster…</span>
+                        </div>
+
+                        <div class="group-controls-grid">
+                            <div class="form-group">
+                                <label for="group-class-select">Class</label>
+                                <select id="group-class-select">
+                                    <option value="">Select a class</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="group-size-select">Students per group</label>
+                                <select id="group-size-select">
+                                    <option value="2" selected>2 students</option>
+                                    <option value="3">3 students</option>
+                                    <option value="4">4 students</option>
+                                    <option value="5">5 students</option>
+                                    <option value="6">6 students</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="absence-heading">
+                            <div>
+                                <h4>Who is absent today?</h4>
+                                <p>Tap a student to exclude them from the groups.</p>
+                            </div>
+                            <button id="clear-group-absences-btn" class="btn text-btn" type="button">Clear absences</button>
+                        </div>
+                        <div id="group-student-list" class="group-student-list" aria-live="polite">
+                            <p class="teacher-empty-state">Select a class to see its students.</p>
+                        </div>
+
+                        <details class="group-restriction-settings">
+                            <summary>
+                                <span>
+                                    <i data-lucide="shield-user"></i>
+                                    Do-not-pair settings
+                                </span>
+                                <span id="group-restriction-count" class="group-count-badge">0 saved</span>
+                            </summary>
+                            <div class="group-restriction-body">
+                                <p class="group-restriction-help">
+                                    These private rules are visible only to teachers and are applied to every reshuffle.
+                                </p>
+                                <div class="group-restriction-form">
+                                    <div class="form-group">
+                                        <label for="group-restriction-student-a">First student</label>
+                                        <select id="group-restriction-student-a">
+                                            <option value="">Choose a student</option>
+                                        </select>
+                                    </div>
+                                    <div class="group-restriction-separator" aria-hidden="true">+</div>
+                                    <div class="form-group">
+                                        <label for="group-restriction-student-b">Second student</label>
+                                        <select id="group-restriction-student-b">
+                                            <option value="">Choose a student</option>
+                                        </select>
+                                    </div>
+                                    <button id="save-group-restriction-btn" class="btn secondary-btn" type="button">
+                                        <i data-lucide="shield-plus"></i>
+                                        Never group together
+                                    </button>
+                                </div>
+                                <p id="group-restriction-status" class="teacher-inline-status" role="status" aria-live="polite"></p>
+                                <div id="group-restriction-list" class="group-restriction-list" aria-live="polite">
+                                    <p class="teacher-empty-state">No pairing restrictions saved for this class.</p>
+                                </div>
+                            </div>
+                        </details>
+
+                        <button id="randomize-groups-btn" class="btn primary-btn randomize-groups-btn" type="button" disabled>
+                            <i data-lucide="shuffle"></i>
+                            Randomize groups
+                        </button>
+                        <p id="group-generator-status" class="teacher-inline-status group-generator-status" role="status" aria-live="polite"></p>
+                    </section>
+
+                    <section class="card group-results-card" aria-labelledby="group-results-title">
+                        <div class="group-section-heading">
+                            <div>
+                                <span class="group-step">2</span>
+                                <h3 id="group-results-title">Your groups</h3>
+                            </div>
+                            <button id="copy-groups-btn" class="btn secondary-btn hidden" type="button">
+                                <i data-lucide="copy"></i>
+                                Copy
+                            </button>
+                        </div>
+                        <div id="group-results" class="group-results" aria-live="polite">
+                            <div class="group-results-empty">
+                                <i data-lucide="users-round"></i>
+                                <h4>Ready when you are</h4>
+                                <p>Your randomized groups will appear here.</p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </section>
 
