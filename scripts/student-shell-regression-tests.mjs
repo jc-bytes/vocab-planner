@@ -64,12 +64,12 @@ async function resolveServer() {
 
 async function installFixture(page) {
     await page.goto(`${baseUrl}/student.html`, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.studentApp?.manifest?.vocabularies?.length, null, { timeout: 15000 });
+    await page.waitForFunction(() => window.studentApp?.activities?.manifest?.vocabularies?.length, null, { timeout: 15000 });
     await page.evaluate(async () => {
         const app = window.studentApp;
-        const source = app.manifest.vocabularies.find(vocab => {
+        const source = app.activities.manifest.vocabularies.find(vocab => {
             return String(vocab.grade) === '6' || vocab.grades?.some(grade => String(grade) === '6');
-        }) || app.manifest.vocabularies[0];
+        }) || app.activities.manifest.vocabularies[0];
 
         app.authDisabled = true;
         app.currentUser = { id: 'student-shell-regression' };
@@ -78,7 +78,7 @@ async function installFixture(page) {
             { slug: 'technology', name: 'Technology', color: '#adc6ff', active: true },
             { slug: 'science', name: 'Science', color: '#7ee787', active: true }
         ];
-        app.cloudVocabs = [{
+        app.activities.cloudVocabs = [{
             ...source,
             id: 'student-shell-regression-science',
             name: 'Student Shell Science Fixture',

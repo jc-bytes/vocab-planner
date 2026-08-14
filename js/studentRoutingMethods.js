@@ -1,3 +1,5 @@
+import { notifications } from './notifications.js';
+
 export class StudentRouting {
     constructor(studentManager) {
         this.sm = studentManager;
@@ -182,15 +184,15 @@ export class StudentRouting {
         const normalized = String(unitId || '').trim();
         if (!normalized) return null;
 
-        if (!Array.isArray(this.sm.availableVocabs) || this.sm.availableVocabs.length === 0) {
+        if (this.sm.activities.availableVocabs.length === 0) {
             this.sm.activities.renderDashboard();
         }
 
-        return (this.sm.availableVocabs || []).find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+        return this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
     }
 
     isKnownActivityType(activityType) {
-        return this.sm.activityRouteTypes.includes(activityType);
+        return this.sm.activities.activityRouteTypes.includes(activityType);
     }
 
     showUnitsView(route = {}) {
@@ -212,6 +214,13 @@ export class StudentRouting {
     }
 
     async showArcadeView() {
+        const access = this.sm.activities.getPendingRequiredWork();
+        this.sm.activities.updateArcadeGateDisplay(access);
+        if (access.isBlocked) {
+            await this.redirectToPendingRequiredWork(access);
+            return false;
+        }
+
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
         this.sm.switchView('arcade-view');
@@ -219,6 +228,24 @@ export class StudentRouting {
         games.updateArcadeUI();
         games.updateGameSelectionUI();
         games.updateLeaderboardGame();
+        return true;
+    }
+
+    async redirectToPendingRequiredWork(access = this.sm.activities.getPendingRequiredWork()) {
+        const next = access.next;
+        if (!next?.vocab) {
+            this.setRoute({ view: 'menu' }, { replace: true });
+            this.sm.activities.renderStudentHome();
+            this.sm.switchView('main-menu-view');
+            return;
+        }
+
+        const activityLabel = access.remainingActivities === 1 ? 'activity' : 'activities';
+        notifications.warning(
+            `Arcade is locked. Complete ${access.remainingActivities} required ${activityLabel} first.`
+        );
+        this.setRoute({ view: 'unit', unitId: next.routeId }, { replace: true });
+        await this.sm.activities.loadVocabulary(next.vocab, { fromRoute: true });
     }
 
     async applyRoute(route) {

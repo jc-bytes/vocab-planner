@@ -1,5 +1,7 @@
 import { createElement } from '../main.js';
 
+const FLASHCARD_MASTERY_VERSION = 2;
+
 export class FlashcardsActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
         this.container = container;
@@ -10,11 +12,11 @@ export class FlashcardsActivity {
 
         this.currentIndex = 0;
         this.isFlipped = false;
-        this.viewedCards = new Set();
-        this.studyDurationMs = 10000;
-        this.studyStartedAt = null;
-        this.studyTimeoutId = null;
-        this.studyIntervalId = null;
+        this.answeredCards = new Set();
+        this.firstAttemptCorrectCards = new Set();
+        this.attemptsByCard = {};
+        this.feedback = '';
+        this.feedbackTone = '';
 
         this.container.classList.add('flashcards-activity-container');
         this.container.closest('#activity-view')?.classList.add('flashcards-active');
@@ -40,7 +42,12 @@ export class FlashcardsActivity {
         if (!state) return false;
 
         this.currentIndex = this.clampIndex(state.currentIndex || 0);
-        this.viewedCards = new Set(this.sanitizeViewedCards(state.viewedCards));
+        if (Number(state.masteryVersion) === FLASHCARD_MASTERY_VERSION) {
+            this.answeredCards = new Set(this.sanitizeCardIndexes(state.answeredCards));
+            this.firstAttemptCorrectCards = new Set(this.sanitizeCardIndexes(state.firstAttemptCorrectCards));
+            this.attemptsByCard = this.sanitizeAttempts(state.attemptsByCard);
+            this.isFlipped = this.answeredCards.has(this.currentIndex);
+        }
         return true;
     }
 
@@ -66,64 +73,116 @@ export class FlashcardsActivity {
         return Math.min(Math.max(Number(index) || 0, 0), this.words.length - 1);
     }
 
-    sanitizeViewedCards(viewedCards) {
-        if (!Array.isArray(viewedCards)) return [];
-
-        const validCards = new Set(this.words.map((_, index) => index));
+    sanitizeCardIndexes(indexes) {
+        if (!Array.isArray(indexes)) return [];
         const seen = new Set();
-
-        return viewedCards
-            .map(index => parseInt(index, 10))
+        return indexes
+            .map(index => Number.parseInt(index, 10))
             .filter(index => {
-                if (!validCards.has(index) || seen.has(index)) return false;
-                seen.add(index);
-                return true;
+                const valid = index >= 0 && index < this.words.length && !seen.has(index);
+                if (valid) seen.add(index);
+                return valid;
             });
+    }
+
+    sanitizeAttempts(attempts) {
+        if (!attempts || typeof attempts !== 'object' || Array.isArray(attempts)) return {};
+        return Object.fromEntries(
+            Object.entries(attempts)
+                .map(([index, count]) => [Number.parseInt(index, 10), Math.max(0, Number.parseInt(count, 10) || 0)])
+                .filter(([index]) => index >= 0 && index < this.words.length)
+        );
     }
 
     saveState() {
         const state = {
+            masteryVersion: FLASHCARD_MASTERY_VERSION,
             currentIndex: this.currentIndex,
-            viewedCards: Array.from(this.viewedCards),
+            answeredCards: Array.from(this.answeredCards),
+            firstAttemptCorrectCards: Array.from(this.firstAttemptCorrectCards),
+            attemptsByCard: { ...this.attemptsByCard },
             score: this.getScore().score
         };
 
-        if (this.onSaveState) {
-            this.onSaveState(state);
-        }
-
+        this.onSaveState?.(state);
         localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
     }
 
     reportProgress() {
-        if (this.onProgress) {
-            this.onProgress(this.getScore());
-        }
+        this.onProgress?.(this.getScore());
     }
 
     getScore() {
-        const viewedCount = this.viewedCards.size;
+        const answeredCount = this.answeredCards.size;
         const total = this.words.length;
-        const percentage = total === 0 ? 0 : Math.round((viewedCount / total) * 100);
+        const percentage = total === 0 ? 0 : Math.round((answeredCount / total) * 100);
+        const attemptedCards = Object.values(this.attemptsByCard).filter(count => count > 0).length;
+        const firstAttemptAccuracy = attemptedCards === 0
+            ? 0
+            : Math.round((this.firstAttemptCorrectCards.size / attemptedCards) * 100);
 
         return {
             score: percentage,
-            details: `Studied: ${viewedCount}/${total} cards`,
-            isComplete: total > 0 && percentage === 100
+            details: `Mastered: ${answeredCount}/${total} cards. First-attempt accuracy: ${firstAttemptAccuracy}%`,
+            isComplete: total > 0 && answeredCount === total,
+            accuracy: firstAttemptAccuracy
         };
     }
 
-    isCurrentCardStudied() {
-        return this.viewedCards.has(this.currentIndex);
+    isCurrentCardAnswered() {
+        return this.answeredCards.has(this.currentIndex);
     }
 
-    getRemainingStudyMs() {
-        if (!this.studyStartedAt || this.isCurrentCardStudied()) return 0;
-        return Math.max(0, this.studyDurationMs - (Date.now() - this.studyStartedAt));
+    normalizeDefinition(value) {
+        return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    }
+
+    getDefinition(word = this.words[this.currentIndex]) {
+        return String(word?.definition || word?.matchText || word?.example || `The meaning of ${word?.word || 'this word'}`).trim();
+    }
+
+    getStableOptionRank(option) {
+        const seed = `${this.words[this.currentIndex]?.word || ''}:${this.currentIndex}:${option}`;
+        let hash = 0;
+        for (let index = 0; index < seed.length; index += 1) {
+            hash = ((hash << 5) - hash + seed.charCodeAt(index)) | 0;
+        }
+        return hash;
+    }
+
+    getDefinitionOptions() {
+        const correct = this.getDefinition();
+        const correctKey = this.normalizeDefinition(correct);
+        const seen = new Set([correctKey]);
+        const distractors = [];
+
+        this.words.forEach(word => {
+            const definition = this.getDefinition(word);
+            const key = this.normalizeDefinition(definition);
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            distractors.push(definition);
+        });
+
+        const fallbackOptions = [
+            'A different meaning that is not used in this unit',
+            'None of the vocabulary definitions shown here',
+            'An unrelated action or object'
+        ];
+        fallbackOptions.forEach(option => {
+            if (distractors.length >= 3) return;
+            const key = this.normalizeDefinition(option);
+            if (!seen.has(key)) {
+                seen.add(key);
+                distractors.push(option);
+            }
+        });
+
+        return [correct, ...distractors.slice(0, 3)]
+            .sort((a, b) => this.getStableOptionRank(a) - this.getStableOptionRank(b));
     }
 
     render() {
-        this.clearStudyTimer();
         this.container.innerHTML = '';
 
         if (this.words.length === 0) {
@@ -133,11 +192,12 @@ export class FlashcardsActivity {
             return;
         }
 
-        const wrapper = createElement('div', 'flashcard-wrapper');
+        const wrapper = createElement('div', 'flashcard-wrapper flashcard-mastery-wrapper');
         const cardScene = createElement('div', 'card-scene');
         const card = createElement('button', 'flashcard');
         card.type = 'button';
-        card.setAttribute('aria-label', 'Flip flashcard');
+        card.setAttribute('aria-label', this.isCurrentCardAnswered() ? 'Flip flashcard' : 'Answer the definition question to reveal this flashcard');
+        card.setAttribute('aria-disabled', this.isCurrentCardAnswered() ? 'false' : 'true');
         if (this.isFlipped) card.classList.add('is-flipped');
 
         const word = this.words[this.currentIndex];
@@ -145,11 +205,9 @@ export class FlashcardsActivity {
         card.appendChild(this.createBackFace(word));
         cardScene.appendChild(card);
 
-        const studyStatus = this.createStudyStatus();
-        const controls = this.createControls();
-        const panel = createElement('div', 'flashcard-panel');
-        panel.appendChild(studyStatus);
-        panel.appendChild(controls);
+        const panel = createElement('div', 'flashcard-panel flashcard-mastery-panel');
+        panel.appendChild(this.createMasteryCheck(word));
+        panel.appendChild(this.createControls());
 
         const stage = createElement('div', 'flashcard-stage');
         stage.appendChild(cardScene);
@@ -158,11 +216,8 @@ export class FlashcardsActivity {
         this.container.appendChild(wrapper);
 
         card.addEventListener('click', () => this.handleCardFlip(card));
-        controls.querySelector('#prev-card')?.addEventListener('click', event => this.goToPrevious(event));
-        controls.querySelector('#next-card')?.addEventListener('click', event => this.goToNext(event));
-
-        this.updateStudyStatus();
-        this.updateControls();
+        panel.querySelector('#prev-card')?.addEventListener('click', event => this.goToPrevious(event));
+        panel.querySelector('#next-card')?.addEventListener('click', event => this.goToNext(event));
     }
 
     createFrontFace(word) {
@@ -172,12 +227,11 @@ export class FlashcardsActivity {
         const hint = createElement('p', 'hint');
 
         heading.textContent = word.word || '';
-        hint.textContent = 'Tap to reveal the definition';
-
-        content.appendChild(heading);
-        content.appendChild(hint);
+        hint.textContent = this.isCurrentCardAnswered()
+            ? 'Tap to review the definition'
+            : 'Choose the matching definition';
+        content.append(heading, hint);
         front.appendChild(content);
-
         return front;
     }
 
@@ -189,27 +243,53 @@ export class FlashcardsActivity {
         const example = createElement('p', 'example');
 
         partOfSpeech.textContent = word.part_of_speech || '';
-        definition.textContent = word.definition || '';
-        example.textContent = word.example ? `"${word.example}"` : '';
+        definition.textContent = this.getDefinition(word);
+        example.textContent = word.example ? `“${word.example}”` : '';
 
         if (word.part_of_speech) content.appendChild(partOfSpeech);
         content.appendChild(definition);
         if (word.example) content.appendChild(example);
         back.appendChild(content);
-
         return back;
     }
 
-    createStudyStatus() {
-        const status = createElement('div', 'flashcard-study-status');
-        status.setAttribute('aria-live', 'polite');
-        status.innerHTML = `
-            <span id="flashcard-study-text"></span>
-            <div class="flashcard-study-meter" aria-hidden="true">
-                <div id="flashcard-study-fill" class="flashcard-study-fill"></div>
-            </div>
-        `;
-        return status;
+    createMasteryCheck(word) {
+        const check = createElement('section', 'flashcard-mastery-check');
+        check.setAttribute('aria-label', `Definition check for ${word.word || 'vocabulary word'}`);
+
+        const heading = createElement('h3', null, this.isCurrentCardAnswered()
+            ? 'Definition mastered'
+            : `Which definition matches “${word.word || ''}”?`);
+        check.appendChild(heading);
+
+        if (this.isCurrentCardAnswered()) {
+            check.appendChild(createElement('p', 'flashcard-feedback is-correct', 'Correct. Review the card, then continue.'));
+            return check;
+        }
+
+        const optionList = createElement('div', 'flashcard-answer-options');
+        this.getDefinitionOptions().forEach(option => {
+            const button = createElement('button', 'btn secondary-btn flashcard-answer-option', option);
+            button.type = 'button';
+            button.addEventListener('click', () => this.handleAnswer(option));
+            optionList.appendChild(button);
+        });
+        check.appendChild(optionList);
+
+        const feedback = createElement('p', `flashcard-feedback${this.feedbackTone ? ` ${this.feedbackTone}` : ''}`, this.feedback);
+        feedback.setAttribute('aria-live', 'polite');
+        check.appendChild(feedback);
+
+        if ((this.attemptsByCard[this.currentIndex] || 0) >= 2) {
+            const hintText = word.example
+                ? `Hint: think about this example — “${word.example}”`
+                : word.part_of_speech
+                    ? `Hint: this word is a ${word.part_of_speech}.`
+                    : 'Hint: compare the meaning of each option carefully.';
+            check.appendChild(createElement('p', 'flashcard-question-hint', hintText));
+        }
+
+        return check;
     }
 
     createControls() {
@@ -219,126 +299,75 @@ export class FlashcardsActivity {
             <span class="progress">${this.currentIndex + 1} / ${this.words.length}</span>
             <button id="next-card" class="btn primary-btn" type="button">Next</button>
         `;
-        return controls;
-    }
 
-    handleCardFlip(card) {
-        card.classList.toggle('is-flipped');
-        this.isFlipped = !this.isFlipped;
-
-        if (this.isFlipped && !this.isCurrentCardStudied()) {
-            this.startStudyTimer();
-        } else {
-            this.clearStudyTimer();
-        }
-
-        this.updateStudyStatus();
-        this.updateControls();
-        this.saveState();
-    }
-
-    startStudyTimer() {
-        this.clearStudyTimer();
-        this.studyStartedAt = Date.now();
-
-        this.studyIntervalId = setInterval(() => {
-            this.updateStudyStatus();
-            this.updateControls();
-        }, 250);
-
-        this.studyTimeoutId = setTimeout(() => this.completeCurrentCardStudy(), this.studyDurationMs);
-    }
-
-    completeCurrentCardStudy() {
-        if (!this.isFlipped || this.isCurrentCardStudied()) return;
-
-        this.viewedCards.add(this.currentIndex);
-        this.clearStudyTimer();
-        this.updateStudyStatus();
-        this.updateControls();
-        this.reportProgress();
-        this.saveState();
-    }
-
-    clearStudyTimer() {
-        if (this.studyTimeoutId) {
-            clearTimeout(this.studyTimeoutId);
-            this.studyTimeoutId = null;
-        }
-
-        if (this.studyIntervalId) {
-            clearInterval(this.studyIntervalId);
-            this.studyIntervalId = null;
-        }
-
-        this.studyStartedAt = null;
-    }
-
-    updateStudyStatus() {
-        const text = this.container.querySelector('#flashcard-study-text');
-        const fill = this.container.querySelector('#flashcard-study-fill');
-        if (!text || !fill) return;
-
-        if (this.isCurrentCardStudied()) {
-            text.textContent = 'Card counted';
-            fill.style.width = '100%';
-            return;
-        }
-
-        if (!this.isFlipped) {
-            text.textContent = 'Reveal the definition to start the 10 second study timer';
-            fill.style.width = '0%';
-            return;
-        }
-
-        const remainingMs = this.getRemainingStudyMs();
-        const remainingSeconds = Math.max(1, Math.ceil(remainingMs / 1000));
-        const elapsedPercent = Math.min(100, Math.round(((this.studyDurationMs - remainingMs) / this.studyDurationMs) * 100));
-
-        text.textContent = `Keep studying: ${remainingSeconds}s`;
-        fill.style.width = `${elapsedPercent}%`;
-    }
-
-    updateControls() {
-        const previousButton = this.container.querySelector('#prev-card');
-        const nextButton = this.container.querySelector('#next-card');
-        if (!previousButton || !nextButton) return;
-
+        const previousButton = controls.querySelector('#prev-card');
+        const nextButton = controls.querySelector('#next-card');
         previousButton.disabled = this.currentIndex === 0;
 
         const isLastCard = this.currentIndex === this.words.length - 1;
-        const isStudied = this.isCurrentCardStudied();
-        nextButton.disabled = isLastCard || !isStudied;
+        nextButton.disabled = isLastCard || !this.isCurrentCardAnswered();
+        nextButton.textContent = isLastCard
+            ? (this.isCurrentCardAnswered() ? 'Completed' : 'Answer to finish')
+            : 'Next';
+        return controls;
+    }
 
-        if (isLastCard) {
-            nextButton.textContent = 'Last Card';
-        } else if (isStudied) {
-            nextButton.textContent = 'Next';
-        } else if (this.isFlipped) {
-            nextButton.textContent = `Next in ${Math.max(1, Math.ceil(this.getRemainingStudyMs() / 1000))}s`;
+    recordAnswer(selectedDefinition) {
+        if (this.isCurrentCardAnswered()) return { correct: true, alreadyAnswered: true };
+
+        const priorAttempts = this.attemptsByCard[this.currentIndex] || 0;
+        const correct = this.normalizeDefinition(selectedDefinition) === this.normalizeDefinition(this.getDefinition());
+        this.attemptsByCard[this.currentIndex] = priorAttempts + 1;
+
+        if (correct) {
+            this.answeredCards.add(this.currentIndex);
+            if (priorAttempts === 0) this.firstAttemptCorrectCards.add(this.currentIndex);
+            this.feedback = 'Correct! The next card is now unlocked.';
+            this.feedbackTone = 'is-correct';
+            this.isFlipped = true;
         } else {
-            nextButton.textContent = 'Next';
+            this.feedback = priorAttempts >= 1
+                ? 'Not yet. Use the hint and try again.'
+                : 'Not quite. Compare the definitions and try again.';
+            this.feedbackTone = 'is-incorrect';
+            this.isFlipped = false;
         }
+
+        return { correct, alreadyAnswered: false, attempts: priorAttempts + 1 };
+    }
+
+    handleAnswer(selectedDefinition) {
+        const result = this.recordAnswer(selectedDefinition);
+        this.saveState();
+        if (result.correct) this.reportProgress();
+        this.render();
+    }
+
+    handleCardFlip(card) {
+        if (!this.isCurrentCardAnswered()) return;
+        card.classList.toggle('is-flipped');
+        this.isFlipped = !this.isFlipped;
+        this.saveState();
     }
 
     goToPrevious(event) {
         event.stopPropagation();
         if (this.currentIndex === 0) return;
-
-        this.clearStudyTimer();
-        this.currentIndex--;
-        this.isFlipped = false;
+        this.currentIndex -= 1;
+        this.isFlipped = this.isCurrentCardAnswered();
+        this.feedback = '';
+        this.feedbackTone = '';
         this.render();
         this.saveState();
     }
 
     goToNext(event) {
         event.stopPropagation();
-        if (this.currentIndex >= this.words.length - 1 || !this.isCurrentCardStudied()) return;
-
-        this.clearStudyTimer();
-        this.currentIndex++;
-        this.isFlipped = false;
+        if (this.currentIndex >= this.words.length - 1 || !this.isCurrentCardAnswered()) return;
+        this.currentIndex += 1;
+        this.isFlipped = this.isCurrentCardAnswered();
+        this.feedback = '';
+        this.feedbackTone = '';
         this.render();
         this.saveState();
     }

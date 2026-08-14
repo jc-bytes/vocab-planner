@@ -6,11 +6,22 @@
 import { StudentGameHtmlLoader } from './studentGameHtmlLoaderMethods.js';
 import { StudentGameLeaderboard } from './studentGameLeaderboardMethods.js';
 import { StudentGameLifecycle } from './studentGameLifecycleMethods.js';
+import { STUDENT_GAME_REGISTRY } from './studentGameRegistry.js';
 import { StudentGameSettings } from './studentGameSettingsMethods.js';
 
 export class StudentGames {
     constructor(studentManager) {
         this.sm = studentManager;
+        this.currentGame = null;
+        this.gameTimeRemaining = 0;
+        this.gameTimerInterval = null;
+        this.isHandlingGameMinute = false;
+        this.gamesList = STUDENT_GAME_REGISTRY;
+        this.currentGameIndex = 0;
+        this.currentGameScore = 0;
+        this.currentGameMetadata = null;
+        this.lastSavedScore = 0;
+        this.isGamePaused = false;
         this.settings = new StudentGameSettings(this);
         this.leaderboard = new StudentGameLeaderboard(this);
         this.htmlLoader = new StudentGameHtmlLoader(this);

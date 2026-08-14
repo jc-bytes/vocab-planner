@@ -84,7 +84,7 @@ export class StudentGameSettings {
     }
 
     async updateGameSelectionUI() {
-        const game = this.sm.gamesList[this.sm.currentGameIndex];
+        const game = this.games.gamesList[this.games.currentGameIndex];
         const container = $('#current-game-card');
         if (!container) return;
 
@@ -93,8 +93,8 @@ export class StudentGameSettings {
         const exchangeRate = this.getExchangeRate();
         
         // Game counter (e.g., "3/20")
-        const currentNum = this.sm.currentGameIndex + 1;
-        const totalGames = this.sm.gamesList.length;
+        const currentNum = this.games.currentGameIndex + 1;
+        const totalGames = this.games.gamesList.length;
         const totalEl = $('#arcade-game-total');
         if (totalEl) totalEl.textContent = totalGames;
 

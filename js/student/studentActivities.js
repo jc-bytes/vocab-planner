@@ -12,13 +12,21 @@ import { StudentActivityMenu } from './studentActivityMenuMethods.js';
 import { StudentActivityModuleLoader } from './studentActivityModuleLoaderMethods.js';
 import { StudentActivityProgressFlow } from './studentActivityProgressFlowMethods.js';
 import { StudentActivityProgressPersistence } from './studentActivityProgressPersistenceMethods.js';
+import { getStudentActivityIds } from './studentActivityRegistry.js';
 import { StudentActivitySchedule } from './studentActivityScheduleMethods.js';
+import { StudentActivitySession } from './studentActivitySession.js';
 import { StudentActivityVocabularyData } from './studentActivityVocabularyDataMethods.js';
 import { StudentActivityWordHunt } from './studentActivityWordHuntMethods.js';
 
 export class StudentActivities {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
+        this.manifest = null;
+        this.cloudVocabs = [];
+        this.availableVocabs = [];
+        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
+        this.activityRouteTypes = getStudentActivityIds();
+        this.session = new StudentActivitySession(this);
         this.calendar = new StudentActivityCalendar(this);
         this.schedule = new StudentActivitySchedule(this);
         this.coverage = new StudentActivityCoverage(this);
@@ -293,6 +301,22 @@ export class StudentActivities {
         return this.progressFlow.isActivityComplete(activityType);
     }
 
+    isActivityScoreComplete(scoreData) {
+        return this.progressFlow.isActivityScoreComplete(scoreData);
+    }
+
+    getUnitScores(vocab) {
+        return this.progressFlow.getUnitScores(vocab);
+    }
+
+    getUnitRequiredCompletion(vocab) {
+        return this.progressFlow.getUnitRequiredCompletion(vocab);
+    }
+
+    getPendingRequiredWork(date = new Date()) {
+        return this.progressFlow.getPendingRequiredWork(date);
+    }
+
     getRequiredCompletion(flow = this.getActivityFlowConfig()) {
         return this.progressFlow.getRequiredCompletion(flow);
     }
@@ -303,6 +327,10 @@ export class StudentActivities {
 
     updateActivityGateDisplay(cards, flow = this.getActivityFlowConfig()) {
         return this.progressFlow.updateActivityGateDisplay(cards, flow);
+    }
+
+    updateArcadeGateDisplay(status = this.getPendingRequiredWork()) {
+        return this.progressFlow.updateArcadeGateDisplay(status);
     }
 
     getNextActivityPreloadType(flow = this.getActivityFlowConfig()) {

@@ -71,29 +71,16 @@ test('StudentAuth owns the explicit authentication UI component', () => {
     assert.equal(auth.ui.joinGrade, '7');
 });
 
-test('StudentManager declares the complete auth interface directly', () => {
+test('StudentManager declares only the cross-component auth interface directly', () => {
     for (const method of [
-        'getJoinGradeFromUrl',
-        'prefillRegistrationFromJoinLink',
         'normalizeStudentProfile',
         'mergeStudentProfile',
         'hasCompleteStudentProfile',
         'showAuthPanel',
-        'validateRegistrationForm',
         'handleStudentLogin',
         'handleStudentRegister',
-        'showForcedPasswordChange',
         'handleForcedPasswordChange',
-        'showElectronAuthMessage',
-        'updateHeader',
-        'checkProfile',
-        'initBackendAuth',
-        'fetchAndSetRole',
-        'handleBackendSignIn',
-        'handleBackendSignOut',
-        'updateGuestStatus',
-        'setAuthStatus',
-        'showLoginError'
+        'setAuthStatus'
     ]) {
         assert.equal(
             Object.prototype.hasOwnProperty.call(StudentManager.prototype, method),

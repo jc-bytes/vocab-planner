@@ -50,7 +50,7 @@ export class StudentActivityVocabularyData {
     async loadManifest() {
         const data = await loadManifest();
         if (data) {
-            this.sm.manifest = data;
+            this.activities.manifest = data;
         } else {
             // Fallback or error handling
             console.error('Could not load manifest');
@@ -61,12 +61,12 @@ export class StudentActivityVocabularyData {
     getAllVocabularySources() {
         let vocabs = [];
 
-        if (Array.isArray(this.sm.cloudVocabs) && this.sm.cloudVocabs.length > 0) {
-            vocabs = vocabs.concat(this.sm.cloudVocabs);
+        if (this.activities.cloudVocabs.length > 0) {
+            vocabs = vocabs.concat(this.activities.cloudVocabs);
         }
 
-        if (this.sm.manifest && Array.isArray(this.sm.manifest.vocabularies)) {
-            const manifestVocabs = this.sm.manifest.vocabularies.map(v => ({
+        if (Array.isArray(this.activities.manifest?.vocabularies)) {
+            const manifestVocabs = this.activities.manifest.vocabularies.map(v => ({
                 ...v,
                 subjectSlug: getVocabSubjectSlug(v),
                 __source: 'manifest'
@@ -187,7 +187,7 @@ export class StudentActivityVocabularyData {
             }
         }
 
-        this.sm.availableVocabs = vocabs;
+        this.activities.availableVocabs = vocabs;
         return { vocabs, message: '' };
     }
 
@@ -252,21 +252,21 @@ export class StudentActivityVocabularyData {
 
     async loadCloudVocabularies() {
         if (this.sm.authDisabled) {
-            this.sm.cloudVocabs = [];
+            this.activities.cloudVocabs = [];
             return;
         }
 
         try {
-            this.sm.cloudVocabs = await loadCloudVocabularyList(studentApi);
+            this.activities.cloudVocabs = await loadCloudVocabularyList(studentApi);
         } catch (error) {
             console.error('Failed to load cloud vocabularies:', error);
             const isOffline = !navigator.onLine;
             if (isOffline) {
                 // Silently fail offline - we'll use local/manifest vocabularies
-                this.sm.cloudVocabs = [];
+                this.activities.cloudVocabs = [];
             } else {
                 notifications.warning('Could not load cloud vocabularies. Using local versions.');
-                this.sm.cloudVocabs = [];
+                this.activities.cloudVocabs = [];
             }
             // Re-throw to let caller know we failed
             throw error;

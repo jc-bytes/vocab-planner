@@ -25,6 +25,7 @@ export class StudentActivityProgressPersistence {
             const activityType = this.sm.currentActivityType;
             const settings = this.sm.currentVocab.activitySettings || {};
             const { progressReward, completionBonus } = this.getActivityCoinRewards(activityType, settings);
+            let persistedScoreData = scoreData;
 
             // Non-replayable activities (flashcards, illustration) - only reward first-time progress
             const nonReplayable = ['flashcards', 'illustration'];
@@ -50,7 +51,13 @@ export class StudentActivityProgressPersistence {
                     }
                 }
 
-                this.sm.unitScores[activityType] = scoreData;
+                persistedScoreData = {
+                    ...scoreData,
+                    score: Math.max(oldScore, newScore),
+                    details: newScore >= oldScore ? scoreData.details : oldScoreData?.details,
+                    isComplete: Boolean(oldScoreData?.isComplete) || Boolean(scoreData.isComplete) || oldScore >= 100
+                };
+                this.sm.unitScores[activityType] = persistedScoreData;
             } else {
                 // Replayable activities: track best score + total plays + earn coins on each play
                 const oldScoreData = this.sm.unitScores[activityType] || { score: 0, plays: 0, totalEarned: 0 };
@@ -98,20 +105,22 @@ export class StudentActivityProgressPersistence {
                 oldScoreData.lastPlayed = new Date().toISOString();
 
                 this.sm.unitScores[activityType] = oldScoreData;
+                persistedScoreData = oldScoreData;
             }
 
             this.sm.progress.saveLocalProgress();
-            this.syncActivityProgressToCloud(activityType, scoreData, {
+            this.syncActivityProgressToCloud(activityType, persistedScoreData, {
                 ...settings,
                 progressReward,
                 completionBonus
             });
             this.activities.scheduleActivityPreload();
+            this.activities.updateArcadeGateDisplay();
 
             // Update in-game progress indicator
             const indicator = $('#activity-progress-indicator');
             if (indicator) {
-                const percent = scoreData.score || 0;
+                const percent = persistedScoreData.score || 0;
                 indicator.textContent = `Progress: ${percent}%`;
                 indicator.classList.remove('hidden');
             }

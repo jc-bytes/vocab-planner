@@ -58,19 +58,12 @@ test('StudentListeners owns isolated lifecycle and export state', () => {
     assert.deepEqual(second.disposers, []);
 });
 
-test('StudentManager declares the stable listener interface directly', () => {
-    for (const method of [
-        'initListeners',
-        'addListener',
-        'setStudentExportButtonState',
-        'destroyStudentListeners'
-    ]) {
-        assert.equal(
-            Object.prototype.hasOwnProperty.call(StudentManager.prototype, method),
-            true,
-            `${method} must be declared by StudentManager`
-        );
-    }
+test('StudentManager retains the listener bridge used by game settings', () => {
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentManager.prototype, 'addListener'),
+        true,
+        'addListener must be declared by StudentManager'
+    );
 });
 
 test('tracked listeners are removed during teardown', () => {

@@ -1,4 +1,4 @@
-import { $, createElement } from '../main.js';
+import { StudentActivityGateDisplay } from './studentActivityGateDisplay.js';
 import { getCurrentSchoolYear, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import {
     DEFAULT_PRACTICE_REQUIRED_ROTATION,
@@ -11,6 +11,7 @@ export class StudentActivityProgressFlow {
         this.activities = activities;
         this.sm = activities.sm;
         this.activityPreloadKeys = new Set();
+        this.gateDisplay = new StudentActivityGateDisplay(this);
     }
 
     getVocabTrimesterKey(...args) {
@@ -227,10 +228,11 @@ export class StudentActivityProgressFlow {
         const requestedRequired = hasExplicitRequired ? settings.requiredActivities : defaultRequired;
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
-        let uniqueRequired = [...new Set(required)];
-        if (!uniqueRequired.includes('flashcards')) {
-            uniqueRequired.unshift('flashcards');
-        }
+        let uniqueRequired = [
+            'flashcards',
+            ...required.filter(id => id !== 'flashcards')
+        ];
+        uniqueRequired = [...new Set(uniqueRequired)];
         if (!hasExplicitRequired) {
             uniqueRequired = this.replaceUnsuitableRequiredActivities(uniqueRequired, vocab, validIds);
         }
@@ -251,8 +253,81 @@ export class StudentActivityProgressFlow {
 
     isActivityComplete(activityType) {
         const scoreData = this.sm.unitScores?.[activityType];
+        return this.isActivityScoreComplete(scoreData);
+    }
+
+    isActivityScoreComplete(scoreData) {
         if (!scoreData) return false;
         return Boolean(scoreData.isComplete) || (Number(scoreData.score) || 0) >= 100;
+    }
+
+    getUnitScores(vocab) {
+        if (!vocab) return {};
+        const progressKey = this.getUnitProgressKey(vocab);
+        const unitProgress = this.sm.progressData?.units?.[progressKey]
+            || this.sm.progressData?.units?.[vocab.name]
+            || {};
+        return unitProgress.scores || {};
+    }
+
+    getUnitRequiredCompletion(vocab) {
+        const flow = this.getActivityFlowConfig(vocab);
+        const scores = this.getUnitScores(vocab);
+        const completed = flow.required.filter(activityType => (
+            this.isActivityScoreComplete(scores[activityType])
+        )).length;
+        const nextActivityType = flow.required.find(activityType => (
+            !this.isActivityScoreComplete(scores[activityType])
+        )) || null;
+
+        return {
+            completed,
+            total: flow.required.length,
+            isComplete: flow.required.length > 0 && completed >= flow.required.length,
+            nextActivityType,
+            remaining: Math.max(0, flow.required.length - completed),
+            flow,
+            scores
+        };
+    }
+
+    getPendingRequiredWork(date = new Date()) {
+        const currentTrimester = this.activities.getCurrentTrimesterKey(date);
+        const vocabs = this.activities
+            .filterStudentAvailableVocabulary(this.activities.getGradeMatchedVocabularySources(), date)
+            .filter(vocab => this.activities.getVocabTrimesterKey(vocab) === currentTrimester);
+
+        const units = vocabs
+            .map(vocab => {
+                const completion = this.getUnitRequiredCompletion(vocab);
+                const schedule = this.activities.getVocabSchedule(vocab, date);
+                return {
+                    vocab,
+                    completion,
+                    schedule,
+                    routeId: this.sm.getVocabRouteId?.(vocab) || vocab.id || vocab.name || ''
+                };
+            })
+            .filter(item => !item.completion.isComplete)
+            .sort((a, b) => {
+                const aTime = a.schedule.dueDate?.getTime?.() || 0;
+                const bTime = b.schedule.dueDate?.getTime?.() || 0;
+                if (aTime !== bTime) {
+                    if (!aTime) return 1;
+                    if (!bTime) return -1;
+                    return aTime - bTime;
+                }
+                return String(a.vocab.name || '').localeCompare(String(b.vocab.name || ''));
+            });
+
+        const remainingActivities = units.reduce((total, item) => total + item.completion.remaining, 0);
+        return {
+            isBlocked: units.length > 0,
+            unitCount: units.length,
+            remainingActivities,
+            units,
+            next: units[0] || null
+        };
     }
 
     getRequiredCompletion(flow = this.getActivityFlowConfig()) {
@@ -266,219 +341,23 @@ export class StudentActivityProgressFlow {
 
     isActivityUnlocked(activityType) {
         const flow = this.getActivityFlowConfig();
-        if (flow.required.includes(activityType)) return true;
+        if (flow.required.includes(activityType)) {
+            if (this.isActivityComplete(activityType)) return true;
+            const activityIndex = flow.required.indexOf(activityType);
+            return flow.required
+                .slice(0, activityIndex)
+                .every(requiredType => this.isActivityComplete(requiredType));
+        }
         if (!flow.additional.includes(activityType)) return false;
         return this.getRequiredCompletion(flow).isComplete;
     }
 
     updateActivityGateDisplay(cards, flow = this.getActivityFlowConfig()) {
-        const grid = document.querySelector('#activity-menu-view .activities-grid');
-        if (!grid) return;
+        return this.gateDisplay.updateActivityGateDisplay(cards, flow);
+    }
 
-        const completion = this.getRequiredCompletion(flow);
-        const allCards = Array.from(cards);
-        const cardByType = new Map(allCards.map(card => [card.dataset.activity, card]));
-        const nextActivityType = completion.isComplete
-            ? null
-            : flow.required.find(activityType => !this.isActivityComplete(activityType));
-        const status = $('#required-activities-status');
-        if (status) status.remove();
-
-        const staleHeaderCoverage = document.querySelector('#activity-menu-view .section-header #overall-coverage-indicator');
-        if (staleHeaderCoverage) staleHeaderCoverage.remove();
-
-        allCards.forEach(card => card.remove());
-        grid.querySelectorAll('.activity-flow-section').forEach(section => section.remove());
-        grid.style.display = 'block';
-
-        const createSection = (title, className, description = '') => {
-            const section = createElement('section', `activity-flow-section ${className}`);
-            const headingBlock = createElement('div', 'activity-flow-heading');
-            const heading = createElement('h3', null, title);
-            headingBlock.appendChild(heading);
-            if (description) headingBlock.appendChild(createElement('p', null, description));
-            const innerGrid = createElement('div', 'activities-grid-inner');
-            section.appendChild(headingBlock);
-            section.appendChild(innerGrid);
-            grid.appendChild(section);
-            return innerGrid;
-        };
-
-        const requiredGrid = createSection(
-            'Required Path',
-            'required-activity-section',
-            'Complete these activities to unlock the full practice library.'
-        );
-        requiredGrid.classList.add('required-activity-path');
-        requiredGrid.style.setProperty('--required-count', Math.max(flow.required.length, 1));
-        const pathTrack = createElement('div', 'required-path-track');
-        const requiredCompletionStates = flow.required.map(activityType => this.isActivityComplete(activityType));
-        const getCompletedPathRanges = (completionStates) => {
-            const count = completionStates.length;
-            if (count === 0) return [];
-
-            const ranges = completionStates
-                .map((isComplete, index) => {
-                    if (!isComplete) return null;
-                    if (count === 1) return [0, 100];
-
-                    const current = (index / (count - 1)) * 100;
-                    const previous = index === 0 ? 0 : (((index - 1) / (count - 1)) * 100);
-                    const next = index === count - 1 ? 100 : (((index + 1) / (count - 1)) * 100);
-                    const start = index === 0 ? 0 : (previous + current) / 2;
-                    const end = index === count - 1 ? 100 : (current + next) / 2;
-                    return [start, end];
-                })
-                .filter(Boolean);
-
-            return ranges.reduce((merged, range) => {
-                const last = merged[merged.length - 1];
-                if (last && range[0] <= last[1]) {
-                    last[1] = Math.max(last[1], range[1]);
-                } else {
-                    merged.push([...range]);
-                }
-                return merged;
-            }, []);
-        };
-        const completedPathRanges = getCompletedPathRanges(requiredCompletionStates);
-        const svgNamespace = 'http://www.w3.org/2000/svg';
-        const createPathSvg = (className, viewBox, pathData, clipId, vertical = false) => {
-            const svg = document.createElementNS(svgNamespace, 'svg');
-            svg.setAttribute('class', className);
-            svg.setAttribute('viewBox', viewBox);
-            svg.setAttribute('preserveAspectRatio', 'none');
-
-            const defs = document.createElementNS(svgNamespace, 'defs');
-            const clipPath = document.createElementNS(svgNamespace, 'clipPath');
-            clipPath.setAttribute('id', clipId);
-            completedPathRanges.forEach(([start, end]) => {
-                const clipRect = document.createElementNS(svgNamespace, 'rect');
-                clipRect.setAttribute('x', vertical ? '0' : `${start}%`);
-                clipRect.setAttribute('y', vertical ? `${start}%` : '0');
-                clipRect.setAttribute('width', vertical ? '100%' : `${end - start}%`);
-                clipRect.setAttribute('height', vertical ? `${end - start}%` : '100%');
-                clipPath.appendChild(clipRect);
-            });
-            defs.appendChild(clipPath);
-
-            const basePath = document.createElementNS(svgNamespace, 'path');
-            basePath.setAttribute('class', 'required-path-base');
-            basePath.setAttribute('d', pathData);
-            basePath.setAttribute('pathLength', '100');
-
-            const progressPath = document.createElementNS(svgNamespace, 'path');
-            progressPath.setAttribute('class', 'required-path-progress');
-            progressPath.setAttribute('d', pathData);
-            progressPath.setAttribute('pathLength', '100');
-            progressPath.setAttribute('clip-path', `url(#${clipId})`);
-
-            svg.append(defs, basePath, progressPath);
-            return svg;
-        };
-        pathTrack.append(
-            createPathSvg(
-                'required-path-svg required-path-svg-desktop',
-                '0 0 1000 104',
-                'M 0 52 C 210 -8 360 -8 500 52 S 790 112 1000 52',
-                'required-path-clip-desktop'
-            ),
-            createPathSvg(
-                'required-path-svg required-path-svg-mobile',
-                '0 0 84 1000',
-                'M 42 0 C -8 210 -8 360 42 500 S 92 790 42 1000',
-                'required-path-clip-mobile',
-                true
-            )
-        );
-        requiredGrid.appendChild(pathTrack);
-        const additionalDetails = createElement('details', 'activity-flow-section additional-activity-section activity-secondary-disclosure activity-disclosure');
-        additionalDetails.open = true;
-        const additionalSummary = createElement(
-            'summary',
-            'activity-disclosure__summary',
-            completion.isComplete
-                ? `Additional Practice (${flow.additional.length})`
-                : `Additional Practice (${flow.additional.length}) · locked`
-        );
-        const additionalGrid = createElement('div', 'activities-grid-inner activity-secondary-grid');
-        additionalDetails.appendChild(additionalSummary);
-        if (!completion.isComplete) {
-            additionalDetails.appendChild(createElement(
-                'p',
-                'activity-disclosure-note',
-                'Finish the required activities first. These are still listed here so you can see what unlocks next.'
-            ));
-        }
-        additionalDetails.appendChild(additionalGrid);
-
-        const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure activity-disclosure');
-        unavailableDetails.open = false;
-        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Not Required (${flow.hidden.length})`);
-        const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
-        unavailableDetails.appendChild(unavailableSummary);
-        unavailableDetails.appendChild(createElement(
-            'p',
-            'activity-disclosure-note',
-            'These activities are visible for reference but are not part of this vocabulary unit.'
-        ));
-        unavailableDetails.appendChild(unavailableGrid);
-
-        const prepareCard = (card) => {
-            if (!card) return;
-            const activityType = card.dataset.activity;
-            const isRequired = flow.required.includes(activityType);
-            const isAdditional = flow.additional.includes(activityType);
-            const isHidden = flow.hidden.includes(activityType);
-            const isLockedAdditional = isAdditional && !completion.isComplete;
-            card.classList.toggle('required-activity-card', isRequired);
-            card.classList.toggle('additional-activity-card', isAdditional);
-            card.classList.toggle('activity-locked-card', isLockedAdditional);
-            card.classList.toggle('activity-unavailable-card', isHidden);
-            const isNext = activityType === nextActivityType;
-            const isComplete = this.isActivityComplete(activityType);
-            card.classList.toggle('next-activity-card', isNext);
-            card.classList.toggle('activity-flow-card-compact', !isNext);
-            card.classList.toggle('activity-path-complete', isRequired && isComplete);
-            card.disabled = isHidden;
-            card.setAttribute('aria-disabled', isHidden ? 'true' : 'false');
-            card.title = isHidden
-                ? 'Not required for this vocabulary unit.'
-                : (isLockedAdditional ? 'Finish the required activities to unlock this practice.' : '');
-
-            if (isHidden && !card.querySelector('.activity-unavailable-label')) {
-                card.prepend(createElement('span', 'activity-unavailable-label', 'Not required'));
-            }
-            if (isLockedAdditional && !card.querySelector('.activity-lock-label')) {
-                card.prepend(createElement('span', 'activity-lock-label', 'Locked'));
-            }
-            if (isRequired) {
-                const statusText = isComplete ? 'Complete' : (isNext ? 'Next' : 'Ready');
-                card.appendChild(createElement('span', 'activity-path-status', statusText));
-            }
-        };
-
-        flow.required.forEach(activityType => {
-            const card = cardByType.get(activityType);
-            prepareCard(card);
-            if (card) requiredGrid.appendChild(card);
-        });
-
-        flow.additional.forEach(activityType => {
-            const card = cardByType.get(activityType);
-            prepareCard(card);
-            if (card) additionalGrid.appendChild(card);
-        });
-
-        if (flow.additional.length > 0) grid.appendChild(additionalDetails);
-
-        flow.hidden.forEach(activityType => {
-            const card = cardByType.get(activityType);
-            prepareCard(card);
-            if (card) unavailableGrid.appendChild(card);
-        });
-
-        if (flow.hidden.length > 0) grid.appendChild(unavailableDetails);
+    updateArcadeGateDisplay(status = this.getPendingRequiredWork()) {
+        return this.gateDisplay.updateArcadeGateDisplay(status);
     }
 
     getNextActivityPreloadType(flow = this.getActivityFlowConfig()) {

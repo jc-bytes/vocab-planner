@@ -4,6 +4,7 @@ import { vocabularyRepository } from './services/vocabularyRepository.js';
 import {
     SCHOOL_CALENDAR_LOCAL_KEY,
     SCHOOL_CALENDAR_SETTINGS_KEY,
+    SCHOOL_WEEKDAYS,
     calculateCalendarEndDateFromWeekCount,
     calculateCalendarWeekCount,
     calculateCalendarWeekRange,
@@ -60,18 +61,89 @@ export const teacherSchoolCalendarSettingsMethods = {
         setValue('#calendar-iiit-start', calendar.trimesters.IIIT.startDate);
         setValue('#calendar-iiit-weeks', calendar.trimesters.IIIT.weekCount);
         setValue('#calendar-iiit-end', calendar.trimesters.IIIT.endDate);
+        this.renderClassScheduleRows(calendar.classSchedules);
         this.updateSchoolCalendarRangePreviews();
     },
 
     readSchoolCalendarFromUI() {
         return normalizeSchoolCalendar({
             schoolYear: $('#school-calendar-year')?.value,
+            classSchedules: this.readClassSchedulesFromUI(),
             trimesters: {
                 IT: this.readSchoolCalendarTrimesterFromUI('it'),
                 IIT: this.readSchoolCalendarTrimesterFromUI('iit'),
                 IIIT: this.readSchoolCalendarTrimesterFromUI('iiit')
             }
         });
+    },
+
+    readClassSchedulesFromUI() {
+        return Array.from(document.querySelectorAll('#class-schedule-list .class-schedule-row')).map(row => ({
+            grade: row.querySelector('[data-class-schedule-grade]')?.value || '',
+            section: row.querySelector('[data-class-schedule-section]')?.value || '',
+            weekdays: Array.from(row.querySelectorAll('[data-class-schedule-day]:checked'))
+                .map(input => Number(input.value))
+        }));
+    },
+
+    validateClassScheduleRows() {
+        const schedules = this.readClassSchedulesFromUI();
+        const seen = new Set();
+        for (const schedule of schedules) {
+            const grade = String(schedule.grade || '').match(/\d+/)?.[0] || '';
+            const section = String(schedule.section || '').trim().toUpperCase();
+            if (!grade || !section) return 'Every class schedule needs a grade and section.';
+            if (!schedule.weekdays.length) return `Grade ${grade}${section} needs at least one class day.`;
+            const key = `${grade}:${section}`;
+            if (seen.has(key)) return `Grade ${grade}${section} is listed more than once.`;
+            seen.add(key);
+        }
+        return '';
+    },
+
+    renderClassScheduleRows(schedules = []) {
+        const list = $('#class-schedule-list');
+        if (!list) return;
+        list.innerHTML = '';
+        schedules.forEach(schedule => this.addClassScheduleRow(schedule));
+        list.classList.toggle('is-empty', schedules.length === 0);
+    },
+
+    addClassScheduleRow(schedule = {}) {
+        const list = $('#class-schedule-list');
+        if (!list) return;
+
+        const row = document.createElement('div');
+        row.className = 'class-schedule-row';
+        const selectedDays = new Set((schedule.weekdays || []).map(Number));
+        row.innerHTML = `
+            <label class="class-schedule-field">
+                <span>Grade</span>
+                <select data-class-schedule-grade aria-label="Class grade">
+                    ${['6', '7', '8', '9'].map(grade => `<option value="${grade}"${String(schedule.grade || '') === grade ? ' selected' : ''}>${grade}</option>`).join('')}
+                </select>
+            </label>
+            <label class="class-schedule-field">
+                <span>Section</span>
+                <input data-class-schedule-section type="text" maxlength="2" value="${String(schedule.section || '').replace(/[^a-z0-9]/gi, '').toUpperCase()}" placeholder="A" aria-label="Class section">
+            </label>
+            <fieldset class="class-schedule-days">
+                <legend>Meeting days</legend>
+                ${SCHOOL_WEEKDAYS.map(day => `
+                    <label title="${day.key}">
+                        <input data-class-schedule-day type="checkbox" value="${day.value}"${selectedDays.has(day.value) ? ' checked' : ''}>
+                        <span>${day.shortLabel}</span>
+                    </label>
+                `).join('')}
+            </fieldset>
+            <button class="btn text-btn class-schedule-remove" type="button" data-remove-class-schedule aria-label="Remove class schedule">
+                <i data-lucide="trash-2"></i><span>Remove</span>
+            </button>
+        `;
+        list.appendChild(row);
+        list.classList.remove('is-empty');
+        this.refreshIcons();
+        return row;
     },
 
     readSchoolCalendarTrimesterFromUI(slug) {
@@ -113,6 +185,23 @@ export const teacherSchoolCalendarSettingsMethods = {
                 });
             });
         });
+
+        const addButton = $('#add-class-schedule-btn');
+        if (addButton && addButton.dataset.calendarBound !== 'true') {
+            addButton.dataset.calendarBound = 'true';
+            addButton.addEventListener('click', () => this.addClassScheduleRow({ grade: '6', section: '', weekdays: [] }));
+        }
+
+        const scheduleList = $('#class-schedule-list');
+        if (scheduleList && scheduleList.dataset.calendarBound !== 'true') {
+            scheduleList.dataset.calendarBound = 'true';
+            scheduleList.addEventListener('click', event => {
+                const removeButton = event.target.closest('[data-remove-class-schedule]');
+                if (!removeButton) return;
+                removeButton.closest('.class-schedule-row')?.remove();
+                scheduleList.classList.toggle('is-empty', scheduleList.children.length === 0);
+            });
+        }
     },
 
     handleSchoolCalendarInput(slug, field) {
@@ -179,14 +268,16 @@ export const teacherSchoolCalendarSettingsMethods = {
     },
 
     async saveSchoolCalendarSettings() {
+        const scheduleError = this.validateClassScheduleRows();
         const calendar = this.readSchoolCalendarFromUI();
         const errors = this.validateSchoolCalendar(calendar);
         const statusEl = $('#school-calendar-save-status');
         const saveBtn = $('#save-school-calendar-btn');
 
-        if (errors.length > 0) {
-            if (statusEl) statusEl.textContent = errors[0];
-            notifications.error(errors[0]);
+        if (scheduleError || errors.length > 0) {
+            const message = scheduleError || errors[0];
+            if (statusEl) statusEl.textContent = message;
+            notifications.error(message);
             return;
         }
 

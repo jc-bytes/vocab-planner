@@ -91,7 +91,6 @@ test('StudentManager declares subject methods and compatibility accessors direct
         'selectSubject',
         'ensureSelectedSubject',
         'resetStudentVocabularyDrilldown',
-        'setStudentVocabularyDrilldownToCurrentTrimester',
         'getStoredStudentVocabularyLocation',
         'rememberStudentVocabularyLocation'
     ]) {

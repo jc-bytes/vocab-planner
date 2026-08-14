@@ -248,6 +248,7 @@ export class StudentShell {
 
     updateStudentNav(viewId) {
         const section = this.getStudentSectionForView(viewId);
+        this.sm.activities?.updateArcadeGateDisplay?.();
         const shell = $('#student-tab-shell');
         if (shell) {
             shell.classList.toggle('hidden', !section);

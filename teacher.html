@@ -786,8 +786,9 @@
                                 </div>
                                 <input type="hidden" id="vocab-id">
                                 <div class="form-group vocab-field-date">
-                                    <label for="vocab-assigned-date">Assigned Date</label>
+                                    <label for="vocab-assigned-date">Earliest Release Date</label>
                                     <input type="date" id="vocab-assigned-date">
+                                    <small>Each section receives it on its next configured meeting day.</small>
                                 </div>
                                 <div class="form-group vocab-field-trimester">
                                     <label for="vocab-trimester">Trimester</label>
@@ -1170,6 +1171,21 @@
                                 <input type="date" id="calendar-iiit-end">
                             </div>
                             <div class="calendar-range-preview" id="calendar-iiit-range"></div>
+                        </div>
+                        <div class="class-schedule-settings">
+                            <div class="class-schedule-heading">
+                                <div>
+                                    <h4>Class Meeting Days</h4>
+                                    <p>Material releases on the first meeting day on or after its Assigned Date, then remains available.</p>
+                                </div>
+                                <button id="add-class-schedule-btn" class="btn secondary-btn" type="button">
+                                    <i data-lucide="plus"></i>
+                                    Add Class
+                                </button>
+                            </div>
+                            <div id="class-schedule-list" class="class-schedule-list is-empty">
+                            </div>
+                            <p class="class-schedule-empty">No class timetables yet. Material will use its exact Assigned Date.</p>
                         </div>
                         <div id="school-calendar-save-status" class="teacher-inline-status"></div>
                     </section>

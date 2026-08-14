@@ -165,14 +165,14 @@ export class StudentListeners {
         // Game Selection Navigation
         this.addListener('#prev-game-select-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            this.sm.currentGameIndex = (this.sm.currentGameIndex - 1 + this.sm.gamesList.length) % this.sm.gamesList.length;
+            games.currentGameIndex = (games.currentGameIndex - 1 + games.gamesList.length) % games.gamesList.length;
             games.updateGameSelectionUI();
             games.updateLeaderboardGame();
         });
 
         this.addListener('#next-game-select-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            this.sm.currentGameIndex = (this.sm.currentGameIndex + 1) % this.sm.gamesList.length;
+            games.currentGameIndex = (games.currentGameIndex + 1) % games.gamesList.length;
             games.updateGameSelectionUI();
             games.updateLeaderboardGame();
         });

@@ -21,9 +21,18 @@ export class StudentActivityLauncher {
 
         if (!this.activities.isActivityUnlocked(type)) {
             const flow = this.activities.getActivityFlowConfig();
+            const requiredIndex = flow.required.indexOf(type);
+            const prerequisiteType = requiredIndex > 0
+                ? flow.required.slice(0, requiredIndex).find(activityType => !this.activities.isActivityComplete(activityType))
+                : null;
+            const prerequisiteTitle = prerequisiteType
+                ? prerequisiteType.replaceAll('-', ' ').replace(/\b\w/g, letter => letter.toUpperCase())
+                : '';
             const warning = flow.hidden?.includes(type)
                 ? 'This activity is not required for this vocabulary unit.'
-                : 'Finish the required activities first to unlock additional practice.';
+                : prerequisiteType
+                    ? `Complete ${prerequisiteTitle} first.`
+                    : 'Finish the required activities first to unlock additional practice.';
             notifications.warning(warning);
             const unitId = this.sm.getCurrentVocabRouteId();
             if (unitId) {

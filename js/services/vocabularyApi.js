@@ -32,6 +32,13 @@ const MONTH_KEYS = [
     'november',
     'december'
 ];
+export const SCHOOL_WEEKDAYS = Object.freeze([
+    { value: 1, key: 'monday', shortLabel: 'Mon' },
+    { value: 2, key: 'tuesday', shortLabel: 'Tue' },
+    { value: 3, key: 'wednesday', shortLabel: 'Wed' },
+    { value: 4, key: 'thursday', shortLabel: 'Thu' },
+    { value: 5, key: 'friday', shortLabel: 'Fri' }
+]);
 const SUBJECT_COLORS = ['#2563eb', '#16a34a', '#db2777', '#f59e0b', '#7c3aed', '#0891b2'];
 const DEFAULT_SCHOOL_CALENDARS = Object.freeze({
     '2026': Object.freeze({
@@ -229,6 +236,69 @@ function normalizeTrimesterRange(sourceRange = {}, fallbackRange = {}) {
     return { startDate, endDate, weekCount };
 }
 
+function normalizeClassWeekday(value) {
+    const numeric = Number.parseInt(String(value), 10);
+    if (numeric >= 1 && numeric <= 5) return numeric;
+
+    const normalized = String(value || '').trim().toLowerCase();
+    const aliases = {
+        mon: 1, monday: 1,
+        tue: 2, tues: 2, tuesday: 2,
+        wed: 3, wednesday: 3,
+        thu: 4, thur: 4, thurs: 4, thursday: 4,
+        fri: 5, friday: 5
+    };
+    return aliases[normalized] || null;
+}
+
+export function normalizeClassSchedules(classSchedules = []) {
+    const byClass = new Map();
+
+    (Array.isArray(classSchedules) ? classSchedules : []).forEach(schedule => {
+        const grade = String(schedule?.grade ?? schedule?.gradeLevel ?? '').match(/\d+/)?.[0] || '';
+        const section = String(schedule?.section ?? schedule?.group ?? '').trim().toUpperCase();
+        const weekdays = [...new Set((Array.isArray(schedule?.weekdays) ? schedule.weekdays : [])
+            .map(normalizeClassWeekday)
+            .filter(Boolean))].sort((a, b) => a - b);
+
+        if (!grade || !section || weekdays.length === 0) return;
+        byClass.set(`${grade}:${section}`, { grade, section, weekdays });
+    });
+
+    return Array.from(byClass.values()).sort((a, b) => (
+        Number(a.grade) - Number(b.grade) || a.section.localeCompare(b.section)
+    ));
+}
+
+export function getStudentClassSchedule(calendar, profile = {}) {
+    const grade = String(profile.grade ?? profile.gradeLevel ?? profile.grade_level ?? '').match(/\d+/)?.[0] || '';
+    const section = String(profile.group ?? profile.section ?? profile.sectionLetter ?? profile.section_letter ?? '')
+        .trim()
+        .toUpperCase();
+    if (!grade || !section) return null;
+
+    return normalizeClassSchedules(calendar?.classSchedules)
+        .find(schedule => schedule.grade === grade && schedule.section === section) || null;
+}
+
+export function calculateClassReleaseDate(assignedDate, calendar, profile = {}) {
+    const assigned = parseDateOnly(assignedDate);
+    if (!assigned) return '';
+
+    const schedule = getStudentClassSchedule(calendar, profile);
+    if (!schedule) return toDateOnly(assignedDate);
+
+    for (let offset = 0; offset < 7; offset += 1) {
+        const candidate = new Date(assigned.getTime());
+        candidate.setUTCDate(candidate.getUTCDate() + offset);
+        if (schedule.weekdays.includes(candidate.getUTCDay())) {
+            return candidate.toISOString().slice(0, 10);
+        }
+    }
+
+    return toDateOnly(assignedDate);
+}
+
 export function normalizeSchoolCalendar(calendar, fallbackDate = new Date()) {
     const source = calendar && typeof calendar === 'object' ? calendar : {};
     const schoolYear = String(source.schoolYear || getCurrentSchoolYear(fallbackDate));
@@ -242,6 +312,7 @@ export function normalizeSchoolCalendar(calendar, fallbackDate = new Date()) {
 
     return {
         schoolYear,
+        classSchedules: normalizeClassSchedules(source.classSchedules || source.class_schedules),
         trimesters: {
             IT: normalizeTrimesterRange(sourceTrimesters.IT, fallback.trimesters.IT),
             IIT: normalizeTrimesterRange(sourceTrimesters.IIT, fallback.trimesters.IIT),

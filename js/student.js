@@ -6,15 +6,12 @@ import { StudentRouting } from './studentRoutingMethods.js';
 import { StudentShell } from './studentShellMethods.js';
 import { StudentListeners } from './studentListenerMethods.js';
 import { StudentSubjects } from './studentSubjectMethods.js';
-import { getStudentActivityIds, renderStudentActivityCards } from './student/studentActivityRegistry.js';
-import { STUDENT_GAME_REGISTRY } from './student/studentGameRegistry.js';
+import { renderStudentActivityCards } from './student/studentActivityRegistry.js';
 
 const DEV_AUTH_DISABLED = false;
 
 export class StudentManager {
     constructor() {
-        this.currentVocab = null;
-        this.manifest = null;
         this.studentProfile = {
             firstName: '',
             lastName: '',
@@ -24,7 +21,6 @@ export class StudentManager {
             email: ''
         };
         this.progressData = {};
-        this.activityInstance = null;
         this.currentUser = null;
         this.coins = 0; // Legacy support - will be replaced by coinData
         this.coinData = {
@@ -37,23 +33,9 @@ export class StudentManager {
         this.coinHistory = [];
         this.currentRole = 'student';
 
-        // Game variables
-        this.currentGame = null;
-        this.gameTimeRemaining = 0;
-        this.gameTimerInterval = null;
-        this.isHandlingGameMinute = false;
-
-        // Registry-derived arcade metadata retained for existing UI consumers.
-        this.gamesList = STUDENT_GAME_REGISTRY;
-        this.currentGameIndex = 0;
         this.authInitialized = false;
         this.authDisabled = DEV_AUTH_DISABLED;
         this.mustChangePassword = false;
-        this.cloudVocabs = [];
-        this.availableVocabs = [];
-        this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
-        this.unitImages = {};
-        this.activityRouteTypes = getStudentActivityIds();
 
         // Initialize modular components
         this.auth = new StudentAuth(this);
@@ -67,8 +49,60 @@ export class StudentManager {
         this.init();
     }
 
-    slugifyRouteId(value) {
-        return this.routing.slugifyRouteId(value);
+    get currentVocab() {
+        return this.activities.session.currentVocab;
+    }
+
+    set currentVocab(vocab) {
+        this.activities.session.currentVocab = vocab;
+    }
+
+    get activityInstance() {
+        return this.activities.session.activityInstance;
+    }
+
+    set activityInstance(instance) {
+        this.activities.session.activityInstance = instance;
+    }
+
+    get currentActivityType() {
+        return this.activities.session.currentActivityType;
+    }
+
+    set currentActivityType(activityType) {
+        this.activities.session.currentActivityType = activityType;
+    }
+
+    get unitScores() {
+        return this.activities.session.unitScores;
+    }
+
+    set unitScores(scores) {
+        this.activities.session.unitScores = scores;
+    }
+
+    get unitImages() {
+        return this.activities.session.unitImages;
+    }
+
+    set unitImages(images) {
+        this.activities.session.unitImages = images;
+    }
+
+    get unitWordHunt() {
+        return this.activities.session.unitWordHunt;
+    }
+
+    set unitWordHunt(wordHunt) {
+        this.activities.session.unitWordHunt = wordHunt;
+    }
+
+    get unitStates() {
+        return this.activities.session.unitStates;
+    }
+
+    set unitStates(states) {
+        this.activities.session.unitStates = states;
     }
 
     getVocabRouteId(vocab) {
@@ -83,16 +117,8 @@ export class StudentManager {
         return this.routing.getGames();
     }
 
-    safeDecodeRoutePart(value) {
-        return this.routing.safeDecodeRoutePart(value);
-    }
-
     parseRoute(hash) {
         return this.routing.parseRoute(hash);
-    }
-
-    buildRoute(route) {
-        return this.routing.buildRoute(route);
     }
 
     setRoute(route, options) {
@@ -111,24 +137,8 @@ export class StudentManager {
         return this.routing.handleRouteChange();
     }
 
-    findVocabByRouteId(unitId) {
-        return this.routing.findVocabByRouteId(unitId);
-    }
-
     isKnownActivityType(activityType) {
         return this.routing.isKnownActivityType(activityType);
-    }
-
-    showUnitsView(route) {
-        return this.routing.showUnitsView(route);
-    }
-
-    showArcadeView() {
-        return this.routing.showArcadeView();
-    }
-
-    applyRoute(route) {
-        return this.routing.applyRoute(route);
     }
 
     resetRouteState() {
@@ -147,10 +157,6 @@ export class StudentManager {
         return this.shell.scheduleStudentScrollSave();
     }
 
-    shouldDebugStudentScroll() {
-        return this.shell.shouldDebugStudentScroll();
-    }
-
     debugStudentScrollLifecycle(eventName, details) {
         return this.shell.debugStudentScrollLifecycle(eventName, details);
     }
@@ -163,10 +169,6 @@ export class StudentManager {
         return this.shell.logStudentDomUpdate(containerId, details);
     }
 
-    getStudentMutationTargetLabel(target) {
-        return this.shell.getStudentMutationTargetLabel(target);
-    }
-
     startStudentDashboardMutationObserver() {
         return this.shell.startStudentDashboardMutationObserver();
     }
@@ -175,44 +177,8 @@ export class StudentManager {
         return this.shell.saveStudentSectionScroll(viewId, options);
     }
 
-    restoreStudentSectionScroll(viewId) {
-        return this.shell.restoreStudentSectionScroll(viewId);
-    }
-
-    getStudentSectionScrollKey(section) {
-        return this.shell.getStudentSectionScrollKey(section);
-    }
-
-    getStudentRouteScrollKey() {
-        return this.shell.getStudentRouteScrollKey();
-    }
-
-    hasSavedStudentRouteScroll() {
-        return this.shell.hasSavedStudentRouteScroll();
-    }
-
-    persistStudentScroll(key, top) {
-        return this.shell.persistStudentScroll(key, top);
-    }
-
-    readStudentScroll(key) {
-        return this.shell.readStudentScroll(key);
-    }
-
-    getStudentSectionForView(viewId) {
-        return this.shell.getStudentSectionForView(viewId);
-    }
-
-    isStudentWideShell() {
-        return this.shell.isStudentWideShell();
-    }
-
     syncStudentShellState(section) {
         return this.shell.syncStudentShellState(section);
-    }
-
-    updateStudentNav(viewId) {
-        return this.shell.updateStudentNav(viewId);
     }
 
     setStudentMobileMenu(open) {
@@ -231,20 +197,8 @@ export class StudentManager {
         return this.shell.showToast(message, duration);
     }
 
-    initListeners() {
-        return this.listeners.initListeners();
-    }
-
     addListener(selector, event, handler) {
         return this.listeners.addListener(selector, event, handler);
-    }
-
-    setStudentExportButtonState(button, isLoading, loadingLabel) {
-        return this.listeners.setStudentExportButtonState(button, isLoading, loadingLabel);
-    }
-
-    destroyStudentListeners() {
-        return this.listeners.destroy();
     }
 
     get subjects() {
@@ -303,10 +257,6 @@ export class StudentManager {
         return this.subjectSelection.resetStudentVocabularyDrilldown();
     }
 
-    setStudentVocabularyDrilldownToCurrentTrimester() {
-        return this.subjectSelection.setStudentVocabularyDrilldownToCurrentTrimester();
-    }
-
     getStoredStudentVocabularyLocation() {
         return this.subjectSelection.getStoredStudentVocabularyLocation();
     }
@@ -321,14 +271,6 @@ export class StudentManager {
 
     set joinGrade(grade) {
         this.auth.ui.joinGrade = grade;
-    }
-
-    getJoinGradeFromUrl() {
-        return this.auth.getJoinGradeFromUrl();
-    }
-
-    prefillRegistrationFromJoinLink() {
-        return this.auth.prefillRegistrationFromJoinLink();
     }
 
     normalizeStudentProfile(profile) {
@@ -347,10 +289,6 @@ export class StudentManager {
         return this.auth.showAuthPanel(panel);
     }
 
-    validateRegistrationForm() {
-        return this.auth.validateRegistrationForm();
-    }
-
     handleStudentLogin(event) {
         return this.auth.handleStudentLogin(event);
     }
@@ -359,211 +297,36 @@ export class StudentManager {
         return this.auth.handleStudentRegister(event);
     }
 
-    showForcedPasswordChange() {
-        return this.auth.showForcedPasswordChange();
-    }
-
     handleForcedPasswordChange(event) {
         return this.auth.handleForcedPasswordChange(event);
-    }
-
-    showElectronAuthMessage(loginBtn) {
-        return this.auth.showElectronAuthMessage(loginBtn);
-    }
-
-    updateHeader() {
-        return this.auth.updateHeader();
-    }
-
-    checkProfile(force) {
-        return this.auth.checkProfile(force);
-    }
-
-    initBackendAuth() {
-        return this.auth.initBackendAuth();
-    }
-
-    fetchAndSetRole(user) {
-        return this.auth.fetchAndSetRole(user);
-    }
-
-    handleBackendSignIn(user) {
-        return this.auth.handleBackendSignIn(user);
-    }
-
-    handleBackendSignOut() {
-        return this.auth.handleBackendSignOut();
-    }
-
-    updateGuestStatus(isGuest) {
-        return this.auth.updateGuestStatus(isGuest);
     }
 
     setAuthStatus(text) {
         return this.auth.setAuthStatus(text);
     }
 
-    showLoginError(message) {
-        return this.auth.showLoginError(message);
-    }
-
-    loadManifest() {
-        return this.activities.loadManifest();
-    }
-
     renderDashboard() {
         return this.activities.renderDashboard();
-    }
-
-    loadVocabulary(vocabMeta, options = {}) {
-        return this.activities.loadVocabulary(vocabMeta, options);
-    }
-
-    showActivityMenu(options = {}) {
-        return this.activities.showActivityMenu(options);
-    }
-
-    loadCloudVocabularies() {
-        return this.activities.loadCloudVocabularies();
-    }
-
-    startActivity(type, options = {}) {
-        return this.activities.startActivity(type, options);
-    }
-
-    async formatTime(seconds) {
-        return (await this.getGames()).formatTime(seconds);
-    }
-
-    async updateArcadeUI() {
-        return (await this.getGames()).updateArcadeUI();
-    }
-
-    async updateGameSelectionUI() {
-        return (await this.getGames()).updateGameSelectionUI();
-    }
-
-    async saveHighScore(gameId, score, metadata = null) {
-        return (await this.getGames()).saveHighScore(gameId, score, metadata);
-    }
-
-    async updateLeaderboardGame() {
-        return (await this.getGames()).updateLeaderboardGame();
-    }
-
-    async loadLeaderboard(gameId) {
-        return (await this.getGames()).loadLeaderboard(gameId);
-    }
-
-    async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
-        return (await this.getGames()).loadHTMLGame(
-            gameId,
-            htmlFile,
-            scoreMessageType,
-            gameOverCallback,
-            canvas,
-            gameStage
-        );
-    }
-
-    async startGame(type) {
-        return (await this.getGames()).startGame(type);
-    }
-
-    async stopCurrentGame() {
-        return (await this.getGames()).stopCurrentGame();
-    }
-
-    async pauseGame() {
-        return (await this.getGames()).pauseGame();
-    }
-
-    async addGameTime(seconds = 60) {
-        return (await this.getGames()).addGameTime(seconds);
-    }
-
-    async updateGameTimer() {
-        return (await this.getGames()).updateGameTimer();
-    }
-
-    migrateCoinData(data) {
-        return this.progress.migrateCoinData(data);
-    }
-
-    loadLocalProgress() {
-        return this.progress.loadLocalProgress();
-    }
-
-    saveLocalProgress(skipCloud = false) {
-        return this.progress.saveLocalProgress(skipCloud);
-    }
-
-    getExperience() {
-        return this.progress.getExperience();
     }
 
     updateLevelDisplay() {
         return this.progress.updateLevelDisplay();
     }
 
-    loadCloudProgress() {
-        return this.progress.loadCloudProgress();
-    }
-
     scheduleCloudSync() {
         return this.progress.scheduleCloudSync();
-    }
-
-    addCoinHistory(type, amount, source, description = '') {
-        return this.progress.addCoinHistory(type, amount, source, description);
-    }
-
-    saveProgressToCloud() {
-        return this.progress.saveProgressToCloud();
-    }
-
-    restoreImagesFromProgress() {
-        return this.progress.restoreImagesFromProgress();
-    }
-
-    dataURLToBlob(dataUrl) {
-        return this.progress.dataURLToBlob(dataUrl);
-    }
-
-    addCoins(amount, source = 'activity', description = '') {
-        return this.progress.addCoins(amount, source, description);
-    }
-
-    deductCoins(amount) {
-        return this.progress.deductCoins(amount);
-    }
-
-    acceptGiftCoins() {
-        return this.progress.acceptGiftCoins();
     }
 
     updateCoinDisplay() {
         return this.progress.updateCoinDisplay();
     }
 
-    showNotificationBadge() {
-        return this.progress.showNotificationBadge();
-    }
-
-    hideNotificationBadge() {
-        return this.progress.hideNotificationBadge();
-    }
-
-    showNotificationPanel() {
-        return this.progress.showNotificationPanel();
-    }
-
     async init() {
         // Attach listeners first so buttons work immediately
-        this.initListeners();
+        this.listeners.initListeners();
         window.addEventListener('online', () => this.setAuthStatus('Synced'));
         window.addEventListener('offline', () => this.setAuthStatus('Offline'));
-        this.prefillRegistrationFromJoinLink();
+        this.auth.prefillRegistrationFromJoinLink();
 
         // Default view/state
         this.switchView('loading-view');

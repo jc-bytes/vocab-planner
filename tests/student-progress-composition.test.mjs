@@ -102,26 +102,11 @@ test('StudentProgress declares its stable lifecycle interface directly', () => {
     }
 });
 
-test('StudentManager declares the stable progress compatibility interface directly', () => {
+test('StudentManager declares only the cross-component progress interface directly', () => {
     for (const method of [
-        'migrateCoinData',
-        'loadLocalProgress',
-        'saveLocalProgress',
-        'getExperience',
         'updateLevelDisplay',
-        'loadCloudProgress',
         'scheduleCloudSync',
-        'addCoinHistory',
-        'saveProgressToCloud',
-        'restoreImagesFromProgress',
-        'dataURLToBlob',
-        'addCoins',
-        'deductCoins',
-        'acceptGiftCoins',
-        'updateCoinDisplay',
-        'showNotificationBadge',
-        'hideNotificationBadge',
-        'showNotificationPanel'
+        'updateCoinDisplay'
     ]) {
         assert.equal(
             Object.prototype.hasOwnProperty.call(StudentManager.prototype, method),
@@ -129,22 +114,6 @@ test('StudentManager declares the stable progress compatibility interface direct
             `${method} must be declared by StudentManager`
         );
     }
-});
-
-test('StudentManager coin notification methods delegate to the progress owner', () => {
-    const manager = Object.create(StudentManager.prototype);
-    const calls = [];
-    manager.progress = {
-        showNotificationBadge: () => calls.push('show'),
-        hideNotificationBadge: () => calls.push('hide'),
-        showNotificationPanel: () => calls.push('panel')
-    };
-
-    manager.showNotificationBadge();
-    manager.hideNotificationBadge();
-    manager.showNotificationPanel();
-
-    assert.deepEqual(calls, ['show', 'hide', 'panel']);
 });
 
 test('progress-owned notifications render and hide the pending coin badge', () => {

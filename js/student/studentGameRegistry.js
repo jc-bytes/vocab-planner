@@ -23,16 +23,16 @@ export const STUDENT_GAME_REGISTRY = Object.freeze([
             const scoreDisplay = document.querySelector('#game-score');
             const updateScore = score => {
                 const numericScore = Number(score) || 0;
-                games.sm.currentGameScore = numericScore;
+                games.currentGameScore = numericScore;
                 if (scoreDisplay) {
                     scoreDisplay.style.display = 'block';
                     scoreDisplay.textContent = `Score: ${numericScore.toLocaleString()}`;
                 }
             };
-            games.sm.currentGameScore = 0;
-            games.sm.currentGameMetadata = null;
+            games.currentGameScore = 0;
+            games.currentGameMetadata = null;
             updateScore(0);
-            return new GalacticBreaker(canvas, gameOverCallback, updateScore, () => games.sm.gameTimeRemaining);
+            return new GalacticBreaker(canvas, gameOverCallback, updateScore, () => games.gameTimeRemaining);
         }
     }),
     canvasGame({ id: 'snake', name: 'Snake', icon: '🐍', art: 'images/game-art/snake-cover-neon-cyberpunk-friendly-v8.webp', desc: 'Grow and avoid yourself!', load: () => import('../games/snake.js'), exportName: 'Snake', create: standardCanvasFactory }),

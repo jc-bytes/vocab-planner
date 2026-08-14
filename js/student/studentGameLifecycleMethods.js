@@ -18,19 +18,29 @@ export class StudentGameLifecycle {
     }
 
     async startGame(type) {
+        const access = this.sm.activities?.getPendingRequiredWork?.();
+        if (access?.isBlocked) {
+            this.sm.activities.updateArcadeGateDisplay(access);
+            notifications.warning('Complete your required activities before playing Arcade games.');
+            await this.sm.navigateTo({ view: 'arcade' });
+            return false;
+        }
+
         // Use global gamification settings
         await this.games.loadGlobalSettings();
         const exchangeRate = this.games.getExchangeRate();
 
         if (this.sm.coins < exchangeRate) {
             notifications.warning(`You need at least ${exchangeRate} coins to play!`);
-            return;
+            return false;
         }
 
         if (await this.sm.progress.deductCoins(exchangeRate)) {
-            this.sm.gameTimeRemaining = 60;
+            this.games.gameTimeRemaining = 60;
             this.launchGame(type, { resetTimer: true });
+            return true;
         }
+        return false;
     }
 
     restartCurrentGame(type) {
@@ -39,6 +49,13 @@ export class StudentGameLifecycle {
     }
 
     launchGame(type, { resetTimer = false } = {}) {
+        const access = this.sm.activities?.getPendingRequiredWork?.();
+        if (access?.isBlocked) {
+            this.sm.activities.updateArcadeGateDisplay(access);
+            notifications.warning('Arcade is locked until required activities are complete.');
+            return false;
+        }
+
         $('#game-selection').classList.add('hidden');
         const gameStage = $('#game-stage');
         gameStage.classList.remove('hidden');
@@ -55,7 +72,7 @@ export class StudentGameLifecycle {
         window.addEventListener('keydown', this.arrowKeyHandler);
 
         this.updateGameTimer();
-        if (resetTimer || !this.sm.gameTimerInterval) {
+        if (resetTimer || !this.games.gameTimerInterval) {
             this.startGameTimer();
         }
 
@@ -67,8 +84,8 @@ export class StudentGameLifecycle {
             this.games.saveHighScore(type, score);
 
             // If there's time remaining, offer to play again
-            if (this.sm.gameTimeRemaining > 0) {
-                const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.sm.gameTimeRemaining / 60)}:${(this.sm.gameTimeRemaining % 60).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
+            if (this.games.gameTimeRemaining > 0) {
+                const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.games.gameTimeRemaining / 60)}:${(this.games.gameTimeRemaining % 60).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
 
                 if (playAgain) {
                     this.restartCurrentGame(type);
@@ -101,40 +118,41 @@ export class StudentGameLifecycle {
                 canvas,
                 gameStage
             );
-            return;
+            return true;
         }
 
         game.launch.load().then(module => {
             const ExportedGame = module[game.launch.exportName];
             if (!ExportedGame) throw new Error(`Game module ${game.id} does not export ${game.launch.exportName}.`);
-            this.sm.currentGame = game.launch.create(ExportedGame, {
+            this.games.currentGame = game.launch.create(ExportedGame, {
                 canvas,
                 gameOverCallback,
                 games: this
             });
-            this.sm.currentGame.gameType = type;
-            this.sm.currentGame.start();
+            this.games.currentGame.gameType = type;
+            this.games.currentGame.start();
         }).catch(error => {
             console.error(`Could not launch ${game.id}:`, error);
             notifications.warning('This game could not be loaded. Please refresh and try again.');
             this.stopCurrentGame();
             this.showGameSelection();
         });
+        return true;
     }
 
     clearGameTimer() {
-        if (this.sm.gameTimerInterval) {
-            clearInterval(this.sm.gameTimerInterval);
-            this.sm.gameTimerInterval = null;
+        if (this.games.gameTimerInterval) {
+            clearInterval(this.games.gameTimerInterval);
+            this.games.gameTimerInterval = null;
         }
     }
 
     startGameTimer() {
         this.clearGameTimer();
-        this.sm.gameTimerInterval = setInterval(() => {
-            this.sm.gameTimeRemaining = Math.max(0, this.sm.gameTimeRemaining - 1);
+        this.games.gameTimerInterval = setInterval(() => {
+            this.games.gameTimeRemaining = Math.max(0, this.games.gameTimeRemaining - 1);
             this.updateGameTimer();
-            if (this.sm.gameTimeRemaining <= 0) {
+            if (this.games.gameTimeRemaining <= 0) {
                 this.pauseGame();
             }
         }, 1000);
@@ -142,22 +160,22 @@ export class StudentGameLifecycle {
 
     cleanupCurrentGame({ keepTimer = false, saveScore = true } = {}) {
         // Store current game type before cleanup for score saving
-        const currentGameType = this.sm.currentGame?.gameType || null;
+        const currentGameType = this.games.currentGame?.gameType || null;
         
-        if (this.sm.currentGame) {
-            if (typeof this.sm.currentGame.stop === 'function') {
-                this.sm.currentGame.stop();
+        if (this.games.currentGame) {
+            if (typeof this.games.currentGame.stop === 'function') {
+                this.games.currentGame.stop();
             }
             // Also clean up message handler if it exists
-            if (this.sm.currentGame.messageHandler) {
-                window.removeEventListener('message', this.sm.currentGame.messageHandler);
+            if (this.games.currentGame.messageHandler) {
+                window.removeEventListener('message', this.games.currentGame.messageHandler);
             }
             // Report final score if available (for games with score reporting)
-            if (saveScore && this.sm.currentGameScore !== undefined && this.sm.currentGameScore > 0 && currentGameType) {
-                this.games.saveHighScore(currentGameType, this.sm.currentGameScore, this.sm.currentGameMetadata);
+            if (saveScore && this.games.currentGameScore > 0 && currentGameType) {
+                this.games.saveHighScore(currentGameType, this.games.currentGameScore, this.games.currentGameMetadata);
             }
-            this.sm.currentGame = null;
-            this.sm.currentGameScore = 0;
+            this.games.currentGame = null;
+            this.games.currentGameScore = 0;
         }
         
         // Clean up any remaining iframes (fallback cleanup)
@@ -196,13 +214,13 @@ export class StudentGameLifecycle {
     }
 
     async pauseGame() {
-        if (!this.sm.currentGame) return;
-        if (this.sm.isHandlingGameMinute) return;
+        if (!this.games.currentGame) return;
+        if (this.games.isHandlingGameMinute) return;
 
-        this.sm.isHandlingGameMinute = true;
+        this.games.isHandlingGameMinute = true;
         try {
-            if (typeof this.sm.currentGame.completeMinute === 'function') {
-                this.sm.currentGame.completeMinute();
+            if (typeof this.games.currentGame.completeMinute === 'function') {
+                this.games.currentGame.completeMinute();
             }
 
             // Check if we can auto-extend BEFORE pausing
@@ -226,10 +244,10 @@ export class StudentGameLifecycle {
             }
 
             // Only pause if there are not enough coins or the deduction failed.
-            if (this.sm.currentGame.pause) {
-                this.sm.currentGame.pause();
+            if (this.games.currentGame.pause) {
+                this.games.currentGame.pause();
             }
-            this.sm.isGamePaused = true;
+            this.games.isGamePaused = true;
 
             this.clearGameTimer();
 
@@ -237,19 +255,19 @@ export class StudentGameLifecycle {
             this.stopCurrentGame();
             this.showGameSelection();
         } finally {
-            this.sm.isHandlingGameMinute = false;
+            this.games.isHandlingGameMinute = false;
         }
     }
 
     addGameTime(seconds = 60) {
         const increment = Number.isFinite(seconds) ? seconds : 0;
-        this.sm.gameTimeRemaining = Math.max(0, this.sm.gameTimeRemaining + increment);
+        this.games.gameTimeRemaining = Math.max(0, this.games.gameTimeRemaining + increment);
         this.updateGameTimer();
     }
 
     updateGameTimer() {
-        const mins = Math.floor(this.sm.gameTimeRemaining / 60);
-        const secs = this.sm.gameTimeRemaining % 60;
+        const mins = Math.floor(this.games.gameTimeRemaining / 60);
+        const secs = this.games.gameTimeRemaining % 60;
         $('#game-timer').textContent = `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
     }
 }

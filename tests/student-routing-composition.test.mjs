@@ -13,8 +13,21 @@ globalThis.document = {
     addEventListener() {},
     removeEventListener() {},
     getElementById() {
-        return {};
+        return null;
     },
+    createElement() {
+        return {
+            style: {},
+            appendChild() {},
+            remove() {},
+            classList: { add() {}, remove() {} },
+            addEventListener() {},
+            setAttribute() {},
+            querySelector() { return { addEventListener() {} }; }
+        };
+    },
+    body: { appendChild() {} },
+    head: { appendChild() {} },
     querySelector() {
         return null;
     },
@@ -44,8 +57,11 @@ function createManager() {
         authDisabled: true,
         currentUser: null,
         currentVocab: null,
-        activityRouteTypes: ['flashcards', 'illustration'],
-        availableVocabs: []
+        activities: {
+            activityRouteTypes: ['flashcards', 'illustration'],
+            availableVocabs: [],
+            renderDashboard() {}
+        }
     };
 }
 
@@ -71,21 +87,15 @@ test('StudentRouting owns route and lazy-game state', () => {
 
 test('StudentManager declares the stable routing interface directly', () => {
     for (const method of [
-        'slugifyRouteId',
         'getVocabRouteId',
         'getCurrentVocabRouteId',
         'getGames',
         'parseRoute',
-        'buildRoute',
         'setRoute',
         'navigateTo',
         'restoreRouteOrDefault',
         'handleRouteChange',
-        'findVocabByRouteId',
         'isKnownActivityType',
-        'showUnitsView',
-        'showArcadeView',
-        'applyRoute',
         'resetRouteState'
     ]) {
         assert.equal(
@@ -120,6 +130,16 @@ test('route parsing and building preserve the public URL contract', () => {
     );
 });
 
+test('route lookup and activity validation use the StudentActivities-owned catalog', () => {
+    const manager = createManager();
+    manager.activities.availableVocabs = [{ id: 'unit-1', name: 'Unit One' }];
+    const routing = new StudentRouting(manager);
+
+    assert.equal(routing.findVocabByRouteId('unit-1'), manager.activities.availableVocabs[0]);
+    assert.equal(routing.isKnownActivityType('flashcards'), true);
+    assert.equal(routing.isKnownActivityType('unknown-activity'), false);
+});
+
 test('reset clears only routing lifecycle state', () => {
     const routing = new StudentRouting(createManager());
     const games = {};
@@ -132,4 +152,29 @@ test('reset clears only routing lifecycle state', () => {
     assert.equal(routing.routeReady, false);
     assert.equal(routing.isApplyingRoute, false);
     assert.equal(routing.games, games);
+});
+
+test('arcade routing redirects blocked students to their oldest pending unit', async () => {
+    const manager = createManager();
+    const pendingVocab = { id: 'unit-1', name: 'Pending Unit' };
+    const calls = [];
+    const access = {
+        isBlocked: true,
+        remainingActivities: 2,
+        next: { vocab: pendingVocab, routeId: 'unit-1' }
+    };
+    manager.activities.getPendingRequiredWork = () => access;
+    manager.activities.updateArcadeGateDisplay = value => calls.push(['gate', value]);
+    manager.activities.loadVocabulary = async (...args) => calls.push(['loadVocabulary', ...args]);
+    const routing = new StudentRouting(manager);
+    routing.setRoute = (...args) => calls.push(['setRoute', ...args]);
+
+    const opened = await routing.showArcadeView();
+
+    assert.equal(opened, false);
+    assert.deepEqual(calls, [
+        ['gate', access],
+        ['setRoute', { view: 'unit', unitId: 'unit-1' }, { replace: true }],
+        ['loadVocabulary', pendingVocab, { fromRoute: true }]
+    ]);
 });

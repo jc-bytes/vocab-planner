@@ -2363,10 +2363,20 @@ input[readonly] {
 }
 
 .activity-flow-choice label {
+    display: grid;
+    gap: 0.18rem;
     margin-bottom: 0;
     color: var(--text-muted);
     font-size: 0.78rem;
     font-weight: var(--type-form-label-weight);
+}
+
+.activity-flow-choice label small {
+    color: rgba(173, 198, 255, 0.72);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .activity-flow-choice select,
@@ -2733,6 +2743,146 @@ input[readonly] {
     font-size: var(--type-secondary-size);
     font-weight: var(--font-weight-semibold);
     line-height: var(--type-secondary-line-height);
+}
+
+.class-schedule-settings {
+    display: grid;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+.class-schedule-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+}
+
+.class-schedule-heading h4,
+.class-schedule-heading p {
+    margin: 0;
+}
+
+.class-schedule-heading p {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: var(--type-secondary-size);
+}
+
+.class-schedule-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.class-schedule-row {
+    display: grid;
+    grid-template-columns: minmax(90px, 0.55fr) minmax(90px, 0.55fr) minmax(310px, 2fr) auto;
+    align-items: end;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+}
+
+.class-schedule-field {
+    display: grid;
+    gap: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.class-schedule-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.class-schedule-days legend {
+    width: 100%;
+    margin-bottom: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.class-schedule-days label {
+    cursor: pointer;
+}
+
+.class-schedule-days input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.class-schedule-days span {
+    display: grid;
+    place-items: center;
+    min-width: 48px;
+    min-height: 42px;
+    padding: 0.45rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.class-schedule-days input:checked + span {
+    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 20%, transparent);
+    color: var(--text-main);
+}
+
+.class-schedule-days input:focus-visible + span {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.class-schedule-empty {
+    display: none;
+    margin: 0;
+    padding: 0.85rem;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+}
+
+.class-schedule-list.is-empty + .class-schedule-empty {
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .class-schedule-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .class-schedule-days {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .class-schedule-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .class-schedule-row {
+        grid-template-columns: 1fr;
+    }
+
+    .class-schedule-days {
+        grid-column: auto;
+    }
 }
 
 .teacher-back-btn {

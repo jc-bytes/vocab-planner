@@ -47,10 +47,10 @@ class TeacherVocabularyActivityFlowMethods {
         const requestedRequired = hasExplicitFlow ? settings.requiredActivities : defaultRequired;
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
-        const uniqueRequired = [...new Set(required)];
-        if (!uniqueRequired.includes('flashcards')) {
-            uniqueRequired.unshift('flashcards');
-        }
+        const uniqueRequired = [...new Set([
+            'flashcards',
+            ...required.filter(id => id !== 'flashcards')
+        ])];
         const requiredSet = new Set(uniqueRequired);
         const requestedAdditional = hasExplicitFlow
             ? settings.additionalActivities
@@ -77,6 +77,11 @@ class TeacherVocabularyActivityFlowMethods {
     setActivityFlowChoice(activityId, choice) {
         if (!VOCAB_ACTIVITY_IDS.includes(activityId)) return;
         if (!['required', 'additional', 'hidden'].includes(choice)) return;
+        if (activityId === 'flashcards' && choice !== 'required') {
+            notifications.warning('Flashcards must remain Step 1 in the required path.');
+            this.renderActivityFlowSettings();
+            return;
+        }
         if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
 
         const flow = this.getActivityFlowConfig(this.vocabSet);
@@ -170,11 +175,18 @@ class TeacherVocabularyActivityFlowMethods {
             const wordCount = settings[settingKey];
             const rewardSettings = this.getActivityRewardSettings(activity.id);
             const disabled = currentValue === 'hidden' ? ' disabled' : '';
+            const requiredStep = flow.required.indexOf(activity.id) + 1;
+            const flowSelectDisabled = activity.id === 'flashcards'
+                ? ' disabled title="Flashcards is always required as Step 1"'
+                : '';
             const group = createElement('div', `form-group activity-flow-choice${currentValue === 'hidden' ? ' is-hidden' : ''}`);
             group.setAttribute('role', 'row');
             group.innerHTML = `
-                <label for="flow-${activity.id}" role="cell">${activity.label}</label>
-                <select id="flow-${activity.id}" class="activity-flow-select" data-activity="${activity.id}">
+                <label for="flow-${activity.id}" role="cell">
+                    <span>${activity.label}</span>
+                    ${requiredStep > 0 ? `<small>Required Step ${requiredStep}</small>` : ''}
+                </label>
+                <select id="flow-${activity.id}" class="activity-flow-select" data-activity="${activity.id}"${flowSelectDisabled}>
                     <option value="required"${currentValue === 'required' ? ' selected' : ''}>Required</option>
                     <option value="additional"${currentValue === 'additional' ? ' selected' : ''}>Additional</option>
                     <option value="hidden"${currentValue === 'hidden' ? ' selected' : ''}>Hidden</option>

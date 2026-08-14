@@ -69,7 +69,7 @@ export class StudentGameLeaderboard {
                 console.log(`[Leaderboard] Saved score for ${gameId}: ${numericScore} (previous: ${existingScore})`);
 
                 // Refresh leaderboard if we're viewing this game
-                if (this.sm.gamesList && this.sm.gamesList[this.sm.currentGameIndex] && this.sm.gamesList[this.sm.currentGameIndex].id === gameId) {
+                if (this.games.gamesList[this.games.currentGameIndex]?.id === gameId) {
                     this.loadLeaderboard(gameId);
                 }
             } else {
@@ -82,7 +82,7 @@ export class StudentGameLeaderboard {
     }
 
     updateLeaderboardGame() {
-        const game = this.sm.gamesList[this.sm.currentGameIndex];
+        const game = this.games.gamesList[this.games.currentGameIndex];
         const nameEl = $('#current-game-name');
         if (nameEl) nameEl.textContent = game.name;
         
@@ -103,7 +103,7 @@ export class StudentGameLeaderboard {
         if (modal) {
             openModal(modal, { initialFocus: '#close-leaderboard-modal' });
             // Reload leaderboard for current game
-            const game = this.sm.gamesList[this.sm.currentGameIndex];
+            const game = this.games.gamesList[this.games.currentGameIndex];
             if (game) {
                 this.loadLeaderboard(game.id);
             }

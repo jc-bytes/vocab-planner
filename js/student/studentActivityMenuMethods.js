@@ -50,6 +50,7 @@ export class StudentActivityMenu {
             card.querySelector('.activity-lock-label')?.remove();
             card.querySelector('.activity-unavailable-label')?.remove();
             card.querySelector('.activity-path-status')?.remove();
+            card.querySelector('.activity-path-step')?.remove();
             card.classList.remove(
                 'next-activity-card',
                 'activity-flow-card-compact',
