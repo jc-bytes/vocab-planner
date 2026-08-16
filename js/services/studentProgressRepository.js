@@ -36,7 +36,10 @@ export const studentProgressRepository = {
             channel = client.channel(`student-progress:${userId}`, {
                 config: { private: true }
             }).on('broadcast', { event: '*' }, payload => {
-                const record = payload?.payload?.record || payload?.record || payload?.new;
+                const record = payload?.payload?.record
+                    || payload?.payload?.new
+                    || payload?.record
+                    || payload?.new;
                 if (record?.user_id === userId) callback(mapStudentProgressRow(record));
             }).subscribe(status => {
                 if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {

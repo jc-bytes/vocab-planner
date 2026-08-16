@@ -168,6 +168,8 @@ test('student progress repository preserves missing-record and realtime teardown
         channel.callback({ payload: { record: { user_id: 'user-1', total_xp: 12, coins: 3 } } });
         assert.equal(seen[0].userId, 'user-1');
         assert.equal(seen[0].totalXp, 12);
+        channel.callback({ payload: { new: { user_id: 'user-1', total_xp: 13, coins: 4 } } });
+        assert.equal(seen[1].totalXp, 13);
         assert.equal(client.authSet, true);
         assert.equal(channel.name, 'student-progress:user-1');
         assert.deepEqual(channel.options, { config: { private: true } });

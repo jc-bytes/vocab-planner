@@ -375,7 +375,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(welcomeRetry.coinData.balance, welcome.coinData.balance);
             const { count: welcomeCount, error: welcomeCountError } = await admin
                 .from('student_coin_ledger').select('id', { count: 'exact', head: true })
-                .eq('user_id', student.id).eq('event_key', `welcome:${RUN_ID}-welcome`);
+                .eq('user_id', student.id).eq('source', 'welcome');
             if (welcomeCountError) throw welcomeCountError;
             assert.equal(welcomeCount, 1);
 
