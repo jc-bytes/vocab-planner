@@ -1,6 +1,7 @@
 import { supabaseService } from '../supabaseService.js';
 import { mapProfileRow, timestampToIso } from './supabaseValues.js';
 import { leaderboardRepository } from './leaderboardRepository.js';
+import { sparkResponsesRepository } from './sparkResponsesRepository.js';
 
 export const teacherExportRepository = {
     async getStudentProgress(userId) {
@@ -19,6 +20,9 @@ export const teacherExportRepository = {
     },
     listScores(userId) {
         return leaderboardRepository.listForUser(userId);
+    },
+    listSparkResponses(userId) {
+        return sparkResponsesRepository.listForStudent(userId);
     },
     async logExport(record = {}) {
         await supabaseService.init();

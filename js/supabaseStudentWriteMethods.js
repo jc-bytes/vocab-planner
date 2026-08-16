@@ -28,18 +28,31 @@ export function installSupabaseStudentWriteMethods(service) {
     service.submitStudentActivityProgress = async function submitStudentActivityProgress(payload = {}) {
         await this.init();
         payload.eventId ||= createEventId('activity-progress');
-        const { data, error } = await this.client.rpc('submit_student_activity_progress_v2', {
+        const { data, error } = await this.client.rpc('submit_student_activity_progress_v3', {
             p_event_id: payload.eventId,
             p_unit_key: payload.unitKey,
             p_unit_context: payload.unitContext || {},
             p_activity_type: payload.activityType,
             p_score: payload.score,
             p_is_complete: Boolean(payload.isComplete),
+            p_is_finished: Boolean(payload.isFinished),
             p_details: payload.details || {},
+            p_metrics: payload.metrics || {},
+            p_state_snapshot: payload.stateSnapshot ?? null,
             p_activity_settings: payload.activitySettings || {},
             p_client_id: payload.clientId || '',
             p_is_required: Boolean(payload.isRequired),
             p_attempt_id: payload.attemptId || ''
+        });
+        if (error) throw error;
+        return firstRow(data);
+    };
+
+    service.submitStudentSparkResponse = async function submitStudentSparkResponse(payload = {}) {
+        await this.init();
+        const { data, error } = await this.client.rpc('submit_student_spark_response', {
+            p_spark_id: payload.sparkId,
+            p_answers: payload.answers || {}
         });
         if (error) throw error;
         return firstRow(data);

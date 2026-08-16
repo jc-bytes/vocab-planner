@@ -15,6 +15,7 @@ export class ScrambleActivity {
         this.currentIndex = 0;
         this.completedCount = 0;
         this.correctCount = 0;
+        this.answerAttempts = 0;
         this.streak = 0;
         this.bestStreak = 0;
         this.currentWord = null;
@@ -81,6 +82,10 @@ export class ScrambleActivity {
             this.currentIndex = Math.min(Math.max(0, Number(state.currentIndex) || 0), this.words.length);
             this.completedCount = Math.max(0, Number(state.completedCount) || 0);
             this.correctCount = Math.max(0, Number(state.correctCount) || 0);
+            this.answerAttempts = Math.max(
+                this.completedCount,
+                Number(state.answerAttempts) || this.completedCount
+            );
             this.streak = Math.max(0, Number(state.streak) || 0);
             this.bestStreak = Math.max(0, Number(state.bestStreak) || 0);
             this.currentWord = state.currentWord || null;
@@ -100,6 +105,7 @@ export class ScrambleActivity {
         if (state.currentWord) {
             this.currentIndex = Math.min(Math.max(0, Number(state.currentIndex) || 0), this.words.length);
             this.completedCount = this.currentIndex;
+            this.answerAttempts = this.completedCount;
             this.currentWord = state.currentWord;
             this.targetAnswer = this.normalizeAnswer(this.currentWord.word);
             this.shuffledLetters = Array.isArray(state.shuffledLetters) ? state.shuffledLetters : [];
@@ -119,6 +125,7 @@ export class ScrambleActivity {
             currentIndex: this.currentIndex,
             completedCount: this.completedCount,
             correctCount: this.correctCount,
+            answerAttempts: this.answerAttempts,
             streak: this.streak,
             bestStreak: this.bestStreak,
             currentWord: this.currentWord,
@@ -195,19 +202,20 @@ export class ScrambleActivity {
 
     getScore() {
         const progress = this.words.length ? Math.round((this.correctCount / this.words.length) * 100) : 0;
-        const accuracy = this.completedCount ? Math.round((this.correctCount / this.completedCount) * 100) : 0;
+        const accuracy = this.answerAttempts ? Math.round((this.correctCount / this.answerAttempts) * 100) : 0;
         return {
             score: progress,
             details: `${this.completedCount}/${this.words.length} words. Accuracy: ${accuracy}%. Best streak: ${this.bestStreak}`,
             accuracy,
             evidence: {
-                attemptedCount: this.completedCount,
+                attemptedCount: this.answerAttempts,
                 correctCount: this.correctCount,
                 totalCount: this.words.length,
                 skippedCount: this.missedWords.length,
                 accuracy
             },
-            isComplete: this.correctCount === this.words.length
+            isComplete: this.correctCount === this.words.length,
+            isFinished: this.completedCount >= this.words.length
         };
     }
 
@@ -272,6 +280,7 @@ export class ScrambleActivity {
         }
 
         this.attempts++;
+        this.answerAttempts++;
         const distance = this.getEditDistance(currentString, this.targetAnswer);
         this.feedback = distance <= 2 ? 'Almost. Check one or two letters.' : 'Not quite. Tap letters to move them back and try again.';
         this.feedbackState = 'error';
@@ -281,6 +290,7 @@ export class ScrambleActivity {
 
     solveCurrent() {
         const perfectSolve = this.attempts === 0 && this.hintsUsed === 0;
+        this.answerAttempts++;
         this.completedCount++;
         this.correctCount++;
         this.streak++;
@@ -298,6 +308,7 @@ export class ScrambleActivity {
 
     skipWord() {
         this.recordMissedWord('Skipped');
+        this.answerAttempts++;
         this.completedCount++;
         this.streak = 0;
         this.currentIndex++;
@@ -338,8 +349,8 @@ export class ScrambleActivity {
     finish() {
         this.isFinished = true;
         this.currentWord = null;
-        this.checkProgress();
         this.saveState();
+        this.checkProgress();
         this.renderSummary();
     }
 
@@ -349,6 +360,7 @@ export class ScrambleActivity {
         this.currentIndex = 0;
         this.completedCount = 0;
         this.correctCount = 0;
+        this.answerAttempts = 0;
         this.streak = 0;
         this.bestStreak = 0;
         this.currentWord = null;
@@ -472,7 +484,7 @@ export class ScrambleActivity {
     }
 
     renderSummary() {
-        const accuracy = this.completedCount ? Math.round((this.correctCount / this.completedCount) * 100) : 0;
+        const accuracy = this.answerAttempts ? Math.round((this.correctCount / this.answerAttempts) * 100) : 0;
         this.container.innerHTML = `
             <div class="completion-screen scramble-summary">
                 <h2>All Words Unscrambled!</h2>

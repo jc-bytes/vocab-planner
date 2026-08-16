@@ -129,7 +129,13 @@ export class FlashcardsActivity {
         return {
             score: percentage,
             details: `Mastered: ${answeredCount}/${total} cards. First-attempt accuracy: ${firstAttemptAccuracy}%`,
-            evidence: { masteredCount: answeredCount, correctCount: answeredCount, totalCount: total },
+            evidence: {
+                masteredCount: answeredCount,
+                correctCount: answeredCount,
+                totalCount: total,
+                firstAttemptCorrectCount: this.firstAttemptCorrectCards.size,
+                attemptedCount: attemptedCards
+            },
             isComplete: total > 0 && answeredCount === total,
             accuracy: firstAttemptAccuracy
         };
@@ -240,17 +246,18 @@ export class FlashcardsActivity {
 
         const panel = createElement('div', 'flashcard-panel flashcard-mastery-panel');
         panel.appendChild(this.createMasteryCheck(word));
-        panel.appendChild(this.createControls());
+        const controls = this.createControls();
 
         const stage = createElement('div', 'flashcard-stage');
         stage.appendChild(cardScene);
         stage.appendChild(panel);
+        stage.appendChild(controls);
         wrapper.appendChild(stage);
         this.container.appendChild(wrapper);
 
         card.addEventListener('click', () => this.handleCardFlip(card));
-        panel.querySelector('#prev-card')?.addEventListener('click', event => this.goToPrevious(event));
-        panel.querySelector('#next-card')?.addEventListener('click', event => this.goToNext(event));
+        controls.querySelector('#prev-card')?.addEventListener('click', event => this.goToPrevious(event));
+        controls.querySelector('#next-card')?.addEventListener('click', event => this.goToNext(event));
     }
 
     createFrontFace(word) {

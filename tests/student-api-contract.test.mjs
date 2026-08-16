@@ -22,6 +22,7 @@ const EXPECTED_STUDENT_METHODS = [
     'startStudentArcadeMinute',
     'submitStudentActivityProgress',
     'submitStudentGameScore',
+    'submitStudentSparkResponse',
     'syncStudentUnitWork',
     'updatePasswordAndClearFlag',
     'updateStudentProfile',

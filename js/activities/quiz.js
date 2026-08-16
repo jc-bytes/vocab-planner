@@ -236,7 +236,8 @@ export class QuizActivity {
                 totalCount: this.totalQuestions,
                 accuracy
             },
-            isComplete: answeredAll && accuracy >= MASTERY_ACCURACY
+            isComplete: answeredAll && accuracy >= MASTERY_ACCURACY,
+            isFinished: answeredAll
         };
     }
 
@@ -328,16 +329,15 @@ export class QuizActivity {
             isCorrect
         };
 
-        if (this.onProgress) {
-            this.onProgress(this.getScore());
-        }
-
         if (this.currentIndex < this.totalQuestions - 1) {
             this.currentIndex++;
         } else {
             this.isFinished = true;
         }
         this.saveState();
+        if (this.onProgress) {
+            this.onProgress(this.getScore());
+        }
 
         // Wait and move to next
         this.timeouts.schedule(() => {

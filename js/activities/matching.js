@@ -372,6 +372,7 @@ export class MatchingActivity {
                 totalCount: targetPairs,
                 completedRounds: this.roundsCompleted,
                 targetRounds: this.targetRounds,
+                attemptedCount: this.attempts,
                 accuracy
             },
             isComplete

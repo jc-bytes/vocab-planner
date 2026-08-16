@@ -1,4 +1,6 @@
 import { $, createElement, escapeHtml } from '../main.js';
+import { imageDB } from '../db.js';
+import { sparkResponsesRepository } from '../services/sparkResponsesRepository.js';
 import { sparksRepository } from '../services/sparksRepository.js';
 import { normalizeSchoolCalendar } from '../services/vocabularyApi.js';
 import {
@@ -60,6 +62,7 @@ export class StudentActivityHomeSpark {
         this.sm = home.sm;
         this.currentSparkSessionCache = new Map();
         this.currentSpark = null;
+        this.sparkResponseSyncSequence = new Map();
     }
 
     normalizeSpark(spark = {}) {
@@ -169,17 +172,92 @@ export class StudentActivityHomeSpark {
         }
     }
 
+    persistSparkLibraryProgress(progress = {}) {
+        localStorage.setItem(this.getSparkLibraryStorageKey(), JSON.stringify(progress));
+    }
+
+    mergeSparkLibraryProgress(localProgress = {}, cloudResponses = []) {
+        const merged = { ...localProgress };
+        cloudResponses.forEach(response => {
+            if (!response?.sparkId) return;
+            const local = merged[response.sparkId];
+            if (local?.syncStatus === 'pending') return;
+            const localTime = Date.parse(local?.updatedAt || '') || 0;
+            const cloudTime = Date.parse(response.updatedAt || '') || 0;
+            if (!local || cloudTime >= localTime) merged[response.sparkId] = response;
+        });
+        return merged;
+    }
+
+    retryPendingSparkResponses(progress = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) return;
+        Object.values(progress).forEach(state => {
+            if (!state?.sparkId || state.syncStatus !== 'pending'
+                || this.sparkResponseSyncSequence.has(state.sparkId)) return;
+            this.sparkResponseSyncSequence.set(state.sparkId, 1);
+            void this.syncSparkLibraryState(state, 1);
+        });
+    }
+
+    async hydrateSparkLibraryProgress(sparkIds = []) {
+        const localProgress = this.loadSparkLibraryProgress();
+        if (this.sm.authDisabled || !this.sm.currentUser || sparkIds.length === 0) return localProgress;
+        try {
+            const cloudResponses = await sparkResponsesRepository.listOwn(sparkIds);
+            const merged = this.mergeSparkLibraryProgress(localProgress, cloudResponses);
+            this.persistSparkLibraryProgress(merged);
+            this.retryPendingSparkResponses(merged);
+            return merged;
+        } catch (error) {
+            console.warn('Could not load saved Spark responses:', error);
+            this.retryPendingSparkResponses(localProgress);
+            return localProgress;
+        }
+    }
+
     saveSparkLibraryState(state = {}) {
         if (!state.sparkId) return;
         const progress = this.loadSparkLibraryProgress();
+        const sequence = (this.sparkResponseSyncSequence.get(state.sparkId) || 0) + 1;
+        this.sparkResponseSyncSequence.set(state.sparkId, sequence);
         progress[state.sparkId] = {
             version: Number(state.version) || 2,
             sparkId: String(state.sparkId),
             answers: state.answers && typeof state.answers === 'object' ? { ...state.answers } : {},
-            completedAt: String(state.completedAt || '')
+            completedAt: String(state.completedAt || ''),
+            updatedAt: new Date().toISOString(),
+            syncStatus: 'pending'
         };
-        localStorage.setItem(this.getSparkLibraryStorageKey(), JSON.stringify(progress));
+        this.persistSparkLibraryProgress(progress);
         this.activities.updateArcadeGateDisplay();
+        if (!this.sm.authDisabled && this.sm.currentUser) {
+            void this.syncSparkLibraryState(progress[state.sparkId], sequence);
+        }
+    }
+
+    async syncSparkLibraryState(state, sequence) {
+        try {
+            const saved = await sparkResponsesRepository.submit(state);
+            if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
+            const progress = this.loadSparkLibraryProgress();
+            progress[state.sparkId] = saved;
+            this.persistSparkLibraryProgress(progress);
+            this.activities.updateArcadeGateDisplay();
+            this.sm.setAuthStatus?.('Synced');
+        } catch (error) {
+            if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
+            try {
+                await imageDB.enqueueSyncAction('student-spark-response', {
+                    sparkId: state.sparkId,
+                    answers: state.answers || {},
+                    storageKey: this.getSparkLibraryStorageKey()
+                });
+            } catch (queueError) {
+                console.warn('Could not queue the Spark response for later sync:', queueError);
+            }
+            this.sm.setAuthStatus?.(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+            console.warn('Could not sync Spark response:', error);
+        }
     }
 
     getCurrentSparkGateWork() {
@@ -203,6 +281,9 @@ export class StudentActivityHomeSpark {
 
     async refreshCurrentSparkGate({ updateDisplay = true } = {}) {
         await this.fetchCurrentSpark();
+        if (this.currentSpark?.id) {
+            await this.hydrateSparkLibraryProgress([this.currentSpark.id]);
+        }
         const work = this.getCurrentSparkGateWork();
         if (updateDisplay) this.activities.updateArcadeGateDisplay();
         return work;
@@ -222,7 +303,7 @@ export class StudentActivityHomeSpark {
                 return;
             }
             this.currentSpark = sparks[0];
-            const progress = this.loadSparkLibraryProgress();
+            const progress = await this.hydrateSparkLibraryProgress(sparks.map(spark => spark.id));
             const dateRange = this.getCurrentSparkDateRange();
             const { SparkReadingActivity } = await import('../activities/sparkReading.js');
             new SparkReadingActivity(

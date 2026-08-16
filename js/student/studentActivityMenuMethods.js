@@ -1,11 +1,75 @@
 import { $, $$, createElement } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
+import { STUDENT_ACTIVITY_REGISTRY } from './studentActivityRegistry.js';
 import { setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityMenu {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
+    }
+
+    renderCompletedActivityExportOptions() {
+        const container = $('#completed-activity-export-options');
+        if (!container) return;
+
+        const completedActivities = STUDENT_ACTIVITY_REGISTRY.filter(activity => {
+            if (activity.id === 'illustration') return false;
+            const result = this.sm.unitScores?.[activity.id];
+            return Boolean(result?.isComplete) || Number(result?.score) >= 100;
+        });
+
+        if (completedActivities.length === 0) {
+            container.innerHTML = '<p class="student-export-menu-empty">Complete an activity to unlock its PDF.</p>';
+            return;
+        }
+
+        container.replaceChildren(...completedActivities.map(activity => {
+            const button = createElement('button', 'student-export-menu-item');
+            button.type = 'button';
+            button.setAttribute('role', 'menuitem');
+            button.dataset.activityPdfExport = activity.id;
+
+            const icon = document.createElement('i');
+            icon.dataset.lucide = 'file-down';
+            const label = createElement('span', '', `${activity.title} PDF`);
+            button.append(icon, label);
+            return button;
+        }));
+    }
+
+    async downloadCompletedActivityReport(activityType) {
+        const scoreData = this.sm.unitScores?.[activityType];
+        if (!scoreData || (!scoreData.isComplete && Number(scoreData.score) < 100)) {
+            throw new Error('Complete this activity before exporting its PDF.');
+        }
+
+        const { ReportGenerator } = await import('../reportGenerator.js');
+        const unitProgress = this.activities.getCurrentUnitProgress();
+        const bestAttempt = scoreData.bestAttempt && typeof scoreData.bestAttempt === 'object'
+            ? scoreData.bestAttempt
+            : null;
+        const reportScoreData = bestAttempt
+            ? {
+                ...scoreData,
+                ...bestAttempt,
+                isComplete: Boolean(bestAttempt.mastered) || Boolean(scoreData.isComplete),
+                evidence: bestAttempt.details?.evidence || scoreData.evidence
+            }
+            : scoreData;
+        ReportGenerator.generateActivityReport(
+            this.sm.studentProfile,
+            this.sm.currentVocab,
+            activityType,
+            reportScoreData,
+            {
+                trimester: unitProgress?.trimester || '',
+                state: bestAttempt?.state
+                    || this.sm.unitStates?.[activityType]
+                    || unitProgress?.states?.[activityType]
+                    || null
+            }
+        );
     }
 
     showActivityMenu(options = {}) {
@@ -105,8 +169,11 @@ export class StudentActivityMenu {
                     ? `${badge.textContent} complete`
                     : badge.textContent;
 
-                if (!nonReplayable.includes(type) && scoreData.plays > 0) {
-                    card.dataset.activityPlaysSummary = scoreData.plays === 1 ? '1 play' : `${scoreData.plays} plays`;
+                const finishedRuns = scoreData.finishedRuns ?? scoreData.plays ?? 0;
+                if (finishedRuns > 0) {
+                    card.dataset.activityPlaysSummary = finishedRuns === 1
+                        ? '1 finished attempt'
+                        : `${finishedRuns} finished attempts`;
                 }
             }
 
@@ -125,6 +192,7 @@ export class StudentActivityMenu {
 
         // Update overall coverage display if element exists
         this.activities.updateOverallCoverageDisplay(coverageStats);
+        this.renderCompletedActivityExportOptions();
 
         if (!options.fromRoute) {
             const unitId = this.sm.getCurrentVocabRouteId();

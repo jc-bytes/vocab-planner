@@ -1,5 +1,6 @@
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
+import { mapSparkResponseRow } from '../services/sparkResponsesRepository.js';
 import { studentProgressRepository } from '../services/studentProgressRepository.js';
 import { imageDB } from '../db.js';
 import {
@@ -386,6 +387,21 @@ export class StudentProgressCloud {
                         this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
                     } else {
                         this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                    }
+                } else if (record.type === 'student-spark-response'
+                    && typeof supabaseService.submitStudentSparkResponse === 'function') {
+                    const saved = await supabaseService.submitStudentSparkResponse(record.payload || {});
+                    const storageKey = String(record.payload?.storageKey || '');
+                    const sparkId = String(record.payload?.sparkId || '');
+                    if (storageKey && sparkId) {
+                        try {
+                            const local = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                            local[sparkId] = mapSparkResponseRow(saved);
+                            localStorage.setItem(storageKey, JSON.stringify(local));
+                            this.sm.activities?.updateArcadeGateDisplay?.();
+                        } catch (storageError) {
+                            console.warn('Could not refresh the locally cached Spark response:', storageError);
+                        }
                     }
                 } else if (record.type === 'student-progress') {
                     await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });

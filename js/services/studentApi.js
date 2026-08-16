@@ -13,6 +13,7 @@ export const STUDENT_API_METHODS = Object.freeze([
     'ensureOwnStudentProgress',
     'startStudentActivityAttempt',
     'submitStudentActivityProgress',
+    'submitStudentSparkResponse',
     'syncStudentUnitWork',
     'getOwnArcadeTime',
     'startStudentArcadeMinute',

@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321; base-uri 'self'; form-action 'self'; object-src 'none'">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-class-options-20260816j">
+    <link rel="stylesheet" href="css/student.css?v=flashcard-layout-20260816b">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
     <link rel="stylesheet" href="css/typography.css?v=typography-month-navigation-20260815a">
     <link rel="stylesheet" href="css/student-design-system.css?v=student-design-system-20260815a"
@@ -252,6 +252,11 @@
                                         <i data-lucide="file-text"></i>
                                         <span>Final Report</span>
                                     </button>
+                                    <div class="student-export-menu-divider" role="separator"></div>
+                                    <p class="student-export-menu-label">Completed activities</p>
+                                    <div id="completed-activity-export-options" class="student-activity-export-options" aria-live="polite">
+                                        <p class="student-export-menu-empty">Complete an activity to unlock its PDF.</p>
+                                    </div>
                                 </div>
                             </details>
                             <button id="back-to-vocab" class="btn secondary-btn activity-menu-close-btn activity-back-control"

@@ -32,7 +32,9 @@ globalThis.window = {
     addEventListener() {},
     removeEventListener() {},
     setTimeout,
-    clearTimeout
+    clearTimeout,
+    atob: globalThis.atob,
+    btoa: globalThis.btoa
 };
 
 const { StudentActivities } = await import('../js/student/studentActivities.js');
@@ -64,6 +66,63 @@ const {
     normalizeSchoolCalendar
 } = await import('../js/services/vocabularyApi.js');
 const { requestWithTimeout } = await import('../js/services/requestReliability.js');
+const { ReportGenerator } = await import('../js/reportGenerator.js');
+
+test('individual activity exports use descriptive PDF filenames', () => {
+    const filename = ReportGenerator.buildActivityReportFileName(
+        { firstName: 'Alex', lastName: 'Rivera', grade: '6', group: 'A' },
+        { name: 'Digital Citizenship', trimester: 'T1' },
+        'speed-match'
+    );
+
+    assert.equal(filename, 'AlexRivera-6a-t1-DigitalCitizenship-SpeedMatch.pdf');
+});
+
+test('individual activity exports normalize saved evidence labels', () => {
+    assert.deepEqual(ReportGenerator.getActivityEvidenceRows({
+        evidence: { correctCount: 8, total_count: 10, skipped: '' }
+    }), [
+        { label: 'Correct Count', value: '8' },
+        { label: 'Total Count', value: '10' }
+    ]);
+});
+
+test('individual activity exports unpack normalized cloud details', () => {
+    const normalized = ReportGenerator.normalizeActivityReportScoreData({
+        score: 100,
+        isComplete: true,
+        accuracy: 92,
+        details: {
+            summary: 'Matched 12/12 pairs in 15 attempts.',
+            evidence: {
+                correctCount: 12,
+                totalCount: 12,
+                completedRounds: 3,
+                targetRounds: 3
+            }
+        }
+    });
+
+    assert.equal(normalized.details, 'Matched 12/12 pairs in 15 attempts.');
+    assert.deepEqual(normalized.evidence, {
+        correctCount: 12,
+        totalCount: 12,
+        completedRounds: 3,
+        targetRounds: 3,
+        accuracy: 92
+    });
+    assert.doesNotMatch(normalized.details, /\[object Object\]/);
+});
+
+test('individual activity exports keep fresh in-memory score details', () => {
+    const normalized = ReportGenerator.normalizeActivityReportScoreData({
+        details: 'Completed the activity.',
+        evidence: { correctCount: 10, totalCount: 10 }
+    });
+
+    assert.equal(normalized.details, 'Completed the activity.');
+    assert.deepEqual(normalized.evidence, { correctCount: 10, totalCount: 10 });
+});
 
 test('StudentActivities owns explicit runtime components', () => {
     const manager = {};
@@ -433,6 +492,52 @@ test('StudentActivities owns explicit browser and home components', () => {
     assert.equal(activities.home.currentSparkSessionCache, activities.home.spark.currentSparkSessionCache);
     assert.equal(activities.browser.sm, manager);
     assert.equal(activities.home.sm, manager);
+});
+
+test('pending local Spark answers win over older cloud data until offline sync completes', () => {
+    const sparkHome = new StudentActivityHomeSpark({ activities: {}, sm: {} });
+    const local = {
+        'spark-1': {
+            sparkId: 'spark-1',
+            answers: { q1: 'Newest offline response.' },
+            updatedAt: '2026-08-16T17:10:00.000Z',
+            syncStatus: 'pending'
+        }
+    };
+    const cloud = [{
+        sparkId: 'spark-1',
+        answers: { q1: 'Older cloud response.' },
+        updatedAt: '2026-08-16T17:09:00.000Z',
+        syncStatus: 'synced'
+    }];
+
+    assert.equal(
+        sparkHome.mergeSparkLibraryProgress(local, cloud)['spark-1'].answers.q1,
+        'Newest offline response.'
+    );
+});
+
+test('newer cloud Spark responses replace already-synced local cache entries', () => {
+    const sparkHome = new StudentActivityHomeSpark({ activities: {}, sm: {} });
+    const local = {
+        'spark-1': {
+            sparkId: 'spark-1',
+            answers: { q1: 'Old local response.' },
+            updatedAt: '2026-08-16T17:08:00.000Z',
+            syncStatus: 'synced'
+        }
+    };
+    const cloud = [{
+        sparkId: 'spark-1',
+        answers: { q1: 'New cloud response.' },
+        updatedAt: '2026-08-16T17:09:00.000Z',
+        syncStatus: 'synced'
+    }];
+
+    assert.equal(
+        sparkHome.mergeSparkLibraryProgress(local, cloud)['spark-1'].answers.q1,
+        'New cloud response.'
+    );
 });
 
 test('StudentActivities owns explicit calendar and schedule components', () => {

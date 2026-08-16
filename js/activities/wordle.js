@@ -213,7 +213,8 @@ export class WordleActivity {
                 failedCount: this.missedWords.length,
                 totalCount: this.words.length
             },
-            isComplete: this.completedWords.length === this.words.length
+            isComplete: this.completedWords.length === this.words.length,
+            isFinished: this.completedWords.length + this.missedWords.length >= this.words.length
         };
     }
 

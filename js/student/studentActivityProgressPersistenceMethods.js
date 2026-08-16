@@ -92,6 +92,7 @@ export class StudentActivityProgressPersistence {
                 }
 
                 persistedScoreData = {
+                    ...oldScoreData,
                     ...scoreData,
                     score: Math.max(oldScore, newScore),
                     details: newScore >= oldScore ? scoreData.details : oldScoreData?.details,
@@ -139,13 +140,14 @@ export class StudentActivityProgressPersistence {
                 }
 
                 // Keep best score
+                const isNewBest = newScore >= oldScore;
                 oldScoreData.score = Math.max(oldScore, newScore);
-                oldScoreData.details = scoreData.details;
+                if (isNewBest) oldScoreData.details = scoreData.details;
                 oldScoreData.isComplete = oldScoreData.isComplete || scoreData.isComplete;
-                if (scoreData.evidence && typeof scoreData.evidence === 'object') {
+                if (isNewBest && scoreData.evidence && typeof scoreData.evidence === 'object') {
                     oldScoreData.evidence = scoreData.evidence;
                 }
-                if (scoreData.accuracy !== undefined) {
+                if (isNewBest && scoreData.accuracy !== undefined) {
                     oldScoreData.accuracy = Number(scoreData.accuracy) || 0;
                 }
                 oldScoreData.lastPlayed = new Date().toISOString();
@@ -162,7 +164,9 @@ export class StudentActivityProgressPersistence {
                 refreshLocalFormativeWindow();
                 this.sm.showToast?.('Formative complete: Arcade is ready for 10 minutes!');
             }
-            this.syncActivityProgressToCloud(activityType, persistedScoreData, {
+            // Send the current run, not the locally aggregated best. The server
+            // finalizes this attempt and updates best/latest/lifetime separately.
+            this.syncActivityProgressToCloud(activityType, scoreData, {
                 ...settings,
                 progressReward,
                 completionBonus
@@ -184,6 +188,10 @@ export class StudentActivityProgressPersistence {
         const unitProgress = this.activities.getCurrentUnitProgress();
         if (!unitProgress || !this.sm.currentVocab) return null;
         const flow = this.activities.getActivityFlowConfig(this.sm.currentVocab);
+        const metrics = this.getActivityAttemptMetrics(activityType, scoreData);
+        const stateSnapshot = this.sanitizeActivityState(
+            this.sm.unitStates?.[activityType] ?? unitProgress.states?.[activityType] ?? null
+        );
         return {
             eventId: `activity-progress:${globalThis.crypto?.randomUUID?.()
                 || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
@@ -201,6 +209,7 @@ export class StudentActivityProgressPersistence {
             attemptId: this.activities.session.activityAttempt?.attemptId || '',
             score: Number(scoreData.score) || 0,
             isComplete: Boolean(scoreData.isComplete),
+            isFinished: this.isActivityAttemptFinished(activityType, scoreData),
             details: {
                 summary: typeof scoreData.details === 'string' ? scoreData.details : '',
                 evidence: scoreData.evidence && typeof scoreData.evidence === 'object'
@@ -208,12 +217,67 @@ export class StudentActivityProgressPersistence {
                     : {},
                 accuracy: Number(scoreData.accuracy) || 0
             },
+            metrics,
+            stateSnapshot: stateSnapshot === undefined ? null : stateSnapshot,
             activitySettings: {
                 progressReward: settings.progressReward,
                 completionBonus: settings.completionBonus
             },
             clientId: this.sm.progress?.clientId || ''
         };
+    }
+
+    getActivityAttemptMetrics(activityType, scoreData = {}) {
+        const evidence = scoreData.evidence && typeof scoreData.evidence === 'object'
+            ? scoreData.evidence
+            : {};
+        const integer = value => {
+            const number = Number(value);
+            return Number.isInteger(number) && number >= 0 ? number : null;
+        };
+        let correctActions = null;
+        let attemptedActions = null;
+
+        if (['quiz', 'synonym-antonym'].includes(activityType)) {
+            correctActions = integer(evidence.correctCount);
+            attemptedActions = integer(evidence.answeredCount);
+        } else if (activityType === 'flashcards') {
+            correctActions = integer(evidence.firstAttemptCorrectCount);
+            attemptedActions = integer(evidence.attemptedCount);
+        } else if (activityType === 'matching' || activityType === 'scramble') {
+            correctActions = integer(evidence.correctCount);
+            attemptedActions = integer(evidence.attemptedCount);
+        } else if (activityType === 'wordle') {
+            correctActions = integer(evidence.correctCount);
+            const failedCount = integer(evidence.failedCount);
+            attemptedActions = correctActions === null || failedCount === null
+                ? null
+                : correctActions + failedCount;
+        }
+
+        if (correctActions === null || attemptedActions === null || attemptedActions <= 0
+            || correctActions > attemptedActions) {
+            return {};
+        }
+        return { correctActions, attemptedActions };
+    }
+
+    isActivityAttemptFinished(activityType, scoreData = {}) {
+        if (scoreData.isFinished !== undefined) return Boolean(scoreData.isFinished);
+        if (scoreData.isComplete) return true;
+        const evidence = scoreData.evidence && typeof scoreData.evidence === 'object'
+            ? scoreData.evidence
+            : {};
+        const total = Number(evidence.totalCount);
+        if (!(total > 0)) return false;
+        if (['quiz', 'synonym-antonym'].includes(activityType)) {
+            return Number(evidence.answeredCount) >= total;
+        }
+        if (activityType === 'scramble') return Number(evidence.attemptedCount) >= total;
+        if (activityType === 'wordle') {
+            return Number(evidence.correctCount) + Number(evidence.failedCount) >= total;
+        }
+        return false;
     }
 
     async syncActivityProgressToCloud(activityType, scoreData = {}, settings = {}) {
@@ -243,7 +307,7 @@ export class StudentActivityProgressPersistence {
 
         const promise = new Promise((resolve, reject) => state.waiters.push({ resolve, reject }));
         state.pending = { payload, fingerprint };
-        this.scheduleActivityProgressFlush(syncKey, Boolean(payload.isComplete));
+        this.scheduleActivityProgressFlush(syncKey, Boolean(payload.isFinished || payload.isComplete));
         return promise;
     }
 
@@ -253,7 +317,10 @@ export class StudentActivityProgressPersistence {
             payload.activityType || '',
             Number(payload.score) || 0,
             Boolean(payload.isComplete),
+            Boolean(payload.isFinished),
             payload.details || {},
+            payload.metrics || {},
+            payload.stateSnapshot || null,
             payload.activitySettings || {},
             payload.attemptId || '',
             Boolean(payload.isRequired)
@@ -261,7 +328,7 @@ export class StudentActivityProgressPersistence {
     }
 
     isMeaningfulActivityProgressPayload(payload = {}) {
-        if (payload.isComplete || Number(payload.score) > 0) return true;
+        if (payload.isComplete || payload.isFinished || Number(payload.score) > 0) return true;
         if (Number(payload.details?.accuracy) > 0) return true;
         return Object.keys(payload.details?.evidence || {}).length > 0;
     }
@@ -312,7 +379,10 @@ export class StudentActivityProgressPersistence {
         } finally {
             state.inFlight = null;
             if (state.pending) {
-                this.scheduleActivityProgressFlush(syncKey, Boolean(state.pending.payload.isComplete));
+                this.scheduleActivityProgressFlush(
+                    syncKey,
+                    Boolean(state.pending.payload.isFinished || state.pending.payload.isComplete)
+                );
             }
         }
     }
@@ -361,6 +431,12 @@ export class StudentActivityProgressPersistence {
         const unit = units[unitKey] ||= { ...(payload.unitContext || {}), scores: {}, states: {} };
         unit.scores ||= {};
         const previous = unit.scores[activityType] || {};
+        const bestAttempt = activity.bestAttempt && typeof activity.bestAttempt === 'object'
+            ? activity.bestAttempt
+            : null;
+        const coherentDetails = bestAttempt?.details && typeof bestAttempt.details === 'object'
+            ? bestAttempt.details
+            : activity.details;
         unit.scores[activityType] = {
             ...previous,
             score: Number(activity.score) || 0,
@@ -370,23 +446,47 @@ export class StudentActivityProgressPersistence {
             accuracy: activity.accuracy === null || activity.accuracy === undefined
                 ? previous.accuracy
                 : Number(activity.accuracy) || 0,
-            details: activity.details?.summary ?? previous.details ?? '',
-            evidence: activity.details?.evidence ?? previous.evidence,
+            bestAccuracy: activity.bestAccuracy ?? previous.bestAccuracy,
+            lifetimeCorrect: Number(activity.lifetimeCorrect) || 0,
+            lifetimeAttempted: Number(activity.lifetimeAttempted) || 0,
+            lifetimeAccuracy: activity.lifetimeAccuracy ?? previous.lifetimeAccuracy,
+            finishedRuns: Number(activity.finishedRuns) || 0,
+            masteredRuns: Number(activity.masteredRuns) || 0,
+            details: coherentDetails?.summary ?? previous.details ?? '',
+            evidence: coherentDetails?.evidence ?? previous.evidence,
             verified: Boolean(activity.verified),
             attemptId: activity.attemptId || previous.attemptId || '',
+            bestAttemptId: activity.bestAttemptId || previous.bestAttemptId || '',
+            latestAttemptId: activity.latestAttemptId || previous.latestAttemptId || '',
+            bestAttempt: bestAttempt || previous.bestAttempt,
+            latestAttempt: activity.latestAttempt || previous.latestAttempt,
             lastPlayed: activity.lastPlayed || previous.lastPlayed,
             updatedAt: activity.updatedAt || progress.updatedAt
         };
+        if (bestAttempt?.state !== undefined && bestAttempt.state !== null) {
+            unit.states ||= {};
+            unit.states[activityType] = bestAttempt.state;
+        }
         this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
         this.sm.progressData.version = Number(progress.version) || this.sm.progressData.version || 0;
         if (progress.coinData) {
             this.sm.progress.applyCoinSnapshot(progress.coinData, this.sm.coinHistory, { saveLocal: false });
         }
-        if (this.sm.currentVocab && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitKey) {
+        const isCurrentUnit = this.sm.currentVocab
+            && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitKey;
+        if (isCurrentUnit) {
             this.sm.unitScores = unit.scores;
         }
         this.sm.progress.updateLevelDisplay?.();
         this.sm.progress.saveLocalProgress(true);
+        this.activities.updateArcadeGateDisplay?.();
+
+        const activityMenuView = typeof document === 'undefined'
+            ? null
+            : document.querySelector('#activity-menu-view');
+        if (isCurrentUnit && activityMenuView && !activityMenuView.classList.contains('hidden')) {
+            this.activities.showActivityMenu?.({ fromRoute: true, skipActivityPreload: true });
+        }
     }
 
     getAwardedXp(previousTotalXp, progress = {}) {

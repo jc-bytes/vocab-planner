@@ -230,7 +230,8 @@ export class SynonymAntonymActivity {
                 totalCount: this.totalQuestions,
                 accuracy
             },
-            isComplete: answeredAll && accuracy >= MASTERY_ACCURACY
+            isComplete: answeredAll && accuracy >= MASTERY_ACCURACY,
+            isFinished: answeredAll
         };
     }
 
@@ -333,16 +334,15 @@ export class SynonymAntonymActivity {
             isCorrect
         };
 
-        if (this.onProgress) {
-            this.onProgress(this.getScore());
-        }
-
         if (this.currentIndex < this.totalQuestions - 1) {
             this.currentIndex++;
         } else {
             this.isFinished = true;
         }
         this.saveState();
+        if (this.onProgress) {
+            this.onProgress(this.getScore());
+        }
 
         this.timeouts.schedule(() => {
             this.render();

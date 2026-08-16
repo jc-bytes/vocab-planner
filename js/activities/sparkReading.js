@@ -258,15 +258,15 @@ export class SparkReadingActivity {
             <div class="spark-reading-layout">
                 ${this.sparks.length > 1 ? `
                     <nav class="spark-reader-navigation" aria-label="Browse Sparks">
-                        <button class="btn text-btn spark-reader-nav-btn" type="button" data-spark-direction="newer"${this.activeSparkIndex === 0 ? ' disabled' : ''}>
+                        <button class="btn text-btn spark-reader-nav-btn" type="button" data-spark-direction="older"${this.activeSparkIndex === this.sparks.length - 1 ? ' disabled' : ''}>
                             <i data-lucide="arrow-left" aria-hidden="true"></i>
-                            Newer Spark
+                            Older Spark
                         </button>
                         <span class="spark-reader-position">
                             <strong>${this.activeSparkIndex + 1}</strong> of ${this.sparks.length}
                         </span>
-                        <button class="btn text-btn spark-reader-nav-btn" type="button" data-spark-direction="older"${this.activeSparkIndex === this.sparks.length - 1 ? ' disabled' : ''}>
-                            Older Spark
+                        <button class="btn text-btn spark-reader-nav-btn" type="button" data-spark-direction="newer"${this.activeSparkIndex === 0 ? ' disabled' : ''}>
+                            Newer Spark
                             <i data-lucide="arrow-right" aria-hidden="true"></i>
                         </button>
                     </nav>
@@ -308,11 +308,11 @@ export class SparkReadingActivity {
                                 <h2 id="spark-check-modal-title">Check Your Understanding</h2>
                             </div>
                             <button class="close-modal spark-check-modal-close" type="button" aria-label="Close understanding check">
-                                <i data-lucide="circle-x" aria-hidden="true"></i>
+                                <i data-lucide="x" aria-hidden="true"></i>
                             </button>
                         </div>
                         <div class="modal-body spark-check-modal-body">
-                            <p class="spark-check-modal-intro">Use the Spark reading behind this window to help you answer.</p>
+                            <p class="spark-check-modal-intro">Use the Spark you just read to help you answer.</p>
                             ${this.createQuestionFieldsHtml(questions)}
                             <p class="spark-response-feedback" role="status" aria-live="polite">${escapeHtml(this.feedback || (evaluation.isComplete ? 'Check complete. You may update your answers.' : 'Answer each question, then submit your check.'))}</p>
                         </div>

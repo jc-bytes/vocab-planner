@@ -10,6 +10,7 @@ globalThis.document = {
 globalThis.window = { addEventListener() {}, removeEventListener() {} };
 
 const { IllustrationActivity } = await import('../js/activities/illustration.js');
+const { WORD_HUNT_IMAGE_LIMITS } = await import('../js/imageUtils.js');
 
 function writingTarget() {
     const feedback = { hidden: true };
@@ -69,4 +70,14 @@ test('Word Hunt does not block text paste outside its writing fields', async () 
         preventDefault() { prevented = true; }
     });
     assert.equal(prevented, false);
+});
+
+test('Word Hunt saves export-sized image thumbnails', () => {
+    assert.deepEqual(WORD_HUNT_IMAGE_LIMITS, {
+        maxWidth: 160,
+        maxHeight: 112,
+        initialQuality: 0.5,
+        targetBytes: 24 * 1024,
+        maxBytes: 40 * 1024
+    });
 });

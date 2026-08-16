@@ -275,12 +275,6 @@ export class WordSearchActivity {
         newPuzzleButton.addEventListener('click', () => this.startNewPuzzle());
         actions.appendChild(newPuzzleButton);
 
-        const shuffleButton = createElement('button', 'btn secondary-btn');
-        shuffleButton.type = 'button';
-        shuffleButton.textContent = 'Shuffle Same Words';
-        shuffleButton.addEventListener('click', () => this.restart());
-        actions.appendChild(shuffleButton);
-
         header.appendChild(actions);
         return header;
     }
@@ -655,8 +649,8 @@ export class WordSearchActivity {
         const percentage = Math.round((this.foundWords.size / this.words.length) * 100);
         const isComplete = this.foundWords.size === this.words.length;
         
-        // Show replay button when complete
-        if (isComplete && !this.container.querySelector('#replay-wordsearch')) {
+        // Show the completion options once when the round is complete.
+        if (isComplete && !this.completionOverlay) {
             this.timeouts.schedule(() => this.showCompletionOverlay(), 500);
         }
         
@@ -692,7 +686,6 @@ export class WordSearchActivity {
                 </h2>
                 <p>You found all ${this.words.length} words!</p>
                 <button id="new-wordsearch" class="btn primary-btn" style="margin-top: 1rem;">New Puzzle</button>
-                <button id="replay-wordsearch" class="btn secondary-btn" style="margin-top: 1rem; margin-left: 0.5rem;">Shuffle Same Words</button>
                 <button id="close-wordsearch" class="btn secondary-btn" style="margin-top: 0.5rem; margin-left: 0.5rem;">Close</button>
             </div>
         `;
@@ -703,11 +696,6 @@ export class WordSearchActivity {
         overlay.querySelector('#new-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
             this.startNewPuzzle();
-        });
-        
-        overlay.querySelector('#replay-wordsearch').addEventListener('click', () => {
-            document.body.removeChild(overlay);
-            this.restart();
         });
         
         overlay.querySelector('#close-wordsearch').addEventListener('click', () => {

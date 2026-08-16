@@ -757,6 +757,28 @@
     height: 1rem;
     flex: 0 0 auto;
     color: #fed7aa;
+}.student-export-menu-divider {
+    height: 1px;
+    margin: 0.35rem 0;
+    background: var(--border-color, rgba(148, 163, 184, 0.22));
+}.student-export-menu-label {
+    margin: 0;
+    padding: 0.45rem 0.75rem 0.25rem;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}.student-activity-export-options {
+    display: grid;
+    gap: 0.15rem;
+}.student-export-menu-empty {
+    max-width: 16rem;
+    margin: 0;
+    padding: 0.5rem 0.75rem 0.65rem;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.8rem;
+    line-height: 1.35;
 }.danger-btn {
     background: rgba(239, 68, 68, 0.16);
     border: 1px solid rgba(248, 113, 113, 0.55);
@@ -7294,7 +7316,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     grid-template-columns: 1fr;
     grid-template-areas: "hero";
     max-width: none;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
     gap: 0;
     align-items: start;
 }
@@ -7440,11 +7462,11 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 
 #activity-menu-view .activity-flow-section {
     max-width: none;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 }
 
 #activity-menu-view .activity-flow-heading {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 #activity-menu-view .activity-flow-heading h3 {
@@ -7515,7 +7537,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 160px;
+    min-height: 152px;
     padding: 0 8px 8px;
     border: 0;
     background: transparent;
@@ -7655,8 +7677,84 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 }
 
 #activity-menu-view .additional-activity-section {
-    padding-top: 14px;
+    padding-top: 10px;
     border-top-color: rgba(173, 198, 255, 0.16);
+}
+
+#activity-menu-view .activity-scroll-cue {
+    position: fixed;
+    z-index: 90;
+    left: 50%;
+    bottom: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 9px 16px;
+    border: 1px solid rgba(173, 198, 255, 0.34);
+    border-radius: 999px;
+    background: rgba(8, 15, 36, 0.94);
+    color: #eef3ff;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.42), 0 0 24px rgba(173, 198, 255, 0.12);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 12px);
+    transition: opacity 180ms ease, transform 180ms ease, border-color 160ms ease;
+}
+
+@media (min-width: 1121px) {
+    #activity-menu-view .activity-scroll-cue {
+        left: calc(50vw + 120px);
+    }
+
+    .app-container.student-sidebar-collapsed #activity-menu-view .activity-scroll-cue {
+        left: calc(50vw + 38px);
+    }
+}
+
+#activity-menu-view .activity-scroll-cue.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+}
+
+#activity-menu-view .activity-scroll-cue:hover,
+#activity-menu-view .activity-scroll-cue:focus-visible {
+    border-color: rgba(228, 242, 34, 0.72);
+    outline: none;
+}
+
+#activity-menu-view .activity-scroll-cue:focus-visible {
+    box-shadow: 0 0 0 3px rgba(228, 242, 34, 0.22), 0 14px 38px rgba(0, 0, 0, 0.42);
+}
+
+#activity-menu-view .activity-scroll-cue svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: var(--color-xp);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: activity-scroll-cue-bob 1.5s ease-in-out infinite;
+}
+
+@keyframes activity-scroll-cue-bob {
+    0%, 100% { transform: translateY(-1px); }
+    50% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #activity-menu-view .activity-scroll-cue,
+    #activity-menu-view .activity-scroll-cue svg {
+        animation: none;
+        transition: none;
+    }
 }
 
 #activity-menu-view .activity-secondary-grid {
@@ -8163,9 +8261,26 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     cursor: default;
 }
 
-.flashcard-mastery-panel {
-    padding: 1rem;
-    gap: 1rem;
+.flashcard-mastery-wrapper .flashcard-mastery-panel {
+    align-self: stretch;
+    padding: 0.15rem 0 0;
+    gap: 0.75rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.flashcard-mastery-wrapper .flashcard-controls {
+    grid-column: 2;
+    margin-top: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    flex-wrap: nowrap;
+}
+
+.flashcard-mastery-wrapper .flashcard-controls .progress {
+    flex: 0 0 auto;
+    order: 0;
 }
 
 .flashcard-mastery-check {
@@ -8245,6 +8360,13 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     .flashcard-mastery-panel {
         width: min(100%, 520px);
         max-width: none;
+        justify-self: center;
+    }
+
+    .flashcard-mastery-wrapper .flashcard-controls {
+        grid-column: 1;
+        width: min(100%, 520px) !important;
+        justify-self: center;
     }
 
     #activity-menu-view .required-activity-card .activity-path-step {
@@ -8451,12 +8573,17 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 
 .spark-check-modal {
     z-index: 180;
+    background: rgba(2, 6, 23, 0.88);
+    backdrop-filter: blur(4px);
 }
 
 .spark-check-modal-content {
-    width: min(94vw, 720px);
-    max-width: 720px;
+    width: min(94vw, 680px);
+    max-width: 680px;
     padding: 0;
+    border: 1px solid rgba(173, 198, 255, 0.22);
+    background: #11182d;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.62);
     overflow: hidden;
 }
 
@@ -8469,8 +8596,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 .spark-check-modal-header {
     align-items: flex-start;
     margin: 0;
-    padding-block: 20px 14px;
-    border-bottom: 1px solid rgba(173, 198, 255, 0.14);
+    padding-block: 22px 10px;
 }
 
 .spark-check-modal-header > div {
@@ -8483,25 +8609,35 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     color: var(--text-main);
 }
 
+.spark-check-modal-close {
+    border-radius: 50%;
+}
+
+.spark-check-modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+}
+
 .spark-check-modal-body {
     display: grid;
-    gap: 14px;
+    gap: 18px;
     max-height: min(64vh, 620px);
-    padding-block: 18px;
+    padding-block: 12px 22px;
     overflow-y: auto;
 }
 
 .spark-check-modal-intro {
     margin: 0;
-    color: var(--text-muted);
-    font-size: 0.86rem;
+    color: #cbd5e1;
+    font-size: 0.9rem;
     line-height: 1.5;
 }
 
 .spark-check-modal-footer {
     margin: 0;
     padding-block: 14px 18px;
-    border-top: 1px solid rgba(173, 198, 255, 0.14);
+    border-top: 1px solid rgba(173, 198, 255, 0.12);
+    background: #0d1427;
 }
 
 .spark-response-panel.is-locked {
@@ -8534,18 +8670,22 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 
 .spark-check-question {
     display: grid;
-    gap: 9px;
+    gap: 12px;
     min-width: 0;
     margin: 0;
-    padding: 13px;
-    border: 1px solid rgba(173, 198, 255, 0.16);
-    border-radius: var(--radius-control);
-    background: rgba(255, 255, 255, 0.025);
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.spark-check-question + .spark-check-question {
+    padding-top: 18px;
+    border-top: 1px solid rgba(173, 198, 255, 0.12);
 }
 
 .spark-check-question.is-invalid {
-    border-color: rgba(251, 146, 60, 0.58);
-    background: rgba(251, 146, 60, 0.07);
+    padding-left: 12px;
+    border-left: 3px solid #fb923c;
 }
 
 .spark-check-question legend,
@@ -8554,10 +8694,10 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     align-items: flex-start;
     gap: 9px;
     padding: 0;
-    color: var(--text-main);
-    font-size: 0.9rem;
+    color: #f8fafc;
+    font-size: 0.96rem;
     font-weight: 800;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .spark-check-question legend > span,
@@ -8576,7 +8716,8 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 
 .spark-check-options {
     display: grid;
-    gap: 7px;
+    gap: 0;
+    border-top: 1px solid rgba(173, 198, 255, 0.12);
 }
 
 .spark-check-option {
@@ -8584,16 +8725,16 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     align-items: center;
     gap: 9px;
     min-height: 42px;
-    padding: 8px 10px;
-    border: 1px solid rgba(173, 198, 255, 0.12);
-    border-radius: 10px;
-    background: rgba(8, 12, 34, 0.28);
+    padding: 10px 4px;
+    border: 0;
+    border-bottom: 1px solid rgba(173, 198, 255, 0.12);
+    border-radius: 0;
+    background: transparent;
     cursor: pointer;
 }
 
 .spark-check-option:has(input:checked) {
-    border-color: rgba(173, 198, 255, 0.48);
-    background: rgba(173, 198, 255, 0.1);
+    background: #192442;
 }
 
 .spark-check-option input {
@@ -8618,11 +8759,15 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 .spark-response-form textarea {
     width: 100%;
     min-height: 96px;
+    border-color: rgba(173, 198, 255, 0.3);
+    background: #080e20;
+    color: #f8fafc;
     resize: vertical;
 }
 
 .spark-response-feedback {
     min-height: 1.3rem;
+    color: #cbd5e1;
 }
 
 .spark-reader-navigation {

@@ -122,6 +122,23 @@ export class StudentListeners {
             if (exportMenu && !exportMenu.contains(event.target)) exportMenu.open = false;
         });
 
+        this.listen(document, 'click', async (event) => {
+            const button = event.target.closest?.('[data-activity-pdf-export]');
+            if (!button || button.disabled) return;
+
+            const activityType = button.dataset.activityPdfExport;
+            this.setStudentExportButtonState(button, true, 'Generating PDF...');
+            $('#student-vocab-export-menu')?.removeAttribute('open');
+            try {
+                await this.sm.activities.downloadCompletedActivityReport(activityType);
+            } catch (error) {
+                console.error('Failed to export activity PDF:', error);
+                notifications.error(error?.message || 'Could not export this activity PDF.');
+            } finally {
+                this.setStudentExportButtonState(button, false);
+            }
+        });
+
         this.listen(document, 'keydown', (event) => {
             if (event.key === 'Escape') {
                 this.sm.closeStudentMobileMenu({ focusToggle: true });

@@ -1,9 +1,11 @@
 export const WORD_HUNT_IMAGE_LIMITS = {
-    maxWidth: 220,
-    maxHeight: 140,
-    initialQuality: 0.55,
-    targetBytes: 45 * 1024,
-    maxBytes: 64 * 1024
+    // The PDF renders these at no more than about 100 x 76 pt, so a larger
+    // thumbnail adds storage and export weight without visible classroom value.
+    maxWidth: 160,
+    maxHeight: 112,
+    initialQuality: 0.5,
+    targetBytes: 24 * 1024,
+    maxBytes: 40 * 1024
 };
 
 const canvasToBlob = (canvas, quality) => new Promise((resolve, reject) => {
@@ -55,11 +57,11 @@ export async function compressImageToWebp(fileOrBlob, options = {}) {
 
         const qualities = [
             limits.initialQuality,
-            0.5,
             0.45,
             0.4,
             0.35,
-            0.3
+            0.3,
+            0.25
         ].filter((quality, index, values) => (
             quality > 0 && values.indexOf(quality) === index
         ));

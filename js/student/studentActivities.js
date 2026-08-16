@@ -591,6 +591,10 @@ export class StudentActivities {
         return this.menu.showActivityMenu(options);
     }
 
+    downloadCompletedActivityReport(activityType) {
+        return this.menu.downloadCompletedActivityReport(activityType);
+    }
+
     loadActivityClass(type) {
         return this.moduleLoader.loadActivityClass(type);
     }

@@ -19,6 +19,48 @@ export class StudentActivityGateDisplay {
         return this.progressFlow.isActivityComplete(...args);
     }
 
+    updateActivityScrollCue() {
+        const view = document.querySelector('#activity-menu-view');
+        if (!view) return;
+
+        let cue = view.querySelector(':scope > .activity-scroll-cue');
+        if (!cue) {
+            cue = createElement('button', 'activity-scroll-cue');
+            cue.type = 'button';
+            cue.innerHTML = `
+                <span>More activities below</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m7 10 5 5 5-5"></path>
+                </svg>
+            `;
+            cue.setAttribute('aria-label', 'Scroll down to see more activities');
+            view.appendChild(cue);
+        }
+
+        if (!view.dataset.scrollCueBound) {
+            const refreshCue = () => {
+                const hasOverflow = view.scrollHeight > view.clientHeight + 8;
+                const isAtStart = view.scrollTop <= 8;
+                view.classList.toggle('has-activity-scroll-peek', hasOverflow && isAtStart);
+                cue.classList.toggle('is-visible', hasOverflow && isAtStart);
+                cue.tabIndex = hasOverflow && isAtStart ? 0 : -1;
+            };
+
+            view.addEventListener('scroll', refreshCue, { passive: true });
+            cue.addEventListener('click', () => {
+                view.scrollBy({
+                    top: Math.max(220, Math.round(view.clientHeight * 0.48)),
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+                });
+            });
+            window.addEventListener('resize', refreshCue, { passive: true });
+            view.dataset.scrollCueBound = 'true';
+            view._refreshActivityScrollCue = refreshCue;
+        }
+
+        requestAnimationFrame(() => view._refreshActivityScrollCue?.());
+    }
+
     updateArcadeGateDisplay(status = this.progressFlow.getPendingRequiredWork()) {
         const arcadeTab = $('#student-tab-arcade');
         if (!arcadeTab) return status;
@@ -290,6 +332,8 @@ export class StudentActivityGateDisplay {
         });
 
         if (flow.hidden.length > 0) grid.appendChild(unavailableDetails);
+
+        this.updateActivityScrollCue();
     }
 
 

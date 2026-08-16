@@ -6,6 +6,7 @@ import { mapSubjectRow, subjectPayload } from '../js/services/subjectsRepository
 import { mapVocabularyRow, vocabularyPayload } from '../js/services/vocabularyRepository.js';
 import { mapSparkRow, sparkPayload } from '../js/services/sparksRepository.js';
 import { sparksRepository } from '../js/services/sparksRepository.js';
+import { mapSparkResponseRow, sparkResponsesRepository } from '../js/services/sparkResponsesRepository.js';
 import { leaderboardRepository } from '../js/services/leaderboardRepository.js';
 import { studentProgressRepository } from '../js/services/studentProgressRepository.js';
 import { supabaseService } from '../js/supabaseService.js';
@@ -70,6 +71,28 @@ test('spark mapping normalizes field aliases, target grades, and empty dates', (
     assert.equal(spark.checkMode, 'reading_only');
 });
 
+test('Spark response mapping preserves mixed answers, snapshots, and completion metadata', () => {
+    const response = mapSparkResponseRow({
+        spark_id: 'spark-1',
+        answers: { q1: 'A measurable success rule.', q2: 1 },
+        question_snapshot: [
+            { id: 'q1', type: 'short_text', prompt: 'Explain.' },
+            { id: 'q2', type: 'multiple_choice', prompt: 'Choose.', options: ['A', 'B'] }
+        ],
+        evaluation: { total: 2, correct: 2, isComplete: true },
+        is_complete: true,
+        completed_at: '2026-08-16T17:00:00.000Z',
+        updated_at: '2026-08-16T17:00:01.000Z'
+    });
+
+    assert.equal(response.sparkId, 'spark-1');
+    assert.equal(response.answers.q2, 1);
+    assert.equal(response.questionSnapshot[1].type, 'multiple_choice');
+    assert.equal(response.evaluation.total, 2);
+    assert.equal(response.isComplete, true);
+    assert.equal(response.syncStatus, 'synced');
+});
+
 test('profile, progress, and score rows preserve existing application shapes', () => {
     const profile = mapProfileRow({
         user_id: 'user-1', role: 'student', first_name: 'Ada', last_name: 'Lovelace',
@@ -115,6 +138,7 @@ function createReadBuilder(result, calls) {
         gte(field, value) { calls.push(['gte', field, value]); return this; },
         lte(field, value) { calls.push(['lte', field, value]); return this; },
         contains(field, value) { calls.push(['contains', field, value]); return this; },
+        in(field, value) { calls.push(['in', field, value]); return this; },
         order(field, options) { calls.push(['order', field, options]); return this; },
         limit(value) { calls.push(['limit', value]); return this; },
         maybeSingle() { calls.push(['maybeSingle']); return Promise.resolve(result); },
@@ -122,6 +146,23 @@ function createReadBuilder(result, calls) {
     };
     return builder;
 }
+
+test('student Spark response reads are scoped to the requested Spark ids', async () => {
+    const calls = [];
+    const builder = createReadBuilder({
+        data: [{ spark_id: 'spark-1', answers: { q1: 'Saved response text.' } }],
+        error: null
+    }, calls);
+    await withFakeClient({ from(table) { calls.push(['from', table]); return builder; } }, async () => {
+        const responses = await sparkResponsesRepository.listOwn(['spark-1', 'spark-1', 'spark-2']);
+        assert.deepEqual(responses.map(response => response.sparkId), ['spark-1']);
+    });
+    assert.deepEqual(calls, [
+        ['from', 'student_spark_responses'], ['select', '*'],
+        ['in', 'spark_id', ['spark-1', 'spark-2']],
+        ['order', 'updated_at', { ascending: false }]
+    ]);
+});
 
 test('scheduled Spark query preserves domain filters, ordering, and limit', async () => {
     const calls = [];
