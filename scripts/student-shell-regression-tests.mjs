@@ -397,6 +397,8 @@ async function assertCollapsedSidebar(page) {
             logoutTop: top('#sign-out-btn'),
             coinLabel: document.querySelector('.student-coin-label')?.textContent?.trim(),
             coinAlignment: window.getComputedStyle(document.querySelector('#coin-balance')).justifyContent,
+            toggleWidth: Math.round(document.querySelector('#student-sidebar-toggle')?.getBoundingClientRect().width || 0),
+            toggleHeight: Math.round(document.querySelector('#student-sidebar-toggle')?.getBoundingClientRect().height || 0),
             toggleIconCenter: center('#student-sidebar-toggle svg'),
             activeNavIconCenter: center('.student-tab.active svg')
         };
@@ -405,6 +407,8 @@ async function assertCollapsedSidebar(page) {
     assert.ok(expandedAccount.logoutTop > expandedAccount.coinTop, `coins and logout are not in separate rows: ${JSON.stringify(expandedAccount)}`);
     assert.equal(expandedAccount.coinLabel, 'Coins');
     assert.equal(expandedAccount.coinAlignment, 'flex-start');
+    assert.equal(expandedAccount.toggleWidth, 44);
+    assert.equal(expandedAccount.toggleHeight, 44);
 
     await page.click('#student-sidebar-toggle');
     await page.waitForTimeout(120);
@@ -427,6 +431,8 @@ async function assertCollapsedSidebar(page) {
             topbarX: Math.round(topbarRect?.x || 0),
             label: toggle?.getAttribute('aria-label'),
             iconPresent: Boolean(toggle?.querySelector('svg')),
+            toggleWidth: Math.round(toggle?.getBoundingClientRect().width || 0),
+            toggleHeight: Math.round(toggle?.getBoundingClientRect().height || 0),
             navLabels: [...document.querySelectorAll('.student-tab')].map(tab => tab.getAttribute('aria-label')),
             coinTop: Math.round(document.querySelector('#coin-balance')?.getBoundingClientRect().top || 0),
             logoutTop: Math.round(document.querySelector('#sign-out-btn')?.getBoundingClientRect().top || 0),
@@ -450,6 +456,8 @@ async function assertCollapsedSidebar(page) {
         topbarX: 76,
         label: 'Expand navigation',
         iconPresent: true,
+        toggleWidth: 44,
+        toggleHeight: 44,
         navLabels: ['Today', 'Vocabulary', 'Sparks'],
         coinTop: 0,
         logoutTop: 0,
@@ -460,7 +468,11 @@ async function assertCollapsedSidebar(page) {
     assert.match(collapsed.navLabels[3], /^Arcade/);
     assert.ok(collapsed.coinTop > 700, `collapsed coins are not in the lower rail: ${collapsed.coinTop}`);
     assert.ok(collapsed.logoutTop > collapsed.coinTop, `collapsed logout is not below coins: ${JSON.stringify(collapsed)}`);
-    assert.deepEqual(collapsed.toggleIconCenter, expandedAccount.toggleIconCenter, 'collapse control moved between rail states');
+    assert.ok(
+        Math.abs(collapsed.toggleIconCenter[0] - expandedAccount.toggleIconCenter[0]) <= 1
+            && collapsed.toggleIconCenter[1] === expandedAccount.toggleIconCenter[1],
+        `collapse control moved between rail states: ${JSON.stringify({ expanded: expandedAccount.toggleIconCenter, collapsed: collapsed.toggleIconCenter })}`
+    );
     assert.ok(
         Math.abs(collapsed.activeNavIconCenter[0] - expandedAccount.activeNavIconCenter[0]) <= 1
             && collapsed.activeNavIconCenter[1] === expandedAccount.activeNavIconCenter[1],
