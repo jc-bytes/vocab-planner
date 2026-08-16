@@ -491,6 +491,23 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 }).eq('user_id', student.id);
                 if (error) throw error;
             };
+            const warmRealtimeStream = async label => {
+                for (let attempt = 1; attempt <= 6; attempt += 1) {
+                    const marker = `${RUN_ID}-${label}-warmup-${attempt}`;
+                    await updateMarker(marker);
+                    try {
+                        await waitFor(() => lastMarker === marker, 'Realtime stream did not warm up.', 1500);
+                        markerCounts.clear();
+                        lastMarker = '';
+                        return;
+                    } catch {
+                        // A freshly started Realtime service can join the WebSocket
+                        // before its logical-replication stream is ready. Retry with
+                        // a new marker, then measure exact delivery only after it is.
+                    }
+                }
+                throw new Error('Realtime stream did not become ready.');
+            };
 
             try {
                 await withServiceClient(studentClient, async () => {
@@ -498,6 +515,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         recordMarker(progress);
                     });
                     await waitFor(() => channelJoined(studentClient), 'Realtime channel did not join.');
+                    await warmRealtimeStream('initial');
                     await updateMarker(`${RUN_ID}-delivery`);
                     await waitFor(() => lastMarker === `${RUN_ID}-delivery`, 'Initial Realtime update was not delivered.');
                     await new Promise(resolve => setTimeout(resolve, 150));
@@ -514,6 +532,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         recordMarker(progress);
                     });
                     await waitFor(() => channelJoined(studentClient), 'Resubscribed Realtime channel did not join.');
+                    await warmRealtimeStream('resubscribe');
                     await updateMarker(`${RUN_ID}-resubscribe`);
                     await waitFor(() => lastMarker === `${RUN_ID}-resubscribe`, 'Resubscribed update was not delivered.');
                     await new Promise(resolve => setTimeout(resolve, 150));
