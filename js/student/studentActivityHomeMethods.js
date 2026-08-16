@@ -93,6 +93,12 @@ export class StudentActivityHome {
         this.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
 
+        try {
+            await this.refreshCurrentSparkGate({ updateDisplay: false });
+        } catch (error) {
+            console.warn('Could not refresh the current Spark gate', error);
+        }
+
         const { vocabs, message } = this.getVisibleVocabularyList({
             availableOnly: true,
             currentTrimesterOnly: true
@@ -344,17 +350,27 @@ export class StudentActivityHome {
         notice.setAttribute('aria-label', 'Arcade unlock progress');
         const copy = createElement('div', 'student-arcade-gate-copy');
         const title = createElement('strong', null, 'Arcade unlock progress');
-        const activityLabel = access.remainingActivities === 1 ? 'activity' : 'activities';
+        const activityLabel = access.vocabularyRemainingActivities === 1 ? 'activity' : 'activities';
         const unitLabel = access.unitCount === 1 ? 'unit' : 'units';
+        const parts = [];
+        if (access.spark) parts.push("today's Spark check");
+        if (access.vocabularyRemainingActivities > 0) {
+            parts.push(`${access.vocabularyRemainingActivities} required ${activityLabel} in ${access.unitCount} ${unitLabel}`);
+        }
         const message = createElement(
             'span',
             null,
-            `${access.remainingActivities} required ${activityLabel} remaining in ${access.unitCount} ${unitLabel}.`
+            `Complete ${parts.join(' and ')} to unlock Arcade.`
         );
         copy.append(title, message);
         notice.appendChild(copy);
 
-        if (access.next?.vocab) {
+        if (access.spark) {
+            const continueButton = createElement('button', 'btn secondary-btn', 'Complete Spark check');
+            continueButton.type = 'button';
+            continueButton.addEventListener('click', () => this.sm.navigateTo({ view: 'sparks' }));
+            notice.appendChild(continueButton);
+        } else if (access.next?.vocab) {
             const continueButton = createElement('button', 'btn secondary-btn', 'Continue required work');
             continueButton.type = 'button';
             continueButton.addEventListener('click', () => this.loadVocabulary(access.next.vocab));
@@ -410,6 +426,14 @@ export class StudentActivityHome {
 
     fetchCurrentSpark() {
         return this.spark.fetchCurrentSpark();
+    }
+
+    getCurrentSparkGateWork() {
+        return this.spark.getCurrentSparkGateWork();
+    }
+
+    refreshCurrentSparkGate(options = {}) {
+        return this.spark.refreshCurrentSparkGate(options);
     }
 
     loadAndRenderCurrentSpark(host) {

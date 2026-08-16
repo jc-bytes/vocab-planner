@@ -4091,6 +4091,77 @@ input[readonly] {
     margin-bottom: 0;
 }
 
+.spark-question-builder-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.spark-question-builder,
+.spark-question-editor,
+.spark-question-options {
+    display: grid;
+    gap: var(--spacing-sm);
+}
+
+.spark-question-editor {
+    padding: var(--spacing-md);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.spark-question-editor-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+}
+
+.spark-question-editor-heading strong {
+    color: var(--text-primary);
+}
+
+.spark-question-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.spark-question-option {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.spark-question-option input[type="radio"] {
+    width: auto;
+}
+
+.spark-question-builder-empty {
+    margin: 0;
+    padding: var(--spacing-md);
+    border: 1px dashed rgba(148, 163, 184, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.spark-question-builder-group[hidden] {
+    display: none;
+}
+
+.spark-legacy-question-settings {
+    padding: var(--spacing-sm) 0;
+}
+
+.spark-legacy-question-settings > summary {
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: var(--font-weight-bold);
+}
+
 .student-spark-host:empty {
     display: none;
 }
@@ -9475,8 +9546,14 @@ button.activity-card {
     }
 
     .spark-grade-question-grid,
-    .spark-target-grade-grid {
+    .spark-target-grade-grid,
+    .spark-question-options {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .spark-question-builder-heading {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .student-spark-host {

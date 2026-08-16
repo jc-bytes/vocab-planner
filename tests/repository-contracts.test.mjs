@@ -52,15 +52,22 @@ test('vocabulary mapping preserves legacy defaults and nullable placement fields
 
 test('spark mapping normalizes field aliases, target grades, and empty dates', () => {
     const payload = sparkPayload({
-        id: 'spark-1', sparkType: 'trivia', targetGrades: ['6', '6', '7'], scheduledDate: ''
+        id: 'spark-1', sparkType: 'trivia', targetGrades: ['6', '6', '7'], scheduledDate: '',
+        checkMode: 'required',
+        questions: [{ id: 'q1', type: 'multiple_choice', prompt: 'Choose one.', options: ['A', 'B'], correctOption: 1 }]
     });
     assert.equal(payload.spark_type, 'trivia');
     assert.deepEqual(payload.target_grades, ['6', '7']);
     assert.equal(payload.scheduled_date, null);
+    assert.equal(payload.check_mode, 'required');
+    assert.equal(payload.questions[0].correctOption, 1);
 
-    const spark = mapSparkRow({ id: 'spark-1', spark_type: 'trivia', target_grades: ['8'] });
+    const spark = mapSparkRow({
+        id: 'spark-1', spark_type: 'trivia', target_grades: ['8'], check_mode: 'reading_only', questions: []
+    });
     assert.equal(spark.sparkType, 'trivia');
     assert.deepEqual(spark.targetGrades, ['8']);
+    assert.equal(spark.checkMode, 'reading_only');
 });
 
 test('profile, progress, and score rows preserve existing application shapes', () => {
@@ -105,7 +112,9 @@ function createReadBuilder(result, calls) {
     const builder = {
         select(value) { calls.push(['select', value]); return this; },
         eq(field, value) { calls.push(['eq', field, value]); return this; },
+        gte(field, value) { calls.push(['gte', field, value]); return this; },
         lte(field, value) { calls.push(['lte', field, value]); return this; },
+        contains(field, value) { calls.push(['contains', field, value]); return this; },
         order(field, options) { calls.push(['order', field, options]); return this; },
         limit(value) { calls.push(['limit', value]); return this; },
         maybeSingle() { calls.push(['maybeSingle']); return Promise.resolve(result); },
@@ -119,7 +128,11 @@ test('scheduled Spark query preserves domain filters, ordering, and limit', asyn
     const builder = createReadBuilder({ data: [{ id: 's1', subject_slug: 'technology', status: 'scheduled' }], error: null }, calls);
     await withFakeClient({ from(table) { calls.push(['from', table]); return builder; } }, async () => {
         const sparks = await sparksRepository.listScheduledForStudent({
-            subjectSlug: 'technology', onOrBefore: '2026-07-13', limit: 40
+            subjectSlug: 'technology',
+            onOrAfter: '2026-06-08',
+            onOrBefore: '2026-07-13',
+            targetGrade: '6',
+            limit: 20
         });
         assert.equal(sparks[0].id, 's1');
     });
@@ -127,8 +140,10 @@ test('scheduled Spark query preserves domain filters, ordering, and limit', asyn
         ['from', 'weekly_sparks'], ['select', '*'],
         ['eq', 'subject_slug', 'technology'], ['eq', 'status', 'scheduled'],
         ['lte', 'scheduled_date', '2026-07-13'],
+        ['gte', 'scheduled_date', '2026-06-08'],
+        ['contains', 'target_grades', ['6']],
         ['order', 'scheduled_date', { ascending: false }],
-        ['order', 'updated_at', { ascending: false }], ['limit', 40]
+        ['order', 'updated_at', { ascending: false }], ['limit', 20]
     ]);
 });
 

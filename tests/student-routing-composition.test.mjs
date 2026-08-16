@@ -239,3 +239,30 @@ test('arcade routing redirects blocked students to their oldest pending unit', a
         ['loadVocabulary', pendingVocab, { fromRoute: true }]
     ]);
 });
+
+test('arcade routing sends required current Spark work to the Sparks view', async () => {
+    const manager = createManager();
+    const calls = [];
+    const access = {
+        isBlocked: true,
+        remainingActivities: 1,
+        spark: { spark: { id: 'spark-1' }, remaining: 1 },
+        next: { kind: 'spark', spark: { id: 'spark-1' } }
+    };
+    manager.activities.refreshCurrentSparkGate = async () => calls.push(['refreshSpark']);
+    manager.activities.getPendingRequiredWork = () => access;
+    manager.activities.updateArcadeGateDisplay = value => calls.push(['gate', value]);
+    const routing = new StudentRouting(manager);
+    routing.setRoute = (...args) => calls.push(['setRoute', ...args]);
+    routing.showSparksView = async () => calls.push(['showSparks']);
+
+    const opened = await routing.showArcadeView();
+
+    assert.equal(opened, false);
+    assert.deepEqual(calls, [
+        ['refreshSpark'],
+        ['gate', access],
+        ['setRoute', { view: 'sparks' }, { replace: true }],
+        ['showSparks']
+    ]);
+});

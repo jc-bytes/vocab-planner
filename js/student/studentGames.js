@@ -8,14 +8,20 @@ import { StudentGameLeaderboard } from './studentGameLeaderboardMethods.js';
 import { StudentGameLifecycle } from './studentGameLifecycleMethods.js';
 import { STUDENT_GAME_REGISTRY } from './studentGameRegistry.js';
 import { StudentGameSettings } from './studentGameSettingsMethods.js';
+import { StudentGameAccess } from './studentGameAccessMethods.js';
+import { readLocalArcadeSession } from './studentArcadeTimeStorage.js';
 
 export class StudentGames {
     constructor(studentManager) {
         this.sm = studentManager;
+        this.sessionOwnerId = studentManager.currentUser?.uid || (studentManager.authDisabled ? 'local-dev' : 'anonymous');
+        const savedSession = readLocalArcadeSession(this.sessionOwnerId);
         this.currentGame = null;
-        this.gameTimeRemaining = 0;
+        this.gameTimeRemaining = savedSession.remainingSeconds;
+        this.savedGameId = savedSession.gameId;
         this.gameTimerInterval = null;
         this.isHandlingGameMinute = false;
+        this.isAddingGameTime = false;
         this.gamesList = STUDENT_GAME_REGISTRY;
         this.currentGameIndex = 0;
         this.currentGameScore = 0;
@@ -23,6 +29,7 @@ export class StudentGames {
         this.lastSavedScore = 0;
         this.isGamePaused = false;
         this.settings = new StudentGameSettings(this);
+        this.access = new StudentGameAccess(this);
         this.leaderboard = new StudentGameLeaderboard(this);
         this.htmlLoader = new StudentGameHtmlLoader(this);
         this.lifecycle = new StudentGameLifecycle(this);
@@ -40,8 +47,20 @@ export class StudentGames {
         return this.settings.getExchangeRate();
     }
 
-    updateArcadeUI() {
-        return this.settings.updateArcadeUI();
+    loadArcadeTime(options = {}) {
+        return this.access.loadArcadeTime(options);
+    }
+
+    getAvailableArcadeSeconds() {
+        return this.access.getAvailableSeconds();
+    }
+
+    startArcadeMinute(gameId) {
+        return this.access.startMinute(gameId);
+    }
+
+    updateArcadeUI(options = {}) {
+        return this.settings.updateArcadeUI(options);
     }
 
     updateGameSelectionUI() {

@@ -1,5 +1,13 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { sparksRepository } from '../services/sparksRepository.js';
+import { normalizeSchoolCalendar } from '../services/vocabularyApi.js';
+import {
+    evaluateSparkAnswers,
+    getSparkQuestionsForGrade,
+    normalizeSparkCheckMode,
+    normalizeSparkQuestions,
+    SPARK_CHECK_MODES
+} from '../sparkCheckModel.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 const SPARK_TYPE_LABELS = {
@@ -51,6 +59,7 @@ export class StudentActivityHomeSpark {
         this.activities = home.activities;
         this.sm = home.sm;
         this.currentSparkSessionCache = new Map();
+        this.currentSpark = null;
     }
 
     normalizeSpark(spark = {}) {
@@ -66,6 +75,8 @@ export class StudentActivityHomeSpark {
             whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
             question: String(source.question || '').trim(),
             gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
+            checkMode: normalizeSparkCheckMode(source.checkMode ?? source.check_mode),
+            questions: normalizeSparkQuestions(source.questions),
             targetGrades: normalizeSparkTargetGrades(source.targetGrades ?? source.target_grades ?? SPARK_GRADE_LEVELS),
             sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
             sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
@@ -78,19 +89,35 @@ export class StudentActivityHomeSpark {
         return String(this.sm.studentProfile?.grade || '').match(/\d+/)?.[0] || '';
     }
 
+    getCurrentSparkDateRange(dateValue = getPanamaDateValue()) {
+        const date = new Date(`${dateValue}T12:00:00`);
+        const trimester = this.activities.getCurrentTrimesterKey(date);
+        const calendar = normalizeSchoolCalendar(this.activities.schoolCalendar, date);
+        const range = calendar.trimesters?.[trimester] || {};
+        return {
+            trimester,
+            onOrAfter: String(range.startDate || ''),
+            onOrBefore: dateValue
+        };
+    }
+
     async fetchCurrentSpark() {
         if (this.sm.authDisabled || !this.sm.currentUser) return null;
         const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
         const dateValue = getPanamaDateValue();
+        const dateRange = this.getCurrentSparkDateRange(dateValue);
         const grade = this.getStudentGradeLevel();
-        const cacheKey = `${subjectSlug}:${grade || 'all'}:${dateValue}`;
+        const cacheKey = `${subjectSlug}:${grade || 'all'}:${dateRange.trimester}:${dateRange.onOrAfter}:${dateRange.onOrBefore}`;
         if (this.currentSparkSessionCache.has(cacheKey)) {
-            return this.currentSparkSessionCache.get(cacheKey);
+            this.currentSpark = this.currentSparkSessionCache.get(cacheKey);
+            return this.currentSpark;
         }
         const sparks = (await sparksRepository.listScheduledForStudent({
             subjectSlug,
-            onOrBefore: dateValue,
-            limit: 40
+            onOrAfter: dateRange.onOrAfter,
+            onOrBefore: dateRange.onOrBefore,
+            targetGrade: grade,
+            limit: 1
         })).map(spark => this.normalizeSpark(spark));
         let currentSpark = null;
         if (grade) {
@@ -98,6 +125,7 @@ export class StudentActivityHomeSpark {
             if (gradeMatch) currentSpark = gradeMatch;
         }
         currentSpark = currentSpark || sparks.find(isAllGradeSpark) || null;
+        this.currentSpark = currentSpark;
         this.currentSparkSessionCache.set(cacheKey, currentSpark);
         return currentSpark;
     }
@@ -106,15 +134,18 @@ export class StudentActivityHomeSpark {
         if (this.sm.authDisabled || !this.sm.currentUser) return [];
         const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
         const dateValue = getPanamaDateValue();
+        const dateRange = this.getCurrentSparkDateRange(dateValue);
         const grade = this.getStudentGradeLevel();
-        const cacheKey = `library:${subjectSlug}:${grade || 'all'}:${dateValue}`;
+        const cacheKey = `library:${subjectSlug}:${grade || 'all'}:${dateRange.trimester}:${dateRange.onOrAfter}:${dateRange.onOrBefore}`;
         if (this.currentSparkSessionCache.has(cacheKey)) {
             return this.currentSparkSessionCache.get(cacheKey);
         }
         const sparks = (await sparksRepository.listScheduledForStudent({
             subjectSlug,
-            onOrBefore: dateValue,
-            limit: 40
+            onOrAfter: dateRange.onOrAfter,
+            onOrBefore: dateRange.onOrBefore,
+            targetGrade: grade,
+            limit: 20
         })).map(spark => this.normalizeSpark(spark));
         const available = grade
             ? sparks.filter(spark => spark.targetGrades.includes(grade) || isAllGradeSpark(spark))
@@ -142,13 +173,39 @@ export class StudentActivityHomeSpark {
         if (!state.sparkId) return;
         const progress = this.loadSparkLibraryProgress();
         progress[state.sparkId] = {
-            version: Number(state.version) || 1,
+            version: Number(state.version) || 2,
             sparkId: String(state.sparkId),
-            hasRead: Boolean(state.hasRead),
-            response: String(state.response || '').trim().slice(0, 240),
+            answers: state.answers && typeof state.answers === 'object' ? { ...state.answers } : {},
             completedAt: String(state.completedAt || '')
         };
         localStorage.setItem(this.getSparkLibraryStorageKey(), JSON.stringify(progress));
+        this.activities.updateArcadeGateDisplay();
+    }
+
+    getCurrentSparkGateWork() {
+        const spark = this.currentSpark;
+        if (!spark?.id || spark.checkMode !== SPARK_CHECK_MODES.REQUIRED) return null;
+        const state = this.loadSparkLibraryProgress()[spark.id] || null;
+        const questions = getSparkQuestionsForGrade(spark, this.getStudentGradeLevel());
+        if (questions.length === 0) return null;
+        const answers = Number(state?.version) === 1 && state?.response && questions[0]
+            ? { [questions[0].id]: state.response }
+            : (state?.answers || {});
+        const evaluation = evaluateSparkAnswers(questions, answers);
+        if (evaluation.isComplete) return null;
+        return {
+            spark,
+            routeId: spark.id,
+            remaining: Math.max(1, evaluation.total - evaluation.correct),
+            total: evaluation.total
+        };
+    }
+
+    async refreshCurrentSparkGate({ updateDisplay = true } = {}) {
+        await this.fetchCurrentSpark();
+        const work = this.getCurrentSparkGateWork();
+        if (updateDisplay) this.activities.updateArcadeGateDisplay();
+        return work;
     }
 
     async renderSparkLibrary() {
@@ -164,14 +221,17 @@ export class StudentActivityHomeSpark {
                 container.innerHTML = '<p class="teacher-empty-state">No Sparks are available for this class yet.</p>';
                 return;
             }
+            this.currentSpark = sparks[0];
             const progress = this.loadSparkLibraryProgress();
+            const dateRange = this.getCurrentSparkDateRange();
             const { SparkReadingActivity } = await import('../activities/sparkReading.js');
             new SparkReadingActivity(
                 container,
                 {
                     subjectSlug: this.sm.selectedSubjectSlug || 'technology',
                     grade: this.getStudentGradeLevel(),
-                    scheduledDate: getPanamaDateValue(),
+                    scheduledDate: dateRange.onOrBefore,
+                    onOrAfter: dateRange.onOrAfter,
                     loadSparks: async () => sparks,
                     getSparkState: sparkId => progress[sparkId] || null
                 },
@@ -198,6 +258,7 @@ export class StudentActivityHomeSpark {
             }
             this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:replaceChildren' });
             host.replaceChildren(this.createStudentSparkCard(spark));
+            this.activities.updateArcadeGateDisplay();
             if (window.lucide) window.lucide.createIcons({ root: host });
         } catch {
             this.removeSparkHomePanel(host);
@@ -205,8 +266,7 @@ export class StudentActivityHomeSpark {
     }
 
     getStudentSparkQuestion(spark) {
-        const grade = this.getStudentGradeLevel();
-        return String(spark.gradeQuestions?.[grade] || spark.question || '').trim();
+        return getSparkQuestionsForGrade(spark, this.getStudentGradeLevel())[0]?.prompt || '';
     }
 
     createStudentSparkCard(spark) {
@@ -232,7 +292,7 @@ export class StudentActivityHomeSpark {
             ${question ? `
                 <div class="student-spark-question">
                     <i data-lucide="message-circle-question"></i>
-                    <span>${escapeHtml(question)}</span>
+                    <span>${escapeHtml(spark.questions.length > 1 ? `${spark.questions.length} Check Your Understanding questions` : question)}</span>
                 </div>
             ` : ''}
             ${sourceHtml ? `<div class="student-spark-source">${sourceHtml}</div>` : ''}

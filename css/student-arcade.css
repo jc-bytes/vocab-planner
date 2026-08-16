@@ -45,6 +45,12 @@
     display: block;
 }
 
+#arcade-view .game-counter { grid-area: counter; }
+#arcade-view .game-icon { grid-area: icon; }
+#arcade-view .game-card-copy { grid-area: copy; }
+#arcade-view .game-cost { grid-area: cost; }
+#arcade-view .game-card #play-current-game-btn { grid-area: play; }
+
 @media (max-width: 760px) {
     #arcade-view .game-icon {
         min-height: 104px;

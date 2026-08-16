@@ -231,24 +231,88 @@ export class StudentActivityVocabularyData {
         }
 
         const selectedSubject = subjects.find(subject => subject.slug === this.sm.selectedSubjectSlug) || subjects[0];
-        const selectId = `${targetId.replace(/[^a-z0-9_-]/gi, '')}-class-select`;
+        const pickerId = targetId.replace(/[^a-z0-9_-]/gi, '');
+        const triggerId = `${pickerId}-class-select`;
+        const labelId = `${pickerId}-class-label`;
+        const valueId = `${pickerId}-class-value`;
+        const listboxId = `${pickerId}-class-options`;
 
         container.innerHTML = '';
         container.style.setProperty('--subject-color', selectedSubject.color);
 
-        const picker = createElement('label', 'student-class-picker');
-        picker.setAttribute('for', selectId);
+        const picker = createElement('div', 'student-class-picker');
         picker.innerHTML = `
-            <span class="student-class-picker-label">Class</span>
+            <span id="${escapeHtml(labelId)}" class="student-class-picker-label">Class</span>
             <span class="subject-color-dot" style="background:${escapeHtml(selectedSubject.color)};"></span>
-            <select id="${escapeHtml(selectId)}" class="student-subject-select" aria-label="Choose class">
+            <button id="${escapeHtml(triggerId)}" class="student-subject-select student-subject-trigger" type="button"
+                aria-labelledby="${escapeHtml(labelId)} ${escapeHtml(valueId)}" aria-haspopup="listbox"
+                aria-expanded="false" aria-controls="${escapeHtml(listboxId)}">
+                <span id="${escapeHtml(valueId)}" class="student-subject-value">${escapeHtml(selectedSubject.name)}</span>
+                <span class="student-subject-chevron" aria-hidden="true"></span>
+            </button>
+            <div id="${escapeHtml(listboxId)}" class="student-subject-options" role="listbox"
+                aria-labelledby="${escapeHtml(labelId)}" hidden>
                 ${subjects.map(subject => {
-                    return `<option value="${escapeHtml(subject.slug)}"${subject.slug === selectedSubject.slug ? ' selected' : ''}>${escapeHtml(subject.name)}</option>`;
+                    const isSelected = subject.slug === selectedSubject.slug;
+                    return `
+                        <button class="student-subject-option" type="button" role="option"
+                            data-subject-slug="${escapeHtml(subject.slug)}" aria-selected="${isSelected}">
+                            <span class="subject-color-dot" style="background:${escapeHtml(subject.color)};"></span>
+                            <span>${escapeHtml(subject.name)}</span>
+                            <span class="student-subject-option-check" aria-hidden="true">✓</span>
+                        </button>
+                    `;
                 }).join('')}
-            </select>
+            </div>
         `;
 
-        picker.querySelector('select')?.addEventListener('change', event => this.sm.selectSubject(event.target.value));
+        const trigger = picker.querySelector('.student-subject-trigger');
+        const listbox = picker.querySelector('.student-subject-options');
+        const options = [...picker.querySelectorAll('.student-subject-option')];
+        const selectedOption = options.find(option => option.getAttribute('aria-selected') === 'true') || options[0];
+        const closeOnOutsidePointer = event => {
+            if (!picker.contains(event.target)) setOpen(false);
+        };
+        const setOpen = open => {
+            trigger?.setAttribute('aria-expanded', String(open));
+            if (listbox) listbox.hidden = !open;
+            picker.classList.toggle('is-open', open);
+            document.removeEventListener('pointerdown', closeOnOutsidePointer);
+            if (open) document.addEventListener('pointerdown', closeOnOutsidePointer);
+        };
+        const focusOption = index => options[(index + options.length) % options.length]?.focus();
+
+        trigger?.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
+        trigger?.addEventListener('keydown', event => {
+            if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            setOpen(true);
+            const selectedIndex = Math.max(0, options.indexOf(selectedOption));
+            focusOption(event.key === 'ArrowUp' || event.key === 'End' ? options.length - 1 : selectedIndex);
+        });
+        listbox?.addEventListener('keydown', event => {
+            const currentIndex = options.indexOf(document.activeElement);
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                setOpen(false);
+                trigger?.focus();
+            } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                focusOption(currentIndex + (event.key === 'ArrowDown' ? 1 : -1));
+            } else if (event.key === 'Home' || event.key === 'End') {
+                event.preventDefault();
+                focusOption(event.key === 'Home' ? 0 : options.length - 1);
+            }
+        });
+        options.forEach(option => option.addEventListener('click', () => {
+            const subjectSlug = option.dataset.subjectSlug;
+            setOpen(false);
+            if (subjectSlug === this.sm.selectedSubjectSlug) {
+                trigger?.focus();
+                return;
+            }
+            this.sm.selectSubject(subjectSlug);
+        }));
         container.appendChild(picker);
     }
 

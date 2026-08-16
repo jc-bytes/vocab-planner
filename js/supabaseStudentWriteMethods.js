@@ -73,6 +73,25 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
+    service.getOwnArcadeTime = async function getOwnArcadeTime() {
+        await this.init();
+        const { data, error } = await this.client.rpc('get_own_arcade_time_v1');
+        if (error) throw error;
+        return firstRow(data);
+    };
+
+    service.startStudentArcadeMinute = async function startStudentArcadeMinute(payload = {}) {
+        await this.init();
+        payload.eventId ||= createEventId('arcade-minute');
+        const { data, error } = await this.client.rpc('start_student_arcade_minute_v1', {
+            p_event_id: payload.eventId,
+            p_game_id: payload.gameId || '',
+            p_client_id: payload.clientId || ''
+        });
+        if (error) throw error;
+        return firstRow(data);
+    };
+
     service.spendStudentCoins = async function spendStudentCoins(payload = {}) {
         await this.init();
         payload.eventId ||= createEventId('spend-coins');

@@ -339,13 +339,19 @@ export class StudentActivityProgressFlow {
                 return String(a.vocab.name || '').localeCompare(String(b.vocab.name || ''));
             });
 
-        const remainingActivities = units.reduce((total, item) => total + item.completion.remaining, 0);
+        const vocabularyRemainingActivities = units.reduce((total, item) => total + item.completion.remaining, 0);
+        const sparkWork = this.activities.getCurrentSparkGateWork?.() || null;
+        const remainingSparkQuestions = sparkWork?.remaining || 0;
+        const remainingActivities = vocabularyRemainingActivities + remainingSparkQuestions;
         return {
-            isBlocked: units.length > 0,
+            isBlocked: units.length > 0 || Boolean(sparkWork),
             unitCount: units.length,
             remainingActivities,
+            vocabularyRemainingActivities,
+            remainingSparkQuestions,
+            spark: sparkWork,
             units,
-            next: units[0] || null
+            next: sparkWork ? { kind: 'spark', ...sparkWork } : (units[0] || null)
         };
     }
 

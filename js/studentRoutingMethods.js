@@ -234,6 +234,7 @@ export class StudentRouting {
     }
 
     async showArcadeView() {
+        await this.sm.activities.refreshCurrentSparkGate?.({ updateDisplay: false });
         const access = this.sm.activities.getPendingRequiredWork();
         this.sm.activities.updateArcadeGateDisplay(access);
         if (access.isBlocked) {
@@ -262,6 +263,12 @@ export class StudentRouting {
 
     async redirectToPendingRequiredWork(access = this.sm.activities.getPendingRequiredWork()) {
         const next = access.next;
+        if (next?.kind === 'spark' || access.spark) {
+            notifications.warning('Arcade is locked. Complete today\'s Spark check first.');
+            this.setRoute({ view: 'sparks' }, { replace: true });
+            await this.showSparksView();
+            return;
+        }
         if (!next?.vocab) {
             this.setRoute({ view: 'menu' }, { replace: true });
             this.sm.activities.renderStudentHome();

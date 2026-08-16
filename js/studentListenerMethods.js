@@ -1,6 +1,7 @@
 import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 import { STUDENT_WIDE_SHELL_MEDIA_QUERY } from './studentShellMethods.js';
+import { MAX_GAME_TIME_SECONDS } from './student/studentGameLifecycleMethods.js';
 
 const STUDENT_RESIZE_DEBOUNCE_MS = 120;
 
@@ -199,15 +200,28 @@ export class StudentListeners {
 
         this.addListener('#add-time-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            // Use global gamification settings
-            await games.loadGlobalSettings();
-            const exchangeRate = games.getExchangeRate();
-            const extensionSeconds = 60;
-
-            if (await this.sm.progress.deductCoins(exchangeRate)) {
-                games.addGameTime(extensionSeconds);
-            } else {
-                notifications.warning(`You need ${exchangeRate} coins to add time.`);
+            if (games.isAddingGameTime) return;
+            if (games.gameTimeRemaining > MAX_GAME_TIME_SECONDS - 60) {
+                notifications.warning('You can queue a maximum of 10 minutes.');
+                games.updateGameTimer();
+                return;
+            }
+            const gameId = games.currentGame?.gameType || 'arcade';
+            games.isAddingGameTime = true;
+            games.updateGameTimer();
+            try {
+                const minute = await games.startArcadeMinute(gameId);
+                if (minute) {
+                    games.addGameTime(minute.minuteSeconds || 60);
+                    await games.updateArcadeUI({ force: false });
+                } else {
+                    notifications.warning('Complete another formative activity before continuing your Arcade break.');
+                }
+            } catch (error) {
+                notifications.warning(error?.message || 'Could not add Arcade time.');
+            } finally {
+                games.isAddingGameTime = false;
+                games.updateGameTimer();
             }
         });
 

@@ -1,6 +1,9 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getStudentGame } from './studentGameRegistry.js';
+import { writeLocalArcadeSession } from './studentArcadeTimeStorage.js';
+
+export const MAX_GAME_TIME_SECONDS = 600;
 
 export class StudentGameLifecycle {
     constructor(games) {
@@ -18,6 +21,7 @@ export class StudentGameLifecycle {
     }
 
     async startGame(type) {
+        await this.sm.activities?.refreshCurrentSparkGate?.({ updateDisplay: false });
         const access = this.sm.activities?.getPendingRequiredWork?.();
         if (access?.isBlocked) {
             this.sm.activities.updateArcadeGateDisplay(access);
@@ -27,18 +31,41 @@ export class StudentGameLifecycle {
         }
 
         // Use global gamification settings
-        await this.games.loadGlobalSettings();
+        await Promise.all([
+            this.games.loadGlobalSettings(),
+            this.games.loadArcadeTime({ force: true })
+        ]);
         const exchangeRate = this.games.getExchangeRate();
 
+        if (this.games.gameTimeRemaining > 0) {
+            this.games.savedGameId = type;
+            this.updateGameTimer();
+            this.launchGame(type, { resetTimer: false });
+            return true;
+        }
+
+        if (this.games.getAvailableArcadeSeconds() < 60) {
+            notifications.warning('Complete a formative activity before starting another 10-minute Arcade break.');
+            await this.sm.navigateTo({ view: 'units' });
+            return false;
+        }
         if (this.sm.coins < exchangeRate) {
             notifications.warning(`You need at least ${exchangeRate} coins to play!`);
             return false;
         }
 
-        if (await this.sm.progress.deductCoins(exchangeRate)) {
-            this.games.gameTimeRemaining = 60;
-            this.launchGame(type, { resetTimer: true });
-            return true;
+        try {
+            const minute = await this.games.startArcadeMinute(type);
+            if (minute) {
+                this.games.gameTimeRemaining = minute.minuteSeconds || 60;
+                this.games.savedGameId = type;
+                await this.games.updateArcadeUI({ force: false });
+                this.launchGame(type, { resetTimer: true });
+                return true;
+            }
+        } catch (error) {
+            console.error('Could not start Arcade minute:', error);
+            notifications.warning(error?.message || 'Could not start Arcade time. Please try again.');
         }
         return false;
     }
@@ -223,12 +250,18 @@ export class StudentGameLifecycle {
                 this.games.currentGame.completeMinute();
             }
 
-            // Check if we can auto-extend BEFORE pausing
-            const settings = (this.sm.currentVocab && this.sm.currentVocab.activitySettings) ? this.sm.currentVocab.activitySettings : {};
-            const exchangeRate = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
+            const exchangeRate = this.games.getExchangeRate();
+            const gameId = this.games.currentGame?.gameType || 'arcade';
+            let minute = null;
+            try {
+                minute = await this.games.startArcadeMinute(gameId);
+            } catch (error) {
+                console.warn('Could not extend Arcade time:', error);
+            }
 
-            if (this.sm.coins >= exchangeRate && await this.sm.progress.deductCoins(exchangeRate)) {
-                this.addGameTime(60);
+            if (minute) {
+                this.addGameTime(minute.minuteSeconds || 60);
+                await this.games.updateArcadeUI({ force: false });
 
                 // Visual feedback for extension (non-blocking)
                 const timerEl = $('#game-timer');
@@ -251,9 +284,17 @@ export class StudentGameLifecycle {
 
             this.clearGameTimer();
 
-            notifications.warning('Time up! The next minute could not be started.');
+            const needsFormativeCheck = this.games.getAvailableArcadeSeconds() < 60;
+            const message = needsFormativeCheck
+                ? 'Your 10-minute Arcade break is complete. Finish another formative activity to continue.'
+                : `Time up! You need ${exchangeRate} coins for the next minute.`;
+            notifications.warning(message);
             this.stopCurrentGame();
-            this.showGameSelection();
+            if (needsFormativeCheck) {
+                await this.sm.navigateTo({ view: 'units' });
+            } else {
+                this.showGameSelection();
+            }
         } finally {
             this.games.isHandlingGameMinute = false;
         }
@@ -261,13 +302,27 @@ export class StudentGameLifecycle {
 
     addGameTime(seconds = 60) {
         const increment = Number.isFinite(seconds) ? seconds : 0;
-        this.games.gameTimeRemaining = Math.max(0, this.games.gameTimeRemaining + increment);
+        this.games.gameTimeRemaining = Math.min(
+            MAX_GAME_TIME_SECONDS,
+            Math.max(0, this.games.gameTimeRemaining + increment)
+        );
         this.updateGameTimer();
     }
 
     updateGameTimer() {
         const mins = Math.floor(this.games.gameTimeRemaining / 60);
         const secs = this.games.gameTimeRemaining % 60;
-        $('#game-timer').textContent = `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
+        const timerEl = $('#game-timer');
+        if (timerEl) timerEl.textContent = `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
+        const addTimeBtn = $('#add-time-btn');
+        if (addTimeBtn) {
+            const atManualLimit = this.games.gameTimeRemaining > MAX_GAME_TIME_SECONDS - 60;
+            addTimeBtn.disabled = atManualLimit || this.games.isAddingGameTime;
+            addTimeBtn.title = atManualLimit ? 'Maximum queued Arcade time is 10 minutes.' : '';
+        }
+        writeLocalArcadeSession(this.games.sessionOwnerId, {
+            remainingSeconds: this.games.gameTimeRemaining,
+            gameId: this.games.currentGame?.gameType || this.games.savedGameId || ''
+        });
     }
 }

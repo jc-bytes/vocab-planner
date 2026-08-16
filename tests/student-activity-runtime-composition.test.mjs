@@ -945,6 +945,33 @@ test('pending required work includes available current-trimester units and selec
     assert.deepEqual(pending.units.map(item => item.vocab.id), ['old-unit', 'current-unit']);
 });
 
+test('only the cached current required Spark contributes to pending Arcade work', () => {
+    const manager = {
+        studentProfile: { grade: '6' },
+        currentVocab: null,
+        unitScores: {},
+        progressData: { units: {} },
+        getVocabRouteId: vocab => vocab.id
+    };
+    const activities = new StudentActivities(manager);
+    activities.getGradeMatchedVocabularySources = () => [];
+    activities.getCurrentTrimesterKey = () => 'IIT';
+    activities.getCurrentSparkGateWork = () => ({
+        spark: { id: 'current-spark', title: 'Current Spark' },
+        routeId: 'current-spark',
+        remaining: 2,
+        total: 2
+    });
+
+    const pending = activities.getPendingRequiredWork(new Date(2026, 7, 14, 12));
+
+    assert.equal(pending.isBlocked, true);
+    assert.equal(pending.remainingSparkQuestions, 2);
+    assert.equal(pending.vocabularyRemainingActivities, 0);
+    assert.equal(pending.next.kind, 'spark');
+    assert.equal(pending.next.spark.id, 'current-spark');
+});
+
 test('student home recommends overdue required work before unfinished and current-week units', () => {
     const home = new StudentActivityHome({ sm: {} });
     const today = new Date(2026, 7, 15, 12);
@@ -1170,6 +1197,24 @@ test('Spark session caches are isolated and owned by the home component', () => 
 
     assert.equal(second.home.currentSparkSessionCache.size, 0);
     assert.equal('currentSparkSessionCache' in first.sm, false);
+});
+
+test('Spark requests use only the active trimester through the current date', () => {
+    const activities = new StudentActivities({ studentProfile: { grade: '6' } });
+    activities.calendar.schoolCalendar = normalizeSchoolCalendar({
+        schoolYear: 2026,
+        trimesters: {
+            IT: { startDate: '2026-03-02', endDate: '2026-05-29' },
+            IIT: { startDate: '2026-06-08', endDate: '2026-09-04' },
+            IIIT: { startDate: '2026-09-14', endDate: '2026-12-11' }
+        }
+    });
+
+    assert.deepEqual(activities.home.spark.getCurrentSparkDateRange('2026-08-16'), {
+        trimester: 'IIT',
+        onOrAfter: '2026-06-08',
+        onOrBefore: '2026-08-16'
+    });
 });
 
 test('school calendar snapshots are isolated and owned by the calendar component', () => {

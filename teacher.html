@@ -1493,8 +1493,26 @@
                         <textarea id="spark-why-input" rows="3"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="spark-question-input">Fallback Question</label>
-                        <textarea id="spark-question-input" rows="2" required></textarea>
+                        <label for="spark-check-mode-input">Student completion</label>
+                        <select id="spark-check-mode-input">
+                            <option value="reading_only">Reading only — no questions</option>
+                            <option value="optional">Optional check — Arcade stays available</option>
+                            <option value="required">Required check — gates Arcade</option>
+                        </select>
+                        <small class="form-helper">Only the current Required Spark can lock Arcade.</small>
+                    </div>
+                    <div id="spark-question-builder-group" class="form-group spark-question-builder-group">
+                        <div class="spark-question-builder-heading">
+                            <div>
+                                <label>Check Your Understanding</label>
+                                <small class="form-helper">Add up to three short-response or multiple-choice questions.</small>
+                            </div>
+                            <button id="add-spark-question-btn" class="btn secondary-btn btn-compact" type="button">
+                                <i data-lucide="plus"></i>
+                                Add question
+                            </button>
+                        </div>
+                        <div id="spark-question-builder" class="spark-question-builder"></div>
                     </div>
                     <div class="form-group spark-target-grades-group">
                         <label>Target Grades</label>
@@ -1517,8 +1535,13 @@
                             </label>
                         </div>
                     </div>
-                    <div class="form-group spark-grade-questions-group">
-                        <label>Grade Questions</label>
+                    <details class="form-group spark-legacy-question-settings">
+                        <summary>Legacy grade-specific question settings</summary>
+                        <p class="form-helper">Kept for existing Sparks. New Check Your Understanding questions above take priority.</p>
+                        <div class="form-group">
+                            <label for="spark-question-input">Fallback Question</label>
+                            <textarea id="spark-question-input" rows="2"></textarea>
+                        </div>
                         <div class="spark-grade-question-grid">
                             <div class="form-group">
                                 <label for="spark-grade-question-6-input">Grade 6</label>
@@ -1537,7 +1560,7 @@
                                 <textarea id="spark-grade-question-9-input" rows="2"></textarea>
                             </div>
                         </div>
-                    </div>
+                    </details>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="spark-source-title-input">Source Title</label>

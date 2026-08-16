@@ -2,6 +2,7 @@ import { $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
+import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
 
 function getSyncErrorSummary(error) {
     const parts = [error?.code, error?.message, error?.details, error?.hint]
@@ -63,6 +64,7 @@ export class StudentActivityProgressPersistence {
             const activityType = this.sm.currentActivityType;
             const settings = this.sm.currentVocab.activitySettings || {};
             const { progressReward, completionBonus } = this.getActivityCoinRewards(activityType, settings);
+            const wasComplete = Boolean(this.sm.unitScores[activityType]?.isComplete);
             let persistedScoreData = scoreData;
 
             // Non-replayable activities (flashcards, illustration) - only reward first-time progress
@@ -155,6 +157,11 @@ export class StudentActivityProgressPersistence {
             // The activity RPC is the authoritative cloud write. Persist locally
             // without scheduling the generic unit-work RPC for the same event.
             this.sm.progress.saveLocalProgress(true);
+            if (this.sm.authDisabled && activityType !== 'flashcards'
+                && !wasComplete && Boolean(persistedScoreData.isComplete)) {
+                refreshLocalFormativeWindow();
+                this.sm.showToast?.('Formative complete: Arcade is ready for 10 minutes!');
+            }
             this.syncActivityProgressToCloud(activityType, persistedScoreData, {
                 ...settings,
                 progressReward,

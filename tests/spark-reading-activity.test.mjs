@@ -39,11 +39,14 @@ function createActivity(context = {}) {
         id: 'spark-1',
         question: 'What did you learn?',
         gradeQuestions: {},
+        checkMode: 'optional',
+        questions: [],
         targetGrades: ['9']
     };
-    activity.pastSparks = [];
-    activity.hasRead = false;
-    activity.response = '';
+    activity.sparks = [activity.spark];
+    activity.activeSparkIndex = 0;
+    activity.sparkStates = new Map();
+    activity.answers = {};
     activity.completedAt = '';
     activity.feedback = '';
     activity.onProgress = () => {};
@@ -51,21 +54,41 @@ function createActivity(context = {}) {
     return activity;
 }
 
-test('Spark response cannot complete until it contains a short complete thought', () => {
+test('Spark short-response checks require a complete thought', () => {
     const activity = createActivity({ grade: '9' });
 
-    assert.equal(activity.saveResponse('Charts make patterns easier to notice.'), false);
-    assert.match(activity.feedback, /finish the reading/i);
-
-    activity.hasRead = true;
-
-    assert.equal(activity.saveResponse('Too short'), false);
+    assert.equal(activity.saveAnswers({ 'legacy-question': 'Too short' }), false);
     assert.equal(activity.getScore().isComplete, false);
     assert.match(activity.feedback, /at least 12 characters/i);
 
-    assert.equal(activity.saveResponse('Charts make patterns easier to notice.'), true);
+    assert.equal(activity.saveAnswers({ 'legacy-question': 'Charts make patterns easier to notice.' }), true);
     assert.equal(activity.getScore().score, 100);
     assert.equal(activity.getScore().isComplete, true);
+});
+
+test('multiple-choice checks provide retryable correctness', () => {
+    const activity = createActivity({ grade: '9' });
+    activity.spark.questions = [{
+        id: 'station-purpose',
+        type: 'multiple_choice',
+        prompt: 'Why use a practice station?',
+        options: ['To focus one test', 'To skip testing', 'To hide evidence'],
+        correctOption: 0
+    }];
+
+    assert.equal(activity.getScore().isComplete, false);
+    assert.equal(activity.saveAnswers({ 'station-purpose': 1 }), false);
+    assert.match(activity.feedback, /not quite/i);
+    assert.equal(activity.saveAnswers({ 'station-purpose': 0 }), true);
+    assert.equal(activity.getScore().isComplete, true);
+});
+
+test('reading-only Sparks complete without a response', () => {
+    const activity = createActivity({ grade: '9' });
+    activity.spark.checkMode = 'reading_only';
+
+    assert.equal(activity.getScore().isComplete, true);
+    assert.equal(activity.getScore().score, 100);
 });
 
 test('Spark state restores only when it belongs to the current Spark', () => {
@@ -73,26 +96,22 @@ test('Spark state restores only when it belongs to the current Spark', () => {
     activity.initialState = {
         version: 1,
         sparkId: 'spark-1',
-        hasRead: true,
         response: 'This is a saved Spark response.',
         completedAt: '2026-08-14T12:00:00.000Z'
     };
 
     activity.restoreState();
 
-    assert.equal(activity.hasRead, true);
-    assert.equal(activity.response, 'This is a saved Spark response.');
+    assert.equal(activity.answers['legacy-question'], 'This is a saved Spark response.');
     assert.equal(activity.getScore().isComplete, true);
 
     activity.spark.id = 'spark-2';
-    activity.response = '';
-    activity.hasRead = false;
+    activity.answers = {};
     activity.restoreState();
-    assert.equal(activity.hasRead, false);
-    assert.equal(activity.response, '');
+    assert.deepEqual(activity.answers, {});
 });
 
-test('Spark library selection keeps the target grade and newest eligible history', async () => {
+test('Spark library selection keeps the target grade and newest eligible Sparks', async () => {
     const activity = createActivity({
         grade: 'Grade 9',
         scheduledDate: '2026-08-10',
@@ -106,6 +125,36 @@ test('Spark library selection keeps the target grade and newest eligible history
     const sparks = await activity.loadEligibleSparks();
 
     assert.deepEqual(sparks.map(spark => spark.id), ['g9-current', 'g9-old']);
+});
+
+test('Spark navigation moves through the reader and restores saved answers', () => {
+    const savedOlderState = {
+        version: 2,
+        sparkId: 'spark-older',
+        answers: { 'legacy-question': 'An older saved response.' },
+        completedAt: '2026-08-01T12:00:00.000Z'
+    };
+    const activity = createActivity({
+        grade: '9',
+        getSparkState: sparkId => sparkId === 'spark-older' ? savedOlderState : null
+    });
+    const olderSpark = {
+        ...activity.spark,
+        id: 'spark-older',
+        title: 'Older Spark'
+    };
+    activity.sparks = [activity.spark, olderSpark];
+    activity.render = () => {};
+    activity.answers = { 'legacy-question': 'The current saved response.' };
+    activity.persistCurrentState();
+
+    activity.showSparkAt(1);
+    assert.equal(activity.spark.id, 'spark-older');
+    assert.equal(activity.answers['legacy-question'], 'An older saved response.');
+
+    activity.showSparkAt(0);
+    assert.equal(activity.spark.id, 'spark-1');
+    assert.equal(activity.answers['legacy-question'], 'The current saved response.');
 });
 
 test('a temporary general Technology reading is available when Sparks cannot load', () => {

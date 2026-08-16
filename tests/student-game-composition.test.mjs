@@ -50,9 +50,12 @@ const { StudentGames } = await import('../js/student/studentGames.js');
 const { StudentManager } = await import('../js/student.js');
 const { StudentGameHtmlLoader } = await import('../js/student/studentGameHtmlLoaderMethods.js');
 const { StudentGameLeaderboard } = await import('../js/student/studentGameLeaderboardMethods.js');
-const { StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
+const { MAX_GAME_TIME_SECONDS, StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
 const { StudentGameScoreMonitor } = await import('../js/student/studentGameScoreMonitor.js');
 const { StudentGameSettings } = await import('../js/student/studentGameSettingsMethods.js');
+const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
+const { readLocalArcadeSession, writeLocalArcadeSession, writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
+const { refreshLocalFormativeWindow } = await import('../js/student/studentArcadeTimeStorage.js');
 
 test('StudentGames owns explicit game components', () => {
     const manager = {};
@@ -60,17 +63,21 @@ test('StudentGames owns explicit game components', () => {
 
     assert.equal(games.sm, manager);
     assert.ok(games.settings instanceof StudentGameSettings);
+    assert.ok(games.access instanceof StudentGameAccess);
     assert.ok(games.leaderboard instanceof StudentGameLeaderboard);
     assert.ok(games.htmlLoader instanceof StudentGameHtmlLoader);
     assert.ok(games.htmlLoader.scoreMonitor instanceof StudentGameScoreMonitor);
     assert.ok(games.lifecycle instanceof StudentGameLifecycle);
     assert.equal(games.settings.games, games);
+    assert.equal(games.access.games, games);
     assert.equal(games.lifecycle.games, games);
     assert.equal(games.htmlLoader.scoreMonitor.htmlLoader, games.htmlLoader);
     assert.equal(games.currentGame, null);
     assert.equal(games.gameTimeRemaining, 0);
+    assert.equal(games.savedGameId, '');
     assert.equal(games.gameTimerInterval, null);
     assert.equal(games.isHandlingGameMinute, false);
+    assert.equal(games.isAddingGameTime, false);
     assert.equal(games.currentGameIndex, 0);
     assert.ok(games.gamesList.length > 0);
     assert.equal(games.currentGameScore, 0);
@@ -80,8 +87,10 @@ test('StudentGames owns explicit game components', () => {
     for (const state of [
         'currentGame',
         'gameTimeRemaining',
+        'savedGameId',
         'gameTimerInterval',
         'isHandlingGameMinute',
+        'isAddingGameTime',
         'gamesList',
         'currentGameIndex',
         'currentGameScore',
@@ -116,6 +125,9 @@ test('StudentGames declares its stable public interface directly', () => {
         'formatTime',
         'loadGlobalSettings',
         'getExchangeRate',
+        'loadArcadeTime',
+        'getAvailableArcadeSeconds',
+        'startArcadeMinute',
         'updateArcadeUI',
         'updateGameSelectionUI',
         'saveHighScore',
@@ -171,6 +183,7 @@ test('blocked game starts redirect before settings load or coin deduction', asyn
     };
     const games = new StudentGames(manager);
     games.loadGlobalSettings = async () => calls.push(['loadGlobalSettings']);
+    games.loadArcadeTime = async () => calls.push(['loadArcadeTime']);
 
     const started = await games.startGame('snake');
 
@@ -194,4 +207,113 @@ test('direct game launch is rejected while required work is pending', () => {
     assert.equal(games.launchGame('snake'), false);
     assert.equal(games.currentGame, null);
     assert.equal(games.gameTimerInterval, null);
+});
+
+test('local Arcade minutes require and consume both coins and formative-earned time', async () => {
+    const values = new Map();
+    globalThis.localStorage.getItem = key => values.get(key) ?? null;
+    globalThis.localStorage.setItem = (key, value) => values.set(key, value);
+    writeLocalArcadeTime({ availableSeconds: 600, lifetimeEarnedSeconds: 600 });
+
+    let coinCharges = 0;
+    const manager = {
+        authDisabled: true,
+        progress: {
+            async deductCoins(amount) {
+                coinCharges += amount;
+                return true;
+            }
+        }
+    };
+    const games = new StudentGames(manager);
+    games.settings.globalSettings = { exchangeRate: 10 };
+    await games.loadArcadeTime({ force: true });
+
+    const minute = await games.startArcadeMinute('snake');
+
+    assert.equal(coinCharges, 10);
+    assert.equal(minute.minuteSeconds, 60);
+    assert.equal(games.getAvailableArcadeSeconds(), 540);
+});
+
+test('no coins are charged when a student has no formative-earned Arcade time', async () => {
+    const values = new Map();
+    globalThis.localStorage.getItem = key => values.get(key) ?? null;
+    globalThis.localStorage.setItem = (key, value) => values.set(key, value);
+    writeLocalArcadeTime({ availableSeconds: 0 });
+
+    let charged = false;
+    const games = new StudentGames({
+        authDisabled: true,
+        progress: { async deductCoins() { charged = true; return true; } }
+    });
+    games.settings.globalSettings = { exchangeRate: 10 };
+    await games.loadArcadeTime({ force: true });
+
+    assert.equal(await games.startArcadeMinute('snake'), null);
+    assert.equal(charged, false);
+});
+
+test('formative completions refresh the window instead of stacking extra Arcade time', () => {
+    const values = new Map();
+    globalThis.localStorage.getItem = key => values.get(key) ?? null;
+    globalThis.localStorage.setItem = (key, value) => values.set(key, value);
+    writeLocalArcadeTime({ availableSeconds: 420, lifetimeEarnedSeconds: 600 });
+
+    const refreshed = refreshLocalFormativeWindow();
+    const repeated = refreshLocalFormativeWindow();
+
+    assert.equal(refreshed.availableSeconds, 600);
+    assert.equal(refreshed.lifetimeEarnedSeconds, 780);
+    assert.equal(repeated.availableSeconds, 600);
+    assert.equal(repeated.lifetimeEarnedSeconds, 780);
+});
+
+test('manual time additions cannot queue more than ten minutes', () => {
+    const games = new StudentGames({});
+    games.gameTimeRemaining = MAX_GAME_TIME_SECONDS - 30;
+
+    games.addGameTime(60);
+
+    assert.equal(games.gameTimeRemaining, MAX_GAME_TIME_SECONDS);
+});
+
+test('queued Arcade time survives recreation without another charge', () => {
+    const values = new Map();
+    globalThis.localStorage.getItem = key => values.get(key) ?? null;
+    globalThis.localStorage.setItem = (key, value) => values.set(key, value);
+    globalThis.localStorage.removeItem = key => values.delete(key);
+    writeLocalArcadeSession('student-1', { remainingSeconds: 347, gameId: 'snake' });
+
+    const restored = new StudentGames({ currentUser: { uid: 'student-1' } });
+
+    assert.equal(restored.gameTimeRemaining, 347);
+    assert.equal(restored.savedGameId, 'snake');
+    assert.equal(readLocalArcadeSession('student-1').remainingSeconds, 347);
+});
+
+test('a restored Arcade session resumes without buying another minute', async () => {
+    const values = new Map();
+    globalThis.localStorage.getItem = key => values.get(key) ?? null;
+    globalThis.localStorage.setItem = (key, value) => values.set(key, value);
+    globalThis.localStorage.removeItem = key => values.delete(key);
+    writeLocalArcadeSession('student-2', { remainingSeconds: 180, gameId: 'snake' });
+
+    const games = new StudentGames({
+        currentUser: { uid: 'student-2' },
+        coins: 0,
+        activities: {
+            async refreshCurrentSparkGate() {},
+            getPendingRequiredWork: () => ({ isBlocked: false })
+        }
+    });
+    games.loadGlobalSettings = async () => ({ exchangeRate: 10 });
+    games.loadArcadeTime = async () => ({ availableSeconds: 0 });
+    games.startArcadeMinute = async () => { throw new Error('must not charge'); };
+    let launched = null;
+    games.lifecycle.launchGame = (gameId, options) => { launched = { gameId, options }; return true; };
+
+    assert.equal(await games.startGame('snake'), true);
+    assert.deepEqual(launched, { gameId: 'snake', options: { resetTimer: false } });
+    assert.equal(games.gameTimeRemaining, 180);
 });

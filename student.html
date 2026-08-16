@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321; base-uri 'self'; form-action 'self'; object-src 'none'">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-page-loading-20260816d">
+    <link rel="stylesheet" href="css/student.css?v=student-class-options-20260816j">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
     <link rel="stylesheet" href="css/typography.css?v=typography-month-navigation-20260815a">
     <link rel="stylesheet" href="css/student-design-system.css?v=student-design-system-20260815a"
@@ -52,10 +52,6 @@
                     </button>
                 </div>
             </nav>
-            <div class="student-sidebar-context" aria-label="Student class context">
-                <p class="student-sidebar-context-label">Class</p>
-                <div id="student-subject-picker" class="student-subject-picker"></div>
-            </div>
             <div class="header-actions">
                 <!-- Authenticated/User Status -->
                 <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
@@ -81,6 +77,9 @@
         </header>
 
         <div class="student-top-bar" aria-label="Student identity and progress">
+            <div class="student-sidebar-context" aria-label="Student class context">
+                <div id="student-subject-picker" class="student-subject-picker"></div>
+            </div>
             <div class="header-left">
                 <div class="student-identity">
                     <div id="student-level-display" class="student-level-display" role="progressbar"
@@ -296,6 +295,7 @@
                         <header class="arcade-selection-intro">
                             <div>
                                 <h2>Choose your next challenge</h2>
+                                <p id="arcade-time-balance">Complete a formative activity after every 10 minutes of Arcade play.</p>
                             </div>
                             <div class="arcade-game-count"><strong id="arcade-game-total">22</strong><span>games</span></div>
                         </header>

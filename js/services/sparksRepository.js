@@ -1,5 +1,6 @@
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, normalizeTextArray, timestampToIso, toClientTimestamp } from './supabaseValues.js';
+import { normalizeSparkCheckMode, normalizeSparkQuestions } from '../sparkCheckModel.js';
 
 export function mapSparkRow(row) {
     if (!row) return null;
@@ -7,6 +8,8 @@ export function mapSparkRow(row) {
         id: row.id, sparkType: row.spark_type || 'cool_fact', title: row.title || '',
         sparkText: row.spark_text || '', whyItMatters: row.why_it_matters || '', question: row.question || '',
         gradeQuestions: row.grade_questions && typeof row.grade_questions === 'object' ? row.grade_questions : {},
+        checkMode: normalizeSparkCheckMode(row.check_mode),
+        questions: normalizeSparkQuestions(row.questions),
         targetGrades: normalizeTextArray(row.target_grades || ['6', '7', '8', '9']),
         sourceTitle: row.source_title || '', sourceUrl: row.source_url || '',
         subjectSlug: row.subject_slug || 'technology', scheduledDate: row.scheduled_date || '',
@@ -23,6 +26,8 @@ export function sparkPayload(spark = {}, id = null) {
         why_it_matters: spark.whyItMatters ?? spark.why_it_matters,
         question: spark.question,
         grade_questions: spark.gradeQuestions ?? spark.grade_questions ?? {},
+        check_mode: normalizeSparkCheckMode(spark.checkMode ?? spark.check_mode),
+        questions: normalizeSparkQuestions(spark.questions),
         target_grades: normalizeTextArray(spark.targetGrades ?? spark.target_grades ?? ['6', '7', '8', '9']),
         source_title: spark.sourceTitle ?? spark.source_title ?? '',
         source_url: spark.sourceUrl ?? spark.source_url ?? '',
@@ -40,11 +45,16 @@ export const sparksRepository = {
         if (error) throw error;
         return (data || []).map(mapSparkRow);
     },
-    async listScheduledForStudent({ subjectSlug, onOrBefore, limit = 40 }) {
+    async listScheduledForStudent({ subjectSlug, onOrAfter = '', onOrBefore, targetGrade = '', limit = 20 }) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('weekly_sparks').select('*')
-            .eq('subject_slug', subjectSlug).eq('status', 'scheduled').lte('scheduled_date', onOrBefore)
-            .order('scheduled_date', { ascending: false }).order('updated_at', { ascending: false }).limit(limit);
+        let query = supabaseService.getClient().from('weekly_sparks').select('*')
+            .eq('subject_slug', subjectSlug).eq('status', 'scheduled').lte('scheduled_date', onOrBefore);
+        if (onOrAfter) query = query.gte('scheduled_date', onOrAfter);
+        if (targetGrade) query = query.contains('target_grades', [String(targetGrade)]);
+        query = query.order('scheduled_date', { ascending: false })
+            .order('updated_at', { ascending: false })
+            .limit(limit);
+        const { data, error } = await query;
         if (error) throw error;
         return (data || []).map(mapSparkRow);
     },

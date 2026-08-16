@@ -543,6 +543,14 @@ export class StudentActivities {
         return this.home.fetchCurrentSpark();
     }
 
+    getCurrentSparkGateWork() {
+        return this.home.getCurrentSparkGateWork();
+    }
+
+    refreshCurrentSparkGate(options = {}) {
+        return this.home.refreshCurrentSparkGate(options);
+    }
+
     loadAndRenderCurrentSpark(host) {
         return this.home.loadAndRenderCurrentSpark(host);
     }

@@ -71,16 +71,24 @@ export class StudentGameSettings {
         return this.globalSettings?.exchangeRate || 10;
     }
 
-    async updateArcadeUI() {
+    async updateArcadeUI(options = {}) {
         // Load global settings
-        await this.loadGlobalSettings();
+        await Promise.all([
+            this.loadGlobalSettings(),
+            this.games.loadArcadeTime({ force: options.force !== false })
+        ]);
         const exchangeRate = this.getExchangeRate();
 
         const costEl = $('#galactic-breaker-cost');
         if (costEl) costEl.textContent = `${exchangeRate} Coins / min`;
 
         const addTimeBtn = $('#add-time-btn');
-        if (addTimeBtn) addTimeBtn.textContent = `+1 Min (${exchangeRate} Coins)`;
+        if (addTimeBtn) addTimeBtn.textContent = `+1 Min (${exchangeRate} coins)`;
+
+        const timeBalance = $('#arcade-time-balance');
+        if (timeBalance) {
+            timeBalance.textContent = 'Complete a formative activity after every 10 minutes of Arcade play.';
+        }
     }
 
     async updateGameSelectionUI() {
@@ -89,8 +97,9 @@ export class StudentGameSettings {
         if (!container) return;
 
         // Load global settings
-        await this.loadGlobalSettings();
+        await Promise.all([this.loadGlobalSettings(), this.games.loadArcadeTime()]);
         const exchangeRate = this.getExchangeRate();
+        const resumableTime = this.games.gameTimeRemaining;
         
         // Game counter (e.g., "3/20")
         const currentNum = this.games.currentGameIndex + 1;
@@ -109,10 +118,13 @@ export class StudentGameSettings {
                 <h3>${game.name}</h3>
                 <p>${game.desc}</p>
             </div>
-            <div class="game-cost"><span>Play rate</span><strong>${exchangeRate} coins / min</strong></div>
+            <div class="game-cost">
+                <span>Play rate</span><strong>${exchangeRate} coins / min</strong>
+                <span>Learning check</span><strong>One formative activity every 10 min</strong>
+            </div>
             <button id="play-current-game-btn" class="btn primary-btn">
                 <i data-lucide="play" aria-hidden="true"></i>
-                <span>Play game</span>
+                <span>${resumableTime > 0 ? `Resume (${this.formatTime(resumableTime)})` : 'Play game'}</span>
             </button>
         `;
         window.lucide?.createIcons({ root: container });

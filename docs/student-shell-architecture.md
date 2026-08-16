@@ -19,7 +19,7 @@ JavaScript mirrors the same boundary through the exported `STUDENT_WIDE_SHELL_ME
 
 | Responsibility | Canonical owner |
 | --- | --- |
-| Sidebar | The `min-width: 1121px` canonical block fixes `.student-app-header` at 256px and exposes its sidebar content. The optional `student-sidebar-collapsed` state reduces it to a 76px icon rail and persists in local storage. The `max-width: 1120px` block converts the same header to the compact header and hides sidebar-only context. |
+| Sidebar | The `min-width: 1121px` canonical block fixes `.student-app-header` at 240px and exposes its sidebar content. The optional `student-sidebar-collapsed` state reduces it to a 76px icon rail and persists in local storage. The `max-width: 1120px` block converts the same header to the compact header and hides sidebar-only context. |
 | Identity top bar | `.student-top-bar` owns the wide-shell student name, level title, XP meter, and XP metadata. Its left edge follows the shared sidebar-width variable during collapse. It is absent in compact shell. |
 | Content scrolling | On wide screens, `main` is a fixed viewport-height rounded surface and the active direct `.view` owns vertical scrolling. Compact screens continue to use document scrolling. Scroll persistence follows whichever element owns scrolling. |
 | Compact header | The `max-width: 1120px` canonical block owns sticky, full-width header geometry and compact actions. JavaScript only synchronizes the existing compact class at the same boundary. |

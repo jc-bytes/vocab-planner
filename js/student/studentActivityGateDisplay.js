@@ -31,8 +31,13 @@ export class StudentActivityGateDisplay {
 
         if (status.isBlocked) {
             const unitLabel = status.unitCount === 1 ? 'unit' : 'units';
-            const activityLabel = status.remainingActivities === 1 ? 'activity' : 'activities';
-            const message = `Complete ${status.remainingActivities} required ${activityLabel} in ${status.unitCount} ${unitLabel} to unlock Arcade.`;
+            const activityLabel = status.vocabularyRemainingActivities === 1 ? 'activity' : 'activities';
+            const vocabularyMessage = status.vocabularyRemainingActivities > 0
+                ? `${status.vocabularyRemainingActivities} required ${activityLabel} in ${status.unitCount} ${unitLabel}`
+                : '';
+            const sparkMessage = status.spark ? "today's Spark check" : '';
+            const workMessage = [sparkMessage, vocabularyMessage].filter(Boolean).join(' and ');
+            const message = `Complete ${workMessage} to unlock Arcade.`;
             arcadeTab.title = message;
             arcadeTab.setAttribute('aria-label', `Arcade locked. ${message}`);
             const badge = createElement('span', 'student-arcade-lock-count', String(status.remainingActivities));

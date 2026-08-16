@@ -129,15 +129,17 @@ async function readShellState(page, width, view) {
         const toggle = document.querySelector('#student-mobile-menu-toggle');
         const tabs = document.querySelector('#student-tabs');
         const activityChoices = [...document.querySelectorAll('#activity-menu-view [data-activity]')];
+        const sparkTitle = document.querySelector('#student-sparks-view .page-header__title');
+        const sparkLibrary = document.querySelector('#student-sparks-library');
         const appStyle = window.getComputedStyle(app);
         const headerStyle = window.getComputedStyle(header);
         const topbarStyle = window.getComputedStyle(topbar);
         const mainStyle = window.getComputedStyle(main);
         const activeViewStyle = activeView ? window.getComputedStyle(activeView) : null;
         const hiddenControls = [
-            sidebarPicker.querySelector('select'),
-            vocabularyPicker.querySelector('select'),
-            sparkPicker.querySelector('select'),
+            sidebarPicker.querySelector('.student-subject-trigger'),
+            vocabularyPicker.querySelector('.student-subject-trigger'),
+            sparkPicker.querySelector('.student-subject-trigger'),
             toggle,
             ...tabs.querySelectorAll('button')
         ].filter(Boolean).filter(control => !isVisible(control));
@@ -190,6 +192,13 @@ async function readShellState(page, width, view) {
                 ? window.getComputedStyle(vocabularyGrid).gridTemplateColumns.split(/\s+/).filter(Boolean).length
                 : 0,
             sidebarPickerVisible: isVisible(sidebarPicker),
+            pickerInTopbar: topbar.contains(sidebarPicker),
+            sparkAlignment: {
+                titleLeft: sparkTitle ? Math.round(sparkTitle.getBoundingClientRect().left) : 0,
+                contentLeft: sparkLibrary
+                    ? Math.round(sparkLibrary.getBoundingClientRect().left + Math.max(0, (sparkLibrary.getBoundingClientRect().width - 980) / 2))
+                    : 0
+            },
             toggleVisible: isVisible(toggle),
             tabsVisible: isVisible(tabs),
             hiddenControlIds: hiddenControls.map(control => control.id),
@@ -235,13 +244,13 @@ function assertShellState(state) {
         if (subjectPage && state.heights.pagePicker !== 44) failures.push(`compact picker height ${state.heights.pagePicker}`);
     } else {
         if (state.compactClass) failures.push('compact class remains active in wide shell');
-        if (state.header.position !== 'fixed' || state.header.rect[0] !== 0 || state.header.rect[2] !== 256) {
+        if (state.header.position !== 'fixed' || state.header.rect[0] !== 0 || state.header.rect[2] !== 240) {
             failures.push(`wide sidebar geometry ${JSON.stringify(state.header)}`);
         }
         if (!state.topbar.visible
-            || state.topbar.rect[0] !== 256
+            || state.topbar.rect[0] !== 240
             || state.topbar.rect[1] !== 0
-            || state.topbar.rect[2] !== state.width - 256
+            || state.topbar.rect[2] !== state.width - 240
             || state.topbar.rect[3] !== 52) {
             failures.push(`wide top bar geometry ${JSON.stringify(state.topbar)}`);
         }
@@ -255,8 +264,9 @@ function assertShellState(state) {
             failures.push(`top-bar status cluster is too wide ${JSON.stringify(state.topbar)}`);
         }
         if (!state.sidebarPickerVisible || state.pagePickerVisible) failures.push('wide picker ownership is wrong');
+        if (!state.pickerInTopbar) failures.push('wide class context is not in the top bar');
         if (state.toggleVisible || !state.tabsVisible) failures.push('wide navigation ownership is wrong');
-        if (state.heights.sidebarPicker !== 52) failures.push(`wide picker height ${state.heights.sidebarPicker}`);
+        if (state.heights.sidebarPicker !== 44) failures.push(`wide picker height ${state.heights.sidebarPicker}`);
         if (state.main.rect[1] !== 52 || state.main.borderRadius !== '22px') {
             failures.push(`rounded content surface ${JSON.stringify(state.main)}`);
         }
@@ -274,14 +284,17 @@ function assertShellState(state) {
         if (state.verticalOverflow !== 0) {
             failures.push(`wide document scroll changed: expected 0px, got ${state.verticalOverflow}px`);
         }
+        if (state.view === 'Sparks' && state.sparkAlignment.titleLeft !== state.sparkAlignment.contentLeft) {
+            failures.push(`Sparks title/content alignment ${JSON.stringify(state.sparkAlignment)}`);
+        }
 
         if (arcade) {
             if (state.app.display !== 'block'
-                || state.main.marginLeft !== '268px'
-                || state.main.rect[0] !== 268) {
+                || state.main.marginLeft !== '252px'
+                || state.main.rect[0] !== 252) {
                 failures.push(`Arcade wide ownership ${JSON.stringify({ app: state.app, main: state.main })}`);
             }
-        } else if (state.main.rect[0] !== 268 || state.main.marginLeft !== '268px') {
+        } else if (state.main.rect[0] !== 252 || state.main.marginLeft !== '252px') {
             failures.push(`normal wide rail ${JSON.stringify(state.main)}`);
         }
     }
