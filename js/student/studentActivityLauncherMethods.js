@@ -1,6 +1,8 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
+import { requestWithTimeout } from '../services/requestReliability.js';
+import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityLauncher {
     constructor(activities) {
@@ -18,6 +20,9 @@ export class StudentActivityLauncher {
             this.activities.showActivityMenu({ fromRoute: true });
             return;
         }
+
+        await this.activities.session.waitForVocabularyOverride();
+        if (!this.sm.currentVocab) return;
 
         if (!this.activities.isActivityUnlocked(type)) {
             const flow = this.activities.getActivityFlowConfig();
@@ -53,8 +58,20 @@ export class StudentActivityLauncher {
             }
         }
 
-        this.sm.currentActivityType = type; // Track current activity type
+        const vocab = this.sm.currentVocab;
+        const unitId = this.sm.getCurrentVocabRouteId();
+        const session = this.activities.session;
+        const launchId = session.beginActivityLaunch();
+        const isCurrentLaunch = () => (
+            session.isActivityLaunchCurrent(launchId)
+            && this.sm.currentVocab === vocab
+            && this.sm.currentActivityType === type
+        );
+
+        session.destroyActivityInstance();
+        this.sm.currentActivityType = type;
         const activityView = $('#activity-view');
+        setStudentPageLoading(activityView, true);
         if (activityView) {
             activityView.classList.forEach(className => {
                 if (className.startsWith('activity-type-')) {
@@ -67,98 +84,130 @@ export class StudentActivityLauncher {
         this.setActivityHeaderTitle(type);
 
         const container = $('#activity-container');
-        if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
-            this.sm.activityInstance.destroy();
+        if (!container) {
+            setStudentPageLoading(activityView, false);
+            console.error('Activity container was not found.');
+            return;
+        }
+        if (this.activities.getActivityPlayableCount(type, vocab) <= 0) {
+            setStudentPageLoading(activityView, false);
+            this.renderActivityUnavailable(container, unitId);
+            return;
         }
         container.innerHTML = ''; // Clear previous
         container.classList.remove('flashcards-activity-container');
         $('#activity-view')?.classList.remove('flashcards-active');
-        container.innerHTML = '<div class="loading-spinner">Loading activity...</div>';
+        container.innerHTML = getStudentPageSkeleton('activity', 'Loading activity');
 
-        const onProgress = this.activities.handleAutoSave.bind(this.activities);
-        const onSaveState = this.activities.handleStateSave.bind(this.activities);
-        const initialState = this.sm.unitStates ? this.sm.unitStates[type] : null;
-        const settings = this.sm.currentVocab.activitySettings || {};
         let ActivityClass;
-
         try {
-            ActivityClass = await this.activities.loadActivityClass(type);
+            const [, loadedActivityClass] = await Promise.all([
+                import('./studentFeatureStyles.js'),
+                requestWithTimeout(() => this.activities.loadActivityClass(type), {
+                    signal: session.activityLaunchSignal,
+                    timeoutMs: 10000,
+                    label: 'Loading the activity'
+                }),
+                this.activities.startVerifiedActivityAttempt(type, {
+                    signal: session.activityLaunchSignal,
+                    timeoutMs: 10000
+                })
+            ]);
+            ActivityClass = loadedActivityClass;
         } catch (error) {
-            console.error('Failed to load activity module:', error);
-            container.innerHTML = '<p class="error">Could not load this activity. Please try again.</p>';
-            notifications.error('Could not load this activity.');
+            if (!isCurrentLaunch()) return;
+            console.error('Failed to prepare the activity:', error);
+            const message = this.getActivityLoadErrorMessage(error);
+            setStudentPageLoading(activityView, false);
+            this.renderActivityError(container, type, unitId, message);
+            notifications.error(message);
             return;
         }
 
+        if (!isCurrentLaunch()) return;
+
+        const onProgress = scoreData => {
+            if (isCurrentLaunch()) this.activities.handleAutoSave(scoreData);
+        };
+        const onSaveState = stateData => {
+            if (isCurrentLaunch()) this.activities.handleStateSave(stateData);
+        };
+        const initialState = this.sm.unitStates ? this.sm.unitStates[type] : null;
+        const settings = vocab.activitySettings || {};
+        const playableWords = vocab.words.filter(word => this.activities.isActivityWordPlayable(type, word));
+        if (!isCurrentLaunch()) return;
         container.innerHTML = '';
 
         const getActivityWordLimit = (settingKey) => {
             const configuredLimit = Number(settings[settingKey]);
             return Number.isFinite(configuredLimit) && configuredLimit > 0
                 ? configuredLimit
-                : this.sm.currentVocab.words.length;
+                : playableWords.length;
         };
 
         // Helper to get prioritized words (least practiced first)
         const getPrioritized = (limit, filter = null) => {
             let words = filter
-                ? this.sm.currentVocab.words.filter(filter)
-                : [...this.sm.currentVocab.words];
+                ? playableWords.filter(filter)
+                : [...playableWords];
             return this.activities.getPrioritizedWords(type, Math.min(limit, words.length), words);
         };
 
-        switch (type) {
+        let activityInstance = null;
+        try {
+            activityInstance = this.startActivityWithStateRecovery(type, initialState, savedState => {
+                switch (type) {
             case 'matching':
                 const matchingLimit = getActivityWordLimit('matching');
                 const matchingWords = this.activities.restoreWordsFromState(
-                    initialState,
+                    savedState,
                     getPrioritized(matchingLimit, w => w.word.length >= 2),
                     w => w.word.length >= 2
                 );
-                this.sm.activityInstance = new ActivityClass(container, matchingWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, matchingWords, onProgress, onSaveState, savedState);
                 // Mark words as used when activity starts
                 this.activities.markWordsPracticed(type, matchingWords);
                 break;
             case 'flashcards':
                 // Flashcards: use all words (non-replayable, study mode)
                 const flashcardsLimit = getActivityWordLimit('flashcards');
-                const flashcardsWords = this.sm.currentVocab.words.slice(0, flashcardsLimit);
-                this.sm.activityInstance = new ActivityClass(container, flashcardsWords, onProgress, onSaveState, initialState);
+                const flashcardsWords = playableWords.slice(0, flashcardsLimit);
+                activityInstance = new ActivityClass(container, flashcardsWords, onProgress, onSaveState, savedState);
                 break;
             case 'quiz':
                 const quizLimit = getActivityWordLimit('quiz');
-                const quizWords = this.activities.restoreWordsFromState(initialState, getPrioritized(quizLimit));
-                this.sm.activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, initialState);
+                const quizWords = this.activities.restoreWordsFromState(savedState, getPrioritized(quizLimit));
+                activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, quizWords);
                 break;
             case 'synonym-antonym':
                 const synonymLimit = getActivityWordLimit('synonymAntonym');
                 const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);
                 const synonymWords = this.activities.restoreWordsFromState(
-                    initialState,
+                    savedState,
                     getPrioritized(synonymLimit, synonymFilter),
                     synonymFilter
                 );
-                this.sm.activityInstance = new ActivityClass(container, synonymWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, synonymWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, synonymWords);
                 break;
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
-                const illustrationWords = this.activities.getWordHuntWords(settings);
-                const wordHuntSubjectSlug = getVocabSubjectSlug(this.sm.currentVocab);
+                const illustrationWords = this.activities.getWordHuntWords(settings)
+                    .filter(word => this.activities.isActivityWordPlayable(type, word));
+                const wordHuntSubjectSlug = getVocabSubjectSlug(vocab);
                 const wordHuntSubject = getSubjectBySlug(this.sm.subjects, wordHuntSubjectSlug);
-                this.sm.activityInstance = new ActivityClass(
+                activityInstance = new ActivityClass(
                     container,
                     illustrationWords,
-                    this.sm.currentVocab.name,
+                    vocab.name,
                     onProgress,
                     this.activities.handleIllustrationSave.bind(this.activities),
                     this.sm.unitWordHunt,
                     {
                         initialIndex: options.initialWordIndex || 0,
                         onWordChange: index => {
-                            const unitId = this.sm.getCurrentVocabRouteId();
-                            if (!unitId) return;
+                            if (!isCurrentLaunch() || !unitId) return;
                             this.sm.setRoute({
                                 view: 'activity',
                                 unitId,
@@ -170,10 +219,10 @@ export class StudentActivityLauncher {
                         loadImage: path => this.activities.loadWordHuntImage(path),
                         onDownloadWordHunt: () => this.activities.downloadWordHuntSubmission(),
                         researchContext: {
-                            grade: this.activities.getUnitGrade(this.sm.currentVocab),
+                            grade: this.activities.getUnitGrade(vocab),
                             subjectName: wordHuntSubject.name,
                             subjectSlug: wordHuntSubjectSlug,
-                            unitName: this.sm.currentVocab.name || ''
+                            unitName: vocab.name || ''
                         }
                     }
                 );
@@ -181,21 +230,22 @@ export class StudentActivityLauncher {
             case 'word-search':
                 const wordSearchLimit = getActivityWordLimit('wordSearch');
                 const wordSearchWords = this.activities.restoreWordsFromState(
-                    initialState,
+                    savedState,
                     getPrioritized(wordSearchLimit, w => w.word.length >= 4),
                     w => w.word.length >= 4
                 );
                 // Pass vocab ID (or name as fallback) for stable persistence
-                const vocabID = this.sm.currentVocab.id || this.sm.currentVocab.name;
-                this.sm.activityInstance = new ActivityClass(
+                const vocabID = vocab.id || vocab.name;
+                activityInstance = new ActivityClass(
                     container,
                     wordSearchWords,
                     onProgress,
                     vocabID,
                     onSaveState,
-                    initialState,
+                    savedState,
                     {
                         onNewPuzzle: () => {
+                            if (!isCurrentLaunch()) return;
                             this.activities.resetActivityState('word-search');
                             this.startActivity('word-search', { fromRoute: true }).catch(error => {
                                 console.error('Failed to restart word search:', error);
@@ -203,27 +253,27 @@ export class StudentActivityLauncher {
                         }
                     }
                 );
-                this.activities.markWordsPracticed(type, this.sm.activityInstance.words);
+                this.activities.markWordsPracticed(type, activityInstance.words);
                 break;
             case 'crossword':
                 const crosswordWords = getPrioritized(getActivityWordLimit('crossword'));
-                this.sm.activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, initialState);
-                this.activities.markWordsPracticed(type, this.sm.activityInstance.placedWords);
+                activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
+                this.activities.markWordsPracticed(type, activityInstance.placedWords);
                 break;
             case 'hangman':
                 const hangmanWords = getPrioritized(getActivityWordLimit('hangman'));
-                this.sm.activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, hangmanWords);
                 break;
             case 'scramble':
                 const scrambleWords = getPrioritized(getActivityWordLimit('scramble'));
-                this.sm.activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, scrambleWords);
                 break;
             case 'wordle':
                 const wordleLimit = getActivityWordLimit('wordle');
                 const wordleWords = this.activities.restoreWordsFromState(
-                    initialState,
+                    savedState,
                     getPrioritized(wordleLimit, w => {
                         const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
                         return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
@@ -233,23 +283,117 @@ export class StudentActivityLauncher {
                         return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
                     }
                 );
-                this.sm.activityInstance = new ActivityClass(container, wordleWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, wordleWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, wordleWords);
                 break;
             case 'speed-match':
                 const speedMatchWords = getPrioritized(getActivityWordLimit('speedMatch'));
-                this.sm.activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, speedMatchWords);
                 break;
             case 'fill-in-blank':
                 const fibWords = getPrioritized(getActivityWordLimit('fillInBlank'), w => w.example);
-                this.sm.activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, initialState);
+                activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, fibWords);
                 break;
             default:
                 container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
-                this.sm.activityInstance = null;
+            }
+                return activityInstance;
+            });
+        } catch (error) {
+            if (!isCurrentLaunch()) return;
+            console.error('Failed to start activity:', error);
+            setStudentPageLoading(activityView, false);
+            this.renderActivityError(container, type, unitId);
+            notifications.error('This activity could not start.');
+            return;
         }
+
+        if (!isCurrentLaunch()) {
+            try {
+                activityInstance?.destroy?.();
+            } catch (error) {
+                console.warn('Could not clean up a cancelled activity:', error);
+            }
+            return;
+        }
+        this.sm.activityInstance = activityInstance;
+        setStudentPageLoading(activityView, false);
+    }
+
+    startActivityWithStateRecovery(type, initialState, createActivity) {
+        try {
+            return createActivity(initialState);
+        } catch (error) {
+            if (type === 'illustration') throw error;
+
+            console.warn(`Resetting stale ${type} activity state after a startup error:`, error);
+            this.activities.resetActivityState(type);
+            return createActivity(null);
+        }
+    }
+
+    getActivityLoadErrorMessage(error) {
+        const serverMessage = String(error?.message || '');
+        if ((typeof navigator !== 'undefined' && navigator.onLine === false) || error?.code === 'OFFLINE') {
+            return 'Reconnect to the internet to start this verified activity.';
+        }
+        if (error?.code === 'REQUEST_TIMEOUT') {
+            return 'The connection is taking too long. Check Wi-Fi and try again.';
+        }
+        if (/unknown vocabulary unit|unit key does not match the server catalog/i.test(serverMessage)) {
+            return 'This vocabulary unit has not been synchronized with the activity server yet.';
+        }
+        if (/not assigned to your grade/i.test(serverMessage)) {
+            return 'This vocabulary unit is not assigned to your grade.';
+        }
+        if (/not available yet/i.test(serverMessage)) {
+            return 'This vocabulary unit is not available yet.';
+        }
+        if (/complete (all required activities|required activity)/i.test(serverMessage)) {
+            return serverMessage;
+        }
+        return 'The activity server could not start this activity. Try again in a moment.';
+    }
+
+    renderActivityError(container, type, unitId, message = 'Your progress is safe. Try loading it again.') {
+        container.innerHTML = `
+            <div class="activity-load-error" role="alert">
+                <h2>Activity did not load</h2>
+                <p>${message}</p>
+                <div class="activity-load-error-actions">
+                    <button class="btn primary-btn" id="retry-activity-btn" type="button">Try again</button>
+                    <button class="btn secondary-btn" id="return-to-unit-btn" type="button">Back to unit</button>
+                </div>
+            </div>
+        `;
+        container.querySelector('#retry-activity-btn')?.addEventListener('click', () => {
+            this.activities.moduleLoader.clearActivityModule(type);
+            this.startActivity(type, { fromRoute: true }).catch(error => {
+                console.error('Failed to retry activity:', error);
+            });
+        });
+        container.querySelector('#return-to-unit-btn')?.addEventListener('click', () => {
+            this.sm.navigateTo({ view: 'unit', unitId }).catch(error => {
+                console.error('Failed to return to unit:', error);
+            });
+        });
+    }
+
+    renderActivityUnavailable(container, unitId) {
+        container.innerHTML = `
+            <div class="activity-load-error" role="status">
+                <h2>This activity is not available</h2>
+                <p>This unit does not have enough suitable vocabulary words for it.</p>
+                <button class="btn primary-btn" id="return-to-unit-btn" type="button">Back to unit</button>
+            </div>
+        `;
+        container.querySelector('#return-to-unit-btn')?.addEventListener('click', () => {
+            this.sm.navigateTo({ view: 'unit', unitId }).catch(error => {
+                console.error('Failed to return to unit:', error);
+            });
+        });
     }
 
     setActivityHeaderTitle(type) {

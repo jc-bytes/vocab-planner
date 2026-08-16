@@ -128,7 +128,7 @@ async function cleanupAcceptanceData({ admin, peer, student }) {
     await admin.from('app_settings').delete().eq('key', IDS.settings);
     await admin.from('subjects').delete().eq('slug', IDS.subject);
     await admin.from('scores').delete().eq('user_id', student.id).eq('game_id', 'snake');
-    await admin.from('student_xp_events').delete().eq('user_id', student.id).eq('unit_key', IDS.unit);
+    await admin.from('student_xp_events').delete().eq('user_id', student.id).eq('unit_key', `technology:${IDS.vocabulary}`);
     if (peer?.id) await admin.auth.admin.deleteUser(peer.id);
 }
 
@@ -297,6 +297,24 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         });
 
         await t.test('Student RPCs enforce authentication, role, ownership, idempotency, and score uniqueness', async () => {
+            await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.vocabulary, {
+                name: 'Verified Activity Unit', description: 'Acceptance activity verification',
+                grades: ['6'], subjectSlug: 'technology', assignedDate: '2026-07-14',
+                trimester: 'IIT', month: 'July', week: 1,
+                activitySettings: {
+                    requiredActivities: ['flashcards', 'matching'],
+                    progressReward: 1,
+                    completionBonus: 25
+                },
+                words: [
+                    { word: 'Data', definition: 'Facts used for analysis.' },
+                    { word: 'Chart', definition: 'A visual display of data.' },
+                    { word: 'Cell', definition: 'A spreadsheet box.' },
+                    { word: 'Formula', definition: 'A spreadsheet calculation.' }
+                ],
+                ownerId: teacher.id
+            }));
+            const activityUnitKey = `technology:${IDS.vocabulary}`;
             const initial = await withServiceClient(studentClient, () => supabaseService.ensureOwnStudentProgress({
                 firstName: 'Audit', lastName: 'Student', email: AUDIT_STUDENT_EMAIL, grade: '6', group: 'A'
             }));
@@ -311,31 +329,52 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(welcomeRetry.coinData.balance, welcome.coinData.balance);
             assert.equal(welcomeRetry.coinHistory.filter(entry => entry?.source === 'welcome').length, 1);
 
+            await expectRejected(() => withServiceClient(studentClient, () => (
+                supabaseService.startStudentActivityAttempt({
+                    unitKey: activityUnitKey,
+                    vocabularyId: IDS.vocabulary,
+                    activityType: 'matching'
+                })
+            )), /flashcards/i);
+
+            const attempt = await withServiceClient(studentClient, () => (
+                supabaseService.startStudentActivityAttempt({
+                    unitKey: activityUnitKey,
+                    vocabularyId: IDS.vocabulary,
+                    activityType: 'flashcards'
+                })
+            ));
             const activityPayload = {
-                unitKey: IDS.unit,
-                unitContext: { unitId: IDS.unit, unitName: 'Acceptance Unit', subjectSlug: 'technology', grade: '6' },
+                unitKey: activityUnitKey,
+                unitContext: { unitId: 'forged-unit', unitName: 'Forged', subjectSlug: 'science', grade: '9' },
                 activityType: 'flashcards', score: 100, isComplete: true,
-                details: { cardsReviewed: 5 }, activitySettings: { progressReward: 1, completionBonus: 10 },
-                clientId: `${RUN_ID}-activity`, isRequired: true, attemptId: `${RUN_ID}-attempt`
+                details: { evidence: { masteredCount: 4, correctCount: 4, totalCount: 4 } },
+                activitySettings: { progressReward: 1000, completionBonus: 10000 },
+                clientId: `${RUN_ID}-activity`, isRequired: false, attemptId: attempt.attemptId
             };
+            await expectRejected(() => withServiceClient(studentClient, () => (
+                supabaseService.submitStudentActivityProgress(activityPayload)
+            )), /quickly/i);
+            await new Promise(resolve => setTimeout(resolve, (attempt.minimumSeconds * 1000) + 100));
             const activity = await withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
             ));
-            assert.equal(activity.units[IDS.unit].scores.flashcards.score, 100);
-            assert.equal(activity.units[IDS.unit].scores.flashcards.isComplete, true);
-            const activityRetry = await withServiceClient(studentClient, () => (
+            assert.equal(activity.units[activityUnitKey].scores.flashcards.score, 100);
+            assert.equal(activity.units[activityUnitKey].scores.flashcards.isComplete, true);
+            assert.equal(activity.units[activityUnitKey].scores.flashcards.verified, true);
+            assert.equal(activity.units[activityUnitKey].unitId, IDS.vocabulary);
+            await expectRejected(() => withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
-            ));
-            assert.equal(activityRetry.totalXp, activity.totalXp);
+            )), /already completed/i);
 
             const synced = await withServiceClient(studentClient, () => supabaseService.syncStudentUnitWork({
-                unitKey: IDS.unit,
+                unitKey: activityUnitKey,
                 unitContext: activityPayload.unitContext,
                 workPatch: { acceptanceNote: 'persisted', scores: { forbiddenOverwrite: true } }
             }));
-            assert.equal(synced.units[IDS.unit].acceptanceNote, 'persisted');
-            assert.equal(synced.units[IDS.unit].scores.flashcards.score, 100);
-            assert.equal(synced.units[IDS.unit].scores.forbiddenOverwrite, undefined);
+            assert.equal(synced.units[activityUnitKey].acceptanceNote, 'persisted');
+            assert.equal(synced.units[activityUnitKey].scores.flashcards.score, 100);
+            assert.equal(synced.units[activityUnitKey].scores.forbiddenOverwrite, undefined);
 
             const firstScore = await withServiceClient(studentClient, () => supabaseService.submitStudentGameScore({
                 gameId: 'snake', score: 123, metadata: { runId: RUN_ID }

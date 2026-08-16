@@ -5,7 +5,7 @@ month: July
 trimester: 2nd Trimester
 week: Week 7
 duration: 45 minutes
-topic: "Debugging strategies"
+topic: "Trace events, broadcasts, and variables"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 7 |
 | Class Length | 45 minutes |
-| Topic | Debugging strategies |
+| Topic | Trace events, broadcasts, and variables |
 
 ## Class Objective
 
-Practice debugging a Scratch starter program by identifying likely errors and planning fixes.
+Trace a teacher-provided Scratch script and explain how one event or broadcast changes a variable and produces a visible response.
 
 ## Pre-Activities
 
-- Review Week 7 practice vocabulary (part 1). debug: To find and fix a problem in code trace: To follow code step by step bug: A mistake in a program
+- Review Week 7 practice vocabulary (part 1). trace: To follow code step by step event: Something that starts a script broadcast: A message that starts another script
 
 ## While Activities
 
-- Practice debugging a Scratch starter program by identifying likely errors and planning fixes. Compare possible fixes with a partner before the graded debugging check.
+- Follow the green-flag, target-generation, key-input, hit, and miss paths in short sample scripts. Mark the event, condition, variable change, and visible output in each path.
 
 ## Post-Activities
 
-- Add one debugging tip to your notebook. List one error type to watch for in the long class.
+- Draw one event-to-output flow and explain it to a partner.
 
 ## Prep Notes
 

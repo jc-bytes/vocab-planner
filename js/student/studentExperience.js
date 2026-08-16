@@ -1,7 +1,24 @@
-export const REQUIRED_ACTIVITY_XP = 50;
-export const OPTIONAL_ACTIVITY_XP = 10;
 export const FIRST_LEVEL_XP = 100;
 export const LEVEL_XP_INCREMENT = 50;
+
+export const ACTIVITY_XP = Object.freeze({
+    flashcards: 10,
+    matching: 20,
+    'word-search': 20,
+    hangman: 20,
+    scramble: 20,
+    wordle: 25,
+    'speed-match': 30,
+    'fill-in-blank': 30,
+    crossword: 35,
+    quiz: 40,
+    'synonym-antonym': 40,
+    illustration: 50
+});
+
+export function getActivityXp(activityType) {
+    return ACTIVITY_XP[activityType] || 10;
+}
 
 export function getLevelTitle(level) {
     if (level >= 10) return 'Innovator';

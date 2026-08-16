@@ -1,6 +1,7 @@
 import { getCurrentSchoolYear } from './supabaseValues.js';
 import { subjectsRepository } from './subjectsRepository.js';
 import { vocabularyRepository } from './vocabularyRepository.js';
+import { requestWithTimeout } from './requestReliability.js';
 
 export { getCurrentSchoolYear };
 
@@ -122,12 +123,12 @@ export function getSubjectBySlug(subjects = [], slug = DEFAULT_SUBJECT_SLUG) {
         || normalizeSubject({ slug: normalizedSlug });
 }
 
-export async function loadSubjects(api = null) {
+export async function loadSubjects(api = null, options = {}) {
     if (!api) return normalizeSubjects();
 
     try {
         await api.init();
-        return normalizeSubjects(await subjectsRepository.list());
+        return normalizeSubjects(await subjectsRepository.list(options));
     } catch (error) {
         console.warn('Could not load subjects, using defaults:', error);
         return normalizeSubjects();
@@ -390,10 +391,15 @@ async function fetchManifestFromNetwork(options = {}) {
     return fetchJsonFromNetwork('vocabularies/manifest.json', options);
 }
 
-async function fetchJsonFromNetwork(path, { fresh = false } = {}) {
+async function fetchJsonFromNetwork(path, { fresh = false, signal = null, timeoutMs = 10000 } = {}) {
     const url = new URL(path, window.location.href);
-    const response = await fetch(url.toString(), {
-        cache: fresh ? 'reload' : 'default'
+    const response = await requestWithTimeout(requestSignal => fetch(url.toString(), {
+        cache: fresh ? 'reload' : 'default',
+        signal: requestSignal
+    }), {
+        signal,
+        timeoutMs,
+        label: `Loading ${path}`
     });
     if (!response.ok) throw new Error(`Failed to load ${path}`);
     return response.json();
@@ -493,7 +499,7 @@ export function invalidateVocabularyFileCache(path) {
     }
 }
 
-export async function loadVocabularyFile(path, { fresh = false, silent = false } = {}) {
+export async function loadVocabularyFile(path, { fresh = false, silent = false, signal = null, timeoutMs = 10000 } = {}) {
     const normalizedPath = String(path || '').trim();
     if (!normalizedPath) return null;
 
@@ -503,11 +509,11 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false }
     }
 
     const requestKey = `${normalizedPath}|${fresh ? 'fresh' : 'normal'}`;
-    if (vocabFileRequests.has(requestKey)) {
+    if (!signal && vocabFileRequests.has(requestKey)) {
         return vocabFileRequests.get(requestKey);
     }
 
-    const request = fetchJsonFromNetwork(normalizedPath, { fresh })
+    const request = fetchJsonFromNetwork(normalizedPath, { fresh, signal, timeoutMs })
         .then(data => {
             if (data) {
                 writeCachedVocabFile(normalizedPath, data);
@@ -524,10 +530,10 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false }
             return null;
         })
         .finally(() => {
-            vocabFileRequests.delete(requestKey);
+            if (!signal) vocabFileRequests.delete(requestKey);
         });
 
-    vocabFileRequests.set(requestKey, request);
+    if (!signal) vocabFileRequests.set(requestKey, request);
     return request;
 }
 

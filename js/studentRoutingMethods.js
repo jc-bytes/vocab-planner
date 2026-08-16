@@ -1,10 +1,12 @@
 import { notifications } from './notifications.js';
+import { setStudentPageLoading } from './student/studentLoadingSkeletons.js';
 
 export class StudentRouting {
     constructor(studentManager) {
         this.sm = studentManager;
         this.routeReady = false;
         this.isApplyingRoute = false;
+        this.pendingRoute = null;
         this.games = null;
         this.gamesPromise = null;
     }
@@ -12,6 +14,7 @@ export class StudentRouting {
     reset() {
         this.routeReady = false;
         this.isApplyingRoute = false;
+        this.pendingRoute = null;
     }
 
     slugifyRouteId(value) {
@@ -78,6 +81,10 @@ export class StudentRouting {
             };
         }
 
+        if (parts.length === 1 && parts[0] === 'sparks') {
+            return { view: 'sparks' };
+        }
+
         if (parts.length === 1 && parts[0] === 'arcade') {
             return { view: 'arcade' };
         }
@@ -129,6 +136,7 @@ export class StudentRouting {
             const query = params.toString();
             return query ? `#/units?${query}` : '#/units';
         }
+        if (route.view === 'sparks') return '#/sparks';
         if (route.view === 'arcade') return '#/arcade';
 
         if (route.view === 'unit' && route.unitId) {
@@ -175,9 +183,14 @@ export class StudentRouting {
     }
 
     handleRouteChange() {
-        if (!this.routeReady || this.isApplyingRoute) return;
+        if (!this.routeReady) return;
         if (!this.sm.authDisabled && !this.sm.currentUser) return;
-        this.applyRoute(this.parseRoute());
+        const route = this.parseRoute();
+        if (this.isApplyingRoute) {
+            this.pendingRoute = route;
+            return;
+        }
+        this.applyRoute(route);
     }
 
     findVocabByRouteId(unitId) {
@@ -213,6 +226,13 @@ export class StudentRouting {
         this.sm.switchView('vocab-selection-view');
     }
 
+    async showSparksView() {
+        this.sm.cleanupActivity();
+        this.sm.currentVocab = null;
+        this.sm.switchView('student-sparks-view');
+        await this.sm.activities.renderSparkLibrary();
+    }
+
     async showArcadeView() {
         const access = this.sm.activities.getPendingRequiredWork();
         this.sm.activities.updateArcadeGateDisplay(access);
@@ -223,12 +243,21 @@ export class StudentRouting {
 
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
+        await import('./student/studentFeatureStyles.js');
         this.sm.switchView('arcade-view');
-        const games = await this.getGames();
-        games.updateArcadeUI();
-        games.updateGameSelectionUI();
-        games.updateLeaderboardGame();
-        return true;
+        const arcadeView = document.getElementById('arcade-view');
+        setStudentPageLoading(arcadeView, true);
+        try {
+            const games = await this.getGames();
+            await Promise.all([
+                games.updateArcadeUI(),
+                games.updateGameSelectionUI()
+            ]);
+            games.updateLeaderboardGame();
+            return true;
+        } finally {
+            setStudentPageLoading(arcadeView, false);
+        }
     }
 
     async redirectToPendingRequiredWork(access = this.sm.activities.getPendingRequiredWork()) {
@@ -250,8 +279,26 @@ export class StudentRouting {
 
     async applyRoute(route) {
         const targetRoute = route && route.view ? route : { view: 'menu' };
+        if (this.isApplyingRoute) {
+            this.pendingRoute = targetRoute;
+            return;
+        }
+
         this.isApplyingRoute = true;
 
+        try {
+            let nextRoute = targetRoute;
+            while (nextRoute) {
+                this.pendingRoute = null;
+                await this.applyRouteTarget(nextRoute);
+                nextRoute = this.pendingRoute;
+            }
+        } finally {
+            this.isApplyingRoute = false;
+        }
+    }
+
+    async applyRouteTarget(targetRoute) {
         try {
             if (targetRoute.view === 'invalid') {
                 this.setRoute({ view: 'units' }, { replace: true });
@@ -272,6 +319,11 @@ export class StudentRouting {
                 return;
             }
 
+            if (targetRoute.view === 'sparks') {
+                await this.showSparksView();
+                return;
+            }
+
             if (targetRoute.view === 'arcade') {
                 await this.showArcadeView();
                 return;
@@ -285,7 +337,10 @@ export class StudentRouting {
                     return;
                 }
 
-                await this.sm.activities.loadVocabulary(vocab, { fromRoute: true });
+                await this.sm.activities.loadVocabulary(vocab, {
+                    fromRoute: true,
+                    skipActivityPreload: targetRoute.view === 'activity'
+                });
 
                 if (targetRoute.view === 'unit') {
                     return;
@@ -320,8 +375,9 @@ export class StudentRouting {
                     }
                 }
             }
-        } finally {
-            this.isApplyingRoute = false;
+        } catch (error) {
+            console.error('Could not apply student route:', error);
+            notifications.error('This page could not load. Please try again.');
         }
     }
 }

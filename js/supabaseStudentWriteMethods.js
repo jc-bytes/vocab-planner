@@ -8,11 +8,15 @@ const requireRpcResult = (mapper, data, error) => {
 };
 
 export function installSupabaseStudentWriteMethods(service) {
-    service.ensureOwnStudentProgress = async function ensureOwnStudentProgress(studentProfile = {}) {
+    service.ensureOwnStudentProgress = async function ensureOwnStudentProgress(studentProfile = {}, options = {}) {
         await this.init();
-        const { data, error } = await this.client.rpc('ensure_own_student_progress', {
+        let query = this.client.rpc('ensure_own_student_progress', {
             p_student_profile: studentProfile || {}
         });
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         return requireRpcResult(mapStudentProgressRow, data, error);
     };
 
@@ -31,6 +35,21 @@ export function installSupabaseStudentWriteMethods(service) {
             p_attempt_id: payload.attemptId || ''
         });
         return requireRpcResult(mapStudentProgressRow, data, error);
+    };
+
+    service.startStudentActivityAttempt = async function startStudentActivityAttempt(payload = {}) {
+        await this.init();
+        let query = this.client.rpc('start_student_activity_attempt', {
+            p_unit_key: payload.unitKey,
+            p_vocabulary_id: payload.vocabularyId,
+            p_activity_type: payload.activityType
+        });
+        if (payload.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(payload.signal);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+        return firstRow(data);
     };
 
     service.syncStudentUnitWork = async function syncStudentUnitWork(payload = {}) {

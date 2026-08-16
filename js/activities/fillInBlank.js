@@ -1,5 +1,6 @@
 
-import { createElement, $, notifications } from '../main.js';
+import { createElement, $, notifications, openModal, closeModal } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
 
 export class FillInBlankActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -13,6 +14,7 @@ export class FillInBlankActivity {
         this.score = 0;
         this.currentWord = null;
         this.attempts = 0;
+        this.timeouts = new ActivityTimeoutController();
 
         this.init();
     }
@@ -83,11 +85,18 @@ export class FillInBlankActivity {
         if (this.currentIndex >= this.words.length) {
             this.container.innerHTML = `
                 <div class="completion-screen">
-                    <h2>🎉 All Words Completed!</h2>
+                    <h2 class="activity-result-heading">
+                        <i data-lucide="badge-check" aria-hidden="true"></i>
+                        <span>All Words Completed!</span>
+                    </h2>
                     <p>You completed ${this.words.length} words!</p>
-                    <button id="replay-fib" class="btn primary-btn" style="margin-top: 1rem;">🔄 Play Again</button>
+                    <button id="replay-fib" class="btn primary-btn" style="margin-top: 1rem;">
+                        <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                        <span>Play Again</span>
+                    </button>
                 </div>
             `;
+            window.lucide?.createIcons({ root: this.container });
             
             // Add replay button listener
             const replayBtn = this.container.querySelector('#replay-fib');
@@ -107,6 +116,7 @@ export class FillInBlankActivity {
         return {
             score: progress,
             details: `${this.currentIndex}/${this.words.length} words completed`,
+            evidence: { correctCount: this.currentIndex, totalCount: this.words.length },
             isComplete: this.currentIndex === this.words.length
         };
     }
@@ -119,7 +129,7 @@ export class FillInBlankActivity {
         if (val === correct) {
             // Correct
             input.classList.add('correct');
-            setTimeout(() => {
+            this.timeouts.schedule(() => {
                 notifications.success('Correct!');
                 this.currentIndex++;
                 this.checkProgress();
@@ -131,19 +141,15 @@ export class FillInBlankActivity {
             input.classList.add('wrong');
             this.attempts++;
             this.saveState();
-            setTimeout(() => {
+            this.timeouts.schedule(() => {
                 input.classList.remove('wrong');
                 input.value = '';
                 input.focus();
             }, 1000);
 
             if (this.attempts >= 3) {
-                // Show hint or move on?
-                // Let's show the answer
                 notifications.info(`The correct word was: ${this.currentWord.word}`);
-                this.currentIndex++;
-                this.checkProgress();
-                this.startRound();
+                this.attempts = 0;
                 this.saveState();
             }
         }
@@ -153,6 +159,47 @@ export class FillInBlankActivity {
         if (this.onProgress) {
             this.onProgress(this.getScore());
         }
+    }
+
+    getHints(word = this.currentWord) {
+        if (!word) return [];
+
+        const hints = [];
+        const addHint = (label, value) => {
+            const text = String(value || '').trim();
+            if (text) hints.push({ label, text });
+        };
+        const cleanList = (values) => Array.from(new Set(
+            (Array.isArray(values) ? values : [])
+                .map(value => String(value || '').trim())
+                .filter(Boolean)
+        ));
+
+        addHint('Definition', word.definition);
+
+        const synonyms = cleanList(word.synonyms);
+        if (synonyms.length > 0) {
+            addHint(synonyms.length === 1 ? 'Synonym' : 'Synonyms', synonyms.join(', '));
+        }
+
+        const antonyms = cleanList(word.antonyms);
+        if (antonyms.length > 0) {
+            addHint(antonyms.length === 1 ? 'Antonym' : 'Antonyms', antonyms.join(', '));
+        }
+
+        addHint('Part of speech', word.part_of_speech || word.partOfSpeech);
+
+        const answer = String(word.word || '').trim();
+        if (answer) {
+            const letters = Array.from(answer).filter(character => /[\p{L}\p{N}]/u.test(character)).length;
+            const firstCharacter = Array.from(answer)[0];
+            addHint(
+                'Word clue',
+                `Starts with “${firstCharacter.toUpperCase()}” and has ${letters} ${letters === 1 ? 'letter' : 'letters'}.`
+            );
+        }
+
+        return hints;
     }
 
     restart() {
@@ -221,19 +268,85 @@ export class FillInBlankActivity {
         btn.addEventListener('click', () => this.checkAnswer());
         wrapper.appendChild(btn);
 
-        // Hint button
+        // Hint button and app-styled modal
         const hintBtn = createElement('button', 'btn text-btn', 'Show Hint');
-        hintBtn.addEventListener('click', () => {
-            alert(`Definition: ${this.currentWord.definition}`);
-        });
+        hintBtn.type = 'button';
         wrapper.appendChild(hintBtn);
 
+        const hints = this.getHints();
+        let activeHintIndex = 0;
+
+        const hintModal = createElement('div', 'modal hidden fib-hint-modal');
+        hintModal.setAttribute('aria-describedby', 'fib-hint-text');
+
+        const hintContent = createElement('div', 'modal-content fib-hint-modal-content');
+        const hintHeader = createElement('div', 'modal-header fib-hint-header');
+        const hintHeadingGroup = createElement('div', 'fib-hint-heading-group');
+        const hintIcon = createElement('span', 'fib-hint-icon');
+        hintIcon.innerHTML = '<i data-lucide="lightbulb" aria-hidden="true"></i>';
+        const hintTitle = createElement('h2', '', 'Here’s a hint');
+        hintHeadingGroup.append(hintIcon, hintTitle);
+
+        const closeButton = createElement('button', 'close-modal fib-hint-close');
+        closeButton.type = 'button';
+        closeButton.setAttribute('aria-label', 'Close hint');
+        closeButton.innerHTML = '<i data-lucide="circle-x" aria-hidden="true"></i>';
+        hintHeader.append(hintHeadingGroup, closeButton);
+
+        const hintBody = createElement('div', 'modal-body fib-hint-body');
+        hintBody.setAttribute('aria-live', 'polite');
+        const hintLabel = createElement('p', 'fib-hint-label');
+        const hintText = createElement('p', 'fib-hint-definition');
+        hintText.id = 'fib-hint-text';
+        hintBody.append(hintLabel, hintText);
+
+        const hintFooter = createElement('div', 'modal-footer fib-hint-footer');
+        const hintNavigation = createElement('div', 'fib-hint-navigation');
+        const hintCounter = createElement('span', 'fib-hint-counter');
+        const nextHintButton = createElement('button', 'btn text-btn fib-next-hint-btn', 'Next hint');
+        nextHintButton.type = 'button';
+        hintNavigation.append(hintCounter, nextHintButton);
+        const gotItButton = createElement('button', 'btn primary-btn', 'Got it');
+        gotItButton.type = 'button';
+        hintFooter.append(hintNavigation, gotItButton);
+
+        const showHintAtIndex = (index) => {
+            activeHintIndex = index;
+            const hint = hints[activeHintIndex] || { label: 'Hint', text: 'Think about the sentence and the vocabulary you studied.' };
+            hintLabel.textContent = hint.label;
+            hintText.textContent = hint.text;
+            hintCounter.textContent = `Hint ${activeHintIndex + 1} of ${Math.max(1, hints.length)}`;
+            nextHintButton.textContent = activeHintIndex === hints.length - 1 ? 'Start over' : 'Next hint';
+            nextHintButton.hidden = hints.length <= 1;
+        };
+        showHintAtIndex(0);
+
+        hintContent.append(hintHeader, hintBody, hintFooter);
+        hintModal.appendChild(hintContent);
+        wrapper.appendChild(hintModal);
+
+        hintBtn.addEventListener('click', () => {
+            openModal(hintModal, { initialFocus: gotItButton });
+        });
+        nextHintButton.addEventListener('click', () => {
+            showHintAtIndex((activeHintIndex + 1) % hints.length);
+        });
+        closeButton.addEventListener('click', () => closeModal(hintModal));
+        gotItButton.addEventListener('click', () => closeModal(hintModal));
+
         this.container.appendChild(wrapper);
+        window.lucide?.createIcons({ root: wrapper });
 
         // Focus input
-        setTimeout(() => {
+        this.timeouts.schedule(() => {
             const inp = this.container.querySelector('.fib-input');
             if (inp) inp.focus();
         }, 100);
+    }
+
+    destroy() {
+        this.timeouts.clear();
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

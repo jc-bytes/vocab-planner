@@ -25,8 +25,8 @@ Most important flow limits:
 - April website/Scratch work: have accounts and starter files ready; if login fails, use planning sheets.
 - May awareness product: limit formats to poster, slide, or infographic.
 - June robotics setup: pre-check batteries, number kits, and assign pair roles.
-- July mini-challenge: require only movement plus one output or one sensor.
-- August demonstrations: limit each team to one minute of robot demo and one minute of explanation.
+- July Summative #4: give every pair the assigned ultrasonic task, starter project, threshold/response requirements, and equipment checklist before the assessed class.
+- August Summative #5: finish and present in Week 11 using the same teacher-prepared Rescue Robot route and provided logic for all pairs; stagger demonstrations by assigned order. Keep Week 12 formative only.
 - September formulas: use a prepared spreadsheet; do not make students build the whole file first.
 - October 3D modelling: no printing or advanced measurement required.
 - November presentations: use one-minute presentations so micro:bit setup is not squeezed.
@@ -55,8 +55,8 @@ Daily/summative evidence includes:
 - April: copyright image-selection form; Scratch score mini-task.
 - May: recycling/e-waste sorting check.
 - June: robotics vocabulary table; mBot movement debugging check.
-- July: mBot route map/command plan; mBot condition flowchart.
-- August: mBot card practice check; final robotics demonstration checklist and reflection.
+- July: mBot route map/command plan; mBot Ultrasonic Sensor Flowchart and Programming Task.
+- August: guided Rescue Robot practice; mBot Rescue Robot summative demonstration, submission, English explanation, and equipment check.
 - September: spreadsheet vocabulary table; formatted data table as practice evidence.
 - October: chart creation/explanation task; 3D model design plan.
 - November: micro:bit parts/input-output check; project reflection and peer feedback as appreciation evidence.
@@ -147,11 +147,11 @@ Charged mBots, USB cables or Bluetooth setup, batteries/chargers, mBot Knowledge
 
 ### July
 
-Charged mBots, mBot Knowledge Cards Part 1, route-map template, condition-flowchart template, floor tape/markers, sensor test area, debugging checklist, projector, computers/software.
+Charged and numbered mBots, assigned mBlock starter project, Summative #4 rubric/task sheet, flowchart template, floor tape/markers, ultrasonic sensor test area, debugging checklist, projector, computers/software.
 
 ### August
 
-Charged mBots, mBot Knowledge Cards Part 1, station cards, final challenge planning sheet, demonstration checklist/rubric, reflection form, floor tape/markers, projector, computers/software.
+Charged and numbered mBots, assigned Rescue Robot starter project, Summative #5 rubric/task sheet, teacher-prepared line/branch route, obstacle blocks, connection checklist, projector, computers/software.
 
 ### September
 
@@ -220,8 +220,8 @@ The monthly overview plans are ready to teach as classroom guides. The sequence 
 - March packet simulation.
 - April Google Sites build/preview and Scratch score task.
 - June first mBot movement class.
-- July sensor practice and mini-challenge.
-- August final mBot demonstrations.
+- July ultrasonic sensor practice and Summative #4 connection/upload workflow.
+- August Rescue Robot route testing and Summative #5 demonstrations.
 - October first Tinkercad/3D modelling class.
 - December final micro:bit demonstrations.
 

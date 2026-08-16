@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 10
 duration: 90 minutes
-topic: "Build dance moves and input logic"
+topic: "Build target lanes and key input"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 10 |
 | Class Length | 90 minutes |
-| Topic | Build dance moves and input logic |
+| Topic | Build target lanes and key input |
 
 ## Class Objective
 
-Build at least two dance move routines, add success/failure feedback, test user input timing, and debug one code issue.
+Complete the four target lanes and connect D/F/J/K input to collision-based hit and miss responses.
 
 ## Pre-Activities
 
-- Review Week 10 practice vocabulary (part 2). feedback: Helpful comments about how to improve testing: Trying something to see if it works bug: A mistake in a program
+- Review Week 10 practice vocabulary (part 2). condition: A rule that can be true or false glide: To move smoothly from one position to another synchronize: To make actions follow the same timing
 
 ## While Activities
 
-- Continue Exam Project: Build at least two dance move routines, add success/failure feedback, test user input timing, and debug one code issue.
+- Continue Exam Project: Duplicate or adapt the working lane for F, J, and K; use events or broadcasts to generate targets; check the matching key and collision at the hit line; add visible or audible “Perfect” and “Miss” feedback; and debug at least one input or timing issue.
 
 ## Post-Activities
 
-- Record one successful test and one bug. Plan the scoring or timer improvement.
+- Record one successful four-lane test and one bug with its fix.
 
 ## Prep Notes
 

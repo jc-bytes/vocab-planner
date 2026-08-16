@@ -160,16 +160,20 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         throw new Error('Student progress initialization RPC is unavailable.');
     },
 
-    async getProfile(userId = null) {
+    async getProfile(userId = null, options = {}) {
         await this.init();
         const id = userId || this.currentUser?.uid;
         if (!id) return null;
 
-        const { data, error } = await this.client
+        let query = this.client
             .from('profiles')
             .select('*')
             .eq('user_id', id)
             .maybeSingle();
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return mapProfileRow(data);
     },

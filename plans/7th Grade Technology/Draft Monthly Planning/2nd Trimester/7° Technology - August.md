@@ -2,7 +2,7 @@
 
 ## Monthly Focus
 
-Students finish regular Scratch preparation, then complete the Scratch Dance Game Challenge exam project. The project uses sequence, subroutines, user input, conditionals, loops, variables, testing, and a short demonstration.
+Students use the teacher-provided reference game and their Week 8 code walkthrough to plan, build, test, and present an original osu!-style Scratch rhythm game. The exam project uses four key lanes, moving targets, broadcasts, user input, collision conditions, score, time, tempo, feedback, testing, and a short code demonstration.
 
 ## Weekly Time
 
@@ -20,44 +20,44 @@ Students finish regular Scratch preparation, then complete the Scratch Dance Gam
 
 ## Competences
 
-- Design an interactive Scratch dance game with organized code, inputs, feedback, and changing values.
-- Use subroutines, variables, loops, conditionals, score, timer, costumes, and sounds in a controlled project.
+- Design an interactive Scratch rhythm game with organized code, four key lanes, moving targets, input, feedback, and changing values.
+- Use events, broadcasts, variables, loops, conditionals, collision sensing, score, timer, tempo, costumes, and sounds in a controlled project.
 - Test, improve, and present a Scratch game using project evidence and a clear code explanation.
 
 ## Learning Objectives
 
-- Review second-trimester programming concepts and identify the skills needed for the dance game project.
-- Plan and build a Scratch game prototype with inputs, rules, score or timer, and feedback.
-- Demonstrate the final game and explain the code logic, real-world application, and one improvement.
+- Convert the reference-game analysis into a feasible plan for an original D/F/J/K rhythm game.
+- Build a playable Scratch prototype with four lanes, moving targets, hit/miss rules, score, time, tempo, and feedback.
+- Demonstrate the final game and explain the target generator, input/collision logic, variables, testing evidence, and one improvement.
 
 ## Learning Outcomes
 
-- Complete programming review, make-up support, and project readiness evidence.
-- Submit a Scratch Dance Game plan, prototype, testing checklist, and improvement notes.
-- Demonstrate the final Scratch Dance Game and complete the project presentation/reflection.
+- Submit a rhythm-game plan, code map, playable prototype, testing checklist, and improvement notes.
+- Complete the four required D/F/J/K lanes and connect each lane to moving targets and hit/miss feedback.
+- Demonstrate the final osu!-style Scratch Rhythm Game and complete the exam presentation/reflection.
 
 ## Evaluation
 
-- Week 8: programming review and make-up support.
-- Week 9: final regular grade make-up and project readiness.
+- Daily Grade #5 was completed in Week 8 through the reference-game code-walkthrough presentation.
+- Week 9: exam rubric, planning, and starter-project readiness.
 - Weeks 10-11: Begin and continue exam project in pairs, using pair-programming roles when helpful.
-- Week 12: Complete exam project presentation using the Scratch Dance Game rubric.
-- Required grading resource: Scratch Dance Game rubric and prototype/testing checklist.
+- Week 12: Complete exam project presentation using the Scratch Rhythm Game rubric.
+- Required grading resource: Scratch Rhythm Game rubric, code map, and testing checklist.
 
 ## Vocabulary Plan
 
 ### Practice Vocabulary
 
-#### Week 8: Dance Prep
+#### Week 8: Rhythm Game Analysis
 
 | Word | Simple Definition |
 | --- | --- |
-| game | An interactive activity with rules or goals. |
-| costume | A sprite appearance in Scratch. |
-| sound | Audio used in a project. |
-| input | Information that goes into a system or program. |
-| timing | When actions happen and how long they last. |
-| feedback | Helpful comments about how to improve. |
+| target | The object the player must hit at the correct time. |
+| lane | One path used by a target and its matching key. |
+| collision | When two sprites touch in the program. |
+| tempo | The speed of the beat or timing pattern. |
+| broadcast | A message that starts another script. |
+| code walkthrough | An explanation that connects scripts to program behavior. |
 
 #### Week 9: Project Planning
 
@@ -65,32 +65,32 @@ Students finish regular Scratch preparation, then complete the Scratch Dance Gam
 | --- | --- |
 | prototype | An early version used for testing. |
 | rubric | A guide that explains how work will be graded. |
-| goal | What you are trying to achieve. |
-| subroutine | A smaller named part of a program that can be reused. |
-| timer | A tool or variable that tracks time. |
-| score | A number that tracks points or progress. |
+| lane | One path used by a target and its matching key. |
+| hit line | The place where the player should press the matching key. |
+| spawn | To create or show a new target. |
+| broadcast | A message that starts another script. |
 
 #### Week 10: Build
 
 | Word | Simple Definition |
 | --- | --- |
-| subroutine | A smaller named part of a program that can be reused. |
+| generator | Code that creates or starts targets. |
 | input | Information that goes into a system or program. |
+| collision | When two sprites touch in the program. |
 | condition | A rule that can be true or false. |
-| feedback | Helpful comments about how to improve. |
-| testing | Trying something to see if it works. |
-| bug | A mistake in a program. |
+| glide | To move smoothly from one position to another. |
+| synchronize | To make actions follow the same timing. |
 
 #### Week 11: Improve
 
 | Word | Simple Definition |
 | --- | --- |
-| score | A number that tracks points or progress. |
+| score | A number that changes after a hit or miss. |
+| miss | A target that reaches the end without a correct key press. |
 | timer | A tool or variable that tracks time. |
-| organization | Keeping work clear and easy to follow. |
-| functionality | How well something does what it should do. |
-| application | A real use for a skill or project. |
-| reflection | Thinking about what happened and what you learned. |
+| tempo | The speed of the beat or timing pattern. |
+| testing | Trying something to see if it works. |
+| reliability | Working correctly in repeated tests. |
 
 #### Week 12: Demo
 
@@ -105,25 +105,24 @@ Students finish regular Scratch preparation, then complete the Scratch Dance Gam
 
 ## Class Notes (Generated)
 
-- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 45 minutes|Project rubric and planning]]
-- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 90 minutes|Prototype and testing checklist]]
-- Week 10 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 45 minutes|Begin Exam Project: Scratch Dance Game]]
-- Week 10 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 90 minutes|Build dance moves and input logic]]
-- Week 11 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 45 minutes|Score, timer, and feedback]]
-- Week 11 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 90 minutes|Final game improvement and presentation prep]]
-- Week 12 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 45 minutes|Presentation rehearsal]]
-- Week 12 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 90 minutes|Final dance game demonstration]]
+- Week 9 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 45 minutes|Rhythm-game rubric and code map]]
+- Week 9 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 9 - 90 minutes|Four-lane prototype plan]]
+- Week 10 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 45 minutes|Begin Exam Project: Scratch Rhythm Game]]
+- Week 10 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 10 - 90 minutes|Build target lanes and key input]]
+- Week 11 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 45 minutes|Score, misses, time, and tempo]]
+- Week 11 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 11 - 90 minutes|Final rhythm-game testing and presentation prep]]
+- Week 12 - 45 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 45 minutes|Exam presentation rehearsal]]
+- Week 12 - 90 minutes: [[7th Grade Technology/Class Notes (Generated)/T2 2026-08 August/7th Grade Technology - T2 - 2026-08 - August - Week 12 - 90 minutes|Final Scratch Rhythm Game demonstration]]
 
 ## Monthly Plan
 
 | Week | Class | Topic | Class Objective | Pre-Activities | While Activities | Post-Activities |
 | --- | --- | --- | --- | --- | --- | --- |
-| Week 9 | 45 minutes | Project rubric and planning | Create a project plan with game goal, keys used, dance moves, variables, subroutines, success/failure feedback, and pair-programming responsibilities. | Review Week 9 practice vocabulary (part 1). prototype: An early version used for testing rubric: A guide that explains how work will be graded goal: What you are trying to achieve<br>Read the Scratch Dance Game rubric. Highlight criteria for real-world application, code organization, functionality, programming concepts, presentation, punctuality, and responsibility. | Create a project plan with game goal, keys used, dance moves, variables, subroutines, success/failure feedback, and pair-programming responsibilities.<br>Complete any final make-up task for regular trimester grades if needed. | Submit the project plan. Identify the first dance move to build. |
-| Week 9 | 90 minutes | Prototype and testing checklist | Create a prototype using the checklist for the dance game. | Review Week 9 practice vocabulary (part 2). subroutine: A smaller named part of a program that can be reused timer: A tool or variable that tracks time score: A number that tracks points or progress | Create a prototype using the checklist for the dance game.<br>Test one starter feature and record what works, what fails, and what needs to be built during the exam project. | Save the prototype notes. Write one debugging risk to watch during project work. |
-| Week 10 | 45 minutes | Begin Exam Project: Scratch Dance Game | Set up the Scratch dance game with variables, sprites or costumes, and the first dance move subroutine. | Review Week 10 practice vocabulary (part 1). subroutine: A smaller named part of a program that can be reused input: Information that goes into a system or program condition: A rule that can be true or false<br>Review the project goal: create an interactive dance game where the player presses correct keys at the right time and receives feedback. | Begin Exam Project: Set up the Scratch project, name variables, identify sprites/costumes, and create the first dance move subroutine. | Save the project with a clear filename. Record the next feature to build. |
-| Week 10 | 90 minutes | Build dance moves and input logic | Build at least two dance move routines, add success/failure feedback, test user input timing, and debug one code issue. | Review Week 10 practice vocabulary (part 2). feedback: Helpful comments about how to improve testing: Trying something to see if it works bug: A mistake in a program | Continue Exam Project: Build at least two dance move routines, add success/failure feedback, test user input timing, and debug one code issue. | Record one successful test and one bug. Plan the scoring or timer improvement. |
-| Week 11 | 45 minutes | Score, timer, and feedback | Improve the score, timer, and feedback subroutine. | Review Week 11 practice vocabulary (part 1). score: A number that tracks points or progress timer: A tool or variable that tracks time organization: Keeping work clear and easy to follow | Continue Exam Project: Improve the score, timer, and feedback subroutine. Test whether the game responds correctly to correct and incorrect actions. | Save the improved game. Write one sentence explaining how a variable controls the game. |
-| Week 11 | 90 minutes | Final game improvement and presentation prep | Complete the required features, debug the game, prepare a 1.5-2 minute demonstration, and write a short real-world application explanation. | Review Week 11 practice vocabulary (part 2). functionality: How well something does what it should do application: A real use for a skill or project reflection: Thinking about what happened and what you learned Review the rubric and choose the two criteria that need the most attention. Test the game from start to finish once. | Continue Exam Project: Complete the required features, debug the game, prepare a 1.5-2 minute demonstration, and write a short real-world application explanation. | Practice the demonstration with a partner. Revise one unclear explanation. |
-| Week 12 | 45 minutes | Presentation rehearsal | Rehearse the game demonstration and code explanation using the rubric so the final presentation is ready for the long class. | Review Week 12 practice vocabulary (part 1). demo: A short demonstration of how something works presentation: Sharing work or ideas with others application: A real use for a skill or project | Rehearse the game demonstration and code explanation using the rubric so the final presentation is ready for the long class. | Prepare the final file for presentation. Write one final reminder for the demo. |
-| Week 12 | 90 minutes | Final dance game demonstration | Demonstrate the Scratch Dance Game, explain subroutines, input, conditionals, loops, variables, and one real-world application, then submit the reflection. | Review Week 12 practice vocabulary (part 2). rubric: A guide that explains how work will be graded reflection: Thinking about what happened and what you learned improvement: A change that makes something better Open the final Scratch project and test the start sequence. Prepare to explain code organization and programming concepts. | Complete Exam Project Presentation: Demonstrate the Scratch Dance Game, explain subroutines, input, conditionals, loops, variables, and one real-world application, then submit the reflection. | Listen to classmates respectfully. Complete a short reflection about programming growth and problem solving. |
-
+| Week 9 | 45 minutes | Rhythm-game rubric and code map | Identify the required exam features and create a code map showing how the main scripts communicate. | Review Week 9 practice vocabulary (part 1). prototype: An early version used for testing rubric: A guide that explains how work will be graded lane: One path used by a target and its matching key Read the Scratch Rhythm Game rubric and inspect the reference screenshots. | Create a code map with the game loop, four D/F/J/K lanes, target generator, key/collision checks, hit and miss broadcasts, score, time, tempo, music, and end condition. The teacher confirms the common game format and required features. | Submit the code map and identify the first working lane to build. |
+| Week 9 | 90 minutes | Four-lane prototype plan | Create a feasible project plan and paper or Scratch prototype for the osu!-style rhythm game. | Review Week 9 practice vocabulary (part 2). hit line: The place where the player should press the matching key spawn: To create or show a new target broadcast: A message that starts another script | Plan the stage, D/F/J/K key sprites, four target paths, hit line, score and miss rules, time limit, tempo, music, success feedback, and pair responsibilities. Build or annotate one teacher-provided starter lane and complete the testing checklist for a correct hit, wrong key, and missed target. | Save the plan and starter evidence. Record one risk that must be tested in Week 10. |
+| Week 10 | 45 minutes | Begin Exam Project: Scratch Rhythm Game | Set up the stage, variables, broadcasts, D/F/J/K key sprites, and one working target lane. | Review Week 10 practice vocabulary (part 1). generator: Code that creates or starts targets input: Information that goes into a system or program collision: When two sprites touch in the program Review the required common format and starter-file rules. | Begin Exam Project: Create the stage and hit line, initialize score, misses, time, and tempo, add the D/F/J/K key sprites, and make one target show or spawn, glide toward its hit line, and hide or reset. | Save the project with a clear filename. Demonstrate the first lane and record the next build step. |
+| Week 10 | 90 minutes | Build target lanes and key input | Complete the four target lanes and connect D/F/J/K input to collision-based hit and miss responses. | Review Week 10 practice vocabulary (part 2). condition: A rule that can be true or false glide: To move smoothly from one position to another synchronize: To make actions follow the same timing | Continue Exam Project: Duplicate or adapt the working lane for F, J, and K; use events or broadcasts to generate targets; check the matching key and collision at the hit line; add visible or audible “Perfect” and “Miss” feedback; and debug at least one input or timing issue. | Record one successful four-lane test and one bug with its fix. |
+| Week 11 | 45 minutes | Score, misses, time, and tempo | Make the score, miss rule, timer, and tempo work consistently across all four lanes. | Review Week 11 practice vocabulary (part 1). score: A number that changes after a hit or miss miss: A target that reaches the end without a correct key press timer: A tool or variable that tracks time | Continue Exam Project: Add points for correct hits, apply the chosen miss consequence, display score and time, connect tempo to target movement or spacing, and test the start and end conditions. | Save the improved game and explain how one variable controls gameplay. |
+| Week 11 | 90 minutes | Final rhythm-game testing and presentation prep | Complete the playable game, run repeated tests, document one improvement, and prepare the exam demonstration. | Review Week 11 practice vocabulary (part 2). tempo: The speed of the beat or timing pattern testing: Trying something to see if it works reliability: Working correctly in repeated tests Review the rubric and test all four lanes from start to finish. | Continue Exam Project: Complete required features, run at least three documented tests, fix one gameplay problem, collect a final screenshot or project link, and prepare a 1.5-2 minute explanation of the target generator, key/collision logic, score or miss rule, and testing improvement. | Rehearse with a partner and correct one unclear code explanation. |
+| Week 12 | 45 minutes | Exam presentation rehearsal | Rehearse the complete rhythm-game demonstration and code explanation using the exam rubric. | Review Week 12 practice vocabulary (part 1). demo: A short demonstration of how something works presentation: Sharing work or ideas with others application: A real use for a skill or project | Open the final project, run the start sequence, test D/F/J/K, verify score, misses, time, tempo, music, and end condition, then rehearse the explanation and teacher-question response. | Prepare the final file, code map, and test log for submission. |
+| Week 12 | 90 minutes | Final Scratch Rhythm Game demonstration | Demonstrate the playable osu!-style Scratch Rhythm Game and explain how its main systems work together. | Review Week 12 practice vocabulary (part 2). rubric: A guide that explains how work will be graded reflection: Thinking about what happened and what you learned improvement: A change that makes something better Open the final project and complete one final readiness check. | Complete Exam Project Presentation: Demonstrate the four D/F/J/K lanes, moving targets, hit/miss feedback, score, time, tempo, music, and end condition; explain the target generator, key/collision logic, variable changes, one bug and fix, and one possible improvement; then submit the project, code map, test log, and reflection. | Listen to classmates respectfully and complete the final programming reflection. |

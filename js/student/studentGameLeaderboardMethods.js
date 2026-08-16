@@ -3,6 +3,7 @@ import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { leaderboardRepository } from '../services/leaderboardRepository.js';
 import { getLeaderboardGameIds } from './studentGameRegistry.js';
+import { getStudentPageSkeleton } from './studentLoadingSkeletons.js';
 
 const LEADERBOARD_ENABLED_GAMES = getLeaderboardGameIds();
 
@@ -133,7 +134,7 @@ export class StudentGameLeaderboard {
             return;
         }
 
-        container.innerHTML = '<div class="loading-spinner">Loading scores...</div>';
+        container.innerHTML = getStudentPageSkeleton('list', 'Loading scores');
 
         try {
             // Query: Same grade, same game, order by score (desc for higher=better, asc for lower=better)

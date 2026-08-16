@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 10
 duration: 45 minutes
-topic: "Knowledge Cards review"
+topic: "Line-following logic review"
 tags:
   - class-plan
   - grade-6
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 10 |
 | Class Length | 45 minutes |
-| Topic | Knowledge Cards review |
+| Topic | Line-following logic review |
 
 ## Class Objective
 
-Practice reading one mBot Knowledge Card and predicting what robot action it helps create.
+Identify the loop, line-sensor input, forward movement, left correction, right correction, and lost-line response in the assigned code.
 
 ## Pre-Activities
 
-- Answer the warm-up question: Which mBot card helped you the most? Review August Week 1 practice vocabulary (part 1). movement: changing position output: what a device shows or does sensor: part that detects something debug: find and fix a problem Review the assigned mBot Knowledge Card Part 1.
+- Review the Summative #5 task and teacher-prepared rescue route. Review August Week 1 vocabulary: line sensor, correction, loop, forward, left, right, lost line.
 
 ## While Activities
 
-- Practice reading one mBot Knowledge Card and predicting what robot action it helps create. Review how the card could support a STEM challenge.
+- Trace the assigned line-following code using three sample sensor readings. Match each reading to forward, left correction, right correction, or lost-line response.
 
 ## Post-Activities
 
-- Share the robot action from the assigned card. Write one way the card could help in the final challenge.
+- Complete a four-item line-following exit check.
 
 ## Prep Notes
 

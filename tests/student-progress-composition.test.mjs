@@ -74,6 +74,50 @@ test('StudentProgress owns explicit core, cloud, and coin components', () => {
     assert.ok(progress.clientId);
 });
 
+test('level display shows total XP and XP remaining to the next level', () => {
+    const manager = createManager();
+    manager.progressData.totalXp = 249;
+    const progress = new StudentProgress(manager);
+    const elements = new Map([
+        ['[data-student-level]', { textContent: '' }],
+        ['[data-student-level-title]', { textContent: '' }],
+        ['[data-student-xp-current]', { textContent: '' }],
+        ['[data-student-xp-goal]', { textContent: '' }],
+        ['[data-student-xp-remaining]', { textContent: '' }],
+        ['[data-student-next-level]', { textContent: '' }],
+        ['[data-student-xp-fill]', { style: {} }]
+    ]);
+    const levelDisplay = {
+        title: '',
+        attributes: {},
+        querySelector(selector) {
+            return elements.get(selector) || null;
+        },
+        setAttribute(name, value) {
+            this.attributes[name] = value;
+        }
+    };
+    const originalQuerySelector = document.querySelector;
+    document.querySelector = selector => selector === '#student-level-display' ? levelDisplay : null;
+
+    try {
+        progress.core.updateLevelDisplay();
+        assert.equal(elements.get('[data-student-level]').textContent, '2');
+        assert.equal(elements.get('[data-student-level-title]').textContent, 'Explorer');
+        assert.equal(elements.get('[data-student-xp-current]').textContent, '149');
+        assert.equal(elements.get('[data-student-xp-goal]').textContent, '150');
+        assert.equal(elements.get('[data-student-xp-remaining]').textContent, '1');
+        assert.equal(elements.get('[data-student-next-level]').textContent, '3');
+        assert.match(elements.get('[data-student-xp-fill]').style.width, /^99\.3/);
+        assert.match(levelDisplay.title, /249 XP total/);
+        assert.equal(levelDisplay.attributes['aria-valuemax'], '150');
+        assert.equal(levelDisplay.attributes['aria-valuenow'], '149');
+        assert.match(levelDisplay.attributes['aria-label'], /1 experience points to Level 3/);
+    } finally {
+        document.querySelector = originalQuerySelector;
+    }
+});
+
 test('StudentProgress declares its stable lifecycle interface directly', () => {
     for (const method of [
         'loadLocalProgress',
@@ -181,7 +225,7 @@ test('scheduled cloud saving is owned and cancellable by StudentProgress', () =>
     try {
         progress.scheduleCloudSync();
         assert.equal(progress.scheduledCloudSaveTimeout, 42);
-        assert.deepEqual(statuses, ['☁️ Saving...']);
+        assert.deepEqual(statuses, ['Saving...']);
 
         progress.scheduleCloudSync();
         assert.equal(clearedTimer, 42);

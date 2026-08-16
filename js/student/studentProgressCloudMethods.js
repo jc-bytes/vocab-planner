@@ -142,7 +142,7 @@ export class StudentProgressCloud {
         this.progress.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
         this.progress.updateLevelDisplay();
         this.lastCoinRefreshAt = Date.now();
-        this.sm.setAuthStatus('☁️ Synced');
+        this.sm.setAuthStatus('Synced');
     }
 
     async refreshCoinsFromCloud(options = {}) {
@@ -184,20 +184,20 @@ export class StudentProgressCloud {
         }
     }
 
-    async loadCloudProgress() {
+    async loadCloudProgress(options = {}) {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         try {
             let data = null;
 
             if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
-                data = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
+                data = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile, options);
             } else {
-                data = await studentProgressRepository.get(this.sm.currentUser.uid);
+                data = await studentProgressRepository.get(this.sm.currentUser.uid, options);
             }
 
             if (!data) {
-                this.sm.setAuthStatus('☁️ Ready');
+                this.sm.setAuthStatus('Ready');
                 return;
             }
 
@@ -237,23 +237,23 @@ export class StudentProgressCloud {
                     this.progress.applyProgressSnapshot(progress, { saveLocal: true });
                     const bonusCoinData = this.progress.migrateCoinData(progress);
                     if (bonusCoinData.coinHistory.some(entry => entry?.source === 'welcome')) {
-                        this.sm.showToast('🎉 Welcome! You received 100 starting coins!');
+                        this.sm.showToast('Welcome! You received 100 starting coins!');
                     }
                 }
             } else {
                 this.progress.saveLocalProgress(true);
             }
 
-            this.sm.setAuthStatus('☁️ Synced');
+            this.sm.setAuthStatus('Synced');
         } catch (error) {
             console.error('Failed to load cloud progress:', error);
             // Check if we're offline
             const isOffline = !navigator.onLine;
             if (isOffline) {
-                this.sm.setAuthStatus('🔐 Signed in (Offline)');
+                this.sm.setAuthStatus('Signed in (Offline)');
                 notifications.info('You are offline. Using local data. Changes will sync when online.');
             } else {
-                this.sm.setAuthStatus('⚠️ Cloud load failed');
+                this.sm.setAuthStatus('Cloud load failed');
                 notifications.warning('Could not load progress from cloud. Using local data.');
             }
             // Re-throw so caller knows we're offline/failed
@@ -266,24 +266,24 @@ export class StudentProgressCloud {
         if (!this.sm.currentUser) return;
         try {
             let progress = null;
-            if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
-                progress = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
-            }
-
             const unitPayload = this.buildUnitWorkSyncPayload();
             if (unitPayload && typeof supabaseService.syncStudentUnitWork === 'function') {
                 progress = await supabaseService.syncStudentUnitWork(unitPayload);
+            } else if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
+                // Unit sync already ensures the row exists. Avoid a duplicate round trip
+                // whenever the current save contains unit work.
+                progress = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             }
 
             if (progress) {
                 this.progress.applyProgressSnapshot(progress, { saveLocal: true });
             }
 
-            this.sm.setAuthStatus('☁️ Synced');
+            this.sm.setAuthStatus('Synced');
         } catch (error) {
             console.error('Failed to save progress to cloud:', error);
             await this.enqueueProgressSync();
-            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Sync failed - saved locally' : 'Saved locally - offline');
+            this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
         }
     }
 
@@ -338,7 +338,7 @@ export class StudentProgressCloud {
         }
 
         if (pending.length === 0) return;
-        this.sm.setAuthStatus('☁️ Syncing local changes...');
+        this.sm.setAuthStatus('Syncing local changes...');
 
         for (const record of pending) {
             try {
@@ -354,13 +354,13 @@ export class StudentProgressCloud {
                 await imageDB.completeSyncAction(record.id);
             } catch (error) {
                 await imageDB.markSyncActionFailed(record, error);
-                this.sm.setAuthStatus('⚠️ Sync failed - saved locally');
+                this.sm.setAuthStatus('Sync failed - saved locally');
                 if (!options.silent) console.warn('Could not sync queued local change:', error);
                 return;
             }
         }
 
-        this.sm.setAuthStatus('☁️ Synced');
+        this.sm.setAuthStatus('Synced');
     }
 
     async restoreImagesFromProgress() {

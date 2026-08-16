@@ -1,5 +1,6 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { sparksRepository } from '../services/sparksRepository.js';
+import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 const SPARK_TYPE_LABELS = {
     cool_fact: 'Cool Fact',
@@ -101,6 +102,91 @@ export class StudentActivityHomeSpark {
         return currentSpark;
     }
 
+    async fetchAvailableSparks() {
+        if (this.sm.authDisabled || !this.sm.currentUser) return [];
+        const subjectSlug = this.sm.selectedSubjectSlug || 'technology';
+        const dateValue = getPanamaDateValue();
+        const grade = this.getStudentGradeLevel();
+        const cacheKey = `library:${subjectSlug}:${grade || 'all'}:${dateValue}`;
+        if (this.currentSparkSessionCache.has(cacheKey)) {
+            return this.currentSparkSessionCache.get(cacheKey);
+        }
+        const sparks = (await sparksRepository.listScheduledForStudent({
+            subjectSlug,
+            onOrBefore: dateValue,
+            limit: 40
+        })).map(spark => this.normalizeSpark(spark));
+        const available = grade
+            ? sparks.filter(spark => spark.targetGrades.includes(grade) || isAllGradeSpark(spark))
+            : sparks.filter(isAllGradeSpark);
+        this.currentSparkSessionCache.set(cacheKey, available);
+        return available;
+    }
+
+    getSparkLibraryStorageKey() {
+        const studentId = String(this.sm.currentUser?.id || this.sm.currentUser?.email || 'student');
+        const subjectSlug = String(this.sm.selectedSubjectSlug || 'technology');
+        return `student_spark_library_v1:${studentId}:${subjectSlug}`;
+    }
+
+    loadSparkLibraryProgress() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(this.getSparkLibraryStorageKey()) || '{}');
+            return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+        } catch {
+            return {};
+        }
+    }
+
+    saveSparkLibraryState(state = {}) {
+        if (!state.sparkId) return;
+        const progress = this.loadSparkLibraryProgress();
+        progress[state.sparkId] = {
+            version: Number(state.version) || 1,
+            sparkId: String(state.sparkId),
+            hasRead: Boolean(state.hasRead),
+            response: String(state.response || '').trim().slice(0, 240),
+            completedAt: String(state.completedAt || '')
+        };
+        localStorage.setItem(this.getSparkLibraryStorageKey(), JSON.stringify(progress));
+    }
+
+    async renderSparkLibrary() {
+        const container = $('#student-sparks-library');
+        if (!container) return;
+        const view = $('#student-sparks-view');
+        setStudentPageLoading(view, true);
+        this.activities.renderSubjectPicker('#spark-subject-picker');
+        container.innerHTML = getStudentPageSkeleton('sparks', 'Loading Sparks');
+        try {
+            const sparks = await this.fetchAvailableSparks();
+            if (sparks.length === 0) {
+                container.innerHTML = '<p class="teacher-empty-state">No Sparks are available for this class yet.</p>';
+                return;
+            }
+            const progress = this.loadSparkLibraryProgress();
+            const { SparkReadingActivity } = await import('../activities/sparkReading.js');
+            new SparkReadingActivity(
+                container,
+                {
+                    subjectSlug: this.sm.selectedSubjectSlug || 'technology',
+                    grade: this.getStudentGradeLevel(),
+                    scheduledDate: getPanamaDateValue(),
+                    loadSparks: async () => sparks,
+                    getSparkState: sparkId => progress[sparkId] || null
+                },
+                null,
+                state => this.saveSparkLibraryState(state),
+                progress[sparks[0].id] || null
+            );
+        } catch (error) {
+            console.error('Failed to render Spark library', error);
+            container.innerHTML = '<p class="teacher-empty-state">Could not load Sparks. Please try again.</p>';
+        } finally {
+            setStudentPageLoading(view, false);
+        }
+    }
+
     async loadAndRenderCurrentSpark(host) {
         if (!host) return;
         try {
@@ -187,6 +273,11 @@ export class StudentActivityHomeSpark {
                 <p class="teacher-empty-state">Loading Spark...</p>
             </div>
         `;
+        const openButton = createElement('button', 'student-home-spark-open');
+        openButton.type = 'button';
+        openButton.setAttribute('aria-label', 'Open Sparks');
+        openButton.addEventListener('click', () => this.sm.navigateTo({ view: 'sparks' }));
+        panel.appendChild(openButton);
         return panel;
     }
 }

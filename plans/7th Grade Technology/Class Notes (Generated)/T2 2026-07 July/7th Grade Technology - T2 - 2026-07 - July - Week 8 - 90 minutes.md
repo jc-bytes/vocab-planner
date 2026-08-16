@@ -5,7 +5,7 @@ month: July
 trimester: 2nd Trimester
 week: Week 8
 duration: 90 minutes
-topic: "Dance game preparation"
+topic: "Summative 5 rhythm-game presentation"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 8 |
 | Class Length | 90 minutes |
-| Topic | Dance game preparation |
+| Topic | Summative 5 rhythm-game presentation |
 
 ## Class Objective
 
-Complete a pair-programming self-reflection about driver/navigator roles, effort, communication, organization, and responding to feedback.
+Present the teacher-provided Scratch rhythm game, explain the assigned component and its connection to the whole game, and answer one teacher question.
 
 ## Pre-Activities
 
-- Review Week 8 practice vocabulary (part 2). input: Information that goes into a system or program timing: When actions happen and how long they last feedback: Helpful comments about how to improve Predict which blocks will be needed for player input.
+- Review Week 8 practice vocabulary (part 2). tempo: The speed of the beat or timing pattern score: A number that changes after a hit or miss code walkthrough: An explanation that connects scripts to program behavior Open the assigned reference project and verify that the demonstration works.
 
 ## While Activities
 
-- Complete Appreciation Grade #2: Complete a pair-programming self-reflection about driver/navigator roles, effort, communication, organization, and responding to feedback. Then build a practice dance move with one key press, one costume change, one sound, one movement, and one success/failure response. Complete any missing daily-grade evidence from weeks 1-7 if needed.
+- Complete Daily Summative #5: In a 2-minute code walkthrough, demonstrate the teacher-provided rhythm game, identify the assigned sprites or variables, explain the event-to-output logic of at least two connected scripts, state how the component affects gameplay, and answer one teacher question in understandable English. Submit the code map or annotated screenshot as evidence.
 
 ## Post-Activities
 
-- Submit a screenshot of the practice feature. Write one project feature you want to build well.
+- Write one feature from the reference game that will be required in the exam project and one question that remains.
 
 ## Prep Notes
 

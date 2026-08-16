@@ -2,10 +2,14 @@ import { supabaseService } from '../supabaseService.js';
 import { mapStudentProgressRow } from './supabaseValues.js';
 
 export const studentProgressRepository = {
-    async get(userId) {
+    async get(userId, options = {}) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient()
+        let query = supabaseService.getClient()
             .from('student_progress').select('*').eq('user_id', userId).maybeSingle();
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return mapStudentProgressRow(data);
     },

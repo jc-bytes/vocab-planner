@@ -7,8 +7,26 @@
     "6"
   ],
   "trimester": "2",
+  "month": "July",
+  "week": 7,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "crossword"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 6,
     "flashcards": 6,
     "quiz": 6,
@@ -82,7 +100,5 @@
       ],
       "antonyms": []
     }
-  ],
-  "month": "july",
-  "week": 7
+  ]
 }

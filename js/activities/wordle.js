@@ -98,7 +98,7 @@ export class WordleActivity {
 
     addLetter(letter) {
         const target = this.currentWord;
-        if (!target || this.currentGuess.length >= target.cleanWord.length) return;
+        if (!target || this.isRoundComplete() || this.currentGuess.length >= target.cleanWord.length) return;
 
         this.currentGuess += letter;
         this.message = 'Keep going.';
@@ -108,6 +108,14 @@ export class WordleActivity {
 
     handleKeydown(event) {
         if (!this.currentWord || this.currentIndex >= this.words.length) return;
+
+        if (this.isRoundComplete()) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                this.nextWord();
+            }
+            return;
+        }
 
         if (/^[a-zA-Z]$/.test(event.key)) {
             event.preventDefault();
@@ -122,7 +130,7 @@ export class WordleActivity {
     }
 
     backspace() {
-        if (!this.currentGuess) return;
+        if (this.isRoundComplete() || !this.currentGuess) return;
 
         this.currentGuess = this.currentGuess.slice(0, -1);
         this.saveState();
@@ -132,6 +140,11 @@ export class WordleActivity {
     submitGuess() {
         const target = this.currentWord;
         if (!target) return;
+
+        if (this.isRoundComplete()) {
+            this.nextWord();
+            return;
+        }
 
         if (this.currentGuess.length !== target.cleanWord.length) {
             this.message = `Your guess needs ${target.cleanWord.length} letters.`;
@@ -143,7 +156,7 @@ export class WordleActivity {
 
         if (this.currentGuess === target.cleanWord) {
             this.completedWords.push(target.cleanWord);
-            this.message = `Correct: ${target.word}`;
+            this.message = `Correct: ${target.word}. ${this.getNextActionPrompt()}`;
             this.currentGuess = '';
             this.saveState();
             this.reportProgress();
@@ -153,7 +166,7 @@ export class WordleActivity {
 
         if (this.guesses.length >= MAX_GUESSES) {
             this.missedWords.push(target.cleanWord);
-            this.message = `The word was ${target.word}.`;
+            this.message = `The word was ${target.word}. ${this.getNextActionPrompt()}`;
         } else {
             this.message = `${MAX_GUESSES - this.guesses.length} guesses left.`;
         }
@@ -195,7 +208,12 @@ export class WordleActivity {
         return {
             score,
             details: `${this.completedWords.length}/${this.words.length} words solved`,
-            isComplete: this.currentIndex >= this.words.length || this.completedWords.length === this.words.length
+            evidence: {
+                correctCount: this.completedWords.length,
+                failedCount: this.missedWords.length,
+                totalCount: this.words.length
+            },
+            isComplete: this.completedWords.length === this.words.length
         };
     }
 
@@ -243,6 +261,27 @@ export class WordleActivity {
         return status;
     }
 
+    isRoundComplete() {
+        const target = this.currentWord;
+        return Boolean(target && (
+            this.guesses.includes(target.cleanWord) || this.guesses.length >= MAX_GUESSES
+        ));
+    }
+
+    getNextActionPrompt() {
+        return this.currentIndex === this.words.length - 1
+            ? 'Press Enter to finish.'
+            : 'Press Enter for the next word.';
+    }
+
+    getDisplayMessage() {
+        const target = this.currentWord;
+        if (target && this.currentGuess.length === target.cleanWord.length) {
+            return 'Press Enter to check.';
+        }
+        return this.message;
+    }
+
     render() {
         this.container.innerHTML = '';
 
@@ -285,10 +324,10 @@ export class WordleActivity {
         }
         wrapper.appendChild(board);
 
-        const message = createElement('div', 'wordle-message', this.message);
+        const message = createElement('div', 'wordle-message', this.getDisplayMessage());
         wrapper.appendChild(message);
 
-        if (this.guesses.includes(target.cleanWord) || this.guesses.length >= MAX_GUESSES) {
+        if (this.isRoundComplete()) {
             const nextButton = createElement('button', 'btn primary-btn', this.currentIndex === this.words.length - 1 ? 'Finish' : 'Next Word');
             nextButton.addEventListener('click', () => this.nextWord());
             wrapper.appendChild(nextButton);

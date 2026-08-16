@@ -149,6 +149,14 @@ export class StudentManager {
         this.shell.setWideShellMediaQuery(mediaQuery);
     }
 
+    setStudentSidebarCollapsed(collapsed, options) {
+        return this.shell.setStudentSidebarCollapsed(collapsed, options);
+    }
+
+    restoreStudentSidebarState() {
+        return this.shell.restoreStudentSidebarState();
+    }
+
     switchView(viewId) {
         return this.shell.switchView(viewId);
     }
@@ -233,8 +241,8 @@ export class StudentManager {
         this.subjectSelection.vocabularyAutoSelect = autoSelect;
     }
 
-    loadSubjectSettings() {
-        return this.subjectSelection.loadSubjectSettings();
+    loadSubjectSettings(options = {}) {
+        return this.subjectSelection.loadSubjectSettings(options);
     }
 
     getActiveSubjects() {
@@ -368,4 +376,12 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', startStudentApp, { once: true });
 } else {
     startStudentApp();
+}
+
+if (import.meta.env?.PROD === true && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./student-sw.js').catch(error => {
+            console.warn('Offline support could not be enabled:', error);
+        });
+    }, { once: true });
 }

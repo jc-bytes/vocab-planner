@@ -277,7 +277,7 @@ option,
 }
 
 .month-navigation__action--back {
-    font-size: var(--type-caption-size);
+    font-size: var(--month-navigation-action-size, var(--type-eyebrow-size));
 }
 
 .month-navigation__current {
@@ -557,8 +557,13 @@ option,
 }
 
 .toast-icon {
-    font-size: var(--type-section-title-size);
-    line-height: var(--type-section-title-line-height);
+    display: inline-flex;
+    line-height: 1;
+}
+
+.toast-icon svg {
+    width: 1.35rem;
+    height: 1.35rem;
 }
 
 .toast-emphasis {

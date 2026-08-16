@@ -17,6 +17,7 @@ globalThis.sessionStorage = {
 globalThis.document = {
     readyState: 'loading',
     addEventListener() {},
+    removeEventListener() {},
     getElementById() {
         return {};
     },
@@ -29,10 +30,15 @@ globalThis.document = {
 };
 globalThis.window = {
     addEventListener() {},
-    removeEventListener() {}
+    removeEventListener() {},
+    setTimeout,
+    clearTimeout
 };
 
 const { StudentActivities } = await import('../js/student/studentActivities.js');
+const { ActivityTimeoutController } = await import('../js/activities/activityTimeoutController.js');
+const { WordSearchActivity } = await import('../js/activities/wordSearch.js');
+const { attachWritingChecker } = await import('../js/studentWritingSuggestions.js');
 const { StudentManager } = await import('../js/student.js');
 const { StudentActivityAvailability } = await import('../js/student/studentActivityAvailability.js');
 const { StudentActivityBrowser } = await import('../js/student/studentActivityBrowserMethods.js');
@@ -57,6 +63,7 @@ const {
     normalizeClassSchedules,
     normalizeSchoolCalendar
 } = await import('../js/services/vocabularyApi.js');
+const { requestWithTimeout } = await import('../js/services/requestReliability.js');
 
 test('StudentActivities owns explicit runtime components', () => {
     const manager = {};
@@ -74,6 +81,7 @@ test('StudentActivities owns explicit runtime components', () => {
     assert.ok(activities.moduleLoader instanceof StudentActivityModuleLoader);
     assert.ok(activities.launcher instanceof StudentActivityLauncher);
     assert.ok(activities.progressPersistence instanceof StudentActivityProgressPersistence);
+    assert.ok(activities.progressPersistence.activitySyncChains instanceof Map);
     assert.equal(activities.menu.activities, activities);
     assert.equal(activities.launcher.activities, activities);
     for (const state of [
@@ -85,6 +93,38 @@ test('StudentActivities owns explicit runtime components', () => {
     ]) {
         assert.equal(state in manager, false, `${state} must not be stored on StudentManager`);
     }
+});
+
+test('activity cloud-sync queues are isolated per student runtime', () => {
+    const first = new StudentActivities({});
+    const second = new StudentActivities({});
+    first.progressPersistence.activitySyncChains.set('unit:quiz', Promise.resolve());
+
+    assert.equal(first.progressPersistence.activitySyncChains.size, 1);
+    assert.equal(second.progressPersistence.activitySyncChains.size, 0);
+});
+
+test('activity XP reward uses the authoritative server total delta', () => {
+    const activities = new StudentActivities({});
+    const persistence = activities.progressPersistence;
+
+    assert.equal(persistence.getAwardedXp(270, { totalXp: 300 }), 30);
+    assert.equal(persistence.getAwardedXp(300, { totalXp: 300 }), 0);
+    assert.equal(persistence.getAwardedXp(310, { totalXp: 300 }), 0);
+});
+
+test('activity state comparison ignores timestamp-only saves but detects progress changes', () => {
+    const activities = new StudentActivities({});
+    const persistence = activities.progressPersistence;
+
+    assert.equal(persistence.areActivityStatesEquivalent(
+        { currentIndex: 2, answers: [{ selected: 'A', correct: true }], updatedAt: '2026-08-14T10:00:00Z' },
+        { updatedAt: '2026-08-14T10:01:00Z', answers: [{ correct: true, selected: 'A' }], currentIndex: 2 }
+    ), true);
+    assert.equal(persistence.areActivityStatesEquivalent(
+        { currentIndex: 2, updatedAt: '2026-08-14T10:00:00Z' },
+        { currentIndex: 3, updatedAt: '2026-08-14T10:01:00Z' }
+    ), false);
 });
 
 test('StudentActivities owns isolated active activity-session state', () => {
@@ -106,6 +146,187 @@ test('StudentActivities owns isolated active activity-session state', () => {
     assert.deepEqual(second.session.unitImages, {});
     assert.deepEqual(second.session.unitWordHunt, {});
     assert.deepEqual(second.session.unitStates, {});
+});
+
+test('activity sessions invalidate stale launches and safely destroy instances', () => {
+    const activities = new StudentActivities({});
+    const firstLaunch = activities.session.beginActivityLaunch();
+    let destroyed = 0;
+    activities.session.activityInstance = {
+        destroy() {
+            destroyed += 1;
+        }
+    };
+
+    assert.equal(activities.session.isActivityLaunchCurrent(firstLaunch), true);
+    activities.session.cancelActivityLaunch();
+    activities.session.destroyActivityInstance();
+
+    assert.equal(activities.session.isActivityLaunchCurrent(firstLaunch), false);
+    assert.equal(activities.session.activityInstance, null);
+    assert.equal(destroyed, 1);
+});
+
+test('new vocabulary loads abort stale unit requests', () => {
+    const session = new StudentActivitySession({});
+    const firstLoad = session.beginVocabularyLoad();
+    const firstSignal = session.vocabularyLoadController.signal;
+    const secondLoad = session.beginVocabularyLoad();
+
+    assert.equal(firstSignal.aborted, true);
+    assert.equal(session.isVocabularyLoadCurrent(firstLoad), false);
+    assert.equal(session.isVocabularyLoadCurrent(secondLoad), true);
+});
+
+test('bounded requests abort stalled network work', async () => {
+    let receivedAbort = false;
+    await assert.rejects(
+        requestWithTimeout(signal => new Promise((resolve, reject) => {
+            signal.addEventListener('abort', () => {
+                receivedAbort = true;
+                reject(signal.reason);
+            }, { once: true });
+        }), { timeoutMs: 5, label: 'Test request' }),
+        error => error?.code === 'REQUEST_TIMEOUT'
+    );
+    assert.equal(receivedAbort, true);
+});
+
+test('activity module loader evicts rejected imports so students can retry', async () => {
+    let attempts = 0;
+    class TestActivity {}
+    const loader = new StudentActivityModuleLoader({}, {
+        test: async () => {
+            attempts += 1;
+            if (attempts === 1) throw new Error('temporary load failure');
+            return { TestActivity };
+        }
+    }, {
+        test: 'TestActivity'
+    });
+
+    await assert.rejects(loader.loadActivityClass('test'), /temporary load failure/);
+    assert.equal(await loader.loadActivityClass('test'), TestActivity);
+    assert.equal(attempts, 2);
+});
+
+test('activity startup automatically retries once without stale saved state', () => {
+    const resetTypes = [];
+    const launcher = new StudentActivityLauncher({
+        sm: {},
+        resetActivityState(type) {
+            resetTypes.push(type);
+        }
+    });
+    const savedState = { currentWordIndex: 99 };
+    const receivedStates = [];
+
+    const activity = launcher.startActivityWithStateRecovery('hangman', savedState, state => {
+        receivedStates.push(state);
+        if (state) throw new TypeError('stale state');
+        return { started: true };
+    });
+
+    assert.deepEqual(activity, { started: true });
+    assert.deepEqual(receivedStates, [savedState, null]);
+    assert.deepEqual(resetTypes, ['hangman']);
+});
+
+test('activity recovery does not discard protected Word Hunt work', () => {
+    const launcher = new StudentActivityLauncher({
+        sm: {},
+        resetActivityState() {
+            throw new Error('Word Hunt work must not be reset automatically');
+        }
+    });
+
+    assert.throws(() => launcher.startActivityWithStateRecovery('illustration', {}, () => {
+        throw new TypeError('startup error');
+    }), /startup error/);
+});
+
+test('activity launch errors distinguish catalog problems from connectivity problems', () => {
+    const launcher = Object.create(StudentActivityLauncher.prototype);
+    assert.equal(
+        launcher.getActivityLoadErrorMessage({ message: 'Unknown vocabulary unit.' }),
+        'This vocabulary unit has not been synchronized with the activity server yet.'
+    );
+    assert.equal(
+        launcher.getActivityLoadErrorMessage({ message: 'Unexpected server error.' }),
+        'The activity server could not start this activity. Try again in a moment.'
+    );
+    assert.equal(
+        launcher.getActivityLoadErrorMessage({ code: 'REQUEST_TIMEOUT' }),
+        'The connection is taking too long. Check Wi-Fi and try again.'
+    );
+});
+
+test('activity timeout cleanup prevents delayed work after navigation', async () => {
+    const timeouts = new ActivityTimeoutController();
+    let delayedWork = 0;
+    timeouts.schedule(() => {
+        delayedWork += 1;
+    }, 5);
+    timeouts.clear();
+
+    await new Promise(resolve => setTimeout(resolve, 15));
+    assert.equal(delayedWork, 0);
+    assert.equal(timeouts.pending.size, 0);
+});
+
+test('word-search render cleanup preserves save callbacks until the activity is destroyed', () => {
+    const activity = Object.create(WordSearchActivity.prototype);
+    const onProgress = () => {};
+    const onSaveState = () => {};
+    activity.onProgress = onProgress;
+    activity.onSaveState = onSaveState;
+    activity.handleDocumentPointerEnd = () => {};
+    activity.timeouts = { clear() {} };
+    activity.completionOverlay = null;
+
+    activity.detachPointerListeners();
+    assert.equal(activity.onProgress, onProgress);
+    assert.equal(activity.onSaveState, onSaveState);
+
+    activity.destroy();
+    assert.equal(activity.onProgress, null);
+    assert.equal(activity.onSaveState, null);
+});
+
+test('writing checker uses native spellcheck without timers or event listeners', () => {
+    const listeners = new Map();
+    let scheduledChecks = 0;
+    const originalSetTimeout = window.setTimeout;
+    window.setTimeout = () => {
+        scheduledChecks += 1;
+        return 1;
+    };
+    const panel = { replaceChildren() {} };
+    const field = {
+        dataset: {},
+        value: 'A restored answer',
+        parentElement: { querySelector: () => panel },
+        setAttribute(name, value) {
+            this[name] = value;
+        },
+        addEventListener(name, listener) {
+            listeners.set(name, listener);
+        },
+        removeEventListener(name) {
+            listeners.delete(name);
+        }
+    };
+    const cleanup = attachWritingChecker({ querySelectorAll: () => [field] });
+
+    assert.equal(field.spellcheck, 'true');
+    assert.equal(scheduledChecks, 0);
+    assert.equal(field.autocapitalize, 'sentences');
+    assert.equal(listeners.has('blur'), false);
+    assert.equal(listeners.has('input'), false);
+
+    cleanup();
+    window.setTimeout = originalSetTimeout;
+    assert.equal(listeners.size, 0);
 });
 
 test('StudentManager session accessors preserve existing cross-component callers', () => {
@@ -348,6 +569,7 @@ test('StudentActivities declares its presentation interface directly', () => {
         'scheduleFirstVocabularyPreload',
         'getUnitProgressSummary',
         'renderStudentHome',
+        'renderSparkLibrary',
         'createContinueLearningHero',
         'fetchCurrentSpark',
         'createStudentSparkCard',
@@ -608,6 +830,24 @@ test('explicit activity flow settings remain partitioned and ordered', () => {
     assert.equal(flow.hidden.includes('quiz'), false);
 });
 
+test('playable activity counts reject vocabulary data that cannot build a game', () => {
+    const activities = new StudentActivities({});
+    const vocab = {
+        words: [
+            { word: 'AI', definition: 'Artificial intelligence.' },
+            { word: 'data set', definition: 'Related data.', example: 'A data set was collected.' },
+            { word: '', definition: '' }
+        ]
+    };
+
+    assert.equal(activities.getActivityPlayableCount('quiz', vocab), 2);
+    assert.equal(activities.isActivityWordPlayable('quiz', vocab.words[2]), false);
+    assert.equal(activities.getActivityPlayableCount('crossword', vocab), 1);
+    assert.equal(activities.getActivityPlayableCount('word-search', vocab), 1);
+    assert.equal(activities.getActivityPlayableCount('fill-in-blank', vocab), 1);
+    assert.equal(activities.getActivityPlayableCount('quiz', { words: [] }), 0);
+});
+
 test('required activities unlock sequentially while completed steps remain replayable', () => {
     const manager = {
         currentVocab: {
@@ -695,6 +935,108 @@ test('pending required work includes available current-trimester units and selec
     assert.equal(pending.next.vocab.id, 'old-unit');
     assert.equal(pending.next.completion.nextActivityType, 'matching');
     assert.deepEqual(pending.units.map(item => item.vocab.id), ['old-unit', 'current-unit']);
+});
+
+test('student home recommends overdue required work before unfinished and current-week units', () => {
+    const home = new StudentActivityHome({ sm: {} });
+    const today = new Date(2026, 7, 15, 12);
+    const makeItem = ({ id, dueDate, latestPlayed = 0, completedRequired = 0 }) => ({
+        vocab: { id, name: id },
+        schedule: { dueDate },
+        sortTime: dueDate.getTime(),
+        progress: {
+            isComplete: false,
+            latestPlayed,
+            completedRequired,
+            bestScore: 0
+        }
+    });
+    const oldest = makeItem({ id: 'oldest', dueDate: new Date(2026, 7, 3, 12) });
+    const unfinished = makeItem({
+        id: 'unfinished',
+        dueDate: new Date(2026, 7, 10, 12),
+        latestPlayed: new Date(2026, 7, 14, 12).getTime(),
+        completedRequired: 1
+    });
+    const current = makeItem({ id: 'current', dueDate: new Date(2026, 7, 17, 12) });
+
+    const recommendation = home.getHomeRecommendation({
+        decoratedVocabs: [current, unfinished, oldest],
+        weekItems: [current],
+        requiredWork: {
+            units: [
+                { vocab: oldest.vocab },
+                { vocab: unfinished.vocab },
+                { vocab: current.vocab }
+            ]
+        },
+        today
+    });
+
+    assert.equal(recommendation.item.vocab.id, 'oldest');
+    assert.equal(recommendation.mode, 'required');
+    assert.equal(recommendation.heading, 'Your oldest required work');
+    assert.equal(recommendation.badge, 'Catch up');
+    assert.equal(recommendation.action, 'Continue required work');
+});
+
+test('student home falls back from unfinished work to this week and then completion', () => {
+    const home = new StudentActivityHome({ sm: {} });
+    const today = new Date(2026, 7, 15, 12);
+    const current = {
+        vocab: { id: 'current', name: 'Current' },
+        schedule: { dueDate: new Date(2026, 7, 17, 12) },
+        sortTime: new Date(2026, 7, 17, 12).getTime(),
+        progress: {
+            isComplete: false,
+            latestPlayed: 0,
+            completedRequired: 0,
+            bestScore: 0
+        }
+    };
+    const unfinished = {
+        ...current,
+        vocab: { id: 'unfinished', name: 'Unfinished' },
+        progress: {
+            ...current.progress,
+            latestPlayed: new Date(2026, 7, 14, 12).getTime(),
+            completedRequired: 1
+        }
+    };
+
+    const unfinishedRecommendation = home.getHomeRecommendation({
+        decoratedVocabs: [current, unfinished],
+        weekItems: [current],
+        requiredWork: { units: [{ vocab: current.vocab }] },
+        today
+    });
+    assert.equal(unfinishedRecommendation.item.vocab.id, 'unfinished');
+    assert.equal(unfinishedRecommendation.mode, 'unfinished');
+    assert.equal(unfinishedRecommendation.heading, 'Continue learning');
+    assert.equal(unfinishedRecommendation.badge, 'In progress');
+    assert.equal(unfinishedRecommendation.action, 'Continue');
+
+    const currentRecommendation = home.getHomeRecommendation({
+        decoratedVocabs: [current],
+        weekItems: [current],
+        requiredWork: { units: [{ vocab: current.vocab }] },
+        today
+    });
+    assert.equal(currentRecommendation.item.vocab.id, 'current');
+    assert.equal(currentRecommendation.mode, 'current');
+    assert.equal(currentRecommendation.heading, 'Start this week\u2019s work');
+    assert.equal(currentRecommendation.badge, 'This week');
+    assert.equal(currentRecommendation.action, 'Start unit');
+
+    const completeRecommendation = home.getHomeRecommendation({
+        decoratedVocabs: [],
+        weekItems: [],
+        requiredWork: { units: [] },
+        today
+    });
+    assert.equal(completeRecommendation.item, null);
+    assert.equal(completeRecommendation.mode, 'complete');
+    assert.equal(completeRecommendation.heading, 'You\u2019re all caught up');
 });
 
 test('legacy completed flashcards are not regressed by the new mastery-state initialization', () => {
@@ -845,6 +1187,26 @@ test('class meeting days delay release to the next lesson and never hide it afte
     assert.equal(activities.isStudentVocabularyAvailable(vocab, new Date(2026, 7, 16, 12)), false);
     assert.equal(activities.isStudentVocabularyAvailable(vocab, new Date(2026, 7, 17, 12)), true);
     assert.equal(activities.isStudentVocabularyAvailable(vocab, new Date(2026, 7, 19, 12)), true);
+});
+
+test('vocabulary cards summarize required completion before a unit is opened', () => {
+    const cards = new StudentActivityBrowserCards({
+        activities: {
+            getUnitRequiredCompletion() {
+                return { completed: 2, total: 3 };
+            }
+        },
+        sm: {}
+    });
+
+    assert.deepEqual(cards.getVocabularyRequiredProgress({ id: 'unit-1' }), {
+        completed: 2,
+        total: 3,
+        percent: 67,
+        isComplete: false,
+        actionLabel: 'Continue unit',
+        ariaLabel: '67% complete: 2 of 3 required activities'
+    });
 });
 
 test('coverage and preload state are isolated inside their components', () => {

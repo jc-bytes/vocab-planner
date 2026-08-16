@@ -41,10 +41,10 @@ class NotificationManager {
         };
 
         const icons = {
-            info: 'ℹ️',
-            success: '✅',
-            error: '❌',
-            warning: '⚠️'
+            info: 'info',
+            success: 'circle-check',
+            error: 'circle-x',
+            warning: 'triangle-alert'
         };
 
         const color = colors[type] || colors.info;
@@ -68,7 +68,7 @@ class NotificationManager {
         `;
 
         toast.innerHTML = `
-            <span class="toast-icon">${icons[type] || icons.info}</span>
+            <span class="toast-icon" aria-hidden="true"><i data-lucide="${icons[type] || icons.info}"></i></span>
             <span style="flex: 1;">${message}</span>
             <button class="toast-close btn-icon-only" type="button" aria-label="Dismiss notification" style="
                 background: none;
@@ -83,8 +83,9 @@ class NotificationManager {
                 align-items: center;
                 justify-content: center;
                 opacity: 0.8;
-            ">&times;</button>
+            "><i data-lucide="circle-x" aria-hidden="true"></i></button>
         `;
+        window.lucide?.createIcons({ root: toast });
 
         // Add animation styles if not already added
         if (!document.getElementById('toast-styles')) {

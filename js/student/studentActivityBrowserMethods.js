@@ -1,6 +1,7 @@
 import { $, createElement } from '../main.js';
 import { StudentActivityBrowserCards } from './studentActivityBrowserCards.js';
 import { StudentActivityBrowserNavigation } from './studentActivityBrowserNavigation.js';
+import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityBrowser {
     constructor(activities) {
@@ -84,10 +85,13 @@ export class StudentActivityBrowser {
 
     renderDashboard() {
         const container = $('#vocab-list');
+        const view = $('#vocab-selection-view');
+        if (!container) return;
+        setStudentPageLoading(view, true);
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
         this.renderSubjectPicker('#student-subject-picker');
         this.renderSubjectPicker('#vocab-subject-picker');
-        container.innerHTML = '';
+        container.innerHTML = getStudentPageSkeleton('units', 'Loading vocabulary units');
         container.className = 'vocab-groups';
         this.activities.availableVocabs = [];
 
@@ -95,11 +99,13 @@ export class StudentActivityBrowser {
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p>${message}</p>`;
+            setStudentPageLoading(view, false);
             return;
         }
 
         this.renderVocabularyBrowser(container, vocabs);
         this.scheduleFirstVocabularyPreload(container);
+        setStudentPageLoading(view, false);
     }
 
     renderVocabularyBrowser(container = $('#vocab-list'), vocabs = null) {
@@ -298,7 +304,7 @@ export class StudentActivityBrowser {
         this.renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups);
 
         if (this.getStudentVocabularyViewMode() === 'rows') {
-            const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type']);
+            const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type', 'Progress']);
             monthVocabs
                 .sort((a, b) => this.compareVocabularySchedule(a, b))
                 .forEach(vocab => list.appendChild(this.createVocabularyRow(vocab)));

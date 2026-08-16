@@ -1,11 +1,13 @@
 import { $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
+import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
 
 export class StudentActivityProgressPersistence {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
+        this.activitySyncChains = new Map();
     }
 
     getActivityCoinRewards(activityType, settings = {}) {
@@ -18,6 +20,34 @@ export class StudentActivityProgressPersistence {
                 ? activityRewards.completionBonus
                 : (settings.completionBonus !== undefined ? settings.completionBonus : 50)
         };
+    }
+
+    async startVerifiedActivityAttempt(activityType, options = {}) {
+        if (this.sm.authDisabled || !this.sm.currentUser) {
+            this.activities.session.activityAttempt = null;
+            return null;
+        }
+
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+            throw createRequestError('An internet connection is required to start this activity.', 'OFFLINE');
+        }
+
+        const vocab = this.sm.currentVocab;
+        const attempt = await requestWithTimeout(signal => (
+            supabaseService.startStudentActivityAttempt({
+                unitKey: this.activities.getUnitProgressKey(vocab),
+                vocabularyId: this.sm.getVocabRouteId?.(vocab) || vocab?.id || '',
+                activityType,
+                signal
+            })
+        ), {
+            signal: options.signal,
+            timeoutMs: options.timeoutMs || 10000,
+            label: 'Starting the verified activity'
+        });
+        if (!attempt?.attemptId) throw new Error('The server did not create a verified activity attempt.');
+        this.activities.session.activityAttempt = attempt;
+        return attempt;
     }
 
     handleAutoSave(scoreData) {
@@ -143,11 +173,16 @@ export class StudentActivityProgressPersistence {
             },
             activityType,
             isRequired: flow.required.includes(activityType),
-            attemptId: globalThis.crypto?.randomUUID?.()
-                || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            attemptId: this.activities.session.activityAttempt?.attemptId || '',
             score: Number(scoreData.score) || 0,
-            isComplete: Boolean(scoreData.isComplete) || Number(scoreData.score) >= 100,
-            details: scoreData.details || {},
+            isComplete: Boolean(scoreData.isComplete),
+            details: {
+                summary: typeof scoreData.details === 'string' ? scoreData.details : '',
+                evidence: scoreData.evidence && typeof scoreData.evidence === 'object'
+                    ? scoreData.evidence
+                    : {},
+                accuracy: Number(scoreData.accuracy) || 0
+            },
             activitySettings: {
                 progressReward: settings.progressReward,
                 completionBonus: settings.completionBonus
@@ -161,10 +196,32 @@ export class StudentActivityProgressPersistence {
         const payload = this.buildActivityProgressPayload(activityType, scoreData, settings);
         if (!payload) return;
 
+        const syncKey = `${payload.unitKey}:${activityType}`;
+        const previousSync = this.activitySyncChains.get(syncKey) || Promise.resolve();
+        const currentSync = previousSync
+            .catch(() => {})
+            .then(() => this.submitActivityProgressPayload(payload));
+        this.activitySyncChains.set(syncKey, currentSync);
+
         try {
+            await currentSync;
+        } finally {
+            if (this.activitySyncChains.get(syncKey) === currentSync) {
+                this.activitySyncChains.delete(syncKey);
+            }
+        }
+    }
+
+    async submitActivityProgressPayload(payload) {
+        try {
+            const previousTotalXp = Number(this.sm.progressData?.totalXp) || 0;
             const progress = await supabaseService.submitStudentActivityProgress(payload);
+            const xpAwarded = this.getAwardedXp(previousTotalXp, progress);
             this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
-            this.sm.setAuthStatus('☁️ Synced');
+            this.sm.setAuthStatus('Synced');
+            if (payload.isComplete) {
+                this.showActivityXpReward(xpAwarded, progress, payload.activityType);
+            }
         } catch (error) {
             console.warn('Could not sync activity progress event:', error);
             try {
@@ -172,8 +229,54 @@ export class StudentActivityProgressPersistence {
             } catch (queueError) {
                 console.warn('Could not queue activity progress event:', queueError);
             }
-            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Sync failed - saved locally' : 'Saved locally - offline');
+            this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
         }
+    }
+
+    getAwardedXp(previousTotalXp, progress = {}) {
+        const before = Math.max(0, Number(previousTotalXp) || 0);
+        const after = Math.max(0, Number(progress.totalXp) || 0);
+        return Math.max(0, Math.round(after - before));
+    }
+
+    showActivityXpReward(xpAwarded, progress = {}, activityType = '') {
+        if (this.sm.currentActivityType !== activityType || typeof document === 'undefined' || !document.body) {
+            return null;
+        }
+
+        document.getElementById('activity-xp-reward')?.remove();
+
+        const amount = Math.max(0, Number(xpAwarded) || 0);
+        const totalXp = Math.max(0, Number(progress.totalXp) || 0);
+        const reward = document.createElement('div');
+        reward.id = 'activity-xp-reward';
+        reward.className = `activity-xp-reward${amount > 0 ? '' : ' activity-xp-reward--none'}`;
+        reward.setAttribute('role', 'status');
+        reward.setAttribute('aria-live', 'polite');
+
+        const emblem = document.createElement('span');
+        emblem.className = 'activity-xp-reward__emblem';
+        emblem.textContent = 'XP';
+        emblem.setAttribute('aria-hidden', 'true');
+
+        const copy = document.createElement('span');
+        copy.className = 'activity-xp-reward__copy';
+
+        const value = document.createElement('strong');
+        value.className = 'activity-xp-reward__value';
+        value.textContent = amount > 0 ? `+${amount} XP` : 'No new XP';
+
+        const detail = document.createElement('span');
+        detail.className = 'activity-xp-reward__detail';
+        detail.textContent = `Activity complete · ${totalXp} XP total`;
+
+        copy.append(value, detail);
+        reward.append(emblem, copy);
+        document.body.appendChild(reward);
+
+        window.setTimeout(() => reward.classList.add('activity-xp-reward--leaving'), 4700);
+        window.setTimeout(() => reward.remove(), 5200);
+        return reward;
     }
 
     resetActivityState(activityType) {
@@ -182,25 +285,30 @@ export class StudentActivityProgressPersistence {
         const vocabName = this.sm.currentVocab.name;
         const vocabID = this.sm.currentVocab.id || vocabName;
 
-        // Clear localStorage state
-        const stateKeys = [
-            `flashcards_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
-            `flashcards_state_${this.sm.currentVocab.words.length}`,
-            `hangman_state_${this.sm.currentVocab.words.length}`,
-            `scramble_state_${this.sm.currentVocab.words.length}`,
-            `wordle_state_${this.sm.currentVocab.words.length}`,
-            `crossword_state_${this.sm.currentVocab.words.length}`,
-            `fib_state_${this.sm.currentVocab.words.length}`,
-            `matching_state_${this.sm.currentVocab.words[0]?.word}_${this.sm.currentVocab.words.length}`,
-            `quiz_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
-            `synonym_antonym_state_${this.sm.currentVocab.words[0]?.word || 'empty'}_${this.sm.currentVocab.words.length}`,
-            `word_search_state_${vocabID}`,
-            `speedmatch_highscore_${this.sm.currentVocab.words.length}`
-        ];
+        // Clear only this activity's transient state. A broken save in one game
+        // must never erase another activity's in-progress round.
+        const wordCount = this.sm.currentVocab.words.length;
+        const firstWord = this.sm.currentVocab.words[0]?.word || 'empty';
+        const stateKeysByActivity = {
+            flashcards: [`flashcards_state_${firstWord}_${wordCount}`, `flashcards_state_${wordCount}`],
+            hangman: [`hangman_state_${wordCount}`],
+            scramble: [`scramble_state_${wordCount}`],
+            wordle: [`wordle_state_${wordCount}`],
+            crossword: [`crossword_state_${wordCount}`],
+            'fill-in-blank': [`fib_state_${wordCount}`],
+            matching: [`matching_state_${firstWord}_${wordCount}`],
+            quiz: [`quiz_state_${firstWord}_${wordCount}`],
+            'synonym-antonym': [`synonym_antonym_state_${firstWord}_${wordCount}`],
+            'word-search': [`word_search_state_${vocabID}`],
+            'speed-match': [`speedmatch_highscore_${wordCount}`]
+        };
+        const stateKeys = stateKeysByActivity[activityType] || [];
 
         stateKeys.forEach(key => {
+            const normalizedKey = key.trim();
             localStorage.removeItem(key);
-            localStorage.removeItem(key.trim()); // Handle keys with trailing spaces
+            localStorage.removeItem(normalizedKey);
+            localStorage.removeItem(`${normalizedKey} `); // Handle legacy keys with a trailing space.
         });
 
         // Clear saved state in progress data
@@ -248,6 +356,32 @@ export class StudentActivityProgressPersistence {
         }
     }
 
+    areActivityStatesEquivalent(firstState, secondState) {
+        if (firstState === secondState) return true;
+        if (!firstState || !secondState || typeof firstState !== 'object' || typeof secondState !== 'object') {
+            return false;
+        }
+
+        const canonicalize = value => {
+            if (Array.isArray(value)) return value.map(item => canonicalize(item));
+            if (!value || typeof value !== 'object') return value;
+
+            return Object.keys(value)
+                .filter(key => key !== 'updatedAt')
+                .sort()
+                .reduce((result, key) => {
+                    result[key] = canonicalize(value[key]);
+                    return result;
+                }, {});
+        };
+
+        try {
+            return JSON.stringify(canonicalize(firstState)) === JSON.stringify(canonicalize(secondState));
+        } catch {
+            return false;
+        }
+    }
+
     handleStateSave(stateData) {
         if (this.sm.currentVocab && this.sm.currentActivityType) {
             const sanitizedState = this.sanitizeActivityState(stateData);
@@ -255,11 +389,20 @@ export class StudentActivityProgressPersistence {
 
             const unitProgress = this.activities.getCurrentUnitProgress();
             if (!unitProgress.states) unitProgress.states = {};
+            const activityType = this.sm.currentActivityType;
+            const existingState = unitProgress.states[activityType];
+
+            if (
+                (sanitizedState === null && existingState === undefined)
+                || this.areActivityStatesEquivalent(existingState, sanitizedState)
+            ) {
+                return;
+            }
 
             if (sanitizedState === null) {
-                delete unitProgress.states[this.sm.currentActivityType];
+                delete unitProgress.states[activityType];
             } else {
-                unitProgress.states[this.sm.currentActivityType] = sanitizedState;
+                unitProgress.states[activityType] = sanitizedState;
             }
 
             this.sm.unitStates = unitProgress.states;

@@ -1,4 +1,7 @@
 import { createElement, $ } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
+
+const MASTERY_ACCURACY = 80;
 
 export class SynonymAntonymActivity {
     constructor(container, words, onProgress, onSaveState = null, initialState = null) {
@@ -14,6 +17,7 @@ export class SynonymAntonymActivity {
         this.totalQuestions = this.questions.length;
         this.selectedAnswers = [];
         this.isFinished = false;
+        this.timeouts = new ActivityTimeoutController();
 
         this.restoreState();
         this.saveState();
@@ -168,13 +172,19 @@ export class SynonymAntonymActivity {
     getScore() {
         if (this.totalQuestions === 0) return { score: 0, details: 'No questions available' };
 
-        const percentage = Math.round((this.answeredCount / this.totalQuestions) * 100);
         const accuracy = this.answeredCount === 0 ? 0 : Math.round((this.score / this.answeredCount) * 100);
+        const answeredAll = this.answeredCount === this.totalQuestions;
         return {
-            score: percentage,
+            score: accuracy,
             details: `Answered: ${this.answeredCount}/${this.totalQuestions}. Correct: ${this.score}/${this.answeredCount || 0} (${accuracy}% accuracy)`,
             accuracy,
-            isComplete: this.answeredCount === this.totalQuestions
+            evidence: {
+                answeredCount: this.answeredCount,
+                correctCount: this.score,
+                totalCount: this.totalQuestions,
+                accuracy
+            },
+            isComplete: answeredAll && accuracy >= MASTERY_ACCURACY
         };
     }
 
@@ -288,7 +298,7 @@ export class SynonymAntonymActivity {
         }
         this.saveState();
 
-        setTimeout(() => {
+        this.timeouts.schedule(() => {
             this.render();
         }, 1500);
     }
@@ -300,15 +310,23 @@ export class SynonymAntonymActivity {
         const result = this.getScore();
 
         summary.innerHTML = `
-            <h2>🎉 Challenge Complete!</h2>
+            <h2 class="activity-result-heading">
+                ${result.isComplete ? '<i data-lucide="badge-check" aria-hidden="true"></i>' : ''}
+                <span>${result.isComplete ? 'Challenge Mastered!' : 'Keep Practicing'}</span>
+            </h2>
             <div style="font-size: 4rem; font-weight: bold; color: var(--primary); margin: 2rem 0;">
                 ${result.score}%
             </div>
             <p style="font-size: 1.5rem; margin-bottom: 2rem;">${result.details}</p>
-            <button id="restart-quiz" class="btn primary-btn">🔄 Play Again</button>
+            <p>${result.isComplete ? 'You reached the mastery goal.' : `Reach ${MASTERY_ACCURACY}% accuracy to complete this activity.`}</p>
+            <button id="restart-quiz" class="btn primary-btn">
+                <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                <span>${result.isComplete ? 'Play Again' : 'Try Again'}</span>
+            </button>
         `;
 
         this.container.appendChild(summary);
+        window.lucide?.createIcons({ root: summary });
 
         $('#restart-quiz').addEventListener('click', () => this.restart());
     }
@@ -332,5 +350,11 @@ export class SynonymAntonymActivity {
         }
         
         this.render();
+    }
+
+    destroy() {
+        this.timeouts.clear();
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

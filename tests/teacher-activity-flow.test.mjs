@@ -44,3 +44,19 @@ test('teacher activity flow always pins Flashcards to required Step 1', () => {
     assert.deepEqual(flow.required, ['flashcards', 'quiz', 'matching']);
     assert.deepEqual(flow.additional, ['word-search']);
 });
+
+test('teacher save normalization always materializes both activity-flow arrays', () => {
+    const manager = new TeacherFlowHarness();
+    manager.vocabSet = {
+        id: 'custom-unit',
+        name: 'Custom Unit',
+        words: [{ word: 'data', definition: 'Stored facts.' }],
+        activitySettings: {}
+    };
+
+    const flow = manager.normalizeActivityFlowSettings();
+
+    assert.deepEqual(manager.vocabSet.activitySettings.requiredActivities, flow.required);
+    assert.deepEqual(manager.vocabSet.activitySettings.additionalActivities, flow.additional);
+    assert.equal(flow.required[0], 'flashcards');
+});

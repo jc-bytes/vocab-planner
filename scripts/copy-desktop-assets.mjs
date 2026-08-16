@@ -14,7 +14,8 @@ const entries = [
   'favicon.ico',
   'logo.jpeg',
   'Micro_bit V2 - vocab test - v1.pdf',
-  'format example.pdf'
+  'format example.pdf',
+  'student-sw.js'
 ];
 
 function shouldCopyAsset(path) {

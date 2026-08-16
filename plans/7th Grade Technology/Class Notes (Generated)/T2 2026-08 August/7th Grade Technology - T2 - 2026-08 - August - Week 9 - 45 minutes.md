@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 9
 duration: 45 minutes
-topic: "Project rubric and planning"
+topic: "Rhythm-game rubric and code map"
 tags:
   - class-plan
   - grade-7
@@ -28,25 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 9 |
 | Class Length | 45 minutes |
-| Topic | Project rubric and planning |
+| Topic | Rhythm-game rubric and code map |
 
 ## Class Objective
 
-Create a project plan with game goal, keys used, dance moves, variables, subroutines, success/failure feedback, and pair-programming responsibilities.
+Identify the required exam features and create a code map showing how the main scripts communicate.
 
 ## Pre-Activities
 
-- Review Week 9 practice vocabulary (part 1). prototype: An early version used for testing rubric: A guide that explains how work will be graded goal: What you are trying to achieve
-- Read the Scratch Dance Game rubric. Highlight criteria for real-world application, code organization, functionality, programming concepts, presentation, punctuality, and responsibility.
+- Review Week 9 practice vocabulary (part 1). prototype: An early version used for testing rubric: A guide that explains how work will be graded lane: One path used by a target and its matching key Read the Scratch Rhythm Game rubric and inspect the reference screenshots.
 
 ## While Activities
 
-- Create a project plan with game goal, keys used, dance moves, variables, subroutines, success/failure feedback, and pair-programming responsibilities.
-- Complete any final make-up task for regular trimester grades if needed.
+- Create a code map with the game loop, four D/F/J/K lanes, target generator, key/collision checks, hit and miss broadcasts, score, time, tempo, music, and end condition. The teacher confirms the common game format and required features.
 
 ## Post-Activities
 
-- Submit the project plan. Identify the first dance move to build.
+- Submit the code map and identify the first working lane to build.
 
 ## Prep Notes
 

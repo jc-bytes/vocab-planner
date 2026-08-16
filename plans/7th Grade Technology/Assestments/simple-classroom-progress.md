@@ -56,21 +56,21 @@ This file explains the year in simple classroom sentences. It is meant for quick
 - Week 5, Class 2: Then, students work on Comparison and logic operators. They complete a 6-question quiz-style check on comparison and logic operators.
 - Week 6, Class 1: Then, students work on Count-controlled loops. They replace repeated Scratch blocks with a repeat loop.
 - Week 6, Class 2: Then, students work on Loops and variables together. They complete Appreciation Grade #1: Complete a peer feedback checklist about respectful comments, specific suggestions, participation, and response to feedback. They also create a countdown or rhythm-timing program that uses a loop and a variable.
-- Week 7, Class 1: Then, students work on Debugging strategies. They practice identifying Scratch errors and planning fixes before the graded debugging check.
-- Week 7, Class 2: Then, students work on Independent problem solving with Scratch. They complete Daily Grade #5: Debug a Scratch starter program by identifying 3 errors, fixing at least 2 errors, and submitting a short debugging note that names the problem, fix, and result.
+- Week 7, Class 1: Then, students trace events, broadcasts, conditions, variables, and visible outputs in teacher-provided Scratch scripts.
+- Week 7, Class 2: Then, students analyze the teacher-provided D/F/J/K rhythm game, complete a shared code map, and complete Appreciation Grade #2 for pair-programming responsibility.
 
 ### August
 
-- Week 8, Class 1: Then, students work on Scratch concept review. They complete a short practice task that adds one input, one condition, and one variable to a Scratch starter file.
-- Week 8, Class 2: Then, students work on Dance game preparation. They complete Appreciation Grade #2: Complete a pair-programming self-reflection about driver/navigator roles, effort, communication, organization, and responding to feedback. They also build a practice dance move with one key press, one costume change, one sound, one movement, and one success/failure response.
-- Week 9, Class 1: Then, students work on Project rubric and planning. They create a project plan with game goal, keys used, dance moves, variables, subroutines, success/failure feedback, and pair-programming responsibilities.
-- Week 9, Class 2: Then, students work on Prototype and testing checklist. They create a prototype checklist for the dance game.
-- Week 10, Class 1: Then, students work on Begin Exam Project: Scratch Dance Game. They begin Exam Project: Set up the Scratch project, name variables, identify sprites/costumes, and create the first dance move subroutine.
-- Week 10, Class 2: Then, students work on Build dance moves and input logic. They continue Exam Project: Build at least two dance move routines, add success/failure feedback, test user input timing, and debug one code issue.
-- Week 11, Class 1: Then, students work on Score, timer, and feedback. They continue Exam Project: Improve the score, timer, and feedback subroutine. Test whether the game responds correctly to correct and incorrect actions.
-- Week 11, Class 2: Then, students work on Final game improvement and presentation prep. They continue Exam Project: Complete the required features, debug the game, prepare a 1.5-2 minute demonstration, and write a short real-world application explanation.
-- Week 12, Class 1: Then, students work on Presentation rehearsal. They rehearse the game demonstration and code explanation using the rubric so the final presentation is ready for the long class.
-- Week 12, Class 2: Then, students work on Final dance game demonstration. They complete Exam Project Presentation: Demonstrate the Scratch Dance Game, explain subroutines, input, conditionals, loops, variables, and one real-world application, then submit the reflection.
+- Week 8, Class 1: Then, students rehearse a 2-minute explanation of a teacher-assigned rhythm-game component using the live reference project and a code map.
+- Week 8, Class 2: Then, students complete Daily Grade #5: Present the teacher-provided rhythm game, explain at least two connected scripts in the assigned component, connect the code to visible behavior, and answer one teacher question.
+- Week 9, Class 1: Then, students read the Scratch Rhythm Game exam rubric and create a code map for the game loop, four D/F/J/K lanes, target generator, collision checks, feedback, variables, music, and end condition.
+- Week 9, Class 2: Then, students plan the four-lane osu!-style game and test one teacher-provided starter lane.
+- Week 10, Class 1: Then, students begin the Scratch Rhythm Game exam project by setting up the stage, hit line, variables, broadcasts, key sprites, and one working target lane.
+- Week 10, Class 2: Then, students complete the four target lanes, connect D/F/J/K input to collision checks, add hit/miss feedback, and debug one timing or input issue.
+- Week 11, Class 1: Then, students make score, misses, time, tempo, music, start, and end conditions work consistently across the game.
+- Week 11, Class 2: Then, students run at least three documented tests, fix one gameplay problem, collect final evidence, and prepare the exam demonstration.
+- Week 12, Class 1: Then, students rehearse the complete rhythm-game demonstration and code explanation using the exam rubric.
+- Week 12, Class 2: Then, students complete the Exam Project Presentation: Demonstrate the four D/F/J/K lanes, moving targets, hit/miss feedback, score, time, tempo, music, and end condition; explain the key systems and one bug fix; and submit the project evidence and reflection.
 
 ## 3rd Trimester
 

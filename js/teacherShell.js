@@ -56,7 +56,7 @@ class TeacherShellMethods {
     setCloudStatus(text, state = 'info') {
         const el = $('#teacher-cloud-status');
         if (!el) return;
-        const label = String(text || '').replace(/[☁️🔐⚠️✅]/g, '').trim() || 'Status unknown';
+        const label = String(text || '').trim() || 'Status unknown';
         const normalized = label.toLowerCase();
         const dotState = !navigator.onLine || normalized.includes('offline') || normalized.includes('signed out')
             ? 'offline'

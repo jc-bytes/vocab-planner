@@ -19,11 +19,26 @@ export class StudentProgressCore {
         if (!levelDisplay) return;
 
         const experience = this.getExperience();
-        levelDisplay.textContent = `Level ${experience.level} ${experience.title}`;
-        levelDisplay.title = `${experience.completedCount} activities completed | ${experience.totalXp} XP total | ${experience.xpIntoLevel}/${experience.xpPerLevel} XP toward next level`;
+        const progressPercent = Math.min(100, Math.max(0, (experience.xpIntoLevel / experience.xpPerLevel) * 100));
+        const setText = (selector, value) => {
+            const target = levelDisplay.querySelector(selector);
+            if (target) target.textContent = String(value);
+        };
+        setText('[data-student-level]', experience.level);
+        setText('[data-student-level-title]', experience.title);
+        setText('[data-student-xp-current]', experience.xpIntoLevel);
+        setText('[data-student-xp-goal]', experience.xpPerLevel);
+        setText('[data-student-xp-remaining]', experience.xpToNextLevel);
+        setText('[data-student-next-level]', experience.level + 1);
+        const xpFill = levelDisplay.querySelector('[data-student-xp-fill]');
+        if (xpFill) xpFill.style.width = `${progressPercent}%`;
+        levelDisplay.title = `${experience.completedCount} activities completed | ${experience.totalXp} XP total | ${experience.xpIntoLevel}/${experience.xpPerLevel} XP in this level | ${experience.xpToNextLevel} XP to Level ${experience.level + 1}`;
+        levelDisplay.setAttribute('aria-valuemax', String(experience.xpPerLevel));
+        levelDisplay.setAttribute('aria-valuenow', String(experience.xpIntoLevel));
+        levelDisplay.setAttribute('aria-valuetext', `${experience.xpIntoLevel} of ${experience.xpPerLevel} XP. ${experience.xpToNextLevel} XP to Level ${experience.level + 1}.`);
         levelDisplay.setAttribute(
             'aria-label',
-            `Level ${experience.level} ${experience.title}. ${experience.completedCount} activities completed. ${experience.xpIntoLevel} of ${experience.xpPerLevel} experience points toward the next level.`
+            `Level ${experience.level} ${experience.title}. ${experience.xpIntoLevel} of ${experience.xpPerLevel} experience points in this level. ${experience.xpToNextLevel} experience points to Level ${experience.level + 1}. ${experience.totalXp} experience points total.`
         );
     }
 

@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 11
 duration: 90 minutes
-topic: "Build and test final challenge"
+topic: "Summative 5 - Rescue Robot presentations"
 tags:
   - class-plan
   - grade-6
@@ -28,24 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 11 |
 | Class Length | 90 minutes |
-| Topic | Build and test final challenge |
+| Topic | Summative 5 - Rescue Robot presentations |
 
 ## Class Objective
 
-Program the final challenge using movement plus one output or sensor.
+Present and demonstrate the teacher-assigned mBot Rescue Robot task.
 
 ## Pre-Activities
 
-- Review your challenge plan and success rule. Prepare the mBot, cards, and test area.
-- Review August Week 2 practice vocabulary. improvement: change that makes better challenge: task that takes effort parts: pieces of a device
+- Collect the numbered kit, open the final assigned project, prepare the route, and confirm partner roles and presentation order.
 
 ## While Activities
 
-- Program the final challenge using movement plus one output or sensor. Test the challenge in small steps. Debug one problem before asking for feedback. Improve the program after testing.
+- Complete Summative Activity #5: With a partner, present and demonstrate the Rescue Robot; show that it follows the line, detects blocked paths, turns onto an open branch, and stops when the front, left, and right are blocked; save and submit the project; explain its behavior in English; and follow all equipment procedures.
 
 ## Post-Activities
 
-- Show your progress for a quick check. Record one problem and one improvement.
+- Submit the saved project. Complete the presentation, route demonstration, English explanation, and equipment return check.
 
 ## Prep Notes
 

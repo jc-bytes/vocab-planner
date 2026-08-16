@@ -1,6 +1,6 @@
 import { createElement } from '../main.js';
 
-const FLASHCARD_MASTERY_VERSION = 2;
+const FLASHCARD_MASTERY_VERSION = 3;
 
 export class FlashcardsActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -11,8 +11,9 @@ export class FlashcardsActivity {
         this.initialState = initialState;
 
         this.currentIndex = 0;
-        this.isFlipped = false;
+        this.isFlipped = true;
         this.answeredCards = new Set();
+        this.questionReadyCards = new Set();
         this.firstAttemptCorrectCards = new Set();
         this.attemptsByCard = {};
         this.feedback = '';
@@ -42,11 +43,14 @@ export class FlashcardsActivity {
         if (!state) return false;
 
         this.currentIndex = this.clampIndex(state.currentIndex || 0);
-        if (Number(state.masteryVersion) === FLASHCARD_MASTERY_VERSION) {
+        if (Number(state.masteryVersion) >= 2) {
             this.answeredCards = new Set(this.sanitizeCardIndexes(state.answeredCards));
             this.firstAttemptCorrectCards = new Set(this.sanitizeCardIndexes(state.firstAttemptCorrectCards));
             this.attemptsByCard = this.sanitizeAttempts(state.attemptsByCard);
-            this.isFlipped = this.answeredCards.has(this.currentIndex);
+            if (Number(state.masteryVersion) >= FLASHCARD_MASTERY_VERSION) {
+                this.questionReadyCards = new Set(this.sanitizeCardIndexes(state.questionReadyCards));
+            }
+            this.syncCardViewMode();
         }
         return true;
     }
@@ -99,6 +103,7 @@ export class FlashcardsActivity {
             masteryVersion: FLASHCARD_MASTERY_VERSION,
             currentIndex: this.currentIndex,
             answeredCards: Array.from(this.answeredCards),
+            questionReadyCards: Array.from(this.questionReadyCards),
             firstAttemptCorrectCards: Array.from(this.firstAttemptCorrectCards),
             attemptsByCard: { ...this.attemptsByCard },
             score: this.getScore().score
@@ -124,6 +129,7 @@ export class FlashcardsActivity {
         return {
             score: percentage,
             details: `Mastered: ${answeredCount}/${total} cards. First-attempt accuracy: ${firstAttemptAccuracy}%`,
+            evidence: { masteredCount: answeredCount, correctCount: answeredCount, totalCount: total },
             isComplete: total > 0 && answeredCount === total,
             accuracy: firstAttemptAccuracy
         };
@@ -131,6 +137,29 @@ export class FlashcardsActivity {
 
     isCurrentCardAnswered() {
         return this.answeredCards.has(this.currentIndex);
+    }
+
+    isCurrentQuestionReady() {
+        return this.questionReadyCards.has(this.currentIndex);
+    }
+
+    syncCardViewMode() {
+        this.isFlipped = this.isCurrentCardAnswered() || !this.isCurrentQuestionReady();
+    }
+
+    startCurrentQuestion() {
+        if (this.isCurrentCardAnswered()) return false;
+        this.questionReadyCards.add(this.currentIndex);
+        this.isFlipped = false;
+        this.feedback = '';
+        this.feedbackTone = '';
+        return true;
+    }
+
+    handleStartQuestion() {
+        if (!this.startCurrentQuestion()) return;
+        this.saveState();
+        this.render();
     }
 
     normalizeDefinition(value) {
@@ -196,7 +225,11 @@ export class FlashcardsActivity {
         const cardScene = createElement('div', 'card-scene');
         const card = createElement('button', 'flashcard');
         card.type = 'button';
-        card.setAttribute('aria-label', this.isCurrentCardAnswered() ? 'Flip flashcard' : 'Answer the definition question to reveal this flashcard');
+        card.setAttribute('aria-label', this.isCurrentCardAnswered()
+            ? 'Flip flashcard'
+            : this.isCurrentQuestionReady()
+                ? 'Vocabulary term shown while answering the definition question'
+                : 'Study the vocabulary definition and example');
         card.setAttribute('aria-disabled', this.isCurrentCardAnswered() ? 'false' : 'true');
         if (this.isFlipped) card.classList.add('is-flipped');
 
@@ -229,7 +262,9 @@ export class FlashcardsActivity {
         heading.textContent = word.word || '';
         hint.textContent = this.isCurrentCardAnswered()
             ? 'Tap to review the definition'
-            : 'Choose the matching definition';
+            : this.isCurrentQuestionReady()
+                ? 'Choose the matching definition'
+                : 'Study the definition and example';
         content.append(heading, hint);
         front.appendChild(content);
         return front;
@@ -259,11 +294,26 @@ export class FlashcardsActivity {
 
         const heading = createElement('h3', null, this.isCurrentCardAnswered()
             ? 'Definition mastered'
-            : `Which definition matches “${word.word || ''}”?`);
+            : this.isCurrentQuestionReady()
+                ? `Which definition matches “${word.word || ''}”?`
+                : `Study “${word.word || ''}”`);
         check.appendChild(heading);
 
         if (this.isCurrentCardAnswered()) {
             check.appendChild(createElement('p', 'flashcard-feedback is-correct', 'Correct. Review the card, then continue.'));
+            return check;
+        }
+
+        if (!this.isCurrentQuestionReady()) {
+            check.appendChild(createElement(
+                'p',
+                'flashcard-study-instruction',
+                'Read the definition and example on the card. When you are ready, answer a question without looking at them.'
+            ));
+            const startButton = createElement('button', 'btn primary-btn flashcard-start-question', 'Answer question');
+            startButton.type = 'button';
+            startButton.addEventListener('click', () => this.handleStartQuestion());
+            check.appendChild(startButton);
             return check;
         }
 
@@ -314,6 +364,9 @@ export class FlashcardsActivity {
 
     recordAnswer(selectedDefinition) {
         if (this.isCurrentCardAnswered()) return { correct: true, alreadyAnswered: true };
+        if (!this.isCurrentQuestionReady()) {
+            return { correct: false, alreadyAnswered: false, questionNotReady: true, attempts: 0 };
+        }
 
         const priorAttempts = this.attemptsByCard[this.currentIndex] || 0;
         const correct = this.normalizeDefinition(selectedDefinition) === this.normalizeDefinition(this.getDefinition());
@@ -354,7 +407,7 @@ export class FlashcardsActivity {
         event.stopPropagation();
         if (this.currentIndex === 0) return;
         this.currentIndex -= 1;
-        this.isFlipped = this.isCurrentCardAnswered();
+        this.syncCardViewMode();
         this.feedback = '';
         this.feedbackTone = '';
         this.render();
@@ -365,7 +418,7 @@ export class FlashcardsActivity {
         event.stopPropagation();
         if (this.currentIndex >= this.words.length - 1 || !this.isCurrentCardAnswered()) return;
         this.currentIndex += 1;
-        this.isFlipped = this.isCurrentCardAnswered();
+        this.syncCardViewMode();
         this.feedback = '';
         this.feedbackTone = '';
         this.render();

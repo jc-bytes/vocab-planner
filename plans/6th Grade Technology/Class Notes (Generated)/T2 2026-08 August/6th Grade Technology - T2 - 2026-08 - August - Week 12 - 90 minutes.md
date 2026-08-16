@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 12
 duration: 90 minutes
-topic: "Demonstrate, reflect, and leave mBots ready"
+topic: "Formative robotics review and equipment readiness"
 tags:
   - class-plan
   - grade-6
@@ -28,24 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 12 |
 | Class Length | 90 minutes |
-| Topic | Demonstrate, reflect, and leave mBots ready |
+| Topic | Formative robotics review and equipment readiness |
 
 ## Class Objective
 
-Demonstrate your mBot STEM Challenge Project.
+Review the main mBot skills from the trimester and prepare the numbered kits for the next unit.
 
 ## Pre-Activities
 
-- Review your demonstration notes. Prepare the mBot and test area.
-- Complete a vocabulary review activity using August Week 3 practice vocabulary. audience: people who see or hear work explain: make clear with words reflection: thinking about what worked
+- Complete a short formative matching review of movement, line sensor, ultrasonic sensor, loop, condition, branch, and debugging vocabulary.
 
 ## While Activities
 
-- Complete Summative Activity #5: Demonstrate your mBot STEM Challenge Project. Explain the goal, route/behavior, main robot action, output or sensor, test result, and one improvement. Save code or screenshot evidence. Complete the readiness checklist: numbered kit, charged battery, challenge sheet, route/test data, and sensor/output notes.
+- Rotate through guided review stations for line-following logic, ultrasonic conditions, flowchart reading, and code debugging. Complete the numbered-kit readiness check and organize all robot parts. This activity is formative and does not create an additional grade.
 
 ## Post-Activities
 
-- Complete the final robotics reflection. Submit the reflection, project evidence, and readiness checklist.
+- Submit the review sheet and confirm that the assigned kit is complete and correctly stored.
 
 ## Prep Notes
 

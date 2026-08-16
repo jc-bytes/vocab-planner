@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 12
 duration: 45 minutes
-topic: "Presentation rehearsal"
+topic: "Exam presentation rehearsal"
 tags:
   - class-plan
   - grade-7
@@ -28,11 +28,11 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 12 |
 | Class Length | 45 minutes |
-| Topic | Presentation rehearsal |
+| Topic | Exam presentation rehearsal |
 
 ## Class Objective
 
-Rehearse the game demonstration and code explanation using the rubric so the final presentation is ready for the long class.
+Rehearse the complete rhythm-game demonstration and code explanation using the exam rubric.
 
 ## Pre-Activities
 
@@ -40,11 +40,11 @@ Rehearse the game demonstration and code explanation using the rubric so the fin
 
 ## While Activities
 
-- Rehearse the game demonstration and code explanation using the rubric so the final presentation is ready for the long class.
+- Open the final project, run the start sequence, test D/F/J/K, verify score, misses, time, tempo, music, and end condition, then rehearse the explanation and teacher-question response.
 
 ## Post-Activities
 
-- Prepare the final file for presentation. Write one final reminder for the demo.
+- Prepare the final file, code map, and test log for submission.
 
 ## Prep Notes
 

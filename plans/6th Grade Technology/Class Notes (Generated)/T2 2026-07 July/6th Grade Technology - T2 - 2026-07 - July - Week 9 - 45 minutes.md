@@ -5,7 +5,7 @@ month: July
 trimester: 2nd Trimester
 week: Week 9
 duration: 45 minutes
-topic: "Plan a mini-challenge"
+topic: "Prepare for Summative 4"
 tags:
   - class-plan
   - grade-6
@@ -28,25 +28,24 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 9 |
 | Class Length | 45 minutes |
-| Topic | Plan a mini-challenge |
+| Topic | Prepare for Summative 4 |
 
 ## Class Objective
 
-Plan your mini-challenge with a goal, commands, test area, and success rule.
+Interpret the assigned ultrasonic sensor task and organize the required flowchart, code, and demonstration evidence.
 
 ## Pre-Activities
 
-- Answer the warm-up question: What should your robot do by the end of the challenge?
-- Review July Week 5 practice vocabulary with a quick matching activity. test area: space used for trying work commands: program instructions blocks: coding pieces
-- Choose a realistic goal using movement plus one output or sensor.
+- Review the Summative #4 task sheet and rubric.
+- Review July Week 5 practice vocabulary with a quick matching activity. ultrasonic sensor: measures distance with sound threshold: number that separates responses branch: one program path
 
 ## While Activities
 
-- Plan your mini-challenge with a goal, commands, test area, and success rule. List the mBot cards or blocks you will need. Check that your goal is possible in class time.
+- Examine the teacher-assigned project, distance threshold, and required True and False responses. Label the nine required flowchart features. Rehearse the English explanation using at least three task vocabulary words. Confirm partner roles and equipment procedures.
 
 ## Post-Activities
 
-- Submit your mini-challenge plan. Write one question you need to solve next class.
+- Complete a readiness check for the flowchart, assigned project, English explanation, and numbered mBot kit.
 
 ## Prep Notes
 

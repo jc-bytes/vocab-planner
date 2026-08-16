@@ -21,8 +21,9 @@ export class StudentSubjects {
         this.vocabularyAutoSelect = false;
     }
 
-    async loadSubjectSettings() {
-        this.subjects = await loadSubjects(this.sm.authDisabled || !this.sm.currentUser ? null : supabaseService);
+    async loadSubjectSettings(options = {}) {
+        const useLocalDefaults = this.sm.authDisabled || !this.sm.currentUser || !navigator.onLine;
+        this.subjects = await loadSubjects(useLocalDefaults ? null : supabaseService, options);
         this.ensureSelectedSubject();
     }
 
@@ -39,11 +40,13 @@ export class StudentSubjects {
         localStorage.setItem('student_selected_subject', this.selectedSubjectSlug);
         this.resetStudentVocabularyDrilldown();
         this.vocabularyAutoSelect = true;
-        if (this.sm.parseRoute()?.view === 'units') {
+        const routeView = this.sm.parseRoute()?.view;
+        if (routeView === 'units') {
             this.sm.setRoute({ view: 'units' }, { replace: true });
         }
         this.sm.activities.renderDashboard();
         this.sm.activities.renderStudentHome();
+        if (routeView === 'sparks') this.sm.activities.renderSparkLibrary();
     }
 
     ensureSelectedSubject(vocabs = null) {

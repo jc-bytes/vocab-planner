@@ -1,4 +1,5 @@
 import { createElement, $ } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
 
 export class CrosswordActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -12,6 +13,11 @@ export class CrosswordActivity {
         this.placedWords = [];
         this.score = 0;
         this.activeWordNumber = null;
+        this.revealedWordNumbers = new Set();
+        this.solvedWordNumbers = new Set();
+        this.activeFeedback = null;
+        this.timeouts = new ActivityTimeoutController();
+        this.completionOverlay = null;
 
         this.init();
     }
@@ -28,6 +34,10 @@ export class CrosswordActivity {
         if (this.initialState) {
             this.grid = this.initialState.grid;
             this.placedWords = this.initialState.placedWords;
+            this.revealedWordNumbers = new Set(this.initialState.revealedWordNumbers || []);
+            this.solvedWordNumbers = new Set(
+                this.initialState.solvedWordNumbers || this.findCompletedWordNumbers()
+            );
             return true;
         }
 
@@ -39,6 +49,10 @@ export class CrosswordActivity {
                 const state = JSON.parse(saved);
                 this.grid = state.grid;
                 this.placedWords = state.placedWords;
+                this.revealedWordNumbers = new Set(state.revealedWordNumbers || []);
+                this.solvedWordNumbers = new Set(
+                    state.solvedWordNumbers || this.findCompletedWordNumbers()
+                );
                 return true;
             } catch (e) {
                 console.error('Failed to restore crossword state', e);
@@ -50,7 +64,9 @@ export class CrosswordActivity {
     saveState() {
         const state = {
             grid: this.grid,
-            placedWords: this.placedWords
+            placedWords: this.placedWords,
+            revealedWordNumbers: Array.from(this.revealedWordNumbers),
+            solvedWordNumbers: Array.from(this.solvedWordNumbers)
         };
 
         // Save via callback (to StudentManager -> backend)
@@ -199,22 +215,14 @@ export class CrosswordActivity {
     }
 
     getScore() {
-        // Calculate percentage of correct letters filled
-        const inputs = this.container.querySelectorAll('input.cw-cell');
-        let correct = 0;
-        let total = 0;
-        inputs.forEach(input => {
-            total++;
-            if (input.value.toUpperCase() === input.dataset.answer) {
-                correct++;
-            }
-        });
-
-        const score = total === 0 ? 0 : Math.round((correct / total) * 100);
+        const solved = this.solvedWordNumbers.size;
+        const total = this.placedWords.length;
+        const score = total === 0 ? 0 : Math.round((solved / total) * 100);
         return {
             score,
-            details: `${correct}/${total} letters correct`,
-            isComplete: score === 100
+            details: `${solved}/${total} words solved`,
+            evidence: { correctCount: solved, totalCount: total },
+            isComplete: total > 0 && solved === total
         };
     }
 
@@ -273,6 +281,8 @@ export class CrosswordActivity {
         gameArea.appendChild(cluesPanel);
         wrapper.appendChild(gameArea);
         this.container.appendChild(wrapper);
+        window.lucide?.createIcons({ root: this.container });
+        this.syncSolvedState();
         this.updateHighlights();
         this.updateProgressUI();
     }
@@ -314,12 +324,14 @@ export class CrosswordActivity {
         const controls = createElement('div', 'cw-controls');
         const checkButton = createElement('button', 'btn primary-btn');
         checkButton.type = 'button';
-        checkButton.textContent = 'Check';
+        checkButton.id = 'cw-check-word';
+        checkButton.textContent = 'Check Word';
         checkButton.addEventListener('click', () => this.checkAnswers());
         controls.appendChild(checkButton);
 
         const revealButton = createElement('button', 'btn secondary-btn');
         revealButton.type = 'button';
+        revealButton.id = 'cw-reveal-letter';
         revealButton.textContent = 'Reveal Letter';
         revealButton.addEventListener('click', () => this.revealLetter());
         controls.appendChild(revealButton);
@@ -342,10 +354,14 @@ export class CrosswordActivity {
             item.dataset.wordNumber = w.number;
             const number = document.createElement('strong');
             number.textContent = `${w.number}.`;
+            const solvedIcon = document.createElement('span');
+            solvedIcon.className = 'cw-clue-solved-icon';
+            solvedIcon.setAttribute('aria-hidden', 'true');
+            solvedIcon.innerHTML = '<i data-lucide="check"></i>';
             const length = document.createElement('span');
             length.className = 'cw-clue-length';
             length.textContent = `(${w.word.length})`;
-            item.append(number, ` ${w.definition || ''} `, length);
+            item.append(number, solvedIcon, ` ${w.definition || ''} `, length);
             item.addEventListener('click', () => this.setActiveWord(w, true));
 
             if (w.direction === 'across') {
@@ -366,6 +382,8 @@ export class CrosswordActivity {
         if (this.grid[r][c]) {
             this.grid[r][c].value = val;
         }
+        this.activeFeedback = null;
+        this.clearTransientValidation();
         if (val) {
             // Auto-advance
             // We need to know current direction context. 
@@ -373,10 +391,9 @@ export class CrosswordActivity {
             // Or better, track last focused direction.
             // Let's just try across first.
             this.focusNext(r, c);
-            this.saveState(); // Save on input
-            this.checkProgress();
         }
-        this.clearCheckMarks();
+        this.saveState();
+        this.updateActiveClue();
         this.updateProgressUI();
     }
 
@@ -412,12 +429,33 @@ export class CrosswordActivity {
         this.setActiveWord(nextWord, false);
     }
 
+    updateRevealButton() {
+        const button = this.container.querySelector('#cw-reveal-letter');
+        const activeWord = this.getActiveWord();
+        if (!button) return;
+
+        const hintUsed = activeWord && this.revealedWordNumbers.has(activeWord.number);
+        button.disabled = !activeWord || hintUsed;
+        button.textContent = hintUsed ? 'Hint Used' : 'Reveal Letter';
+    }
+
+    updateCheckButton() {
+        const button = this.container.querySelector('#cw-check-word');
+        const activeWord = this.getActiveWord();
+        if (!button) return;
+
+        const solved = activeWord && this.solvedWordNumbers.has(activeWord.number);
+        button.disabled = !activeWord || solved;
+        button.textContent = solved ? 'Solved' : 'Check Word';
+    }
+
     focusNext(r, c) {
         const word = this.getActiveWord();
         if (word) {
             const cells = this.getWordCells(word);
             const index = cells.findIndex(cell => cell.row === r && cell.col === c);
-            const nextCell = cells[index + 1];
+            const nextCell = cells.slice(index + 1)
+                .find(cell => !this.getCell(cell.row, cell.col)?.readOnly);
             if (nextCell) {
                 this.getCell(nextCell.row, nextCell.col)?.focus();
                 return;
@@ -431,7 +469,8 @@ export class CrosswordActivity {
         if (word) {
             const cells = this.getWordCells(word);
             const index = cells.findIndex(cell => cell.row === r && cell.col === c);
-            const prevCell = cells[index - 1];
+            const prevCell = cells.slice(0, index).reverse()
+                .find(cell => !this.getCell(cell.row, cell.col)?.readOnly);
             if (prevCell) {
                 this.getCell(prevCell.row, prevCell.col)?.focus();
                 return;
@@ -482,9 +521,14 @@ export class CrosswordActivity {
     setActiveWord(wordObj, focusStart = false) {
         if (!wordObj) return;
         this.activeWordNumber = wordObj.number;
+        this.activeFeedback = null;
+        this.clearTransientValidation();
         this.updateHighlights();
         if (focusStart) {
-            this.getCell(wordObj.row, wordObj.col)?.focus();
+            const target = this.getWordCells(wordObj)
+                .map(({ row, col }) => this.getCell(row, col))
+                .find(input => input && !input.readOnly);
+            (target || this.getCell(wordObj.row, wordObj.col))?.focus();
         }
     }
 
@@ -511,6 +555,8 @@ export class CrosswordActivity {
         });
         this.getCellWrapper(activeWord.row, activeWord.col)?.classList.add('start');
         this.updateActiveClue();
+        this.updateRevealButton();
+        this.updateCheckButton();
     }
 
     updateActiveClue() {
@@ -522,16 +568,25 @@ export class CrosswordActivity {
             <div class="cw-active-label">${activeWord.number} ${activeWord.direction}</div>
             <div class="cw-active-text">${activeWord.definition}</div>
             <div class="cw-active-meta">${activeWord.word.length} letters</div>
+            ${this.activeFeedback ? `<div class="cw-word-feedback ${this.activeFeedback.type}" role="status">${this.activeFeedback.message}</div>` : ''}
         `;
     }
 
+    findCompletedWordNumbers() {
+        return (this.placedWords || [])
+            .filter(word => this.isWordCorrect(word))
+            .map(word => word.number);
+    }
+
+    isWordCorrect(wordObj) {
+        return this.getWordCells(wordObj).every(({ row, col }) => {
+            const cell = this.grid[row]?.[col];
+            return Boolean(cell?.value) && cell.value.toUpperCase() === cell.char;
+        });
+    }
+
     getSolvedCount() {
-        return this.placedWords.filter(word => (
-            this.getWordCells(word).every(({ row, col }) => {
-                const value = this.grid[row][col]?.value || '';
-                return value.toUpperCase() === this.grid[row][col]?.char;
-            })
-        )).length;
+        return this.solvedWordNumbers.size;
     }
 
     updateProgressUI() {
@@ -544,31 +599,83 @@ export class CrosswordActivity {
         if (fill) fill.style.width = `${percentage}%`;
     }
 
-    clearCheckMarks() {
+    clearTransientValidation() {
         this.container.querySelectorAll('.cw-cell').forEach(input => {
-            input.classList.remove('correct', 'incorrect');
+            input.classList.remove('word-incorrect');
         });
     }
 
     checkAnswers() {
-        this.container.querySelectorAll('.cw-cell').forEach(input => {
-            input.classList.remove('correct', 'incorrect');
-            if (!input.value) return;
-            input.classList.add(input.value.toUpperCase() === input.dataset.answer ? 'correct' : 'incorrect');
-        });
+        const activeWord = this.getActiveWord();
+        if (!activeWord || this.solvedWordNumbers.has(activeWord.number)) return;
+
+        const cells = this.getWordCells(activeWord);
+        const inputs = cells.map(({ row, col }) => this.getCell(row, col)).filter(Boolean);
+        this.clearTransientValidation();
+
+        const firstEmpty = inputs.find(input => !input.value);
+        if (firstEmpty) {
+            this.activeFeedback = { type: 'incomplete', message: 'Finish the whole word before checking.' };
+            this.updateActiveClue();
+            firstEmpty.focus();
+            return;
+        }
+
+        if (!this.isWordCorrect(activeWord)) {
+            inputs.forEach(input => {
+                if (!input.classList.contains('solved')) input.classList.add('word-incorrect');
+            });
+            this.activeFeedback = { type: 'incorrect', message: 'Not quite. Review the clue and try the whole word again.' };
+            this.updateActiveClue();
+            return;
+        }
+
+        this.solvedWordNumbers.add(activeWord.number);
+        this.activeFeedback = { type: 'correct', message: 'Word solved!' };
+        this.syncSolvedState();
+        this.saveState();
         this.checkProgress();
         this.updateProgressUI();
+        this.updateActiveClue();
+        this.updateCheckButton();
+    }
+
+    syncSolvedState() {
+        this.container.querySelectorAll('.cw-cell').forEach(input => {
+            const row = Number(input.dataset.row);
+            const col = Number(input.dataset.col);
+            const belongsToSolvedWord = this.getWordsAtCell(row, col)
+                .some(word => this.solvedWordNumbers.has(word.number));
+            input.classList.toggle('solved', belongsToSolvedWord);
+            input.readOnly = belongsToSolvedWord;
+        });
+        this.container.querySelectorAll('.cw-clue-item').forEach(item => {
+            item.classList.toggle('solved', this.solvedWordNumbers.has(Number(item.dataset.wordNumber)));
+        });
     }
 
     revealLetter() {
-        const focused = document.activeElement?.classList?.contains('cw-cell') ? document.activeElement : null;
         const activeWord = this.getActiveWord();
-        const cells = activeWord ? this.getWordCells(activeWord) : [];
+        if (!activeWord || this.revealedWordNumbers.has(activeWord.number)) return;
+
+        const cells = this.getWordCells(activeWord);
+        const focused = document.activeElement?.classList?.contains('cw-cell')
+            && !document.activeElement.readOnly
+            && cells.some(({ row, col }) => (
+                Number(document.activeElement.dataset.row) === row
+                && Number(document.activeElement.dataset.col) === col
+            ))
+            ? document.activeElement
+            : null;
         let target = focused;
 
         if (!target && cells.length > 0) {
-            const emptyCell = cells.find(({ row, col }) => !this.grid[row][col]?.value);
-            target = emptyCell ? this.getCell(emptyCell.row, emptyCell.col) : this.getCell(cells[0].row, cells[0].col);
+            const editableCells = cells.filter(({ row, col }) => !this.getCell(row, col)?.readOnly);
+            const emptyCell = editableCells.find(({ row, col }) => !this.grid[row][col]?.value);
+            const fallbackCell = editableCells[0];
+            target = emptyCell
+                ? this.getCell(emptyCell.row, emptyCell.col)
+                : fallbackCell ? this.getCell(fallbackCell.row, fallbackCell.col) : null;
         }
 
         if (!target) return;
@@ -577,11 +684,15 @@ export class CrosswordActivity {
         const col = Number(target.dataset.col);
         target.value = target.dataset.answer;
         if (this.grid[row][col]) this.grid[row][col].value = target.dataset.answer;
-        target.classList.add('correct');
+        this.revealedWordNumbers.add(activeWord.number);
+        target.classList.add('hinted');
         this.saveState();
         this.checkProgress();
         this.updateProgressUI();
+        this.updateActiveClue();
+        this.updateCheckButton();
         this.focusNext(row, col);
+        this.updateRevealButton();
     }
 
     clearPuzzle() {
@@ -589,12 +700,17 @@ export class CrosswordActivity {
             const row = Number(input.dataset.row);
             const col = Number(input.dataset.col);
             input.value = '';
-            input.classList.remove('correct', 'incorrect');
+            input.classList.remove('solved', 'word-incorrect', 'hinted');
+            input.readOnly = false;
             if (this.grid[row][col]) this.grid[row][col].value = '';
         });
+        this.solvedWordNumbers.clear();
+        this.activeFeedback = null;
         this.saveState();
         this.checkProgress();
         this.updateProgressUI();
+        this.updateActiveClue();
+        this.updateCheckButton();
     }
 
     checkProgress() {
@@ -605,12 +721,13 @@ export class CrosswordActivity {
         
         // Show completion overlay when done
         if (score.isComplete && !this.container.querySelector('#replay-crossword')) {
-            setTimeout(() => this.showCompletionOverlay(), 500);
+            this.timeouts.schedule(() => this.showCompletionOverlay(), 500);
         }
     }
     
     showCompletionOverlay() {
         const overlay = document.createElement('div');
+        this.completionOverlay = overlay;
         overlay.className = 'completion-overlay';
         overlay.style.cssText = `
             position: fixed;
@@ -626,14 +743,21 @@ export class CrosswordActivity {
         `;
         overlay.innerHTML = `
             <div class="completion-screen" style="background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 1rem; text-align: center;">
-                <h2>🎉 Crossword Complete!</h2>
+                <h2 class="activity-result-heading">
+                    <i data-lucide="badge-check" aria-hidden="true"></i>
+                    <span>Crossword Complete!</span>
+                </h2>
                 <p>You solved all ${this.placedWords.length} words!</p>
-                <button id="replay-crossword" class="btn primary-btn" style="margin-top: 1rem;">🔄 Play Again</button>
+                <button id="replay-crossword" class="btn primary-btn" style="margin-top: 1rem;">
+                    <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                    <span>Play Again</span>
+                </button>
                 <button id="close-crossword" class="btn secondary-btn" style="margin-top: 0.5rem; margin-left: 0.5rem;">Close</button>
             </div>
         `;
         
         document.body.appendChild(overlay);
+        window.lucide?.createIcons({ root: overlay });
         
         overlay.querySelector('#replay-crossword').addEventListener('click', () => {
             document.body.removeChild(overlay);
@@ -642,6 +766,7 @@ export class CrosswordActivity {
         
         overlay.querySelector('#close-crossword').addEventListener('click', () => {
             document.body.removeChild(overlay);
+            this.completionOverlay = null;
         });
     }
     
@@ -654,13 +779,16 @@ export class CrosswordActivity {
         this.grid = [];
         this.placedWords = [];
         this.score = 0;
+        this.revealedWordNumbers = new Set();
+        this.solvedWordNumbers = new Set();
+        this.activeFeedback = null;
         
         // Generate new grid
         this.generateGrid();
         
         // Notify progress system of new session
         if (this.onProgress) {
-            this.onProgress({ score: 0, details: '0/0 letters correct', isComplete: false, isReplay: true });
+            this.onProgress({ score: 0, details: '0/0 words solved', isComplete: false, isReplay: true });
         }
         
         this.render();
@@ -668,5 +796,13 @@ export class CrosswordActivity {
 
     highlightWord(wordObj) {
         this.setActiveWord(wordObj, true);
+    }
+
+    destroy() {
+        this.timeouts.clear();
+        this.completionOverlay?.remove();
+        this.completionOverlay = null;
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

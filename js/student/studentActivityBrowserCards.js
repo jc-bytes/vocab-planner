@@ -29,9 +29,10 @@ export class StudentActivityBrowserCards {
 
     createStudentVocabRowList(headers = []) {
         const list = createElement('div', 'student-vocab-row-list');
+        if (headers.length >= 5) list.classList.add('student-vocab-row-list-six-columns');
         const header = createElement('div', 'student-vocab-row student-vocab-row-header');
         headers.forEach(label => header.appendChild(createElement('span', null, label)));
-        while (header.children.length < 4) {
+        while (header.children.length < Math.max(4, headers.length)) {
             header.appendChild(createElement('span', null, ''));
         }
         header.appendChild(createElement('span', null, ''));
@@ -116,26 +117,38 @@ export class StudentActivityBrowserCards {
         const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
         const scheduleLabel = this.formatVocabularyScheduleLabel(vocab);
         const description = this.formatVocabularyCardDescription(vocab, title);
+        const progress = this.getVocabularyRequiredProgress(vocab);
         const iconName = String(vocab.purpose || '').toLowerCase() === 'summative'
             ? 'clipboard-check'
             : 'book-open';
 
         card.style.setProperty('--subject-color', subject.color);
         card.classList.add(this.getVocabularyPurposeClass(vocab.purpose));
+        card.classList.toggle('has-progress', progress.percent > 0);
+        card.classList.toggle('is-required-complete', progress.isComplete);
+        card.setAttribute('aria-label', `${title}. ${purposeLabel}. ${progress.ariaLabel}. Open unit.`);
 
         card.innerHTML = `
             <div class="student-vocab-card-head">
                 <span class="student-vocab-icon" aria-hidden="true"><i data-lucide="${iconName}"></i></span>
-                <span class="student-vocab-schedule">${escapeHtml(scheduleLabel)}</span>
+                <span class="student-vocab-card-meta">
+                    <span class="student-vocab-schedule">${escapeHtml(scheduleLabel)}</span>
+                    <strong class="student-vocab-progress-percent">${progress.percent}%</strong>
+                </span>
             </div>
             <div class="student-vocab-copy">
                 <h3>${escapeHtml(title)}</h3>
                 <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
                 <p data-vocab-description>${escapeHtml(description)}</p>
             </div>
-            <span class="student-vocab-action">
-                Start unit
-                <i data-lucide="arrow-right"></i>
+            <span class="student-vocab-required-progress" aria-label="${escapeHtml(progress.ariaLabel)}">
+                <span class="student-vocab-required-progress-copy">
+                    <span>Required activities</span>
+                    <strong>${progress.completed} of ${progress.total}</strong>
+                </span>
+                <span class="student-vocab-required-progress-track" aria-hidden="true">
+                    <span style="width: ${progress.percent}%"></span>
+                </span>
             </span>
         `;
         if (vocab.path) {
@@ -155,14 +168,27 @@ export class StudentActivityBrowserCards {
         const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
         const monthLabel = this.browser.getMonthLabel(schedule.month);
         const weekLabel = schedule.week ? `Week ${schedule.week}` : 'No week';
+        const progress = this.getVocabularyRequiredProgress(vocab);
+        const progressState = progress.isComplete
+            ? 'is-complete'
+            : (progress.percent > 0 ? 'is-in-progress' : 'is-not-started');
+        const progressLabel = progress.isComplete
+            ? 'Complete'
+            : (progress.percent > 0 ? 'In progress' : 'Not started');
         const row = createElement('button', 'student-vocab-row student-vocab-unit-row');
         row.type = 'button';
         row.style.setProperty('--subject-color', subject.color);
+        row.classList.add(progressState);
+        row.setAttribute('aria-label', `${title}. ${purposeLabel}. ${progress.ariaLabel}.`);
         row.innerHTML = `
             <strong>${escapeHtml(title)}</strong>
-            <span>${escapeHtml(monthLabel)}</span>
-            <span>${escapeHtml(weekLabel)}</span>
-            <span class="student-vocab-purpose ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+            <span class="student-vocab-row-month">${escapeHtml(monthLabel)}</span>
+            <span class="student-vocab-row-week">${escapeHtml(weekLabel)}</span>
+            <span class="student-vocab-purpose student-vocab-row-type ${escapeHtml(this.getVocabularyPurposeClass(vocab.purpose))}">${escapeHtml(purposeLabel)}</span>
+            <span class="student-vocab-row-progress ${progressState}" aria-label="${escapeHtml(progress.ariaLabel)}">
+                <strong>${progress.percent}%</strong>
+                <small>${progressLabel}</small>
+            </span>
             <i data-lucide="arrow-right"></i>
         `;
         if (vocab.path) {
@@ -173,6 +199,26 @@ export class StudentActivityBrowserCards {
         }
         row.addEventListener('click', () => this.browser.loadVocabulary(vocab));
         return row;
+    }
+
+    getVocabularyRequiredProgress(vocab) {
+        const completion = this.activities.getUnitRequiredCompletion(vocab);
+        const completed = Math.max(0, Number(completion?.completed) || 0);
+        const total = Math.max(0, Number(completion?.total) || 0);
+        const percent = total > 0
+            ? Math.min(100, Math.round((completed / total) * 100))
+            : 0;
+        const isComplete = total > 0 && completed >= total;
+        const actionLabel = isComplete ? 'Review unit' : percent > 0 ? 'Continue unit' : 'Start unit';
+
+        return {
+            completed,
+            total,
+            percent,
+            isComplete,
+            actionLabel,
+            ariaLabel: `${percent}% complete: ${completed} of ${total} required activities`
+        };
     }
 
     formatVocabularyCardTitle(vocab) {

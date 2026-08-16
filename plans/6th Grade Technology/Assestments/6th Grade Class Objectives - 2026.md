@@ -67,20 +67,20 @@ These objectives are based on the 6th Grade Technology annual plan and the March
 | Week 7 | 45 minutes | Sensors around us | Students will be able to identify a robot sensor, describe what it detects, and connect it to a real-life sensor example. |
 | Week 7 | 90 minutes | mBot sensor practice | Students will be able to test a sensor in two situations, record what changed, and create one simple sensor response. |
 | Week 8 | 45 minutes | Simple conditions | Students will be able to create an if/then flowchart with one condition, one true response, and one false response. |
-| Week 8 | 90 minutes | Obstacle or line challenge | Students will be able to complete a sensor condition flowchart, program one sensor-triggered behavior, test it, and improve one problem. |
-| Week 9 | 45 minutes | Plan a mini-challenge | Students will be able to plan a realistic mBot mini-challenge with a goal, commands, test area, and success rule. |
-| Week 9 | 90 minutes | mBot mini-challenge practice | Students will be able to build and test an mBot mini-challenge, record one problem and one improvement, and revise after feedback. |
+| Week 8 | 90 minutes | Ultrasonic condition practice | Students will be able to create a practice ultrasonic flowchart, match it to if/else code, test one response, and correct one problem. |
+| Week 9 | 45 minutes | Prepare for Summative 4 | Students will be able to interpret the teacher-assigned ultrasonic task and organize the required flowchart, code, explanation, and equipment evidence. |
+| Week 9 | 90 minutes | Summative 4 - Ultrasonic Sensor Task | Students will be able to complete the assigned ultrasonic flowchart and code, demonstrate two responses, submit the project, and explain the logic in English. |
 
 ### August
 
 | Week | Class | Topic | Class Objective |
 | --- | --- | --- | --- |
-| Week 10 | 45 minutes | Knowledge Cards review | Students will be able to read an mBot Knowledge Card and predict the robot action it can help create. |
-| Week 10 | 90 minutes | Card practice stations | Students will be able to complete mBot card practice stations, test robot actions, record results, and explain what one card helps the robot do. |
-| Week 11 | 45 minutes | Plan the mBot STEM challenge | Students will be able to plan an mBot STEM challenge with a goal, success rule, and list of needed cards, blocks, or robot parts. |
-| Week 11 | 90 minutes | Build and test final challenge | Students will be able to program a final mBot challenge using movement plus one output or sensor, test it in steps, debug one problem, and improve the program. |
-| Week 12 | 45 minutes | Prepare demonstration | Students will be able to prepare a one-minute explanation of the robot goal, robot action, card/block/part used, and improvement made after testing. |
-| Week 12 | 90 minutes | Demonstrate, reflect, and leave mBots ready | Students will be able to demonstrate the mBot STEM Challenge Project, explain the required evidence, and complete the readiness checklist and reflection. |
+| Week 10 | 45 minutes | Line-following logic review | Students will be able to identify the loop, line-sensor input, corrections, and lost-line response in the assigned Rescue Robot code. |
+| Week 10 | 90 minutes | Guided line-following practice | Students will be able to test and correct the line-following section of the assigned Rescue Robot project. |
+| Week 11 | 45 minutes | Rescue Robot final build and rehearsal | Students will be able to finish the assigned Rescue Robot logic, test the full route, correct one problem, and prepare the explanation and equipment checklist. |
+| Week 11 | 90 minutes | Summative 5 - Rescue Robot presentations | Students will be able to present and demonstrate the assigned Rescue Robot, submit the project, explain the behavior in English, and return the kit correctly. |
+| Week 12 | 45 minutes | Formative Rescue Robot reflection and feedback | Students will be able to reflect on the presentation and identify one successful decision, one challenge, one debugging step, and one possible improvement. |
+| Week 12 | 90 minutes | Formative robotics review and equipment readiness | Students will be able to review line-following, sensors, conditions, flowcharts, and debugging while preparing the numbered kits for the next unit. |
 
 ## Trimester 3
 

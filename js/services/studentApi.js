@@ -11,6 +11,7 @@ export const STUDENT_API_METHODS = Object.freeze([
     'updateStudentProfile',
     'updatePasswordAndClearFlag',
     'ensureOwnStudentProgress',
+    'startStudentActivityAttempt',
     'submitStudentActivityProgress',
     'syncStudentUnitWork',
     'spendStudentCoins',

@@ -27,6 +27,7 @@ export class IllustrationActivity {
         this.previewImage = null;
         this.previewUrl = null;
         this.pasteHandler = null;
+        this.writingCheckerCleanup = null;
 
         this.init();
     }
@@ -183,6 +184,7 @@ export class IllustrationActivity {
 
     renderWord() {
         this.destroyPasteListener();
+        this.destroyWritingChecker();
         this.container.innerHTML = '';
 
         const word = this.getCurrentWord();
@@ -193,7 +195,7 @@ export class IllustrationActivity {
         wrapper.appendChild(this.createHuntGrid(word, entry));
         wrapper.appendChild(this.createFooter(entry));
         this.container.appendChild(wrapper);
-        attachWritingChecker(wrapper);
+        this.writingCheckerCleanup = attachWritingChecker(wrapper);
 
         this.previewImage = this.container.querySelector('#word-hunt-preview');
         this.removeImageButton = this.container.querySelector('[data-word-hunt-remove-image]');
@@ -338,7 +340,13 @@ export class IllustrationActivity {
         textarea.placeholder = placeholder;
         textarea.value = value || '';
         textarea.dataset.writingCheck = 'true';
-        textarea.addEventListener('input', event => this.updateEntryField(field, event.target.value));
+        textarea.dataset.wordHuntWriting = 'true';
+        textarea.addEventListener('beforeinput', event => this.handleWritingBeforeInput(event, textarea));
+        textarea.addEventListener('drop', event => this.handleWritingDrop(event, textarea));
+        textarea.addEventListener('input', event => {
+            this.hideTextPasteFeedback(textarea);
+            this.updateEntryField(field, event.target.value);
+        });
 
         group.appendChild(labelEl);
         group.appendChild(textarea);
@@ -347,6 +355,11 @@ export class IllustrationActivity {
         writingSuggestions.setAttribute('role', 'status');
         writingSuggestions.hidden = true;
         group.appendChild(writingSuggestions);
+        const pasteFeedback = createElement('p', 'word-hunt-text-paste-feedback');
+        pasteFeedback.setAttribute('role', 'alert');
+        pasteFeedback.textContent = 'Text pasting is disabled for Word Hunt. Type this answer in your own words.';
+        pasteFeedback.hidden = true;
+        group.appendChild(pasteFeedback);
         if (helper) {
             const helperText = createElement('p', 'word-hunt-field-helper', helper);
             group.appendChild(helperText);
@@ -581,14 +594,51 @@ export class IllustrationActivity {
 
     async handlePaste(event) {
         const items = Array.from((event.clipboardData || event.originalEvent?.clipboardData)?.items || []);
-        for (const item of items) {
-            if (item.type.indexOf('image') === 0) {
-                const blob = item.getAsFile();
-                event.preventDefault();
-                await this.processAndSaveImage(blob);
-                break;
-            }
+        const imageItem = items.find(item => item.type.indexOf('image') === 0);
+        if (imageItem) {
+            const blob = imageItem.getAsFile();
+            event.preventDefault();
+            if (blob) await this.processAndSaveImage(blob);
+            return;
         }
+
+        const textarea = event.target?.closest?.('[data-word-hunt-writing="true"]');
+        if (textarea && this.clipboardContainsText(event.clipboardData || event.originalEvent?.clipboardData)) {
+            event.preventDefault();
+            this.showTextPasteBlocked(textarea);
+        }
+    }
+
+    clipboardContainsText(clipboardData) {
+        const types = Array.from(clipboardData?.types || []);
+        if (types.some(type => type === 'text/plain' || type === 'text/html')) return true;
+        return Array.from(clipboardData?.items || []).some(item => String(item.type || '').startsWith('text/'));
+    }
+
+    handleWritingBeforeInput(event, textarea) {
+        if (!['insertFromPaste', 'insertFromDrop'].includes(event.inputType)) return;
+        event.preventDefault();
+        this.showTextPasteBlocked(textarea);
+    }
+
+    async handleWritingDrop(event, textarea) {
+        const image = Array.from(event.dataTransfer?.files || []).find(file => file.type.startsWith('image/'));
+        event.preventDefault();
+        if (image) {
+            await this.processAndSaveImage(image);
+            return;
+        }
+        this.showTextPasteBlocked(textarea);
+    }
+
+    showTextPasteBlocked(textarea) {
+        const feedback = textarea?.closest?.('.word-hunt-field')?.querySelector?.('.word-hunt-text-paste-feedback');
+        if (feedback) feedback.hidden = false;
+    }
+
+    hideTextPasteFeedback(textarea) {
+        const feedback = textarea?.closest?.('.word-hunt-field')?.querySelector?.('.word-hunt-text-paste-feedback');
+        if (feedback) feedback.hidden = true;
     }
 
     async pasteImageFromClipboard() {
@@ -873,6 +923,7 @@ export class IllustrationActivity {
         return {
             score: percentage,
             details: `Completed ${count}/${total} word hunts`,
+            evidence: { correctCount: count, totalCount: total },
             isComplete: total > 0 && count === total
         };
     }
@@ -884,8 +935,14 @@ export class IllustrationActivity {
         }
     }
 
+    destroyWritingChecker() {
+        this.writingCheckerCleanup?.();
+        this.writingCheckerCleanup = null;
+    }
+
     destroy() {
         this.destroyPasteListener();
+        this.destroyWritingChecker();
         if (this.previewUrl) {
             URL.revokeObjectURL(this.previewUrl);
             this.previewUrl = null;

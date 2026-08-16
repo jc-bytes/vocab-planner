@@ -7,8 +7,26 @@
     "7"
   ],
   "trimester": "IIT",
+  "month": "July",
+  "week": 4,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "quiz"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 6,
     "flashcards": 6,
     "quiz": 6,

@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 10
 duration: 90 minutes
-topic: "Card practice stations"
+topic: "Guided line-following practice"
 tags:
   - class-plan
   - grade-6
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 10 |
 | Class Length | 90 minutes |
-| Topic | Card practice stations |
+| Topic | Guided line-following practice |
 
 ## Class Objective
 
-Use one assigned mBot Knowledge Card Part 1, complete the card practice task, record the robot action, and explain what the card helps the robot do.
+Test and correct the line-following section of the assigned Rescue Robot project.
 
 ## Pre-Activities
 
-- Review August Week 1 practice vocabulary and the selected cards (part 2). card: small guide station: place for one activity action: something someone does Choose two stations to complete first.
+- Collect the numbered mBot kit and open the assigned starter project. Review the line-following checklist.
 
 ## While Activities
 
-- Complete formative mBot card practice: use one assigned mBot Knowledge Card Part 1, complete the card practice task, record the robot action, and explain what the card helps the robot do. Complete two mBot practice stations. Test the robot action at each station. Record what worked and what was hard. Ask for help after trying one debugging step.
+- Run the assigned line-following project on the teacher-prepared route. Test forward movement, left correction, right correction, and lost-line response. Change only teacher-approved values. Record one problem and correction.
 
 ## Post-Activities
 
-- Submit your station notes. Write one card you want to use in the STEM challenge.
+- Demonstrate stable line following before beginning obstacle logic.
 
 ## Prep Notes
 

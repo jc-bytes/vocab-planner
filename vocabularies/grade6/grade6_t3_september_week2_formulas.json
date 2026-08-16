@@ -7,8 +7,26 @@
     "6"
   ],
   "trimester": "3",
+  "month": "September",
+  "week": 2,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
     "matching": 7,
     "flashcards": 7,
     "quiz": 7,

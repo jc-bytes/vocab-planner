@@ -250,7 +250,7 @@ class TeacherQuizLegacyMethods {
             // Show instructions
             setTimeout(() => {
                 alert(
-                    `✅ Files downloaded!\n\n` +
+                    `Files downloaded!\n\n` +
                     `Next steps:\n` +
                     `1. Move ${vocab.id}.json to vocabularies/ folder\n` +
                     `2. Replace vocabularies/manifest.json\n` +
@@ -466,4 +466,3 @@ class TeacherQuizLegacyMethods {
 export function installTeacherQuizLegacyMethods(TeacherManager) {
     installMethods(TeacherManager, TeacherQuizLegacyMethods);
 }
-

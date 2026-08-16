@@ -60,11 +60,11 @@ export class StudentProgressCoins {
                 clientId: this.progress.clientId
             });
             this.progress.applyProgressSnapshot(progress, { saveLocal: true });
-            this.sm.setAuthStatus('☁️ Synced');
+            this.sm.setAuthStatus('Synced');
             return true;
         } catch (error) {
             console.error('Error spending coins:', error);
-            this.sm.setAuthStatus(navigator.onLine ? '⚠️ Could not spend coins' : 'Saved locally - offline');
+            this.sm.setAuthStatus(navigator.onLine ? 'Could not spend coins' : 'Saved locally - offline');
             return false;
         }
     }
@@ -88,8 +88,8 @@ export class StudentProgressCoins {
         try {
             const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.progress.clientId });
             this.progress.applyProgressSnapshot(progress, { saveLocal: true });
-            this.sm.showToast(`🎉 You received ${amount} coins!`);
-            this.sm.setAuthStatus('☁️ Synced');
+            this.sm.showToast(`You received ${amount} coins!`);
+            this.sm.setAuthStatus('Synced');
         } catch (error) {
             console.error('Error saving after accepting coins:', error);
             this.sm.updateCoinDisplay();
@@ -101,7 +101,13 @@ export class StudentProgressCoins {
         this.sm.logStudentDomUpdate?.('coin-balance', { source: 'updateCoinDisplay' });
         const coinEl = $('#coin-balance');
         if (coinEl) {
-            coinEl.textContent = `🪙 ${this.sm.coinData.balance} `;
+            let balanceValue = coinEl.querySelector?.('[data-coin-balance-value]');
+            if (!balanceValue) {
+                coinEl.innerHTML = '<i data-lucide="coins" aria-hidden="true"></i><span class="student-coin-label">Coins</span><span data-coin-balance-value></span>';
+                balanceValue = coinEl.querySelector?.('[data-coin-balance-value]');
+                window.lucide?.createIcons({ root: coinEl });
+            }
+            if (balanceValue) balanceValue.textContent = String(this.sm.coinData.balance);
             coinEl.style.display = (this.sm.currentUser || this.sm.authDisabled) ? 'flex' : 'none';
         }
         

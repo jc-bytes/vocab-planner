@@ -7,8 +7,26 @@
     "9"
   ],
   "trimester": "IIIT",
+  "month": "November",
+  "week": 8,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "hangman"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 6,
     "flashcards": 6,
     "quiz": 6,

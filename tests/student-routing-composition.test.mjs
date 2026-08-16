@@ -73,6 +73,7 @@ test('StudentRouting owns route and lazy-game state', () => {
     assert.equal(first.sm, manager);
     assert.equal(first.routeReady, false);
     assert.equal(first.isApplyingRoute, false);
+    assert.equal(first.pendingRoute, null);
     assert.equal(first.games, null);
     assert.equal(first.gamesPromise, null);
 
@@ -82,7 +83,34 @@ test('StudentRouting owns route and lazy-game state', () => {
 
     assert.equal(second.routeReady, false);
     assert.equal(second.isApplyingRoute, false);
+    assert.equal(second.pendingRoute, null);
     assert.equal(second.games, null);
+});
+
+test('route changes are queued while a previous route is still loading', async () => {
+    const manager = createManager();
+    const routing = new StudentRouting(manager);
+    routing.routeReady = true;
+    const applied = [];
+    let releaseFirst;
+    routing.applyRouteTarget = async route => {
+        applied.push(route.view);
+        if (route.view === 'unit') {
+            await new Promise(resolve => {
+                releaseFirst = resolve;
+            });
+        }
+    };
+
+    const firstApply = routing.applyRoute({ view: 'unit', unitId: 'one' });
+    window.location.hash = '#/menu';
+    routing.handleRouteChange();
+    releaseFirst();
+    await firstApply;
+
+    assert.deepEqual(applied, ['unit', 'menu']);
+    assert.equal(routing.pendingRoute, null);
+    assert.equal(routing.isApplyingRoute, false);
 });
 
 test('StudentManager declares the stable routing interface directly', () => {
@@ -110,6 +138,7 @@ test('route parsing and building preserve the public URL contract', () => {
     const routing = new StudentRouting(createManager());
 
     assert.deepEqual(routing.parseRoute('#/menu'), { view: 'menu' });
+    assert.deepEqual(routing.parseRoute('#/sparks'), { view: 'sparks' });
     assert.deepEqual(routing.parseRoute('#/units?trimester=t2&month=july'), {
         view: 'units',
         all: false,
@@ -128,6 +157,7 @@ test('route parsing and building preserve the public URL contract', () => {
         routing.buildRoute({ view: 'activity', unitId: 'week 1', activityType: 'illustration', word: 3 }),
         '#/unit/week%201/activity/illustration?word=3'
     );
+    assert.equal(routing.buildRoute({ view: 'sparks' }), '#/sparks');
 });
 
 test('route lookup and activity validation use the StudentActivities-owned catalog', () => {

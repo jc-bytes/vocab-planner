@@ -7,8 +7,26 @@
     "6"
   ],
   "trimester": "2",
+  "month": "August",
+  "week": 10,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "word-search"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 6,
     "flashcards": 6,
     "quiz": 6,
@@ -87,7 +105,5 @@
       ],
       "antonyms": []
     }
-  ],
-  "month": "august",
-  "week": 10
+  ]
 }

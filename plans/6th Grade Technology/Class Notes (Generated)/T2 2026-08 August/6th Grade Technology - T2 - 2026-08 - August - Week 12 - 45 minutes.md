@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 12
 duration: 45 minutes
-topic: "Prepare demonstration"
+topic: "Formative Rescue Robot reflection and feedback"
 tags:
   - class-plan
   - grade-6
@@ -28,25 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 12 |
 | Class Length | 45 minutes |
-| Topic | Prepare demonstration |
+| Topic | Formative Rescue Robot reflection and feedback |
 
 ## Class Objective
 
-Practice explaining what the robot should do.
+Reflect on the Rescue Robot presentation and identify one successful decision and one possible improvement.
 
 ## Pre-Activities
 
-- Answer the warm-up question: What should your audience understand about your robot?
-- Complete a vocabulary review activity using August Week 3 practice vocabulary. challenge: task that takes effort test: try and check debug: find and fix a problem improve: make better
-- Prepare a one-minute explanation.
+- Review the presentation experience and August vocabulary: test, debug, improve, explain, and demonstrate.
 
 ## While Activities
 
-- Practice explaining what the robot should do. Describe which card, block, or part helped your program. Explain what you improved after testing.
+- Complete a formative reflection describing one successful robot behavior, one challenge, one debugging step, and one improvement that could be made. Give one constructive feedback comment to another pair.
 
 ## Post-Activities
 
-- Submit your explanation notes. Prepare your final mBot demonstration.
+- Share one lesson learned from the Rescue Robot task.
 
 ## Prep Notes
 

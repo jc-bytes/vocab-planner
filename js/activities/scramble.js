@@ -1,4 +1,5 @@
 import { createElement } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
 
 const MAX_HINTS = 3;
 
@@ -26,6 +27,7 @@ export class ScrambleActivity {
         this.feedbackState = 'muted';
         this.missedWords = [];
         this.isFinished = false;
+        this.timeouts = new ActivityTimeoutController();
 
         this.init();
     }
@@ -192,13 +194,20 @@ export class ScrambleActivity {
     }
 
     getScore() {
-        const progress = this.words.length ? Math.round((this.completedCount / this.words.length) * 100) : 0;
+        const progress = this.words.length ? Math.round((this.correctCount / this.words.length) * 100) : 0;
         const accuracy = this.completedCount ? Math.round((this.correctCount / this.completedCount) * 100) : 0;
         return {
             score: progress,
             details: `${this.completedCount}/${this.words.length} words. Accuracy: ${accuracy}%. Best streak: ${this.bestStreak}`,
             accuracy,
-            isComplete: this.completedCount === this.words.length
+            evidence: {
+                attemptedCount: this.completedCount,
+                correctCount: this.correctCount,
+                totalCount: this.words.length,
+                skippedCount: this.missedWords.length,
+                accuracy
+            },
+            isComplete: this.correctCount === this.words.length
         };
     }
 
@@ -281,7 +290,7 @@ export class ScrambleActivity {
         this.checkProgress();
         this.render();
 
-        setTimeout(() => {
+        this.timeouts.schedule(() => {
             this.currentIndex++;
             this.startRound();
         }, 650);
@@ -509,5 +518,11 @@ export class ScrambleActivity {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
+    }
+
+    destroy() {
+        this.timeouts.clear();
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

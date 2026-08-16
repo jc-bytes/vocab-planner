@@ -1,175 +1,75 @@
-<!-- Converted from: 7th Grade Final Project - IIT - 2026.docx -->
-Academia Internacional David
+# Academia Internacional David
 
-Dance Game Challenge
+## Scratch Rhythm Game Challenge
 
-7th Grade Final Project
+### 7th Grade Final Project — Second Trimester
 
-Second Trimester
+## Project Overview
 
-Project Overview
+Create an original osu!-style rhythm game in Scratch. Targets move through four lanes toward a hit line. The player uses the D, F, J, and K keys to hit the matching targets at the correct time. The game must track hits and misses, display changing values, provide clear feedback, and follow a controlled start-to-finish sequence.
 
-Create an interactive dance game in Scratch where players must press the correct keys at the right time to make Jim perform dance moves. This project will teach you about subroutines, user input, conditional statements, loops, and variables while creating an engaging game experience.
+The teacher provides the common game format, required features, reference screenshots, and a starter structure when needed. Students make the visual theme, sounds, timing choices, and code improvements within that format.
 
-The Challenge Scenario
+## Required Game Features
 
-You're creating a rhythm-based dance game where:
+1. A clear stage with four lanes and a visible hit line.
+2. Four matching key sprites or indicators labeled D, F, J, and K.
+3. Targets that show or spawn and glide toward the correct hit area.
+4. Events or broadcasts that coordinate target generation and game actions.
+5. A correct-hit condition that checks both the matching key and target collision.
+6. A miss rule for a wrong key or a target that reaches the end.
+7. Visible variables for score and time, plus a miss counter or score penalty.
+8. A tempo value that controls target speed, target spacing, or the music pattern.
+9. Visible or audible feedback such as “Perfect,” “Miss,” a costume change, or a sound.
+10. A start sequence, playable game loop, and clear end condition.
 
-Jim the dancer needs your programming skills to perform dance moves
+## Required Evidence
 
-Players must press specific keys within a time limit
+1. Project plan with the stage, four lanes, keys, variables, broadcasts, hit/miss rules, timing, and partner responsibilities.
+2. Code map showing the target generator, D/F/J/K input checks, score/time/tempo variables, feedback, and end condition.
+3. Scratch project or share link with all required features.
+4. Test log with at least three tests, one identified bug, the code change, and the result after retesting.
+5. Final screenshot or project link and a short individual reflection.
 
-Success results in cool dance animations
+## Project Schedule
 
-Failure shows Jim looking disappointed
+### Week 9 — Plan and Prototype
 
-Scoring system tracks player performance
+Read the rubric, study the reference game, make the code map, plan the four lanes, and test one starter lane.
 
-Your Programming Objectives
+### Week 10 — Build the Playable Core
 
-Core Programming Concepts You'll Master
+Set up the stage and variables, create the four D/F/J/K lanes, make targets move, connect the key and collision checks, and add hit/miss feedback.
 
-1. Subroutines & Functions
+### Week 11 — Complete, Test, and Improve
 
-Create reusable code blocks for each dance move
+Finish score, misses, time, tempo, music, and end conditions. Run at least three documented tests, fix one problem, and prepare the code explanation.
 
-Organize your program into logical sections
+### Week 12 — Exam Presentation
 
-Use parameters and return values effectively
+Demonstrate the final game and explain the target generator, key/collision logic, variable changes, one bug and fix, and one possible improvement.
 
-2. User Input & Timing
+## Presentation Requirements
 
-Capture keyboard input from players
+The presentation lasts approximately 1.5–2 minutes. Students must:
 
-Implement time-sensitive responses
+1. Play the game from its start sequence through its end condition.
+2. Demonstrate all four D/F/J/K lanes.
+3. Explain how targets are generated and moved.
+4. Explain how a correct hit and a miss are detected.
+5. Explain how score, time, misses, or tempo change.
+6. Describe one bug, the fix, and the evidence that the fix worked.
+7. Answer one teacher question about the code.
 
-Handle multiple key combinations
+## Exam Rubric — 90 Points
 
-3. Conditional Logic
+| Criterion | 15–13 points | 12–9 points | 8–5 points | 4–0 points |
+| --- | --- | --- | --- | --- |
+| Four-lane game design | Stage, hit line, D/F/J/K indicators, four matching target paths, and a clear visual theme are complete and easy to follow. | Most design elements are complete; one element is unclear or inconsistent. | Two or more required design elements are incomplete. | The four-lane design is mostly missing or cannot be checked. |
+| Target generation and timing | Targets reliably show or spawn, move toward the correct hit areas, follow controlled timing or tempo, and reset or hide correctly. | Target movement and timing mostly work with minor errors. | Some targets move, but timing or resetting is unreliable. | Target generation or movement does not work. |
+| Input, collision, and feedback | D/F/J/K checks match the correct lanes; collision and hit/miss rules work; feedback is immediate and clear. | Most key and collision checks work with minor errors. | Some input works, but hit/miss detection is inconsistent. | Input or collision logic is mostly missing. |
+| Variables and game flow | Score, time, miss consequence, tempo, start sequence, game loop, and end condition work and display correctly. | Most variables and game-flow features work with minor errors. | Several variables or game-flow features are incomplete. | Variables or game flow cannot be demonstrated. |
+| Testing and improvement | Includes three documented tests, one specific bug, a relevant code change, a retest result, and a clear improvement. | Includes most testing evidence and a reasonable improvement. | Testing evidence is limited or the improvement is unclear. | Little or no testing evidence is submitted. |
+| Presentation and responsibility | Demonstration is complete; code explanations are accurate; the teacher question is answered; evidence is submitted on time; class time and equipment are used responsibly. | Presentation and submission are mostly complete with minor omissions. | Presentation or evidence is incomplete, unclear, or late. | Presentation is missing or the project cannot be evaluated. |
 
-Use if/else statements for success/failure outcomes
-
-Implement complex decision-making logic
-
-Handle multiple conditions and scenarios
-
-4. Loops & Iteration
-
-Create countdown timers using count-controlled loops
-
-Animate dance sequences with repetition
-
-Implement costume switching animations
-
-5. Variables & Scoring
-
-Track player score throughout the game
-
-Use variables to control game flow
-
-Implement feedback based on performance
-
-Your Development Tasks
-
-Phase 1: Basic Dance Moves
-
-Task 1: Complete the 'move1' subroutine for single-key input
-
-Task 2: Build 'move2' subroutine requiring two-key combinations
-
-Implement success/failure costume changes
-
-Add appropriate timing mechanisms
-
-Phase 2: Advanced Features
-
-Task 3: Create countdown system using loops
-
-Task 4: Design 'move3' with complex animation sequences
-
-Implement alternating costume animations
-
-Add precise timing controls
-
-Phase 3: Game Enhancement
-
-Task 5: Integrate scoring system
-
-Task 6: Create feedback subroutine with conditional messages
-
-Add performance-based responses
-
-Implement end-game evaluation
-
-Phase 4: Creative Extension
-
-Task 7: Design your own custom dance move
-
-Create unique animation sequences
-
-Implement creative key combinations
-
-Add personal flair to the game
-
-Phase 5: Prepare a compelling demonstration that showcases:
-
-Key features of your algorithm (logic)
-
-Key features of your code
-
-Your chosen real-world application and why it matters
-
-How this technology could genuinely help people in real situations
-
-Example Real-World Applications
-
-Educational Games & Learning
-
-Interactive typing tutors and skill-building games
-
-Music education software with rhythm training
-
-Physical therapy applications for motor skill development
-
-Entertainment & Media
-
-Dance Dance Revolution and rhythm games
-
-Interactive music videos and performances
-
-Social gaming platforms with multiplayer challenges
-
-Accessibility & Therapy
-
-Rehabilitation software for coordination training
-
-Cognitive therapy games for memory and reaction time
-
-Adaptive gaming for users with different abilities
-
-Academia Internacional David
-
-Dance Game Challenge
-
-7th Grade Final Project
-
-Second Trimester
-
-7th A and 7th B
-
-| Name: ______________________________ | Name: ______________________________ | Date: ______________________ | Date: ______________________ |
-| --- | --- | --- | --- |
-| Teacher: Porfirio Rios | Group: 7th ____ | Group: 7th ____ | Total points: ____/90pts |
-
-Project Overview: Create an interactive dance game in Scratch where players must press the correct keys at the right time to make Jim perform dance moves. This project will teach you about subroutines, user input, conditional statements, loops, and variables while creating an engaging game experience.
-
-| Criteria | 16 | 16 | 8 | 8 | 4 | 4 |
-| --- | --- | --- | --- | --- | --- | --- |
-| Real-World Application | Relevant application with specific examples of how games could help people, creative and well-researched | Relevant application with specific examples of how games could help people, creative and well-researched | Relevant application with good explanation of benefits | Relevant application with good explanation of benefits | Basic application identified with some explanation | Basic application identified with some explanation |
-| Subroutines & Code Organization | All subroutines work well, clean organization, proper parameters, reusable code blocks | All subroutines work well, clean organization, proper parameters, reusable code blocks | Most subroutines work well, generally organized code | Most subroutines work well, generally organized code | Basic subroutines present, acceptable organization | Basic subroutines present, acceptable organization |
-| Game Functionality | All dance moves work reliably, timing perfect, user input responsive, scoring system accurate | All dance moves work reliably, timing perfect, user input responsive, scoring system accurate | Most features work well, minor timing issues | Most features work well, minor timing issues | Basic functionality present, some features work | Basic functionality present, some features work |
-| Programming Concepts | Excellent use of conditionals, loops, variables, user input handling | Excellent use of conditionals, loops, variables, user input handling | Good use of most programming concepts | Good use of most programming concepts | Basic programming concepts present | Basic programming concepts present |
-| Presentation & Communication | Good 1.5 - 2 min presentation, clear explanations, confident delivery and no reading | Good 1.5 - 2 min presentation, clear explanations, confident delivery and no reading | Good presentation within time, clear demo. Some reading. | Good presentation within time, clear demo. Some reading. | Basic presentation, demo attempted. Mostly reading. | Basic presentation, demo attempted. Mostly reading. |
-| Criteria | 5 | 5 | 5 | 0 | 0 | 0 |
-| Punctuality | Finishes on time. Comes prepared to work. Uses class time well. | Finishes on time. Comes prepared to work. Uses class time well. | Finishes on time. Comes prepared to work. Uses class time well. | Did not finish on time. Often unprepared. Does not use class time well. | Did not finish on time. Often unprepared. Does not use class time well. | Did not finish on time. Often unprepared. Does not use class time well. |
-| Responsibility | Works hard. Takes initiative. Follows safety rules. Tries to improve. | Works hard. Takes initiative. Follows safety rules. Tries to improve. | Works hard. Takes initiative. Follows safety rules. Tries to improve. | Doesn't participate fully. Ignores instructions. Reluctant to try new ideas. | Doesn't participate fully. Ignores instructions. Reluctant to try new ideas. | Doesn't participate fully. Ignores instructions. Reluctant to try new ideas. |
+**Total: 90 points**

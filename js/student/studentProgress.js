@@ -79,7 +79,7 @@ export class StudentProgress {
 
     scheduleCloudSync() {
         if (!this.sm.currentUser) return;
-        this.sm.setAuthStatus('☁️ Saving...');
+        this.sm.setAuthStatus('Saving...');
         this.cancelScheduledCloudSync();
         this.scheduledCloudSaveTimeout = setTimeout(() => {
             this.scheduledCloudSaveTimeout = null;
@@ -129,8 +129,8 @@ export class StudentProgress {
         return this.cloud.refreshCoinsFromCloud(options);
     }
 
-    loadCloudProgress() {
-        return this.cloud.loadCloudProgress();
+    loadCloudProgress(options = {}) {
+        return this.cloud.loadCloudProgress(options);
     }
 
     saveProgressToCloud() {

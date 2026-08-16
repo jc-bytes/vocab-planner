@@ -5,6 +5,7 @@ const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
 // JavaScript mirror of the canonical CSS boundary documented in docs/student-shell-architecture.md.
 // Import this value instead of creating another shell-state media query.
 export const STUDENT_WIDE_SHELL_MEDIA_QUERY = '(min-width: 1121px)';
+const STUDENT_SIDEBAR_STORAGE_KEY = 'student_sidebar_collapsed';
 
 export class StudentShell {
     constructor(studentManager) {
@@ -17,6 +18,38 @@ export class StudentShell {
 
     setWideShellMediaQuery(mediaQuery) {
         this.wideShellMediaQuery = mediaQuery;
+    }
+
+    setStudentSidebarCollapsed(collapsed, { persist = true } = {}) {
+        const appContainer = document.querySelector('.app-container');
+        const toggle = $('#student-sidebar-toggle');
+        if (!appContainer || !toggle) return;
+
+        const isCollapsed = Boolean(collapsed);
+        appContainer.classList.toggle('student-sidebar-collapsed', isCollapsed);
+        toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        toggle.setAttribute('aria-label', isCollapsed ? 'Expand navigation' : 'Collapse navigation');
+        toggle.title = isCollapsed ? 'Expand navigation' : 'Collapse navigation';
+        toggle.innerHTML = `<i data-lucide="${isCollapsed ? 'panel-left-open' : 'panel-left-close'}" aria-hidden="true"></i>`;
+        window.lucide?.createIcons?.({ root: toggle });
+
+        if (persist) {
+            try {
+                localStorage.setItem(STUDENT_SIDEBAR_STORAGE_KEY, String(isCollapsed));
+            } catch {
+                // The shell still works when browser storage is unavailable.
+            }
+        }
+    }
+
+    restoreStudentSidebarState() {
+        let collapsed = document.querySelector('.app-container')?.classList.contains('student-sidebar-collapsed');
+        try {
+            collapsed = localStorage.getItem(STUDENT_SIDEBAR_STORAGE_KEY) === 'true';
+        } catch {
+            // Keep the state applied by the inline no-flash bootstrap.
+        }
+        this.setStudentSidebarCollapsed(collapsed, { persist: false });
     }
 
     switchView(viewId) {
@@ -71,13 +104,16 @@ export class StudentShell {
 
     debugStudentScrollLifecycle(eventName, details = {}) {
         if (!this.shouldDebugStudentScroll()) return;
+        const activeViewId = $('.view.active')?.id || '';
+        const scrollContainer = this.getStudentScrollContainer(activeViewId);
         console.debug('[student-scroll]', eventName, {
             ...details,
             hash: window.location.hash,
-            scrollY: Math.round(window.scrollY || document.documentElement.scrollTop || 0),
-            scrollHeight: document.documentElement.scrollHeight,
-            innerHeight: window.innerHeight,
-            activeViewId: $('.view.active')?.id || ''
+            scrollY: Math.round(scrollContainer?.scrollTop ?? window.scrollY ?? document.documentElement.scrollTop ?? 0),
+            scrollHeight: scrollContainer?.scrollHeight ?? document.documentElement.scrollHeight,
+            innerHeight: scrollContainer?.clientHeight ?? window.innerHeight,
+            scrollOwner: scrollContainer ? `#${scrollContainer.id}` : 'window',
+            activeViewId
         });
     }
 
@@ -142,7 +178,11 @@ export class StudentShell {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
 
-        const top = window.scrollY || document.documentElement.scrollTop || 0;
+        const scrollContainer = this.getStudentScrollContainer(viewId);
+        const top = scrollContainer?.scrollTop
+            ?? window.scrollY
+            ?? document.documentElement.scrollTop
+            ?? 0;
         this.sectionScrollPositions[section] = top;
         this.persistStudentScroll(this.getStudentSectionScrollKey(section), top);
 
@@ -175,6 +215,16 @@ export class StudentShell {
         });
 
         const restore = () => {
+            const scrollContainer = this.getStudentScrollContainer(viewId);
+            if (scrollContainer) {
+                const maxTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+                scrollContainer.scrollTo({
+                    top: Math.min(Math.max(0, savedTop), maxTop),
+                    left: 0,
+                    behavior: 'auto'
+                });
+                return;
+            }
             const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
             window.scrollTo({
                 top: Math.min(Math.max(0, savedTop), maxTop),
@@ -226,6 +276,7 @@ export class StudentShell {
 
     getStudentSectionForView(viewId) {
         if (viewId === 'arcade-view') return 'arcade';
+        if (viewId === 'student-sparks-view') return 'sparks';
         if ([
             'vocab-selection-view',
             'activity-menu-view',
@@ -240,6 +291,14 @@ export class StudentShell {
             ?? window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY).matches;
     }
 
+    getStudentScrollContainer(viewId = '') {
+        if (!this.isStudentWideShell()) return null;
+        const view = viewId ? $(`#${viewId}`) : $('.view.active');
+        if (!view?.classList.contains('active') || view.classList.contains('hidden')) return null;
+        const shell = view.closest('.app-container')?.querySelector('#student-tab-shell:not(.hidden)');
+        return shell ? view : null;
+    }
+
     syncStudentShellState(section = this.getStudentSectionForView($('.view.active')?.id || '')) {
         const compactShellActive = Boolean(section) && !this.isStudentWideShell();
         $('.student-app-header')?.classList.toggle('student-mobile-compact', compactShellActive);
@@ -251,7 +310,19 @@ export class StudentShell {
         this.sm.activities?.updateArcadeGateDisplay?.();
         const shell = $('#student-tab-shell');
         if (shell) {
-            shell.classList.toggle('hidden', !section);
+            const preserveLoadingLayout = !section
+                && viewId === 'loading-view'
+                && shell.dataset.sessionReserved === 'true';
+            shell.classList.toggle('hidden', !section && !preserveLoadingLayout);
+            if (preserveLoadingLayout) {
+                shell.inert = true;
+                shell.setAttribute('aria-hidden', 'true');
+            } else {
+                delete shell.dataset.sessionReserved;
+                shell.inert = false;
+                shell.removeAttribute('aria-hidden');
+                shell.closest('.app-container')?.classList.remove('student-session-loading');
+            }
         }
         let activeLabel = 'Today';
         $$('.student-tab').forEach(tab => {
@@ -295,8 +366,17 @@ export class StudentShell {
     }
 
     cleanupActivity() {
-        if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
-            this.sm.activityInstance.destroy();
+        const session = this.sm.activities?.session;
+        session?.cancelActivityLaunch();
+        session?.cancelVocabularyLoad?.();
+        if (session?.destroyActivityInstance) {
+            session.destroyActivityInstance();
+        } else if (this.sm.activityInstance && typeof this.sm.activityInstance.destroy === 'function') {
+            try {
+                this.sm.activityInstance.destroy();
+            } catch (error) {
+                console.warn('Could not fully clean up the previous activity:', error);
+            }
         }
 
         const activityContainer = $('#activity-container');

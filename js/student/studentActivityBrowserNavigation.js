@@ -161,6 +161,7 @@ export class StudentActivityBrowserNavigation {
                 this.setStudentVocabularyViewMode(button.dataset.vocabViewMode);
             });
         });
+        window.lucide?.createIcons({ root: container });
     }
 
     renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups) {
@@ -176,9 +177,9 @@ export class StudentActivityBrowserNavigation {
 
         const backButton = createElement(
             'button',
-            'student-vocab-month-nav-btn student-vocab-month-back month-navigation__action month-navigation__action--back',
-            '← Back to Months'
+            'student-vocab-month-nav-btn student-vocab-month-back month-navigation__action month-navigation__action--back'
         );
+        backButton.innerHTML = '<i data-lucide="arrow-left" aria-hidden="true"></i><span>Back to Months</span>';
         backButton.type = 'button';
         backButton.addEventListener('click', () => {
             this.sm.navigateTo({ view: 'units', trimester: selectedTrimester });
@@ -187,9 +188,9 @@ export class StudentActivityBrowserNavigation {
         const monthStrip = createElement('div', 'student-vocab-month-nav-strip');
         const previousButton = createElement(
             'button',
-            'student-vocab-month-nav-btn month-navigation__action',
-            '← Previous Month'
+            'student-vocab-month-nav-btn month-navigation__action'
         );
+        previousButton.innerHTML = '<i data-lucide="chevron-left" aria-hidden="true"></i><span>Previous Month</span>';
         previousButton.type = 'button';
         previousButton.disabled = !previousMonth;
         previousButton.addEventListener('click', () => {
@@ -202,9 +203,9 @@ export class StudentActivityBrowserNavigation {
 
         const nextButton = createElement(
             'button',
-            'student-vocab-month-nav-btn month-navigation__action',
-            'Next Month →'
+            'student-vocab-month-nav-btn month-navigation__action'
         );
+        nextButton.innerHTML = '<span>Next Month</span><i data-lucide="chevron-right" aria-hidden="true"></i>';
         nextButton.type = 'button';
         nextButton.disabled = !nextMonth;
         nextButton.addEventListener('click', () => {
@@ -217,6 +218,7 @@ export class StudentActivityBrowserNavigation {
             toolbar.appendChild(monthStrip);
         }
         container.appendChild(toolbar);
+        window.lucide?.createIcons({ root: toolbar });
     }
 
 }

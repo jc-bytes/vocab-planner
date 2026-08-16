@@ -294,26 +294,26 @@ Suggested July replacement:
 - Week 2: Movement sequences and paths: create a route, test, debug turns and timing.
 - Week 3: Visual/audio feedback: LEDs and buzzer communicate robot state.
 - Week 4: Sensors: ultrasonic obstacle detection and/or line sensor readings.
-- Week 5: Reactive behavior mini-challenge: avoid obstacle or follow a simple line/path.
+- Week 5: Teacher-assigned mBot Ultrasonic Sensor Flowchart and Programming Task with two required responses.
 
 ### August
 
-August is blank. Teacher direction is that August is also robotics, using mBot Knowledge Cards Part 1.
+August is a three-week teacher-assigned Rescue Robot sequence.
 
-The annual second trimester still needs:
+The final second-trimester sequence includes:
 
 - Basic movement
 - Movement sequences and paths
-- Visual feedback
-- Audio feedback
-- Sensor-triggered behavior
-- Integrated mini-project
+- Line-sensor input and corrections
+- Ultrasonic obstacle checks
+- Left/right branch decisions
+- Final rescue-zone stop
 
 Recommended August structure:
 
-- Week 1: mBot Knowledge Cards Part 1 review and practice: movement, LEDs/buzzer, and basic programs.
-- Week 2: mBot sensor-triggered behavior: obstacle avoidance or line-following challenge, depending on available cards/components.
-- Week 3: Integrated mBot mini-project, demonstration, assessment, and reflection.
+- Week 1: Review and test the assigned line-following logic.
+- Week 2: Finish the teacher-provided obstacle, branch, and stop logic, then present and demonstrate Summative #5.
+- Week 3: Complete formative Rescue Robot reflection, peer feedback, robotics review stations, debugging practice, and equipment readiness.
 
 ### September
 
@@ -440,8 +440,8 @@ This spine would make the monthly plans read as direct extensions of the annual 
 - April: copyright, web page creation, navigation, links/evaluation, Scratch variables and game design.
 - May: Internet Day, digital citizenship reinforcement, recycling/e-waste, environmental responsibility, awareness product.
 - June: mBot safety, kit organization, robot structure, components, simple movement foundations.
-- July: mBot movement sequences, robot feedback, sensors, reactive behavior, mini-challenges.
-- August: mBot Knowledge Cards Part 1 practice, integrated mBot project, testing, presentation, assessment/reflection.
+- July: mBot movement sequences, robot feedback, sensors, condition practice, and the teacher-assigned ultrasonic Summative #4 task.
+- August: assigned Rescue Robot line-following and obstacle-decision practice, testing, English explanation, Summative #5 demonstration, and equipment return.
 - September: data/information, spreadsheet data sets, formatting, formulas.
 - October: event/project planning spreadsheet, charts/presenting data, 3D modelling basics and design.
 - November: 3D/STEM project completion, presentation/reflection, micro:bit introduction.

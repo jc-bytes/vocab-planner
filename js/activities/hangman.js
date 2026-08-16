@@ -1,4 +1,5 @@
 import { createElement, $, notifications } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
 
 export class HangmanActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -15,6 +16,7 @@ export class HangmanActivity {
         this.mistakes = 0;
         this.guessedLetters = new Set();
         this.wordStatus = []; // null or letter
+        this.timeouts = new ActivityTimeoutController();
 
         this.init();
     }
@@ -24,27 +26,56 @@ export class HangmanActivity {
             // Shuffle words if new game
             this.words.sort(() => Math.random() - 0.5);
             this.startRound();
+        } else if (this.currentWordIndex >= this.words.length) {
+            this.startRound();
         } else {
             this.render();
         }
     }
 
+    applyRestoredState(state) {
+        if (!state || typeof state !== 'object') return false;
+
+        const restoredWords = Array.isArray(state.shuffledWords) && state.shuffledWords.length > 0
+            ? state.shuffledWords
+            : this.words;
+        const restoredIndex = Number(state.currentWordIndex);
+        if (
+            !Number.isInteger(restoredIndex)
+            || restoredIndex < 0
+            || restoredIndex > restoredWords.length
+        ) {
+            return false;
+        }
+
+        this.words = restoredWords;
+        this.currentWordIndex = restoredIndex;
+        this.score = Math.max(0, Number(state.score) || 0);
+        this.mistakes = Math.max(0, Math.min(this.maxMistakes, Number(state.mistakes) || 0));
+        this.guessedLetters = new Set(Array.isArray(state.guessedLetters) ? state.guessedLetters : []);
+
+        if (this.currentWordIndex === this.words.length) {
+            this.currentWord = null;
+            this.wordStatus = [];
+            return true;
+        }
+
+        this.currentWord = this.words[this.currentWordIndex];
+        if (!this.currentWord || typeof this.currentWord.word !== 'string' || !this.currentWord.word) {
+            return false;
+        }
+
+        this.wordStatus = Array.isArray(state.wordStatus)
+            && state.wordStatus.length === this.currentWord.word.length
+            ? state.wordStatus
+            : new Array(this.currentWord.word.length).fill(null);
+        return true;
+    }
+
     restoreState() {
         // Try initial state passed from StudentManager
         if (this.initialState) {
-            const state = this.initialState;
-            this.currentWordIndex = state.currentWordIndex;
-            this.score = state.score;
-            this.mistakes = state.mistakes;
-            this.guessedLetters = new Set(state.guessedLetters);
-            this.wordStatus = state.wordStatus;
-
-            if (state.shuffledWords) {
-                this.words = state.shuffledWords;
-            }
-
-            this.currentWord = this.words[this.currentWordIndex];
-            return true;
+            return this.applyRestoredState(this.initialState);
         }
 
         const key = `hangman_state_${this.words.length}`;
@@ -52,23 +83,7 @@ export class HangmanActivity {
         if (saved) {
             try {
                 const state = JSON.parse(saved);
-                this.currentWordIndex = state.currentWordIndex;
-                this.score = state.score;
-                this.mistakes = state.mistakes;
-                this.guessedLetters = new Set(state.guessedLetters);
-                this.wordStatus = state.wordStatus;
-
-                // Re-hydrate current word based on index (assuming words array hasn't changed order... wait)
-                // If we shuffled initially, we need to save the shuffled order or just the current word object?
-                // Saving the shuffled indices or the words themselves is safer.
-                // Let's assume for now the input 'words' is constant from the source.
-                // If we shuffle 'this.words', we must save the shuffled order.
-                if (state.shuffledWords) {
-                    this.words = state.shuffledWords;
-                }
-
-                this.currentWord = this.words[this.currentWordIndex];
-                return true;
+                return this.applyRestoredState(state);
             } catch (e) {
                 console.error('Failed to restore hangman state', e);
             }
@@ -98,11 +113,18 @@ export class HangmanActivity {
         if (this.currentWordIndex >= this.words.length) {
             this.container.innerHTML = `
                 <div class="completion-screen">
-                    <h2>🎉 All Words Completed!</h2>
+                    <h2 class="activity-result-heading">
+                        <i data-lucide="badge-check" aria-hidden="true"></i>
+                        <span>All Words Completed!</span>
+                    </h2>
                     <p>You completed ${this.words.length} words!</p>
-                    <button id="replay-hangman" class="btn primary-btn" style="margin-top: 1rem;">🔄 Play Again</button>
+                    <button id="replay-hangman" class="btn primary-btn" style="margin-top: 1rem;">
+                        <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                        <span>Play Again</span>
+                    </button>
                 </div>
             `;
+            window.lucide?.createIcons({ root: this.container });
             
             // Add replay button listener
             const replayBtn = this.container.querySelector('#replay-hangman');
@@ -134,6 +156,7 @@ export class HangmanActivity {
         return {
             score: progress,
             details: `${this.currentWordIndex}/${this.words.length} words completed`,
+            evidence: { correctCount: this.currentWordIndex, totalCount: this.words.length },
             isComplete: this.currentWordIndex === this.words.length
         };
     }
@@ -153,7 +176,7 @@ export class HangmanActivity {
             }
 
             if (!this.wordStatus.includes(null)) {
-                setTimeout(() => {
+                this.timeouts.schedule(() => {
                     notifications.success(`Correct! The word was: ${this.currentWord.word}`);
                     this.currentWordIndex++;
                     this.checkProgress();
@@ -167,10 +190,8 @@ export class HangmanActivity {
             // Wrong guess
             this.mistakes++;
             if (this.mistakes >= this.maxMistakes) {
-                setTimeout(() => {
-                    notifications.info(`Game Over! The word was: ${this.currentWord.word}`);
-                    this.currentWordIndex++;
-                    this.checkProgress();
+                this.timeouts.schedule(() => {
+                    notifications.info(`The word was: ${this.currentWord.word}. Try it again to continue.`);
                     this.startRound();
                     this.saveState();
                 }, 500);
@@ -295,5 +316,11 @@ export class HangmanActivity {
         if (mistakes > 5) svgContent += parts[9]; // R Leg
 
         return `<svg width="300" height="260" viewBox="0 0 300 260" stroke="white" stroke-width="4" fill="none">${svgContent}</svg>`;
+    }
+
+    destroy() {
+        this.timeouts.clear();
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

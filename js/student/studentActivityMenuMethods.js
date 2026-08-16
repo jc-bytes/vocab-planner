@@ -1,5 +1,6 @@
 import { $, $$, createElement } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
+import { setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityMenu {
     constructor(activities) {
@@ -14,9 +15,34 @@ export class StudentActivityMenu {
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(this.sm.currentVocab));
         const subjectEl = $('#current-unit-subject');
         if (subjectEl) {
-            const purpose = this.activities.formatVocabularyPurpose?.(this.sm.currentVocab.purpose) || 'Unit';
-            const schedule = this.activities.formatVocabularyScheduleLabel?.(this.sm.currentVocab) || '';
-            subjectEl.textContent = [subject.name, purpose, schedule].filter(Boolean).join(' · ');
+            const schedule = this.activities.getVocabSchedule(this.sm.currentVocab);
+            const trimester = this.activities.getTrimesterLabel(
+                this.activities.getVocabTrimesterKey(this.sm.currentVocab)
+            );
+            const month = this.activities.getMonthLabel(schedule.month);
+            const breadcrumbItems = ['Vocabulary', trimester, month, unitTitle].filter(Boolean);
+            subjectEl.replaceChildren();
+            breadcrumbItems.forEach((label, index) => {
+                if (index > 0) {
+                    const separator = createElement(
+                        'span',
+                        'teacher-library-breadcrumb-separator breadcrumb__separator',
+                        '/'
+                    );
+                    separator.setAttribute('aria-hidden', 'true');
+                    subjectEl.appendChild(separator);
+                }
+                const isCurrent = index === breadcrumbItems.length - 1;
+                const item = createElement(
+                    'span',
+                    isCurrent
+                        ? 'teacher-library-breadcrumb-current breadcrumb__current'
+                        : 'breadcrumb__item',
+                    label
+                );
+                if (isCurrent) item.setAttribute('aria-current', 'page');
+                subjectEl.appendChild(item);
+            });
             subjectEl.style.setProperty('--subject-color', subject.color);
         }
         const descriptionEl = $('#current-unit-description');
@@ -97,19 +123,6 @@ export class StudentActivityMenu {
         });
         this.activities.updateActivityGateDisplay(cards, activityFlow);
 
-        const completion = this.activities.getRequiredCompletion(activityFlow);
-        const percent = completion.total > 0
-            ? Math.round((completion.completed / completion.total) * 100)
-            : 0;
-        const percentEl = $('#current-unit-progress-percent');
-        const fillEl = $('#current-unit-progress-fill');
-        const progressCopyEl = $('#current-unit-progress-copy');
-        if (percentEl) percentEl.textContent = `${percent}%`;
-        if (fillEl) fillEl.style.width = `${percent}%`;
-        if (progressCopyEl) {
-            progressCopyEl.textContent = `${completion.completed} of ${completion.total} required complete`;
-        }
-
         // Update overall coverage display if element exists
         this.activities.updateOverallCoverageDisplay(coverageStats);
 
@@ -121,7 +134,10 @@ export class StudentActivityMenu {
         }
 
         this.sm.switchView('activity-menu-view');
-        this.activities.scheduleActivityPreload(activityFlow);
+        setStudentPageLoading($('#activity-menu-view'), false);
+        if (!options.skipActivityPreload) {
+            this.activities.scheduleActivityPreload(activityFlow);
+        }
         if (window.lucide) window.lucide.createIcons({ root: $('#activity-menu-view') });
     }
 }

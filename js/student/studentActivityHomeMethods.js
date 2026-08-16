@@ -126,26 +126,25 @@ export class StudentActivityHome {
             })
             .slice(0, 3);
 
-        const vocabularyPendingItems = decoratedVocabs
-            .filter(item => {
-                if (item.progress.isComplete) return false;
-                if (item.schedule.dueDate) return item.schedule.dueDate <= today;
-                if (!item.schedule.month || !item.schedule.week) return true;
-                const monthIndex = MONTH_INDEX[item.schedule.month];
-                return monthIndex < currentMonth || (monthIndex === currentMonth && item.schedule.week <= currentWeek);
-            })
-            .slice(-3)
-            .reverse();
-
-        const pendingItems = vocabularyPendingItems
-            .sort((a, b) => b.sortTime - a.sortTime)
-            .slice(0, 4);
-
         const weekItems = vocabularyThisWeekItems
             .sort((a, b) => a.sortTime - b.sortTime)
             .slice(0, 4);
 
-        const continueItem = pendingItems[0] || weekItems[0] || decoratedVocabs[0] || null;
+        const arcadeAccess = this.activities.getPendingRequiredWork(today);
+        const recommendation = this.getHomeRecommendation({
+            decoratedVocabs,
+            weekItems,
+            requiredWork: arcadeAccess,
+            today
+        });
+        const dashboardHeading = $('#student-home-heading');
+        if (dashboardHeading) {
+            dashboardHeading.textContent = recommendation.heading;
+            dashboardHeading.closest('.student-dashboard-heading')?.removeAttribute('hidden');
+        }
+        const mainMenuView = $('#main-menu-view');
+        mainMenuView?.classList.remove('student-home-loading');
+        mainMenuView?.setAttribute('aria-busy', 'false');
 
         const panels = [
             {
@@ -163,8 +162,7 @@ export class StudentActivityHome {
         ];
 
         container.replaceChildren();
-        container.appendChild(this.createContinueLearningHero(continueItem, message));
-        const arcadeAccess = this.activities.getPendingRequiredWork(today);
+        container.appendChild(this.createContinueLearningHero(recommendation.item, message, recommendation));
         if (arcadeAccess.isBlocked) {
             container.appendChild(this.createArcadeGateNotice(arcadeAccess));
         }
@@ -204,9 +202,83 @@ export class StudentActivityHome {
         }
     }
 
-    createContinueLearningHero(item, emptyText = '') {
+    getHomeRecommendation({ decoratedVocabs = [], weekItems = [], requiredWork = {}, today = new Date() } = {}) {
+        const getIdentity = vocab => String(vocab?.path || vocab?.id || vocab?.name || '');
+        const decoratedByIdentity = new Map(
+            decoratedVocabs.map(item => [getIdentity(item.vocab), item])
+        );
+        const requiredItems = (requiredWork.units || [])
+            .map(required => decoratedByIdentity.get(getIdentity(required.vocab)))
+            .filter(Boolean);
+        const oldestRequired = requiredItems.find(item => this.isHomeScheduleBeforeCurrentWeek(item.schedule, today));
+
+        if (oldestRequired) {
+            return {
+                item: oldestRequired,
+                mode: 'required',
+                heading: 'Your oldest required work',
+                badge: 'Catch up',
+                action: 'Continue required work'
+            };
+        }
+
+        const unfinished = decoratedVocabs
+            .filter(item => !item.progress.isComplete && (
+                item.progress.latestPlayed > 0
+                || item.progress.completedRequired > 0
+                || item.progress.bestScore > 0
+            ))
+            .sort((a, b) => {
+                if (a.progress.latestPlayed !== b.progress.latestPlayed) {
+                    return b.progress.latestPlayed - a.progress.latestPlayed;
+                }
+                return a.sortTime - b.sortTime;
+            })[0];
+
+        if (unfinished) {
+            return {
+                item: unfinished,
+                mode: 'unfinished',
+                heading: 'Continue learning',
+                badge: 'In progress',
+                action: 'Continue'
+            };
+        }
+
+        if (weekItems[0]) {
+            return {
+                item: weekItems[0],
+                mode: 'current',
+                heading: 'Start this week\u2019s work',
+                badge: 'This week',
+                action: 'Start unit'
+            };
+        }
+
+        const nextRequired = requiredItems[0] || decoratedVocabs.find(item => !item.progress.isComplete) || null;
+        if (nextRequired) {
+            return {
+                item: nextRequired,
+                mode: 'required',
+                heading: 'Your next required work',
+                badge: 'Required',
+                action: 'Start required work'
+            };
+        }
+
+        return {
+            item: null,
+            mode: 'complete',
+            heading: 'You\u2019re all caught up',
+            badge: '',
+            action: ''
+        };
+    }
+
+    createContinueLearningHero(item, emptyText = '', context = {}) {
         const hero = createElement(item?.vocab ? 'button' : 'section', 'student-continue-hero');
         if (item?.vocab) hero.type = 'button';
+        hero.dataset.recommendation = context.mode || (item?.vocab ? 'available' : 'complete');
 
         if (!item?.vocab) {
             hero.innerHTML = `
@@ -221,8 +293,10 @@ export class StudentActivityHome {
         const { vocab, schedule, progress } = item;
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
         const title = this.formatVocabularyCardTitle?.(vocab) || vocab.name || 'Vocabulary Unit';
-        const purposeLabel = this.formatVocabularyPurpose?.(vocab.purpose) || 'Unit';
+        const purposeLabel = context.badge || this.formatVocabularyPurpose?.(vocab.purpose) || 'Unit';
         const purposeClass = this.getVocabularyPurposeClass?.(vocab.purpose) || 'is-unit';
+        const recommendationClass = context.mode ? `is-${context.mode}` : '';
+        const actionLabel = context.action || 'Continue';
         const percent = this.getContinueLearningPercent(progress);
         const progressText = progress.requiredTotal > 0
             ? `${progress.completedRequired}/${progress.requiredTotal} required complete`
@@ -232,7 +306,7 @@ export class StudentActivityHome {
         hero.style.setProperty('--subject-color', subject.color);
         hero.innerHTML = `
             <div class="student-continue-copy">
-                <span class="student-hero-purpose ${escapeHtml(purposeClass)}">${escapeHtml(purposeLabel)}</span>
+                <span class="student-hero-purpose ${escapeHtml(purposeClass)} ${escapeHtml(recommendationClass)}">${escapeHtml(purposeLabel)}</span>
                 <h3>${escapeHtml(title)}</h3>
                 <p>${escapeHtml(subject.name)} · ${escapeHtml(scheduleText)}</p>
                 <div class="student-continue-progress" aria-label="${escapeHtml(progressText)}">
@@ -246,7 +320,7 @@ export class StudentActivityHome {
                 </div>
             </div>
             <span class="student-continue-action">
-                <span>Continue</span>
+                <span>${escapeHtml(actionLabel)}</span>
                 <i data-lucide="play"></i>
             </span>
         `;
@@ -259,6 +333,10 @@ export class StudentActivityHome {
         }
         hero.addEventListener('click', () => this.loadVocabulary(vocab));
         return hero;
+    }
+
+    renderSparkLibrary() {
+        return this.spark.renderSparkLibrary();
     }
 
     createArcadeGateNotice(access) {
@@ -309,6 +387,17 @@ export class StudentActivityHome {
         end.setDate(end.getDate() + 6);
         end.setHours(23, 59, 59, 999);
         return { start: start.getTime(), end: end.getTime() };
+    }
+
+    isHomeScheduleBeforeCurrentWeek(schedule = {}, date = new Date()) {
+        if (schedule.dueDate instanceof Date && !Number.isNaN(schedule.dueDate.getTime())) {
+            return schedule.dueDate.getTime() < this.getHomeCurrentWeekBounds(date).start;
+        }
+        if (!schedule.month || !schedule.week) return false;
+        const currentMonth = date.getMonth();
+        const currentWeek = Math.floor((date.getDate() - 1) / 7) + 1;
+        const monthIndex = MONTH_INDEX[schedule.month];
+        return monthIndex < currentMonth || (monthIndex === currentMonth && schedule.week < currentWeek);
     }
 
     normalizeSpark(spark = {}) {

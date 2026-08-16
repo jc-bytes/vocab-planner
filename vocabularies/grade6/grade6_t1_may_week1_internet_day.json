@@ -3,10 +3,30 @@
   "subjectSlug": "technology",
   "name": "Grade 6 T1 Practice: May Week 1 - Internet Day",
   "description": "Practice words for responsible Internet Day choices and campaign messages.",
-  "grades": ["6"],
+  "grades": [
+    "6"
+  ],
   "trimester": "1",
+  "month": "May",
+  "week": 1,
   "purpose": "practice",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 8,
     "flashcards": 8,
     "quiz": 8,
@@ -20,13 +40,93 @@
     "fillInBlank": 8
   },
   "words": [
-    {"word": "safe", "definition": "Protected from harm or problems.", "example": "A safe internet habit keeps private information protected.", "difficulty": 1, "synonyms": ["protected"], "antonyms": ["unsafe"]},
-    {"word": "kind", "definition": "Friendly and caring toward others.", "example": "A kind message can help a classmate.", "difficulty": 1, "synonyms": ["nice"], "antonyms": ["unkind"]},
-    {"word": "respectful", "definition": "Kind and appropriate.", "example": "Respectful comments are helpful, not rude.", "difficulty": 1, "synonyms": ["polite"], "antonyms": ["rude"]},
-    {"word": "reliable", "definition": "Able to be trusted.", "example": "A reliable source gives correct information.", "difficulty": 1, "synonyms": ["trustworthy"], "antonyms": ["unreliable"]},
-    {"word": "rule", "definition": "An instruction people should follow.", "example": "The class wrote one rule for safe internet use.", "difficulty": 1, "synonyms": ["guideline"], "antonyms": []},
-    {"word": "privacy", "definition": "Keeping personal information protected.", "example": "Privacy matters when using the internet.", "difficulty": 1, "synonyms": ["protection"], "antonyms": []},
-    {"word": "campaign", "definition": "A planned message that tries to help people understand or act.", "example": "The campaign reminded students to be kind online.", "difficulty": 1, "synonyms": ["message project"], "antonyms": []},
-    {"word": "poster", "definition": "A visual message with words and images.", "example": "The poster showed one internet safety rule.", "difficulty": 1, "synonyms": ["sign"], "antonyms": []}
+    {
+      "word": "safe",
+      "definition": "Protected from harm or problems.",
+      "example": "A safe internet habit keeps private information protected.",
+      "difficulty": 1,
+      "synonyms": [
+        "protected"
+      ],
+      "antonyms": [
+        "unsafe"
+      ]
+    },
+    {
+      "word": "kind",
+      "definition": "Friendly and caring toward others.",
+      "example": "A kind message can help a classmate.",
+      "difficulty": 1,
+      "synonyms": [
+        "nice"
+      ],
+      "antonyms": [
+        "unkind"
+      ]
+    },
+    {
+      "word": "respectful",
+      "definition": "Kind and appropriate.",
+      "example": "Respectful comments are helpful, not rude.",
+      "difficulty": 1,
+      "synonyms": [
+        "polite"
+      ],
+      "antonyms": [
+        "rude"
+      ]
+    },
+    {
+      "word": "reliable",
+      "definition": "Able to be trusted.",
+      "example": "A reliable source gives correct information.",
+      "difficulty": 1,
+      "synonyms": [
+        "trustworthy"
+      ],
+      "antonyms": [
+        "unreliable"
+      ]
+    },
+    {
+      "word": "rule",
+      "definition": "An instruction people should follow.",
+      "example": "The class wrote one rule for safe internet use.",
+      "difficulty": 1,
+      "synonyms": [
+        "guideline"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "privacy",
+      "definition": "Keeping personal information protected.",
+      "example": "Privacy matters when using the internet.",
+      "difficulty": 1,
+      "synonyms": [
+        "protection"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "campaign",
+      "definition": "A planned message that tries to help people understand or act.",
+      "example": "The campaign reminded students to be kind online.",
+      "difficulty": 1,
+      "synonyms": [
+        "message project"
+      ],
+      "antonyms": []
+    },
+    {
+      "word": "poster",
+      "definition": "A visual message with words and images.",
+      "example": "The poster showed one internet safety rule.",
+      "difficulty": 1,
+      "synonyms": [
+        "sign"
+      ],
+      "antonyms": []
+    }
   ]
 }

@@ -66,8 +66,14 @@ export class StudentListeners {
         this.listen(window, 'resize', debounceStudentResize(() => this.sm.setStudentMobileMenu(false)));
         const wideShellMediaQuery = window.matchMedia(STUDENT_WIDE_SHELL_MEDIA_QUERY);
         this.sm.setStudentWideShellMediaQuery(wideShellMediaQuery);
+        this.sm.restoreStudentSidebarState();
         this.listen(wideShellMediaQuery, 'change', () => this.sm.syncStudentShellState());
         this.listen(window, 'scroll', () => this.sm.scheduleStudentScrollSave(), { passive: true });
+        this.listen(document, 'scroll', (event) => {
+            if (event.target?.matches?.('.view.active')) {
+                this.sm.scheduleStudentScrollSave();
+            }
+        }, { passive: true, capture: true });
         this.listen(window, 'pagehide', (event) => {
             this.sm.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
             this.sm.saveStudentSectionScroll($('.view.active')?.id || '');
@@ -94,6 +100,11 @@ export class StudentListeners {
         setupModal('#force-password-modal', { dismissible: false });
 
         // Navigation
+        this.addListener('#student-sidebar-toggle', 'click', () => {
+            const collapsed = document.querySelector('.app-container')?.classList.contains('student-sidebar-collapsed');
+            this.sm.setStudentSidebarCollapsed(!collapsed);
+        });
+
         this.addListener('#student-mobile-menu-toggle', 'click', (event) => {
             event.stopPropagation();
             const isOpen = $('#student-mobile-menu-toggle')?.getAttribute('aria-expanded') === 'true';
@@ -129,6 +140,10 @@ export class StudentListeners {
 
         this.addListener('#student-tab-vocabulary', 'click', () => {
             this.sm.navigateTo({ view: 'units' });
+        });
+
+        this.addListener('#student-tab-sparks', 'click', () => {
+            this.sm.navigateTo({ view: 'sparks' });
         });
 
         this.addListener('#mobile-edit-profile-btn', 'click', () => {
@@ -229,6 +244,10 @@ export class StudentListeners {
             }
         });
 
+        this.addListener('#close-activity-btn', 'click', () => {
+            $('#back-to-menu-btn')?.click();
+        });
+
         this.addListener('#student-login-form', 'submit', (e) => this.sm.handleStudentLogin(e));
         this.addListener('#student-register-form', 'submit', (e) => this.sm.handleStudentRegister(e));
         this.addListener('#show-login-btn', 'click', () => this.sm.showAuthPanel('login'));
@@ -279,8 +298,10 @@ export class StudentListeners {
                 }
 
                 const { ReportGenerator } = await import('./reportGenerator.js');
+                const unitProgress = this.sm.activities.getCurrentUnitProgress();
                 await ReportGenerator.generateReport(this.sm.studentProfile, this.sm.currentVocab, this.sm.unitScores, {
-                    wordHunt: this.sm.unitWordHunt || {},
+                    wordHunt: this.sm.activities.getReportWordHuntEntries(),
+                    trimester: unitProgress?.trimester || '',
                     loadImage: path => supabaseService.downloadWordHuntImage(path)
                 });
             } catch (error) {

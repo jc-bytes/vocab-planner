@@ -20,14 +20,14 @@ This map is for approval before creating worksheets, rubrics, forms, or template
 | 2 | Week 1, 90-minute class | Summative | #1 | Trimester 2 Summative Vocabulary Table | Vocabulary table with definitions, illustrations, and example sentences for robot, mBot, program, instruction, safety, motor, wheel, sensor, LED, buzzer | Robotics vocabulary table worksheet or template |
 | 2 | Week 3, 90-minute class | Summative | #2 | mBot Movement Debugging Check | 3 movement sequences reviewed, mistake identified, correction written, one correction explained | Movement debugging worksheet |
 | 2 | Week 4, 90-minute class | Summative | #3 | mBot Route Map and Command Plan | Route map with at least 4 movement steps, command sequence, and labeled turns/stops | Route-map and command-plan template |
-| 2 | Week 7, 90-minute class | Summative | #4 | mBot Condition Flowchart | If/then flowchart with one sensor condition, true response, false response, and explanation sentence | Condition-flowchart template |
-| 2 | Week 12, 90-minute class | Summative | #5 | mBot STEM Challenge Project | Goal, route/behavior, movement plus one output or sensor, test result, improvement, one-minute demo, and readiness evidence | mBot STEM project checklist; readiness checklist; route/test data sheet |
+| 2 | Week 9, 90-minute class | Summative | #4 | mBot Ultrasonic Sensor Flowchart and Programming Task | Required flowchart features, assigned sensor-condition code with two different responses, successful mBlock connection/test, saved project, English explanation, and equipment-care evidence | Summative #4 task sheet/rubric; assigned mBlock starter project; flowchart template |
+| 2 | Week 11, 90-minute class | Summative | #5 | mBot Rescue Robot Presentation | Line-following code, obstacle and branch-decision code, rescue-route performance, mBlock connection/test, saved project, English explanation, and equipment-care evidence | Summative #5 task sheet/rubric; assigned Rescue Robot starter project; teacher-prepared route |
 | 2 | Week 2 | Practice evidence | N/A | First mBot Movements | Observed basic movement program and one written change/improvement | Charged mBot; movement checklist |
 | 2 | Week 4 | Practice evidence | N/A | Path Challenge 2 | Demonstrated working sequence and written debugging note | Floor tape/markers; charged mBot |
-| 2 | Week 8 | Project planning evidence | N/A | mBot Mini-Challenge Plan | Goal, commands, test area, success rule, and needed cards/blocks | Mini-challenge planning sheet |
-| 2 | Week 10 | Practice evidence | N/A | mBot Knowledge Card Practice | Assigned mBot card practice task, recorded robot action, and explanation of what the card helps the robot do | mBot Knowledge Cards Part 1; card-practice form |
-| 2 | Week 11 | Project/demo evidence | N/A | mBot STEM Challenge Build/Test | Progress check showing route/behavior, movement plus one output or sensor, one problem, and one improvement | Final challenge planning sheet; demonstration checklist |
-| 2 | Week 12 | Demo/reflection evidence | N/A | mBot STEM Demonstration and Reflection | One-minute robot demo, goal explanation, route/behavior, output or sensor, improvement, final reflection, and readiness check | mBot final challenge rubric/checklist; readiness checklist; reflection form |
+| 2 | Week 8 | Practice evidence | N/A | Ultrasonic Condition Rehearsal | Practice flowchart, sample threshold, two responses, matched if/else code, and one corrected test | Practice flowchart; sample code; ultrasonic test area |
+| 2 | Week 10 | Practice evidence | N/A | Rescue Robot Line-Following Practice | Forward movement, left/right corrections, lost-line response, and one recorded correction | Assigned Rescue Robot starter project; teacher-prepared line route |
+| 2 | Week 11, 45-minute class | Practice/project evidence | N/A | Rescue Robot Final Build and Rehearsal | Remaining front/left/right checks, final stop, full-route test, one correction, English rehearsal, and readiness check | Assigned Rescue Robot starter project; teacher-prepared rescue route; readiness checklist |
+| 2 | Week 12 | Formative evidence | N/A | Rescue Robot Reflection and Robotics Review | Reflection, peer feedback, guided skill review, debugging practice, and numbered-kit readiness check | Reflection sheet; review stations; equipment checklist |
 | 2 | Week 1-10 | Make-up option | #1-#5 | Second Trimester Make-Up Tasks | Paper make-up for vocabulary/debugging/route/flowchart; supervised robot station for card practice and demonstrations | Printed worksheets; make-up robot station; charged mBot |
 | 3 | Week 1, 90-minute class | Summative | #1 | IIIT Vocabulary Table | Vocabulary table with definitions, simple visuals or examples, and example sentences for key spreadsheet/data, 3D modelling, and micro:bit input/output terms | IIIT vocabulary table worksheet or Google Classroom template |
 | 3 | Week 2, 90-minute class | Summative | #2 | mBot STEM Data Table | Clean mBot data table with at least 6 records, headers, units/categories, readable formatting, and one data sentence | mBot STEM data collection sheet; spreadsheet template |
@@ -50,7 +50,7 @@ This map is for approval before creating worksheets, rubrics, forms, or template
 | Trimester | Summative #1 | Summative #2 | Summative #3 | Summative #4 | Summative #5 |
 |---|---|---|---|---|---|
 | 1 | Week 1 90-minute class: Trimester 1 Summative Vocabulary Table | Week 4 90-minute class: Online Communication Scenario Quiz | Week 5 90-minute class: Copyright Image-Choice Check | Week 8 90-minute class: Scratch Variables Mini-Task | Week 10 90-minute class: Recycling and E-Waste Sorting Check |
-| 2 | Week 1 90-minute class: Trimester 2 Summative Vocabulary Table | Week 3 90-minute class: mBot Movement Debugging Check | Week 4 90-minute class: mBot Route Map and Command Plan | Week 7 90-minute class: mBot Condition Flowchart | Week 12 90-minute class: mBot STEM Challenge Project |
+| 2 | Week 1 90-minute class: Trimester 2 Summative Vocabulary Table | Week 3 90-minute class: mBot Movement Debugging Check | Week 4 90-minute class: mBot Route Map and Command Plan | Week 9 90-minute class: mBot Ultrasonic Sensor Flowchart and Programming Task | Week 11 90-minute class: mBot Rescue Robot Presentation |
 | 3 | Week 1 90-minute class: IIIT Vocabulary Table | Week 2 90-minute class: mBot STEM Data Table | Week 4 90-minute class: mBot Data Chart and Conclusion | Week 6 90-minute class: 3D Model Design | Week 7 90-minute class: micro:bit Parts and Input/Output Check |
 
 Each trimester still has exactly five counted summative activities.
@@ -60,7 +60,7 @@ Each trimester still has exactly five counted summative activities.
 | Trimester | Quiz Or Quiz-Style Check | Timing Check | Presentation, Demonstration, Or Product Share | Balance Decision |
 |---|---|---|---|---|
 | 1 | Week 4: Online Communication Scenario Quiz | Acceptable. Students practice online communication, public/private sharing, audience, permission, and safe responses before completing the quiz-style scenario task. | Week 6: Website Product Share; Week 10: Internet Day/Recycling Awareness Product | Meets requirement. Week 6 gives an earlier natural product-share moment before the Week 10 summative/community product. |
-| 2 | Week 3: mBot Movement Debugging Check | Strong. Students practice movement, sequence, forward/backward/turn/stop, and first mBot movement before the debugging check. | Week 12: mBot STEM Demonstration and Reflection | Meets requirement. The mBot STEM project naturally counts because students explain and demonstrate a robot challenge. |
+| 2 | Week 3: mBot Movement Debugging Check | Strong. Students practice movement, sequence, forward/backward/turn/stop, and first mBot movement before the debugging check. | Week 9: Ultrasonic Sensor Task demonstration; Week 11: Rescue Robot presentation and English explanation | Meets requirement. Both teacher-assigned tasks require students to explain and demonstrate programmed robot behavior. |
 | 3 | Week 3: Formula Practice With mBot Data | Strong. Students practice formulas after creating the mBot STEM data table. | Week 8: Project Presentation and Reflection; Week 12: Final micro:bit Demonstration and Reflection | Meets requirement. All counted summatives finish by Week 7; later presentation/demo work stays as appreciation, practice, make-up, or project evidence. |
 
 Notes:
@@ -80,11 +80,12 @@ Notes:
 | 2 | Week 2 | First mBot movements | Practice movement and setup | No, practice evidence |
 | 2 | Week 3 | Movement debugging check | Assess ability to identify and correct movement mistakes | Yes, Summative #2 |
 | 2 | Week 4 | Route map and command plan | Assess route planning before larger challenge | Yes, Summative #3 |
-| 2 | Week 7 | Condition flowchart | Assess sensor/condition logic without depending fully on hardware | Yes, Summative #4 |
-| 2 | Week 8 | Mini-challenge plan | Prepare controlled final challenge | No, project planning evidence |
-| 2 | Week 10 | Knowledge card practice | Prepare card use and explanation before final demo | No, formative practice |
-| 2 | Week 11 | mBot STEM Challenge Build/Test | Build, test, and improve movement plus one output or one sensor | No, project/demo evidence |
-| 2 | Week 12 | mBot STEM Challenge Project | Show working challenge, explain improvement, and leave mBots ready | Yes, Summative #5 |
+| 2 | Week 8 | Ultrasonic condition rehearsal | Practice the full flowchart structure and match it to sample if/else code | No, formative practice |
+| 2 | Week 9 | mBot Ultrasonic Sensor Flowchart and Programming Task | Complete the teacher-assigned flowchart, code modification, demonstration, submission, and English explanation | Yes, Summative #4 |
+| 2 | Week 10 | Rescue Robot line-following practice | Stabilize loop, line-sensor input, corrections, and lost-line response | No, formative practice |
+| 2 | Week 11, 45-minute class | Rescue Robot final build/rehearsal | Finish front/left/right obstacle decisions and final stop; test once; rehearse the explanation | No, practice/project evidence |
+| 2 | Week 11, 90-minute class | mBot Rescue Robot Presentation | Present the teacher-assigned route, demonstrate performance, explain behavior, submit code, and return equipment | Yes, Summative #5 |
+| 2 | Week 12 | Rescue Robot reflection and robotics review | Complete reflection, peer feedback, guided review stations, debugging practice, and equipment readiness | No, formative evidence |
 | 3 | Week 1 | IIIT Vocabulary Table | Establish shared spreadsheet/data, 3D modelling, and micro:bit vocabulary before the disrupted November period | Yes, Summative #1 |
 | 3 | Week 1 | Ready mBot inspection and second challenge plan | Reuse ready robots and define project data fields | No, project planning evidence |
 | 3 | Week 2 | Second mBot STEM challenge and data table | Run/observe challenge and organize data | Yes, Summative #2 |
@@ -117,8 +118,8 @@ Create these first because they are counted summative evidence:
 6. Trimester 2 Summative #1 Vocabulary Table worksheet/template.
 7. Trimester 2 Summative #2 mBot Movement Debugging Check.
 8. Trimester 2 Summative #3 mBot Route Map and Command Plan template.
-9. Trimester 2 Summative #4 mBot Condition Flowchart template.
-10. Trimester 2 Summative #5 mBot STEM Challenge Project checklist.
+9. Trimester 2 Summative #4 mBot Ultrasonic Sensor Flowchart and Programming Task sheet/rubric.
+10. Trimester 2 Summative #5 mBot Rescue Robot task sheet/rubric.
 11. Trimester 3 Summative #1 IIIT Vocabulary Table template.
 12. Trimester 3 Summative #2 mBot STEM Data Table template.
 13. Trimester 3 Summative #3 mBot Data Chart and Conclusion task.

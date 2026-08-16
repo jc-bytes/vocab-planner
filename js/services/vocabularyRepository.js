@@ -37,9 +37,13 @@ export const vocabularyRepository = {
         if (error) throw error;
         return (data || []).map(mapVocabularyRow);
     },
-    async get(id) {
+    async get(id, options = {}) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('vocabularies').select('*').eq('id', id).maybeSingle();
+        let query = supabaseService.getClient().from('vocabularies').select('*').eq('id', id).maybeSingle();
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return mapVocabularyRow(data);
     },

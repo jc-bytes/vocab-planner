@@ -142,37 +142,53 @@ export class StudentActivityProgressFlow {
 
     getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
         const words = Array.isArray(vocab?.words) ? vocab.words : [];
+        return words.filter(word => this.isActivityWordPlayable(activityType, word)).length;
+    }
+
+    isActivityWordPlayable(activityType, word = {}) {
         switch (activityType) {
             case 'matching':
-                return words.filter(word => String(word.word || '').length >= 2).length;
+                return (
+                    String(word.word || '').trim().length >= 2
+                    && String(word.definition || '').trim().length > 0
+                );
             case 'synonym-antonym':
-                return words.filter(word => (
-                    word.synonyms?.length > 0 || word.antonyms?.length > 0
-                )).length;
+                return (
+                    String(word.word || '').trim().length > 0
+                    && (word.synonyms?.length > 0 || word.antonyms?.length > 0)
+                );
             case 'word-search':
-                return words.filter(word => String(word.word || '').length >= 4).length;
+                return String(word.word || '').trim().length >= 4;
             case 'crossword':
-                return words.filter(word => (
+                return (
                     String(word.word || '').length > 1 &&
                     /^[a-zA-Z]+$/.test(String(word.word || ''))
-                )).length;
+                    && String(word.definition || '').trim().length > 0
+                );
             case 'wordle':
-                return words.filter(word => {
+                {
                     const label = String(word.word || '');
                     const cleanWord = label.replace(/[^a-zA-Z]/g, '');
                     return /^[a-zA-Z\s-]+$/.test(label) && cleanWord.length >= 3 && cleanWord.length <= 10;
-                }).length;
+                }
             case 'fill-in-blank':
-                return words.filter(word => word.example).length;
+                return (
+                    String(word.word || '').trim().length > 0
+                    && String(word.example || '').trim().length > 0
+                );
             case 'flashcards':
             case 'quiz':
+            case 'speed-match':
+                return (
+                    String(word.word || '').trim().length > 0
+                    && String(word.definition || '').trim().length > 0
+                );
             case 'illustration':
             case 'hangman':
             case 'scramble':
-            case 'speed-match':
-                return words.length;
+                return String(word.word || '').trim().length > 0;
             default:
-                return 0;
+                return false;
         }
     }
 
@@ -258,7 +274,10 @@ export class StudentActivityProgressFlow {
 
     isActivityScoreComplete(scoreData) {
         if (!scoreData) return false;
-        return Boolean(scoreData.isComplete) || (Number(scoreData.score) || 0) >= 100;
+        const completed = Boolean(scoreData.isComplete) || (Number(scoreData.score) || 0) >= 100;
+        if (!completed) return false;
+        if (this.sm.authDisabled || !this.sm.currentUser) return true;
+        return scoreData.verified === true;
     }
 
     getUnitScores(vocab) {
@@ -382,7 +401,10 @@ export class StudentActivityProgressFlow {
         this.activityPreloadKeys.add(key);
 
         this.scheduleIdleTask(() => {
-            this.loadActivityClass(activityType).catch(() => {});
+            Promise.all([
+                import('./studentFeatureStyles.js'),
+                this.loadActivityClass(activityType)
+            ]).catch(() => {});
         }, 900);
     }
 }

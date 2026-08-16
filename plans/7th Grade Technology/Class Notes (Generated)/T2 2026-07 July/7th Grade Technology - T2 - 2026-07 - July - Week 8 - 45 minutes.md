@@ -5,7 +5,7 @@ month: July
 trimester: 2nd Trimester
 week: Week 8
 duration: 45 minutes
-topic: "Scratch concept review"
+topic: "Code-walkthrough rehearsal"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 8 |
 | Class Length | 45 minutes |
-| Topic | Scratch concept review |
+| Topic | Code-walkthrough rehearsal |
 
 ## Class Objective
 
-Complete a short practice task that adds one input, one condition, and one variable to a Scratch starter file.
+Prepare and rehearse a 2-minute explanation of an assigned rhythm-game component using the live project and a simple code map.
 
 ## Pre-Activities
 
-- Review Week 8 practice vocabulary (part 1). game: An interactive activity with rules or goals costume: A sprite appearance in Scratch sound: Audio used in a project Mark the 2 concepts you need to review most.
+- Review Week 8 practice vocabulary (part 1). target: The object the player must hit at the correct time lane: One path used by a target and its matching key collision: When two sprites touch in the program
 
 ## While Activities
 
-- Complete a short practice task that adds one input, one condition, and one variable to a Scratch starter file. Fix one issue after testing.
+- The teacher assigns one component: game loop and variables; target generation and movement; D/F/J/K input and collision; hit/miss feedback and scoring; or tempo, timing, and music. Students trace the assigned scripts, connect each block group to visible behavior, and rehearse without reading a full script.
 
 ## Post-Activities
 
-- Save the practice file. Write one concept that is now clearer.
+- Use the presentation checklist to correct one unclear explanation.
 
 ## Prep Notes
 

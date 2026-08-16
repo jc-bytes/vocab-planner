@@ -91,7 +91,7 @@ export class SpeedMatchActivity {
         const hud = createElement('div', 'speed-match-hud');
         hud.innerHTML = `
             <span>Score: <span id="sm-score">0</span></span>
-            <span>Lives: <span id="sm-lives">❤️❤️❤️</span></span>
+            <span class="sm-lives-wrap">Lives: <span id="sm-lives" aria-label="3 lives"></span></span>
         `;
         wrapper.appendChild(hud);
 
@@ -105,6 +105,7 @@ export class SpeedMatchActivity {
         wrapper.appendChild(gameArea);
 
         this.container.appendChild(wrapper);
+        this.renderLives();
 
         this.pickNewDefinition();
         this.animationFrame = requestAnimationFrame((t) => this.loop(t));
@@ -193,9 +194,19 @@ export class SpeedMatchActivity {
 
     updateHUD() {
         const scoreEl = $('#sm-score');
-        const livesEl = $('#sm-lives');
         if (scoreEl) scoreEl.textContent = this.score;
-        if (livesEl) livesEl.textContent = '❤️'.repeat(Math.max(0, this.lives));
+        this.renderLives();
+    }
+
+    renderLives() {
+        const livesEl = $('#sm-lives');
+        if (!livesEl) return;
+        const lives = Math.max(0, this.lives);
+        livesEl.innerHTML = Array.from({ length: lives }, () => (
+            '<i data-lucide="heart" aria-hidden="true"></i>'
+        )).join('');
+        livesEl.setAttribute('aria-label', `${lives} ${lives === 1 ? 'life' : 'lives'}`);
+        window.lucide?.createIcons({ root: livesEl });
     }
 
     showFeedback(text, type) {
@@ -259,12 +270,19 @@ export class SpeedMatchActivity {
         
         this.container.innerHTML = `
             <div class="completion-screen">
-                <h2>${isNewHighScore ? '🏆 New High Score!' : 'Game Over!'}</h2>
+                <h2 class="activity-result-heading">
+                    ${isNewHighScore ? '<i data-lucide="trophy" aria-hidden="true"></i>' : ''}
+                    <span>${isNewHighScore ? 'New High Score!' : 'Game Over!'}</span>
+                </h2>
                 <p>Final Score: ${this.score}</p>
                 <p>High Score: ${this.highScore}</p>
-                <button id="restart-speed-match" class="btn primary-btn">🔄 Play Again</button>
+                <button id="restart-speed-match" class="btn primary-btn">
+                    <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                    <span>Play Again</span>
+                </button>
             </div>
         `;
+        window.lucide?.createIcons({ root: this.container });
 
         $('#restart-speed-match').addEventListener('click', () => {
             // Notify progress system of new session
@@ -280,10 +298,15 @@ export class SpeedMatchActivity {
     }
 
     getScore() {
+        const targetScore = 10;
         return {
-            score: this.score * 10, // Arbitrary scaling
-            details: `Score: ${this.score} `,
-            isComplete: true // Always "complete" when game over
+            score: Math.min(100, Math.round((this.score / targetScore) * 100)),
+            details: `Matched ${this.score}/${targetScore} required words`,
+            evidence: {
+                correctCount: this.score,
+                totalCount: targetScore
+            },
+            isComplete: this.score >= targetScore
         };
     }
 

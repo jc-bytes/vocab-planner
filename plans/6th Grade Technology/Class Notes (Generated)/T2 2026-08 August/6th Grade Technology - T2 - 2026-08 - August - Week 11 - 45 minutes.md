@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 11
 duration: 45 minutes
-topic: "Plan the mBot STEM challenge"
+topic: "Rescue Robot final build and rehearsal"
 tags:
   - class-plan
   - grade-6
@@ -28,25 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 11 |
 | Class Length | 45 minutes |
-| Topic | Plan the mBot STEM challenge |
+| Topic | Rescue Robot final build and rehearsal |
 
 ## Class Objective
 
-Plan the mBot STEM challenge.
+Finish the assigned Rescue Robot logic and prepare the robot, explanation, and equipment checklist for presentation.
 
 ## Pre-Activities
 
-- Answer the warm-up question: What task can your robot complete successfully?
-- Review August Week 2 practice vocabulary. goal: what you are trying to do success rule: rule that says the task worked test area: space used for trying work
-- Choose one challenge type: path, obstacle, signal, or line/sensor task.
+- Review August Week 2 and 3 vocabulary: obstacle, branch, blocked, open, rescue zone, demonstrate, explain, submit, disconnect. Review the Summative #5 rubric and presentation order.
 
 ## While Activities
 
-- Plan the mBot STEM challenge. Write the goal and success rule. List the cards, blocks, or parts you will use. Check that the plan can be completed in class time.
+- Complete the remaining front, left, and right checks and final stop condition in the assigned project. Test the full route once. Correct one problem. Rehearse the English explanation and complete the readiness and lab-care checklist.
 
 ## Post-Activities
 
-- Submit the STEM challenge plan. Explain your success rule to a partner.
+- Save the final project and confirm that the pair is ready to present during the 90-minute class.
 
 ## Prep Notes
 

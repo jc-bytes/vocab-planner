@@ -8,6 +8,8 @@ import {
     loadManifest,
     loadVocabularyFile
 } from '../services/vocabularyApi.js';
+import { requestWithTimeout } from '../services/requestReliability.js';
+import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityVocabularyData {
     constructor(activities) {
@@ -273,14 +275,20 @@ export class StudentActivityVocabularyData {
         }
     }
 
-    async loadVocabularyOverride(vocabMeta) {
-        if (this.sm.authDisabled || !vocabMeta?.id) return null;
+    async loadVocabularyOverride(vocabMeta, options = {}) {
+        if (this.sm.authDisabled || !vocabMeta?.id || !navigator.onLine) return null;
 
         try {
-            const vocabulary = await vocabularyRepository.get(vocabMeta.id);
+            const vocabulary = await requestWithTimeout(signal => (
+                vocabularyRepository.get(vocabMeta.id, { signal })
+            ), {
+                signal: options.signal,
+                timeoutMs: options.timeoutMs || 8000,
+                label: 'Loading the latest vocabulary settings'
+            });
             return vocabulary ? { ...vocabulary, __source: 'cloud' } : null;
         } catch (error) {
-            console.warn('Could not load live vocabulary settings:', error);
+            if (!options.signal?.aborted) console.warn('Could not load live vocabulary settings:', error);
             return null;
         }
     }
@@ -314,39 +322,32 @@ export class StudentActivityVocabularyData {
     }
 
     async loadVocabulary(vocabMeta, options = {}) {
-        let vocabData = null;
-        const override = await this.loadVocabularyOverride(vocabMeta);
+        const session = this.activities.session;
+        const loadId = session.beginVocabularyLoad();
+        const signal = session.vocabularyLoadController.signal;
+        const isCurrentLoad = () => session.isVocabularyLoadCurrent(loadId) && !signal.aborted;
+        this.renderVocabularyLoading(vocabMeta);
 
-        if (vocabMeta.path) {
-            const fetched = await loadVocabularyFile(vocabMeta.path);
-            if (fetched) {
-                vocabData = this.mergeVocabularyData({ meta: vocabMeta, fileData: fetched, override });
-            } else if (override) {
-                vocabData = this.mergeVocabularyData({ meta: vocabMeta, override });
-            }
-        } else {
-            vocabData = this.mergeVocabularyData({ meta: vocabMeta, override });
+        const overridePromise = this.loadVocabularyOverride(vocabMeta, { signal });
+        const fileData = vocabMeta.path
+            ? await loadVocabularyFile(vocabMeta.path, { signal, timeoutMs: 8000 })
+            : null;
+        if (!isCurrentLoad()) return;
+
+        let vocabData = this.mergeVocabularyData({ meta: vocabMeta, fileData });
+        if (!vocabData.words?.length) {
+            const override = await overridePromise;
+            if (!isCurrentLoad()) return;
+            vocabData = this.mergeVocabularyData({ meta: vocabMeta, fileData, override });
         }
 
-        if (!vocabData) {
+        if (!vocabData?.words?.length) {
             console.error('Failed to load vocabulary data for:', vocabMeta);
-            notifications.error('Failed to load vocabulary data. Please try again or contact your teacher.');
+            this.renderVocabularyLoadError(vocabMeta, options);
             return;
         }
 
-        this.sm.currentVocab = vocabData;
-
-        const unitProgress = this.ensureUnitProgress(this.sm.currentVocab);
-
-        // Load scores into current session (reference to the stored object)
-        this.sm.unitScores = unitProgress.scores;
-        this.sm.unitImages = unitProgress.images;
-        this.sm.unitWordHunt = unitProgress.wordHunt;
-        this.sm.unitStates = unitProgress.states;
-        
-        // Initialize word coverage tracking
-        this.initWordCoverage();
-        await this.migrateLegacyWordHuntImages();
+        this.applyVocabularyData(vocabData);
 
         if (!options.fromRoute) {
             const unitId = this.sm.getCurrentVocabRouteId();
@@ -356,5 +357,93 @@ export class StudentActivityVocabularyData {
         }
 
         this.showActivityMenu(options);
+
+        const pendingOverride = overridePromise
+            .then(async override => {
+                if (!isCurrentLoad()) return;
+                if (override) {
+                    const merged = this.mergeVocabularyData({ meta: vocabMeta, fileData, override });
+                    this.applyVocabularyData(merged);
+                    if (!this.sm.currentActivityType) this.showActivityMenu(options);
+                }
+                await this.migrateLegacyWordHuntImages();
+            })
+            .catch(error => {
+                if (!signal.aborted) console.warn('Could not finish loading live vocabulary settings:', error);
+            })
+            .finally(() => {
+                if (session.pendingVocabularyOverride === pendingOverride) {
+                    session.pendingVocabularyOverride = null;
+                }
+            });
+        session.pendingVocabularyOverride = pendingOverride;
+    }
+
+    applyVocabularyData(vocabData) {
+        this.sm.currentVocab = vocabData;
+        const unitProgress = this.ensureUnitProgress(vocabData);
+        this.sm.unitScores = unitProgress.scores;
+        this.sm.unitImages = unitProgress.images;
+        this.sm.unitWordHunt = unitProgress.wordHunt;
+        this.sm.unitStates = unitProgress.states;
+        this.initWordCoverage();
+    }
+
+    renderVocabularyLoading(vocabMeta = {}) {
+        const title = $('#current-unit-title');
+        const description = $('#current-unit-description');
+        const grid = $('#activity-menu-view .activities-grid');
+        const view = $('#activity-menu-view');
+        setStudentPageLoading(view, true);
+        if (title) title.textContent = '';
+        if (description) description.textContent = '';
+        if (grid) {
+            grid.querySelectorAll(':scope > .activity-flow-section').forEach(section => {
+                section.hidden = true;
+            });
+            grid.querySelectorAll('.activity-card').forEach(card => {
+                card.disabled = true;
+            });
+            let state = grid.querySelector(':scope > .unit-loading-state');
+            if (!state) {
+                state = createElement('div', 'unit-loading-state');
+                state.setAttribute('role', 'status');
+                grid.prepend(state);
+            }
+            state.classList.remove('unit-load-error');
+            state.innerHTML = getStudentPageSkeleton('unit', 'Loading vocabulary unit');
+        }
+        this.sm.switchView('activity-menu-view');
+    }
+
+    renderVocabularyLoadError(vocabMeta = {}, options = {}) {
+        const grid = $('#activity-menu-view .activities-grid');
+        const view = $('#activity-menu-view');
+        setStudentPageLoading(view, false);
+        const title = $('#current-unit-title');
+        if (title) title.textContent = vocabMeta.name || 'Vocabulary unit';
+        const offline = !navigator.onLine;
+        const message = offline
+            ? 'This vocabulary has not been saved on this device yet. Reconnect once to download it.'
+            : 'This vocabulary could not be loaded. Check the connection and try again.';
+
+        if (grid) {
+            let state = grid.querySelector(':scope > .unit-loading-state');
+            if (!state) {
+                state = createElement('div', 'unit-loading-state');
+                grid.prepend(state);
+            }
+            state.classList.add('unit-load-error');
+            state.setAttribute('role', 'alert');
+            state.innerHTML = `
+                <p>${escapeHtml(message)}</p>
+                <button type="button" class="btn btn-primary" data-retry-vocabulary>Try again</button>
+            `;
+            state.querySelector('[data-retry-vocabulary]')?.addEventListener('click', () => {
+                this.loadVocabulary(vocabMeta, options);
+            }, { once: true });
+        }
+
+        notifications.error(message);
     }
 }

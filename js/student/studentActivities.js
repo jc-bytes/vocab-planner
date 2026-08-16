@@ -53,8 +53,8 @@ export class StudentActivities {
         return this.calendar.getCurrentTrimesterKey(date);
     }
 
-    loadSchoolCalendar() {
-        return this.calendar.loadSchoolCalendar();
+    loadSchoolCalendar(options = {}) {
+        return this.calendar.loadSchoolCalendar(options);
     }
 
     getVocabSchedule(vocab, date = new Date()) {
@@ -221,6 +221,10 @@ export class StudentActivities {
         return this.vocabularyData.loadVocabulary(vocabMeta, options);
     }
 
+    startVerifiedActivityAttempt(activityType, options = {}) {
+        return this.progressPersistence.startVerifiedActivityAttempt(activityType, options);
+    }
+
     initWordCoverage() {
         return this.coverage.initWordCoverage();
     }
@@ -279,6 +283,10 @@ export class StudentActivities {
 
     getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
         return this.progressFlow.getActivityPlayableCount(activityType, vocab);
+    }
+
+    isActivityWordPlayable(activityType, word) {
+        return this.progressFlow.isActivityWordPlayable(activityType, word);
     }
 
     getRequiredActivityMinimum(vocab = this.sm.currentVocab) {
@@ -503,8 +511,12 @@ export class StudentActivities {
         return this.home.renderStudentHome();
     }
 
-    createContinueLearningHero(item, emptyText = '') {
-        return this.home.createContinueLearningHero(item, emptyText);
+    renderSparkLibrary() {
+        return this.home.renderSparkLibrary();
+    }
+
+    createContinueLearningHero(item, emptyText = '', context = {}) {
+        return this.home.createContinueLearningHero(item, emptyText, context);
     }
 
     getContinueLearningPercent(progress = {}) {

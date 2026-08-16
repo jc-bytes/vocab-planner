@@ -5,7 +5,7 @@ month: July
 trimester: 2nd Trimester
 week: Week 8
 duration: 90 minutes
-topic: "Obstacle or line challenge"
+topic: "Ultrasonic condition practice"
 tags:
   - class-plan
   - grade-6
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 8 |
 | Class Length | 90 minutes |
-| Topic | Obstacle or line challenge |
+| Topic | Ultrasonic condition practice |
 
 ## Class Objective
 
-Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior.
+Practice a flowchart and mBlock program with one ultrasonic distance condition and two different robot responses.
 
 ## Pre-Activities
 
-- Review July Week 4 practice vocabulary with Blooket or a crossword puzzle (part 2). true: correct or happening false: not correct or not happening flowchart: diagram of steps or choices Check your planned condition and response.
+- Review July Week 4 practice vocabulary with Blooket or a crossword puzzle (part 2). true: correct or happening false: not correct or not happening flowchart: diagram of steps or choices Review a sample numbered distance condition.
 
 ## While Activities
 
-- Complete Summative Activity #4: Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior. Submit the completed flowchart in class or on Google Classroom. Program one sensor-triggered behavior. Test the behavior in the challenge area. Debug one problem with the condition or response. Improve the behavior after testing.
+- Create a practice flowchart with Start, ultrasonic input, a numbered threshold with a unit, True and False labels, and two different responses. Match the flowchart to a sample if/else program. Test one sensor-triggered behavior and correct one problem.
 
 ## Post-Activities
 
-- Show one working sensor response. Record one test result and one improvement.
+- Show the corrected practice response. Explain which response runs when the condition is true.
 
 ## Prep Notes
 

@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 9
 duration: 90 minutes
-topic: "Prototype and testing checklist"
+topic: "Four-lane prototype plan"
 tags:
   - class-plan
   - grade-7
@@ -28,24 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 9 |
 | Class Length | 90 minutes |
-| Topic | Prototype and testing checklist |
+| Topic | Four-lane prototype plan |
 
 ## Class Objective
 
-Create a prototype using the checklist for the dance game.
+Create a feasible project plan and paper or Scratch prototype for the osu!-style rhythm game.
 
 ## Pre-Activities
 
-- Review Week 9 practice vocabulary (part 2). subroutine: A smaller named part of a program that can be reused timer: A tool or variable that tracks time score: A number that tracks points or progress
+- Review Week 9 practice vocabulary (part 2). hit line: The place where the player should press the matching key spawn: To create or show a new target broadcast: A message that starts another script
 
 ## While Activities
 
-- Create a prototype using the checklist for the dance game.
-- Test one starter feature and record what works, what fails, and what needs to be built during the exam project.
+- Plan the stage, D/F/J/K key sprites, four target paths, hit line, score and miss rules, time limit, tempo, music, success feedback, and pair responsibilities. Build or annotate one teacher-provided starter lane and complete the testing checklist for a correct hit, wrong key, and missed target.
 
 ## Post-Activities
 
-- Save the prototype notes. Write one debugging risk to watch during project work.
+- Save the plan and starter evidence. Record one risk that must be tested in Week 10.
 
 ## Prep Notes
 

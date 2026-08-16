@@ -24,10 +24,21 @@ export class MatchingActivity {
         this.selectedDefinition = null;
         this.lockBoard = false;
         this.timerInterval = null;
+        this.pendingTimeouts = new Set();
+        this.roundCompletionDueAt = 0;
+        this.destroyed = false;
         this.difficultyAdjusted = false;
 
         this.restoreState();
         this.ensureActiveRound();
+
+        // Recover if the browser saved the fifth match but suspended the short
+        // callback that advances to the next set.
+        if (this.isCurrentRoundComplete()) {
+            this.completeCurrentRound();
+            return;
+        }
+
         this.saveState();
 
         if (this.isSessionComplete()) {
@@ -54,7 +65,12 @@ export class MatchingActivity {
     }
 
     loadTargetRounds() {
-        const saved = localStorage.getItem(this.getDifficultyKey());
+        let saved = null;
+        try {
+            saved = localStorage.getItem(this.getDifficultyKey());
+        } catch (error) {
+            console.warn('Unable to read matching difficulty:', error);
+        }
         if (!saved) return this.baseRoundCount;
 
         try {
@@ -67,10 +83,14 @@ export class MatchingActivity {
     }
 
     saveTargetRounds(targetRounds) {
-        localStorage.setItem(this.getDifficultyKey(), JSON.stringify({
-            targetRounds,
-            updatedAt: new Date().toISOString()
-        }));
+        try {
+            localStorage.setItem(this.getDifficultyKey(), JSON.stringify({
+                targetRounds,
+                updatedAt: new Date().toISOString()
+            }));
+        } catch (error) {
+            console.warn('Unable to save matching difficulty:', error);
+        }
     }
 
     shuffleIds(ids) {
@@ -184,7 +204,12 @@ export class MatchingActivity {
             return;
         }
 
-        const saved = localStorage.getItem(this.getStorageKey());
+        let saved = null;
+        try {
+            saved = localStorage.getItem(this.getStorageKey());
+        } catch (error) {
+            console.warn('Unable to read matching progress:', error);
+        }
         if (!saved) return;
 
         try {
@@ -233,9 +258,17 @@ export class MatchingActivity {
             difficultyAdjusted: this.difficultyAdjusted
         };
 
-        localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+        try {
+            localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+        } catch (error) {
+            console.warn('Unable to save matching progress locally:', error);
+        }
         if (typeof this.onSaveState === 'function') {
-            this.onSaveState(state);
+            try {
+                this.onSaveState(state);
+            } catch (error) {
+                console.warn('Unable to sync matching progress:', error);
+            }
         }
     }
 
@@ -313,6 +346,10 @@ export class MatchingActivity {
         return this.currentRoundIds.length > 0 && this.currentRoundIds.every(id => this.matchedRoundIds.has(id));
     }
 
+    getCurrentRoundKey() {
+        return `${this.roundsCompleted}:${this.currentRoundIds.join(',')}`;
+    }
+
     isSessionComplete() {
         return this.words.length > 0 && this.roundsCompleted >= this.targetRounds;
     }
@@ -330,6 +367,13 @@ export class MatchingActivity {
         return {
             score: progress,
             details: `Matched ${completedPairs}/${targetPairs} round pairs. Completed ${this.roundsCompleted}/${this.targetRounds} sets. Accuracy: ${accuracy}% (${this.attempts} attempts).${speedDetails}`,
+            evidence: {
+                correctCount: completedPairs,
+                totalCount: targetPairs,
+                completedRounds: this.roundsCompleted,
+                targetRounds: this.targetRounds,
+                accuracy
+            },
             isComplete
         };
     }
@@ -356,9 +400,17 @@ export class MatchingActivity {
         const hud = createElement('div', 'matching-hud');
         const copy = createElement('div', 'matching-hud-copy');
         copy.innerHTML = `
-            <h2>Matching Sprint</h2>
-            <p>Match 5 random pairs. The next set starts automatically.</p>
+            <div class="matching-hud-heading">
+                <h2>Matching Sprint</h2>
+                <p>Match 5 random pairs. The next set starts automatically.</p>
+            </div>
         `;
+
+        const restartButton = createElement('button', 'btn secondary-btn matching-restart-button', 'New game');
+        restartButton.type = 'button';
+        restartButton.title = 'Restart this matching game from set 1';
+        restartButton.addEventListener('click', () => this.requestRestart());
+        copy.appendChild(restartButton);
 
         const stats = createElement('div', 'matching-stats');
         stats.innerHTML = `
@@ -546,12 +598,16 @@ export class MatchingActivity {
             this.notifyProgress();
         }
 
-        setTimeout(() => {
+        const completedRoundKey = this.getCurrentRoundKey();
+        this.roundCompletionDueAt = this.isCurrentRoundComplete() ? Date.now() + 1000 : 0;
+        this.scheduleTimeout(() => {
+            if (completedRoundKey !== this.getCurrentRoundKey()) return;
+
             this.resetSelection();
             this.lockBoard = false;
 
             if (this.isCurrentRoundComplete()) {
-                this.completeCurrentRound();
+                this.completeCurrentRound(completedRoundKey);
             } else {
                 this.render();
             }
@@ -566,7 +622,7 @@ export class MatchingActivity {
         this.updateHud();
         this.notifyProgress();
 
-        setTimeout(() => {
+        this.scheduleTimeout(() => {
             this.selectedTerm?.card.classList.remove('selected', 'wrong');
             this.selectedDefinition?.card.classList.remove('selected', 'wrong');
             this.selectedTerm?.card?.setAttribute('aria-pressed', 'false');
@@ -576,7 +632,11 @@ export class MatchingActivity {
         }, 650);
     }
 
-    completeCurrentRound() {
+    completeCurrentRound(expectedRoundKey = null) {
+        if (!this.isCurrentRoundComplete()) return false;
+        if (expectedRoundKey && expectedRoundKey !== this.getCurrentRoundKey()) return false;
+
+        this.roundCompletionDueAt = 0;
         const elapsedMs = this.getCurrentRoundElapsedMs();
         const roundSize = this.currentRoundIds.length;
         const roundAccuracy = this.roundAttempts === 0
@@ -599,12 +659,13 @@ export class MatchingActivity {
 
         if (this.isSessionComplete()) {
             this.showCompletionScreen();
-            return;
+            return true;
         }
 
         this.startNewRound();
         this.saveState();
         this.render();
+        return true;
     }
 
     updateHud() {
@@ -629,7 +690,19 @@ export class MatchingActivity {
 
     startTimer() {
         this.clearTimer();
-        this.timerInterval = setInterval(() => this.updateHud(), 1000);
+        this.timerInterval = setInterval(() => {
+            if (
+                this.isCurrentRoundComplete() &&
+                (!this.roundCompletionDueAt || Date.now() >= this.roundCompletionDueAt)
+            ) {
+                this.resetSelection();
+                this.lockBoard = false;
+                this.completeCurrentRound(this.getCurrentRoundKey());
+                return;
+            }
+
+            this.updateHud();
+        }, 1000);
     }
 
     clearTimer() {
@@ -638,9 +711,22 @@ export class MatchingActivity {
         this.timerInterval = null;
     }
 
+    scheduleTimeout(callback, delay) {
+        const timeoutId = setTimeout(() => {
+            this.pendingTimeouts.delete(timeoutId);
+            if (!this.destroyed) callback();
+        }, delay);
+        this.pendingTimeouts.add(timeoutId);
+        return timeoutId;
+    }
+
     notifyProgress() {
-        if (this.onProgress) {
+        if (typeof this.onProgress !== 'function') return;
+
+        try {
             this.onProgress(this.getScore());
+        } catch (error) {
+            console.warn('Unable to report matching progress:', error);
         }
     }
 
@@ -712,7 +798,12 @@ export class MatchingActivity {
 
     restart() {
         this.clearTimer();
-        localStorage.removeItem(this.getStorageKey());
+        this.clearPendingTimeouts();
+        try {
+            localStorage.removeItem(this.getStorageKey());
+        } catch (error) {
+            console.warn('Unable to clear saved matching progress:', error);
+        }
 
         this.targetRounds = this.loadTargetRounds();
         this.roundsCompleted = 0;
@@ -727,12 +818,17 @@ export class MatchingActivity {
         this.selectedTerm = null;
         this.selectedDefinition = null;
         this.lockBoard = false;
+        this.roundCompletionDueAt = 0;
         this.difficultyAdjusted = false;
         this.startNewRound();
         this.saveState();
 
-        if (this.onProgress) {
-            this.onProgress({ score: 0, details: `Matched 0/${this.getTargetPairCount()} round pairs. Completed 0/${this.targetRounds} sets. Accuracy: 0% (0 attempts).`, isComplete: false, isReplay: true });
+        if (typeof this.onProgress === 'function') {
+            try {
+                this.onProgress({ score: 0, details: `Matched 0/${this.getTargetPairCount()} round pairs. Completed 0/${this.targetRounds} sets. Accuracy: 0% (0 attempts).`, isComplete: false, isReplay: true });
+            } catch (error) {
+                console.warn('Unable to report matching restart:', error);
+            }
         }
 
         this.render();
@@ -741,5 +837,25 @@ export class MatchingActivity {
     resetSelection() {
         this.selectedTerm = null;
         this.selectedDefinition = null;
+    }
+
+    requestRestart() {
+        const shouldRestart = typeof window?.confirm !== 'function' || window.confirm(
+            'Start a new matching game? Your progress in this matching game will be reset.'
+        );
+        if (shouldRestart) this.restart();
+    }
+
+    clearPendingTimeouts() {
+        this.pendingTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+        this.pendingTimeouts.clear();
+    }
+
+    destroy() {
+        this.destroyed = true;
+        this.clearTimer();
+        this.clearPendingTimeouts();
+        this.onProgress = null;
+        this.onSaveState = null;
     }
 }

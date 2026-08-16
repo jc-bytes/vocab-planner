@@ -82,8 +82,13 @@ export class StudentCoinNotifications {
         `;
         panel.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 id="coin-notification-title" class="notification-panel-title" style="margin: 0; color: var(--primary-color);">💰 Pending Coins</h3>
-                <button id="close-notification-panel" class="btn-icon-only" type="button" aria-label="Close coin notification" style="background: none; border: none; cursor: pointer; color: #666;">&times;</button>
+                <h3 id="coin-notification-title" class="notification-panel-title" style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="coins" aria-hidden="true"></i>
+                    <span>Pending Coins</span>
+                </h3>
+                <button id="close-notification-panel" class="btn-icon-only" type="button" aria-label="Close coin notification" style="background: none; border: none; cursor: pointer; color: #666;">
+                    <i data-lucide="circle-x" aria-hidden="true"></i>
+                </button>
             </div>
             <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
                 <div class="notification-panel-metric" style="color: #1e40af; margin-bottom: 0.5rem;">
@@ -113,6 +118,7 @@ export class StudentCoinNotifications {
         `;
         document.head.appendChild(style);
         document.body.appendChild(panel);
+        window.lucide?.createIcons({ root: panel });
 
         $('#close-notification-panel').addEventListener('click', () => panel.remove());
         $('#accept-gift-coins').addEventListener('click', async () => {

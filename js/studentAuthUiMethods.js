@@ -251,7 +251,9 @@ export class StudentAuthUi {
         const deployedUrl = window.location.href.split('?')[0]; // Remove query params if any
         
         electronMsg.innerHTML = `
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
+            <div style="display: flex; justify-content: center; margin-bottom: 0.5rem;" aria-hidden="true">
+                <i data-lucide="compass" style="width: 2rem; height: 2rem;"></i>
+            </div>
             <h3 class="card-title" style="margin: 0 0 0.75rem 0; color: var(--text-main, #f8fafc);">Sign In via Browser</h3>
             <p class="card-secondary" style="margin: 0 0 1rem 0; color: var(--text-muted, #94a3b8);">
                 External sign-in doesn't work in the Cursor browser. Please use one of these options:
@@ -261,14 +263,16 @@ export class StudentAuthUi {
                    style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
                           background: var(--primary-color, #6366f1); color: white; padding: 0.75rem 1.5rem; 
                           border-radius: 8px; text-decoration: none; transition: all 0.2s;">
-                    🔗 Open in Browser
+                    <i data-lucide="arrow-right" aria-hidden="true"></i>
+                    <span>Open in Browser</span>
                 </a>
                 <button id="copy-url-btn" class="card-action"
                         style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
                                background: transparent; border: 1px solid var(--border-color, rgba(255,255,255,0.2)); 
                                color: var(--text-main, #f8fafc); padding: 0.75rem 1.5rem; border-radius: 8px; 
                                cursor: pointer; transition: all 0.2s;">
-                    📋 Copy URL
+                    <i data-lucide="copy" aria-hidden="true"></i>
+                    <span>Copy URL</span>
                 </button>
             </div>
             <p class="card-caption" style="margin: 1rem 0 0 0; color: var(--text-muted, #94a3b8);">
@@ -281,6 +285,7 @@ export class StudentAuthUi {
         if (loginSection) {
             loginSection.appendChild(electronMsg);
         }
+        window.lucide?.createIcons({ root: electronMsg });
         
         // Add copy URL functionality
         setTimeout(() => {
@@ -289,9 +294,11 @@ export class StudentAuthUi {
                 copyBtn.addEventListener('click', async () => {
                     try {
                         await navigator.clipboard.writeText(deployedUrl);
-                        copyBtn.innerHTML = '✅ Copied!';
+                        copyBtn.innerHTML = '<i data-lucide="check" aria-hidden="true"></i><span>Copied!</span>';
+                        window.lucide?.createIcons({ root: copyBtn });
                         setTimeout(() => {
-                            copyBtn.innerHTML = '📋 Copy URL';
+                            copyBtn.innerHTML = '<i data-lucide="copy" aria-hidden="true"></i><span>Copy URL</span>';
+                            window.lucide?.createIcons({ root: copyBtn });
                         }, 2000);
                     } catch (err) {
                         // Fallback for older browsers
@@ -301,9 +308,11 @@ export class StudentAuthUi {
                         textArea.select();
                         document.execCommand('copy');
                         document.body.removeChild(textArea);
-                        copyBtn.innerHTML = '✅ Copied!';
+                        copyBtn.innerHTML = '<i data-lucide="check" aria-hidden="true"></i><span>Copied!</span>';
+                        window.lucide?.createIcons({ root: copyBtn });
                         setTimeout(() => {
-                            copyBtn.innerHTML = '📋 Copy URL';
+                            copyBtn.innerHTML = '<i data-lucide="copy" aria-hidden="true"></i><span>Copy URL</span>';
+                            window.lucide?.createIcons({ root: copyBtn });
                         }, 2000);
                     }
                 });

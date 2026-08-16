@@ -55,7 +55,7 @@ const teacherDataDashboardRecentActivityMethods = {
                             student: studentName,
                             unit: unitId.replace(/_/g, ' '),
                             activity: activityLabel,
-                            score: activityData.score !== undefined ? `${activityData.score}%` : (activityData.completed ? '✓' : '-'),
+                            score: activityData.score !== undefined ? `${activityData.score}%` : (activityData.completed ? 'Complete' : '-'),
                             date: date,
                             dateStr: date && !isNaN(date) ? date.toLocaleDateString() : '-'
                         });

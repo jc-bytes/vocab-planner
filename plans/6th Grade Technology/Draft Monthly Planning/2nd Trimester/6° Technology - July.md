@@ -2,7 +2,7 @@
 
 ## Monthly Focus
 
-Students continue using mBot through hands-on challenges. Students practice movement sequences, outputs, sensors, and simple reactive behavior.
+Students continue using mBot through hands-on practice. Students develop the sensor, condition, flowchart, and programming skills needed to complete the teacher-assigned Summative #4 ultrasonic sensor task.
 
 ## Weekly Time
 
@@ -21,7 +21,7 @@ Students continue using mBot through hands-on challenges. Students practice move
 
 - Create, test, and improve mBot programs that use movement, outputs, and simple repeated actions.
 - Describe how sensors provide input and how conditions can control robot responses.
-- Plan a small robot challenge with a clear goal, route or test area, commands, and success rule.
+- Follow a teacher-assigned robot task with a defined sensor condition, two programmed responses, and clear success criteria.
 
 ## Learning Objectives
 
@@ -33,24 +33,23 @@ Students continue using mBot through hands-on challenges. Students practice move
 
 - Submit an mBot route map and command plan with at least four movement steps.
 - Create an if/then flowchart with one sensor condition, true response, false response, and explanation.
-- Complete a mini-challenge plan or reflection and demonstrate a simple robot behavior after testing.
+- Complete the teacher-assigned mBot ultrasonic sensor flowchart, modify the assigned mBlock project, and demonstrate the two programmed responses.
 
 ## Evaluation
 
 - Complete vocabulary review activities.
 - Demonstrate mBot movement and sensor practice tasks.
-- Complete a mini-challenge plan and reflection.
 - Complete Summative Activity #3: Draw an mBot route map with at least 4 movement steps, write the command sequence, and label each turn or stop point.
-- Complete Summative Activity #4: Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior.
+- Complete Summative Activity #4: With a partner, create the required ultrasonic sensor flowchart, modify the assigned mBlock project, demonstrate the two programmed responses, save and submit the project, and explain the logic in English.
 
 ## Teacher Reality Notes
 
 - Main purpose: extend mBot movement into loops, sensors, and simple if/then behavior.
-- Grade evidence: Summative Activity #3 is the route map and command plan; grade at least 4 ordered movement steps, labeled turns/stops, and a realistic route. Summative Activity #4 is the condition flowchart; grade one sensor condition, true response, false response, and explanation sentence. Mini-challenge evidence is the submitted plan plus observed test/improvement, not a polished final robot.
-- Flow guardrail: only one sensor-triggered behavior is required. If sensor setup is unreliable, use the emulator/card-based flowchart as the grade and treat the robot test as practice.
-- Materials to prepare: charged mBots, mBot Knowledge Cards Part 1, route-map template, condition-flowchart template, floor tape/markers, sensor test area, debugging checklist, projector, computers/software.
-- Make-up option: route map and condition flowchart can be made up without hardware; robot demonstrations need a station day.
-- Risk: Week 5 mini-challenge may feel like a full project. Keep the success rule small: movement plus one output or one sensor.
+- Grade evidence: Summative Activity #3 is the route map and command plan; grade at least 4 ordered movement steps, labeled turns/stops, and a realistic route. Summative Activity #4 is the teacher-assigned mBot Ultrasonic Sensor Flowchart and Programming Task described in the approved rubric.
+- Assignment guardrail: students do not choose their own mini-challenge. Every pair receives the same assigned project structure and required evidence; the teacher may assign thresholds or robot responses to groups.
+- Materials to prepare: charged and numbered mBots, assigned mBlock starter project, Summative #4 rubric/task sheet, flowchart template, floor tape/markers, ultrasonic sensor test area, debugging checklist, projector, computers/software.
+- Make-up option: the flowchart and code explanation can be completed without hardware; the connection and demonstration criteria require a short supervised robot station.
+- Risk: connection and upload delays can reduce assessment time. Open the assigned project and verify numbered kits before the 90-minute summative class.
 
 ## Vocabulary Plan
 
@@ -101,16 +100,16 @@ Students continue using mBot through hands-on challenges. Students practice move
 | false | Not correct or not happening. |
 | flowchart | A diagram that shows steps or choices. |
 
-#### July Week 5 - Mini-Challenge Plan
+#### July Week 5 - Assigned Ultrasonic Task
 
 | Word | Simple definition |
 | --- | --- |
-| challenge | A task that takes effort to complete. |
-| goal | What you are trying to do. |
-| success rule | A simple rule that says when the task is complete. |
-| test area | The space where a project is tried safely. |
-| commands | Instructions used in a program. |
-| blocks | Coding pieces that snap together in a program. |
+| ultrasonic sensor | A sensor that measures distance using sound. |
+| threshold | The number used to separate two responses. |
+| branch | One path a program follows after a condition. |
+| upload | To transfer a program to the robot. |
+| demonstrate | To show clearly how something works. |
+| assigned | Chosen and given by the teacher. |
 
 ## Class Notes (Generated)
 
@@ -122,8 +121,8 @@ Students continue using mBot through hands-on challenges. Students practice move
 - Week 7 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 7 - 90 minutes|mBot sensor practice]]
 - Week 8 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 8 - 45 minutes|Simple conditions]]
 - Week 8 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 8 - 90 minutes|Obstacle or line challenge]]
-- Week 9 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 45 minutes|Plan a mini-challenge]]
-- Week 9 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 90 minutes|mBot mini-challenge practice]]
+- Week 9 - 45 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 45 minutes|Prepare for Summative 4]]
+- Week 9 - 90 minutes: [[6th Grade Technology/Class Notes (Generated)/T2 2026-07 July/6th Grade Technology - T2 - 2026-07 - July - Week 9 - 90 minutes|Summative 4 - Ultrasonic Sensor Task]]
 
 ## Monthly Plan
 
@@ -136,7 +135,6 @@ Students continue using mBot through hands-on challenges. Students practice move
 | Week 7 | 45 minutes | Sensors around us | Identify the available mBot sensor on your robot or card. | Answer the warm-up question: What senses do humans use? Review July Week 3 practice vocabulary (part 1). sensor: part that detects something detect: notice or find obstacle: thing in the way Match each sensor word with what it detects. | Identify the available mBot sensor on your robot or card. Describe what the sensor can detect. Record one real-life example of a sensor. | Complete one exit question: What does a sensor do? Share one sensor example. |
 | Week 7 | 90 minutes | mBot sensor practice | Test the sensor in two different situations. | Complete a word soup or matching activity using July Week 3 practice vocabulary (part 2). line: long mark or path input: information or action going in response: what happens after Review the mBot Knowledge Card connected to the available sensor. | Observe how the sensor reacts to an object or line. Test the sensor in two different situations. Record what changed in each test. Create one simple response using the sensor. | Demonstrate one sensor response. Write what the sensor detected. |
 | Week 8 | 45 minutes | Simple conditions | Practice building an if/then flowchart with a sample sensor condition, true response, and false response. | Answer the warm-up question: What happens if it rains? Review July Week 4 practice vocabulary (part 1). if: starts a condition condition: rule that is checked response: what happens after Complete three everyday if/then sentences. | Practice building an if/then flowchart with a sample sensor condition, true response, and false response. Review the condition flowchart expectations before the next class. | Share the condition and response from your flowchart. Write one sentence explaining why conditions help robots make decisions. |
-| Week 8 | 90 minutes | Obstacle or line challenge | Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior. | Review July Week 4 practice vocabulary with Blooket or a crossword puzzle (part 2). true: correct or happening false: not correct or not happening flowchart: diagram of steps or choices Check your planned condition and response. | Complete Summative Activity #4: Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior. Submit the completed flowchart in class or on Google Classroom. Program one sensor-triggered behavior. Test the behavior in the challenge area. Debug one problem with the condition or response. Improve the behavior after testing. | Show one working sensor response. Record one test result and one improvement. |
-| Week 9 | 45 minutes | Plan a mini-challenge | Plan your mini-challenge with a goal, commands, test area, and success rule. | Answer the warm-up question: What should your robot do by the end of the challenge?<br>Review July Week 5 practice vocabulary with a quick matching activity. test area: space used for trying work commands: program instructions blocks: coding pieces<br>Choose a realistic goal using movement plus one output or sensor. | Plan your mini-challenge with a goal, commands, test area, and success rule. List the mBot cards or blocks you will need. Check that your goal is possible in class time. | Submit your mini-challenge plan. Write one question you need to solve next class. |
-| Week 9 | 90 minutes | mBot mini-challenge practice | Build and test your chosen mini-challenge. | Review your mini-challenge plan. Prepare the robot, cards, and test area.<br>Review July Week 5 practice vocabulary with a quick matching activity. challenge: task that takes effort goal: what you are trying to do success rule: rule that says the task worked | Build and test your chosen mini-challenge. Record one problem and one improvement. Ask another group to watch your test and give one suggestion. Improve your program after feedback. | Demonstrate your best attempt. Reflect on what you will improve in August. |
-
+| Week 8 | 90 minutes | Ultrasonic condition practice | Practice a flowchart and mBlock program with one ultrasonic distance condition and two different robot responses. | Review July Week 4 practice vocabulary with Blooket or a crossword puzzle (part 2). true: correct or happening false: not correct or not happening flowchart: diagram of steps or choices Review a sample numbered distance condition. | Create a practice flowchart with Start, ultrasonic input, a numbered threshold with a unit, True and False labels, and two different responses. Match the flowchart to a sample if/else program. Test one sensor-triggered behavior and correct one problem. | Show the corrected practice response. Explain which response runs when the condition is true. |
+| Week 9 | 45 minutes | Prepare for Summative 4 | Interpret the assigned ultrasonic sensor task and organize the required flowchart, code, and demonstration evidence. | Review the Summative #4 task sheet and rubric.<br>Review July Week 5 practice vocabulary with a quick matching activity. ultrasonic sensor: measures distance with sound threshold: number that separates responses branch: one program path | Examine the teacher-assigned project, distance threshold, and required True and False responses. Label the nine required flowchart features. Rehearse the English explanation using at least three task vocabulary words. Confirm partner roles and equipment procedures. | Complete a readiness check for the flowchart, assigned project, English explanation, and numbered mBot kit. |
+| Week 9 | 90 minutes | Summative 4 - Ultrasonic Sensor Task | Complete the teacher-assigned mBot ultrasonic sensor flowchart and programming task. | Open the assigned mBlock project, collect the numbered mBot kit, and review partner roles.<br>Review July Week 5 practice vocabulary. upload: transfer a program to the robot demonstrate: show clearly assigned: chosen by the teacher | Complete Summative Activity #4: With a partner, create a flowchart showing how the mBot uses its ultrasonic sensor to choose between two responses; modify the assigned mBlock project; connect, run or upload, and demonstrate the behavior; save and submit the project; and explain the sensor condition and responses in English. Follow all equipment-handling and return procedures. | Submit the flowchart and saved project. Demonstrate both responses and complete the equipment return check. |

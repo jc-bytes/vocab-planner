@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -14,6 +15,7 @@ const widths = [1280, 1121, 1120, 1024, 901, 900, 768, 390, 320];
 const views = [
     ['Today', 'main-menu-view'],
     ['Vocabulary', 'vocab-selection-view'],
+    ['Sparks', 'student-sparks-view'],
     ['Activity menu', 'activity-menu-view'],
     ['Activity view', 'activity-view'],
     ['Arcade', 'arcade-view']
@@ -89,10 +91,11 @@ async function installFixture(page) {
         localStorage.setItem('student_selected_subject', 'technology');
         app.activities.renderDashboard();
         await app.activities.renderStudentHome();
+        await app.activities.renderSparkLibrary();
         await app.activities.loadVocabulary(source, { fromRoute: true });
 
         const style = document.createElement('style');
-        style.textContent = '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';
+        style.textContent = 'html body .app-container{--student-sidebar-transition-duration:0ms!important}*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';
         document.head.appendChild(style);
     });
 }
@@ -115,17 +118,26 @@ async function readShellState(page, width, view) {
 
         const app = document.querySelector('.app-container');
         const header = document.querySelector('.student-app-header');
+        const topbar = document.querySelector('.student-top-bar');
         const main = document.querySelector('.app-container > main');
+        const activeView = main?.querySelector(':scope > .view.active:not(.hidden)');
         const sidebarPicker = document.querySelector('#student-subject-picker');
-        const pagePicker = document.querySelector('#vocab-subject-picker');
+        const vocabularyPicker = document.querySelector('#vocab-subject-picker');
+        const sparkPicker = document.querySelector('#spark-subject-picker');
+        const vocabularyGrid = document.querySelector('#vocab-selection-view .trimester-vocab-grid');
+        const pagePicker = view === 'Sparks' ? sparkPicker : vocabularyPicker;
         const toggle = document.querySelector('#student-mobile-menu-toggle');
         const tabs = document.querySelector('#student-tabs');
         const activityChoices = [...document.querySelectorAll('#activity-menu-view [data-activity]')];
         const appStyle = window.getComputedStyle(app);
+        const headerStyle = window.getComputedStyle(header);
+        const topbarStyle = window.getComputedStyle(topbar);
         const mainStyle = window.getComputedStyle(main);
+        const activeViewStyle = activeView ? window.getComputedStyle(activeView) : null;
         const hiddenControls = [
             sidebarPicker.querySelector('select'),
-            pagePicker.querySelector('select'),
+            vocabularyPicker.querySelector('select'),
+            sparkPicker.querySelector('select'),
             toggle,
             ...tabs.querySelectorAll('button')
         ].filter(Boolean).filter(control => !isVisible(control));
@@ -137,6 +149,7 @@ async function readShellState(page, width, view) {
 
         return {
             width,
+            viewportHeight: window.innerHeight,
             view,
             compactClass: header.classList.contains('student-mobile-compact'),
             app: {
@@ -147,14 +160,35 @@ async function readShellState(page, width, view) {
             },
             header: {
                 rect: roundRect(header),
-                position: window.getComputedStyle(header).position
+                position: headerStyle.position,
+                backgroundColor: headerStyle.backgroundColor,
+                borderRightWidth: headerStyle.borderRightWidth,
+                boxShadow: headerStyle.boxShadow
+            },
+            topbar: {
+                visible: isVisible(topbar),
+                rect: roundRect(topbar),
+                backgroundColor: topbarStyle.backgroundColor,
+                boxShadow: topbarStyle.boxShadow,
+                statusWidth: Math.round(document.querySelector('.student-top-bar .student-identity')?.getBoundingClientRect().width || 0),
+                trackWidth: Math.round(document.querySelector('.student-top-bar .student-xp-track')?.getBoundingClientRect().width || 0)
             },
             main: {
                 rect: roundRect(main),
                 marginLeft: mainStyle.marginLeft,
-                gridColumn: mainStyle.gridColumn
+                gridColumn: mainStyle.gridColumn,
+                borderRadius: mainStyle.borderRadius,
+                overflowY: mainStyle.overflowY
+            },
+            activeView: {
+                id: activeView?.id || '',
+                rect: activeView ? roundRect(activeView) : [0, 0, 0, 0],
+                overflowY: activeViewStyle?.overflowY || ''
             },
             pagePickerVisible: isVisible(pagePicker),
+            vocabularyGridColumns: isVisible(vocabularyGrid)
+                ? window.getComputedStyle(vocabularyGrid).gridTemplateColumns.split(/\s+/).filter(Boolean).length
+                : 0,
             sidebarPickerVisible: isVisible(sidebarPicker),
             toggleVisible: isVisible(toggle),
             tabsVisible: isVisible(tabs),
@@ -174,7 +208,8 @@ async function readShellState(page, width, view) {
                     .filter(element => element.getBoundingClientRect().right > document.documentElement.clientWidth + 0.5)
                     .map(element => element.id || element.className || element.tagName)
             },
-            overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth
+            overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth,
+            verticalOverflow: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) - window.innerHeight
         };
     }, { width, view });
 }
@@ -182,6 +217,7 @@ async function readShellState(page, width, view) {
 function assertShellState(state) {
     const compact = state.width <= 1120;
     const vocabulary = state.view === 'Vocabulary';
+    const subjectPage = vocabulary || state.view === 'Sparks';
     const arcade = state.view === 'Arcade';
     const failures = [];
 
@@ -191,36 +227,67 @@ function assertShellState(state) {
             failures.push(`compact header geometry ${JSON.stringify(state.header)}`);
         }
         if (state.main.rect[0] !== 0 || state.main.marginLeft !== '0px') failures.push(`compact rail ${JSON.stringify(state.main)}`);
+        if (state.topbar.visible) failures.push('wide identity top bar is visible in compact shell');
         if (state.sidebarPickerVisible) failures.push('compact sidebar picker is visible');
         if (!state.toggleVisible || state.tabsVisible) failures.push('compact navigation ownership is wrong');
-        if (vocabulary !== state.pagePickerVisible) failures.push('compact page picker ownership is wrong');
+        if (subjectPage !== state.pagePickerVisible) failures.push('compact page picker ownership is wrong');
         if (state.heights.toggle !== 44) failures.push(`compact toggle height ${state.heights.toggle}`);
-        if (vocabulary && state.heights.pagePicker !== 44) failures.push(`compact picker height ${state.heights.pagePicker}`);
+        if (subjectPage && state.heights.pagePicker !== 44) failures.push(`compact picker height ${state.heights.pagePicker}`);
     } else {
         if (state.compactClass) failures.push('compact class remains active in wide shell');
         if (state.header.position !== 'fixed' || state.header.rect[0] !== 0 || state.header.rect[2] !== 256) {
             failures.push(`wide sidebar geometry ${JSON.stringify(state.header)}`);
         }
+        if (!state.topbar.visible
+            || state.topbar.rect[0] !== 256
+            || state.topbar.rect[1] !== 0
+            || state.topbar.rect[2] !== state.width - 256
+            || state.topbar.rect[3] !== 52) {
+            failures.push(`wide top bar geometry ${JSON.stringify(state.topbar)}`);
+        }
+        if (state.header.backgroundColor !== state.topbar.backgroundColor
+            || state.header.borderRightWidth !== '0px'
+            || state.header.boxShadow !== 'none'
+            || state.topbar.boxShadow !== 'none') {
+            failures.push(`sidebar/top-bar seam ${JSON.stringify({ header: state.header, topbar: state.topbar })}`);
+        }
+        if (state.topbar.statusWidth > 448 || state.topbar.trackWidth > 288) {
+            failures.push(`top-bar status cluster is too wide ${JSON.stringify(state.topbar)}`);
+        }
         if (!state.sidebarPickerVisible || state.pagePickerVisible) failures.push('wide picker ownership is wrong');
         if (state.toggleVisible || !state.tabsVisible) failures.push('wide navigation ownership is wrong');
         if (state.heights.sidebarPicker !== 52) failures.push(`wide picker height ${state.heights.sidebarPicker}`);
+        if (state.main.rect[1] !== 52 || state.main.borderRadius !== '22px') {
+            failures.push(`rounded content surface ${JSON.stringify(state.main)}`);
+        }
+        if (state.main.rect[1] + state.main.rect[3] !== state.viewportHeight - 12
+            || state.main.overflowY !== 'hidden'
+            || state.activeView.overflowY !== 'auto'
+            || state.activeView.rect[3] <= 0
+            || state.activeView.rect[1] < state.main.rect[1]
+            || state.activeView.rect[1] + state.activeView.rect[3] > state.main.rect[1] + state.main.rect[3]) {
+            failures.push(`inner content scroll ownership ${JSON.stringify({ main: state.main, activeView: state.activeView })}`);
+        }
+        if (vocabulary && state.vocabularyGridColumns > 0 && state.vocabularyGridColumns !== 4) {
+            failures.push(`desktop vocabulary grid has ${state.vocabularyGridColumns} columns instead of 4`);
+        }
+        if (state.verticalOverflow !== 0) {
+            failures.push(`wide document scroll changed: expected 0px, got ${state.verticalOverflow}px`);
+        }
 
         if (arcade) {
-            if (state.app.display !== 'grid'
-                || !state.app.columns.startsWith('260px ')
-                || state.app.gap !== '32px'
-                || state.main.gridColumn !== '2'
-                || state.main.marginLeft !== '0px'
-                || state.main.rect[0] !== 292) {
+            if (state.app.display !== 'block'
+                || state.main.marginLeft !== '268px'
+                || state.main.rect[0] !== 268) {
                 failures.push(`Arcade wide ownership ${JSON.stringify({ app: state.app, main: state.main })}`);
             }
-        } else if (state.main.rect[0] !== 256 || state.main.marginLeft !== '256px') {
+        } else if (state.main.rect[0] !== 268 || state.main.marginLeft !== '268px') {
             failures.push(`normal wide rail ${JSON.stringify(state.main)}`);
         }
     }
 
-    if (vocabulary && Number(state.pagePickerVisible) + Number(state.sidebarPickerVisible) !== 1) {
-        failures.push('Vocabulary does not have exactly one visible subject picker');
+    if (subjectPage && Number(state.pagePickerVisible) + Number(state.sidebarPickerVisible) !== 1) {
+        failures.push(`${state.view} does not have exactly one visible subject picker`);
     }
     if (!state.hiddenControlsRejectFocus) failures.push('a hidden shell control accepted programmatic focus');
 
@@ -316,6 +383,240 @@ async function assertResizeTransition(page) {
     }
 }
 
+async function assertCollapsedSidebar(page) {
+    await page.setViewportSize({ width: 1280, height: viewportHeight });
+    await page.evaluate(() => window.studentApp.switchView('main-menu-view'));
+    const expandedAccount = await page.evaluate(() => {
+        const top = selector => Math.round(document.querySelector(selector)?.getBoundingClientRect().top || 0);
+        const center = selector => {
+            const bounds = document.querySelector(selector)?.getBoundingClientRect();
+            return [Math.round((bounds?.left || 0) + (bounds?.width || 0) / 2), Math.round((bounds?.top || 0) + (bounds?.height || 0) / 2)];
+        };
+        return {
+            coinTop: top('#coin-balance'),
+            logoutTop: top('#sign-out-btn'),
+            coinLabel: document.querySelector('.student-coin-label')?.textContent?.trim(),
+            coinAlignment: window.getComputedStyle(document.querySelector('#coin-balance')).justifyContent,
+            toggleIconCenter: center('#student-sidebar-toggle svg'),
+            activeNavIconCenter: center('.student-tab.active svg')
+        };
+    });
+    assert.ok(expandedAccount.coinTop > 700, `expanded account controls are not in the lower rail: ${JSON.stringify(expandedAccount)}`);
+    assert.ok(expandedAccount.logoutTop > expandedAccount.coinTop, `coins and logout are not in separate rows: ${JSON.stringify(expandedAccount)}`);
+    assert.equal(expandedAccount.coinLabel, 'Coins');
+    assert.equal(expandedAccount.coinAlignment, 'flex-start');
+
+    await page.click('#student-sidebar-toggle');
+    await page.waitForTimeout(120);
+
+    const collapsed = await page.evaluate(() => {
+        const rect = selector => document.querySelector(selector)?.getBoundingClientRect();
+        const headerRect = rect('.student-app-header');
+        const mainRect = rect('.app-container > main');
+        const topbarRect = rect('.student-top-bar');
+        const toggle = document.querySelector('#student-sidebar-toggle');
+        const center = selector => {
+            const bounds = rect(selector);
+            return [Math.round((bounds?.left || 0) + (bounds?.width || 0) / 2), Math.round((bounds?.top || 0) + (bounds?.height || 0) / 2)];
+        };
+        return {
+            active: document.querySelector('.app-container')?.classList.contains('student-sidebar-collapsed'),
+            stored: localStorage.getItem('student_sidebar_collapsed'),
+            headerWidth: Math.round(headerRect?.width || 0),
+            mainX: Math.round(mainRect?.x || 0),
+            topbarX: Math.round(topbarRect?.x || 0),
+            label: toggle?.getAttribute('aria-label'),
+            iconPresent: Boolean(toggle?.querySelector('svg')),
+            navLabels: [...document.querySelectorAll('.student-tab')].map(tab => tab.getAttribute('aria-label')),
+            coinTop: Math.round(document.querySelector('#coin-balance')?.getBoundingClientRect().top || 0),
+            logoutTop: Math.round(document.querySelector('#sign-out-btn')?.getBoundingClientRect().top || 0),
+            toggleIconCenter: center('#student-sidebar-toggle svg'),
+            activeNavIconCenter: center('.student-tab.active svg'),
+            overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth
+        };
+    });
+    assert.deepEqual({
+        ...collapsed,
+        navLabels: collapsed.navLabels.slice(0, 3),
+        coinTop: 0,
+        logoutTop: 0,
+        toggleIconCenter: [0, 0],
+        activeNavIconCenter: [0, 0]
+    }, {
+        active: true,
+        stored: 'true',
+        headerWidth: 76,
+        mainX: 88,
+        topbarX: 76,
+        label: 'Expand navigation',
+        iconPresent: true,
+        navLabels: ['Today', 'Vocabulary', 'Sparks'],
+        coinTop: 0,
+        logoutTop: 0,
+        toggleIconCenter: [0, 0],
+        activeNavIconCenter: [0, 0],
+        overflow: 0
+    });
+    assert.match(collapsed.navLabels[3], /^Arcade/);
+    assert.ok(collapsed.coinTop > 700, `collapsed coins are not in the lower rail: ${collapsed.coinTop}`);
+    assert.ok(collapsed.logoutTop > collapsed.coinTop, `collapsed logout is not below coins: ${JSON.stringify(collapsed)}`);
+    assert.deepEqual(collapsed.toggleIconCenter, expandedAccount.toggleIconCenter, 'collapse control moved between rail states');
+    assert.ok(
+        Math.abs(collapsed.activeNavIconCenter[0] - expandedAccount.activeNavIconCenter[0]) <= 1
+            && collapsed.activeNavIconCenter[1] === expandedAccount.activeNavIconCenter[1],
+        `active navigation icon moved between rail states: ${JSON.stringify({ expanded: expandedAccount.activeNavIconCenter, collapsed: collapsed.activeNavIconCenter })}`
+    );
+    if (snapshotDir) {
+        await page.screenshot({ path: path.join(snapshotDir, '1280-collapsed-sidebar.png'), animations: 'disabled' });
+    }
+
+    await page.evaluate(() => window.studentApp.switchView('arcade-view'));
+    await page.waitForTimeout(120);
+    const arcade = await page.evaluate(() => {
+        const app = document.querySelector('.app-container');
+        const main = document.querySelector('.app-container > main');
+        return {
+            columns: window.getComputedStyle(app).gridTemplateColumns,
+            mainX: Math.round(main.getBoundingClientRect().x)
+        };
+    });
+    assert.equal(arcade.columns, 'none');
+    assert.equal(arcade.mainX, 88);
+
+    await page.click('#student-sidebar-toggle');
+    await page.waitForTimeout(120);
+}
+
+async function assertStudentDesignSystem(page, width, view) {
+    if (view === 'Activity view' || view === 'Arcade') return;
+
+    const state = await page.evaluate(currentView => {
+        const visibleControls = [...document.querySelectorAll('.view:not(.hidden) .btn, .view:not(.hidden) button')]
+            .filter(control => {
+                const style = window.getComputedStyle(control);
+                return style.display !== 'none' && style.visibility !== 'hidden' && control.getBoundingClientRect().width > 0;
+            });
+        const titleSelector = {
+            Today: '.student-dashboard-heading h2',
+            Vocabulary: '#vocab-selection-view .page-header__title',
+            Sparks: '#student-sparks-view .page-header__title',
+            'Activity menu': '#activity-menu-view .activity-menu-title-block > h2'
+        }[currentView];
+        const title = titleSelector ? document.querySelector(titleSelector) : null;
+        return {
+            bodyFont: window.getComputedStyle(document.body).fontFamily,
+            designSheetLoaded: [...document.styleSheets].some(sheet => sheet.href?.includes('student-design-system.css')),
+            titleSize: title ? Number.parseFloat(window.getComputedStyle(title).fontSize) : null,
+            undersizedControls: visibleControls
+                .map(control => ({
+                    label: control.getAttribute('aria-label') || control.textContent.trim().replace(/\s+/g, ' ').slice(0, 60),
+                    height: Math.round(control.getBoundingClientRect().height)
+                }))
+                .filter(control => control.height < 44)
+        };
+    }, view);
+
+    assert.equal(state.designSheetLoaded, true, 'student design-system stylesheet is not loaded');
+    assert.match(state.bodyFont, /^Inter,/, `student UI is not using Inter: ${state.bodyFont}`);
+    assert.deepEqual(state.undersizedControls, [], `controls below 44px at ${width}px in ${view}: ${JSON.stringify(state.undersizedControls)}`);
+
+    if (view === 'Today' && width > 700) {
+        assert.ok(state.titleSize >= 32 && state.titleSize <= 48, `Today display title is outside the approved scale: ${state.titleSize}px`);
+    } else if (view !== 'Today') {
+        assert.equal(state.titleSize, 24, `${view} page title must use the 24px page-title role`);
+    }
+}
+
+async function assertCompactTodaySupportRow(page) {
+    await page.setViewportSize({ width: 1280, height: viewportHeight });
+    await page.evaluate(() => window.studentApp.switchView('main-menu-view'));
+    await page.waitForTimeout(120);
+
+    const layout = await page.evaluate(() => {
+        const rect = selector => {
+            const bounds = document.querySelector(selector)?.getBoundingClientRect();
+            return bounds ? {
+                top: Math.round(bounds.top),
+                bottom: Math.round(bounds.bottom),
+                left: Math.round(bounds.left),
+                width: Math.round(bounds.width),
+                height: Math.round(bounds.height)
+            } : null;
+        };
+        return {
+            week: rect('#student-home-panel-week'),
+            gate: rect('#student-home-dashboard > .student-arcade-gate-notice'),
+            spark: rect('#student-home-panel-spark')
+        };
+    });
+
+    assert.ok(layout.week, 'This Week panel is missing');
+    assert.ok(layout.gate, 'Arcade unlock progress is missing');
+    assert.ok(layout.week.height <= 250, `lower dashboard row is too tall: ${JSON.stringify(layout)}`);
+    assert.ok(layout.gate.top > layout.week.top, `Arcade unlock progress is not inside This Week: ${JSON.stringify(layout)}`);
+    assert.ok(layout.gate.bottom <= layout.week.bottom, `Arcade unlock progress overflows This Week: ${JSON.stringify(layout)}`);
+    assert.ok(layout.gate.left > layout.week.left, `Arcade unlock progress does not have an inset: ${JSON.stringify(layout)}`);
+    assert.ok(layout.gate.width < layout.week.width, `Arcade unlock progress is not contained by This Week: ${JSON.stringify(layout)}`);
+    if (!layout.spark) {
+        assert.ok(layout.week.width > 0, `This Week does not fill the support row: ${JSON.stringify(layout)}`);
+    } else {
+        assert.equal(layout.spark.top, layout.week.top, `Spark is not aligned with the support row: ${JSON.stringify(layout)}`);
+        assert.equal(layout.spark.height, layout.week.height, `Spark has a different support-row height: ${JSON.stringify(layout)}`);
+    }
+}
+
+async function assertShortDesktopTodayStartsAtTop(page) {
+    await page.setViewportSize({ width: 1414, height: 866 });
+    await page.evaluate(() => {
+        window.studentApp.switchView('main-menu-view');
+        const view = document.querySelector('#main-menu-view');
+        if (view) view.scrollTop = 0;
+    });
+    await page.waitForTimeout(120);
+
+    const layout = await page.evaluate(() => {
+        const rect = selector => {
+            const bounds = document.querySelector(selector)?.getBoundingClientRect();
+            return bounds ? {
+                top: Math.round(bounds.top),
+                bottom: Math.round(bounds.bottom)
+            } : null;
+        };
+        const view = document.querySelector('#main-menu-view');
+        return {
+            view: rect('#main-menu-view'),
+            heading: rect('#main-menu-view > .student-dashboard-heading'),
+            hero: rect('#student-home-dashboard .student-continue-hero'),
+            week: rect('#student-home-panel-week'),
+            gate: rect('#student-home-dashboard > .student-arcade-gate-notice'),
+            spark: rect('#student-home-panel-spark'),
+            sparkContent: rect('#student-home-panel-spark .student-spark-card > :last-child'),
+            scrollTop: Math.round(view?.scrollTop || 0),
+            scrollHeight: Math.round(view?.scrollHeight || 0),
+            clientHeight: Math.round(view?.clientHeight || 0)
+        };
+    });
+
+    assert.ok(layout.view && layout.heading && layout.hero, `short desktop Today layout is incomplete: ${JSON.stringify(layout)}`);
+    assert.equal(layout.scrollTop, 0, `short desktop Today unexpectedly starts scrolled: ${JSON.stringify(layout)}`);
+    assert.ok(layout.scrollHeight <= layout.clientHeight, `short desktop Today requires scrolling: ${JSON.stringify(layout)}`);
+    assert.ok(layout.heading.top >= layout.view.top, `Today heading is clipped above the view: ${JSON.stringify(layout)}`);
+    assert.ok(layout.hero.top >= layout.heading.bottom, `continue hero overlaps or precedes the Today heading: ${JSON.stringify(layout)}`);
+    assert.ok(layout.week?.bottom <= layout.view.bottom, `This Week is below the fold: ${JSON.stringify(layout)}`);
+    assert.ok(layout.gate?.bottom <= layout.view.bottom, `Arcade unlock progress is below the fold: ${JSON.stringify(layout)}`);
+    if (layout.spark) {
+        assert.ok(layout.spark.bottom <= layout.view.bottom, `Spark is below the fold: ${JSON.stringify(layout)}`);
+        assert.ok(layout.sparkContent?.bottom <= layout.spark.bottom, `Spark content overflows its card: ${JSON.stringify(layout)}`);
+    }
+    const contentBottom = Math.max(layout.week?.bottom || 0, layout.spark?.bottom || 0);
+    const topGap = layout.heading.top - layout.view.top;
+    const bottomGap = layout.view.bottom - contentBottom;
+    assert.ok(Math.abs(topGap - bottomGap) <= 3, `Today content is not vertically centered: ${JSON.stringify({ ...layout, topGap, bottomGap })}`);
+    if (snapshotDir) {
+        await page.screenshot({ path: path.join(snapshotDir, '1414-laptop-today.png'), animations: 'disabled' });
+    }
+}
+
 let server = null;
 let browser = null;
 const browserProblems = [];
@@ -341,6 +642,7 @@ try {
     });
     page.on('pageerror', error => browserProblems.push(`pageerror: ${error.message}`));
     await installFixture(page);
+    await page.waitForTimeout(320);
 
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
@@ -349,6 +651,7 @@ try {
             await page.waitForTimeout(120);
             const state = await readShellState(page, width, view);
             assertShellState(state);
+            await assertStudentDesignSystem(page, width, view);
             if (view === 'Vocabulary') await assertHiddenControlsOutsideTabOrder(page, state);
             if (view === 'Activity menu' && width <= 390) {
                 await assertNarrowActivityControlsReachable(page, width);
@@ -361,6 +664,9 @@ try {
         }
     }
 
+    await assertCompactTodaySupportRow(page);
+    await assertShortDesktopTodayStartsAtTop(page);
+    await assertCollapsedSidebar(page);
     await assertResizeTransition(page);
     if (browserProblems.length) {
         throw new Error(`Student shell audit emitted browser errors:\n${browserProblems.join('\n')}`);
@@ -368,7 +674,7 @@ try {
     if (snapshotDir) {
         fs.writeFileSync(path.join(snapshotDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
     }
-    console.log(`Student shell regression tests passed for ${widths.length} widths, ${views.length} views, and the 1120px ↔ 1121px transition.`);
+    console.log(`Student shell regression tests passed for ${widths.length} widths, ${views.length} views, the collapsible rail, and the 1120px ↔ 1121px transition.`);
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

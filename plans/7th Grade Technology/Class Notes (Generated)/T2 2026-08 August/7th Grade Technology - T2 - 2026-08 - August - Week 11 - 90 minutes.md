@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 11
 duration: 90 minutes
-topic: "Final game improvement and presentation prep"
+topic: "Final rhythm-game testing and presentation prep"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 11 |
 | Class Length | 90 minutes |
-| Topic | Final game improvement and presentation prep |
+| Topic | Final rhythm-game testing and presentation prep |
 
 ## Class Objective
 
-Complete the required features, debug the game, prepare a 1.5-2 minute demonstration, and write a short real-world application explanation.
+Complete the playable game, run repeated tests, document one improvement, and prepare the exam demonstration.
 
 ## Pre-Activities
 
-- Review Week 11 practice vocabulary (part 2). functionality: How well something does what it should do application: A real use for a skill or project reflection: Thinking about what happened and what you learned Review the rubric and choose the two criteria that need the most attention. Test the game from start to finish once.
+- Review Week 11 practice vocabulary (part 2). tempo: The speed of the beat or timing pattern testing: Trying something to see if it works reliability: Working correctly in repeated tests Review the rubric and test all four lanes from start to finish.
 
 ## While Activities
 
-- Continue Exam Project: Complete the required features, debug the game, prepare a 1.5-2 minute demonstration, and write a short real-world application explanation.
+- Continue Exam Project: Complete required features, run at least three documented tests, fix one gameplay problem, collect a final screenshot or project link, and prepare a 1.5-2 minute explanation of the target generator, key/collision logic, score or miss rule, and testing improvement.
 
 ## Post-Activities
 
-- Practice the demonstration with a partner. Revise one unclear explanation.
+- Rehearse with a partner and correct one unclear code explanation.
 
 ## Prep Notes
 

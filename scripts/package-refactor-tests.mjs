@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 import { Packer } from 'docx';
 import { readFile } from 'node:fs/promises';
 import { buildQuizWordDocument } from '../js/quizMakerWordExportMethods.js';
-import { getLevelProgress, getStudentExperience } from '../js/student/studentExperience.js';
+import { getActivityXp, getLevelProgress, getStudentExperience } from '../js/student/studentExperience.js';
 
 function assertIncludes(text, needle, label) {
     if (text.includes(needle)) return;
@@ -137,6 +137,11 @@ async function runDocxTests() {
 }
 
 function runStudentExperienceTests() {
+    if (getActivityXp('flashcards') !== 10) throw new Error('Flashcards should use the easiest XP reward.');
+    if (getActivityXp('crossword') !== 35) throw new Error('Crossword should use a medium-high XP reward.');
+    if (getActivityXp('illustration') !== 50) throw new Error('Illustration should use the highest XP reward.');
+    if (getActivityXp('unknown-activity') !== 10) throw new Error('Unknown activities should use the safe minimum XP reward.');
+
     const experience = getStudentExperience({
         units: {
             'technology:week-1': {

@@ -7,10 +7,14 @@ export function mapSettingsRow(row) {
 }
 
 export const settingsRepository = {
-    async get(key) {
+    async get(key, options = {}) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient()
+        let query = supabaseService.getClient()
             .from('app_settings').select('*').eq('key', key).maybeSingle();
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return mapSettingsRow(data);
     },

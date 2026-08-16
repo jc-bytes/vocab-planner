@@ -5,7 +5,7 @@ month: August
 trimester: 2nd Trimester
 week: Week 11
 duration: 45 minutes
-topic: "Score, timer, and feedback"
+topic: "Score, misses, time, and tempo"
 tags:
   - class-plan
   - grade-7
@@ -28,23 +28,23 @@ Grade Index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grad
 | Trimester | 2nd Trimester |
 | Week | Week 11 |
 | Class Length | 45 minutes |
-| Topic | Score, timer, and feedback |
+| Topic | Score, misses, time, and tempo |
 
 ## Class Objective
 
-Improve the score, timer, and feedback subroutine.
+Make the score, miss rule, timer, and tempo work consistently across all four lanes.
 
 ## Pre-Activities
 
-- Review Week 11 practice vocabulary (part 1). score: A number that tracks points or progress timer: A tool or variable that tracks time organization: Keeping work clear and easy to follow
+- Review Week 11 practice vocabulary (part 1). score: A number that changes after a hit or miss miss: A target that reaches the end without a correct key press timer: A tool or variable that tracks time
 
 ## While Activities
 
-- Continue Exam Project: Improve the score, timer, and feedback subroutine. Test whether the game responds correctly to correct and incorrect actions.
+- Continue Exam Project: Add points for correct hits, apply the chosen miss consequence, display score and time, connect tempo to target movement or spacing, and test the start and end conditions.
 
 ## Post-Activities
 
-- Save the improved game. Write one sentence explaining how a variable controls the game.
+- Save the improved game and explain how one variable controls gameplay.
 
 ## Prep Notes
 

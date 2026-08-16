@@ -32,8 +32,8 @@ export class StudentActivityCalendar {
         return 'IIIT';
     }
 
-    async loadSchoolCalendar() {
-        if (this.sm.authDisabled) {
+    async loadSchoolCalendar(options = {}) {
+        if (this.sm.authDisabled || !navigator.onLine) {
             try {
                 const localCalendar = JSON.parse(localStorage.getItem(SCHOOL_CALENDAR_LOCAL_KEY) || 'null');
                 this.schoolCalendar = localCalendar ? normalizeSchoolCalendar(localCalendar) : null;
@@ -50,7 +50,7 @@ export class StudentActivityCalendar {
         }
 
         try {
-            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY);
+            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY, options);
             this.schoolCalendar = settings ? normalizeSchoolCalendar(settings) : null;
         } catch (error) {
             console.error('Failed to load school calendar:', error);

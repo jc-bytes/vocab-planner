@@ -1,0 +1,389 @@
+/*
+ * Student design-system ownership layer.
+ *
+ * This file owns typography and spacing for the student shell, authentication,
+ * Today, Vocabulary, Sparks, Activity Menu, and shared student modals. Activity
+ * internals, canvas games, and embedded third-party experiences remain isolated.
+ */
+
+.student-site {
+    /* Font families */
+    --student-font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --student-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+    /* Type scale */
+    --student-type-caption-size: 0.75rem;
+    --student-type-secondary-size: 0.875rem;
+    --student-type-body-size: 1rem;
+    --student-type-card-title-size: 1.125rem;
+    --student-type-section-title-size: 1.25rem;
+    --student-type-page-title-size: 1.5rem;
+    --student-type-display-size: clamp(2rem, 5vw, 3rem);
+
+    --student-weight-regular: 400;
+    --student-weight-medium: 500;
+    --student-weight-semibold: 600;
+    --student-weight-bold: 700;
+
+    --student-leading-display: 1.1;
+    --student-leading-heading: 1.2;
+    --student-leading-card: 1.25;
+    --student-leading-caption: 1.35;
+    --student-leading-secondary: 1.45;
+    --student-leading-body: 1.5;
+
+    --student-tracking-normal: 0;
+    --student-tracking-label: 0.02em;
+    --student-tracking-eyebrow: 0.08em;
+
+    /* Four-pixel spacing scale */
+    --student-space-1: 0.25rem;
+    --student-space-2: 0.5rem;
+    --student-space-3: 0.75rem;
+    --student-space-4: 1rem;
+    --student-space-6: 1.5rem;
+    --student-space-8: 2rem;
+    --student-space-12: 3rem;
+    --student-space-16: 4rem;
+
+    /* Semantic spacing */
+    --student-gap-inline: var(--student-space-2);
+    --student-gap-related: var(--student-space-3);
+    --student-control-padding-inline: var(--student-space-4);
+    --student-card-padding: var(--student-space-6);
+    --student-section-gap: var(--student-space-8);
+    --student-page-gap: var(--student-space-12);
+    --student-touch-target: 2.75rem;
+
+    /* Bridge shared primitives to the student contract. */
+    --font-family-sans: var(--student-font-sans);
+    --font-family-mono: var(--student-font-mono);
+    --type-body-size: var(--student-type-body-size);
+    --type-body-line-height: var(--student-leading-body);
+    --type-secondary-size: var(--student-type-secondary-size);
+    --type-secondary-line-height: var(--student-leading-secondary);
+    --type-caption-size: var(--student-type-caption-size);
+    --type-caption-line-height: var(--student-leading-caption);
+    --type-card-title-size: var(--student-type-card-title-size);
+    --type-card-title-line-height: var(--student-leading-card);
+    --type-section-title-size: var(--student-type-section-title-size);
+    --type-section-title-line-height: var(--student-leading-heading);
+    --type-page-title-size: var(--student-type-page-title-size);
+    --type-page-title-line-height: var(--student-leading-heading);
+    --touch-target: var(--student-touch-target);
+
+    font-family: var(--student-font-sans);
+    font-size: var(--student-type-body-size);
+    line-height: var(--student-leading-body);
+}
+
+/* Component contracts */
+
+.student-site :where(button, input, select, textarea, optgroup, option) {
+    font-family: var(--student-font-sans);
+}
+
+.student-site :where(
+    h1,
+    h2,
+    h3,
+    .student-vocab-card h3,
+    .student-vocab-row strong,
+    .game-card-copy h3,
+    .activity-card h3
+) {
+    font-family: var(--student-font-sans);
+    letter-spacing: var(--student-tracking-normal);
+}
+
+.student-site :where(
+    .teacher-eyebrow,
+    .student-hero-purpose,
+    .student-vocab-purpose,
+    .student-vocab-schedule,
+    .student-vocab-row-header,
+    .game-counter,
+    .game-cost,
+    .progress-badge,
+    .coin-badge,
+    .student-spark-badge,
+    .student-spark-heading,
+    .student-continue-progress-top,
+    .word-hunt-title span
+) {
+    font-family: var(--student-font-sans);
+}
+
+.student-site :where(.page-header__title, .student-dashboard-heading h2) {
+    font-size: var(--student-type-page-title-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-heading);
+}
+
+/* Deliberately outrank historical component selectors through scoped specificity. */
+.student-site .student-dashboard-heading h2 {
+    font-size: var(--student-type-display-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-display);
+}
+
+.student-site .page-header .page-header__title {
+    font-size: var(--student-type-page-title-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-heading);
+}
+
+.student-site #activity-menu-view .activity-menu-title-block > h2 {
+    font-size: var(--student-type-page-title-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-heading);
+}
+
+.student-site :where(.section-header__title, .teacher-panel-header h3) {
+    font-size: var(--student-type-section-title-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-heading);
+}
+
+.student-site :where(
+    .student-vocab-card h3,
+    .student-vocab-row strong,
+    .student-spark-card h3,
+    .activity-card h3,
+    .card-title
+) {
+    font-size: var(--student-type-card-title-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-card);
+}
+
+.student-site .student-vocab-card h3,
+.student-site .student-vocab-row strong,
+.student-site .student-spark-card h3,
+.student-site .activity-card h3 {
+    font-size: var(--student-type-card-title-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-card);
+}
+
+.student-site :where(
+    .page-header__description,
+    .section-header__description,
+    .student-home-unit-copy span,
+    .student-home-unit-status span,
+    .student-vocab-card p,
+    .student-vocab-row span,
+    .student-spark-card p,
+    .activity-card p,
+    .activity-menu-unit-description,
+    .card-secondary
+) {
+    font-size: var(--student-type-secondary-size);
+    font-weight: var(--student-weight-regular);
+    line-height: var(--student-leading-secondary);
+}
+
+.student-site :where(
+    .teacher-eyebrow,
+    .student-hero-purpose,
+    .student-vocab-purpose,
+    .student-vocab-schedule,
+    .student-vocab-row-header,
+    .game-counter,
+    .game-cost,
+    .progress-badge,
+    .student-spark-badge,
+    .student-spark-heading,
+    .card-caption
+) {
+    font-size: var(--student-type-caption-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-caption);
+}
+
+.student-site :where(.teacher-eyebrow, .student-hero-purpose) {
+    letter-spacing: var(--student-tracking-eyebrow);
+    text-transform: uppercase;
+}
+
+.student-site .student-hero-purpose.is-required {
+    border-color: rgba(255, 183, 134, 0.38);
+    background: rgba(255, 183, 134, 0.16);
+    color: var(--color-tertiary);
+}
+
+.student-site .student-hero-purpose.is-unfinished {
+    border-color: rgba(173, 198, 255, 0.34);
+    background: rgba(173, 198, 255, 0.16);
+    color: var(--color-primary);
+}
+
+.student-site .student-hero-purpose.is-current {
+    border-color: rgba(221, 183, 255, 0.34);
+    background: rgba(221, 183, 255, 0.15);
+    color: var(--color-secondary);
+}
+
+.student-site :where(
+    .student-vocab-purpose,
+    .student-vocab-schedule,
+    .student-vocab-row-header,
+    .game-counter,
+    .game-cost,
+    .progress-badge,
+    .student-spark-badge,
+    .student-spark-heading
+) {
+    letter-spacing: var(--student-tracking-label);
+}
+
+.student-site :where(.btn, .student-home-tab, .teacher-tab, .vocab-view-toggle-btn) {
+    min-height: var(--student-touch-target);
+    padding-inline: var(--student-control-padding-inline);
+    font-size: var(--student-type-body-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-heading);
+}
+
+.student-site :where(.btn-compact, .activity-back-control, .student-export-menu-item) {
+    font-size: var(--student-type-secondary-size);
+}
+
+.student-site :where(.icon-btn, .password-toggle, .activity-close-btn, .game-select-nav-btn) {
+    min-width: var(--student-touch-target);
+    min-height: var(--student-touch-target);
+    padding: var(--student-space-2);
+}
+
+.student-site :where(.form-group, .form-field) {
+    gap: var(--student-space-2);
+    margin-bottom: var(--student-space-4);
+}
+
+.student-site :where(.form-group label, .form-label) {
+    font-size: var(--student-type-secondary-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-caption);
+}
+
+.student-site :where(.form-group input, .form-group select, .form-group textarea, .form-control) {
+    min-height: var(--student-touch-target);
+    padding: var(--student-space-3) var(--student-space-4);
+    font-size: var(--student-type-body-size);
+    line-height: var(--student-leading-body);
+}
+
+.student-site :where(.student-dashboard-heading, .page-header, #activity-menu-view > .section-header) {
+    margin-bottom: var(--student-section-gap);
+}
+
+.student-site :where(.student-home-dashboard, .vocab-grid, .student-sparks-library, .activities-grid) {
+    gap: var(--student-space-6);
+}
+
+.student-site :where(
+    .student-home-panel,
+    .student-vocab-card,
+    .student-spark-card,
+    .activity-card,
+    .auth-panel
+) {
+    padding: var(--student-card-padding);
+}
+
+.student-site :where(.student-home-panel, .student-spark-card, .activity-card) > * + * {
+    margin-top: var(--student-gap-related);
+}
+
+.student-site .student-continue-hero {
+    gap: var(--student-space-6);
+    padding: var(--student-space-8);
+}
+
+.student-site .student-continue-copy {
+    gap: var(--student-space-3);
+}
+
+.student-site .student-continue-copy h3 {
+    font-size: var(--student-type-display-size);
+    font-weight: var(--student-weight-bold);
+    line-height: var(--student-leading-display);
+}
+
+.student-site .student-continue-copy p {
+    font-size: var(--student-type-body-size);
+    line-height: var(--student-leading-body);
+}
+
+.student-site :where(.student-vocab-card, .student-vocab-row, .student-home-unit) {
+    gap: var(--student-space-3);
+}
+
+.student-site :where(.student-vocab-row, .student-home-unit) {
+    padding: var(--student-space-3) var(--student-space-4);
+}
+
+.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-body) {
+    font-size: var(--student-type-body-size);
+    line-height: var(--student-leading-body);
+}
+
+.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-header) {
+    gap: var(--student-space-4);
+    padding: var(--student-space-4) var(--student-space-6);
+}
+
+.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-body) {
+    padding: var(--student-space-6);
+}
+
+.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-footer) {
+    gap: var(--student-space-3);
+    padding: var(--student-space-4) var(--student-space-6);
+}
+
+@media (max-width: 700px) {
+    .student-site {
+        --student-card-padding: var(--student-space-4);
+        --student-section-gap: var(--student-space-6);
+    }
+
+    .student-site .student-continue-hero {
+        gap: var(--student-space-4);
+        padding: var(--student-space-6);
+    }
+
+    .student-site :where(.btn, .student-home-tab, .teacher-tab, .vocab-view-toggle-btn) {
+        font-size: var(--student-type-secondary-size);
+    }
+
+    .student-site #vocab-selection-view .vocab-selection-header {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "intro"
+            "subject"
+            "view";
+        align-items: stretch;
+        gap: var(--student-space-3);
+    }
+
+    .student-site #vocab-selection-view .vocab-page-intro {
+        grid-area: intro;
+        width: 100%;
+    }
+
+    .student-site #vocab-selection-view .vocab-header-subject-picker {
+        grid-area: subject;
+        justify-content: stretch;
+        width: 100%;
+    }
+
+    .student-site #vocab-selection-view .vocab-header-subject-picker .student-class-picker {
+        width: 100%;
+    }
+
+    .student-site #vocab-selection-view .vocab-view-toggle {
+        grid-area: view;
+        justify-self: start;
+    }
+}

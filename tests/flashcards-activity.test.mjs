@@ -36,8 +36,9 @@ function createFlashcards(words) {
     const activity = Object.create(FlashcardsActivity.prototype);
     activity.words = words;
     activity.currentIndex = 0;
-    activity.isFlipped = false;
+    activity.isFlipped = true;
     activity.answeredCards = new Set();
+    activity.questionReadyCards = new Set();
     activity.firstAttemptCorrectCards = new Set();
     activity.attemptsByCard = {};
     activity.feedback = '';
@@ -66,6 +67,7 @@ test('a correct answer unlocks the card and records first-attempt accuracy', () 
         { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' }
     ]);
 
+    activity.startCurrentQuestion();
     const result = activity.recordAnswer('A visual display of data.');
     const score = activity.getScore();
 
@@ -83,6 +85,7 @@ test('mistakes provide a retry and do not prevent eventual mastery', () => {
         { word: 'Chart', definition: 'A visual display of data.' }
     ]);
 
+    activity.startCurrentQuestion();
     const first = activity.recordAnswer('An unrelated action or object');
     const second = activity.recordAnswer('A visual display of data.');
     const score = activity.getScore();
@@ -94,6 +97,23 @@ test('mistakes provide a retry and do not prevent eventual mastery', () => {
     assert.equal(score.score, 100);
     assert.equal(score.accuracy, 0);
     assert.equal(score.isComplete, true);
+});
+
+test('students study the definition before the question becomes available', () => {
+    const activity = createFlashcards([
+        { word: 'Chart', definition: 'A visual display of data.', example: 'The chart compares our results.' }
+    ]);
+
+    const earlyAnswer = activity.recordAnswer('A visual display of data.');
+
+    assert.equal(activity.isFlipped, true);
+    assert.equal(activity.isCurrentQuestionReady(), false);
+    assert.equal(earlyAnswer.questionNotReady, true);
+    assert.equal(activity.attemptsByCard[0], undefined);
+
+    assert.equal(activity.startCurrentQuestion(), true);
+    assert.equal(activity.isCurrentQuestionReady(), true);
+    assert.equal(activity.isFlipped, false);
 });
 
 test('legacy timer state does not bypass the new mastery question', () => {
@@ -133,4 +153,26 @@ test('versioned mastery state restores answered cards and attempts', () => {
     assert.deepEqual(Array.from(activity.firstAttemptCorrectCards), [0]);
     assert.deepEqual(activity.attemptsByCard, { 0: 1, 1: 2 });
     assert.equal(activity.currentIndex, 1);
+    assert.equal(activity.isFlipped, true);
+    assert.equal(activity.isCurrentQuestionReady(), false);
+});
+
+test('version 3 state restores the study-to-question stage', () => {
+    const activity = createFlashcards([
+        { word: 'Chart', definition: 'A visual display of data.' },
+        { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' }
+    ]);
+    activity.initialState = {
+        masteryVersion: 3,
+        currentIndex: 1,
+        answeredCards: [],
+        questionReadyCards: [1],
+        firstAttemptCorrectCards: [],
+        attemptsByCard: {}
+    };
+
+    activity.restoreState();
+
+    assert.equal(activity.isCurrentQuestionReady(), true);
+    assert.equal(activity.isFlipped, false);
 });

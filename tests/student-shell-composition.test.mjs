@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+
+const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.url), 'utf8');
+const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
+const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
+const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
+const studentLauncherSource = readFileSync(new URL('../js/student/studentActivityLauncherMethods.js', import.meta.url), 'utf8');
 
 const sessionValues = new Map();
 globalThis.localStorage = {
@@ -77,9 +84,36 @@ test('StudentShell owns isolated lifecycle state', () => {
     assert.equal(second.wideShellMediaQuery, null);
 });
 
+test('student dashboard loading state hides real copy and resolves accessibly', () => {
+    assert.match(studentHtmlSource, /id="main-menu-view" class="view hidden student-home-loading" aria-busy="true"/);
+    assert.match(studentHtmlSource, /class="student-dashboard-heading" hidden/);
+    assert.match(studentHtmlSource, /class="student-dashboard-skeleton" role="status" aria-label="Loading dashboard"/);
+    assert.doesNotMatch(studentHtmlSource, /class="loading-spinner">Loading dashboard/);
+    assert.match(studentHomeSource, /classList\.remove\('student-home-loading'\)/);
+    assert.match(studentHomeSource, /setAttribute\('aria-busy', 'false'\)/);
+    assert.match(studentHomeSource, /removeAttribute\('hidden'\)/);
+});
+
+test('student sections use page-shaped loading states without exposing real headings', () => {
+    assert.match(studentHtmlSource, /id="vocab-selection-view" class="view hidden student-page-loading" aria-busy="true"/);
+    assert.match(studentHtmlSource, /id="student-sparks-view" class="view hidden student-page-loading" aria-busy="true"/);
+    assert.match(studentHtmlSource, /id="arcade-view" class="view hidden student-page-loading" aria-busy="true"/);
+    assert.match(studentHtmlSource, /student-session-loader/);
+    assert.doesNotMatch(studentHtmlSource, /class="loading-spinner">Loading (?:vocabularies|scores)/);
+    for (const kind of ['units', 'sparks', 'unit', 'activity', 'arcade', 'list']) {
+        assert.match(studentLoadingSource, new RegExp(`'${kind}'`));
+    }
+    assert.match(studentSparkSource, /getStudentPageSkeleton\('sparks', 'Loading Sparks'\)/);
+    assert.match(studentSparkSource, /setStudentPageLoading\(view, false\)/);
+    assert.match(studentLauncherSource, /getStudentPageSkeleton\('activity', 'Loading activity'\)/);
+    assert.match(studentLauncherSource, /setStudentPageLoading\(activityView, false\)/);
+});
+
 test('StudentManager declares the stable shell interface directly', () => {
     for (const method of [
         'setStudentWideShellMediaQuery',
+        'setStudentSidebarCollapsed',
+        'restoreStudentSidebarState',
         'switchView',
         'scheduleStudentScrollSave',
         'debugStudentScrollLifecycle',
@@ -106,11 +140,13 @@ test('shell view mapping and persisted scroll keys preserve their contracts', ()
 
     assert.equal(shell.getStudentSectionForView('main-menu-view'), 'today');
     assert.equal(shell.getStudentSectionForView('vocab-selection-view'), 'vocabulary');
+    assert.equal(shell.getStudentSectionForView('student-sparks-view'), 'sparks');
     assert.equal(shell.getStudentSectionForView('activity-menu-view'), 'vocabulary');
     assert.equal(shell.getStudentSectionForView('activity-view'), 'vocabulary');
     assert.equal(shell.getStudentSectionForView('arcade-view'), 'arcade');
     assert.equal(shell.getStudentSectionForView('login-view'), '');
     assert.equal(shell.getStudentSectionScrollKey('vocabulary'), 'student_scroll_position:section:vocabulary');
+    assert.equal(shell.getStudentSectionScrollKey('sparks'), 'student_scroll_position:section:sparks');
     assert.equal(shell.getStudentRouteScrollKey(), 'student_scroll_position:route:#/menu');
 
     shell.persistStudentScroll('scroll-test', 37.6);

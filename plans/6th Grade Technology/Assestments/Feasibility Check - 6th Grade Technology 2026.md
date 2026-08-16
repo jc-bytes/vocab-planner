@@ -42,7 +42,7 @@ Primary education rule: 6th grade should have exactly five formal grades per tri
 | Trimester | Formal grades confirmed |
 |---|---|
 | 1st Trimester | #1 March vocabulary table, #2 March online communication scenario quiz, #3 April copyright image-choice check, #4 April Scratch variables mini-task, #5 May recycling/e-waste sorting check |
-| 2nd Trimester | #1 June robotics vocabulary table, #2 June mBot movement debugging check, #3 July route map and command plan, #4 July condition flowchart, #5 August mBot STEM challenge |
+| 2nd Trimester | #1 June robotics vocabulary table, #2 June mBot movement debugging check, #3 July route map and command plan, #4 July mBot Ultrasonic Sensor Flowchart and Programming Task, #5 August mBot Rescue Robot |
 | 3rd Trimester | #1 September IIIT vocabulary table, #2 September mBot STEM data table, #3 October data chart and conclusion, #4 October 3D model design, #5 October micro:bit parts/input-output check |
 
 Assessment decision: compliant. Do not add exam projects or extra counted final projects unless the school explicitly requests a different structure.
@@ -120,7 +120,7 @@ What is working:
 What still needs tightening:
 
 - Some earlier assessment/reality-check files are out of sync with the current official DOCX placement, especially around third-trimester micro:bit timing. Add a short note that the current official version collects all five formal IIIT grades by October.
-- August Summative #5 should be worded consistently everywhere as the full mBot STEM challenge evidence: goal, route/behavior, movement plus one output or sensor, test result, improvement, one-minute demo, and readiness evidence.
+- August Summative #5 should be completed in Week 11 and worded consistently everywhere as the teacher-assigned mBot Rescue Robot presentation: line-following code, obstacle and branch logic, rescue-route performance, mBlock use, English explanation, lab care, and readiness/respect evidence. Week 12 remains formative only.
 - The annual plan should explicitly include May Internet Day/e-waste as a community technology application, mBot Knowledge Cards Part 1 as a named robotics resource, and controlled small products for spreadsheet/3D/micro:bit work.
 
 ## Resource And Classroom Readiness

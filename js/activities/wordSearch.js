@@ -1,4 +1,5 @@
 import { createElement, $ } from '../main.js';
+import { ActivityTimeoutController } from './activityTimeoutController.js';
 
 export class WordSearchActivity {
     constructor(container, words, onProgress, vocabID, onSaveState = null, initialState = null, options = {}) {
@@ -19,6 +20,8 @@ export class WordSearchActivity {
         this.selectedCells = [];
         this.activePointerId = null;
         this.handleDocumentPointerEnd = (event) => this.handlePointerEnd(event);
+        this.timeouts = new ActivityTimeoutController();
+        this.completionOverlay = null;
 
         // Try to restore state first
         this.restoreState();
@@ -207,7 +210,7 @@ export class WordSearchActivity {
     }
 
     render() {
-        this.destroy();
+        this.detachPointerListeners();
         this.container.innerHTML = '';
 
         const header = this.renderHeader();
@@ -228,6 +231,7 @@ export class WordSearchActivity {
         wrapper.appendChild(gridContainer);
 
         this.container.appendChild(wrapper);
+        window.lucide?.createIcons({ root: this.container });
 
         // Restore highlights for found words after rendering
         this.restoreHighlights();
@@ -405,7 +409,12 @@ export class WordSearchActivity {
         }
 
         const puzzleLabel = createElement('div');
-        puzzleLabel.textContent = isFound ? `✓ ${word}` : word;
+        puzzleLabel.innerHTML = isFound
+            ? `<i data-lucide="check" aria-hidden="true"></i><span>${word}</span>`
+            : `<span>${word}</span>`;
+        puzzleLabel.style.display = 'flex';
+        puzzleLabel.style.alignItems = 'center';
+        puzzleLabel.style.gap = '0.35rem';
         puzzleLabel.style.color = isFound ? '#86efac' : '#f8fafc';
         puzzleLabel.style.fontWeight = '700';
         if (isFound) {
@@ -630,6 +639,7 @@ export class WordSearchActivity {
         if (wordListContainer) {
             const newWordList = this.renderWordList();
             wordListContainer.parentNode.replaceChild(newWordList, wordListContainer);
+            window.lucide?.createIcons({ root: newWordList });
         }
     }
 
@@ -647,18 +657,20 @@ export class WordSearchActivity {
         
         // Show replay button when complete
         if (isComplete && !this.container.querySelector('#replay-wordsearch')) {
-            setTimeout(() => this.showCompletionOverlay(), 500);
+            this.timeouts.schedule(() => this.showCompletionOverlay(), 500);
         }
         
         return {
             score: percentage,
             details: `Found ${this.foundWords.size} of ${this.words.length} words`,
+            evidence: { correctCount: this.foundWords.size, totalCount: this.words.length },
             isComplete
         };
     }
     
     showCompletionOverlay() {
         const overlay = document.createElement('div');
+        this.completionOverlay = overlay;
         overlay.className = 'completion-overlay';
         overlay.style.cssText = `
             position: fixed;
@@ -674,7 +686,10 @@ export class WordSearchActivity {
         `;
         overlay.innerHTML = `
             <div class="completion-screen" style="background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 1rem; text-align: center;">
-                <h2>🎉 All Words Found!</h2>
+                <h2 class="activity-result-heading">
+                    <i data-lucide="badge-check" aria-hidden="true"></i>
+                    <span>All Words Found!</span>
+                </h2>
                 <p>You found all ${this.words.length} words!</p>
                 <button id="new-wordsearch" class="btn primary-btn" style="margin-top: 1rem;">New Puzzle</button>
                 <button id="replay-wordsearch" class="btn secondary-btn" style="margin-top: 1rem; margin-left: 0.5rem;">Shuffle Same Words</button>
@@ -683,6 +698,7 @@ export class WordSearchActivity {
         `;
         
         document.body.appendChild(overlay);
+        window.lucide?.createIcons({ root: overlay });
 
         overlay.querySelector('#new-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
@@ -696,6 +712,7 @@ export class WordSearchActivity {
         
         overlay.querySelector('#close-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
+            this.completionOverlay = null;
         });
     }
 
@@ -731,6 +748,15 @@ export class WordSearchActivity {
     }
 
     destroy() {
+        this.timeouts.clear();
+        this.completionOverlay?.remove();
+        this.completionOverlay = null;
+        this.detachPointerListeners();
+        this.onProgress = null;
+        this.onSaveState = null;
+    }
+
+    detachPointerListeners() {
         document.removeEventListener('pointerup', this.handleDocumentPointerEnd);
         document.removeEventListener('pointercancel', this.handleDocumentPointerEnd);
     }

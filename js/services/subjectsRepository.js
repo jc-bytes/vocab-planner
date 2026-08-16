@@ -22,9 +22,13 @@ export function subjectPayload(subject = {}) {
 }
 
 export const subjectsRepository = {
-    async list() {
+    async list(options = {}) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('subjects').select('*');
+        let query = supabaseService.getClient().from('subjects').select('*');
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return (data || []).map(mapSubjectRow);
     },

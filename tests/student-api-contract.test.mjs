@@ -17,6 +17,7 @@ const EXPECTED_STUDENT_METHODS = [
     'signOut',
     'signUpStudent',
     'spendStudentCoins',
+    'startStudentActivityAttempt',
     'submitStudentActivityProgress',
     'submitStudentGameScore',
     'syncStudentUnitWork',

@@ -5,21 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Master - Student</title>
-    <link rel="stylesheet" href="css/student.css?v=student-presentation-composition-20260714a">
+    <link rel="stylesheet" href="css/student.css?v=student-page-loading-20260816c">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
-    <link rel="stylesheet" href="css/typography.css?v=typography-activity-controls-20260713i">
+    <link rel="stylesheet" href="css/typography.css?v=typography-month-navigation-20260815a">
+    <link rel="stylesheet" href="css/student-design-system.css?v=student-design-system-20260815a"
+        data-student-design-system>
 </head>
 
-<body>
+<body class="student-site">
     <div class="app-container">
         <header class="app-header student-app-header">
-            <div class="header-left">
-                <a href="index.html" class="back-link" style="display:none;">← Home</a>
-                <div class="student-identity">
-                    <h1 id="welcome-header">Welcome!</h1>
-                    <span id="student-level-display" class="student-level-display">Level 1 Explorer</span>
-                </div>
-            </div>
+            <button id="student-sidebar-toggle" class="student-sidebar-toggle" type="button"
+                aria-expanded="true" aria-controls="student-tab-shell student-subject-picker"
+                aria-label="Collapse navigation" title="Collapse navigation">
+                <i data-lucide="panel-left-close" aria-hidden="true"></i>
+            </button>
             <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
                 <button id="student-mobile-menu-toggle" class="teacher-mobile-menu-toggle student-mobile-menu-toggle"
                     type="button" aria-expanded="false" aria-controls="student-tabs"
@@ -29,17 +29,22 @@
                 </button>
                 <div id="student-tabs" class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
                     <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
-                        aria-selected="true" data-section="today">
+                        aria-selected="true" aria-label="Today" title="Today" data-tooltip="Today" data-section="today">
                         <i data-lucide="layout-dashboard"></i>
                         <span>Today</span>
                     </button>
                     <button class="teacher-tab student-tab" id="student-tab-vocabulary" type="button" role="tab"
-                        aria-selected="false" data-section="vocabulary">
+                        aria-selected="false" aria-label="Vocabulary" title="Vocabulary" data-tooltip="Vocabulary" data-section="vocabulary">
                         <i data-lucide="book-open"></i>
                         <span>Vocabulary</span>
                     </button>
+                    <button class="teacher-tab student-tab" id="student-tab-sparks" type="button" role="tab"
+                        aria-selected="false" aria-label="Sparks" title="Sparks" data-tooltip="Sparks" data-section="sparks">
+                        <i data-lucide="sparkles"></i>
+                        <span>Sparks</span>
+                    </button>
                     <button class="teacher-tab student-tab" id="student-tab-arcade" type="button" role="tab"
-                        aria-selected="false" data-section="arcade">
+                        aria-selected="false" aria-label="Arcade" title="Arcade" data-tooltip="Arcade" data-section="arcade">
                         <i data-lucide="gamepad-2"></i>
                         <span>Arcade</span>
                     </button>
@@ -52,13 +57,18 @@
             <div class="header-actions">
                 <!-- Authenticated/User Status -->
                 <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
-                    <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">🪙 0</div>
+                    <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">
+                        <i data-lucide="coins" aria-hidden="true"></i>
+                        <span class="student-coin-label">Coins</span>
+                        <span data-coin-balance-value>0</span>
+                    </div>
                     <span id="auth-status" class="status-dot" title="Syncing" aria-label="Syncing"></span>
                     <button id="mobile-edit-profile-btn" class="btn text-btn icon-btn student-mobile-profile-btn" title="Student profile" aria-label="Student profile">
                         <i data-lucide="user"></i>
                     </button>
                     <button id="sign-out-btn" class="btn text-btn icon-btn" title="Sign out" aria-label="Sign out">
                         <i data-lucide="log-out"></i>
+                        <span class="student-sign-out-label">Log out</span>
                     </button>
                 </div>
                 <div id="guest-status" style="display:none; align-items: center; gap: 1rem;">
@@ -68,13 +78,37 @@
             </div>
         </header>
 
+        <div class="student-top-bar" aria-label="Student identity and progress">
+            <div class="header-left">
+                <div class="student-identity">
+                    <div id="student-level-display" class="student-level-display" role="progressbar"
+                        aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                        aria-label="Level 1 Explorer. 0 of 100 experience points. 100 experience points to Level 2.">
+                        <div class="student-level-heading">
+                            <span class="student-level-badge">LEVEL <strong data-student-level>1</strong></span>
+                            <span class="student-level-divider" aria-hidden="true">/</span>
+                            <span class="student-level-title" data-student-level-title>Explorer</span>
+                        </div>
+                        <div class="student-xp-track" aria-hidden="true">
+                            <span class="student-xp-fill" data-student-xp-fill></span>
+                        </div>
+                        <div class="student-xp-meta">
+                            <span><strong data-student-xp-current>0</strong> / <span data-student-xp-goal>100</span> XP</span>
+                            <span id="welcome-header" class="student-topbar-name">Welcome!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <main>
             <!-- Loading View -->
             <section id="loading-view" class="view active">
-                <div
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh;">
-                    <div class="loading-spinner" style="width: 50px; height: 50px; border-width: 4px;"></div>
-                    <p style="margin-top: 1rem; color: var(--text-muted);">Loading session...</p>
+                <div class="student-session-loader" role="status" aria-label="Loading student session">
+                    <div class="student-session-loader-orbit" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="student-session-loader-wordmark" aria-hidden="true"></div>
                 </div>
             </section>
 
@@ -174,34 +208,81 @@
             </section>
 
             <!-- View: Main Menu -->
-            <section id="main-menu-view" class="view hidden">
-                <div class="student-dashboard-heading">
+            <section id="main-menu-view" class="view hidden student-home-loading" aria-busy="true">
+                <div class="student-dashboard-heading" hidden>
                     <div>
-                        <p class="teacher-eyebrow">Student dashboard</p>
-                        <h2>Pick up where learning left off</h2>
-                        <p class="student-dashboard-subtitle">You're making steady progress this week.</p>
+                        <h2 id="student-home-heading">Your next learning step</h2>
                     </div>
                 </div>
                 <div id="student-home-dashboard" class="student-home-dashboard">
-                    <div class="loading-spinner">Loading dashboard...</div>
+                    <div class="student-dashboard-skeleton" role="status" aria-label="Loading dashboard">
+                        <div class="student-dashboard-skeleton-line student-dashboard-skeleton-title"></div>
+                        <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-hero">
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-badge"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-hero-title"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-meta"></div>
+                            <div class="student-dashboard-skeleton-progress">
+                                <div class="student-dashboard-skeleton-line"></div>
+                                <div class="student-dashboard-skeleton-line"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-button"></div>
+                        </div>
+                        <div class="student-dashboard-skeleton-lower">
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card student-dashboard-skeleton-card--spark">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Vocabulary Selection View -->
-            <section id="vocab-selection-view" class="view hidden">
+            <section id="vocab-selection-view" class="view hidden student-page-loading" aria-busy="true">
                 <div class="section-header vocab-selection-header page-header">
                     <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
                     <div class="vocab-page-intro page-header__content">
                         <h2 class="page-header__title">Vocabulary Units</h2>
-                        <p class="page-header__description">Master the language of technology through interactive challenges.</p>
                         <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb"></div>
                     </div>
                     <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
                     <div id="vocab-view-toggle" class="vocab-view-toggle segmented-control" role="group" aria-label="Vocabulary view"></div>
                 </div>
                 <div id="vocab-list" class="vocab-grid">
-                    <!-- Vocabulary sets will be listed here -->
-                    <div class="loading-spinner">Loading vocabularies...</div>
+                    <div class="student-page-skeleton student-page-skeleton--units" role="status" aria-label="Loading vocabulary units">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-card-grid">
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: General Technology Sparks -->
+            <section id="student-sparks-view" class="view hidden student-page-loading" aria-busy="true">
+                <div class="section-header spark-library-header page-header">
+                    <div class="page-header__content">
+                        <h2 class="page-header__title">Sparks</h2>
+                    </div>
+                    <div id="spark-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
+                </div>
+                <div id="student-sparks-library" class="student-sparks-library" aria-live="polite">
+                    <div class="student-page-skeleton student-page-skeleton--sparks" role="status" aria-label="Loading Sparks">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-surface student-loading-reading-card">
+                            <div class="student-loading-reading-copy"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-reading-line"></span><span class="student-loading-line student-loading-reading-line student-loading-reading-line--short"></span></div>
+                            <div class="student-loading-response-panel"><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-response-box"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -210,26 +291,14 @@
                 <div class="section-header">
                     <div class="activity-menu-hero">
                         <div class="activity-menu-title-block">
-                            <div class="activity-menu-meta-row">
-                                <button id="back-to-vocab" class="activity-menu-back-link activity-back-control" type="button">← Back to Units</button>
-                                <div id="current-unit-subject" class="unit-subject-label"></div>
-                            </div>
                             <h2 id="current-unit-title">Unit Title</h2>
+                            <nav id="current-unit-subject" class="unit-subject-label teacher-library-breadcrumb breadcrumb"
+                                aria-label="Vocabulary location"></nav>
                             <p id="current-unit-description" class="activity-menu-unit-description"></p>
                         </div>
                         <div class="activity-menu-status">
-                            <div class="activity-menu-progress" aria-label="Required activity progress">
-                                <div class="activity-menu-progress-heading">
-                                    <span>Unit progress</span>
-                                    <strong id="current-unit-progress-percent">0%</strong>
-                                </div>
-                                <div class="activity-menu-progress-track" aria-hidden="true">
-                                    <span id="current-unit-progress-fill"></span>
-                                </div>
-                                <p id="current-unit-progress-copy">0 of 0 required complete</p>
-                            </div>
                             <details id="student-vocab-export-menu" class="student-export-menu">
-                                <summary class="btn accent-btn">
+                                <summary class="btn secondary-btn activity-export-btn">
                                     <i data-lucide="download"></i>
                                     <span>Export</span>
                                     <i data-lucide="chevron-down"></i>
@@ -245,6 +314,10 @@
                                     </button>
                                 </div>
                             </details>
+                            <button id="back-to-vocab" class="btn secondary-btn activity-menu-close-btn activity-back-control"
+                                type="button" aria-label="Close unit and return to Units" title="Close unit">
+                                <i data-lucide="x" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -254,32 +327,47 @@
             <!-- View: Activity Container -->
             <section id="activity-view" class="view hidden">
                 <div class="activity-header">
-                    <button id="back-to-menu-btn" class="btn text-btn">← Back</button>
+                    <button id="back-to-menu-btn" class="btn text-btn">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i>
+                        <span>Back</span>
+                    </button>
                     <h2 id="activity-header-title" class="activity-header-title"></h2>
-                    <div id="activity-progress-indicator" class="hidden">Progress: 0%</div>
+                    <div class="activity-header-actions">
+                        <div id="activity-progress-indicator" class="hidden">Progress: 0%</div>
+                        <button id="close-activity-btn" class="btn activity-close-btn" type="button"
+                            aria-label="Close activity and return to activities" title="Close activity">
+                            <i data-lucide="x" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
                 <div id="activity-container"></div>
             </section>
 
             <!-- View: Arcade -->
-            <section id="arcade-view" class="view hidden">
+            <section id="arcade-view" class="view hidden student-page-loading" aria-busy="true">
                 <!-- Game Area -->
                 <div class="arcade-container">
+                    <div class="student-page-skeleton student-page-skeleton--arcade" role="status" aria-label="Loading Arcade">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-surface student-loading-arcade-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-arcade-art"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                    </div>
                     <div id="game-selection">
                         <header class="arcade-selection-intro">
                             <div>
-                                <span class="arcade-selection-eyebrow">Arcade</span>
                                 <h2>Choose your next challenge</h2>
-                                <p>Pick a game, spend coins by the minute, and climb the leaderboard.</p>
                             </div>
                             <div class="arcade-game-count"><strong id="arcade-game-total">22</strong><span>games</span></div>
                         </header>
                         <div class="game-selection-row">
-                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Previous game">←</button>
+                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Previous game">
+                                <i data-lucide="chevron-left" aria-hidden="true"></i>
+                            </button>
                             <div id="current-game-card" class="card game-card">
                                 <!-- Game card will be dynamically inserted here -->
                             </div>
-                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Next game">→</button>
+                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Next game">
+                                <i data-lucide="chevron-right" aria-hidden="true"></i>
+                            </button>
                         </div>
                         <div class="game-selection-actions">
                             <button id="show-leaderboard-btn" class="btn secondary-btn">View leaderboard <span aria-hidden="true">↗</span></button>
@@ -304,14 +392,26 @@
     <div id="leaderboard-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboard-modal-title">
         <div class="modal-content" style="max-width: 600px; width: 90%; max-height: 80vh;">
             <div class="modal-header">
-                <h3 id="leaderboard-modal-title" style="margin: 0;">🏆 Leaderboard</h3>
-                <button id="close-leaderboard-modal" class="btn text-btn" style="font-size: 1.5rem;" aria-label="Close leaderboard">×</button>
+                <h3 id="leaderboard-modal-title" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="trophy" aria-hidden="true"></i>
+                    <span>Leaderboard</span>
+                </h3>
+                <button id="close-leaderboard-modal" class="btn text-btn" aria-label="Close leaderboard">
+                    <i data-lucide="circle-x" aria-hidden="true"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <h4 id="current-game-name" style="margin: 0 0 1rem 0; text-align: center; color: var(--text-muted);">Galactic Breaker</h4>
                 <div id="leaderboard-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto;">
                     <!-- Scores will be injected here -->
-                    <div class="loading-spinner">Loading scores...</div>
+                    <div class="student-page-skeleton student-page-skeleton--list" role="status" aria-label="Loading scores">
+                        <div class="student-loading-list">
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -391,7 +491,27 @@
         </div>
     </div>
 
-    <script src="js/icons.js" type="module"></script>
+    <script>
+        try {
+            if (localStorage.getItem('student_sidebar_collapsed') === 'true') {
+                document.querySelector('.app-container')?.classList.add('student-sidebar-collapsed');
+            }
+            if (localStorage.getItem('was_logged_in') === 'true') {
+                const appContainer = document.querySelector('.app-container');
+                const studentShell = document.getElementById('student-tab-shell');
+                appContainer?.classList.add('student-session-loading');
+                if (studentShell) {
+                    studentShell.classList.remove('hidden');
+                    studentShell.dataset.sessionReserved = 'true';
+                    studentShell.setAttribute('aria-hidden', 'true');
+                    studentShell.inert = true;
+                }
+            }
+        } catch {
+            // Storage can be unavailable in privacy modes; the normal loading view still works.
+        }
+    </script>
+    <script src="js/icons.js?v=student-unit-close-icon-20260815a" type="module"></script>
     <script src="js/student.js" type="module"></script>
 </body>
 

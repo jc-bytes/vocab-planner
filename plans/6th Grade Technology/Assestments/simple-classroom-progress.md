@@ -57,18 +57,18 @@ This file explains the year in simple classroom sentences. It is meant for quick
 - Week 3, Class 1: Then, students work on Sensors around us. They identify the available mBot sensor on their robot or card.
 - Week 3, Class 2: Then, students work on mBot sensor practice. They observe how the sensor reacts to an object or line.
 - Week 4, Class 1: Then, students work on Simple conditions. They practice building an if/then flowchart with a sample sensor condition.
-- Week 4, Class 2: Then, students work on Obstacle or line challenge. They complete Summative Activity #4: Create an if/then flowchart with one mBot sensor condition, one true response, one false response, and one sentence explaining the robot behavior.
-- Week 5, Class 1: Then, students work on Plan a mini-challenge. They plan their mini-challenge with a goal, commands, test area, and success rule.
-- Week 5, Class 2: Then, students work on mBot mini-challenge practice. They build and test their chosen mini-challenge.
+- Week 4, Class 2: Then, students work on ultrasonic condition practice. They create a practice flowchart, match it to sample if/else code, test one response, and correct one problem.
+- Week 5, Class 1: Then, students prepare for Summative Activity #4. They review the teacher-assigned ultrasonic task, required flowchart features, assigned project, English explanation, and equipment procedures.
+- Week 5, Class 2: Then, students complete Summative Activity #4: the teacher-assigned mBot Ultrasonic Sensor Flowchart and Programming Task.
 
 ### August
 
-- Week 1, Class 1: Then, students work on Knowledge Cards review. They practice reading one mBot Knowledge Card and predicting the robot action.
-- Week 1, Class 2: Then, students work on Card practice stations. They complete Summative Activity #5: Use one assigned mBot Knowledge Card Part 1, complete the card practice task, record the robot action, and explain what the card helps the robot do.
-- Week 2, Class 1: Then, students work on Plan the final mBot challenge. They plan the final mBot challenge.
-- Week 2, Class 2: Then, students work on Build and test final challenge. They program the final challenge using movement plus one output or sensor.
-- Week 3, Class 1: Then, students work on Prepare demonstration. They practice explaining what the robot should do.
-- Week 3, Class 2: Then, students work on Demonstrate and reflect. They demonstrate their final mBot challenge.
+- Week 1, Class 1: Then, students review the assigned Rescue Robot line-following logic.
+- Week 1, Class 2: Then, students test and correct the line-following section of the assigned project.
+- Week 2, Class 1: Then, students finish the assigned Rescue Robot logic, test the full route, correct one problem, and rehearse their presentation.
+- Week 2, Class 2: Then, students complete Summative Activity #5 by presenting and demonstrating the teacher-assigned mBot Rescue Robot.
+- Week 3, Class 1: Then, students complete a formative Rescue Robot reflection and peer-feedback activity.
+- Week 3, Class 2: Then, students complete formative robotics review stations and prepare the numbered kits for the next unit.
 
 ## 3rd Trimester
 

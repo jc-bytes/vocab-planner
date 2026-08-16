@@ -50,6 +50,8 @@ export class StudentActivityGateDisplay {
         const grid = document.querySelector('#activity-menu-view .activities-grid');
         if (!grid) return;
 
+        grid.querySelectorAll(':scope > .unit-loading-state').forEach(state => state.remove());
+
         const completion = this.getRequiredCompletion(flow);
         const allCards = Array.from(cards);
         const cardByType = new Map(allCards.map(card => [card.dataset.activity, card]));
@@ -205,6 +207,7 @@ export class StudentActivityGateDisplay {
             const isRequired = flow.required.includes(activityType);
             const isAdditional = flow.additional.includes(activityType);
             const isHidden = flow.hidden.includes(activityType);
+            const hasPlayableContent = this.activities.getActivityPlayableCount(activityType) > 0;
             const requiredIndex = flow.required.indexOf(activityType);
             const isComplete = this.isActivityComplete(activityType);
             const isLockedRequired = isRequired
@@ -212,15 +215,16 @@ export class StudentActivityGateDisplay {
                 && !this.activities.isActivityUnlocked(activityType);
             const isLockedAdditional = isAdditional && !completion.isComplete;
             const isLocked = isLockedRequired || isLockedAdditional;
+            const isUnavailable = isHidden || !hasPlayableContent;
             card.classList.toggle('required-activity-card', isRequired);
             card.classList.toggle('additional-activity-card', isAdditional);
             card.classList.toggle('activity-locked-card', isLocked);
-            card.classList.toggle('activity-unavailable-card', isHidden);
+            card.classList.toggle('activity-unavailable-card', isUnavailable);
             const isNext = activityType === nextActivityType;
             card.classList.toggle('next-activity-card', isNext);
             card.classList.toggle('activity-flow-card-compact', !isNext);
             card.classList.toggle('activity-path-complete', isRequired && isComplete);
-            card.disabled = isHidden || isLocked;
+            card.disabled = isUnavailable || isLocked;
             card.setAttribute('aria-disabled', card.disabled ? 'true' : 'false');
 
             const prerequisiteType = isLockedRequired
@@ -230,16 +234,22 @@ export class StudentActivityGateDisplay {
             const prerequisiteTitle = prerequisiteCard?.dataset.activityTitle
                 || prerequisiteCard?.querySelector('h3')?.textContent?.trim()
                 || 'the previous activity';
-            card.title = isHidden
-                ? 'Not required for this vocabulary unit.'
+            card.title = !hasPlayableContent
+                ? 'This unit does not have enough suitable words for this activity.'
+                : isHidden
+                    ? 'Not required for this vocabulary unit.'
                 : isLockedRequired
                     ? `Complete ${prerequisiteTitle} first.`
                     : isLockedAdditional
                         ? 'Finish the required activities to unlock this practice.'
                         : '';
 
-            if (isHidden && !card.querySelector('.activity-unavailable-label')) {
-                card.prepend(createElement('span', 'activity-unavailable-label', 'Not required'));
+            if (isUnavailable && !card.querySelector('.activity-unavailable-label')) {
+                card.prepend(createElement(
+                    'span',
+                    'activity-unavailable-label',
+                    hasPlayableContent ? 'Not required' : 'Not enough words'
+                ));
             }
             if (isLocked && !card.querySelector('.activity-lock-label')) {
                 const lockLabel = isLockedRequired ? `Complete ${prerequisiteTitle} first` : 'Locked';
@@ -247,7 +257,9 @@ export class StudentActivityGateDisplay {
             }
             if (isRequired) {
                 card.prepend(createElement('span', 'activity-path-step', `Step ${requiredIndex + 1}`));
-                const statusText = isComplete ? 'Complete' : (isNext ? 'Next' : 'Locked');
+                const statusText = isComplete
+                    ? 'Complete'
+                    : (!hasPlayableContent ? 'Unavailable' : (isNext ? 'Next' : 'Locked'));
                 card.appendChild(createElement('span', 'activity-path-status', statusText));
             }
         };

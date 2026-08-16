@@ -7,10 +7,26 @@
     "8"
   ],
   "trimester": "IT",
-  "month": "march",
+  "month": "March",
   "week": 1,
   "purpose": "summative",
   "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "illustration"
+    ],
+    "additionalActivities": [
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "matching": 10,
     "flashcards": 10,
     "quiz": 10,

@@ -43,9 +43,9 @@ class QuizMakerComposerMethods {
                             <strong>${config.title}</strong>
                         </div>
                         <div class="quiz-section-actions">
-                            <button type="button" class="btn text-btn quiz-section-up" title="Move section up" ${index === 0 ? 'disabled' : ''}>↑</button>
-                            <button type="button" class="btn text-btn quiz-section-down" title="Move section down" ${index === this.quizSections.length - 1 ? 'disabled' : ''}>↓</button>
-                            <button type="button" class="btn text-btn quiz-section-remove" title="Remove section">×</button>
+                            <button type="button" class="btn text-btn quiz-section-up" title="Move section up" aria-label="Move section up" ${index === 0 ? 'disabled' : ''}><i data-lucide="arrow-up" aria-hidden="true"></i></button>
+                            <button type="button" class="btn text-btn quiz-section-down" title="Move section down" aria-label="Move section down" ${index === this.quizSections.length - 1 ? 'disabled' : ''}><i data-lucide="arrow-down" aria-hidden="true"></i></button>
+                            <button type="button" class="btn text-btn quiz-section-remove" title="Remove section" aria-label="Remove section"><i data-lucide="circle-x" aria-hidden="true"></i></button>
                         </div>
                     </div>
                     <div class="quiz-section-fields">
@@ -62,6 +62,8 @@ class QuizMakerComposerMethods {
                 </article>
             `;
         }).join('');
+
+        window.lucide?.createIcons({ root: list });
 
         list.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {

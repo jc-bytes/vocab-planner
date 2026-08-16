@@ -100,7 +100,7 @@ export class StudentGameSettings {
 
         const gameArt = game.art
             ? `<img class="game-art" src="${game.art}" alt="" loading="lazy">`
-            : game.icon;
+            : `<i data-lucide="${game.icon}"></i>`;
 
         container.innerHTML = `
             <div class="game-counter">Game ${currentNum} of ${totalGames}</div>
@@ -110,8 +110,12 @@ export class StudentGameSettings {
                 <p>${game.desc}</p>
             </div>
             <div class="game-cost"><span>Play rate</span><strong>${exchangeRate} coins / min</strong></div>
-            <button id="play-current-game-btn" class="btn primary-btn">Play game <span aria-hidden="true">→</span></button>
+            <button id="play-current-game-btn" class="btn primary-btn">
+                <i data-lucide="play" aria-hidden="true"></i>
+                <span>Play game</span>
+            </button>
         `;
+        window.lucide?.createIcons({ root: container });
 
         // Re-attach the play button listener
         this.sm.addListener('#play-current-game-btn', 'click', () => {
