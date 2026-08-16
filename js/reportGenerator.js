@@ -1,11 +1,12 @@
 import { imageDB } from './db.js';
 import { jsPDF } from 'jspdf';
+import {
+    getWordHuntQuality,
+    hasMeaningfulWordHuntText,
+    WORD_HUNT_TEXT_RULES
+} from './services/wordHuntQuality.js';
 
 const PDF_PAGE_FORMAT = 'letter';
-const WORD_HUNT_TEXT_RULES = {
-    definition: { minChars: 12, minWords: 3 },
-    example: { minChars: 18, minWords: 4 }
-};
 const FINAL_REPORT_ACTIVITIES = [
     ['flashcards', 'Flashcards'],
     ['matching', 'Matching'],
@@ -857,22 +858,11 @@ export class ReportGenerator {
     }
 
     static hasMeaningfulWordHuntText(value, rules = WORD_HUNT_TEXT_RULES.definition) {
-        const text = String(value || '').trim();
-        if (text.length < rules.minChars) return false;
-        return text.split(/\s+/).filter(Boolean).length >= rules.minWords;
+        return hasMeaningfulWordHuntText(value, rules);
     }
 
     static getWordHuntQuality(entry = {}) {
-        const quality = {
-            definition: this.hasMeaningfulWordHuntText(entry.definition, WORD_HUNT_TEXT_RULES.definition),
-            image: Boolean(entry.hasImage || entry.imagePath),
-            examples: (
-                this.hasMeaningfulWordHuntText(entry.exampleOne, WORD_HUNT_TEXT_RULES.example) &&
-                this.hasMeaningfulWordHuntText(entry.exampleTwo, WORD_HUNT_TEXT_RULES.example)
-            )
-        };
-        quality.complete = Object.values(quality).every(Boolean);
-        return quality;
+        return getWordHuntQuality(entry);
     }
 
     static getFinalReportActivityRows(scores = {}) {

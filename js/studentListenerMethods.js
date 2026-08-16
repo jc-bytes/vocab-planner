@@ -282,9 +282,6 @@ export class StudentListeners {
         });
 
         this.addListener('#student-login-form', 'submit', (e) => this.sm.handleStudentLogin(e));
-        this.addListener('#student-register-form', 'submit', (e) => this.sm.handleStudentRegister(e));
-        this.addListener('#show-login-btn', 'click', () => this.sm.showAuthPanel('login'));
-        this.addListener('#show-register-btn', 'click', () => this.sm.showAuthPanel('register'));
         this.addListener('#guest-signin-btn', 'click', () => {
             this.sm.switchView('login-view');
             this.sm.showAuthPanel('login');

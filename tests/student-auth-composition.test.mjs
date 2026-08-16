@@ -46,6 +46,7 @@ globalThis.window = {
 const { StudentManager } = await import('../js/student.js');
 const { StudentAuth } = await import('../js/student/studentAuth.js');
 const { StudentAuthUi } = await import('../js/studentAuthUiMethods.js');
+const { SessionInitializationCoordinator } = await import('../js/services/sessionInitialization.js');
 
 function createManager() {
     return {
@@ -169,4 +170,30 @@ test('registration validation preserves the school account contract', () => {
         () => auth.validateRegistrationForm(),
         /@aid\.edu\.pa/
     );
+});
+
+test('session initialization coalesces duplicate events and invalidates stale work', async () => {
+    const coordinator = new SessionInitializationCoordinator();
+    let calls = 0;
+    let release;
+    const waiting = new Promise(resolve => { release = resolve; });
+    const initialize = async context => {
+        calls += 1;
+        await waiting;
+        return context.isCurrent();
+    };
+
+    const first = coordinator.run('student-1', initialize);
+    const duplicate = coordinator.run('student-1', initialize);
+    assert.equal(first, duplicate);
+    assert.equal(calls, 0);
+    await Promise.resolve();
+    assert.equal(calls, 1);
+    coordinator.invalidate();
+    release();
+    assert.equal(await first, false);
+
+    assert.equal(await coordinator.run('student-1', async context => context.isCurrent()), true);
+    assert.equal(await coordinator.run('student-1', async () => { calls += 1; }), true);
+    assert.equal(calls, 1);
 });

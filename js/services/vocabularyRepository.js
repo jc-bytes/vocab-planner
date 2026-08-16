@@ -12,6 +12,27 @@ export function mapVocabularyRow(row) {
     };
 }
 
+export function mapVocabularyMetadata(record) {
+    if (!record) return null;
+    return {
+        id: record.id,
+        name: record.name || '',
+        description: record.description || '',
+        grades: record.grades || [],
+        subjectSlug: record.subjectSlug || 'technology',
+        assignedDate: record.assignedDate || '',
+        trimester: record.trimester || '',
+        month: record.month || '',
+        week: record.week || '',
+        activitySettings: record.activitySettings || {},
+        wordCount: Number(record.wordCount) || 0,
+        ownerId: record.ownerId || null,
+        createdAt: toClientTimestamp(record.createdAt),
+        updatedAt: toClientTimestamp(record.updatedAt),
+        metadataOnly: true
+    };
+}
+
 export function vocabularyPayload(vocabulary = {}, id = null) {
     return cleanUndefined({
         id: id || vocabulary.id,
@@ -31,6 +52,12 @@ export function vocabularyPayload(vocabulary = {}, id = null) {
 }
 
 export const vocabularyRepository = {
+    async listMetadata() {
+        await supabaseService.init();
+        const { data, error } = await supabaseService.getClient().rpc('list_vocabulary_metadata_v1');
+        if (error) throw error;
+        return (Array.isArray(data) ? data : []).map(mapVocabularyMetadata);
+    },
     async list() {
         await supabaseService.init();
         const { data, error } = await supabaseService.getClient().from('vocabularies').select('*');

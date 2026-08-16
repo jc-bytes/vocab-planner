@@ -29,6 +29,17 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
     }
 });
 
+test('notifications render messages as text and Spark links require safe protocols', async () => {
+    const [notifications, sparks] = await Promise.all([
+        read('js/notifications.js'),
+        read('js/student/studentActivityHomeSpark.js')
+    ]);
+    assert.match(notifications, /messageText\.textContent = String\(message/);
+    assert.doesNotMatch(notifications, /toast\.innerHTML[\s\S]*\$\{message\}/);
+    assert.match(sparks, /\['https:', 'http:'\]\.includes\(url\.protocol\)/);
+    assert.match(sparks, /getSafeExternalUrl\(spark\.sourceUrl\)/);
+});
+
 test('quiz imports are rendered as text instead of executable HTML', async () => {
     const [questions, documentRender] = await Promise.all([
         read('js/quizMakerQuestionCardRenderer.js'),

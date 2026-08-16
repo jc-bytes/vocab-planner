@@ -93,12 +93,8 @@ class TeacherStudentProgressRenderMethods {
         const rawName = profile.firstName && profile.lastName
             ? `${profile.firstName} ${profile.lastName}`
             : (profile.name || 'Unknown');
-        const updatedAt = student.updatedAt;
-        const date = updatedAt?.toDate
-            ? updatedAt.toDate()
-            : updatedAt?.seconds
-                ? new Date(updatedAt.seconds * 1000)
-                : null;
+        const updatedTime = this.getStudentUpdatedTime(student);
+        const date = updatedTime ? new Date(updatedTime) : null;
 
         return {
             name: escapeHtml(rawName),
@@ -160,6 +156,28 @@ class TeacherStudentProgressRenderMethods {
     }
 
     async showStudentDetails(student) {
+        this.activeStudentId = student.id;
+        const needsDetail = !student.progressDetailLoaded;
+        this.renderStudentDetails(student, { loading: needsDetail });
+
+        if (!needsDetail) return;
+        try {
+            const detailedStudent = await this.ensureStudentProgressDetail(student);
+            if (this.activeStudentId === student.id) {
+                this.renderStudentDetails(detailedStudent);
+            }
+        } catch (error) {
+            console.error('Failed to load student details:', error);
+            if (this.activeStudentId === student.id) {
+                const list = $('#detail-activity-list');
+                if (list) {
+                    list.innerHTML = '<p class="modal-secondary" style="color: var(--danger-color);">Activity details are unavailable right now. Please try again.</p>';
+                }
+            }
+        }
+    }
+
+    renderStudentDetails(student, { loading = false } = {}) {
         const modal = $('#student-detail-modal');
         const profile = student.studentProfile || {};
         this.activeStudentId = student.id;
@@ -171,9 +189,8 @@ class TeacherStudentProgressRenderMethods {
         $('#detail-student-grade').textContent = profile.grade || '-';
         $('#detail-student-group').textContent = profile.group || '-';
         $('#detail-student-coins').textContent = student.coins || 0;
-        const lastActiveDate = student.updatedAt
-            ? new Date((student.updatedAt.seconds || 0) * 1000).toLocaleString()
-            : '-';
+        const lastActiveTime = this.getStudentUpdatedTime(student);
+        const lastActiveDate = lastActiveTime ? new Date(lastActiveTime).toLocaleString() : '-';
         $('#detail-last-active').textContent = lastActiveDate;
 
         const passwordFlag = $('#detail-password-flag');
@@ -195,7 +212,9 @@ class TeacherStudentProgressRenderMethods {
         let totalScores = 0;
         let scoreCount = 0;
         let totalActivities = 0;
-        if (Object.keys(units).length === 0) {
+        if (loading) {
+            list.innerHTML = '<div class="loading-spinner runtime-status">Loading activity details...</div>';
+        } else if (Object.keys(units).length === 0) {
             list.innerHTML = '<p class="modal-secondary" style="color: var(--text-muted);">No activity data recorded.</p>';
         } else {
             for (const [unitName, unitData] of Object.entries(units)) {
@@ -227,9 +246,9 @@ class TeacherStudentProgressRenderMethods {
                 list.appendChild(card);
             }
         }
-        const avgScore = scoreCount ? Math.round(totalScores / scoreCount) : '-';
+        const avgScore = loading ? '-' : (scoreCount ? Math.round(totalScores / scoreCount) : '-');
         $('#detail-avg-score').textContent = avgScore === '-' ? '-' : `${avgScore}%`;
-        $('#detail-total-activities').textContent = totalActivities || '-';
+        $('#detail-total-activities').textContent = loading ? '-' : (totalActivities || '-');
 
         openModal(modal, { initialFocus: '#close-detail-modal' });
     }

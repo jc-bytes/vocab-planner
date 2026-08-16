@@ -7,6 +7,7 @@ import { $, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
+import { SessionInitializationCoordinator } from '../services/sessionInitialization.js';
 import { StudentAuthUi } from '../studentAuthUiMethods.js';
 
 const AUTH_REQUEST_TIMEOUT_MS = 8000;
@@ -15,6 +16,8 @@ export class StudentAuth {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
         this.ui = new StudentAuthUi(this);
+        this.sessionCoordinator = new SessionInitializationCoordinator();
+        this.authUnsubscribe = null;
     }
 
     getJoinGradeFromUrl() {
@@ -81,30 +84,24 @@ export class StudentAuth {
             // Check for redirect result (when using signInWithRedirect)
             // This must be called before onAuthStateChanged
             const redirectResult = await supabaseService.handleRedirectResult();
-            let redirectProcessed = false;
             if (redirectResult?.user) {
                 console.log('Processing redirect sign-in result...');
                 await this.handleBackendSignIn(redirectResult.user);
-                redirectProcessed = true;
             }
-            
-            supabaseService.onAuthStateChanged(async (user, event) => {
+
+            this.authUnsubscribe?.();
+            this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
                 this.sm.logStudentDomUpdate?.('auth-state', {
                     source: 'onAuthStateChanged',
                     event,
                     userId: user?.uid || ''
                 });
                 if (user) {
-                    const isSameUser = this.sm.currentUser?.uid === user.uid;
-                    const isAlreadyInitialized = Boolean(this.sm.authInitialized);
-                    const isRedirectUser = redirectProcessed && redirectResult?.user?.uid === user.uid;
-                    if (isSameUser && isAlreadyInitialized && event !== 'USER_UPDATED') {
-                        return;
-                    }
-                    // Only handle if we didn't already process redirect result
-                    if (!isRedirectUser) {
-                        await this.handleBackendSignIn(user);
-                    }
+                    void this.handleBackendSignIn(user, { force: event === 'USER_UPDATED' })
+                        .catch(error => {
+                            console.error('Student session initialization failed:', error);
+                            this.showLoginError(error?.message || 'Could not finish signing in.');
+                        });
                 } else {
                     this.handleBackendSignOut();
                 }
@@ -116,7 +113,15 @@ export class StudentAuth {
         }
     }
 
-    async handleBackendSignIn(user) {
+    handleBackendSignIn(user, options = {}) {
+        return this.sessionCoordinator.run(
+            user?.uid,
+            context => this.initializeBackendSignIn(user, context),
+            options
+        );
+    }
+
+    async initializeBackendSignIn(user, context) {
         this.sm.currentUser = user;
         localStorage.setItem('was_logged_in', 'true');
         // Restore the last verified local snapshot before making any network call.
@@ -143,17 +148,20 @@ export class StudentAuth {
         // Try to fetch role and profile.
         try {
             if (navigator.onLine) {
-                await this.fetchAndSetRole(user);
+                const role = await this.fetchAndSetRole(user, context);
+                if (role === null || !context.isCurrent()) return false;
             } else {
                 this.restoreCachedStudentIdentity(user);
             }
         } catch (error) {
+            if (!context.isCurrent()) return false;
             console.error('Failed to fetch role:', error);
             const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
             this.sm.currentRole = cachedRole || 'student';
             this.setAuthStatus('Signed in');
         }
 
+        if (!context.isCurrent()) return false;
         if (this.sm.currentRole !== 'student') {
             const message = this.sm.currentRole === 'teacher'
                 ? 'This page is for student accounts. Please use the teacher dashboard.'
@@ -170,9 +178,10 @@ export class StudentAuth {
         }
 
         const sessionFinished = await this.finishSignedInSession(user.uid);
-        if (sessionFinished) {
+        if (sessionFinished && context.isCurrent()) {
             this.sm.authInitialized = true;
         }
+        return sessionFinished;
     }
 
     isStillSignedIn(userId) {
@@ -238,6 +247,7 @@ export class StudentAuth {
     }
 
     handleBackendSignOut() {
+        this.sessionCoordinator.invalidate();
         this.sm.progress.stopCoinSync();
         this.sm.currentUser = null;
         localStorage.removeItem('was_logged_in');
@@ -249,12 +259,13 @@ export class StudentAuth {
         this.sm.switchView('login-view');
     }
 
-    async fetchAndSetRole(user) {
+    async fetchAndSetRole(user, context = null) {
         try {
             const profile = await requestWithTimeout(
                 signal => supabaseService.getProfile(user.uid, { signal }),
                 { timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Student profile' }
             );
+            if (context && !context.isCurrent()) return null;
             if (!profile) {
                 this.sm.currentRole = 'student';
                 this.sm.mustChangePassword = false;
@@ -283,6 +294,7 @@ export class StudentAuth {
 
             localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
         } catch (error) {
+            if (context && !context.isCurrent()) return null;
             console.error('Error fetching role:', error);
             // Try to use cached role if available
             const cachedRole = localStorage.getItem(`userRole_${user.uid}`);

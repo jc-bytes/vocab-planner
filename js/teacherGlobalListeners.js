@@ -44,6 +44,7 @@ function bindTeacherAuthListeners(manager) {
     if (signOutBtn) {
         signOutBtn.addEventListener('click', async () => {
             await supabaseService.signOut();
+            manager.getAuthCoordinator?.().invalidate();
             localStorage.removeItem('was_logged_in');
             manager.isAuthenticated = false;
             manager.currentUser = null;
@@ -77,6 +78,7 @@ function bindOverviewListeners(manager) {
     $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection('students'));
     $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection('vocabulary'));
     $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
+    $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection('sparks'));
     $('#overview-settings-btn')?.addEventListener('click', () => manager.showTeacherSection('data-settings'));
     $('#overview-export-btn')?.addEventListener('click', () => {
         manager.showTeacherSection('data-settings', { tab: 'export' });

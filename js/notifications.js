@@ -67,24 +67,42 @@ class NotificationManager {
             cursor: pointer;
         `;
 
-        toast.innerHTML = `
-            <span class="toast-icon" aria-hidden="true"><i data-lucide="${icons[type] || icons.info}"></i></span>
-            <span style="flex: 1;">${message}</span>
-            <button class="toast-close btn-icon-only" type="button" aria-label="Dismiss notification" style="
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                padding: 0;
-                width: 44px;
-                height: 44px;
-                min-width: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                opacity: 0.8;
-            "><i data-lucide="circle-x" aria-hidden="true"></i></button>
+        const icon = document.createElement('span');
+        icon.className = 'toast-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        const iconGlyph = document.createElement('i');
+        iconGlyph.setAttribute('data-lucide', icons[type] || icons.info);
+        icon.appendChild(iconGlyph);
+
+        const messageText = document.createElement('span');
+        messageText.style.flex = '1';
+        messageText.textContent = String(message ?? '');
+
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'toast-close btn-icon-only';
+        closeBtn.type = 'button';
+        closeBtn.setAttribute('aria-label', 'Dismiss notification');
+        closeBtn.style.cssText = `
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.8;
         `;
+        const closeGlyph = document.createElement('i');
+        closeGlyph.setAttribute('data-lucide', 'circle-x');
+        closeGlyph.setAttribute('aria-hidden', 'true');
+        closeBtn.appendChild(closeGlyph);
+        toast.appendChild(icon);
+        toast.appendChild(messageText);
+        toast.appendChild(closeBtn);
         window.lucide?.createIcons({ root: toast });
 
         // Add animation styles if not already added
@@ -120,7 +138,6 @@ class NotificationManager {
         }
 
         // Close button handler
-        const closeBtn = toast.querySelector('.toast-close');
         const closeToast = () => {
             toast.style.animation = 'slideOutRight 0.3s ease-out';
             setTimeout(() => {

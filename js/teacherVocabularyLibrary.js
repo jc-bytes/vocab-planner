@@ -416,7 +416,7 @@ class TeacherVocabularyLibraryMethods {
         if (type === 'remote') {
             this.loadVocabularyFromPath(vocab.path);
         } else if (type === 'cloud') {
-            this.loadVocabularyObject(vocab, { source: 'cloud' });
+            this.loadCloudVocabularyById(vocab.id);
         } else {
             this.loadLocalVocabulary(vocab);
         }
@@ -480,6 +480,7 @@ class TeacherVocabularyLibraryMethods {
     }
 
     getTeacherVocabularyWordCount(vocab = {}) {
+        if (Number.isFinite(Number(vocab.wordCount))) return Number(vocab.wordCount);
         if (Array.isArray(vocab.words)) return vocab.words.length;
         if (Array.isArray(vocab.terms)) return vocab.terms.length;
         if (Array.isArray(vocab.vocabulary)) return vocab.vocabulary.length;

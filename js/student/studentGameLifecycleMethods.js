@@ -108,7 +108,7 @@ export class StudentGameLifecycle {
 
         // Create a callback that offers replay if time remains
         const gameOverCallback = (score) => {
-            this.games.saveHighScore(type, score);
+            this.games.saveHighScore(type, score, null, { immediate: true });
 
             // If there's time remaining, offer to play again
             if (this.games.gameTimeRemaining > 0) {
@@ -199,7 +199,12 @@ export class StudentGameLifecycle {
             }
             // Report final score if available (for games with score reporting)
             if (saveScore && this.games.currentGameScore > 0 && currentGameType) {
-                this.games.saveHighScore(currentGameType, this.games.currentGameScore, this.games.currentGameMetadata);
+                this.games.saveHighScore(
+                    currentGameType,
+                    this.games.currentGameScore,
+                    this.games.currentGameMetadata,
+                    { immediate: true }
+                );
             }
             this.games.currentGame = null;
             this.games.currentGameScore = 0;

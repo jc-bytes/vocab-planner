@@ -673,7 +673,9 @@ try {
         await page.setViewportSize({ width, height: viewportHeight });
         for (const [view, viewId] of views) {
             await page.evaluate(id => window.studentApp.switchView(id), viewId);
-            await page.waitForTimeout(120);
+            // The wide shell animates its rail for 280 ms. Read settled geometry,
+            // otherwise faster browser builds can sample halfway through the transition.
+            await page.waitForTimeout(340);
             const state = await readShellState(page, width, view);
             assertShellState(state);
             await assertStudentDesignSystem(page, width, view);

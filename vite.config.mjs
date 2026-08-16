@@ -46,6 +46,7 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: 'dist-desktop',
       emptyOutDir: true,
+      manifest: true,
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'index.html'),

@@ -1,5 +1,6 @@
 import { $ } from './main.js';
 import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { SessionInitializationCoordinator } from './services/sessionInitialization.js';
 
 export const DEV_AUTH_DISABLED = false;
 export const DEV_TEACHER_USER = {
@@ -9,6 +10,11 @@ export const DEV_TEACHER_USER = {
 };
 
 class TeacherAuthMethods {
+    getAuthCoordinator() {
+        this.authCoordinator ||= new SessionInitializationCoordinator();
+        return this.authCoordinator;
+    }
+
     async startDevelopmentSession() {
         this.isAuthenticated = true;
         this.currentUser = DEV_TEACHER_USER;
@@ -32,15 +38,17 @@ class TeacherAuthMethods {
                 this.showLoginView();
             }
 
-            supabaseService.onAuthStateChanged((user) => {
+            this.authUnsubscribe?.();
+            this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
                 if (user) {
                     if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
                         return;
                     }
-                    this.handleAuthWithRole(user);
+                    void this.handleAuthWithRole(user, { force: event === 'USER_UPDATED' });
                 } else {
                     restoredUserHandled = false;
+                    this.getAuthCoordinator().invalidate();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);
@@ -83,9 +91,18 @@ class TeacherAuthMethods {
         }
     }
 
-    async handleAuthWithRole(user) {
+    handleAuthWithRole(user, options = {}) {
+        return this.getAuthCoordinator().run(
+            user?.uid,
+            context => this.initializeAuthWithRole(user, context),
+            options
+        );
+    }
+
+    async initializeAuthWithRole(user, context) {
         try {
             const role = await this.fetchUserRole(user);
+            if (!context.isCurrent()) return false;
             this.currentRole = role;
             if (role !== 'teacher') {
                 await supabaseService.signOut();
@@ -93,19 +110,24 @@ class TeacherAuthMethods {
                     ? 'No teacher profile was found for this account. Check the teacher allowlist and database sync.'
                     : 'Access restricted to allowlisted teacher emails.');
                 this.showLoginView();
-                return;
+                return false;
             }
             this.isAuthenticated = true;
             this.currentUser = user;
             localStorage.setItem('was_logged_in', 'true');
             this.updateAuthUI(user);
             await this.loadSubjectSettings();
+            if (!context.isCurrent()) return false;
             await this.loadSchoolCalendarSettings();
+            if (!context.isCurrent()) return false;
             await this.restoreRouteOrDefault();
+            return context.isCurrent();
         } catch (err) {
+            if (!context.isCurrent()) return false;
             console.error('Role check failed:', err);
             this.showAuthError('Could not verify teacher role.');
             this.showLoginView();
+            return false;
         }
     }
 

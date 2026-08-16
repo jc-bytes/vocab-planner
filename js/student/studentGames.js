@@ -67,8 +67,8 @@ export class StudentGames {
         return this.settings.updateGameSelectionUI();
     }
 
-    saveHighScore(gameId, score, metadata = null) {
-        return this.leaderboard.saveHighScore(gameId, score, metadata);
+    saveHighScore(gameId, score, metadata = null, options = {}) {
+        return this.leaderboard.saveHighScore(gameId, score, metadata, options);
     }
 
     updateLeaderboardGame() {

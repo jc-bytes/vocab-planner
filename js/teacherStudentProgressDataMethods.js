@@ -89,6 +89,55 @@ class TeacherStudentProgressDataMethods {
         return this.studentProgressPromise;
     }
 
+    mergeStudentProgressDetail(detail) {
+        if (!detail?.id) return null;
+        const student = this.allStudentData.find(item => item.id === detail.id);
+        if (!student) return detail;
+
+        const summaryProfile = student.studentProfile || {};
+        Object.assign(student, detail, {
+            email: student.email || detail.email,
+            mustChangePassword: student.mustChangePassword,
+            studentProfile: {
+                ...(detail.studentProfile || {}),
+                ...summaryProfile
+            },
+            progressDetailLoaded: true
+        });
+        return student;
+    }
+
+    async ensureStudentProgressDetail(student, { forceRefresh = false } = {}) {
+        if (!student?.id) throw new Error('Student progress cannot be loaded without an ID.');
+        if (!forceRefresh && student.progressDetailLoaded) return student;
+
+        this.studentProgressDetailPromises ||= new Map();
+        if (!forceRefresh && this.studentProgressDetailPromises.has(student.id)) {
+            return this.studentProgressDetailPromises.get(student.id);
+        }
+
+        const request = supabaseService.getStudentProgressForTeacher(student.id)
+            .then(detail => this.mergeStudentProgressDetail(detail) || student)
+            .finally(() => this.studentProgressDetailPromises.delete(student.id));
+        this.studentProgressDetailPromises.set(student.id, request);
+        return request;
+    }
+
+    async ensureStudentProgressDetails(studentIds = []) {
+        const requestedIds = new Set(studentIds.filter(Boolean));
+        const pendingIds = this.allStudentData
+            .filter(student => requestedIds.has(student.id) && !student.progressDetailLoaded)
+            .map(student => student.id);
+        if (pendingIds.length === 0) return;
+
+        for (let index = 0; index < pendingIds.length; index += 100) {
+            const details = await supabaseService.getStudentsProgressForTeacher(
+                pendingIds.slice(index, index + 100)
+            );
+            details.forEach(detail => this.mergeStudentProgressDetail(detail));
+        }
+    }
+
     populateFilters() {
         const grades = new Set();
 

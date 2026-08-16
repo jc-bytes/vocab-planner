@@ -2,6 +2,7 @@ import { $ } from '../main.js';
 import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
+import { classifySyncError } from '../services/syncQueuePolicy.js';
 import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
 
 function getSyncErrorSummary(error) {
@@ -407,12 +408,20 @@ export class StudentActivityProgressPersistence {
             return progress;
         } catch (error) {
             console.warn(`Could not sync activity progress event: ${getSyncErrorSummary(error)}`);
-            try {
-                await imageDB.enqueueSyncAction('student-activity-progress', payload);
-            } catch (queueError) {
-                console.warn('Could not queue activity progress event:', queueError);
+            const failure = classifySyncError(error, { online: navigator.onLine });
+            if (failure.retryable) {
+                try {
+                    await imageDB.enqueueSyncAction('student-activity-progress', payload);
+                    this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+                } catch (queueError) {
+                    console.warn('Could not queue activity progress event:', queueError);
+                    this.sm.setAuthStatus('Local sync storage is full');
+                    this.sm.showToast?.('Reconnect before completing more work so your progress can sync.');
+                }
+            } else {
+                this.sm.setAuthStatus('Activity result rejected');
+                this.sm.showToast?.('This activity result was not accepted. Refresh and try again.');
             }
-            this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
             return null;
         }
     }

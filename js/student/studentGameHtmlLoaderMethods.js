@@ -59,7 +59,8 @@ export class StudentGameHtmlLoader {
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
-        const storageChannel = crypto.randomUUID();
+        const storageChannel = globalThis.crypto?.randomUUID?.()
+            || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
         iframe.name = `${GAME_STORAGE_PREFIX}${JSON.stringify({
             gameId,
             channel: storageChannel,
@@ -245,7 +246,7 @@ export class StudentGameHtmlLoader {
                     if (score > 0 && score !== lastSaved) {
                         this.games.lastSavedScore = score;
                         console.log(`[Game] Saving score for ${gameId}: ${score} (previous saved: ${lastSaved})`);
-                        this.games.saveHighScore(gameId, score, metadata).catch(err => {
+                        this.games.saveHighScore(gameId, score, metadata, { immediate: isGameOver }).catch(err => {
                             console.error('Error saving score:', err);
                         });
                     }

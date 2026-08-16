@@ -1,42 +1,16 @@
 import { $, $$, createElement, escapeHtml, notifications } from './main.js';
 import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { toDate } from './services/dateUtils.js';
 import { DEFAULT_SUBJECT_SLUG, getSubjectBySlug, normalizeSubjectSlug } from './services/vocabularyApi.js';
+import { getWordHuntQuality } from './services/wordHuntQuality.js';
 
 const WORD_HUNT_REVIEW_STORAGE_KEY = 'teacher_word_hunt_review_notes';
 const WORD_HUNT_REVIEW_VIEW_MODE_KEY = 'teacher_word_hunt_review_view_modes';
-const WORD_HUNT_TEXT_RULES = {
-    definition: { minChars: 12, minWords: 3 },
-    example: { minChars: 18, minWords: 4 }
-};
-
-const toDate = (value) => {
-    if (!value) return null;
-    if (typeof value.toDate === 'function') return value.toDate();
-    if (value.seconds !== undefined) return new Date(value.seconds * 1000);
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? null : date;
-};
-
 const getStudentName = (student = {}) => {
     const profile = student.studentProfile || {};
     if (profile.firstName && profile.lastName) return `${profile.firstName} ${profile.lastName}`;
     return profile.name || student.email || 'Unknown student';
 };
-
-const hasMeaningfulText = (value, rules) => {
-    const text = String(value || '').trim();
-    if (text.length < rules.minChars) return false;
-    return text.split(/\s+/).filter(Boolean).length >= rules.minWords;
-};
-
-const getWordQuality = (entry = {}) => ({
-    definition: hasMeaningfulText(entry.definition, WORD_HUNT_TEXT_RULES.definition),
-    image: Boolean(entry.hasImage || entry.imagePath),
-    examples: (
-        hasMeaningfulText(entry.exampleOne, WORD_HUNT_TEXT_RULES.example) &&
-        hasMeaningfulText(entry.exampleTwo, WORD_HUNT_TEXT_RULES.example)
-    )
-});
 
 const getUnitLabel = (unitId = '') => String(unitId || 'Vocabulary').replace(/_/g, ' ');
 
@@ -92,6 +66,7 @@ class TeacherWordHuntReviewMethods {
                 forceRefresh: options.forceRefresh === true,
                 showError: false
             });
+            await this.ensureStudentProgressDetails(students.map(student => student.id));
             this.wordHuntReviewRows = this.buildWordHuntReviewRows(students);
             this.renderWordHuntReviewBrowser({ preserveSelection: true });
         } catch (error) {
@@ -115,8 +90,8 @@ class TeacherWordHuntReviewMethods {
                 const words = Object.entries(wordHunt)
                     .filter(([word]) => String(word || '').trim())
                     .map(([word, entry]) => {
-                        const quality = getWordQuality(entry || {});
-                        const complete = quality.definition && quality.image && quality.examples;
+                        const quality = getWordHuntQuality(entry || {});
+                        const complete = quality.complete;
                         return {
                             word,
                             entry: entry || {},

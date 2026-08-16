@@ -6,79 +6,138 @@ import { getLeaderboardGameIds } from './studentGameRegistry.js';
 import { getStudentPageSkeleton } from './studentLoadingSkeletons.js';
 
 const LEADERBOARD_ENABLED_GAMES = getLeaderboardGameIds();
+const SCORE_CHECKPOINT_INTERVAL_MS = 15000;
 
 export class StudentGameLeaderboard {
     constructor(games) {
         this.games = games;
         this.sm = games.sm;
+        this.scoreSyncStates = new Map();
     }
 
-    async saveHighScore(gameId, score, metadata = null) {
+    isBetterScore(score, previous, lowerIsBetter) {
+        if (previous === null || previous === undefined) return true;
+        return lowerIsBetter ? score < previous : score > previous;
+    }
+
+    buildScoreMetadata(gameId, metadata) {
+        if (gameId !== 'trapdoor-trials' || !metadata) return {};
+        return {
+            level: metadata.level || 0,
+            deaths: metadata.deaths || 0,
+            totalDeaths: metadata.totalDeaths || 0,
+            completedLevels: metadata.completedLevels || 0,
+            totalLevels: metadata.totalLevels || 0,
+            completed: Boolean(metadata.completed),
+            time: metadata.time || 0
+        };
+    }
+
+    saveHighScore(gameId, score, metadata = null, options = {}) {
         if (this.sm.authDisabled) {
-            return;
+            return Promise.resolve(null);
         }
 
         // Only save scores for games with leaderboards enabled
         if (!LEADERBOARD_ENABLED_GAMES.includes(gameId)) {
-            return; // This game doesn't have leaderboard support
+            return Promise.resolve(null); // This game doesn't have leaderboard support
         }
         if (!this.sm.currentUser) {
-            return; // Only save if logged in
+            return Promise.resolve(null); // Only save if logged in
         }
         if (!this.sm.studentProfile.grade) {
-            return; // Need grade for leaderboard
+            return Promise.resolve(null); // Need grade for leaderboard
         }
 
         // Ensure score is a number
         const numericScore = typeof score === 'number' ? score : Number(score) || 0;
         if (numericScore <= 0 && gameId !== 'spacepi') {
             // Don't save zero or negative scores (except for SpacePi where lower can be better)
-            return;
+            return Promise.resolve(null);
         }
 
-        try {
-            // Use a deterministic document ID: userId-gameId
-            // This ensures each player has only one entry per game
-            const scoreDocId = `${this.sm.currentUser.uid}-${gameId}`;
-            const existingScoreRow = await leaderboardRepository.get(scoreDocId);
+        const lowerIsBetter = gameId === 'spacepi';
+        let state = this.scoreSyncStates.get(gameId);
+        if (!state) {
+            state = {
+                bestObserved: null,
+                bestPersisted: null,
+                pending: null,
+                inFlight: null,
+                timer: null,
+                lastSubmittedAt: 0
+            };
+            this.scoreSyncStates.set(gameId, state);
+        }
 
-            // Only update if this is a new high score or first time playing
-            // Note: SpacePi uses "lower is better" scoring, so invert the comparison
-            const existingScore = existingScoreRow ? (Number(existingScoreRow.score) || 0) : 0;
-            const isLowerBetter = gameId === 'spacepi';
-            const isNewHighScore = isLowerBetter 
-                ? (!existingScoreRow || numericScore < existingScore)
-                : (!existingScoreRow || numericScore > existingScore);
-            
-            if (isNewHighScore) {
-                const scoreMetadata = {};
-                if (gameId === 'trapdoor-trials' && metadata) {
-                    scoreMetadata.level = metadata.level || 0;
-                    scoreMetadata.deaths = metadata.deaths || 0;
-                    scoreMetadata.totalDeaths = metadata.totalDeaths || 0;
-                    scoreMetadata.completedLevels = metadata.completedLevels || 0;
-                    scoreMetadata.totalLevels = metadata.totalLevels || 0;
-                    scoreMetadata.completed = Boolean(metadata.completed);
-                    scoreMetadata.time = metadata.time || 0;
-                }
+        if (!this.isBetterScore(numericScore, state.bestObserved, lowerIsBetter)) {
+            return state.inFlight || Promise.resolve(null);
+        }
 
-                await supabaseService.submitStudentGameScore({
-                    gameId,
-                    score: numericScore,
-                    metadata: scoreMetadata
-                });
-                console.log(`[Leaderboard] Saved score for ${gameId}: ${numericScore} (previous: ${existingScore})`);
+        state.bestObserved = numericScore;
+        state.pending = {
+            gameId,
+            score: numericScore,
+            metadata: this.buildScoreMetadata(gameId, metadata),
+            immediate: Boolean(options.immediate)
+        };
 
-                // Refresh leaderboard if we're viewing this game
+        const checkpointDue = Date.now() - state.lastSubmittedAt >= SCORE_CHECKPOINT_INTERVAL_MS;
+        if (state.pending.immediate || checkpointDue) return this.flushHighScore(gameId);
+        this.scheduleHighScoreFlush(gameId, SCORE_CHECKPOINT_INTERVAL_MS - (Date.now() - state.lastSubmittedAt));
+        return state.inFlight || Promise.resolve(null);
+    }
+
+    scheduleHighScoreFlush(gameId, delayMs) {
+        const state = this.scoreSyncStates.get(gameId);
+        if (!state || state.timer) return;
+        state.timer = window.setTimeout(() => {
+            state.timer = null;
+            void this.flushHighScore(gameId);
+        }, Math.max(0, delayMs));
+    }
+
+    async flushHighScore(gameId) {
+        const state = this.scoreSyncStates.get(gameId);
+        if (!state) return null;
+        if (state.timer) {
+            window.clearTimeout(state.timer);
+            state.timer = null;
+        }
+        if (state.inFlight) {
+            await state.inFlight;
+            return state.pending ? this.flushHighScore(gameId) : null;
+        }
+        if (!state.pending) return null;
+
+        const submission = state.pending;
+        state.pending = null;
+        state.lastSubmittedAt = Date.now();
+        state.inFlight = (async () => {
+            try {
+                const saved = await supabaseService.submitStudentGameScore(submission);
+                const savedScore = Number(saved?.score);
+                if (Number.isFinite(savedScore)) state.bestPersisted = savedScore;
                 if (this.games.gamesList[this.games.currentGameIndex]?.id === gameId) {
-                    this.loadLeaderboard(gameId);
+                    await this.loadLeaderboard(gameId);
                 }
-            } else {
-                console.log(`[Leaderboard] Score not saved for ${gameId}: ${numericScore} is not better than ${existingScore} (isLowerBetter: ${isLowerBetter})`);
+                return saved;
+            } catch (error) {
+                console.error('Error saving score:', error);
+                notifications.warning('Could not save your score to the leaderboard. Your game can continue.');
+                return null;
             }
-        } catch (error) {
-            console.error('Error saving score:', error);
-            notifications.warning('Could not save your score to the leaderboard. Your progress is still saved locally.');
+        })();
+
+        try {
+            return await state.inFlight;
+        } finally {
+            state.inFlight = null;
+            if (state.pending?.immediate) {
+                void this.flushHighScore(gameId);
+            } else if (state.pending) {
+                this.scheduleHighScoreFlush(gameId, SCORE_CHECKPOINT_INTERVAL_MS);
+            }
         }
     }
 
@@ -121,7 +180,6 @@ export class StudentGameLeaderboard {
     async loadLeaderboard(gameId) {
         const container = $('#leaderboard-list');
         if (!container) return; // Modal might not be in DOM yet
-        if (!container) return;
 
         if (this.sm.authDisabled) {
             container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Leaderboards are disabled in local development.</p>';

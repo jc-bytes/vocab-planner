@@ -271,6 +271,10 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(vocabulary.updatedAt.toDate() instanceof Date, true);
             assert.equal((await withServiceClient(teacherClient, () => vocabularyRepository.list()))
                 .some(item => item.id === IDS.vocabulary), true);
+            const metadata = (await withServiceClient(teacherClient, () => vocabularyRepository.listMetadata()))
+                .find(item => item.id === IDS.vocabulary);
+            assert.equal(metadata.wordCount, 1);
+            assert.equal(metadata.words, undefined);
 
             vocabulary = await withServiceClient(teacherClient, () => vocabularyRepository.update(IDS.vocabulary, {
                 ...source, name: 'Acceptance Vocabulary Updated', week: 3
@@ -340,6 +344,32 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             await expectRejected(() => withServiceClient(studentClient, () => teacherExportRepository.logExport({
                 teacherId: student.id, filename: `${RUN_ID}-student.json`
             })));
+        });
+
+        await t.test('Teacher roster summaries paginate and detailed batches remain teacher-only', async () => {
+            const { data: page, error: pageError } = await teacherClient.rpc('list_student_progress_summaries_v1', {
+                p_limit: 1,
+                p_offset: 0
+            });
+            if (pageError) throw pageError;
+            assert.equal(page.items.length, 1);
+            assert.equal(page.limit, 1);
+            assert.equal(Object.hasOwn(page.items[0], 'units'), false);
+
+            const { data: details, error: detailsError } = await teacherClient.rpc('get_students_progress_by_ids_v1', {
+                p_user_ids: [student.id, peer.id]
+            });
+            if (detailsError) throw detailsError;
+            assert.equal(details.length, 2);
+            assert.equal(details.every(item => item.units && typeof item.units === 'object'), true);
+
+            await expectRejected(() => studentClient.rpc('list_student_progress_summaries_v1', {
+                p_limit: 10,
+                p_offset: 0
+            }).throwOnError());
+            await expectRejected(() => studentClient.rpc('get_students_progress_by_ids_v1', {
+                p_user_ids: [peer.id]
+            }).throwOnError());
         });
 
         await t.test('Student RPCs enforce authentication, role, ownership, idempotency, and score uniqueness', async () => {

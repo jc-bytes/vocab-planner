@@ -30,6 +30,8 @@ Object.defineProperty(globalThis, 'navigator', {
 });
 
 const { StudentActivityProgressPersistence } = await import('../js/student/studentActivityProgressPersistenceMethods.js');
+const { StudentProgressCloud } = await import('../js/student/studentProgressCloudMethods.js');
+const { imageDB } = await import('../js/db.js');
 
 function createPersistence() {
     const localSaves = [];
@@ -267,4 +269,51 @@ test('empty zero-progress launch events never reach the server', async () => {
     await persistence.flushPendingActivityProgress();
 
     assert.equal(submitted, 0);
+});
+
+test('one rejected queued record does not block later valid work', async () => {
+    const original = {
+        getPendingSyncActions: imageDB.getPendingSyncActions,
+        completeSyncAction: imageDB.completeSyncAction,
+        markSyncActionFailed: imageDB.markSyncActionFailed
+    };
+    const completed = [];
+    const failed = [];
+    imageDB.getPendingSyncActions = async () => [
+        { id: 'bad', type: 'bad', payload: {}, attempts: 0 },
+        { id: 'good', type: 'good', payload: {}, attempts: 0 }
+    ];
+    imageDB.completeSyncAction = async id => completed.push(id);
+    imageDB.markSyncActionFailed = async (record, error, options) => {
+        failed.push({ id: record.id, error, options });
+        return { ...record, status: options.terminal ? 'failed' : 'pending' };
+    };
+
+    const statuses = [];
+    const progress = {
+        sm: {
+            authDisabled: false,
+            currentUser: { uid: 'student-1' },
+            setAuthStatus: status => statuses.push(status)
+        }
+    };
+    const cloud = new StudentProgressCloud(progress);
+    cloud.syncQueuedRecord = async record => {
+        if (record.id === 'bad') {
+            const error = new Error('Invalid payload');
+            error.status = 422;
+            throw error;
+        }
+    };
+
+    try {
+        await cloud.flushLocalSyncQueue({ silent: true });
+    } finally {
+        Object.assign(imageDB, original);
+    }
+
+    assert.deepEqual(completed, ['good']);
+    assert.equal(failed[0].id, 'bad');
+    assert.equal(failed[0].options.terminal, true);
+    assert.equal(statuses.at(-1), 'Some local changes need attention');
 });

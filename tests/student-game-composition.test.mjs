@@ -24,6 +24,8 @@ globalThis.document = {
     createElement() {
         return {
             style: {},
+            dataset: {},
+            append() {},
             appendChild() {},
             remove() {},
             classList: { add() {}, remove() {} },
@@ -43,7 +45,9 @@ globalThis.document = {
 };
 globalThis.window = {
     addEventListener() {},
-    removeEventListener() {}
+    removeEventListener() {},
+    setTimeout,
+    clearTimeout
 };
 
 const { StudentGames } = await import('../js/student/studentGames.js');
@@ -56,6 +60,7 @@ const { StudentGameSettings } = await import('../js/student/studentGameSettingsM
 const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
 const { readLocalArcadeSession, writeLocalArcadeSession, writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
 const { refreshLocalFormativeWindow } = await import('../js/student/studentArcadeTimeStorage.js');
+const { supabaseService } = await import('../js/supabaseService.js');
 
 test('StudentGames owns explicit game components', () => {
     const manager = {};
@@ -161,8 +166,61 @@ test('StudentGames delegates to the owning component', async () => {
 
     assert.deepEqual(calls, [
         ['startGame', 'snake'],
-        ['saveHighScore', 'snake', 25, { level: 2 }]
+        ['saveHighScore', 'snake', 25, { level: 2 }, {}]
     ]);
+});
+
+test('leaderboard persistence coalesces intermediate scores and avoids preflight reads', async () => {
+    const originalSubmit = supabaseService.submitStudentGameScore;
+    const submitted = [];
+    supabaseService.submitStudentGameScore = async payload => {
+        submitted.push(payload);
+        return { score: payload.score };
+    };
+    const games = new StudentGames({
+        authDisabled: false,
+        currentUser: { uid: 'student-1' },
+        studentProfile: { grade: '7' }
+    });
+    games.currentGameIndex = games.gamesList.findIndex(game => game.id === 'snake');
+    games.leaderboard.loadLeaderboard = async () => {};
+
+    try {
+        await games.saveHighScore('snake', 10);
+        await games.saveHighScore('snake', 20);
+        await games.saveHighScore('snake', 30);
+        await games.saveHighScore('snake', 40, null, { immediate: true });
+    } finally {
+        supabaseService.submitStudentGameScore = originalSubmit;
+    }
+
+    assert.deepEqual(submitted.map(item => item.score), [10, 40]);
+});
+
+test('lower-is-better leaderboard scores keep only improvements', async () => {
+    const originalSubmit = supabaseService.submitStudentGameScore;
+    const submitted = [];
+    supabaseService.submitStudentGameScore = async payload => {
+        submitted.push(payload.score);
+        return { score: payload.score };
+    };
+    const games = new StudentGames({
+        authDisabled: false,
+        currentUser: { uid: 'student-2' },
+        studentProfile: { grade: '7' }
+    });
+    games.currentGameIndex = games.gamesList.findIndex(game => game.id === 'spacepi');
+    games.leaderboard.loadLeaderboard = async () => {};
+
+    try {
+        await games.saveHighScore('spacepi', 10);
+        await games.saveHighScore('spacepi', 12, null, { immediate: true });
+        await games.saveHighScore('spacepi', 8, null, { immediate: true });
+    } finally {
+        supabaseService.submitStudentGameScore = originalSubmit;
+    }
+
+    assert.deepEqual(submitted, [10, 8]);
 });
 
 test('blocked game starts redirect before settings load or coin deduction', async () => {

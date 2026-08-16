@@ -67,6 +67,8 @@ import {
     Search,
     Send,
     Settings,
+    ShieldPlus,
+    ShieldUser,
     SlidersHorizontal,
     Sparkles,
     Shuffle,
@@ -80,6 +82,7 @@ import {
     User,
     UserPlus,
     Users,
+    UsersRound,
     X
 } from 'lucide';
 
@@ -150,6 +153,8 @@ const icons = {
     Search,
     Send,
     Settings,
+    ShieldPlus,
+    ShieldUser,
     SlidersHorizontal,
     Sparkles,
     Shuffle,
@@ -163,6 +168,7 @@ const icons = {
     User,
     UserPlus,
     Users,
+    UsersRound,
     X
 };
 

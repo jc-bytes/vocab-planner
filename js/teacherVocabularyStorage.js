@@ -11,7 +11,7 @@ class TeacherVocabularyStorageMethods {
         if (!this.ensureAuthenticated(false)) return [];
 
         try {
-            const vocabularies = await vocabularyRepository.list();
+            const vocabularies = await vocabularyRepository.listMetadata();
             this.setCloudStatus('Ready', 'info');
             return vocabularies.map(vocabulary => ({ ...vocabulary, source: 'cloud' }));
         } catch (error) {
@@ -98,7 +98,7 @@ class TeacherVocabularyStorageMethods {
             if (type === 'remote') {
                 this.loadVocabularyFromPath(vocab.path);
             } else if (type === 'cloud') {
-                this.loadVocabularyObject(vocab, { source: 'cloud' });
+                this.loadCloudVocabularyById(vocab.id);
             } else {
                 this.loadLocalVocabulary(vocab);
             }
@@ -159,6 +159,23 @@ class TeacherVocabularyStorageMethods {
         }
     }
 
+    async loadCloudVocabularyById(id) {
+        if (!this.ensureAuthenticated(false) || !id) return false;
+        this.setCloudStatus('Loading vocabulary...', 'info');
+        try {
+            const vocabulary = await vocabularyRepository.get(id);
+            if (!vocabulary) throw new Error('Vocabulary not found.');
+            this.loadVocabularyObject(vocabulary, { source: 'cloud' });
+            this.setCloudStatus('Ready', 'info');
+            return true;
+        } catch (error) {
+            console.error(`Failed to load cloud vocabulary ${id}:`, error);
+            this.setCloudStatus('Cloud load failed', 'error');
+            notifications.error('Could not load that vocabulary. Please try again.');
+            return false;
+        }
+    }
+
     async loadVocabularyById(vocabularyId) {
         if (!this.ensureAuthenticated(false)) return false;
         const id = String(vocabularyId || '').trim();
@@ -183,6 +200,8 @@ class TeacherVocabularyStorageMethods {
                 const data = await loadVocabularyFile(path);
                 if (!data) throw new Error(`Could not load vocabulary file ${path}`);
                 this.loadVocabularyObject(data, { source: 'remote', path });
+            } else if (item.type === 'cloud') {
+                return this.loadCloudVocabularyById(item.vocab.id);
             } else {
                 this.loadVocabularyObject(item.vocab, { source: item.type });
             }

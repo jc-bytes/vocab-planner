@@ -59,6 +59,13 @@ const teacherDataDashboardViewMethods = {
             $('#dashboard-vocab-count').textContent = '--';
         }
 
+        // Full activity snapshots are intentionally deferred until analytics is visible.
+        try {
+            await this.ensureStudentProgressDetails(filteredData.map(student => student.id));
+        } catch (error) {
+            console.error('Unable to load detailed student analytics:', error);
+        }
+
         // Load charts
         await this.renderDashboardCharts();
         this.renderRecentActivity();

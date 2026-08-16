@@ -543,7 +543,7 @@ export function preloadVocabularyFile(path) {
 
 export async function loadCloudVocabularyList(api) {
     await api.init();
-    return (await vocabularyRepository.list()).map(vocabulary => ({
+    return (await vocabularyRepository.listMetadata()).map(vocabulary => ({
         ...vocabulary,
         subjectSlug: getVocabSubjectSlug(vocabulary),
         __source: 'cloud'

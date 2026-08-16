@@ -377,7 +377,9 @@ deno_version = 2
 # secret_key = "env(SECRET_VALUE)"
 
 [analytics]
-enabled = true
+# Local acceptance tests do not consume the logging stack. Keeping it disabled
+# avoids an unnecessary Vector container and its Docker-socket bind dependency.
+enabled = false
 port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"

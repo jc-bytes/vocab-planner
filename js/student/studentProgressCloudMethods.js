@@ -3,6 +3,7 @@ import { studentApi as supabaseService } from '../services/studentApi.js';
 import { mapSparkResponseRow } from '../services/sparkResponsesRepository.js';
 import { studentProgressRepository } from '../services/studentProgressRepository.js';
 import { imageDB } from '../db.js';
+import { classifySyncError } from '../services/syncQueuePolicy.js';
 import {
     COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
     COIN_REFRESH_THROTTLE_MS,
@@ -316,8 +317,14 @@ export class StudentProgressCloud {
             this.sm.setAuthStatus('Synced');
         } catch (error) {
             console.error('Failed to save progress to cloud:', error);
-            await this.enqueueProgressSync();
-            this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+            const failure = classifySyncError(error, { online: navigator.onLine });
+            if (failure.retryable) {
+                await this.enqueueProgressSync();
+                this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+            } else {
+                this.sm.setAuthStatus('Cloud rejected this change');
+                notifications.warning('This change could not be accepted. Refresh and try again, or ask your teacher for help.');
+            }
         }
     }
 
@@ -376,46 +383,77 @@ export class StudentProgressCloud {
         if (pending.length === 0) return;
         this.sm.setAuthStatus('Syncing local changes...');
 
+        let retryableFailures = 0;
+        let terminalFailures = 0;
+
         for (const record of pending) {
             try {
-                if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
-                    const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
-                    this.applyUnitProgressResult(progress, record.payload || {});
-                } else if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
-                    const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
-                    if (this.sm.activities?.progressPersistence?.applyActivityProgressResult) {
-                        this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
-                    } else {
-                        this.progress.applyProgressSnapshot(progress, { saveLocal: true });
-                    }
-                } else if (record.type === 'student-spark-response'
-                    && typeof supabaseService.submitStudentSparkResponse === 'function') {
-                    const saved = await supabaseService.submitStudentSparkResponse(record.payload || {});
-                    const storageKey = String(record.payload?.storageKey || '');
-                    const sparkId = String(record.payload?.sparkId || '');
-                    if (storageKey && sparkId) {
-                        try {
-                            const local = JSON.parse(localStorage.getItem(storageKey) || '{}');
-                            local[sparkId] = mapSparkResponseRow(saved);
-                            localStorage.setItem(storageKey, JSON.stringify(local));
-                            this.sm.activities?.updateArcadeGateDisplay?.();
-                        } catch (storageError) {
-                            console.warn('Could not refresh the locally cached Spark response:', storageError);
-                        }
-                    }
-                } else if (record.type === 'student-progress') {
-                    await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
-                }
+                await this.syncQueuedRecord(record);
                 await imageDB.completeSyncAction(record.id);
             } catch (error) {
-                await imageDB.markSyncActionFailed(record, error);
-                this.sm.setAuthStatus('Sync failed - saved locally');
+                const failure = classifySyncError(error, { online: navigator.onLine });
+                const updated = await imageDB.markSyncActionFailed(record, error, {
+                    terminal: !failure.retryable,
+                    reason: failure.reason
+                });
+                if (updated.status === 'failed') terminalFailures += 1;
+                else retryableFailures += 1;
                 if (!options.silent) console.warn('Could not sync queued local change:', error);
-                return;
             }
         }
 
-        this.sm.setAuthStatus('Synced');
+        if (terminalFailures > 0) {
+            this.sm.setAuthStatus('Some local changes need attention');
+            if (!options.silent) {
+                notifications.warning('Some saved changes were rejected, but other work continued syncing.');
+            }
+        } else if (retryableFailures > 0) {
+            this.sm.setAuthStatus('Sync paused - saved locally');
+        } else {
+            this.sm.setAuthStatus('Synced');
+        }
+    }
+
+    async syncQueuedRecord(record) {
+        if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
+            const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
+            this.applyUnitProgressResult(progress, record.payload || {});
+            return;
+        }
+        if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
+            const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
+            if (this.sm.activities?.progressPersistence?.applyActivityProgressResult) {
+                this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
+            } else {
+                this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            }
+            return;
+        }
+        if (record.type === 'student-spark-response'
+            && typeof supabaseService.submitStudentSparkResponse === 'function') {
+            const saved = await supabaseService.submitStudentSparkResponse(record.payload || {});
+            const storageKey = String(record.payload?.storageKey || '');
+            const sparkId = String(record.payload?.sparkId || '');
+            if (storageKey && sparkId) {
+                try {
+                    const local = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                    local[sparkId] = mapSparkResponseRow(saved);
+                    localStorage.setItem(storageKey, JSON.stringify(local));
+                    this.sm.activities?.updateArcadeGateDisplay?.();
+                } catch (storageError) {
+                    console.warn('Could not refresh the locally cached Spark response:', storageError);
+                }
+            }
+            return;
+        }
+        if (record.type === 'student-progress') {
+            await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
+            return;
+        }
+        const error = new Error(`Unsupported offline sync action: ${record.type || 'unknown'}`);
+        error.code = 'INVALID_SYNC_ACTION';
+        error.status = 422;
+        throw error;
     }
 
     async restoreImagesFromProgress() {

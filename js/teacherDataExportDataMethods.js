@@ -17,126 +17,57 @@ export async function fetchPreviewData(studentIds, dataTypes) {
         }
     };
 
-    if (dataTypes.includes('studentProgress')) {
-        for (const studentId of studentIds) {
-            try {
-                const progress = await teacherExportRepository.getStudentProgress(studentId);
-                if (progress) {
-                    const data = { studentId, ...progress };
-                    preview.studentProgress.push(data);
-                    preview.summary.totalProgressRecords++;
+    const [studentProgress, scores, profiles] = await Promise.all([
+        dataTypes.includes('studentProgress')
+            ? teacherExportRepository.getStudentProgressBatch(studentIds)
+            : [],
+        dataTypes.includes('scores')
+            ? teacherExportRepository.listScoresForUsers(studentIds)
+            : [],
+        dataTypes.includes('userRoles')
+            ? teacherExportRepository.getProfiles(studentIds)
+            : []
+    ]);
 
-                    const coinData = data.coinData || {};
-                    preview.summary.totalCoins += (coinData.balance || 0);
-
-                    if (data.updatedAt) {
-                        const date = data.updatedAt.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt.seconds * 1000);
-                        if (!preview.summary.dateRange.start || date < preview.summary.dateRange.start) {
-                            preview.summary.dateRange.start = date;
-                        }
-                        if (!preview.summary.dateRange.end || date > preview.summary.dateRange.end) {
-                            preview.summary.dateRange.end = date;
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error(`Error fetching progress for ${studentId}:`, error);
-            }
+    preview.studentProgress = studentProgress.map(progress => ({ studentId: progress.id, ...progress }));
+    preview.summary.totalProgressRecords = preview.studentProgress.length;
+    preview.studentProgress.forEach(data => {
+        preview.summary.totalCoins += data.coinData?.balance || 0;
+        const date = data.updatedAt?.toDate?.();
+        if (!date) return;
+        if (!preview.summary.dateRange.start || date < preview.summary.dateRange.start) {
+            preview.summary.dateRange.start = date;
         }
-    }
-
-    if (dataTypes.includes('scores')) {
-        for (const studentId of studentIds) {
-            try {
-                const scores = await teacherExportRepository.listScores(studentId);
-                scores.forEach(score => {
-                    preview.scores.push({ scoreId: score.id, ...score });
-                    preview.summary.totalScores++;
-                    if (score.gameId) {
-                        preview.summary.gamesPlayed.add(score.gameId);
-                    }
-                });
-            } catch (error) {
-                console.error(`Error fetching scores for ${studentId}:`, error);
-            }
+        if (!preview.summary.dateRange.end || date > preview.summary.dateRange.end) {
+            preview.summary.dateRange.end = date;
         }
-    }
+    });
 
-    if (dataTypes.includes('userRoles')) {
-        for (const studentId of studentIds) {
-            try {
-                const profile = await teacherExportRepository.getProfile(studentId);
-                if (profile) {
-                    preview.userRoles.push({ userId: studentId, ...profile });
-                    preview.summary.totalRoles++;
-                }
-            } catch (error) {
-                console.error(`Error fetching role for ${studentId}:`, error);
-            }
-        }
-    }
+    preview.scores = scores.map(score => ({ scoreId: score.id, ...score }));
+    preview.summary.totalScores = preview.scores.length;
+    scores.forEach(score => {
+        if (score.gameId) preview.summary.gamesPlayed.add(score.gameId);
+    });
+
+    preview.userRoles = profiles.map(profile => ({ userId: profile.userId, ...profile }));
+    preview.summary.totalRoles = preview.userRoles.length;
 
     return preview;
 }
 
 export async function exportStudentProgress(studentIds) {
-    const progressData = [];
-
-    for (const studentId of studentIds) {
-        try {
-            const progress = await teacherExportRepository.getStudentProgress(studentId);
-            if (progress) {
-                progressData.push({
-                    studentId: studentId,
-                    ...progress
-                });
-            }
-        } catch (error) {
-            console.error(`Error exporting progress for ${studentId}:`, error);
-        }
-    }
-
-    return progressData;
+    const progressData = await teacherExportRepository.getStudentProgressBatch(studentIds);
+    return progressData.map(progress => ({ studentId: progress.id, ...progress }));
 }
 
 export async function exportScores(studentIds) {
-    const allScores = [];
-
-    for (const studentId of studentIds) {
-        try {
-            const scores = await teacherExportRepository.listScores(studentId);
-            scores.forEach(score => {
-                allScores.push({
-                    scoreId: score.id,
-                    ...score
-                });
-            });
-        } catch (error) {
-            console.error(`Error exporting scores for ${studentId}:`, error);
-        }
-    }
-
-    return allScores;
+    const scores = await teacherExportRepository.listScoresForUsers(studentIds);
+    return scores.map(score => ({ scoreId: score.id, ...score }));
 }
 
 export async function exportUserRoles(studentIds) {
-    const rolesData = [];
-
-    for (const studentId of studentIds) {
-        try {
-            const profile = await teacherExportRepository.getProfile(studentId);
-            if (profile) {
-                rolesData.push({
-                    userId: studentId,
-                    ...profile
-                });
-            }
-        } catch (error) {
-            console.error(`Error exporting role for ${studentId}:`, error);
-        }
-    }
-
-    return rolesData;
+    const profiles = await teacherExportRepository.getProfiles(studentIds);
+    return profiles.map(profile => ({ userId: profile.userId, ...profile }));
 }
 
 export async function markExportComplete(dataTypes, studentIds, exportFormat) {

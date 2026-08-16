@@ -4,8 +4,31 @@ import {
     mapProfileRow,
     normalizeProfile,
     normalizeUser,
-    profilePayload
+    profilePayload,
+    toClientTimestamp
 } from './services/supabaseValues.js';
+
+function normalizeTeacherProgressRecord(record, { detailed = false } = {}) {
+    if (!record) return null;
+    const studentProfile = normalizeProfile(record.studentProfile || {});
+    return {
+        ...record,
+        id: record.id || record.userId,
+        userId: record.userId || record.id,
+        email: record.email || studentProfile.email,
+        role: record.role || 'student',
+        mustChangePassword: Boolean(record.mustChangePassword),
+        studentProfile,
+        units: detailed ? (record.units || {}) : undefined,
+        coins: Number(record.coins) || 0,
+        coinData: record.coinData || { ...DEFAULT_COIN_DATA },
+        totalXp: Number(record.totalXp) || 0,
+        version: Number(record.version) || 0,
+        createdAt: toClientTimestamp(record.createdAt),
+        updatedAt: toClientTimestamp(record.updatedAt),
+        progressDetailLoaded: detailed
+    };
+}
 
 export function installSupabaseAuthProfileMethods(supabaseService) {
     Object.assign(supabaseService, {
@@ -190,63 +213,72 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return mapProfileRow(Array.isArray(data) ? data[0] : data);
     },
 
-    async getStudentsWithProgress() {
+    async listStudentProgressSummaries({
+        limit = 100,
+        offset = 0,
+        grade = null,
+        section = null,
+        search = null
+    } = {}) {
         await this.init();
-        const [{ data: profiles, error: profilesError }, { data: progressRows, error: progressError }] =
-            await Promise.all([
-                this.client
-                    .from('profiles')
-                    .select('*')
-                    .eq('role', 'student')
-                    .order('grade_level', { ascending: true })
-                    .order('section_letter', { ascending: true })
-                    .order('last_name', { ascending: true }),
-                this.client
-                    .rpc('get_students_progress_v3')
-            ]);
-
-        if (profilesError) throw profilesError;
-        if (progressError) throw progressError;
-
-        const progressByUserId = new Map(
-            (progressRows || []).map((progress) => [progress.userId, progress])
-        );
-
-        return (profiles || []).map((profileRow) => {
-            const profile = mapProfileRow(profileRow);
-            const progress = progressByUserId.get(profile.userId) || {
-                id: profile.userId,
-                userId: profile.userId,
-                studentProfile: {},
-                units: {},
-                coins: 0,
-                coinData: { ...DEFAULT_COIN_DATA },
-                coinHistory: [],
-                updatedAt: profile.updatedAt
-            };
-
-            const studentProfile = {
-                firstName: profile.firstName,
-                lastName: profile.lastName,
-                name: profile.name,
-                email: profile.email,
-                grade: profile.grade,
-                group: profile.group
-            };
-
-            return {
-                ...progress,
-                id: profile.userId,
-                email: profile.email,
-                role: profile.role,
-                mustChangePassword: profile.mustChangePassword,
-                studentProfile: {
-                    ...studentProfile,
-                    ...(progress.studentProfile || {})
-                },
-                updatedAt: progress.updatedAt || profile.updatedAt
-            };
+        const pageLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 100, 1), 200);
+        const pageOffset = Math.max(Number.parseInt(offset, 10) || 0, 0);
+        const { data, error } = await this.client.rpc('list_student_progress_summaries_v1', {
+            p_limit: pageLimit,
+            p_offset: pageOffset,
+            p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10),
+            p_section: section || null,
+            p_search: search || null
         });
+        if (error) throw error;
+        const page = Array.isArray(data) ? data[0] : data;
+        return {
+            items: (page?.items || []).map(item => normalizeTeacherProgressRecord(item)),
+            total: Number(page?.total) || 0,
+            limit: Number(page?.limit) || pageLimit,
+            offset: Number(page?.offset) || pageOffset
+        };
+    },
+
+    async getStudentsWithProgress() {
+        const students = [];
+        const limit = 100;
+        let offset = 0;
+        let total = Infinity;
+
+        while (offset < total) {
+            const page = await this.listStudentProgressSummaries({ limit, offset });
+            students.push(...page.items);
+            total = page.total;
+            if (page.items.length === 0) break;
+            offset += page.items.length;
+        }
+
+        return students;
+    },
+
+    async getStudentProgressForTeacher(userId, options = {}) {
+        await this.init();
+        let query = this.client.rpc('get_student_progress_v3', { p_user_id: userId });
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+        return normalizeTeacherProgressRecord(Array.isArray(data) ? data[0] : data, { detailed: true });
+    },
+
+    async getStudentsProgressForTeacher(userIds = []) {
+        await this.init();
+        const ids = Array.from(new Set(userIds.filter(Boolean)));
+        if (ids.length === 0) return [];
+        if (ids.length > 200) throw new Error('A maximum of 200 students can be loaded at once.');
+        const { data, error } = await this.client.rpc('get_students_progress_by_ids_v1', {
+            p_user_ids: ids
+        });
+        if (error) throw error;
+        const rows = Array.isArray(data) ? data : [];
+        return rows.map(row => normalizeTeacherProgressRecord(row, { detailed: true }));
     },
 
     async updatePasswordAndClearFlag(password) {
@@ -304,9 +336,14 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         }
 
         const { data } = this.client.auth.onAuthStateChange((event, session) => {
-            this.currentSession = session || null;
-            this.currentUser = normalizeUser(session?.user || null);
-            setTimeout(() => callback(this.currentUser, event, this.currentSession), 0);
+            const eventSession = session || null;
+            const eventUser = normalizeUser(session?.user || null);
+            this.currentSession = eventSession;
+            this.currentUser = eventUser;
+            setTimeout(() => {
+                Promise.resolve(callback(eventUser, event, eventSession))
+                    .catch(error => console.error('Authentication state handler failed:', error));
+            }, 0);
         });
 
         return () => data.subscription.unsubscribe();

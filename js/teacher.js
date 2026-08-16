@@ -3,14 +3,11 @@ import {
     getDefaultSchoolCalendar
 } from './services/vocabularyApi.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
-import { installTeacherDataManagementMethods } from './teacherDataManagement.js';
 import { installTeacherOverviewMethods } from './teacherOverview.js';
-import { installTeacherGroupsMethods } from './teacherGroups.js';
-import { installTeacherQuizMethods } from './teacherQuiz.js';
+import { installTeacherLazyFeatureMethods } from './teacherLazyFeatures.js';
 import { installTeacherRoutingMethods } from './teacherRouting.js';
 import { installTeacherSettingsMethods } from './teacherSettings.js';
 import { installTeacherShellMethods } from './teacherShell.js';
-import { installTeacherSparkMethods } from './teacherSparks.js';
 import { installTeacherStudentProgressMethods } from './teacherStudentProgress.js';
 import { installTeacherVocabularyMethods } from './teacherVocabulary.js';
 import { initTeacherListeners } from './teacherListeners.js';
@@ -114,14 +111,11 @@ class TeacherManager {
 }
 
 installTeacherAuthMethods(TeacherManager);
-installTeacherDataManagementMethods(TeacherManager);
 installTeacherOverviewMethods(TeacherManager);
-installTeacherGroupsMethods(TeacherManager);
-installTeacherQuizMethods(TeacherManager);
+installTeacherLazyFeatureMethods(TeacherManager);
 installTeacherRoutingMethods(TeacherManager);
 installTeacherSettingsMethods(TeacherManager);
 installTeacherShellMethods(TeacherManager);
-installTeacherSparkMethods(TeacherManager);
 installTeacherStudentProgressMethods(TeacherManager);
 installTeacherVocabularyMethods(TeacherManager);
 

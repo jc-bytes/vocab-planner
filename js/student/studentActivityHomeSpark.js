@@ -1,15 +1,19 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { imageDB } from '../db.js';
+import { classifySyncError } from '../services/syncQueuePolicy.js';
+import { getPanamaDateValue } from '../services/dateUtils.js';
 import { sparkResponsesRepository } from '../services/sparkResponsesRepository.js';
 import { sparksRepository } from '../services/sparksRepository.js';
 import { normalizeSchoolCalendar } from '../services/vocabularyApi.js';
 import {
     evaluateSparkAnswers,
     getSparkQuestionsForGrade,
-    normalizeSparkCheckMode,
-    normalizeSparkQuestions,
     SPARK_CHECK_MODES
 } from '../sparkCheckModel.js';
+import {
+    isAllGradeSpark,
+    normalizeSparkRecord
+} from '../sparkModel.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 const SPARK_TYPE_LABELS = {
@@ -19,40 +23,13 @@ const SPARK_TYPE_LABELS = {
     reflection: 'Reflection',
     debate: 'Debate'
 };
-const SPARK_GRADE_LEVELS = ['6', '7', '8', '9'];
-
-function getPanamaDateValue(date = new Date()) {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'America/Panama',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    }).formatToParts(date);
-    const valueByType = Object.fromEntries(parts.map(part => [part.type, part.value]));
-    return `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
-}
-
-function normalizeSparkGradeQuestions(value) {
-    const source = value && typeof value === 'object' ? value : {};
-    return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
-        const text = String(source[grade] ?? source[`grade${grade}`] ?? '').trim();
-        if (text) questions[grade] = text;
-        return questions;
-    }, {});
-}
-
-function normalizeSparkTargetGrades(value) {
-    const source = Array.isArray(value) ? value : String(value || '').split(',');
-    const grades = source
-        .flatMap(item => String(item || '').split(','))
-        .map(item => item.trim().match(/\d+/)?.[0] || '')
-        .filter(grade => SPARK_GRADE_LEVELS.includes(grade));
-    return Array.from(new Set(grades));
-}
-
-function isAllGradeSpark(spark) {
-    const targetGrades = normalizeSparkTargetGrades(spark?.targetGrades ?? spark?.target_grades);
-    return SPARK_GRADE_LEVELS.every(grade => targetGrades.includes(grade));
+function getSafeExternalUrl(value) {
+    try {
+        const url = new URL(String(value || ''));
+        return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
+    } catch (_error) {
+        return '';
+    }
 }
 
 export class StudentActivityHomeSpark {
@@ -66,26 +43,7 @@ export class StudentActivityHomeSpark {
     }
 
     normalizeSpark(spark = {}) {
-        const source = spark && typeof spark === 'object' ? spark : {};
-        const sparkType = SPARK_TYPE_LABELS[source.sparkType || source.spark_type]
-            ? (source.sparkType || source.spark_type)
-            : 'cool_fact';
-        return {
-            id: String(source.id || ''),
-            sparkType,
-            title: String(source.title || '').trim(),
-            sparkText: String(source.sparkText ?? source.spark_text ?? '').trim(),
-            whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
-            question: String(source.question || '').trim(),
-            gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
-            checkMode: normalizeSparkCheckMode(source.checkMode ?? source.check_mode),
-            questions: normalizeSparkQuestions(source.questions),
-            targetGrades: normalizeSparkTargetGrades(source.targetGrades ?? source.target_grades ?? SPARK_GRADE_LEVELS),
-            sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
-            sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
-            subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? 'technology').trim() || 'technology',
-            scheduledDate: String(source.scheduledDate ?? source.scheduled_date ?? '').trim()
-        };
+        return normalizeSparkRecord(spark);
     }
 
     getStudentGradeLevel() {
@@ -246,16 +204,21 @@ export class StudentActivityHomeSpark {
             this.sm.setAuthStatus?.('Synced');
         } catch (error) {
             if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
-            try {
-                await imageDB.enqueueSyncAction('student-spark-response', {
-                    sparkId: state.sparkId,
-                    answers: state.answers || {},
-                    storageKey: this.getSparkLibraryStorageKey()
-                });
-            } catch (queueError) {
-                console.warn('Could not queue the Spark response for later sync:', queueError);
+            const failure = classifySyncError(error, { online: navigator.onLine });
+            if (failure.retryable) {
+                try {
+                    await imageDB.enqueueSyncAction('student-spark-response', {
+                        sparkId: state.sparkId,
+                        answers: state.answers || {},
+                        storageKey: this.getSparkLibraryStorageKey()
+                    });
+                } catch (queueError) {
+                    console.warn('Could not queue the Spark response for later sync:', queueError);
+                }
+                this.sm.setAuthStatus?.(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+            } else {
+                this.sm.setAuthStatus?.('Spark response rejected');
             }
-            this.sm.setAuthStatus?.(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
             console.warn('Could not sync Spark response:', error);
         }
     }
@@ -354,8 +317,9 @@ export class StudentActivityHomeSpark {
         const card = createElement('section', 'student-spark-card');
         card.setAttribute('aria-label', 'Spark of the Week');
         const question = this.getStudentSparkQuestion(spark);
-        const sourceHtml = spark.sourceUrl
-            ? `<a href="${escapeHtml(spark.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
+        const safeSourceUrl = getSafeExternalUrl(spark.sourceUrl);
+        const sourceHtml = safeSourceUrl
+            ? `<a href="${escapeHtml(safeSourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
             : '';
         card.innerHTML = `
             <div class="student-spark-heading">

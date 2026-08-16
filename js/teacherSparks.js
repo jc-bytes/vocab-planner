@@ -1,5 +1,6 @@
 import { $, closeModal as closeDialog, createElement, escapeHtml, notifications, openModal } from './main.js';
 import { sparksRepository } from './services/sparksRepository.js';
+import { getPanamaDateValue, timestampMillis } from './services/dateUtils.js';
 import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 import {
     normalizeSparkCheckMode,
@@ -8,6 +9,13 @@ import {
     SPARK_QUESTION_LIMIT,
     SPARK_QUESTION_TYPES
 } from './sparkCheckModel.js';
+import {
+    normalizeSparkDate,
+    normalizeSparkGradeQuestions,
+    normalizeSparkRecord,
+    normalizeSparkTargetGrades,
+    SPARK_GRADE_LEVELS
+} from './sparkModel.js';
 
 const SPARK_TYPE_META = {
     cool_fact: { label: 'Fact', pluralLabel: 'Facts', icon: 'lightbulb' },
@@ -17,7 +25,6 @@ const SPARK_TYPE_META = {
     debate: { label: 'Debate', icon: 'messages-square' }
 };
 
-const SPARK_STATUSES = new Set(['draft', 'scheduled', 'archived']);
 const SPARK_VIEW_TABS = [
     { id: 'week', label: 'This Week', icon: 'calendar-days' },
     { id: 'month', label: 'This Month', icon: 'calendar-range' },
@@ -32,32 +39,6 @@ const SPARK_TYPE_FILTERS = [
         icon: meta.icon
     }))
 ];
-const SPARK_GRADE_LEVELS = ['6', '7', '8', '9'];
-
-function getPanamaDateValue(date = new Date()) {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'America/Panama',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-    }).formatToParts(date);
-    const valueByType = Object.fromEntries(parts.map(part => [part.type, part.value]));
-    return `${valueByType.year}-${valueByType.month}-${valueByType.day}`;
-}
-
-function normalizeSparkDate(value) {
-    const text = String(value || '').trim();
-    return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : '';
-}
-
-function timestampMillis(value) {
-    if (!value) return 0;
-    if (typeof value.toDate === 'function') return value.toDate().getTime();
-    if (value.seconds !== undefined) return Number(value.seconds) * 1000;
-    const parsed = Date.parse(value);
-    return Number.isNaN(parsed) ? 0 : parsed;
-}
-
 function compareSparkSchedule(a, b) {
     const dateCompare = String(b.scheduledDate || '').localeCompare(String(a.scheduledDate || ''));
     if (dateCompare !== 0) return dateCompare;
@@ -137,51 +118,9 @@ function isDuplicateScheduledDateError(error) {
         || (text.includes('duplicate key') && text.includes('scheduled_date'));
 }
 
-function normalizeSparkGradeQuestions(value) {
-    const source = value && typeof value === 'object' ? value : {};
-    return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
-        const text = String(source[grade] ?? source[`grade${grade}`] ?? '').trim();
-        if (text) questions[grade] = text;
-        return questions;
-    }, {});
-}
-
-function normalizeSparkTargetGrades(value) {
-    const source = Array.isArray(value) ? value : String(value || '').split(',');
-    const grades = source
-        .flatMap(item => String(item || '').split(','))
-        .map(item => item.trim().match(/\d+/)?.[0] || '')
-        .filter(grade => SPARK_GRADE_LEVELS.includes(grade));
-    return Array.from(new Set(grades));
-}
-
 class TeacherSparkMethods {
     normalizeSpark(spark = {}) {
-        const source = spark && typeof spark === 'object' ? spark : {};
-        const sparkType = SPARK_TYPE_META[source.sparkType || source.spark_type]
-            ? (source.sparkType || source.spark_type)
-            : 'cool_fact';
-        const status = SPARK_STATUSES.has(source.status) ? source.status : 'draft';
-        return {
-            id: String(source.id || ''),
-            sparkType,
-            title: String(source.title || '').trim(),
-            sparkText: String(source.sparkText ?? source.spark_text ?? '').trim(),
-            whyItMatters: String(source.whyItMatters ?? source.why_it_matters ?? '').trim(),
-            question: String(source.question || '').trim(),
-            gradeQuestions: normalizeSparkGradeQuestions(source.gradeQuestions ?? source.grade_questions),
-            checkMode: normalizeSparkCheckMode(source.checkMode ?? source.check_mode),
-            questions: normalizeSparkQuestions(source.questions),
-            targetGrades: normalizeSparkTargetGrades(source.targetGrades ?? source.target_grades ?? SPARK_GRADE_LEVELS),
-            sourceTitle: String(source.sourceTitle ?? source.source_title ?? '').trim(),
-            sourceUrl: String(source.sourceUrl ?? source.source_url ?? '').trim(),
-            subjectSlug: String(source.subjectSlug ?? source.subject_slug ?? DEFAULT_SUBJECT_SLUG).trim() || DEFAULT_SUBJECT_SLUG,
-            scheduledDate: normalizeSparkDate(source.scheduledDate ?? source.scheduled_date),
-            status,
-            ownerId: source.ownerId || source.owner_id || null,
-            createdAt: source.createdAt || source.created_at || null,
-            updatedAt: source.updatedAt || source.updated_at || null
-        };
+        return normalizeSparkRecord(spark, { defaultSubjectSlug: DEFAULT_SUBJECT_SLUG });
     }
 
     createDefaultSpark() {
@@ -1134,7 +1073,6 @@ export function installTeacherSparkMethods(TeacherManager) {
 }
 
 export function initTeacherSparksListeners(manager) {
-    $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection('sparks'));
     $('#add-spark-btn')?.addEventListener('click', () => manager.openSparkModal());
     $('#save-spark-draft-btn')?.addEventListener('click', () => manager.saveSparkFromForm('draft'));
     $('#schedule-spark-btn')?.addEventListener('click', () => manager.saveSparkFromForm('scheduled'));

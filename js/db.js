@@ -1,4 +1,16 @@
 import { openDB } from 'idb';
+import {
+    MAX_SYNC_ATTEMPTS,
+    MAX_SYNC_QUEUE_RECORDS,
+    getSyncActionDedupeKey,
+    getSyncRetryDelayMs
+} from './services/syncQueuePolicy.js';
+
+function createStorageId(type) {
+    const id = globalThis.crypto?.randomUUID?.()
+        || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    return `${type}-${id}`;
+}
 
 export class ImageDB {
     constructor() {
@@ -10,7 +22,7 @@ export class ImageDB {
 
     async open() {
         if (!this.dbPromise) {
-            this.dbPromise = openDB(this.dbName, 4, {
+            this.dbPromise = openDB(this.dbName, 5, {
                 upgrade: (db, _oldVersion, _newVersion, transaction) => {
                     if (!db.objectStoreNames.contains(this.storeName)) {
                         db.createObjectStore(this.storeName, { keyPath: 'id' });
@@ -23,6 +35,9 @@ export class ImageDB {
                     }
                     if (!syncStore.indexNames.contains('createdAt')) {
                         syncStore.createIndex('createdAt', 'createdAt', { unique: false });
+                    }
+                    if (!syncStore.indexNames.contains('dedupeKey')) {
+                        syncStore.createIndex('dedupeKey', 'dedupeKey', { unique: false });
                     }
                 },
                 blocked: () => {
@@ -95,12 +110,45 @@ export class ImageDB {
     async enqueueSyncAction(type, payload = {}) {
         const db = await this.open();
         const now = new Date().toISOString();
+        const dedupeKey = getSyncActionDedupeKey(type, payload);
+        if (dedupeKey) {
+            const existing = await db.getFromIndex(this.syncStoreName, 'dedupeKey', dedupeKey);
+            if (existing && existing.status !== 'failed') {
+                const updated = {
+                    ...existing,
+                    payload,
+                    status: 'pending',
+                    nextAttemptAt: null,
+                    updatedAt: now
+                };
+                await db.put(this.syncStoreName, updated);
+                return updated;
+            }
+        }
+
+        const allRecords = await db.getAll(this.syncStoreName);
+        const terminalRecords = allRecords
+            .filter(record => record.status === 'failed')
+            .sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)));
+        while (allRecords.length >= MAX_SYNC_QUEUE_RECORDS && terminalRecords.length > 0) {
+            const discarded = terminalRecords.shift();
+            await db.delete(this.syncStoreName, discarded.id);
+            allRecords.splice(allRecords.findIndex(record => record.id === discarded.id), 1);
+        }
+        if (allRecords.length >= MAX_SYNC_QUEUE_RECORDS) {
+            const error = new Error('Offline sync storage is full. Reconnect before saving more work.');
+            error.code = 'SYNC_QUEUE_FULL';
+            throw error;
+        }
+
         const record = {
-            id: `${type}-${crypto.randomUUID()}`,
+            id: createStorageId(type),
             type,
             payload,
+            dedupeKey,
             status: 'pending',
             attempts: 0,
+            nextAttemptAt: null,
             createdAt: now,
             updatedAt: now
         };
@@ -108,10 +156,13 @@ export class ImageDB {
         return record;
     }
 
-    async getPendingSyncActions() {
+    async getPendingSyncActions(options = {}) {
         const db = await this.open();
         const records = await db.getAllFromIndex(this.syncStoreName, 'status', 'pending');
-        return records.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+        const now = Number(options.now) || Date.now();
+        return records
+            .filter(record => !record.nextAttemptAt || Date.parse(record.nextAttemptAt) <= now)
+            .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
     }
 
     async completeSyncAction(id) {
@@ -119,16 +170,28 @@ export class ImageDB {
         await db.delete(this.syncStoreName, id);
     }
 
-    async markSyncActionFailed(record, error) {
+    async markSyncActionFailed(record, error, options = {}) {
         const db = await this.open();
+        const attempts = (Number(record.attempts) || 0) + 1;
+        const terminal = options.terminal === true || attempts >= MAX_SYNC_ATTEMPTS;
+        const now = Date.now();
         const updated = {
             ...record,
-            attempts: (Number(record.attempts) || 0) + 1,
+            status: terminal ? 'failed' : 'pending',
+            attempts,
             lastError: error?.message || String(error || 'Sync failed'),
-            updatedAt: new Date().toISOString()
+            failureReason: String(options.reason || ''),
+            nextAttemptAt: terminal ? null : new Date(now + getSyncRetryDelayMs(attempts)).toISOString(),
+            updatedAt: new Date(now).toISOString()
         };
         await db.put(this.syncStoreName, updated);
         return updated;
+    }
+
+    async getFailedSyncActions() {
+        const db = await this.open();
+        const records = await db.getAllFromIndex(this.syncStoreName, 'status', 'failed');
+        return records.sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)));
     }
 }
 
