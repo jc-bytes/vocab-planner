@@ -47,15 +47,18 @@ test('CSV export handles quotes and newlines and neutralizes spreadsheet formula
 });
 
 test('public account creation and student authorization-field edits stay disabled', async () => {
-    const [config, migration, profileMethods] = await Promise.all([
+    const [config, migration, ticketMigration, profileMethods] = await Promise.all([
         read('supabase/config.toml'),
         read('supabase/migrations/20260816023423_harden_student_identity_and_provisioning.sql'),
+        read('supabase/migrations/20260816031016_ticketed_auth_user_provisioning.sql'),
         read('js/supabaseAuthProfileMethods.js')
     ]);
 
     assert.match(config, /\[auth\][\s\S]*?enable_signup = false/);
     assert.match(config, /minimum_password_length = 10/);
-    assert.match(migration, /provisioned_by_teacher/);
+    assert.match(ticketMigration, /issue_auth_user_provisioning_ticket/);
+    assert.match(ticketMigration, /provisioning_token/);
+    assert.match(ticketMigration, /to service_role/);
     for (const column of ['role', 'email', 'grade_level', 'section_letter']) {
         assert.match(migration, new RegExp(`new\\.${column} is distinct from old\\.${column}`));
     }

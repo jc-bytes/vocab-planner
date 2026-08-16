@@ -94,15 +94,26 @@ function channelJoined(client) {
 }
 
 async function createPeerStudent(admin) {
+    const provisioningToken = crypto.randomUUID();
+    await admin.rpc('issue_auth_user_provisioning_ticket', {
+        p_email: IDS.peerEmail,
+        p_token: provisioningToken
+    }).throwOnError();
     const { data: created, error: createError } = await admin.auth.admin.createUser({
         email: IDS.peerEmail,
         password: AUDIT_PASSWORD,
         email_confirm: true,
-        app_metadata: { provisioned_by_teacher: true },
-        user_metadata: { first_name: 'Acceptance', last_name: 'Peer' }
+        user_metadata: {
+            first_name: 'Acceptance',
+            last_name: 'Peer',
+            provisioning_token: provisioningToken
+        }
     });
     if (createError) throw createError;
     const peer = created.user;
+    await admin.auth.admin.updateUserById(peer.id, {
+        user_metadata: { first_name: 'Acceptance', last_name: 'Peer' }
+    });
     await admin.from('profiles').upsert({
         user_id: peer.id,
         role: 'student',

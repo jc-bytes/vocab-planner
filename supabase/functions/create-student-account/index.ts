@@ -164,18 +164,28 @@ Deno.serve(async (req) => {
   }
 
   const fullName = `${payload.firstName} ${payload.lastName}`.trim();
+  const provisioningToken = crypto.randomUUID();
+  const { error: ticketError } = await adminClient.rpc(
+    "issue_auth_user_provisioning_ticket",
+    {
+      p_email: payload.email,
+      p_token: provisioningToken,
+    },
+  );
+  if (ticketError) {
+    return jsonResponse({ error: "Could not authorize account provisioning." }, 500);
+  }
+
   const { data: createData, error: createError } = await adminClient.auth.admin
     .createUser({
       email: payload.email,
       password: payload.password,
       email_confirm: true,
-      app_metadata: {
-        provisioned_by_teacher: true,
-      },
       user_metadata: {
         first_name: payload.firstName,
         last_name: payload.lastName,
         full_name: fullName,
+        provisioning_token: provisioningToken,
       },
     });
 
@@ -186,6 +196,13 @@ Deno.serve(async (req) => {
   }
 
   const studentId = createData.user.id;
+  await adminClient.auth.admin.updateUserById(studentId, {
+    user_metadata: {
+      first_name: payload.firstName,
+      last_name: payload.lastName,
+      full_name: fullName,
+    },
+  });
   const profileRow = {
     user_id: studentId,
     role: "student",

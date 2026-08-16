@@ -118,14 +118,19 @@ async function upsertAuthUser(admin, { email, password, metadata = {} }) {
         return data.user;
     }
 
+    const provisioningToken = crypto.randomUUID();
+    await admin.rpc('issue_auth_user_provisioning_ticket', {
+        p_email: email,
+        p_token: provisioningToken
+    }).throwOnError();
     const { data, error } = await admin.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        app_metadata: { provisioned_by_teacher: true },
-        user_metadata: metadata
+        user_metadata: { ...metadata, provisioning_token: provisioningToken }
     });
     if (error) throw error;
+    await admin.auth.admin.updateUserById(data.user.id, { user_metadata: metadata });
     return data.user;
 }
 
