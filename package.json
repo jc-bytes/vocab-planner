@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
-    "test": "npm run test:catalog && npm run test:repositories && npm run test:student-api && npm run test:student-auth && npm run test:student-games && npm run test:student-progress && npm run test:student-activities && npm run test:teacher-activity-flow && npm run test:student-routing && npm run test:student-shell-composition && npm run test:student-listeners && npm run test:student-subjects && npm run test:student-registries && npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke",
+    "test": "npm run test:catalog && npm run test:repositories && npm run test:student-api && npm run test:student-auth && npm run test:student-games && npm run test:student-progress && npm run test:student-activities && npm run test:teacher-activity-flow && npm run test:student-routing && npm run test:student-shell-composition && npm run test:student-listeners && npm run test:student-subjects && npm run test:student-registries && npm run test:security-hardening && npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke",
     "catalog:validate": "node scripts/validate-vocabulary-catalog.mjs",
     "catalog:normalize": "node scripts/validate-vocabulary-catalog.mjs --write",
     "test:catalog": "npm run catalog:validate && node --test tests/vocabulary-catalog-contract.test.mjs",
@@ -21,6 +21,7 @@
     "test:student-listeners": "node --test tests/student-listener-composition.test.mjs",
     "test:student-subjects": "node --test tests/student-subject-composition.test.mjs",
     "test:student-registries": "node --test tests/student-registry-contracts.test.mjs",
+    "test:security-hardening": "node --test tests/security-hardening.test.mjs",
     "test:student-design": "node scripts/student-design-system-audit.mjs",
     "test:acceptance:supabase": "node --test tests/local-supabase-acceptance.test.mjs",
     "test:games": "node scripts/galactic-breaker-tests.mjs",
@@ -31,7 +32,7 @@
     "test:ui:auth-smoke": "node scripts/ui-auth-smoke.mjs",
     "test:ui:responsive": "node scripts/ui-responsive-audit.mjs",
     "test:ui:responsive:local": "node scripts/ui-responsive-local.mjs",
-    "test:release": "npm run test:catalog && npm run test:ui:smoke && npm run test:ui:smoke:dist && npm run test:ui:auth-smoke && npm run test:ui:responsive:local && supabase db lint --local --fail-on none && supabase db advisors --local --fail-on none --type all && npm run desktop:build:web",
+    "test:release": "npm test && npm run test:acceptance:supabase && npm audit --omit=dev --audit-level=high && npm run test:ui:smoke:dist && npm run test:ui:auth-smoke && npm run test:ui:responsive:local && supabase db lint --local --fail-on error && supabase db advisors --local --level warn --fail-on error --type all && npm run desktop:build:web",
     "desktop:dev": "vite --host 127.0.0.1",
     "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
     "desktop:build": "npm run desktop:build:web && tauri build --bundles app",
@@ -53,6 +54,7 @@
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",
     "lucide": "^1.17.0",
+    "papaparse": "^5.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

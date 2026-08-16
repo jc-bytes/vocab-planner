@@ -232,17 +232,15 @@ class QuizMakerRasterExportMethods {
                 </head>
                 <body>
                     ${pageImages.map(src => `<div class="page"><img src="${src}"></div>`).join('')}
-                    <script>
-                        window.addEventListener('load', () => {
-                            setTimeout(() => window.print(), 250);
-                        });
-                    </script>
                 </body>
             </html>
         `);
         pdfDocument.close();
         pdfWindow.addEventListener('afterprint', cleanupPdfFrame, { once: true });
         pdfWindow.focus();
+        pdfWindow.addEventListener('load', () => {
+            pdfWindow.setTimeout(() => pdfWindow.print(), 250);
+        }, { once: true });
     }
 }
 

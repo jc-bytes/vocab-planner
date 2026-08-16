@@ -1,3 +1,5 @@
+import { escapeHtml } from './main.js';
+
 export function renderPreview(preview, summaryEl, tablesEl) {
     const dateRange = preview.summary.dateRange;
     const dateStr = dateRange.start && dateRange.end
@@ -75,9 +77,9 @@ export function renderPreview(preview, summaryEl, tablesEl) {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td style="padding: 0.75rem;">${item.studentId}</td>
-                                    <td style="padding: 0.75rem;">${name}</td>
-                                    <td style="padding: 0.75rem;">${profile.grade || '-'}</td>
+                                    <td style="padding: 0.75rem;">${escapeHtml(item.studentId)}</td>
+                                    <td style="padding: 0.75rem;">${escapeHtml(name)}</td>
+                                    <td style="padding: 0.75rem;">${escapeHtml(profile.grade || '-')}</td>
                                     <td style="padding: 0.75rem; text-align: right;">${coins}</td>
                                     <td style="padding: 0.75rem;">${lastActive}</td>
                                 </tr>
@@ -114,8 +116,8 @@ export function renderPreview(preview, summaryEl, tablesEl) {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td style="padding: 0.75rem;">${item.name || item.userId}</td>
-                                    <td style="padding: 0.75rem;">${item.gameId || '-'}</td>
+                                    <td style="padding: 0.75rem;">${escapeHtml(item.name || item.userId)}</td>
+                                    <td style="padding: 0.75rem;">${escapeHtml(item.gameId || '-')}</td>
                                     <td style="padding: 0.75rem; text-align: right;">${(item.score || 0).toLocaleString()}</td>
                                     <td style="padding: 0.75rem;">${date}</td>
                                 </tr>

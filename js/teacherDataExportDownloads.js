@@ -1,3 +1,5 @@
+import Papa from 'papaparse';
+
 export function downloadJSON(data, filename) {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -10,12 +12,13 @@ export function downloadJSON(data, filename) {
     URL.revokeObjectURL(url);
 }
 
-export function downloadCSV(data, filename) {
-    let csv = '';
+export function serializeCSV(data) {
+    const sections = [];
 
     if (data.studentProgress && data.studentProgress.length > 0) {
-        csv += 'Student Progress (includes vocabulary progress, scores, coins, images)\n';
-        csv += 'Student ID,Name,Grade,Coins,Total Earned,Vocab Units,Last Active\n';
+        const progressRows = [[
+            'Student ID', 'Name', 'Grade', 'Coins', 'Total Earned', 'Vocab Units', 'Last Active'
+        ]];
         data.studentProgress.forEach(item => {
             const profile = item.studentProfile || {};
             const name = profile.firstName && profile.lastName
@@ -24,54 +27,58 @@ export function downloadCSV(data, filename) {
             const coins = (item.coinData || {}).balance || 0;
             const totalEarned = (item.coinData || {}).totalEarned || 0;
             const vocabUnits = item.units ? Object.keys(item.units).length : 0;
-            const lastActive = item.updatedAt
-                ? (item.updatedAt.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt.seconds * 1000)).toISOString()
-                : '';
-            csv += `"${item.studentId}","${name}","${profile.grade || ''}",${coins},${totalEarned},${vocabUnits},"${lastActive}"\n`;
+            progressRows.push([
+                item.studentId || '', name, profile.grade || '', coins, totalEarned,
+                vocabUnits, toIsoTimestamp(item.updatedAt)
+            ]);
         });
-        csv += '\n';
+        sections.push(`Student Progress (includes vocabulary progress, scores, coins, images)\r\n${serializeSection(progressRows)}`);
 
-        csv += 'Vocabulary Progress Details\n';
-        csv += 'Student ID,Vocabulary Name,Activity,Score,Last Updated\n';
+        const vocabularyRows = [['Student ID', 'Vocabulary Name', 'Activity', 'Score', 'Last Updated']];
         data.studentProgress.forEach(item => {
             if (item.units) {
                 Object.entries(item.units).forEach(([vocabName, unitData]) => {
                     if (unitData.scores) {
                         Object.entries(unitData.scores).forEach(([activity, scoreData]) => {
                             const score = scoreData.score || 0;
-                            const updated = scoreData.updatedAt
-                                ? (scoreData.updatedAt.toDate ? scoreData.updatedAt.toDate() : new Date(scoreData.updatedAt.seconds * 1000)).toISOString()
-                                : '';
-                            csv += `"${item.studentId}","${vocabName}","${activity}",${score},"${updated}"\n`;
+                            vocabularyRows.push([
+                                item.studentId || '', vocabName, activity, score,
+                                toIsoTimestamp(scoreData.updatedAt)
+                            ]);
                         });
                     }
                 });
             }
         });
-        csv += '\n';
+        sections.push(`Vocabulary Progress Details\r\n${serializeSection(vocabularyRows)}`);
     }
 
     if (data.scores && data.scores.length > 0) {
-        csv += 'Leaderboard Scores\n';
-        csv += 'Student,Game,Score,Grade,Date\n';
+        const scoreRows = [['Student', 'Game', 'Score', 'Grade', 'Date']];
         data.scores.forEach(item => {
-            const date = item.timestamp
-                ? (item.timestamp.toDate ? item.timestamp.toDate() : new Date(item.timestamp.seconds * 1000)).toISOString()
-                : '';
-            csv += `"${item.name || item.userId}","${item.gameId || ''}",${item.score || 0},"${item.grade || ''}","${date}"\n`;
+            scoreRows.push([
+                item.name || item.userId || '', item.gameId || '', item.score || 0,
+                item.grade || '', toIsoTimestamp(item.timestamp)
+            ]);
         });
-        csv += '\n';
+        sections.push(`Leaderboard Scores\r\n${serializeSection(scoreRows)}`);
     }
 
     if (data.userRoles && data.userRoles.length > 0) {
-        csv += 'User Roles\n';
-        csv += 'User ID,Role,Email\n';
+        const roleRows = [['User ID', 'Role', 'Email']];
         data.userRoles.forEach(item => {
-            csv += `"${item.userId}","${item.role || ''}","${item.email || ''}"\n`;
+            roleRows.push([item.userId || '', item.role || '', item.email || '']);
         });
+        sections.push(`User Roles\r\n${serializeSection(roleRows)}`);
     }
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    return sections.join('\r\n\r\n');
+}
+
+export function downloadCSV(data, filename) {
+    const csv = serializeCSV(data);
+
+    const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -80,4 +87,19 @@ export function downloadCSV(data, filename) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+function toIsoTimestamp(value) {
+    if (!value) return '';
+    const date = value.toDate
+        ? value.toDate()
+        : new Date(value.seconds !== undefined ? value.seconds * 1000 : value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+}
+
+function serializeSection(rows) {
+    return Papa.unparse(rows, {
+        escapeFormulae: true,
+        newline: '\r\n'
+    });
 }

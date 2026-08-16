@@ -237,8 +237,8 @@ class TeacherAuthMethods {
             return;
         }
 
-        if (password.length < 6) {
-            this.showAuthError('Password must be at least 6 characters.');
+        if (password.length < 10 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+            this.showAuthError('Password must be at least 10 characters and include a letter and number.');
             return;
         }
 

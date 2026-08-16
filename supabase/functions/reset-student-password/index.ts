@@ -37,11 +37,27 @@ const getPublishableKey = () => {
 };
 
 const generateTemporaryPassword = () => {
-  const alphabet =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  const digits = "23456789";
+  const symbols = "!@#$%";
+  const alphabet = `${letters}${digits}${symbols}`;
+  const randomCharacter = (source: string) => {
+    const bytes = new Uint8Array(1);
+    crypto.getRandomValues(bytes);
+    return source[bytes[0] % source.length];
+  };
+  const characters = [randomCharacter(letters), randomCharacter(digits)];
+  while (characters.length < 16) characters.push(randomCharacter(alphabet));
+  for (let index = characters.length - 1; index > 0; index -= 1) {
+    const bytes = new Uint8Array(1);
+    crypto.getRandomValues(bytes);
+    const swapIndex = bytes[0] % (index + 1);
+    [characters[index], characters[swapIndex]] = [
+      characters[swapIndex],
+      characters[index],
+    ];
+  }
+  return characters.join("");
 };
 
 Deno.serve(async (req) => {

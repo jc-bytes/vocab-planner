@@ -118,8 +118,8 @@ export class StudentAuthUi {
             throw new Error('Section letter must be one uppercase letter.');
         }
 
-        if (password.length < 6) {
-            throw new Error('Password must be at least 6 characters.');
+        if (password.length < 10 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+            throw new Error('Password must be at least 10 characters and include a letter and number.');
         }
 
         if (password !== confirmPassword) {
@@ -198,8 +198,8 @@ export class StudentAuthUi {
         const confirmPassword = $('#change-password-confirm')?.value || '';
         const status = $('#change-password-status');
 
-        if (password.length < 6) {
-            if (status) status.textContent = 'Use at least 6 characters.';
+        if (password.length < 10 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+            if (status) status.textContent = 'Use at least 10 characters with a letter and number.';
             return;
         }
 

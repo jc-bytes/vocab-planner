@@ -1,4 +1,4 @@
-import { $, closeModal, openModal } from '../main.js';
+import { $, closeModal, escapeHtml, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { leaderboardRepository } from '../services/leaderboardRepository.js';
@@ -160,6 +160,7 @@ export class StudentGameLeaderboard {
             scores.forEach((data) => {
                 // Ensure score is a number for display
                 const score = Number(data.score) || 0;
+                const displayName = escapeHtml(data.name || 'Student');
                 const isMe = this.sm.currentUser && data.userId === this.sm.currentUser.uid;
 
                 const row = document.createElement('div');
@@ -174,15 +175,19 @@ export class StudentGameLeaderboard {
 
                 if (gameId === 'trapdoor-trials' && data.metadata) {
                     const meta = data.metadata;
+                    const level = Math.max(1, Number.parseInt(meta.level, 10) || 1);
+                    const completedLevels = Math.max(0, Number.parseInt(meta.completedLevels, 10) || 0);
+                    const totalLevels = Math.max(1, Number.parseInt(meta.totalLevels, 10) || 30);
+                    const deaths = Math.max(0, Number.parseInt(meta.deaths, 10) || 0);
                     row.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
                             <span style="font-weight: bold; width: 30px;">#${rank}</span>
-                            <span style="flex-grow: 1; font-weight: 500;">${data.name}</span>
-                            <span style="font-weight: bold; color: var(--primary-color); font-size: 0.9rem;">${meta.completed ? 'Complete' : `Level ${meta.level || 1}`}</span>
+                            <span style="flex-grow: 1; font-weight: 500;">${displayName}</span>
+                            <span style="font-weight: bold; color: var(--primary-color); font-size: 0.9rem;">${meta.completed === true ? 'Complete' : `Level ${level}`}</span>
                         </div>
                         <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-left: 30px;">
-                            <span>Cleared: <strong>${meta.completedLevels || 0}/${meta.totalLevels || 30}</strong></span>
-                            <span>Attempts: <strong>${meta.deaths || 0}</strong></span>
+                            <span>Cleared: <strong>${completedLevels}/${totalLevels}</strong></span>
+                            <span>Attempts: <strong>${deaths}</strong></span>
                             <span>Score: <strong>${score.toLocaleString()}</strong></span>
                         </div>
                     `;
@@ -192,7 +197,7 @@ export class StudentGameLeaderboard {
                     row.style.justifyContent = 'space-between';
                     row.innerHTML = `
                         <span style="font-weight: bold; width: 30px;">#${rank}</span>
-                        <span style="flex-grow: 1;">${data.name}</span>
+                        <span style="flex-grow: 1;">${displayName}</span>
                         <span style="font-weight: bold; color: var(--primary-color);">${score.toLocaleString()}</span>
                     `;
                 }

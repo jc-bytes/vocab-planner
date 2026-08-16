@@ -1,4 +1,4 @@
-import { $ } from './main.js';
+import { $, escapeHtml } from './main.js';
 
 export function installTeacherOverviewMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -110,8 +110,8 @@ export function installTeacherOverviewMethods(TeacherManager) {
                 return `
                     <div class="teacher-activity-item">
                         <div>
-                            <strong>${name}</strong>
-                            <span>${grade}</span>
+                            <strong>${escapeHtml(name)}</strong>
+                            <span>${escapeHtml(grade)}</span>
                         </div>
                         <time>${date}</time>
                     </div>

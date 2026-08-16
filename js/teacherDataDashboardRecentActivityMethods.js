@@ -1,4 +1,4 @@
-import { $ } from './main.js';
+import { $, escapeHtml } from './main.js';
 
 const teacherDataDashboardRecentActivityMethods = {
     renderRecentActivity() {
@@ -91,11 +91,11 @@ const teacherDataDashboardRecentActivityMethods = {
                 <tbody>
                     ${recentActivities.map(activity => `
                         <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <td class="data-table__cell" style="padding: 0.75rem;">${activity.student}</td>
-                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-muted);">${activity.unit}</td>
-                            <td class="data-table__cell" style="padding: 0.75rem;">${activity.activity}</td>
-                            <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--primary-color);">${activity.score}</td>
-                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">${activity.dateStr}</td>
+                            <td class="data-table__cell" style="padding: 0.75rem;">${escapeHtml(activity.student)}</td>
+                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-muted);">${escapeHtml(activity.unit)}</td>
+                            <td class="data-table__cell" style="padding: 0.75rem;">${escapeHtml(activity.activity)}</td>
+                            <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--primary-color);">${escapeHtml(activity.score)}</td>
+                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">${escapeHtml(activity.dateStr)}</td>
                         </tr>
                     `).join('')}
                 </tbody>

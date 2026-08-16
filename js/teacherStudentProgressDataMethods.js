@@ -1,3 +1,4 @@
+import Papa from 'papaparse';
 import { $, closeModal, createElement, notifications, openModal } from './main.js';
 import { teacherApi as supabaseService } from './services/teacherApi.js';
 
@@ -214,8 +215,8 @@ class TeacherStudentProgressDataMethods {
             throw new Error('Section must be one letter.');
         }
 
-        if (password.length < 6) {
-            throw new Error('Password must be at least 6 characters.');
+        if (password.length < 10 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+            throw new Error('Password must be at least 10 characters and include a letter and number.');
         }
 
         if (password !== confirmPassword) {
@@ -402,47 +403,16 @@ class TeacherStudentProgressDataMethods {
     }
 
     parseCsvRows(text) {
-        const rows = [];
-        let row = [];
-        let cell = '';
-        let inQuotes = false;
         const source = String(text || '').replace(/^\uFEFF/, '');
-
-        for (let index = 0; index < source.length; index += 1) {
-            const char = source[index];
-            const nextChar = source[index + 1];
-
-            if (char === '"') {
-                if (inQuotes && nextChar === '"') {
-                    cell += '"';
-                    index += 1;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-                continue;
-            }
-
-            if (char === ',' && !inQuotes) {
-                row.push(cell);
-                cell = '';
-                continue;
-            }
-
-            if ((char === '\n' || char === '\r') && !inQuotes) {
-                if (char === '\r' && nextChar === '\n') index += 1;
-                row.push(cell);
-                if (row.some(value => String(value || '').trim())) rows.push(row);
-                row = [];
-                cell = '';
-                continue;
-            }
-
-            cell += char;
+        const parsed = Papa.parse(source, {
+            skipEmptyLines: 'greedy'
+        });
+        if (parsed.errors.length) {
+            const firstError = parsed.errors[0];
+            const rowLabel = Number.isInteger(firstError.row) ? ` at row ${firstError.row + 1}` : '';
+            throw new Error(`Invalid CSV${rowLabel}: ${firstError.message}`);
         }
-
-        row.push(cell);
-        if (row.some(value => String(value || '').trim())) rows.push(row);
-        return rows;
+        return parsed.data;
     }
 
     normalizeStudentCsvHeader(header) {

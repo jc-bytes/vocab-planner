@@ -25,6 +25,7 @@ const IDS = {
     spark: `${RUN_ID}-spark`,
     unit: `${RUN_ID}-unit`,
     peerEmail: `${RUN_ID}@aid.edu.pa`,
+    signupEmail: `${RUN_ID}-public@aid.edu.pa`,
     exportFilename: `${RUN_ID}.json`
 };
 
@@ -97,6 +98,7 @@ async function createPeerStudent(admin) {
         email: IDS.peerEmail,
         password: AUDIT_PASSWORD,
         email_confirm: true,
+        app_metadata: { provisioned_by_teacher: true },
         user_metadata: { first_name: 'Acceptance', last_name: 'Peer' }
     });
     if (createError) throw createError;
@@ -148,6 +150,39 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         await signIn(peerClient, IDS.peerEmail);
         assert.equal(teacher.id, users.teacher.id);
         assert.equal(student.id, users.student.id);
+
+        await t.test('Public signup is disabled', async () => {
+            const { data, error } = await anonClient.auth.signUp({
+                email: IDS.signupEmail,
+                password: AUDIT_PASSWORD
+            });
+            if (data.user?.id) await admin.auth.admin.deleteUser(data.user.id);
+            assert.ok(error, 'Expected unauthenticated signup to be rejected.');
+        });
+
+        await t.test('Students cannot change grade, section, role, or email', async () => {
+            const { error } = await studentClient
+                .from('profiles')
+                .update({
+                    grade_level: 9,
+                    section_letter: 'Z',
+                    role: 'teacher',
+                    email: IDS.signupEmail
+                })
+                .eq('user_id', student.id);
+            assert.ok(error, 'Expected protected profile fields to reject student updates.');
+
+            const { data: profile, error: readError } = await studentClient
+                .from('profiles')
+                .select('grade_level,section_letter,role,email')
+                .eq('user_id', student.id)
+                .single();
+            if (readError) throw readError;
+            assert.equal(profile.role, 'student');
+            assert.notEqual(profile.grade_level, 9);
+            assert.notEqual(profile.section_letter, 'Z');
+            assert.notEqual(profile.email, IDS.signupEmail);
+        });
 
         await t.test('Teacher settings mutation succeeds and Student mutation is denied', async () => {
             await withServiceClient(teacherClient, () => settingsRepository.save(IDS.settings, {

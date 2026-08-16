@@ -134,10 +134,14 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
             role: 'student'
         }, userId);
 
-        const { error } = await this.client
+        const { data, error } = await this.client
             .from('profiles')
-            .upsert(payload, { onConflict: 'user_id' });
+            .update(payload)
+            .eq('user_id', userId)
+            .select('user_id')
+            .maybeSingle();
         if (error) throw error;
+        if (!data) throw new Error('Student profile was not provisioned by a teacher.');
     },
 
     async updateStudentProfile(profile) {

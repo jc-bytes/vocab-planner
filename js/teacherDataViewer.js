@@ -1,4 +1,4 @@
-import { $, notifications } from './main.js';
+import { $, escapeHtml, notifications } from './main.js';
 
 const teacherDataViewerMethods = {
 
@@ -354,9 +354,9 @@ const teacherDataViewerMethods = {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.studentId}</td>
-                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${name}</td>
-                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${profile.grade || '-'}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${escapeHtml(item.studentId)}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${escapeHtml(name)}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${escapeHtml(profile.grade || '-')}</td>
                                     <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${coins}</td>
                                     <td class="data-table__cell data-table__metric" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${vocabUnits}</td>
                                     <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${lastActive}</td>
@@ -388,8 +388,8 @@ const teacherDataViewerMethods = {
                                 : '-';
                             return `
                                 <tr style="border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.name || item.userId}</td>
-                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${item.gameId || '-'}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${escapeHtml(item.name || item.userId)}</td>
+                                    <td class="data-table__cell" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${escapeHtml(item.gameId || '-')}</td>
                                     <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--text-main, #f8fafc);">${(item.score || 0).toLocaleString()}</td>
                                     <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-main, #f8fafc);">${date}</td>
                                 </tr>

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321; base-uri 'self'; form-action 'self'; object-src 'none'">
     <title>Vocabulary Master - Teacher</title>
     <link rel="stylesheet" href="css/teacher.css?v=teacher-typography-20260713d">
     <link rel="stylesheet" href="css/typography.css?v=typography-runtime-ui-20260713f">
@@ -80,17 +82,7 @@
                     </div>
                     <p class="auth-kicker">Vocabulary Master</p>
                     <h2>Teacher Access</h2>
-                    <div class="teacher-auth-switch" role="tablist" aria-label="Teacher access mode">
-                        <button id="show-teacher-login-btn" class="btn primary-btn teacher-auth-toggle active"
-                            type="button" role="tab" aria-selected="true" aria-controls="teacher-login-panel">
-                            Log In
-                        </button>
-                        <button id="show-teacher-signup-btn" class="btn secondary-btn teacher-auth-toggle"
-                            type="button" role="tab" aria-selected="false" aria-controls="teacher-signup-panel">
-                            Sign Up
-                        </button>
-                    </div>
-                    <div id="teacher-login-panel" class="teacher-auth-panel" role="tabpanel" aria-labelledby="show-teacher-login-btn">
+                    <div id="teacher-login-panel" class="teacher-auth-panel">
                         <form id="teacher-login-form">
                             <div class="form-group">
                                 <label for="teacher-email">Email</label>
@@ -107,35 +99,6 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn primary-btn" style="width:100%;">Log In</button>
-                        </form>
-                    </div>
-                    <div id="teacher-signup-panel" class="teacher-auth-panel hidden" role="tabpanel" aria-labelledby="show-teacher-signup-btn">
-                        <form id="teacher-signup-form">
-                            <div class="form-group">
-                                <label for="teacher-signup-email">Email</label>
-                                <input type="email" id="teacher-signup-email" autocomplete="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="teacher-signup-password">Password</label>
-                                <div class="password-field">
-                                    <input type="password" id="teacher-signup-password" autocomplete="new-password" minlength="6" required>
-                                    <button type="button" class="password-toggle" aria-label="Show password"
-                                        aria-controls="teacher-signup-password" title="Show password">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="teacher-signup-confirm">Confirm Password</label>
-                                <div class="password-field">
-                                    <input type="password" id="teacher-signup-confirm" autocomplete="new-password" minlength="6" required>
-                                    <button type="button" class="password-toggle" aria-label="Show password"
-                                        aria-controls="teacher-signup-confirm" title="Show password">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn secondary-btn" style="width:100%;">Create Teacher Account</button>
                         </form>
                     </div>
                     <div id="teacher-login-error" class="form-feedback" role="alert" aria-live="assertive" style="display:none; color:var(--danger-color); margin-top:1rem; padding:1rem; background:rgba(239,68,68,0.15); border-radius:8px;">
@@ -580,7 +543,7 @@
                                 <div class="form-group">
                                     <label for="add-student-password">Password</label>
                                     <div class="password-field">
-                                        <input type="password" id="add-student-password" autocomplete="new-password" minlength="6" required>
+                                        <input type="password" id="add-student-password" autocomplete="new-password" minlength="10" required>
                                         <button type="button" class="password-toggle" aria-label="Show password"
                                             aria-controls="add-student-password" title="Show password">
                                             <i data-lucide="eye"></i>
@@ -590,7 +553,7 @@
                                 <div class="form-group">
                                     <label for="add-student-confirm-password">Confirm Password</label>
                                     <div class="password-field">
-                                        <input type="password" id="add-student-confirm-password" autocomplete="new-password" minlength="6" required>
+                                        <input type="password" id="add-student-confirm-password" autocomplete="new-password" minlength="10" required>
                                         <button type="button" class="password-toggle" aria-label="Show password"
                                             aria-controls="add-student-confirm-password" title="Show password">
                                             <i data-lucide="eye"></i>

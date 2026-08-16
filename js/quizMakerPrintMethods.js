@@ -325,17 +325,12 @@ class QuizMakerPrintMethods {
             </head>
             <body>
                 ${editorContent.innerHTML}
-                <script>
-                    // Wait for images to load before printing?
-                    setTimeout(() => {
-                        window.print();
-                    }, 250);
-                </script>
             </body>
             </html>
         `);
         printWindow.document.close();
         printWindow.focus();
+        printWindow.setTimeout(() => printWindow.print(), 250);
     }
 }
 

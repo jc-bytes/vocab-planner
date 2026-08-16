@@ -8,6 +8,7 @@ const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHom
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
 const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
 const studentLauncherSource = readFileSync(new URL('../js/student/studentActivityLauncherMethods.js', import.meta.url), 'utf8');
+const studentEarlyShellSource = readFileSync(new URL('../js/studentEarlyShell.js', import.meta.url), 'utf8');
 
 const sessionValues = new Map();
 globalThis.localStorage = {
@@ -111,12 +112,13 @@ test('student sections use page-shaped loading states without exposing real head
 });
 
 test('returning students keep the navigation rail visible while a direct route reloads', () => {
-    assert.match(studentHtmlSource, /studentShell\.classList\.remove\('hidden'\)/);
-    assert.match(studentHtmlSource, /studentShell\.dataset\.sessionReserved = 'true'/);
-    assert.match(studentHtmlSource, /routePath === 'units' \|\| routePath\.startsWith\('unit\/'\)/);
-    assert.match(studentHtmlSource, /routePath === 'sparks'/);
-    assert.match(studentHtmlSource, /routePath === 'arcade'/);
-    assert.match(studentHtmlSource, /tab\.dataset\.section === initialSection/);
+    assert.match(studentHtmlSource, /src="js\/studentEarlyShell\.js" type="module"/);
+    assert.match(studentEarlyShellSource, /studentShell\.classList\.remove\('hidden'\)/);
+    assert.match(studentEarlyShellSource, /studentShell\.dataset\.sessionReserved = 'true'/);
+    assert.match(studentEarlyShellSource, /routePath === 'units' \|\| routePath\.startsWith\('unit\/'\)/);
+    assert.match(studentEarlyShellSource, /routePath === 'sparks'/);
+    assert.match(studentEarlyShellSource, /routePath === 'arcade'/);
+    assert.match(studentEarlyShellSource, /tab\.dataset\.section === initialSection/);
     assert.doesNotMatch(
         studentCssSource,
         /student-session-loading #student-tab-shell[\s\S]{0,180}visibility:\s*hidden/

@@ -152,8 +152,8 @@ test('registration validation preserves the school account contract', () => {
         '#register-email': ' ADA@AID.EDU.PA ',
         '#register-grade': '7',
         '#register-section': 'b',
-        '#register-password': 'secret7',
-        '#register-confirm-password': 'secret7'
+        '#register-password': 'secretpass7',
+        '#register-confirm-password': 'secretpass7'
     });
 
     assert.deepEqual(auth.validateRegistrationForm(), {

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321; base-uri 'self'; form-action 'self'; object-src 'none'">
     <title>Vocabulary Master - Student</title>
     <link rel="stylesheet" href="css/student.css?v=student-page-loading-20260816d">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
@@ -121,11 +123,6 @@
                     <p class="auth-kicker">Vocabulary Master</p>
                     <h2>Student Access</h2>
 
-                    <div class="auth-switch">
-                        <button id="show-login-btn" class="btn primary-btn auth-toggle">Log In</button>
-                        <button id="show-register-btn" class="btn secondary-btn auth-toggle">Register</button>
-                    </div>
-
                     <div id="student-login-panel" class="card auth-panel">
                         <form id="student-login-form">
                             <div class="form-group">
@@ -143,62 +140,6 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn primary-btn" style="width: 100%;">Log In</button>
-                        </form>
-                    </div>
-
-                    <div id="student-register-panel" class="card auth-panel" style="display: none;">
-                        <form id="student-register-form">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
-                                <div class="form-group">
-                                    <label for="register-first-name">First Name</label>
-                                    <input type="text" id="register-first-name" autocomplete="given-name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="register-last-name">Last Name</label>
-                                    <input type="text" id="register-last-name" autocomplete="family-name" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-email">School Email (@aid.edu.pa)</label>
-                                <input type="email" id="register-email" autocomplete="email" required>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div class="form-group">
-                                    <label for="register-grade">Grade</label>
-                                    <select id="register-grade" required>
-                                        <option value="">Select</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="register-section">Section</label>
-                                    <input type="text" id="register-section" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-password">Password</label>
-                                <div class="password-field">
-                                    <input type="password" id="register-password" autocomplete="new-password" minlength="6" required>
-                                    <button type="button" class="password-toggle" aria-label="Show password"
-                                        aria-controls="register-password" title="Show password">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-confirm-password">Confirm Password</label>
-                                <div class="password-field">
-                                    <input type="password" id="register-confirm-password" autocomplete="new-password" minlength="6" required>
-                                    <button type="button" class="password-toggle" aria-label="Show password"
-                                        aria-controls="register-confirm-password" title="Show password">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn primary-btn" style="width: 100%;">Create Account</button>
                         </form>
                     </div>
 
@@ -465,7 +406,7 @@
                     <div class="form-group">
                         <label for="change-password-new">New Password</label>
                         <div class="password-field">
-                            <input type="password" id="change-password-new" autocomplete="new-password" minlength="6" required>
+                            <input type="password" id="change-password-new" autocomplete="new-password" minlength="10" required>
                             <button type="button" class="password-toggle" aria-label="Show password"
                                 aria-controls="change-password-new" title="Show password">
                                 <i data-lucide="eye"></i>
@@ -475,7 +416,7 @@
                     <div class="form-group">
                         <label for="change-password-confirm">Confirm New Password</label>
                         <div class="password-field">
-                            <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="6" required>
+                            <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="10" required>
                             <button type="button" class="password-toggle" aria-label="Show password"
                                 aria-controls="change-password-confirm" title="Show password">
                                 <i data-lucide="eye"></i>
@@ -491,47 +432,7 @@
         </div>
     </div>
 
-    <script>
-        try {
-            if (localStorage.getItem('student_sidebar_collapsed') === 'true') {
-                document.querySelector('.app-container')?.classList.add('student-sidebar-collapsed');
-            }
-            if (localStorage.getItem('was_logged_in') === 'true') {
-                const appContainer = document.querySelector('.app-container');
-                const studentShell = document.getElementById('student-tab-shell');
-                const routePath = String(window.location.hash || '#/menu')
-                    .replace(/^#\/?/, '')
-                    .split('?')[0];
-                const initialSection = routePath === 'sparks'
-                    ? 'sparks'
-                    : routePath === 'arcade'
-                        ? 'arcade'
-                        : routePath === 'units' || routePath.startsWith('unit/')
-                            ? 'vocabulary'
-                            : 'today';
-                appContainer?.classList.add('student-session-loading');
-                if (studentShell) {
-                    studentShell.classList.remove('hidden');
-                    studentShell.dataset.sessionReserved = 'true';
-                    studentShell.setAttribute('aria-hidden', 'true');
-                    studentShell.inert = true;
-                    studentShell.querySelectorAll('.student-tab').forEach(tab => {
-                        const isActive = tab.dataset.section === initialSection;
-                        tab.classList.toggle('active', isActive);
-                        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-                        tab.tabIndex = isActive ? 0 : -1;
-                    });
-                    const mobileLabel = document.getElementById('student-mobile-section-label');
-                    const activeTab = studentShell.querySelector(`.student-tab[data-section="${initialSection}"]`);
-                    if (mobileLabel && activeTab) {
-                        mobileLabel.textContent = activeTab.textContent.trim().replace(/\s+/g, ' ');
-                    }
-                }
-            }
-        } catch {
-            // Storage can be unavailable in privacy modes; the normal loading view still works.
-        }
-    </script>
+    <script src="js/studentEarlyShell.js" type="module"></script>
     <script src="js/icons.js?v=student-unit-close-icon-20260815a" type="module"></script>
     <script src="js/student.js" type="module"></script>
 </body>

@@ -52,14 +52,20 @@ jobs:
         run: supabase start
       - name: Smoke test app shells
         run: npm run test:ui:smoke
+      - name: Unit and composition tests
+        run: npm test
+      - name: Supabase authorization acceptance tests
+        run: npm run test:acceptance:supabase
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
       - name: Authenticated app smoke
         run: npm run test:ui:auth-smoke
       - name: Responsive authenticated audit
         run: npm run test:ui:responsive:local
       - name: Supabase lint
-        run: supabase db lint --local --fail-on none
+        run: supabase db lint --local --fail-on error
       - name: Supabase advisors
-        run: supabase db advisors --local --fail-on none --type all
+        run: supabase db advisors --local --level warn --fail-on error --type all
       - name: Build site
         env:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

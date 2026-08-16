@@ -111,6 +111,7 @@ async function upsertAuthUser(admin, { email, password, metadata = {} }) {
         const { data, error } = await admin.auth.admin.updateUserById(current.id, {
             password,
             email_confirm: true,
+            app_metadata: { provisioned_by_teacher: true },
             user_metadata: metadata
         });
         if (error) throw error;
@@ -121,6 +122,7 @@ async function upsertAuthUser(admin, { email, password, metadata = {} }) {
         email,
         password,
         email_confirm: true,
+        app_metadata: { provisioned_by_teacher: true },
         user_metadata: metadata
     });
     if (error) throw error;
