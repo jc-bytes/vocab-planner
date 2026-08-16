@@ -56,6 +56,13 @@ jobs:
         run: npm test
       - name: Supabase authorization acceptance tests
         run: npm run test:acceptance:supabase
+      - name: Diagnose local Supabase failure
+        if: failure()
+        run: |
+          for container in $(docker ps -a --filter 'name=supabase_' --format '{{.Names}}'); do
+            echo "===== ${container} ====="
+            docker logs --tail 200 "${container}" 2>&1 || true
+          done
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
       - name: Authenticated app smoke
