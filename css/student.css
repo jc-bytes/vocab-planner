@@ -7689,7 +7689,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-height: 42px;
+    min-height: 44px;
     padding: 9px 16px;
     border: 1px solid rgba(173, 198, 255, 0.34);
     border-radius: 999px;
