@@ -2,7 +2,6 @@ import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseC
 import {
     DEFAULT_COIN_DATA,
     mapProfileRow,
-    mapStudentProgressRow,
     normalizeProfile,
     normalizeUser,
     profilePayload
@@ -203,15 +202,14 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
                     .order('section_letter', { ascending: true })
                     .order('last_name', { ascending: true }),
                 this.client
-                    .from('student_progress')
-                    .select('*')
+                    .rpc('get_students_progress_v3')
             ]);
 
         if (profilesError) throw profilesError;
         if (progressError) throw progressError;
 
         const progressByUserId = new Map(
-            (progressRows || []).map((row) => [row.user_id, mapStudentProgressRow(row)])
+            (progressRows || []).map((progress) => [progress.userId, progress])
         );
 
         return (profiles || []).map((profileRow) => {

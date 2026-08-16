@@ -14,7 +14,8 @@ export class StudentActivityProgressPersistence {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
-        this.activitySyncChains = new Map();
+        this.activitySyncStates = new Map();
+        this.activityProgressDebounceMs = 1000;
     }
 
     getActivityCoinRewards(activityType, settings = {}) {
@@ -84,7 +85,7 @@ export class StudentActivityProgressPersistence {
                     }
 
                     if (totalReward > 0) {
-                        this.sm.progress.addCoins(totalReward);
+                        this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
                     }
                 }
 
@@ -122,7 +123,7 @@ export class StudentActivityProgressPersistence {
                     }
 
                     if (totalReward > 0) {
-                        this.sm.progress.addCoins(totalReward);
+                        this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
                         oldScoreData.totalEarned = (oldScoreData.totalEarned || 0) + totalReward;
                     }
                 }
@@ -151,7 +152,9 @@ export class StudentActivityProgressPersistence {
                 persistedScoreData = oldScoreData;
             }
 
-            this.sm.progress.saveLocalProgress();
+            // The activity RPC is the authoritative cloud write. Persist locally
+            // without scheduling the generic unit-work RPC for the same event.
+            this.sm.progress.saveLocalProgress(true);
             this.syncActivityProgressToCloud(activityType, persistedScoreData, {
                 ...settings,
                 progressReward,
@@ -175,6 +178,8 @@ export class StudentActivityProgressPersistence {
         if (!unitProgress || !this.sm.currentVocab) return null;
         const flow = this.activities.getActivityFlowConfig(this.sm.currentVocab);
         return {
+            eventId: `activity-progress:${globalThis.crypto?.randomUUID?.()
+                || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
             unitKey: this.activities.getUnitProgressKey(this.sm.currentVocab),
             unitContext: {
                 unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
@@ -210,19 +215,106 @@ export class StudentActivityProgressPersistence {
         if (!payload) return;
 
         const syncKey = `${payload.unitKey}:${activityType}`;
-        const previousSync = this.activitySyncChains.get(syncKey) || Promise.resolve();
-        const currentSync = previousSync
-            .catch(() => {})
-            .then(() => this.submitActivityProgressPayload(payload));
-        this.activitySyncChains.set(syncKey, currentSync);
+        const fingerprint = this.getActivityProgressFingerprint(payload);
+        let state = this.activitySyncStates.get(syncKey);
+        if (!state) {
+            state = {
+                timer: null,
+                inFlight: null,
+                pending: null,
+                waiters: [],
+                lastSubmittedFingerprint: ''
+            };
+            this.activitySyncStates.set(syncKey, state);
+        }
+
+        if (!this.isMeaningfulActivityProgressPayload(payload)
+            || fingerprint === state.lastSubmittedFingerprint
+            || fingerprint === state.pending?.fingerprint) {
+            return state.inFlight || null;
+        }
+
+        const promise = new Promise((resolve, reject) => state.waiters.push({ resolve, reject }));
+        state.pending = { payload, fingerprint };
+        this.scheduleActivityProgressFlush(syncKey, Boolean(payload.isComplete));
+        return promise;
+    }
+
+    getActivityProgressFingerprint(payload = {}) {
+        return JSON.stringify([
+            payload.unitKey || '',
+            payload.activityType || '',
+            Number(payload.score) || 0,
+            Boolean(payload.isComplete),
+            payload.details || {},
+            payload.activitySettings || {},
+            payload.attemptId || '',
+            Boolean(payload.isRequired)
+        ]);
+    }
+
+    isMeaningfulActivityProgressPayload(payload = {}) {
+        if (payload.isComplete || Number(payload.score) > 0) return true;
+        if (Number(payload.details?.accuracy) > 0) return true;
+        return Object.keys(payload.details?.evidence || {}).length > 0;
+    }
+
+    scheduleActivityProgressFlush(syncKey, immediate = false) {
+        const state = this.activitySyncStates.get(syncKey);
+        if (!state) return;
+        if (state.timer) {
+            clearTimeout(state.timer);
+            state.timer = null;
+        }
+        if (immediate) {
+            void this.flushActivityProgressSync(syncKey);
+            return;
+        }
+        state.timer = setTimeout(() => {
+            state.timer = null;
+            void this.flushActivityProgressSync(syncKey);
+        }, this.activityProgressDebounceMs);
+    }
+
+    async flushActivityProgressSync(syncKey) {
+        const state = this.activitySyncStates.get(syncKey);
+        if (!state) return null;
+        if (state.timer) {
+            clearTimeout(state.timer);
+            state.timer = null;
+        }
+        if (state.inFlight) {
+            await state.inFlight;
+            return this.flushActivityProgressSync(syncKey);
+        }
+        if (!state.pending) return null;
+
+        const pending = state.pending;
+        const waiters = state.waiters.splice(0);
+        state.pending = null;
+        state.inFlight = this.submitActivityProgressPayload(pending.payload);
 
         try {
-            await currentSync;
+            const result = await state.inFlight;
+            state.lastSubmittedFingerprint = pending.fingerprint;
+            waiters.forEach(waiter => waiter.resolve(result));
+            return result;
+        } catch (error) {
+            waiters.forEach(waiter => waiter.reject(error));
+            throw error;
         } finally {
-            if (this.activitySyncChains.get(syncKey) === currentSync) {
-                this.activitySyncChains.delete(syncKey);
+            state.inFlight = null;
+            if (state.pending) {
+                this.scheduleActivityProgressFlush(syncKey, Boolean(state.pending.payload.isComplete));
             }
         }
+    }
+
+    async flushPendingActivityProgress() {
+        const keys = [...this.activitySyncStates.entries()]
+            .filter(([, state]) => state.pending || state.inFlight)
+            .map(([syncKey]) => syncKey);
+        await Promise.all(keys.map(syncKey => this.flushActivityProgressSync(syncKey)));
     }
 
     async submitActivityProgressPayload(payload) {
@@ -230,11 +322,12 @@ export class StudentActivityProgressPersistence {
             const previousTotalXp = Number(this.sm.progressData?.totalXp) || 0;
             const progress = await supabaseService.submitStudentActivityProgress(payload);
             const xpAwarded = this.getAwardedXp(previousTotalXp, progress);
-            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            this.applyActivityProgressResult(progress, payload);
             this.sm.setAuthStatus('Synced');
             if (payload.isComplete) {
                 this.showActivityXpReward(xpAwarded, payload.activityType);
             }
+            return progress;
         } catch (error) {
             console.warn(`Could not sync activity progress event: ${getSyncErrorSummary(error)}`);
             try {
@@ -243,7 +336,50 @@ export class StudentActivityProgressPersistence {
                 console.warn('Could not queue activity progress event:', queueError);
             }
             this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+            return null;
         }
+    }
+
+    applyActivityProgressResult(progress, payload = {}) {
+        if (!progress) return;
+        if (!progress.activity) {
+            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            return;
+        }
+
+        const activity = progress.activity;
+        const unitKey = activity.unitKey || payload.unitKey;
+        const activityType = activity.activityType || payload.activityType;
+        const units = this.sm.progressData.units ||= {};
+        const unit = units[unitKey] ||= { ...(payload.unitContext || {}), scores: {}, states: {} };
+        unit.scores ||= {};
+        const previous = unit.scores[activityType] || {};
+        unit.scores[activityType] = {
+            ...previous,
+            score: Number(activity.score) || 0,
+            isComplete: Boolean(activity.isComplete),
+            plays: Number(activity.plays) || 0,
+            totalEarned: Number(activity.totalEarned) || 0,
+            accuracy: activity.accuracy === null || activity.accuracy === undefined
+                ? previous.accuracy
+                : Number(activity.accuracy) || 0,
+            details: activity.details?.summary ?? previous.details ?? '',
+            evidence: activity.details?.evidence ?? previous.evidence,
+            verified: Boolean(activity.verified),
+            attemptId: activity.attemptId || previous.attemptId || '',
+            lastPlayed: activity.lastPlayed || previous.lastPlayed,
+            updatedAt: activity.updatedAt || progress.updatedAt
+        };
+        this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
+        this.sm.progressData.version = Number(progress.version) || this.sm.progressData.version || 0;
+        if (progress.coinData) {
+            this.sm.progress.applyCoinSnapshot(progress.coinData, this.sm.coinHistory, { saveLocal: false });
+        }
+        if (this.sm.currentVocab && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitKey) {
+            this.sm.unitScores = unit.scores;
+        }
+        this.sm.progress.updateLevelDisplay?.();
+        this.sm.progress.saveLocalProgress(true);
     }
 
     getAwardedXp(previousTotalXp, progress = {}) {

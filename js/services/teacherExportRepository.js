@@ -1,13 +1,15 @@
 import { supabaseService } from '../supabaseService.js';
-import { mapProfileRow, mapStudentProgressRow, timestampToIso } from './supabaseValues.js';
+import { mapProfileRow, timestampToIso } from './supabaseValues.js';
 import { leaderboardRepository } from './leaderboardRepository.js';
 
 export const teacherExportRepository = {
     async getStudentProgress(userId) {
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('student_progress').select('*').eq('user_id', userId).maybeSingle();
+        const { data, error } = await supabaseService.getClient().rpc('get_student_progress_v3', {
+            p_user_id: userId
+        });
         if (error) throw error;
-        return mapStudentProgressRow(data);
+        return Array.isArray(data) ? data[0] : data;
     },
     async getProfile(userId) {
         await supabaseService.init();

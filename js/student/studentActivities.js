@@ -611,6 +611,10 @@ export class StudentActivities {
         return this.progressPersistence.syncActivityProgressToCloud(activityType, scoreData, settings);
     }
 
+    flushPendingActivityProgress() {
+        return this.progressPersistence.flushPendingActivityProgress();
+    }
+
     resetActivityState(activityType) {
         return this.progressPersistence.resetActivityState(activityType);
     }

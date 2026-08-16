@@ -22,13 +22,13 @@ export class StudentProgressCoins {
         this.sm.coinHistory = this.progress.normalizeCoinHistory(this.sm.coinHistory);
     }
 
-    addCoins(amount, source = 'activity', description = '') {
+    addCoins(amount, source = 'activity', description = '', options = {}) {
         this.sm.coinData.balance += amount;
         this.sm.coinData.totalEarned += amount;
         this.sm.coins = this.sm.coinData.balance; // Legacy support
         this.addCoinHistory('earn', amount, source, description);
         this.sm.updateCoinDisplay();
-        this.progress.saveLocalProgress();
+        this.progress.saveLocalProgress(Boolean(options.skipCloud));
 
         // Visual feedback
         const coinEl = $('#coin-balance');
@@ -59,7 +59,7 @@ export class StudentProgressCoins {
                 description: 'Spent on game',
                 clientId: this.progress.clientId
             });
-            this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            this.progress.cloud.applyRemoteCoinProgress(progress);
             this.sm.setAuthStatus('Synced');
             return true;
         } catch (error) {
@@ -87,7 +87,7 @@ export class StudentProgressCoins {
 
         try {
             const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.progress.clientId });
-            this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            this.progress.cloud.applyRemoteCoinProgress(progress);
             this.sm.showToast(`You received ${amount} coins!`);
             this.sm.setAuthStatus('Synced');
         } catch (error) {

@@ -139,10 +139,43 @@ export class StudentProgressCloud {
         const cloudCoinData = this.progress.migrateCoinData(progress);
         this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
 
-        this.progress.applyCoinSnapshot(cloudCoinData.coinData, cloudCoinData.coinHistory, { saveLocal: true });
+        const coinHistory = Array.isArray(progress.coinHistory)
+            ? cloudCoinData.coinHistory
+            : this.sm.coinHistory;
+        this.progress.applyCoinSnapshot(cloudCoinData.coinData, coinHistory, { saveLocal: true });
         this.progress.updateLevelDisplay();
         this.lastCoinRefreshAt = Date.now();
         this.sm.setAuthStatus('Synced');
+    }
+
+    applyUnitProgressResult(progress, fallbackPayload = {}) {
+        if (!progress?.unit) {
+            this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+            return;
+        }
+        const unitKey = progress.unit.unitKey || fallbackPayload.unitKey;
+        if (!unitKey) return;
+        const units = this.sm.progressData.units ||= {};
+        const previous = units[unitKey] || {};
+        const { unitKey: _unitKey, ...unitData } = progress.unit;
+        units[unitKey] = {
+            ...previous,
+            ...unitData,
+            scores: previous.scores || {},
+            states: unitData.states || previous.states || {}
+        };
+        this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
+        this.sm.progressData.version = Number(progress.version) || this.sm.progressData.version || 0;
+        if (progress.coinData) {
+            this.progress.applyCoinSnapshot(progress.coinData, this.sm.coinHistory, { saveLocal: false });
+        }
+        if (this.sm.currentVocab && this.sm.activities?.getUnitProgressKey?.(this.sm.currentVocab) === unitKey) {
+            this.sm.unitScores = units[unitKey].scores;
+            this.sm.unitStates = units[unitKey].states;
+            this.sm.unitImages = units[unitKey].images || {};
+            this.sm.unitWordHunt = units[unitKey].wordHunt || {};
+        }
+        this.progress.saveLocalProgress(true);
     }
 
     async refreshCoinsFromCloud(options = {}) {
@@ -163,7 +196,7 @@ export class StudentProgressCloud {
                 reason: options.reason || ''
             });
             this.lastCoinRefreshAt = Date.now();
-            const progress = await studentProgressRepository.get(this.sm.currentUser.uid);
+            const progress = await studentProgressRepository.getSummary(this.sm.currentUser.uid);
             if (!progress) return;
             this.sm.logStudentDomUpdate?.('student-progress', {
                 source: 'refreshCoinsFromCloud:snapshot',
@@ -234,9 +267,9 @@ export class StudentProgressCloud {
             if (!hasWelcomeBonus && this.sm.coinData.balance === 0 && typeof supabaseService.claimStudentWelcomeBonus === 'function') {
                 const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.progress.clientId });
                 if (progress) {
-                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
-                    const bonusCoinData = this.progress.migrateCoinData(progress);
-                    if (bonusCoinData.coinHistory.some(entry => entry?.source === 'welcome')) {
+                    const previousBalance = this.sm.coinData.balance;
+                    this.applyRemoteCoinProgress(progress);
+                    if (previousBalance === 0 && this.sm.coinData.balance === 100) {
                         this.sm.showToast('Welcome! You received 100 starting coins!');
                     }
                 }
@@ -276,7 +309,7 @@ export class StudentProgressCloud {
             }
 
             if (progress) {
-                this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                this.applyUnitProgressResult(progress, unitPayload || {});
             }
 
             this.sm.setAuthStatus('Synced');
@@ -302,6 +335,8 @@ export class StudentProgressCloud {
         } = unitProgress;
 
         return {
+            eventId: `unit-work:${globalThis.crypto?.randomUUID?.()
+                || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
             unitKey,
             unitContext: {
                 unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
@@ -344,10 +379,14 @@ export class StudentProgressCloud {
             try {
                 if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
                     const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
-                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                    this.applyUnitProgressResult(progress, record.payload || {});
                 } else if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
                     const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
-                    this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                    if (this.sm.activities?.progressPersistence?.applyActivityProgressResult) {
+                        this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
+                    } else {
+                        this.progress.applyProgressSnapshot(progress, { saveLocal: true });
+                    }
                 } else if (record.type === 'student-progress') {
                     await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
                 }

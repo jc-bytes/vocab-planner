@@ -133,7 +133,7 @@ export function mapStudentProgressRow(row) {
         units: row.units || {},
         coins: row.coins ?? row.coin_data?.balance ?? 0,
         coinData: row.coin_data || { ...DEFAULT_COIN_DATA },
-        coinHistory: row.coin_history || [],
+        coinHistory: Object.hasOwn(row, 'coin_history') ? (row.coin_history || []) : undefined,
         totalXp: Number(row.total_xp) || 0,
         email: studentProfile.email || '',
         role: 'student',

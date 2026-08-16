@@ -14,7 +14,7 @@
     "test:student-api": "node --test tests/student-api-contract.test.mjs",
     "test:student-auth": "node --test tests/student-auth-composition.test.mjs",
     "test:student-games": "node --test tests/student-game-composition.test.mjs",
-    "test:student-progress": "node --test tests/student-progress-composition.test.mjs",
+    "test:student-progress": "node --test tests/student-progress-composition.test.mjs tests/student-progress-write-reduction.test.mjs tests/student-progress-v2-schema.test.mjs tests/student-progress-v2-migration.test.mjs tests/student-progress-v2-broadcast.test.mjs tests/student-progress-v2-client.test.mjs tests/student-progress-v2-operations.test.mjs tests/student-progress-direct-normalized.test.mjs tests/student-progress-legacy-retirement.test.mjs",
     "test:student-activities": "node --test tests/student-activity-runtime-composition.test.mjs tests/activity-mastery-security.test.mjs tests/crossword-activity.test.mjs tests/flashcards-activity.test.mjs tests/matching-activity.test.mjs tests/spark-reading-activity.test.mjs tests/word-hunt-paste-security.test.mjs",
     "test:teacher-activity-flow": "node --test tests/teacher-activity-flow.test.mjs",
     "test:student-routing": "node --test tests/student-routing-composition.test.mjs",

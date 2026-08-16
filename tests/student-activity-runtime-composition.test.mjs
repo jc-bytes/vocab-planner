@@ -81,7 +81,7 @@ test('StudentActivities owns explicit runtime components', () => {
     assert.ok(activities.moduleLoader instanceof StudentActivityModuleLoader);
     assert.ok(activities.launcher instanceof StudentActivityLauncher);
     assert.ok(activities.progressPersistence instanceof StudentActivityProgressPersistence);
-    assert.ok(activities.progressPersistence.activitySyncChains instanceof Map);
+    assert.ok(activities.progressPersistence.activitySyncStates instanceof Map);
     assert.equal(activities.menu.activities, activities);
     assert.equal(activities.launcher.activities, activities);
     for (const state of [
@@ -98,10 +98,10 @@ test('StudentActivities owns explicit runtime components', () => {
 test('activity cloud-sync queues are isolated per student runtime', () => {
     const first = new StudentActivities({});
     const second = new StudentActivities({});
-    first.progressPersistence.activitySyncChains.set('unit:quiz', Promise.resolve());
+    first.progressPersistence.activitySyncStates.set('unit:quiz', { pending: null });
 
-    assert.equal(first.progressPersistence.activitySyncChains.size, 1);
-    assert.equal(second.progressPersistence.activitySyncChains.size, 0);
+    assert.equal(first.progressPersistence.activitySyncStates.size, 1);
+    assert.equal(second.progressPersistence.activitySyncStates.size, 0);
 });
 
 test('activity XP reward uses the authoritative server total delta', () => {

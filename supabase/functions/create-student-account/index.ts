@@ -232,7 +232,7 @@ Deno.serve(async (req) => {
   }
 
   const { error: progressError } = await adminClient.rpc(
-    "provision_student_progress_for_account",
+    "provision_student_progress_v2",
     {
       p_student_id: studentId,
       p_student_profile: studentProfile,

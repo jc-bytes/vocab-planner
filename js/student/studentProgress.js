@@ -161,8 +161,8 @@ export class StudentProgress {
         return this.coins.addCoinHistory(type, amount, source, description);
     }
 
-    addCoins(amount, source = 'activity', description = '') {
-        return this.coins.addCoins(amount, source, description);
+    addCoins(amount, source = 'activity', description = '', options = {}) {
+        return this.coins.addCoins(amount, source, description, options);
     }
 
     deductCoins(amount) {

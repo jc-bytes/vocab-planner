@@ -148,22 +148,31 @@ test('student progress repository preserves missing-record and realtime teardown
     const readCalls = [];
     const builder = createReadBuilder({ data: null, error: null }, readCalls);
     const channel = {
-        on(_event, config, callback) { this.config = config; this.callback = callback; return this; },
+        on(event, config, callback) { this.event = event; this.config = config; this.callback = callback; return this; },
         subscribe(callback) { callback('SUBSCRIBED'); return this; }
     };
     let removed = null;
     const client = {
         from(table) { readCalls.push(['from', table]); return builder; },
-        channel(name) { channel.name = name; return channel; },
+        rpc(name, args) { readCalls.push(['rpc', name, args]); return builder; },
+        realtime: { async setAuth() { client.authSet = true; } },
+        channel(name, options) { channel.name = name; channel.options = options; return channel; },
         removeChannel(value) { removed = value; }
     };
     await withFakeClient(client, async () => {
         assert.equal(await studentProgressRepository.get('user-1'), null);
         const seen = [];
         const unsubscribe = studentProgressRepository.subscribe('user-1', value => seen.push(value));
-        channel.callback({ new: { user_id: 'user-1', units: {} } });
+        await Promise.resolve();
+        await Promise.resolve();
+        channel.callback({ payload: { record: { user_id: 'user-1', total_xp: 12, coins: 3 } } });
         assert.equal(seen[0].userId, 'user-1');
-        assert.equal(channel.config.filter, 'user_id=eq.user-1');
+        assert.equal(seen[0].totalXp, 12);
+        assert.equal(client.authSet, true);
+        assert.equal(channel.name, 'student-progress:user-1');
+        assert.deepEqual(channel.options, { config: { private: true } });
+        assert.equal(channel.event, 'broadcast');
+        assert.deepEqual(channel.config, { event: '*' });
         unsubscribe();
         assert.equal(removed, channel);
     });

@@ -187,7 +187,7 @@ async function seedAuditUsers(admin) {
         .throwOnError();
 
     await admin
-        .rpc('provision_student_progress_for_account', {
+        .rpc('provision_student_progress_v2', {
             p_student_id: student.id,
             p_student_profile: {
                 firstName: 'Audit',

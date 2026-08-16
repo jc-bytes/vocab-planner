@@ -33,8 +33,8 @@ const isBase64Image = value => typeof value === 'string' && /^data:image\//i.tes
 
 const loadCandidates = async () => {
     let query = supabase
-        .from('student_progress')
-        .select('user_id, units');
+        .from('student_unit_progress')
+        .select('user_id, unit_key, work_data');
 
     if (Number.isInteger(limit) && limit > 0) {
         query = query.limit(limit);
@@ -45,14 +45,12 @@ const loadCandidates = async () => {
     return data || [];
 };
 
-const cleanUnits = (units = {}) => {
+const cleanUnit = (unitKey, workData = {}) => {
     let removable = 0;
     let needsMigration = 0;
     let changed = false;
-    const nextUnits = JSON.parse(JSON.stringify(units || {}));
-
-    for (const [unitKey, unit] of Object.entries(nextUnits)) {
-        if (!unit || typeof unit !== 'object' || !unit.images || typeof unit.images !== 'object') continue;
+    const unit = JSON.parse(JSON.stringify(workData || {}));
+    if (unit && typeof unit === 'object' && unit.images && typeof unit.images === 'object') {
 
         for (const [word, value] of Object.entries(unit.images)) {
             if (!isBase64Image(value)) continue;
@@ -69,7 +67,7 @@ const cleanUnits = (units = {}) => {
         }
     }
 
-    return { units: nextUnits, removable, needsMigration, changed };
+    return { workData: unit, removable, needsMigration, changed };
 };
 
 const main = async () => {
@@ -78,26 +76,27 @@ const main = async () => {
     let imagesRemoved = 0;
     let imagesNeedingMigration = 0;
 
-    console.log(`${apply ? 'APPLY' : 'DRY RUN'}: ${candidates.length} student progress rows with images objects found.`);
+    console.log(`${apply ? 'APPLY' : 'DRY RUN'}: ${candidates.length} normalized student unit rows inspected.`);
 
     for (const row of candidates) {
-        const result = cleanUnits(row.units || {});
+        const result = cleanUnit(row.unit_key, row.work_data || {});
         imagesRemoved += result.removable;
         imagesNeedingMigration += result.needsMigration;
 
         if (!result.changed) continue;
         rowsChanged += 1;
-        console.log(`${apply ? 'clean' : 'would clean'} ${row.user_id}: remove ${result.removable} legacy base64 images`);
+        console.log(`${apply ? 'clean' : 'would clean'} ${row.user_id}/${row.unit_key}: remove ${result.removable} base64 images`);
 
         if (!apply) continue;
 
         const { error } = await supabase
-            .from('student_progress')
+            .from('student_unit_progress')
             .update({
-                units: result.units,
+                work_data: result.workData,
                 updated_at: new Date().toISOString()
             })
-            .eq('user_id', row.user_id);
+            .eq('user_id', row.user_id)
+            .eq('unit_key', row.unit_key);
         if (error) throw error;
     }
 

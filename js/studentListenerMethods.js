@@ -77,6 +77,7 @@ export class StudentListeners {
         this.listen(window, 'pagehide', (event) => {
             this.sm.debugStudentScrollLifecycle('pagehide', { persisted: event.persisted });
             this.sm.saveStudentSectionScroll($('.view.active')?.id || '');
+            void this.sm.activities?.flushPendingActivityProgress?.();
         });
         this.listen(window, 'pageshow', (event) => {
             if (this.sm.shouldDebugStudentDom()) console.log('PAGESHOW', event.persisted);
@@ -92,6 +93,7 @@ export class StudentListeners {
             });
             if (document.hidden) {
                 this.sm.saveStudentSectionScroll(activeViewId);
+                void this.sm.activities?.flushPendingActivityProgress?.();
             }
         });
 

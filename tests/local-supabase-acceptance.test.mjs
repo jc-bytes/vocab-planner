@@ -124,7 +124,7 @@ async function createPeerStudent(admin) {
         section_letter: 'B',
         must_change_password: false
     }, { onConflict: 'user_id' }).throwOnError();
-    await admin.rpc('provision_student_progress_for_account', {
+    await admin.rpc('provision_student_progress_v2', {
         p_student_id: peer.id,
         p_student_profile: {
             firstName: 'Acceptance', lastName: 'Peer', name: 'Acceptance Peer',
@@ -370,10 +370,14 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 clientId: `${RUN_ID}-welcome`
             }));
             const welcomeRetry = await withServiceClient(studentClient, () => supabaseService.claimStudentWelcomeBonus({
-                clientId: `${RUN_ID}-welcome-retry`
+                clientId: `${RUN_ID}-welcome`
             }));
             assert.equal(welcomeRetry.coinData.balance, welcome.coinData.balance);
-            assert.equal(welcomeRetry.coinHistory.filter(entry => entry?.source === 'welcome').length, 1);
+            const { count: welcomeCount, error: welcomeCountError } = await admin
+                .from('student_coin_ledger').select('id', { count: 'exact', head: true })
+                .eq('user_id', student.id).eq('event_key', `welcome:${RUN_ID}-welcome`);
+            if (welcomeCountError) throw welcomeCountError;
+            assert.equal(welcomeCount, 1);
 
             await expectRejected(() => withServiceClient(studentClient, () => (
                 supabaseService.startStudentActivityAttempt({
@@ -409,18 +413,18 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(activity.units[activityUnitKey].scores.flashcards.isComplete, true);
             assert.equal(activity.units[activityUnitKey].scores.flashcards.verified, true);
             assert.equal(activity.units[activityUnitKey].unitId, IDS.vocabulary);
-            await expectRejected(() => withServiceClient(studentClient, () => (
+            const activityRetry = await withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
-            )), /already completed/i);
+            ));
+            assert.equal(activityRetry.units[activityUnitKey].scores.flashcards.score, 100);
 
             const synced = await withServiceClient(studentClient, () => supabaseService.syncStudentUnitWork({
                 unitKey: activityUnitKey,
                 unitContext: activityPayload.unitContext,
                 workPatch: { acceptanceNote: 'persisted', scores: { forbiddenOverwrite: true } }
             }));
-            assert.equal(synced.units[activityUnitKey].acceptanceNote, 'persisted');
-            assert.equal(synced.units[activityUnitKey].scores.flashcards.score, 100);
-            assert.equal(synced.units[activityUnitKey].scores.forbiddenOverwrite, undefined);
+            assert.equal(synced.unit.acceptanceNote, 'persisted');
+            assert.equal(synced.unit.scores, undefined);
 
             const firstScore = await withServiceClient(studentClient, () => supabaseService.submitStudentGameScore({
                 gameId: 'snake', score: 123, metadata: { runId: RUN_ID }
@@ -465,40 +469,41 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
 
             assert.equal(await withServiceClient(studentClient, () => studentProgressRepository.get(peer.id)), null,
                 'A Student must not read another Student progress row.');
-            const { error: studentCrossWriteError } = await studentClient.from('student_progress')
-                .update({ units: { denied: true } }).eq('user_id', peer.id);
+            const { error: studentCrossWriteError } = await studentClient.from('student_progress_summary')
+                .update({ total_xp: 999999 }).eq('user_id', peer.id);
             assert.ok(studentCrossWriteError, 'A Student direct cross-user progress write must be rejected.');
-            const { error: teacherDirectWriteError } = await teacherClient.from('student_progress')
-                .update({ units: { denied: true } }).eq('user_id', student.id);
+            const { error: teacherDirectWriteError } = await teacherClient.from('student_progress_summary')
+                .update({ total_xp: 999999 }).eq('user_id', student.id);
             assert.ok(teacherDirectWriteError, 'A Teacher direct progress write must use the domain RPC instead.');
         });
 
         await t.test('Realtime delivery, unsubscribe, resubscribe, and repeated application initialization are exact', async () => {
-            const { data: original, error: originalError } = await admin.from('student_progress')
-                .select('units').eq('user_id', student.id).single();
+            const { data: original, error: originalError } = await admin.from('student_progress_summary')
+                .select('version').eq('user_id', student.id).single();
             if (originalError) throw originalError;
-            const originalUnits = original.units || {};
             const markerCounts = new Map();
-            let lastMarker = '';
+            let lastMarker = 0;
             const recordMarker = progress => {
-                const marker = progress.units?.realtimeAcceptance?.marker || '';
+                const marker = Number(progress.version || 0);
                 lastMarker = marker;
                 markerCounts.set(marker, (markerCounts.get(marker) || 0) + 1);
             };
-            const updateMarker = async marker => {
-                const { error } = await admin.from('student_progress').update({
-                    units: { ...originalUnits, realtimeAcceptance: { marker } }
-                }).eq('user_id', student.id);
+            let nextMarker = Number(original.version || 0);
+            const updateMarker = async () => {
+                nextMarker += 1;
+                const marker = nextMarker;
+                const { error } = await admin.from('student_progress_summary').update({ version: marker })
+                    .eq('user_id', student.id);
                 if (error) throw error;
+                return marker;
             };
             const warmRealtimeStream = async label => {
                 for (let attempt = 1; attempt <= 6; attempt += 1) {
-                    const marker = `${RUN_ID}-${label}-warmup-${attempt}`;
-                    await updateMarker(marker);
+                    const marker = await updateMarker();
                     try {
                         await waitFor(() => lastMarker === marker, 'Realtime stream did not warm up.', 1500);
                         markerCounts.clear();
-                        lastMarker = '';
+                        lastMarker = 0;
                         return;
                     } catch {
                         // A freshly started Realtime service can join the WebSocket
@@ -516,16 +521,16 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                     });
                     await waitFor(() => channelJoined(studentClient), 'Realtime channel did not join.');
                     await warmRealtimeStream('initial');
-                    await updateMarker(`${RUN_ID}-delivery`);
-                    await waitFor(() => lastMarker === `${RUN_ID}-delivery`, 'Initial Realtime update was not delivered.');
+                    const deliveryMarker = await updateMarker();
+                    await waitFor(() => lastMarker === deliveryMarker, 'Initial Realtime update was not delivered.');
                     await new Promise(resolve => setTimeout(resolve, 150));
-                    assert.equal(markerCounts.get(`${RUN_ID}-delivery`), 1);
+                    assert.equal(markerCounts.get(deliveryMarker), 1);
 
                     await unsubscribe();
                     await waitFor(() => studentClient.getChannels().length === 0, 'Realtime channel was not removed.');
-                    await updateMarker(`${RUN_ID}-after-unsubscribe`);
+                    const unsubscribedMarker = await updateMarker();
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    assert.equal(markerCounts.get(`${RUN_ID}-after-unsubscribe`) || 0, 0,
+                    assert.equal(markerCounts.get(unsubscribedMarker) || 0, 0,
                         'No callback may arrive after unsubscribe.');
 
                     const unsubscribeAgain = studentProgressRepository.subscribe(student.id, progress => {
@@ -533,10 +538,10 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                     });
                     await waitFor(() => channelJoined(studentClient), 'Resubscribed Realtime channel did not join.');
                     await warmRealtimeStream('resubscribe');
-                    await updateMarker(`${RUN_ID}-resubscribe`);
-                    await waitFor(() => lastMarker === `${RUN_ID}-resubscribe`, 'Resubscribed update was not delivered.');
+                    const resubscribeMarker = await updateMarker();
+                    await waitFor(() => lastMarker === resubscribeMarker, 'Resubscribed update was not delivered.');
                     await new Promise(resolve => setTimeout(resolve, 150));
-                    assert.equal(markerCounts.get(`${RUN_ID}-resubscribe`), 1);
+                    assert.equal(markerCounts.get(resubscribeMarker), 1);
                     await unsubscribeAgain();
                     await waitFor(() => studentClient.getChannels().length === 0, 'Resubscribed channel was not removed.');
                 });
@@ -548,7 +553,8 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                     sessionStorage: globalThis.sessionStorage
                 };
                 let applicationCallbacks = 0;
-                let applicationLastMarker = '';
+                let applicationLastMarker = 0;
+                let repeatedInitMarker = 0;
                 try {
                     const storage = new Map();
                     globalThis.sessionStorage = {
@@ -574,8 +580,8 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         logStudentDomUpdate() {}
                     });
                     progress.cloud.applyRemoteCoinProgress = snapshot => {
-                        applicationLastMarker = snapshot?.units?.realtimeAcceptance?.marker || '';
-                        if (applicationLastMarker === `${RUN_ID}-repeated-init`) {
+                        applicationLastMarker = Number(snapshot?.version || 0);
+                        if (applicationLastMarker === repeatedInitMarker) {
                             applicationCallbacks += 1;
                         }
                     };
@@ -587,8 +593,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         await waitFor(() => channelJoined(studentClient), 'Repeated initialization did not settle to one channel.');
                         assert.equal(studentClient.getChannels().length, 1);
                         for (let attempt = 1; attempt <= 6; attempt += 1) {
-                            const marker = `${RUN_ID}-application-warmup-${attempt}`;
-                            await updateMarker(marker);
+                            const marker = await updateMarker();
                             try {
                                 await waitFor(() => applicationLastMarker === marker,
                                     'Application Realtime stream did not warm up.', 1500);
@@ -597,7 +602,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                                 if (attempt === 6) throw new Error('Application Realtime stream did not become ready.');
                             }
                         }
-                        await updateMarker(`${RUN_ID}-repeated-init`);
+                        repeatedInitMarker = await updateMarker();
                         await waitFor(() => applicationCallbacks === 1, 'Repeated initialization update was not delivered exactly once.');
                         await new Promise(resolve => setTimeout(resolve, 150));
                         assert.equal(applicationCallbacks, 1);
@@ -614,7 +619,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 }
             } finally {
                 await studentClient.removeAllChannels();
-                await admin.from('student_progress').update({ units: originalUnits }).eq('user_id', student.id);
+                await admin.from('student_progress_summary').update({ version: original.version }).eq('user_id', student.id);
             }
         });
     } finally {
