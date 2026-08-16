@@ -548,6 +548,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                     sessionStorage: globalThis.sessionStorage
                 };
                 let applicationCallbacks = 0;
+                let applicationLastMarker = '';
                 try {
                     const storage = new Map();
                     globalThis.sessionStorage = {
@@ -572,8 +573,9 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         currentUser: { uid: student.id },
                         logStudentDomUpdate() {}
                     });
-                    progress.applyRemoteCoinProgress = snapshot => {
-                        if (snapshot?.units?.realtimeAcceptance?.marker === `${RUN_ID}-repeated-init`) {
+                    progress.cloud.applyRemoteCoinProgress = snapshot => {
+                        applicationLastMarker = snapshot?.units?.realtimeAcceptance?.marker || '';
+                        if (applicationLastMarker === `${RUN_ID}-repeated-init`) {
                             applicationCallbacks += 1;
                         }
                     };
@@ -584,6 +586,17 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         progress.startCoinSync();
                         await waitFor(() => channelJoined(studentClient), 'Repeated initialization did not settle to one channel.');
                         assert.equal(studentClient.getChannels().length, 1);
+                        for (let attempt = 1; attempt <= 6; attempt += 1) {
+                            const marker = `${RUN_ID}-application-warmup-${attempt}`;
+                            await updateMarker(marker);
+                            try {
+                                await waitFor(() => applicationLastMarker === marker,
+                                    'Application Realtime stream did not warm up.', 1500);
+                                break;
+                            } catch {
+                                if (attempt === 6) throw new Error('Application Realtime stream did not become ready.');
+                            }
+                        }
                         await updateMarker(`${RUN_ID}-repeated-init`);
                         await waitFor(() => applicationCallbacks === 1, 'Repeated initialization update was not delivered exactly once.');
                         await new Promise(resolve => setTimeout(resolve, 150));
