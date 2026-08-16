@@ -468,8 +468,10 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 studentId: crypto.randomUUID(), amount: 1
             })), /not found/i);
 
-            assert.equal(await withServiceClient(studentClient, () => studentProgressRepository.get(peer.id)), null,
-                'A Student must not read another Student progress row.');
+            await expectRejected(
+                () => withServiceClient(studentClient, () => studentProgressRepository.get(peer.id)),
+                /not allowed to read/i
+            );
             const { error: studentCrossWriteError } = await studentClient.from('student_progress_summary')
                 .update({ total_xp: 999999 }).eq('user_id', peer.id);
             assert.ok(studentCrossWriteError, 'A Student direct cross-user progress write must be rejected.');
