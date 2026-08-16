@@ -1,0 +1,6 @@
+[submodule "plans/9th Grade Technology/data learning module"]
+	path = plans/9th Grade Technology/data learning module
+	url = https://github.com/pjrios/data.git
+[submodule "sites/grade7-appreciation-1-guide"]
+	path = sites/grade7-appreciation-1-guide
+	url = https://git.chatgpt-team.site/2da6acf7-27ff-4d76-98fd-a6ba9793a4b5/appgprj_6a62c734ac30819183f7dbabfab42cf4.git
