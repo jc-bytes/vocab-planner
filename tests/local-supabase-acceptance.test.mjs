@@ -409,14 +409,15 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             const activity = await withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
             ));
-            assert.equal(activity.units[activityUnitKey].scores.flashcards.score, 100);
-            assert.equal(activity.units[activityUnitKey].scores.flashcards.isComplete, true);
-            assert.equal(activity.units[activityUnitKey].scores.flashcards.verified, true);
-            assert.equal(activity.units[activityUnitKey].unitId, IDS.vocabulary);
+            assert.equal(activity.activity.unitKey, activityUnitKey);
+            assert.equal(activity.activity.activityType, 'flashcards');
+            assert.equal(activity.activity.score, 100);
+            assert.equal(activity.activity.isComplete, true);
+            assert.equal(activity.activity.verified, true);
             const activityRetry = await withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
             ));
-            assert.equal(activityRetry.units[activityUnitKey].scores.flashcards.score, 100);
+            assert.deepEqual(activityRetry, activity);
 
             const synced = await withServiceClient(studentClient, () => supabaseService.syncStudentUnitWork({
                 unitKey: activityUnitKey,
