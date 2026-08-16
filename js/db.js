@@ -1,128 +1,102 @@
+import { openDB } from 'idb';
+
 export class ImageDB {
     constructor() {
         this.dbName = 'VocabAppDB';
         this.storeName = 'drawings';
         this.syncStoreName = 'syncQueue';
-        this.db = null;
+        this.dbPromise = null;
     }
 
     async open() {
-        if (this.db) return this.db;
-
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, 4);
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(this.storeName)) {
-                    db.createObjectStore(this.storeName, { keyPath: 'id' });
+        if (!this.dbPromise) {
+            this.dbPromise = openDB(this.dbName, 4, {
+                upgrade: (db, _oldVersion, _newVersion, transaction) => {
+                    if (!db.objectStoreNames.contains(this.storeName)) {
+                        db.createObjectStore(this.storeName, { keyPath: 'id' });
+                    }
+                    const syncStore = db.objectStoreNames.contains(this.syncStoreName)
+                        ? transaction.objectStore(this.syncStoreName)
+                        : db.createObjectStore(this.syncStoreName, { keyPath: 'id' });
+                    if (!syncStore.indexNames.contains('status')) {
+                        syncStore.createIndex('status', 'status', { unique: false });
+                    }
+                    if (!syncStore.indexNames.contains('createdAt')) {
+                        syncStore.createIndex('createdAt', 'createdAt', { unique: false });
+                    }
+                },
+                blocked: () => {
+                    console.warn('Browser storage upgrade is waiting for another app tab to close.');
+                },
+                blocking: (currentVersion, blockedVersion) => {
+                    console.warn(`Closing browser storage version ${currentVersion} for version ${blockedVersion}.`);
+                    this.close();
+                },
+                terminated: () => {
+                    console.warn('Browser storage connection ended unexpectedly; it will reopen when needed.');
+                    this.dbPromise = null;
                 }
-                const syncStore = db.objectStoreNames.contains(this.syncStoreName)
-                    ? event.target.transaction.objectStore(this.syncStoreName)
-                    : db.createObjectStore(this.syncStoreName, { keyPath: 'id' });
-                if (!syncStore.indexNames.contains('status')) {
-                    syncStore.createIndex('status', 'status', { unique: false });
-                }
-                if (!syncStore.indexNames.contains('createdAt')) {
-                    syncStore.createIndex('createdAt', 'createdAt', { unique: false });
-                }
-            };
+            }).catch(error => {
+                this.dbPromise = null;
+                throw error;
+            });
+        }
+        return this.dbPromise;
+    }
 
-            request.onsuccess = (event) => {
-                this.db = event.target.result;
-                resolve(this.db);
-            };
+    async close() {
+        const dbPromise = this.dbPromise;
+        this.dbPromise = null;
+        if (!dbPromise) return;
+        try {
+            const db = await dbPromise;
+            db.close();
+        } catch (_error) {
+            // A failed open has already reset dbPromise and requires no cleanup.
+        }
+    }
 
-            request.onerror = (event) => {
-                console.error('IndexedDB error:', event.target.error);
-                reject(event.target.error);
-            };
-        });
+    drawingId(vocabName, word) {
+        return `${vocabName}_${word}`;
     }
 
     async saveDrawing(vocabName, word, blob) {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-
-            const id = `${vocabName}_${word}`;
-            const record = {
-                id: id,
-                vocabName: vocabName,
-                word: word,
-                blob: blob,
-                date: new Date().toISOString()
-            };
-
-            const request = store.put(record);
-
-            request.onsuccess = () => resolve();
-            request.onerror = (e) => reject(e.target.error);
+        const db = await this.open();
+        await db.put(this.storeName, {
+            id: this.drawingId(vocabName, word),
+            vocabName,
+            word,
+            blob,
+            date: new Date().toISOString()
         });
     }
 
     async getDrawing(vocabName, word) {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const id = `${vocabName}_${word}`;
-            const request = store.get(id);
-
-            request.onsuccess = () => {
-                resolve(request.result ? request.result.blob : null);
-            };
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        const record = await db.get(this.storeName, this.drawingId(vocabName, word));
+        return record?.blob ?? null;
     }
 
     async deleteDrawing(vocabName, word) {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readwrite');
-            const store = transaction.objectStore(this.storeName);
-            const id = `${vocabName}_${word}`;
-            const request = store.delete(id);
-
-            request.onsuccess = () => resolve();
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        await db.delete(this.storeName, this.drawingId(vocabName, word));
     }
 
     async getAllKeys() {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.getAllKeys();
-
-            request.onsuccess = () => {
-                resolve(request.result || []);
-            };
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        return db.getAllKeys(this.storeName);
     }
 
     async getAll() {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.storeName], 'readonly');
-            const store = transaction.objectStore(this.storeName);
-            const request = store.getAll();
-
-            request.onsuccess = () => {
-                resolve(request.result || []);
-            };
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        return db.getAll(this.storeName);
     }
 
     async enqueueSyncAction(type, payload = {}) {
-        await this.open();
+        const db = await this.open();
         const now = new Date().toISOString();
         const record = {
-            id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+            id: `${type}-${crypto.randomUUID()}`,
             type,
             payload,
             status: 'pending',
@@ -130,63 +104,32 @@ export class ImageDB {
             createdAt: now,
             updatedAt: now
         };
-
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
-            const store = transaction.objectStore(this.syncStoreName);
-            const request = store.put(record);
-
-            request.onsuccess = () => resolve(record);
-            request.onerror = (e) => reject(e.target.error);
-        });
+        await db.put(this.syncStoreName, record);
+        return record;
     }
 
     async getPendingSyncActions() {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.syncStoreName], 'readonly');
-            const store = transaction.objectStore(this.syncStoreName);
-            const request = store.index('status').getAll('pending');
-
-            request.onsuccess = () => {
-                const records = request.result || [];
-                resolve(records.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt))));
-            };
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        const records = await db.getAllFromIndex(this.syncStoreName, 'status', 'pending');
+        return records.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
     }
 
     async completeSyncAction(id) {
-        await this.open();
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
-            const store = transaction.objectStore(this.syncStoreName);
-            const request = store.delete(id);
-
-            request.onsuccess = () => resolve();
-            request.onerror = (e) => reject(e.target.error);
-        });
+        const db = await this.open();
+        await db.delete(this.syncStoreName, id);
     }
 
     async markSyncActionFailed(record, error) {
-        await this.open();
+        const db = await this.open();
         const updated = {
             ...record,
             attempts: (Number(record.attempts) || 0) + 1,
             lastError: error?.message || String(error || 'Sync failed'),
             updatedAt: new Date().toISOString()
         };
-
-        return new Promise((resolve, reject) => {
-            const transaction = this.db.transaction([this.syncStoreName], 'readwrite');
-            const store = transaction.objectStore(this.syncStoreName);
-            const request = store.put(updated);
-
-            request.onsuccess = () => resolve(updated);
-            request.onerror = (e) => reject(e.target.error);
-        });
+        await db.put(this.syncStoreName, updated);
+        return updated;
     }
-
 }
 
 export const imageDB = new ImageDB();

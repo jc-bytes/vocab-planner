@@ -4,6 +4,9 @@ node_modules/
 dist-desktop/
 src-tauri/target/
 backups/
+tmp/
+.codex-work/
+.codex_tmp/
 .env
 .env.*
 !.env.example

@@ -1,4 +1,4 @@
-import { $, createElement } from './main.js';
+import { $, createElement, escapeHtml } from './main.js';
 import { renderQuizQuestionCard } from './quizMakerQuestionCardRenderer.js';
 
 class QuizMakerRenderMethods {
@@ -59,11 +59,11 @@ class QuizMakerRenderMethods {
                 <img src="logo.jpeg" alt="Logo">
             </div>
             <div>
-                <h3>${this.meta.schoolName}</h3>
-                <h3>${this.meta.title}</h3>
+                <h3>${escapeHtml(this.meta.schoolName)}</h3>
+                <h3>${escapeHtml(this.meta.title)}</h3>
                 <div class="meta">
-                    Teacher: <span contenteditable="true" class="editable-field" id="teacher-name-field">${this.meta.teacherName || 'Porfirio Rios'}</span> 
-                    • Grade: ${this.meta.grade || ''}
+                    Teacher: <span contenteditable="true" class="editable-field" id="teacher-name-field">${escapeHtml(this.meta.teacherName || 'Porfirio Rios')}</span>
+                    • Grade: ${escapeHtml(this.meta.grade || '')}
                 </div>
             </div>
             <div class="grade-note"></div>
@@ -84,7 +84,7 @@ class QuizMakerRenderMethods {
         // 2. Instructions
         if (this.meta.instructions) {
             const instr = createElement('div', 'doc-instructions');
-            instr.innerHTML = `<h4>Instructions:</h4><p>${this.meta.instructions}</p>`;
+            instr.innerHTML = `<h4>Instructions:</h4><p>${escapeHtml(this.meta.instructions)}</p>`;
             appendToPage(instr);
         }
 
@@ -104,8 +104,8 @@ class QuizMakerRenderMethods {
             this.meta.rubric.forEach(r => {
                 rubricHTML += `
                     <div class="doc-rubric-item">
-                        <div class="rubric-title">${r.title}</div>
-                        <div class="rubric-desc">${r.desc} <span class="rubric-pts">${r.points} pts</span></div>
+                        <div class="rubric-title">${escapeHtml(r.title)}</div>
+                        <div class="rubric-desc">${escapeHtml(r.desc)} <span class="rubric-pts">${escapeHtml(r.points)} pts</span></div>
                     </div>
                 `;
             });
@@ -144,8 +144,8 @@ class QuizMakerRenderMethods {
             const sectionPoints = section.questions.reduce((total, question) => total + (parseInt(question.points) || 0), 0);
             const sectionPointsLabel = sectionPoints === 1 ? '1 pt' : `${sectionPoints} pts`;
             sectionHeader.innerHTML = `
-                <h3 style="margin: 0 0 0.5rem 0; font-size: 12pt; font-weight: bold;">Part ${partNumber}: ${section.title}. ${sectionPointsLabel}</h3>
-                <p style="margin: 0; font-size: 12pt; font-style: italic;">${section.instructions}</p>
+                <h3 style="margin: 0 0 0.5rem 0; font-size: 12pt; font-weight: bold;">Part ${partNumber}: ${escapeHtml(section.title)}. ${escapeHtml(sectionPointsLabel)}</h3>
+                <p style="margin: 0; font-size: 12pt; font-style: italic;">${escapeHtml(section.instructions)}</p>
             `;
             appendToPage(sectionHeader);
             partNumber++;

@@ -177,13 +177,24 @@ Deno.serve(async (req) => {
     .eq("user_id", userId);
 
   if (profileUpdateError) {
+    console.error("Password changed but the profile flag update failed", {
+      userId,
+      message: profileUpdateError.message,
+    });
     return jsonResponse({
-      error: "Password changed, but profile flag could not be updated.",
-    }, 500);
+      temporaryPassword,
+      studentEmail: studentProfile.email,
+      passwordChanged: true,
+      profileFlagUpdated: false,
+      warning:
+        "The password was changed, but the required-change flag could not be saved. Give the student this temporary password and try the reset again later.",
+    });
   }
 
   return jsonResponse({
     temporaryPassword,
     studentEmail: studentProfile.email,
+    passwordChanged: true,
+    profileFlagUpdated: true,
   });
 });

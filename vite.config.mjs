@@ -33,6 +33,16 @@ export default defineConfig(({ command, mode }) => {
     appType: 'mpa',
     base: './',
     publicDir: false,
+    server: {
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    },
+    preview: {
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      }
+    },
     build: {
       outDir: 'dist-desktop',
       emptyOutDir: true,

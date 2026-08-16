@@ -29,6 +29,27 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
     }
 });
 
+test('quiz imports are rendered as text instead of executable HTML', async () => {
+    const [questions, documentRender] = await Promise.all([
+        read('js/quizMakerQuestionCardRenderer.js'),
+        read('js/quizMakerRenderMethods.js')
+    ]);
+
+    assert.match(questions, /import \{ createElement, escapeHtml \}/);
+    for (const value of ['q.prompt', 'pair.term', 'pair.def', 'word', 'clue.clue']) {
+        assert.match(questions, new RegExp(`text\\(${value.replace('.', '\\.')}`));
+    }
+    for (const value of [
+        'this.meta.schoolName',
+        'this.meta.title',
+        'this.meta.instructions',
+        'r.title',
+        'r.desc'
+    ]) {
+        assert.match(documentRender, new RegExp(`escapeHtml\\(${value.replaceAll('.', '\\.')}`));
+    }
+});
+
 test('CSV export handles quotes and newlines and neutralizes spreadsheet formulae', () => {
     const csv = serializeCSV({
         scores: [{
@@ -84,4 +105,38 @@ test('CI runs the complete tests and fails on meaningful database findings', asy
     assert.match(workflow, /supabase db lint --local --fail-on error/);
     assert.match(workflow, /supabase db advisors --local --level warn --fail-on error/);
     assert.doesNotMatch(workflow, /--fail-on none/);
+    assert.match(workflow, /validate:[\s\S]*?deploy:[\s\S]*?needs: validate/);
+    assert.match(workflow, /deploy:[\s\S]*?pages: write[\s\S]*?id-token: write/);
+    assert.doesNotMatch(workflow, /uses: [^\s]+@v\d/);
+});
+
+test('HTML games are sandboxed away from account storage', async () => {
+    const [loader, registry] = await Promise.all([
+        read('js/student/studentGameHtmlLoaderMethods.js'),
+        import('../js/student/studentGameRegistry.js')
+    ]);
+    assert.match(loader, /setAttribute\('sandbox', 'allow-scripts/);
+    assert.doesNotMatch(loader, /allow-same-origin/);
+    assert.match(loader, /event\.source !== iframe\.contentWindow/);
+    assert.match(loader, /data\.channel !== storageChannel/);
+
+    for (const game of registry.STUDENT_GAME_REGISTRY.filter(game => game.launch.mode === 'html')) {
+        const html = await read(game.launch.path);
+        assert.match(html, /sandbox-storage\.js/, `${game.id} must load the sandbox storage bridge first`);
+    }
+});
+
+test('password reset reports recoverable partial success after the password changes', async () => {
+    const source = await read('supabase/functions/reset-student-password/index.ts');
+    const partialSuccess = source.slice(source.indexOf('if (profileUpdateError)'));
+    assert.match(partialSuccess, /temporaryPassword/);
+    assert.match(partialSuccess, /passwordChanged: true/);
+    assert.match(partialSuccess, /profileFlagUpdated: false/);
+    assert.doesNotMatch(partialSuccess.split('return jsonResponse')[1]?.split(');')[0] || '', /, 500/);
+});
+
+test('offline cache cleanup is scoped to this application', async () => {
+    const source = await read('student-sw.js');
+    assert.match(source, /key\.startsWith\(CACHE_PREFIX\)/);
+    assert.doesNotMatch(source, /keys\.filter\(key => key !== CACHE_NAME\)/);
 });

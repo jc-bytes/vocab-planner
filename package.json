@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000",
-    "test": "npm run test:catalog && npm run test:repositories && npm run test:student-api && npm run test:student-auth && npm run test:student-games && npm run test:student-progress && npm run test:student-activities && npm run test:teacher-activity-flow && npm run test:student-routing && npm run test:student-shell-composition && npm run test:student-listeners && npm run test:student-subjects && npm run test:student-registries && npm run test:security-hardening && npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke",
+    "test": "npm run test:catalog && npm run test:repositories && npm run test:browser-storage && npm run test:student-api && npm run test:student-auth && npm run test:student-games && npm run test:student-progress && npm run test:student-activities && npm run test:teacher-activity-flow && npm run test:student-routing && npm run test:student-shell-composition && npm run test:student-listeners && npm run test:student-subjects && npm run test:student-registries && npm run test:security-hardening && npm run test:package-refactor && npm run test:games && npm run test:ui:student-shell && npm run test:ui:smoke && npm run test:ui:game-sandbox",
     "catalog:validate": "node scripts/validate-vocabulary-catalog.mjs",
     "catalog:normalize": "node scripts/validate-vocabulary-catalog.mjs --write",
     "test:catalog": "npm run catalog:validate && node --test tests/vocabulary-catalog-contract.test.mjs",
     "test:repositories": "node --test tests/repository-contracts.test.mjs",
+    "test:browser-storage": "node --test tests/browser-storage.test.mjs",
     "test:student-api": "node --test tests/student-api-contract.test.mjs",
     "test:student-auth": "node --test tests/student-auth-composition.test.mjs",
     "test:student-games": "node --test tests/student-game-composition.test.mjs",
@@ -28,13 +29,14 @@
     "test:package-refactor": "node scripts/package-refactor-tests.mjs",
     "test:ui:student-shell": "node scripts/student-shell-regression-tests.mjs",
     "test:ui:smoke": "node scripts/ui-smoke.mjs",
+    "test:ui:game-sandbox": "node scripts/ui-game-sandbox-smoke.mjs",
     "test:ui:smoke:dist": "node scripts/ui-smoke-dist.mjs",
     "test:ui:auth-smoke": "node scripts/ui-auth-smoke.mjs",
     "test:ui:responsive": "node scripts/ui-responsive-audit.mjs",
     "test:ui:responsive:local": "node scripts/ui-responsive-local.mjs",
     "test:release": "npm test && npm run test:acceptance:supabase && npm audit --omit=dev --audit-level=high && npm run test:ui:smoke:dist && npm run test:ui:auth-smoke && npm run test:ui:responsive:local && supabase db lint --local --fail-on error && supabase db advisors --local --level warn --fail-on error --type all && npm run desktop:build:web",
     "desktop:dev": "vite --host 127.0.0.1",
-    "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs",
+    "desktop:build:web": "vite build && node scripts/copy-desktop-assets.mjs && node scripts/generate-service-worker.mjs && node scripts/check-dist-size.mjs",
     "desktop:build": "npm run desktop:build:web && tauri build --bundles app",
     "desktop:build:mac-dmg": "npm run desktop:build:web && tauri build --bundles dmg",
     "desktop:build:windows": "npm run desktop:build:web && tauri build --bundles nsis",
@@ -51,6 +53,7 @@
     "docx": "^9.7.1",
     "fast-formula-parser": "^1.0.19",
     "html2canvas": "^1.4.1",
+    "idb": "^8.0.3",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.1",
     "lucide": "^1.17.0",
@@ -60,7 +63,9 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",
+    "fake-indexeddb": "^6.2.5",
     "playwright": "^1.60.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "workbox-build": "^7.4.1"
   }
 }

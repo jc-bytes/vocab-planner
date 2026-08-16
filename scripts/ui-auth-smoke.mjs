@@ -1,5 +1,3 @@
-import { spawn } from 'node:child_process';
-import http from 'node:http';
 import process from 'node:process';
 import { chromium } from 'playwright';
 
@@ -9,55 +7,20 @@ import {
     AUDIT_TEACHER_EMAIL,
     seedLocalAuditData
 } from './lib/local-supabase-audit.mjs';
+import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const host = process.env.UI_AUTH_SMOKE_HOST || '127.0.0.1';
 const port = Number(process.env.UI_AUTH_SMOKE_PORT || 8000);
 const baseUrl = (process.env.UI_AUTH_SMOKE_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
 
-function requestOk(url) {
-    return new Promise((resolve) => {
-        const request = http.get(url, (response) => {
-            response.resume();
-            resolve(response.statusCode >= 200 && response.statusCode < 500);
-        });
-        request.on('error', () => resolve(false));
-        request.setTimeout(1000, () => {
-            request.destroy();
-            resolve(false);
-        });
-    });
-}
-
-async function waitForServer(url, timeoutMs = 10000) {
-    const started = Date.now();
-    while (Date.now() - started < timeoutMs) {
-        if (await requestOk(url)) return true;
-        await new Promise(resolve => setTimeout(resolve, 250));
-    }
-    return false;
-}
-
 async function resolveServer() {
-    if (process.env.UI_AUTH_SMOKE_BASE_URL) {
-        if (!(await waitForServer(`${baseUrl}/teacher.html`, 3000))) {
-            throw new Error(`UI_AUTH_SMOKE_BASE_URL is not reachable: ${baseUrl}`);
-        }
-        return null;
-    }
-
-    if (await requestOk(`${baseUrl}/teacher.html`)) return null;
-
-    const server = spawn('npx', ['vite', '--host', host, '--port', String(port), '--strictPort'], {
-        cwd: process.cwd(),
-        stdio: 'ignore'
+    return ensureViteServer({
+        baseUrl,
+        probePath: '/teacher.html',
+        host,
+        port,
+        external: Boolean(process.env.UI_AUTH_SMOKE_BASE_URL)
     });
-
-    if (!(await waitForServer(`${baseUrl}/teacher.html`))) {
-        server.kill();
-        throw new Error(`Could not start local server at ${baseUrl}`);
-    }
-
-    return server;
 }
 
 async function addLocalSupabaseOverride(context, browserConfig) {

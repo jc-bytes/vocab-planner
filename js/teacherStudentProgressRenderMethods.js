@@ -260,17 +260,21 @@ class TeacherStudentProgressRenderMethods {
 
             const result = await supabaseService.resetStudentPassword(this.activeStudentId);
             if (status) {
-                status.style.color = 'var(--success-color)';
-                status.textContent = 'Temporary password created.';
+                status.style.color = result.warning ? '#b45309' : 'var(--success-color)';
+                status.textContent = result.warning || 'Temporary password created.';
             }
             if (tempOutput) {
                 tempOutput.textContent = result.temporaryPassword || '';
                 tempOutput.style.display = 'block';
             }
 
-            if (student) student.mustChangePassword = true;
+            if (student) student.mustChangePassword = result.profileFlagUpdated !== false;
             const passwordFlag = $('#detail-password-flag');
-            if (passwordFlag) passwordFlag.textContent = 'Required';
+            if (passwordFlag) {
+                passwordFlag.textContent = result.profileFlagUpdated === false
+                    ? 'Reset again later'
+                    : 'Required';
+            }
         } catch (error) {
             console.error('Password reset failed:', error);
             if (status) {

@@ -2,6 +2,32 @@ import { $ } from '../main.js';
 import { getStudentGame } from './studentGameRegistry.js';
 import { StudentGameScoreMonitor } from './studentGameScoreMonitor.js';
 
+const GAME_STORAGE_PREFIX = 'vocab-game-storage:';
+const MAX_GAME_STORAGE_ENTRIES = 250;
+const MAX_GAME_STORAGE_SIZE = 1_000_000;
+
+function readGameStorage(gameId) {
+    try {
+        const entries = JSON.parse(localStorage.getItem(`${GAME_STORAGE_PREFIX}${gameId}`) || '[]');
+        return Array.isArray(entries) ? entries : [];
+    } catch (_error) {
+        return [];
+    }
+}
+
+function isSafeStorageEntries(entries) {
+    if (!Array.isArray(entries) || entries.length > MAX_GAME_STORAGE_ENTRIES) return false;
+    let size = 0;
+    for (const entry of entries) {
+        if (!Array.isArray(entry) || entry.length !== 2) return false;
+        const key = String(entry[0]);
+        const value = String(entry[1]);
+        size += key.length + value.length;
+        if (size > MAX_GAME_STORAGE_SIZE) return false;
+    }
+    return true;
+}
+
 export class StudentGameHtmlLoader {
     constructor(games) {
         this.games = games;
@@ -33,6 +59,15 @@ export class StudentGameHtmlLoader {
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
+        const storageChannel = crypto.randomUUID();
+        iframe.name = `${GAME_STORAGE_PREFIX}${JSON.stringify({
+            gameId,
+            channel: storageChannel,
+            entries: readGameStorage(gameId)
+        })}`;
+        iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-downloads allow-pointer-lock');
+        iframe.setAttribute('allow', 'fullscreen');
+        iframe.referrerPolicy = 'no-referrer';
         iframe.src = htmlFile;
         const game = getStudentGame(gameId);
         const frame = game?.launch?.frame || {};
@@ -145,25 +180,6 @@ export class StudentGameHtmlLoader {
                 // Cross-origin restrictions may prevent this
                 console.log('Could not focus iframe content window');
             }
-            try {
-                const iframeWindow = iframe.contentWindow;
-                const iframeDoc = iframe.contentDocument || iframeWindow.document;
-
-                // Inject score reporting script (if scoreMessageType is provided)
-                if (scoreMessageType && frame.injectScoreMonitor !== false) {
-                    try {
-                        const script = iframeDoc.createElement('script');
-                        script.textContent = this.getScoreMonitoringScript(gameId, scoreMessageType);
-                        iframeDoc.body.appendChild(script);
-                    } catch (error) {
-                        console.warn(`Could not inject score monitoring for ${gameId}:`, error);
-                    }
-                }
-            } catch (error) {
-                // Cross-origin restrictions may prevent access
-                console.warn(`Could not access iframe content for ${gameId}:`, error);
-            }
-            
             // Call original onload if it exists
             if (originalOnload) {
                 originalOnload();
@@ -172,6 +188,20 @@ export class StudentGameHtmlLoader {
         
         // Set up message listener for score reporting (if scoreMessageType is provided)
         let messageHandler = null;
+        const storageMessageHandler = (event) => {
+            const data = event.data;
+            if (event.source !== iframe.contentWindow
+                || data?.type !== 'vocab-game-storage'
+                || data.gameId !== gameId
+                || data.channel !== storageChannel
+                || !isSafeStorageEntries(data.entries)) return;
+            try {
+                localStorage.setItem(`${GAME_STORAGE_PREFIX}${gameId}`, JSON.stringify(data.entries));
+            } catch (error) {
+                console.warn(`Could not persist sandboxed storage for ${gameId}:`, error);
+            }
+        };
+        window.addEventListener('message', storageMessageHandler);
         if (scoreMessageType) {
             messageHandler = (event) => {
                 // Verify message is from our iframe (security check)
@@ -242,6 +272,7 @@ export class StudentGameHtmlLoader {
             gameType: gameId,
             iframe: iframe,
             messageHandler: messageHandler,
+            storageMessageHandler,
             stop: () => {
                 if (frameResizeObserver) {
                     frameResizeObserver.disconnect();
@@ -249,6 +280,7 @@ export class StudentGameHtmlLoader {
                 if (messageHandler) {
                     window.removeEventListener('message', messageHandler);
                 }
+                window.removeEventListener('message', storageMessageHandler);
                 if (frameShell && frameShell.parentNode) {
                     frameShell.remove();
                 } else if (iframe && iframe.parentNode) {
