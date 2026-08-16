@@ -164,6 +164,14 @@ drop table public.student_progress;
 alter table public.student_progress_summary
 drop column legacy_updated_at;
 
+-- Service-role maintenance clients bypass RLS but still require explicit table
+-- privileges for acceptance checks, incident repair, and controlled cleanup.
+grant select, insert, update, delete on public.student_progress_summary to service_role;
+grant select, insert, update, delete on public.student_unit_progress to service_role;
+grant select, insert, update, delete on public.student_activity_progress to service_role;
+grant select, insert, update, delete on public.student_activity_state to service_role;
+grant select, insert, update, delete on public.student_coin_ledger to service_role;
+
 -- Remove empty progress created for an account that is no longer a student.
 delete from public.student_progress_summary summary
 where not exists (

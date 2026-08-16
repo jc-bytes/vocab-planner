@@ -45,3 +45,17 @@ test('normalized integrity monitoring remains after retirement', () => {
     assert.match(sql, /'orphanSummaries'/i);
     assert.match(sql, /revoke all on function private\.student_progress_normalized_integrity/i);
 });
+
+test('service-role maintenance keeps explicit normalized table privileges', () => {
+    for (const table of [
+        'student_progress_summary',
+        'student_unit_progress',
+        'student_activity_progress',
+        'student_activity_state',
+        'student_coin_ledger'
+    ]) {
+        assert.match(sql, new RegExp(
+            `grant select, insert, update, delete on public\\.${table} to service_role`, 'i'
+        ));
+    }
+});
