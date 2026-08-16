@@ -3360,6 +3360,30 @@ section.student-continue-hero {
 
 #student-home-panel-spark {
     grid-column: 2;
+    position: relative;
+}
+
+#student-home-panel-spark .student-home-spark-open {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+
+#student-home-panel-spark:has(.student-home-spark-open:hover) {
+    border-color: rgba(173, 198, 255, 0.42);
+    background:
+        linear-gradient(145deg, rgba(116, 54, 178, 0.3), rgba(35, 32, 91, 0.66)),
+        rgba(30, 27, 75, 0.62);
+}
+
+#student-home-panel-spark .student-home-spark-open:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: -4px;
 }
 
 .student-vocab-card {
@@ -5760,29 +5784,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     #student-home-panel-spark .student-spark-question span {
         font-size: 0.74rem !important;
         line-height: 1.25 !important;
-    }
-
-    #student-home-panel-spark .student-home-spark-open {
-        position: absolute !important;
-        inset: 0 !important;
-        z-index: 4 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        border-radius: inherit !important;
-        background: transparent !important;
-        cursor: pointer !important;
-    }
-
-    #student-home-panel-spark:has(.student-home-spark-open:hover) {
-        border-color: rgba(173, 198, 255, 0.42) !important;
-        background:
-            linear-gradient(145deg, rgba(116, 54, 178, 0.3), rgba(35, 32, 91, 0.66)),
-            rgba(30, 27, 75, 0.62) !important;
-    }
-
-    #student-home-panel-spark .student-home-spark-open:focus-visible {
-        outline: 3px solid var(--color-primary) !important;
-        outline-offset: -4px !important;
     }
 
     #student-home-dashboard > .student-arcade-gate-notice {
