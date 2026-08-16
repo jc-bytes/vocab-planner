@@ -9,6 +9,8 @@ const migrationUrl = new URL(
 const sql = await readFile(migrationUrl, 'utf8');
 
 test('legacy deletion is guarded and restrictive', () => {
+    assert.match(sql, /^--[\s\S]*?\nbegin;/i);
+    assert.match(sql, /commit;\s*$/i);
     assert.match(sql, /lock table public\.student_progress in access exclusive mode/i);
     assert.match(sql, /a legacy row has no normalized recovery copy/i);
     assert.match(sql, /drop table public\.student_progress\s*;/i);

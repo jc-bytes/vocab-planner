@@ -1,6 +1,8 @@
 -- Complete the normalized progress cutover. This migration intentionally uses
 -- restrictive drops: an unknown dependency aborts the whole transaction.
 
+begin;
+
 lock table public.student_progress in access exclusive mode;
 lock table public.student_progress_summary in access exclusive mode;
 lock table public.student_unit_progress in access exclusive mode;
@@ -218,3 +220,5 @@ $$;
 
 revoke all on function private.student_progress_normalized_integrity()
 from public, anon, authenticated;
+
+commit;
