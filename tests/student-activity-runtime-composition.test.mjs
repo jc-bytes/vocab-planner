@@ -113,6 +113,14 @@ test('activity XP reward uses the authoritative server total delta', () => {
     assert.equal(persistence.getAwardedXp(310, { totalXp: 300 }), 0);
 });
 
+test('activity XP reward copy shows only the XP earned in the current completion', () => {
+    const activities = new StudentActivities({});
+    const persistence = activities.progressPersistence;
+
+    assert.equal(persistence.getActivityXpRewardText(10), '+10 XP');
+    assert.equal(persistence.getActivityXpRewardText(0), 'No new XP');
+});
+
 test('activity state comparison ignores timestamp-only saves but detects progress changes', () => {
     const activities = new StudentActivities({});
     const persistence = activities.progressPersistence;
@@ -1075,6 +1083,40 @@ test('legacy completed flashcards are not regressed by the new mastery-state ini
     assert.equal(manager.unitScores.flashcards.score, 100);
     assert.equal(manager.unitScores.flashcards.isComplete, true);
     assert.equal(manager.unitScores.flashcards.details, 'Studied: 1/1 cards');
+});
+
+test('replayable activity completion preserves evidence for server verification', () => {
+    const manager = {
+        authDisabled: true,
+        currentUser: null,
+        currentVocab: {
+            id: 'unit-1',
+            name: 'Unit One',
+            words: Array.from({ length: 7 }, (_, index) => ({ word: `word-${index}` })),
+            activitySettings: {}
+        },
+        currentActivityType: 'fill-in-blank',
+        unitScores: {},
+        progress: {
+            addCoins() {},
+            saveLocalProgress() {}
+        }
+    };
+    const activities = new StudentActivities(manager);
+    activities.scheduleActivityPreload = () => {};
+    activities.updateArcadeGateDisplay = () => {};
+
+    activities.progressPersistence.handleAutoSave({
+        score: 100,
+        isComplete: true,
+        details: '7/7 words completed',
+        evidence: { correctCount: 7, totalCount: 7 }
+    });
+
+    assert.deepEqual(manager.unitScores['fill-in-blank'].evidence, {
+        correctCount: 7,
+        totalCount: 7
+    });
 });
 
 test('vocabulary data merging preserves source precedence and identifiers', () => {

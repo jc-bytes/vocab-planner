@@ -3071,12 +3071,6 @@ select:focus,
     color: #a5b4fc;
 }
 
-.app-container.student-session-loading #student-tab-shell,
-.app-container.student-session-loading .student-sidebar-context,
-.app-container.student-session-loading .header-actions {
-    visibility: hidden !important;
-}
-
 .app-container:has(#student-tab-shell:not(.hidden)) .student-level-display {
     display: grid;
 }

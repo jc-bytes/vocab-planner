@@ -3,6 +3,13 @@ import { imageDB } from '../db.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
 
+function getSyncErrorSummary(error) {
+    const parts = [error?.code, error?.message, error?.details, error?.hint]
+        .map(value => String(value || '').trim())
+        .filter(Boolean);
+    return parts.join(' | ') || String(error || 'Unknown sync error');
+}
+
 export class StudentActivityProgressPersistence {
     constructor(activities) {
         this.activities = activities;
@@ -132,6 +139,12 @@ export class StudentActivityProgressPersistence {
                 oldScoreData.score = Math.max(oldScore, newScore);
                 oldScoreData.details = scoreData.details;
                 oldScoreData.isComplete = oldScoreData.isComplete || scoreData.isComplete;
+                if (scoreData.evidence && typeof scoreData.evidence === 'object') {
+                    oldScoreData.evidence = scoreData.evidence;
+                }
+                if (scoreData.accuracy !== undefined) {
+                    oldScoreData.accuracy = Number(scoreData.accuracy) || 0;
+                }
                 oldScoreData.lastPlayed = new Date().toISOString();
 
                 this.sm.unitScores[activityType] = oldScoreData;
@@ -220,10 +233,10 @@ export class StudentActivityProgressPersistence {
             this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
             this.sm.setAuthStatus('Synced');
             if (payload.isComplete) {
-                this.showActivityXpReward(xpAwarded, progress, payload.activityType);
+                this.showActivityXpReward(xpAwarded, payload.activityType);
             }
         } catch (error) {
-            console.warn('Could not sync activity progress event:', error);
+            console.warn(`Could not sync activity progress event: ${getSyncErrorSummary(error)}`);
             try {
                 await imageDB.enqueueSyncAction('student-activity-progress', payload);
             } catch (queueError) {
@@ -239,7 +252,12 @@ export class StudentActivityProgressPersistence {
         return Math.max(0, Math.round(after - before));
     }
 
-    showActivityXpReward(xpAwarded, progress = {}, activityType = '') {
+    getActivityXpRewardText(xpAwarded) {
+        const amount = Math.max(0, Number(xpAwarded) || 0);
+        return amount > 0 ? `+${amount} XP` : 'No new XP';
+    }
+
+    showActivityXpReward(xpAwarded, activityType = '') {
         if (this.sm.currentActivityType !== activityType || typeof document === 'undefined' || !document.body) {
             return null;
         }
@@ -247,7 +265,6 @@ export class StudentActivityProgressPersistence {
         document.getElementById('activity-xp-reward')?.remove();
 
         const amount = Math.max(0, Number(xpAwarded) || 0);
-        const totalXp = Math.max(0, Number(progress.totalXp) || 0);
         const reward = document.createElement('div');
         reward.id = 'activity-xp-reward';
         reward.className = `activity-xp-reward${amount > 0 ? '' : ' activity-xp-reward--none'}`;
@@ -264,13 +281,9 @@ export class StudentActivityProgressPersistence {
 
         const value = document.createElement('strong');
         value.className = 'activity-xp-reward__value';
-        value.textContent = amount > 0 ? `+${amount} XP` : 'No new XP';
+        value.textContent = this.getActivityXpRewardText(amount);
 
-        const detail = document.createElement('span');
-        detail.className = 'activity-xp-reward__detail';
-        detail.textContent = `Activity complete · ${totalXp} XP total`;
-
-        copy.append(value, detail);
+        copy.append(value);
         reward.append(emblem, copy);
         document.body.appendChild(reward);
 

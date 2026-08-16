@@ -11,11 +11,12 @@ globalThis.document = {
 globalThis.window = { addEventListener() {}, removeEventListener() {} };
 
 const [
-    { QuizActivity }, { FillInBlankActivity }, { HangmanActivity },
+    { QuizActivity }, { SynonymAntonymActivity }, { FillInBlankActivity }, { HangmanActivity },
     { ScrambleActivity }, { WordleActivity }, { SpeedMatchActivity },
     { StudentActivityProgressFlow }
 ] = await Promise.all([
-    import('../js/activities/quiz.js'), import('../js/activities/fillInBlank.js'),
+    import('../js/activities/quiz.js'), import('../js/activities/synonymAntonym.js'),
+    import('../js/activities/fillInBlank.js'),
     import('../js/activities/hangman.js'), import('../js/activities/scramble.js'),
     import('../js/activities/wordle.js'), import('../js/activities/speedMatch.js'),
     import('../js/student/studentActivityProgressFlowMethods.js')
@@ -64,6 +65,29 @@ test('completed Hangman state opens its completion screen instead of rendering a
     assert.equal(activity.currentWord, null);
 });
 
+test('completed Fill in Blank state opens its completion screen instead of rendering a missing word', () => {
+    const words = [{ word: 'data', example: 'The program stores data.' }];
+    const activity = Object.assign(Object.create(FillInBlankActivity.prototype), {
+        words,
+        initialState: {
+            currentIndex: words.length,
+            score: 100,
+            attempts: 0,
+            shuffledWords: words
+        },
+        startRoundCalls: 0,
+        renderCalls: 0,
+        startRound() { this.startRoundCalls++; },
+        render() { this.renderCalls++; }
+    });
+
+    activity.init();
+
+    assert.equal(activity.startRoundCalls, 1);
+    assert.equal(activity.renderCalls, 0);
+    assert.equal(activity.currentWord, undefined);
+});
+
 test('Hangman rejects an out-of-range saved word index', () => {
     const activity = Object.assign(Object.create(HangmanActivity.prototype), {
         words: [{ word: 'data', definition: 'Stored information.' }],
@@ -81,6 +105,87 @@ test('quiz completion requires all questions and at least 80 percent accuracy', 
     assert.deepEqual({ score: activity.getScore().score, complete: activity.getScore().isComplete }, { score: 80, complete: true });
     activity.score = 3;
     assert.deepEqual({ score: activity.getScore().score, complete: activity.getScore().isComplete }, { score: 60, complete: false });
+});
+
+test('completed multiple-choice rounds reopen with different question and answer ordering', () => {
+    const quizPrevious = [
+        { word: 'list', correctAnswer: 'A collection.', options: ['A collection.', 'B', 'C', 'D'] },
+        { word: 'append', correctAnswer: 'Add an item.', options: ['Add an item.', 'F', 'G', 'H'] }
+    ];
+    const quiz = Object.assign(Object.create(QuizActivity.prototype), {
+        generateQuestions: () => structuredClone(quizPrevious)
+    });
+    const quizReplay = quiz.prepareReplayQuestions(quizPrevious);
+
+    assert.deepEqual(quizReplay.map(question => question.word), ['append', 'list']);
+    quizReplay.forEach(question => {
+        const previous = quizPrevious.find(item => item.word === question.word);
+        assert.notDeepEqual(question.options, previous.options);
+    });
+
+    const synonymPrevious = [
+        { type: 'Synonym', word: 'result', correctAnswer: 'outcome', options: ['outcome', 'start', 'input', 'cause'] },
+        { type: 'Antonym', word: 'input', correctAnswer: 'output', options: ['output', 'entry', 'source', 'data'] }
+    ];
+    const synonym = Object.assign(Object.create(SynonymAntonymActivity.prototype), {
+        generateQuestions: () => structuredClone(synonymPrevious)
+    });
+    const synonymReplay = synonym.prepareReplayQuestions(synonymPrevious);
+
+    assert.deepEqual(synonymReplay.map(question => synonym.getQuestionKey(question)), ['Antonym:input', 'Synonym:result']);
+    synonymReplay.forEach(question => {
+        const previous = synonymPrevious.find(item => synonym.getQuestionKey(item) === synonym.getQuestionKey(question));
+        assert.notDeepEqual(question.options, previous.options);
+    });
+});
+
+test('completed multiple-choice state starts a fresh round instead of restoring the finished session', () => {
+    for (const [ActivityClass, mode] of [
+        [QuizActivity, 'quiz-v1'],
+        [SynonymAntonymActivity, 'synonym-antonym-v1']
+    ]) {
+        const freshQuestions = [{ word: 'list', type: 'Synonym', options: ['B', 'A'] }];
+        const activity = Object.assign(Object.create(ActivityClass.prototype), {
+            words: [{ word: 'list' }],
+            questions: [],
+            totalQuestions: 1,
+            currentIndex: 0,
+            score: 0,
+            answeredCount: 0,
+            selectedAnswers: [],
+            isFinished: false,
+            prepareReplayQuestions: () => freshQuestions
+        });
+
+        assert.equal(activity.applySavedState({
+            mode,
+            wordsLength: 1,
+            wordKeys: ['list'],
+            questions: [{ word: 'list', type: 'Synonym', options: ['A', 'B'] }],
+            currentIndex: 0,
+            score: 1,
+            answeredCount: 1,
+            selectedAnswers: [{ selected: 'A' }],
+            isFinished: true
+        }), true);
+        assert.equal(activity.score, 0);
+        assert.equal(activity.answeredCount, 0);
+        assert.equal(activity.isFinished, false);
+        assert.equal(activity.questions, freshQuestions);
+    }
+});
+
+test('accuracy activities distinguish finishing a round from mastering the activity', async () => {
+    const [quizSource, synonymAntonymSource] = await Promise.all([
+        readFile(new URL('../js/activities/quiz.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/activities/synonymAntonym.js', import.meta.url), 'utf8')
+    ]);
+
+    for (const source of [quizSource, synonymAntonymSource]) {
+        assert.match(source, /Round Finished/);
+        assert.match(source, /this activity is not complete yet/);
+        assert.match(source, /earn completion XP/);
+    }
 });
 
 test('fill-in-the-blank rotates through available semantic and word clues', () => {

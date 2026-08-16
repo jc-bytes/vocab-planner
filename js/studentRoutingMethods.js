@@ -339,7 +339,8 @@ export class StudentRouting {
 
                 await this.sm.activities.loadVocabulary(vocab, {
                     fromRoute: true,
-                    skipActivityPreload: targetRoute.view === 'activity'
+                    skipActivityPreload: targetRoute.view === 'activity',
+                    deferActivityMenu: targetRoute.view === 'activity'
                 });
 
                 if (targetRoute.view === 'unit') {

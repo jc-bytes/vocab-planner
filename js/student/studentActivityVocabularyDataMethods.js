@@ -326,7 +326,7 @@ export class StudentActivityVocabularyData {
         const loadId = session.beginVocabularyLoad();
         const signal = session.vocabularyLoadController.signal;
         const isCurrentLoad = () => session.isVocabularyLoadCurrent(loadId) && !signal.aborted;
-        this.renderVocabularyLoading(vocabMeta);
+        this.renderVocabularyLoading(vocabMeta, options);
 
         const overridePromise = this.loadVocabularyOverride(vocabMeta, { signal });
         const fileData = vocabMeta.path
@@ -356,7 +356,9 @@ export class StudentActivityVocabularyData {
             }
         }
 
-        this.showActivityMenu(options);
+        if (!options.deferActivityMenu) {
+            this.showActivityMenu(options);
+        }
 
         const pendingOverride = overridePromise
             .then(async override => {
@@ -364,7 +366,9 @@ export class StudentActivityVocabularyData {
                 if (override) {
                     const merged = this.mergeVocabularyData({ meta: vocabMeta, fileData, override });
                     this.applyVocabularyData(merged);
-                    if (!this.sm.currentActivityType) this.showActivityMenu(options);
+                    if (!options.deferActivityMenu && !this.sm.currentActivityType) {
+                        this.showActivityMenu(options);
+                    }
                 }
                 await this.migrateLegacyWordHuntImages();
             })
@@ -389,7 +393,18 @@ export class StudentActivityVocabularyData {
         this.initWordCoverage();
     }
 
-    renderVocabularyLoading(vocabMeta = {}) {
+    renderVocabularyLoading(vocabMeta = {}, options = {}) {
+        if (options.deferActivityMenu) {
+            const activityView = $('#activity-view');
+            const activityContainer = $('#activity-container');
+            setStudentPageLoading(activityView, true);
+            if (activityContainer) {
+                activityContainer.innerHTML = getStudentPageSkeleton('activity', 'Loading activity');
+            }
+            this.sm.switchView('activity-view');
+            return;
+        }
+
         const title = $('#current-unit-title');
         const description = $('#current-unit-description');
         const grid = $('#activity-menu-view .activities-grid');
@@ -417,6 +432,37 @@ export class StudentActivityVocabularyData {
     }
 
     renderVocabularyLoadError(vocabMeta = {}, options = {}) {
+        if (options.deferActivityMenu) {
+            const activityView = $('#activity-view');
+            const activityContainer = $('#activity-container');
+            const offline = !navigator.onLine;
+            const message = offline
+                ? 'This vocabulary has not been saved on this device yet. Reconnect once to download it.'
+                : 'This vocabulary could not be loaded. Check the connection and try again.';
+            setStudentPageLoading(activityView, false);
+            if (activityContainer) {
+                activityContainer.innerHTML = `
+                    <div class="activity-load-error" role="alert">
+                        <h2>Activity did not load</h2>
+                        <p>${escapeHtml(message)}</p>
+                        <div class="activity-load-error-actions">
+                            <button type="button" class="btn primary-btn" data-retry-vocabulary>Try again</button>
+                            <button type="button" class="btn secondary-btn" data-return-to-units>Back to Units</button>
+                        </div>
+                    </div>
+                `;
+                activityContainer.querySelector('[data-retry-vocabulary]')?.addEventListener('click', () => {
+                    this.loadVocabulary(vocabMeta, options);
+                }, { once: true });
+                activityContainer.querySelector('[data-return-to-units]')?.addEventListener('click', () => {
+                    this.sm.navigateTo({ view: 'units' });
+                }, { once: true });
+            }
+            this.sm.switchView('activity-view');
+            notifications.error(message);
+            return;
+        }
+
         const grid = $('#activity-menu-view .activities-grid');
         const view = $('#activity-menu-view');
         setStudentPageLoading(view, false);

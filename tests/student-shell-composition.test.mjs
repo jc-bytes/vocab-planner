@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.url), 'utf8');
+const studentCssSource = readFileSync(new URL('../css/student.css', import.meta.url), 'utf8');
 const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
 const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
@@ -107,6 +108,19 @@ test('student sections use page-shaped loading states without exposing real head
     assert.match(studentSparkSource, /setStudentPageLoading\(view, false\)/);
     assert.match(studentLauncherSource, /getStudentPageSkeleton\('activity', 'Loading activity'\)/);
     assert.match(studentLauncherSource, /setStudentPageLoading\(activityView, false\)/);
+});
+
+test('returning students keep the navigation rail visible while a direct route reloads', () => {
+    assert.match(studentHtmlSource, /studentShell\.classList\.remove\('hidden'\)/);
+    assert.match(studentHtmlSource, /studentShell\.dataset\.sessionReserved = 'true'/);
+    assert.match(studentHtmlSource, /routePath === 'units' \|\| routePath\.startsWith\('unit\/'\)/);
+    assert.match(studentHtmlSource, /routePath === 'sparks'/);
+    assert.match(studentHtmlSource, /routePath === 'arcade'/);
+    assert.match(studentHtmlSource, /tab\.dataset\.section === initialSection/);
+    assert.doesNotMatch(
+        studentCssSource,
+        /student-session-loading #student-tab-shell[\s\S]{0,180}visibility:\s*hidden/
+    );
 });
 
 test('StudentManager declares the stable shell interface directly', () => {

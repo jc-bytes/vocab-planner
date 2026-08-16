@@ -23,6 +23,8 @@ export class FillInBlankActivity {
         if (!this.restoreState()) {
             this.words.sort(() => Math.random() - 0.5);
             this.startRound();
+        } else if (this.currentIndex >= this.words.length) {
+            this.startRound();
         } else {
             this.render();
         }

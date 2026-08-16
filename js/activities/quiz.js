@@ -29,7 +29,7 @@ export class QuizActivity {
     }
 
     generateQuestions() {
-        return this.words.map(word => {
+        const questions = this.words.map(word => {
             const distractors = this.getDefinitionDistractors(word, 3);
             const options = this.shuffleOptions([word.definition, ...distractors]);
 
@@ -39,6 +39,8 @@ export class QuizActivity {
                 options
             };
         });
+
+        return this.shuffleItems(questions);
     }
 
     normalizeText(value) {
@@ -109,7 +111,47 @@ export class QuizActivity {
     }
 
     shuffleOptions(options) {
-        return [...options].sort(() => Math.random() - 0.5);
+        return this.shuffleItems(options);
+    }
+
+    shuffleItems(items) {
+        const shuffled = [...items];
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1));
+            [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+        }
+        return shuffled;
+    }
+
+    prepareReplayQuestions(previousQuestions = []) {
+        let questions = this.generateQuestions();
+        const previousByWord = new Map(
+            (Array.isArray(previousQuestions) ? previousQuestions : [])
+                .map(question => [question?.word, question])
+        );
+
+        questions = questions.map(question => {
+            const previous = previousByWord.get(question.word);
+            const options = Array.isArray(question.options) ? question.options : [];
+            const previousOptions = Array.isArray(previous?.options) ? previous.options : [];
+            const hasSameOptionOrder = options.length > 1
+                && options.length === previousOptions.length
+                && options.every((option, index) => option === previousOptions[index]);
+
+            return hasSameOptionOrder
+                ? { ...question, options: [...options.slice(1), options[0]] }
+                : question;
+        });
+
+        const previousOrder = (Array.isArray(previousQuestions) ? previousQuestions : [])
+            .map(question => question?.word);
+        const hasSameQuestionOrder = questions.length > 1
+            && questions.length === previousOrder.length
+            && questions.every((question, index) => question.word === previousOrder[index]);
+
+        return hasSameQuestionOrder
+            ? [...questions.slice(1), questions[0]]
+            : questions;
     }
 
     restoreState() {
@@ -130,6 +172,12 @@ export class QuizActivity {
             return false;
         }
         if (!this.hasMatchingWordKeys(state.wordKeys)) return false;
+
+        if (state.isFinished) {
+            this.questions = this.prepareReplayQuestions(state.questions);
+            this.totalQuestions = this.questions.length;
+            return true;
+        }
 
         if (Array.isArray(state.questions) && state.questions.length === this.totalQuestions) {
             this.questions = state.questions;
@@ -307,13 +355,15 @@ export class QuizActivity {
         summary.innerHTML = `
             <h2 class="activity-result-heading">
                 ${result.isComplete ? '<i data-lucide="badge-check" aria-hidden="true"></i>' : ''}
-                <span>${result.isComplete ? 'Quiz Mastered!' : 'Keep Practicing'}</span>
+                <span>${result.isComplete ? 'Quiz Mastered!' : 'Round Finished'}</span>
             </h2>
             <div style="font-size: 4rem; font-weight: bold; color: var(--primary); margin: 2rem 0;">
                 ${accuracy}%
             </div>
             <p style="font-size: 1.5rem; margin-bottom: 2rem;">${result.details}</p>
-            <p>${result.isComplete ? 'You reached the mastery goal.' : `Reach ${MASTERY_ACCURACY}% accuracy to complete this activity.`}</p>
+            <p>${result.isComplete
+                ? 'You reached the mastery goal and completed this activity.'
+                : `You answered every question, but this activity is not complete yet. Reach ${MASTERY_ACCURACY}% accuracy to master it and earn completion XP.`}</p>
             <button id="restart-quiz" class="btn primary-btn">
                 <i data-lucide="rotate-ccw" aria-hidden="true"></i>
                 <span>${result.isComplete ? 'Play Again' : 'Try Again'}</span>

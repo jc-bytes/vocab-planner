@@ -170,6 +170,37 @@ test('route lookup and activity validation use the StudentActivities-owned catal
     assert.equal(routing.isKnownActivityType('unknown-activity'), false);
 });
 
+test('direct activity restoration keeps the unit menu deferred until the activity is ready', async () => {
+    const manager = createManager();
+    const vocab = { id: 'unit-1', name: 'Unit One' };
+    const calls = [];
+    manager.activities.availableVocabs = [vocab];
+    manager.activities.loadVocabulary = async (...args) => calls.push(['loadVocabulary', ...args]);
+    manager.activities.startActivity = async (...args) => calls.push(['startActivity', ...args]);
+    const routing = new StudentRouting(manager);
+
+    await routing.applyRouteTarget({
+        view: 'activity',
+        unitId: 'unit-1',
+        activityType: 'flashcards'
+    });
+
+    assert.deepEqual(calls, [
+        ['loadVocabulary', vocab, {
+            fromRoute: true,
+            skipActivityPreload: true,
+            deferActivityMenu: true
+        }],
+        ['startActivity', 'flashcards', {
+            fromRoute: true,
+            initialWordIndex: 0,
+            requestedWord: null,
+            hasWordParam: undefined,
+            wordWasInvalid: undefined
+        }]
+    ]);
+});
+
 test('reset clears only routing lifecycle state', () => {
     const routing = new StudentRouting(createManager());
     const games = {};
