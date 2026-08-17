@@ -11,7 +11,8 @@ import {
 } from './services/vocabularyApi.js';
 
 export const teacherSubjectSettingsMethods = {
-    async loadSubjectSettings() {
+    async loadSubjectSettings(options = {}) {
+        let loadError = null;
         try {
             if (this.authDisabled) {
                 const stored = JSON.parse(localStorage.getItem(SUBJECTS_LOCAL_KEY) || '[]');
@@ -21,11 +22,13 @@ export const teacherSubjectSettingsMethods = {
             }
         } catch (error) {
             console.error('Error loading subjects:', error);
+            loadError = error;
             this.subjects = await loadSubjects();
         }
 
         this.renderSubjectManager();
         this.updateSubjectSelect();
+        if (loadError && options.surfaceErrors) throw loadError;
     },
 
     getSubjects() {

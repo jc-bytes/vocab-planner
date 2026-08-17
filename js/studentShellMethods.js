@@ -14,6 +14,9 @@ export class StudentShell {
         this.dashboardMutationObserver = null;
         this.sectionScrollPositions = {};
         this.wideShellMediaQuery = null;
+        this.scrollRestoreGeneration = 0;
+        this.scrollRestoreFrame = null;
+        this.scrollRestoreTimer = null;
     }
 
     setWideShellMediaQuery(mediaQuery) {
@@ -53,6 +56,7 @@ export class StudentShell {
     }
 
     switchView(viewId) {
+        this.cancelStudentScrollRestore();
         const currentViewId = $('.view.active')?.id || '';
         const currentSection = this.getStudentSectionForView(currentViewId);
         const nextSection = this.getStudentSectionForView(viewId);
@@ -201,6 +205,8 @@ export class StudentShell {
     restoreStudentSectionScroll(viewId = '') {
         const section = this.getStudentSectionForView(viewId);
         if (!section) return;
+        this.cancelStudentScrollRestore();
+        const generation = this.scrollRestoreGeneration;
         const routeTop = this.readStudentScroll(this.getStudentRouteScrollKey());
         const sectionTop = Number.isFinite(this.sectionScrollPositions[section])
             ? this.sectionScrollPositions[section]
@@ -215,31 +221,54 @@ export class StudentShell {
         });
 
         const restore = () => {
+            if (generation !== this.scrollRestoreGeneration
+                || $('.view.active')?.id !== viewId) return true;
             const scrollContainer = this.getStudentScrollContainer(viewId);
             if (scrollContainer) {
                 const maxTop = Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+                const targetTop = Math.min(Math.max(0, savedTop), maxTop);
                 scrollContainer.scrollTo({
-                    top: Math.min(Math.max(0, savedTop), maxTop),
+                    top: targetTop,
                     left: 0,
                     behavior: 'auto'
                 });
-                return;
+                return Math.abs(savedTop - targetTop) <= 1;
             }
             const maxTop = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            const targetTop = Math.min(Math.max(0, savedTop), maxTop);
             window.scrollTo({
-                top: Math.min(Math.max(0, savedTop), maxTop),
+                top: targetTop,
                 left: 0,
                 behavior: 'auto'
             });
+            return Math.abs(savedTop - targetTop) <= 1;
         };
 
-        restore();
-        requestAnimationFrame(() => {
-            restore();
-            setTimeout(restore, 120);
-            setTimeout(restore, 350);
-            setTimeout(restore, 800);
+        if (restore()) return;
+        const retryDelays = [120, 350, 800];
+        const retry = index => {
+            if (generation !== this.scrollRestoreGeneration || restore() || index >= retryDelays.length) {
+                this.scrollRestoreTimer = null;
+                return;
+            }
+            this.scrollRestoreTimer = window.setTimeout(() => retry(index + 1), retryDelays[index]);
+        };
+        this.scrollRestoreFrame = window.requestAnimationFrame(() => {
+            this.scrollRestoreFrame = null;
+            retry(0);
         });
+    }
+
+    cancelStudentScrollRestore() {
+        this.scrollRestoreGeneration += 1;
+        if (this.scrollRestoreFrame !== null) {
+            window.cancelAnimationFrame(this.scrollRestoreFrame);
+            this.scrollRestoreFrame = null;
+        }
+        if (this.scrollRestoreTimer !== null) {
+            window.clearTimeout(this.scrollRestoreTimer);
+            this.scrollRestoreTimer = null;
+        }
     }
 
     getStudentSectionScrollKey(section) {

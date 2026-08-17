@@ -11,7 +11,9 @@ export {
 export const supabaseService = {
     client: null,
     currentUser: null,
-    currentSession: null
+    currentSession: null,
+    initPromise: null,
+    initialized: false
 };
 
 installSupabaseAuthProfileMethods(supabaseService);

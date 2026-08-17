@@ -2,6 +2,10 @@ import { imageDB } from '../db.js';
 import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
 import { $, notifications } from '../main.js';
 import { studentApi } from '../services/studentApi.js';
+import {
+    getActiveStudentStorageOwner,
+    readStudentJson
+} from './persistence/studentStorage.js';
 
 export class StudentActivityWordHunt {
     constructor(activities) {
@@ -52,7 +56,10 @@ export class StudentActivityWordHunt {
         if (!vocab?.name || !Array.isArray(vocab.words)) return {};
 
         try {
-            return JSON.parse(localStorage.getItem(`word_hunt_state_${vocab.name}_${vocab.words.length}`) || '{}');
+            return readStudentJson(`word-hunt:${vocab.name}:${vocab.words.length}`, {}, {
+                owner: this.sm.currentUser?.uid || getActiveStudentStorageOwner(),
+                legacyKeys: [`word_hunt_state_${vocab.name}_${vocab.words.length}`]
+            });
         } catch (error) {
             console.warn('Could not read local Word Hunt draft entries:', error);
             return {};
@@ -127,6 +134,7 @@ export class StudentActivityWordHunt {
             await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
                 wordHunt,
                 trimester: unitProgress?.trimester || '',
+                ownerUserId: this.sm.currentUser?.uid || getActiveStudentStorageOwner(),
                 loadImage: path => this.loadWordHuntImage(path)
             });
         } catch (error) {
@@ -160,7 +168,9 @@ export class StudentActivityWordHunt {
             try {
                 const sourceBlob = await dataUrlToBlob(dataUrl);
                 const imageData = await compressImageToWebp(sourceBlob);
-                await imageDB.saveDrawing(unitName, word, imageData.blob);
+                await imageDB.saveDrawing(unitName, word, imageData.blob, {
+                    ownerUserId: this.sm.currentUser.uid
+                });
                 const metadata = await this.uploadWordHuntImage(word, imageData.blob, imageData);
                 wordHunt[word] = {
                     ...existingEntry,

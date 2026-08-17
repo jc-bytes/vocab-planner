@@ -8,6 +8,7 @@
     let lastState = '';
     let lastLevel = -1;
     let lastMenuMode = true;
+    let cachedGame = null;
 
     const report = (payload) => {
         window.parent.postMessage({ type: messageType, ...payload }, '*');
@@ -27,8 +28,14 @@
     };
 
     const findSpacePiGame = () => {
-        if (window.sp?.levelStats) return window.sp;
-        return Object.values(window).find(value => value && typeof value === 'object' && value.levelStats) || null;
+        if (cachedGame?.levelStats) return cachedGame;
+        if (window.sp?.levelStats) {
+            cachedGame = window.sp;
+            return cachedGame;
+        }
+        cachedGame = Object.values(window)
+            .find(value => value && typeof value === 'object' && value.levelStats) || null;
+        return cachedGame;
     };
 
     const readSpacePi = () => {
@@ -49,11 +56,15 @@
     };
 
     const readPackabunchas = () => {
-        const game = window.game?.score !== undefined
-            ? window.game
-            : (window.Game?.score !== undefined
-                ? window.Game
-                : Object.values(window).find(value => value && typeof value === 'object' && value.score !== undefined));
+        if (!cachedGame || cachedGame.score === undefined) {
+            cachedGame = window.game?.score !== undefined
+                ? window.game
+                : (window.Game?.score !== undefined
+                    ? window.Game
+                    : Object.values(window)
+                        .find(value => value && typeof value === 'object' && value.score !== undefined));
+        }
+        const game = cachedGame;
         const score = Number(game?.score) || 0;
         if (score !== lastScore) report({ score, gameOver: false });
         lastScore = score;

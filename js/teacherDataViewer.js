@@ -137,6 +137,8 @@ const teacherDataViewerMethods = {
 
         if (activeTab === 'dashboard') {
             this.loadDashboardData();
+        } else if (activeTab === 'export') {
+            this.loadExportRosterData();
         }
     },
 

@@ -33,18 +33,33 @@ function normalizeTeacherProgressRecord(record, { detailed = false } = {}) {
 export function installSupabaseAuthProfileMethods(supabaseService) {
     Object.assign(supabaseService, {
     async init() {
-        if (this.client) return this;
+        if (this.initPromise) return this.initPromise;
+        if (this.client && this.initialized) return this;
 
         if (!isSupabaseConfigured()) {
             throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY, or provide window.SUPABASE_CONFIG.');
         }
 
-        this.client = createSupabaseClient();
+        this.initPromise = (async () => {
+            const client = this.client || createSupabaseClient();
+            this.client = client;
+            const { data, error } = await client.auth.getSession();
+            if (error) throw error;
+            this.currentSession = data.session || null;
+            this.currentUser = normalizeUser(this.currentSession?.user || null);
+            this.initialized = true;
+            return this;
+        })().catch(error => {
+            this.client = null;
+            this.currentSession = null;
+            this.currentUser = null;
+            this.initialized = false;
+            throw error;
+        }).finally(() => {
+            this.initPromise = null;
+        });
 
-        const { data } = await this.client.auth.getSession();
-        this.currentSession = data.session || null;
-        this.currentUser = normalizeUser(this.currentSession?.user || null);
-        return this;
+        return this.initPromise;
     },
 
     getClient() {
@@ -255,6 +270,39 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         }
 
         return students;
+    },
+
+    async getStudentRosterFilters() {
+        await this.init();
+        const { data, error } = await this.client.rpc('list_student_roster_filters_v1');
+        if (error) throw error;
+        const filters = Array.isArray(data) ? data[0] : data;
+        return {
+            grades: (filters?.grades || []).map(String),
+            classes: (filters?.classes || []).map(item => ({
+                grade: String(item?.grade || ''),
+                section: String(item?.section || '')
+            })).filter(item => item.grade && item.section)
+        };
+    },
+
+    async getTeacherDashboardAnalytics({ grade = null } = {}) {
+        await this.init();
+        const { data, error } = await this.client.rpc('get_teacher_dashboard_analytics_v1', {
+            p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10)
+        });
+        if (error) throw error;
+        const analytics = Array.isArray(data) ? data[0] : data;
+        return {
+            totalStudents: Number(analytics?.totalStudents) || 0,
+            activeStudents: Number(analytics?.activeStudents) || 0,
+            averageCoins: Number(analytics?.averageCoins) || 0,
+            availableGrades: (analytics?.availableGrades || []).map(String),
+            gradeCounts: analytics?.gradeCounts || {},
+            coinDistribution: (analytics?.coinDistribution || []).map(value => Number(value) || 0),
+            activities: analytics?.activities || {},
+            recentActivities: analytics?.recentActivities || []
+        };
     },
 
     async getStudentProgressForTeacher(userId, options = {}) {

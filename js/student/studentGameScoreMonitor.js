@@ -63,19 +63,22 @@ export class StudentGameScoreMonitor {
                     let lastScore = -1;
                     let lastLevel = -1;
                     let lastMenuMode = true;
+                    let cachedGame = null;
                     let checkInterval = setInterval(function() {
                         try {
                             // SpacePi uses sp.levelStats.score and sp.level
                             // The game instance is stored as 'sp' in global scope
-                            let game = null;
-                            if (typeof sp !== 'undefined' && sp.levelStats) {
-                                game = sp;
+                            let game = cachedGame;
+                            if (!game && typeof sp !== 'undefined' && sp.levelStats) {
+                                cachedGame = game = sp;
                             } else {
-                                // Try to find it in window
-                                for (let key in window) {
-                                    if (window[key] && typeof window[key] === 'object' && window[key].levelStats) {
-                                        game = window[key];
-                                        break;
+                                if (!game) {
+                                    // Discover the legacy global once, then reuse it.
+                                    for (let key in window) {
+                                        if (window[key] && typeof window[key] === 'object' && window[key].levelStats) {
+                                            cachedGame = game = window[key];
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -129,6 +132,7 @@ export class StudentGameScoreMonitor {
             return `
                 (function() {
                     let lastScore = 0;
+                    let cachedGame = null;
                     let checkInterval = setInterval(function() {
                         try {
                             // Packabunchas - need to find the score variable
@@ -136,15 +140,20 @@ export class StudentGameScoreMonitor {
                             let score = 0;
 
                             // Try to access game object
-                            if (typeof game !== 'undefined' && game.score !== undefined) {
-                                score = game.score;
+                            if (cachedGame && cachedGame.score !== undefined) {
+                                score = cachedGame.score;
+                            } else if (typeof game !== 'undefined' && game.score !== undefined) {
+                                cachedGame = game;
+                                score = cachedGame.score;
                             } else if (typeof Game !== 'undefined' && Game.score !== undefined) {
-                                score = Game.score;
+                                cachedGame = Game;
+                                score = cachedGame.score;
                             } else {
-                                // Try to find score in global scope
+                                // Discover the legacy global once, then reuse it.
                                 for (let key in window) {
                                     if (window[key] && typeof window[key] === 'object' && window[key].score !== undefined) {
-                                        score = window[key].score;
+                                        cachedGame = window[key];
+                                        score = cachedGame.score;
                                         break;
                                     }
                                 }

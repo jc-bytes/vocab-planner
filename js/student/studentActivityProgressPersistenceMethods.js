@@ -1,677 +1,118 @@
-import { $ } from '../main.js';
-import { imageDB } from '../db.js';
-import { studentApi as supabaseService } from '../services/studentApi.js';
-import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
-import { classifySyncError } from '../services/syncQueuePolicy.js';
-import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
-
-function getSyncErrorSummary(error) {
-    const parts = [error?.code, error?.message, error?.details, error?.hint]
-        .map(value => String(value || '').trim())
-        .filter(Boolean);
-    return parts.join(' | ') || String(error || 'Unknown sync error');
-}
+import { StudentActivityAttemptService } from './studentActivityAttemptService.js';
+import { StudentActivityAutoSave } from './studentActivityAutoSave.js';
+import { StudentActivityResultProcessor } from './studentActivityResultProcessor.js';
+import { StudentActivityStateStore } from './studentActivityStateStore.js';
+import { StudentActivitySyncCoordinator } from './studentActivitySyncCoordinator.js';
 
 export class StudentActivityProgressPersistence {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
-        this.activitySyncStates = new Map();
-        this.activityProgressDebounceMs = 1000;
+        this.attemptService = new StudentActivityAttemptService(this);
+        this.autoSave = new StudentActivityAutoSave(this);
+        this.resultProcessor = new StudentActivityResultProcessor(activities);
+        this.stateStore = new StudentActivityStateStore(activities);
+        this.syncCoordinator = new StudentActivitySyncCoordinator(this);
+    }
+
+    get activitySyncStates() {
+        return this.syncCoordinator.activitySyncStates;
+    }
+
+    get activityProgressDebounceMs() {
+        return this.syncCoordinator.activityProgressDebounceMs;
+    }
+
+    set activityProgressDebounceMs(value) {
+        this.syncCoordinator.activityProgressDebounceMs = value;
+    }
+
+    resetForSession() {
+        this.syncCoordinator.resetForSession();
+        this.activities.session.activityAttempt = null;
     }
 
     getActivityCoinRewards(activityType, settings = {}) {
-        const activityRewards = settings.activityRewards?.[activityType] || {};
-        return {
-            progressReward: activityRewards.progressReward !== undefined
-                ? activityRewards.progressReward
-                : (settings.progressReward !== undefined ? settings.progressReward : 1),
-            completionBonus: activityRewards.completionBonus !== undefined
-                ? activityRewards.completionBonus
-                : (settings.completionBonus !== undefined ? settings.completionBonus : 50)
-        };
+        return this.autoSave.getActivityCoinRewards(activityType, settings);
     }
 
     async startVerifiedActivityAttempt(activityType, options = {}) {
-        if (this.sm.authDisabled || !this.sm.currentUser) {
-            this.activities.session.activityAttempt = null;
-            return null;
-        }
-
-        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-            throw createRequestError('An internet connection is required to start this activity.', 'OFFLINE');
-        }
-
-        const vocab = this.sm.currentVocab;
-        const attempt = await requestWithTimeout(signal => (
-            supabaseService.startStudentActivityAttempt({
-                unitKey: this.activities.getUnitProgressKey(vocab),
-                vocabularyId: this.sm.getVocabRouteId?.(vocab) || vocab?.id || '',
-                activityType,
-                signal
-            })
-        ), {
-            signal: options.signal,
-            timeoutMs: options.timeoutMs || 10000,
-            label: 'Starting the verified activity'
-        });
-        if (!attempt?.attemptId) throw new Error('The server did not create a verified activity attempt.');
-        this.activities.session.activityAttempt = attempt;
-        return attempt;
+        return this.attemptService.startVerifiedActivityAttempt(activityType, options);
     }
 
     handleAutoSave(scoreData) {
-        if (this.sm.currentVocab && this.sm.currentActivityType) {
-            const activityType = this.sm.currentActivityType;
-            const settings = this.sm.currentVocab.activitySettings || {};
-            const { progressReward, completionBonus } = this.getActivityCoinRewards(activityType, settings);
-            const wasComplete = Boolean(this.sm.unitScores[activityType]?.isComplete);
-            let persistedScoreData = scoreData;
-
-            // Non-replayable activities (flashcards, illustration) - only reward first-time progress
-            const nonReplayable = ['flashcards', 'illustration'];
-
-            if (nonReplayable.includes(activityType)) {
-                // Original behavior: only reward if new score > old score
-                const oldScoreData = this.sm.unitScores[activityType];
-                const oldScore = oldScoreData ? (oldScoreData.score || 0) : 0;
-                const newScore = scoreData.score || 0;
-
-                if (newScore > oldScore) {
-                    const stepsOld = Math.floor(oldScore / 10);
-                    const stepsNew = Math.floor(newScore / 10);
-                    const stepsGained = stepsNew - stepsOld;
-                    let totalReward = Math.max(0, stepsGained * progressReward);
-
-                    if (newScore === 100 && oldScore < 100) {
-                        totalReward += completionBonus;
-                    }
-
-                    if (totalReward > 0) {
-                        this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
-                    }
-                }
-
-                persistedScoreData = {
-                    ...oldScoreData,
-                    ...scoreData,
-                    score: Math.max(oldScore, newScore),
-                    details: newScore >= oldScore ? scoreData.details : oldScoreData?.details,
-                    isComplete: Boolean(oldScoreData?.isComplete) || Boolean(scoreData.isComplete) || oldScore >= 100
-                };
-                this.sm.unitScores[activityType] = persistedScoreData;
-            } else {
-                // Replayable activities: track best score + total plays + earn coins on each play
-                const oldScoreData = this.sm.unitScores[activityType] || { score: 0, plays: 0, totalEarned: 0 };
-                const oldScore = oldScoreData.score || 0;
-                const newScore = scoreData.score || 0;
-
-                // Track session progress for coin rewards
-                if (!this.sm.sessionProgress) this.sm.sessionProgress = {};
-                if (!this.sm.sessionProgress[activityType]) {
-                    this.sm.sessionProgress[activityType] = { lastScore: 0 };
-                }
-
-                const sessionLastScore = this.sm.sessionProgress[activityType].lastScore;
-
-                // Award coins for progress within this session
-                if (newScore > sessionLastScore) {
-                    const stepsOld = Math.floor(sessionLastScore / 10);
-                    const stepsNew = Math.floor(newScore / 10);
-                    const stepsGained = stepsNew - stepsOld;
-                    let totalReward = Math.max(0, stepsGained * progressReward);
-
-                    // Completion bonus only once per session
-                    if (newScore === 100 && sessionLastScore < 100) {
-                        totalReward += completionBonus;
-                    }
-
-                    if (totalReward > 0) {
-                        this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
-                        oldScoreData.totalEarned = (oldScoreData.totalEarned || 0) + totalReward;
-                    }
-                }
-
-                this.sm.sessionProgress[activityType].lastScore = newScore;
-
-                // Update best score and increment plays on completion
-                if (scoreData.isComplete) {
-                    oldScoreData.plays = (oldScoreData.plays || 0) + 1;
-                    this.sm.sessionProgress[activityType].lastScore = 0; // Reset for next play
-                }
-
-                // Keep best score
-                const isNewBest = newScore >= oldScore;
-                oldScoreData.score = Math.max(oldScore, newScore);
-                if (isNewBest) oldScoreData.details = scoreData.details;
-                oldScoreData.isComplete = oldScoreData.isComplete || scoreData.isComplete;
-                if (isNewBest && scoreData.evidence && typeof scoreData.evidence === 'object') {
-                    oldScoreData.evidence = scoreData.evidence;
-                }
-                if (isNewBest && scoreData.accuracy !== undefined) {
-                    oldScoreData.accuracy = Number(scoreData.accuracy) || 0;
-                }
-                oldScoreData.lastPlayed = new Date().toISOString();
-
-                this.sm.unitScores[activityType] = oldScoreData;
-                persistedScoreData = oldScoreData;
-            }
-
-            // The activity RPC is the authoritative cloud write. Persist locally
-            // without scheduling the generic unit-work RPC for the same event.
-            this.sm.progress.saveLocalProgress(true);
-            if (this.sm.authDisabled && activityType !== 'flashcards'
-                && !wasComplete && Boolean(persistedScoreData.isComplete)) {
-                refreshLocalFormativeWindow();
-                this.sm.showToast?.('Formative complete: Arcade is ready for 10 minutes!');
-            }
-            // Send the current run, not the locally aggregated best. The server
-            // finalizes this attempt and updates best/latest/lifetime separately.
-            this.syncActivityProgressToCloud(activityType, scoreData, {
-                ...settings,
-                progressReward,
-                completionBonus
-            });
-            this.activities.scheduleActivityPreload();
-            this.activities.updateArcadeGateDisplay();
-
-            // Update in-game progress indicator
-            const indicator = $('#activity-progress-indicator');
-            if (indicator) {
-                const percent = persistedScoreData.score || 0;
-                indicator.textContent = `Progress: ${percent}%`;
-                indicator.classList.remove('hidden');
-            }
-        }
+        return this.autoSave.handleAutoSave(scoreData);
     }
 
     buildActivityProgressPayload(activityType, scoreData = {}, settings = {}) {
-        const unitProgress = this.activities.getCurrentUnitProgress();
-        if (!unitProgress || !this.sm.currentVocab) return null;
-        const flow = this.activities.getActivityFlowConfig(this.sm.currentVocab);
-        const metrics = this.getActivityAttemptMetrics(activityType, scoreData);
-        const stateSnapshot = this.sanitizeActivityState(
-            this.sm.unitStates?.[activityType] ?? unitProgress.states?.[activityType] ?? null
-        );
-        return {
-            eventId: `activity-progress:${globalThis.crypto?.randomUUID?.()
-                || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
-            unitKey: this.activities.getUnitProgressKey(this.sm.currentVocab),
-            unitContext: {
-                unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
-                unitName: unitProgress.unitName || this.sm.currentVocab.name || '',
-                subjectSlug: unitProgress.subjectSlug || '',
-                trimester: unitProgress.trimester || '',
-                schoolYear: unitProgress.schoolYear || '',
-                grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
-            },
-            activityType,
-            isRequired: flow.required.includes(activityType),
-            attemptId: this.activities.session.activityAttempt?.attemptId || '',
-            score: Number(scoreData.score) || 0,
-            isComplete: Boolean(scoreData.isComplete),
-            isFinished: this.isActivityAttemptFinished(activityType, scoreData),
-            details: {
-                summary: typeof scoreData.details === 'string' ? scoreData.details : '',
-                evidence: scoreData.evidence && typeof scoreData.evidence === 'object'
-                    ? scoreData.evidence
-                    : {},
-                accuracy: Number(scoreData.accuracy) || 0
-            },
-            metrics,
-            stateSnapshot: stateSnapshot === undefined ? null : stateSnapshot,
-            activitySettings: {
-                progressReward: settings.progressReward,
-                completionBonus: settings.completionBonus
-            },
-            clientId: this.sm.progress?.clientId || ''
-        };
+        return this.attemptService.buildActivityProgressPayload(activityType, scoreData, settings);
     }
 
     getActivityAttemptMetrics(activityType, scoreData = {}) {
-        const evidence = scoreData.evidence && typeof scoreData.evidence === 'object'
-            ? scoreData.evidence
-            : {};
-        const integer = value => {
-            const number = Number(value);
-            return Number.isInteger(number) && number >= 0 ? number : null;
-        };
-        let correctActions = null;
-        let attemptedActions = null;
-
-        if (['quiz', 'synonym-antonym'].includes(activityType)) {
-            correctActions = integer(evidence.correctCount);
-            attemptedActions = integer(evidence.answeredCount);
-        } else if (activityType === 'flashcards') {
-            correctActions = integer(evidence.firstAttemptCorrectCount);
-            attemptedActions = integer(evidence.attemptedCount);
-        } else if (activityType === 'matching' || activityType === 'scramble') {
-            correctActions = integer(evidence.correctCount);
-            attemptedActions = integer(evidence.attemptedCount);
-        } else if (activityType === 'wordle') {
-            correctActions = integer(evidence.correctCount);
-            const failedCount = integer(evidence.failedCount);
-            attemptedActions = correctActions === null || failedCount === null
-                ? null
-                : correctActions + failedCount;
-        }
-
-        if (correctActions === null || attemptedActions === null || attemptedActions <= 0
-            || correctActions > attemptedActions) {
-            return {};
-        }
-        return { correctActions, attemptedActions };
+        return this.attemptService.getActivityAttemptMetrics(activityType, scoreData);
     }
 
     isActivityAttemptFinished(activityType, scoreData = {}) {
-        if (scoreData.isFinished !== undefined) return Boolean(scoreData.isFinished);
-        if (scoreData.isComplete) return true;
-        const evidence = scoreData.evidence && typeof scoreData.evidence === 'object'
-            ? scoreData.evidence
-            : {};
-        const total = Number(evidence.totalCount);
-        if (!(total > 0)) return false;
-        if (['quiz', 'synonym-antonym'].includes(activityType)) {
-            return Number(evidence.answeredCount) >= total;
-        }
-        if (activityType === 'scramble') return Number(evidence.attemptedCount) >= total;
-        if (activityType === 'wordle') {
-            return Number(evidence.correctCount) + Number(evidence.failedCount) >= total;
-        }
-        return false;
+        return this.attemptService.isActivityAttemptFinished(activityType, scoreData);
     }
 
     async syncActivityProgressToCloud(activityType, scoreData = {}, settings = {}) {
-        if (this.sm.authDisabled || !this.sm.currentUser) return;
-        const payload = this.buildActivityProgressPayload(activityType, scoreData, settings);
-        if (!payload) return;
-
-        const syncKey = `${payload.unitKey}:${activityType}`;
-        const fingerprint = this.getActivityProgressFingerprint(payload);
-        let state = this.activitySyncStates.get(syncKey);
-        if (!state) {
-            state = {
-                timer: null,
-                inFlight: null,
-                pending: null,
-                waiters: [],
-                lastSubmittedFingerprint: ''
-            };
-            this.activitySyncStates.set(syncKey, state);
-        }
-
-        if (!this.isMeaningfulActivityProgressPayload(payload)
-            || fingerprint === state.lastSubmittedFingerprint
-            || fingerprint === state.pending?.fingerprint) {
-            return state.inFlight || null;
-        }
-
-        const promise = new Promise((resolve, reject) => state.waiters.push({ resolve, reject }));
-        state.pending = { payload, fingerprint };
-        this.scheduleActivityProgressFlush(syncKey, Boolean(payload.isFinished || payload.isComplete));
-        return promise;
+        return this.syncCoordinator.syncActivityProgressToCloud(activityType, scoreData, settings);
     }
 
     getActivityProgressFingerprint(payload = {}) {
-        return JSON.stringify([
-            payload.unitKey || '',
-            payload.activityType || '',
-            Number(payload.score) || 0,
-            Boolean(payload.isComplete),
-            Boolean(payload.isFinished),
-            payload.details || {},
-            payload.metrics || {},
-            payload.stateSnapshot || null,
-            payload.activitySettings || {},
-            payload.attemptId || '',
-            Boolean(payload.isRequired)
-        ]);
+        return this.syncCoordinator.getActivityProgressFingerprint(payload);
     }
 
     isMeaningfulActivityProgressPayload(payload = {}) {
-        if (payload.isComplete || payload.isFinished || Number(payload.score) > 0) return true;
-        if (Number(payload.details?.accuracy) > 0) return true;
-        return Object.keys(payload.details?.evidence || {}).length > 0;
+        return this.syncCoordinator.isMeaningfulActivityProgressPayload(payload);
     }
 
     scheduleActivityProgressFlush(syncKey, immediate = false) {
-        const state = this.activitySyncStates.get(syncKey);
-        if (!state) return;
-        if (state.timer) {
-            clearTimeout(state.timer);
-            state.timer = null;
-        }
-        if (immediate) {
-            void this.flushActivityProgressSync(syncKey);
-            return;
-        }
-        state.timer = setTimeout(() => {
-            state.timer = null;
-            void this.flushActivityProgressSync(syncKey);
-        }, this.activityProgressDebounceMs);
+        return this.syncCoordinator.scheduleActivityProgressFlush(syncKey, immediate);
     }
 
     async flushActivityProgressSync(syncKey) {
-        const state = this.activitySyncStates.get(syncKey);
-        if (!state) return null;
-        if (state.timer) {
-            clearTimeout(state.timer);
-            state.timer = null;
-        }
-        if (state.inFlight) {
-            await state.inFlight;
-            return this.flushActivityProgressSync(syncKey);
-        }
-        if (!state.pending) return null;
-
-        const pending = state.pending;
-        const waiters = state.waiters.splice(0);
-        state.pending = null;
-        state.inFlight = this.submitActivityProgressPayload(pending.payload);
-
-        try {
-            const result = await state.inFlight;
-            state.lastSubmittedFingerprint = pending.fingerprint;
-            waiters.forEach(waiter => waiter.resolve(result));
-            return result;
-        } catch (error) {
-            waiters.forEach(waiter => waiter.reject(error));
-            throw error;
-        } finally {
-            state.inFlight = null;
-            if (state.pending) {
-                this.scheduleActivityProgressFlush(
-                    syncKey,
-                    Boolean(state.pending.payload.isFinished || state.pending.payload.isComplete)
-                );
-            }
-        }
+        return this.syncCoordinator.flushActivityProgressSync(syncKey);
     }
 
     async flushPendingActivityProgress() {
-        const keys = [...this.activitySyncStates.entries()]
-            .filter(([, state]) => state.pending || state.inFlight)
-            .map(([syncKey]) => syncKey);
-        await Promise.all(keys.map(syncKey => this.flushActivityProgressSync(syncKey)));
+        return this.syncCoordinator.flushPendingActivityProgress();
     }
 
-    async submitActivityProgressPayload(payload) {
-        try {
-            const previousTotalXp = Number(this.sm.progressData?.totalXp) || 0;
-            const progress = await supabaseService.submitStudentActivityProgress(payload);
-            const xpAwarded = this.getAwardedXp(previousTotalXp, progress);
-            this.applyActivityProgressResult(progress, payload);
-            this.sm.setAuthStatus('Synced');
-            if (payload.isComplete) {
-                this.showActivityXpReward(xpAwarded, payload.activityType);
-            }
-            return progress;
-        } catch (error) {
-            console.warn(`Could not sync activity progress event: ${getSyncErrorSummary(error)}`);
-            const failure = classifySyncError(error, { online: navigator.onLine });
-            if (failure.retryable) {
-                try {
-                    await imageDB.enqueueSyncAction('student-activity-progress', payload);
-                    this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
-                } catch (queueError) {
-                    console.warn('Could not queue activity progress event:', queueError);
-                    this.sm.setAuthStatus('Local sync storage is full');
-                    this.sm.showToast?.('Reconnect before completing more work so your progress can sync.');
-                }
-            } else {
-                this.sm.setAuthStatus('Activity result rejected');
-                this.sm.showToast?.('This activity result was not accepted. Refresh and try again.');
-            }
-            return null;
-        }
+    async submitActivityProgressPayload(payload, options = {}) {
+        return this.syncCoordinator.submitActivityProgressPayload(payload, options);
     }
 
     applyActivityProgressResult(progress, payload = {}) {
-        if (!progress) return;
-        if (!progress.activity) {
-            this.sm.progress.applyProgressSnapshot(progress, { saveLocal: true });
-            return;
-        }
-
-        const activity = progress.activity;
-        const unitKey = activity.unitKey || payload.unitKey;
-        const activityType = activity.activityType || payload.activityType;
-        const units = this.sm.progressData.units ||= {};
-        const unit = units[unitKey] ||= { ...(payload.unitContext || {}), scores: {}, states: {} };
-        unit.scores ||= {};
-        const previous = unit.scores[activityType] || {};
-        const bestAttempt = activity.bestAttempt && typeof activity.bestAttempt === 'object'
-            ? activity.bestAttempt
-            : null;
-        const coherentDetails = bestAttempt?.details && typeof bestAttempt.details === 'object'
-            ? bestAttempt.details
-            : activity.details;
-        unit.scores[activityType] = {
-            ...previous,
-            score: Number(activity.score) || 0,
-            isComplete: Boolean(activity.isComplete),
-            plays: Number(activity.plays) || 0,
-            totalEarned: Number(activity.totalEarned) || 0,
-            accuracy: activity.accuracy === null || activity.accuracy === undefined
-                ? previous.accuracy
-                : Number(activity.accuracy) || 0,
-            bestAccuracy: activity.bestAccuracy ?? previous.bestAccuracy,
-            lifetimeCorrect: Number(activity.lifetimeCorrect) || 0,
-            lifetimeAttempted: Number(activity.lifetimeAttempted) || 0,
-            lifetimeAccuracy: activity.lifetimeAccuracy ?? previous.lifetimeAccuracy,
-            finishedRuns: Number(activity.finishedRuns) || 0,
-            masteredRuns: Number(activity.masteredRuns) || 0,
-            details: coherentDetails?.summary ?? previous.details ?? '',
-            evidence: coherentDetails?.evidence ?? previous.evidence,
-            verified: Boolean(activity.verified),
-            attemptId: activity.attemptId || previous.attemptId || '',
-            bestAttemptId: activity.bestAttemptId || previous.bestAttemptId || '',
-            latestAttemptId: activity.latestAttemptId || previous.latestAttemptId || '',
-            bestAttempt: bestAttempt || previous.bestAttempt,
-            latestAttempt: activity.latestAttempt || previous.latestAttempt,
-            lastPlayed: activity.lastPlayed || previous.lastPlayed,
-            updatedAt: activity.updatedAt || progress.updatedAt
-        };
-        if (bestAttempt?.state !== undefined && bestAttempt.state !== null) {
-            unit.states ||= {};
-            unit.states[activityType] = bestAttempt.state;
-        }
-        this.sm.progressData.totalXp = Number(progress.totalXp) || 0;
-        this.sm.progressData.version = Number(progress.version) || this.sm.progressData.version || 0;
-        if (progress.coinData) {
-            this.sm.progress.applyCoinSnapshot(progress.coinData, this.sm.coinHistory, { saveLocal: false });
-        }
-        const isCurrentUnit = this.sm.currentVocab
-            && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitKey;
-        if (isCurrentUnit) {
-            this.sm.unitScores = unit.scores;
-        }
-        this.sm.progress.updateLevelDisplay?.();
-        this.sm.progress.saveLocalProgress(true);
-        this.activities.updateArcadeGateDisplay?.();
-
-        const activityMenuView = typeof document === 'undefined'
-            ? null
-            : document.querySelector('#activity-menu-view');
-        if (isCurrentUnit && activityMenuView && !activityMenuView.classList.contains('hidden')) {
-            this.activities.showActivityMenu?.({ fromRoute: true, skipActivityPreload: true });
-        }
+        return this.resultProcessor.applyActivityProgressResult(progress, payload);
     }
 
     getAwardedXp(previousTotalXp, progress = {}) {
-        const before = Math.max(0, Number(previousTotalXp) || 0);
-        const after = Math.max(0, Number(progress.totalXp) || 0);
-        return Math.max(0, Math.round(after - before));
+        return this.resultProcessor.getAwardedXp(previousTotalXp, progress);
     }
 
     getActivityXpRewardText(xpAwarded) {
-        const amount = Math.max(0, Number(xpAwarded) || 0);
-        return amount > 0 ? `+${amount} XP` : 'No new XP';
+        return this.resultProcessor.getActivityXpRewardText(xpAwarded);
     }
 
     showActivityXpReward(xpAwarded, activityType = '') {
-        if (this.sm.currentActivityType !== activityType || typeof document === 'undefined' || !document.body) {
-            return null;
-        }
-
-        document.getElementById('activity-xp-reward')?.remove();
-
-        const amount = Math.max(0, Number(xpAwarded) || 0);
-        const reward = document.createElement('div');
-        reward.id = 'activity-xp-reward';
-        reward.className = `activity-xp-reward${amount > 0 ? '' : ' activity-xp-reward--none'}`;
-        reward.setAttribute('role', 'status');
-        reward.setAttribute('aria-live', 'polite');
-
-        const emblem = document.createElement('span');
-        emblem.className = 'activity-xp-reward__emblem';
-        emblem.textContent = 'XP';
-        emblem.setAttribute('aria-hidden', 'true');
-
-        const copy = document.createElement('span');
-        copy.className = 'activity-xp-reward__copy';
-
-        const value = document.createElement('strong');
-        value.className = 'activity-xp-reward__value';
-        value.textContent = this.getActivityXpRewardText(amount);
-
-        copy.append(value);
-        reward.append(emblem, copy);
-        document.body.appendChild(reward);
-
-        window.setTimeout(() => reward.classList.add('activity-xp-reward--leaving'), 4700);
-        window.setTimeout(() => reward.remove(), 5200);
-        return reward;
+        return this.resultProcessor.showActivityXpReward(xpAwarded, activityType);
     }
 
     resetActivityState(activityType) {
-        if (!this.sm.currentVocab) return;
-
-        const vocabName = this.sm.currentVocab.name;
-        const vocabID = this.sm.currentVocab.id || vocabName;
-
-        // Clear only this activity's transient state. A broken save in one game
-        // must never erase another activity's in-progress round.
-        const wordCount = this.sm.currentVocab.words.length;
-        const firstWord = this.sm.currentVocab.words[0]?.word || 'empty';
-        const stateKeysByActivity = {
-            flashcards: [`flashcards_state_${firstWord}_${wordCount}`, `flashcards_state_${wordCount}`],
-            hangman: [`hangman_state_${wordCount}`],
-            scramble: [`scramble_state_${wordCount}`],
-            wordle: [`wordle_state_${wordCount}`],
-            crossword: [`crossword_state_${wordCount}`],
-            'fill-in-blank': [`fib_state_${wordCount}`],
-            matching: [`matching_state_${firstWord}_${wordCount}`],
-            quiz: [`quiz_state_${firstWord}_${wordCount}`],
-            'synonym-antonym': [`synonym_antonym_state_${firstWord}_${wordCount}`],
-            'word-search': [`word_search_state_${vocabID}`],
-            'speed-match': [`speedmatch_highscore_${wordCount}`]
-        };
-        const stateKeys = stateKeysByActivity[activityType] || [];
-
-        stateKeys.forEach(key => {
-            const normalizedKey = key.trim();
-            localStorage.removeItem(key);
-            localStorage.removeItem(normalizedKey);
-            localStorage.removeItem(`${normalizedKey} `); // Handle legacy keys with a trailing space.
-        });
-
-        // Clear saved state in progress data
-        if (this.sm.unitStates && this.sm.unitStates[activityType]) {
-            delete this.sm.unitStates[activityType];
-        }
-
-        if (activityType === 'illustration') {
-            localStorage.removeItem(`word_hunt_state_${vocabName}_${this.sm.currentVocab.words.length}`);
-            const progressKey = this.activities.getUnitProgressKey(this.sm.currentVocab);
-            if (this.sm.progressData.units[progressKey]?.wordHunt) {
-                delete this.sm.progressData.units[progressKey].wordHunt;
-            }
-            this.sm.unitWordHunt = {};
-        }
-
-        // Reset session progress
-        if (this.sm.sessionProgress && this.sm.sessionProgress[activityType]) {
-            this.sm.sessionProgress[activityType].lastScore = 0;
-        }
-
-        this.sm.progress.saveLocalProgress();
+        return this.stateStore.resetActivityState(activityType);
     }
 
     sanitizeActivityState(stateData) {
-        if (stateData === null) return null;
-
-        try {
-            const serialized = JSON.stringify(stateData);
-            if (/data:image\/|base64/i.test(serialized)) {
-                console.warn('Rejected activity state because it contains image data.');
-                return undefined;
-            }
-
-            const byteLength = new TextEncoder().encode(serialized).length;
-            if (byteLength > 50 * 1024) {
-                console.warn(`Rejected activity state above 50 KB (${byteLength} bytes).`);
-                return undefined;
-            }
-
-            return JSON.parse(serialized);
-        } catch (error) {
-            console.warn('Rejected invalid activity state:', error);
-            return undefined;
-        }
+        return this.stateStore.sanitizeActivityState(stateData);
     }
 
     areActivityStatesEquivalent(firstState, secondState) {
-        if (firstState === secondState) return true;
-        if (!firstState || !secondState || typeof firstState !== 'object' || typeof secondState !== 'object') {
-            return false;
-        }
-
-        const canonicalize = value => {
-            if (Array.isArray(value)) return value.map(item => canonicalize(item));
-            if (!value || typeof value !== 'object') return value;
-
-            return Object.keys(value)
-                .filter(key => key !== 'updatedAt')
-                .sort()
-                .reduce((result, key) => {
-                    result[key] = canonicalize(value[key]);
-                    return result;
-                }, {});
-        };
-
-        try {
-            return JSON.stringify(canonicalize(firstState)) === JSON.stringify(canonicalize(secondState));
-        } catch {
-            return false;
-        }
+        return this.stateStore.areActivityStatesEquivalent(firstState, secondState);
     }
 
     handleStateSave(stateData) {
-        if (this.sm.currentVocab && this.sm.currentActivityType) {
-            const sanitizedState = this.sanitizeActivityState(stateData);
-            if (sanitizedState === undefined) return;
-
-            const unitProgress = this.activities.getCurrentUnitProgress();
-            if (!unitProgress.states) unitProgress.states = {};
-            const activityType = this.sm.currentActivityType;
-            const existingState = unitProgress.states[activityType];
-
-            if (
-                (sanitizedState === null && existingState === undefined)
-                || this.areActivityStatesEquivalent(existingState, sanitizedState)
-            ) {
-                return;
-            }
-
-            if (sanitizedState === null) {
-                delete unitProgress.states[activityType];
-            } else {
-                unitProgress.states[activityType] = sanitizedState;
-            }
-
-            this.sm.unitStates = unitProgress.states;
-            this.sm.progress.saveLocalProgress();
-        }
+        return this.stateStore.handleStateSave(stateData);
     }
 }

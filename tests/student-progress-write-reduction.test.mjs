@@ -32,6 +32,11 @@ Object.defineProperty(globalThis, 'navigator', {
 const { StudentActivityProgressPersistence } = await import('../js/student/studentActivityProgressPersistenceMethods.js');
 const { StudentProgressCloud } = await import('../js/student/studentProgressCloudMethods.js');
 const { imageDB } = await import('../js/db.js');
+const { supabaseService } = await import('../js/supabaseService.js');
+const {
+    getActiveStudentStorageOwner,
+    setActiveStudentStorageOwner
+} = await import('../js/student/persistence/studentStorage.js');
 
 function createPersistence() {
     const localSaves = [];
@@ -272,6 +277,8 @@ test('empty zero-progress launch events never reach the server', async () => {
 });
 
 test('one rejected queued record does not block later valid work', async () => {
+    const originalOwner = getActiveStudentStorageOwner();
+    setActiveStudentStorageOwner('student-1');
     const original = {
         getPendingSyncActions: imageDB.getPendingSyncActions,
         completeSyncAction: imageDB.completeSyncAction,
@@ -280,8 +287,8 @@ test('one rejected queued record does not block later valid work', async () => {
     const completed = [];
     const failed = [];
     imageDB.getPendingSyncActions = async () => [
-        { id: 'bad', type: 'bad', payload: {}, attempts: 0 },
-        { id: 'good', type: 'good', payload: {}, attempts: 0 }
+        { id: 'bad', ownerUserId: 'student-1', type: 'bad', payload: {}, attempts: 0 },
+        { id: 'good', ownerUserId: 'student-1', type: 'good', payload: {}, attempts: 0 }
     ];
     imageDB.completeSyncAction = async id => completed.push(id);
     imageDB.markSyncActionFailed = async (record, error, options) => {
@@ -310,10 +317,87 @@ test('one rejected queued record does not block later valid work', async () => {
         await cloud.flushLocalSyncQueue({ silent: true });
     } finally {
         Object.assign(imageDB, original);
+        setActiveStudentStorageOwner(originalOwner);
     }
 
     assert.deepEqual(completed, ['good']);
     assert.equal(failed[0].id, 'bad');
     assert.equal(failed[0].options.terminal, true);
     assert.equal(statuses.at(-1), 'Some local changes need attention');
+});
+
+test('queued records pass their persisted owner through live-user verification', async () => {
+    const originalOwner = getActiveStudentStorageOwner();
+    const originalSync = supabaseService.syncStudentUnitWork;
+    const calls = [];
+    setActiveStudentStorageOwner('student-1');
+    supabaseService.syncStudentUnitWork = async (payload, options) => {
+        calls.push({ payload, options });
+        return { unit: { unitKey: payload.unitKey } };
+    };
+    const progress = {
+        sm: {
+            authDisabled: false,
+            currentUser: { uid: 'student-1' },
+            setAuthStatus() {}
+        }
+    };
+    const cloud = new StudentProgressCloud(progress);
+    cloud.applyUnitProgressResult = () => {};
+
+    try {
+        await cloud.syncQueuedRecord({
+            id: 'queued-1',
+            ownerUserId: 'student-1',
+            type: 'student-unit-work',
+            payload: { eventId: 'event-1', unitKey: 'unit-1', workPatch: {} }
+        }, { ownerUserId: 'student-1' });
+    } finally {
+        supabaseService.syncStudentUnitWork = originalSync;
+        setActiveStudentStorageOwner(originalOwner);
+    }
+
+    assert.deepEqual(calls[0].options, {
+        ownerUserId: 'student-1',
+        verifyOwner: true
+    });
+});
+
+test('a cloud result from the previous student cannot overwrite the active session', async () => {
+    const originalOwner = getActiveStudentStorageOwner();
+    const originalEnsureProgress = supabaseService.ensureOwnStudentProgress;
+    let release;
+    supabaseService.ensureOwnStudentProgress = () => new Promise(resolve => { release = resolve; });
+    setActiveStudentStorageOwner('student-a');
+    const statuses = [];
+    const sm = {
+        authDisabled: false,
+        currentUser: { uid: 'student-a' },
+        studentProfile: { firstName: 'Student', lastName: 'A' },
+        progressData: { owner: 'student-a' },
+        coinData: { balance: 0, giftCoins: 0 },
+        coinHistory: [],
+        setAuthStatus: status => statuses.push(status)
+    };
+    const cloud = new StudentProgressCloud({ sm });
+
+    try {
+        const loading = cloud.loadCloudProgress({ ownerUserId: 'student-a' });
+        await Promise.resolve();
+        sm.currentUser = { uid: 'student-b' };
+        sm.progressData = { owner: 'student-b' };
+        setActiveStudentStorageOwner('student-b');
+        release({
+            studentProfile: { firstName: 'Student', lastName: 'A' },
+            units: { stale: true },
+            totalXp: 500
+        });
+        await loading;
+
+        assert.deepEqual(sm.progressData, { owner: 'student-b' });
+        assert.deepEqual(statuses, []);
+    } finally {
+        supabaseService.ensureOwnStudentProgress = originalEnsureProgress;
+        setActiveStudentStorageOwner(originalOwner);
+    }
 });

@@ -49,11 +49,11 @@ export const sparkResponsesRepository = {
         return (data || []).map(mapSparkResponseRow);
     },
 
-    async submit(state = {}) {
+    async submit(state = {}, options = {}) {
         const row = await studentApi.submitStudentSparkResponse({
             sparkId: String(state.sparkId || ''),
             answers: objectValue(state.answers)
-        });
+        }, options);
         return mapSparkResponseRow(row);
     }
 };

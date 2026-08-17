@@ -55,6 +55,11 @@ const { StudentActivityLauncher } = await import('../js/student/studentActivityL
 const { StudentActivityMenu } = await import('../js/student/studentActivityMenuMethods.js');
 const { StudentActivityModuleLoader } = await import('../js/student/studentActivityModuleLoaderMethods.js');
 const { StudentActivityProgressPersistence } = await import('../js/student/studentActivityProgressPersistenceMethods.js');
+const { StudentActivityAttemptService } = await import('../js/student/studentActivityAttemptService.js');
+const { StudentActivityAutoSave } = await import('../js/student/studentActivityAutoSave.js');
+const { StudentActivityResultProcessor } = await import('../js/student/studentActivityResultProcessor.js');
+const { StudentActivityStateStore } = await import('../js/student/studentActivityStateStore.js');
+const { StudentActivitySyncCoordinator } = await import('../js/student/studentActivitySyncCoordinator.js');
 const { StudentActivityProgressFlow } = await import('../js/student/studentActivityProgressFlowMethods.js');
 const { StudentActivitySchedule } = await import('../js/student/studentActivityScheduleMethods.js');
 const { StudentActivitySession } = await import('../js/student/studentActivitySession.js');
@@ -140,6 +145,16 @@ test('StudentActivities owns explicit runtime components', () => {
     assert.ok(activities.moduleLoader instanceof StudentActivityModuleLoader);
     assert.ok(activities.launcher instanceof StudentActivityLauncher);
     assert.ok(activities.progressPersistence instanceof StudentActivityProgressPersistence);
+    assert.ok(activities.progressPersistence.attemptService instanceof StudentActivityAttemptService);
+    assert.ok(activities.progressPersistence.autoSave instanceof StudentActivityAutoSave);
+    assert.ok(activities.progressPersistence.resultProcessor instanceof StudentActivityResultProcessor);
+    assert.ok(activities.progressPersistence.stateStore instanceof StudentActivityStateStore);
+    assert.ok(activities.progressPersistence.syncCoordinator instanceof StudentActivitySyncCoordinator);
+    assert.equal(activities.progressPersistence.stateStore.activities, activities);
+    assert.equal(activities.progressPersistence.attemptService.persistence, activities.progressPersistence);
+    assert.equal(activities.progressPersistence.autoSave.persistence, activities.progressPersistence);
+    assert.equal(activities.progressPersistence.resultProcessor.activities, activities);
+    assert.equal(activities.progressPersistence.syncCoordinator.persistence, activities.progressPersistence);
     assert.ok(activities.progressPersistence.activitySyncStates instanceof Map);
     assert.equal(activities.menu.activities, activities);
     assert.equal(activities.launcher.activities, activities);
@@ -161,6 +176,65 @@ test('activity cloud-sync queues are isolated per student runtime', () => {
 
     assert.equal(first.progressPersistence.activitySyncStates.size, 1);
     assert.equal(second.progressPersistence.activitySyncStates.size, 0);
+});
+
+test('activity sync teardown clears scheduled work and releases pending callers', async () => {
+    const activities = new StudentActivities({});
+    const persistence = activities.progressPersistence;
+    let releaseWaiter;
+    let waiterResult = 'pending';
+    const waiter = new Promise(resolve => { releaseWaiter = resolve; })
+        .then(result => { waiterResult = result; });
+    const timer = setTimeout(() => {}, 10_000);
+    persistence.activitySyncStates.set('student-1:unit-1:quiz', {
+        timer,
+        pending: { payload: { score: 20 } },
+        waiters: [{ resolve: releaseWaiter, reject() {} }]
+    });
+    activities.session.activityAttempt = { attemptId: 'attempt-1' };
+
+    persistence.resetForSession();
+    await waiter;
+
+    assert.equal(persistence.activitySyncStates.size, 0);
+    assert.equal(activities.session.activityAttempt, null);
+    assert.equal(waiterResult, null);
+});
+
+test('settled activity sync fingerprints are retained in a bounded LRU', () => {
+    const persistence = new StudentActivities({}).progressPersistence;
+    const coordinator = persistence.syncCoordinator;
+    for (let index = 0; index < 80; index += 1) {
+        coordinator.activitySyncStates.set(`student:unit-${index}:quiz`, {
+            timer: null,
+            pending: null,
+            inFlight: null,
+            waiters: [],
+            lastSubmittedFingerprint: `fingerprint-${index}`
+        });
+    }
+
+    coordinator.pruneSettledSyncStates();
+
+    assert.equal(coordinator.activitySyncStates.size, coordinator.maxSettledSyncStates);
+    assert.equal(coordinator.activitySyncStates.has('student:unit-0:quiz'), false);
+    assert.equal(coordinator.activitySyncStates.has('student:unit-79:quiz'), true);
+});
+
+test('activity state store rejects embedded images and oversized snapshots', () => {
+    const persistence = new StudentActivities({}).progressPersistence;
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    try {
+        assert.equal(persistence.sanitizeActivityState({ image: 'data:image/png;base64,AAAA' }), undefined);
+        assert.equal(persistence.sanitizeActivityState({ text: 'x'.repeat(51 * 1024) }), undefined);
+        const source = { round: 2, answers: ['A'] };
+        const sanitized = persistence.sanitizeActivityState(source);
+        assert.deepEqual(sanitized, source);
+        assert.notEqual(sanitized, source);
+    } finally {
+        console.warn = originalWarn;
+    }
 });
 
 test('activity XP reward uses the authoritative server total delta', () => {

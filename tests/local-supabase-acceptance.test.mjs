@@ -356,6 +356,21 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(page.limit, 1);
             assert.equal(Object.hasOwn(page.items[0], 'units'), false);
 
+            const { data: filters, error: filtersError } = await teacherClient.rpc(
+                'list_student_roster_filters_v1'
+            );
+            if (filtersError) throw filtersError;
+            assert.ok(filters.grades.includes(6));
+            assert.ok(filters.classes.some(item => item.grade === '6' && item.section === 'A'));
+
+            const { data: analytics, error: analyticsError } = await teacherClient.rpc(
+                'get_teacher_dashboard_analytics_v1', { p_grade: 6 }
+            );
+            if (analyticsError) throw analyticsError;
+            assert.ok(analytics.totalStudents >= 1);
+            assert.ok(Array.isArray(analytics.coinDistribution));
+            assert.ok(Array.isArray(analytics.recentActivities));
+
             const { data: details, error: detailsError } = await teacherClient.rpc('get_students_progress_by_ids_v1', {
                 p_user_ids: [student.id, peer.id]
             });
@@ -369,6 +384,10 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             }).throwOnError());
             await expectRejected(() => studentClient.rpc('get_students_progress_by_ids_v1', {
                 p_user_ids: [peer.id]
+            }).throwOnError());
+            await expectRejected(() => studentClient.rpc('list_student_roster_filters_v1').throwOnError());
+            await expectRejected(() => studentClient.rpc('get_teacher_dashboard_analytics_v1', {
+                p_grade: 6
             }).throwOnError());
         });
 
@@ -456,6 +475,12 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             }));
             assert.equal(synced.unit.acceptanceNote, 'persisted');
             assert.equal(synced.unit.scores, undefined);
+
+            await expectRejected(() => withServiceClient(studentClient, () => supabaseService.syncStudentUnitWork({
+                unitKey: activityUnitKey,
+                unitContext: activityPayload.unitContext,
+                workPatch: { crossUserReplay: true }
+            }, { ownerUserId: peer.id })), /owner does not match/i);
 
             const firstScore = await withServiceClient(studentClient, () => supabaseService.submitStudentGameScore({
                 gameId: 'snake', score: 123, metadata: { runId: RUN_ID }

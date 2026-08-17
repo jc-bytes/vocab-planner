@@ -2,12 +2,9 @@ import { $, escapeHtml } from './main.js';
 
 const teacherDataDashboardRecentActivityMethods = {
     renderRecentActivity() {
-        const filteredData = this.getDashboardFilteredData();
         const table = $('#recent-activity-table');
         if (!table) return;
 
-        // Get recent vocabulary activity completions (not coin history)
-        const recentActivities = [];
         const activityNames = {
             matching: 'Matching',
             flashcards: 'Flashcards',
@@ -22,55 +19,19 @@ const teacherDataDashboardRecentActivityMethods = {
             synonymAntonym: 'Synonym/Antonym',
             illustration: 'Word Hunt'
         };
-
-        filteredData.forEach(student => {
-            const profile = student.studentProfile || {};
-            const studentName = profile.firstName && profile.lastName
-                ? `${profile.firstName} ${profile.lastName}`
-                : (profile.name || student.email || 'Unknown');
-
-            const units = student.units || {};
-            Object.entries(units).forEach(([unitId, unitData]) => {
-                // Scores are stored in unitData.scores[activityKey]
-                const scores = unitData.scores || {};
-                Object.entries(activityNames).forEach(([activityKey, activityLabel]) => {
-                    const activityData = scores[activityKey];
-                    if (activityData && (activityData.completed || activityData.score > 0)) {
-                        const timestamp = activityData.completedAt || activityData.lastAttempt || activityData.timestamp || student.updatedAt;
-                        let date = null;
-                        if (timestamp) {
-                            // Handle Supabase timestamp or regular timestamp
-                            if (timestamp.toDate) {
-                                date = timestamp.toDate();
-                            } else if (timestamp.toMillis) {
-                                date = new Date(timestamp.toMillis());
-                            } else if (typeof timestamp === 'number') {
-                                date = new Date(timestamp);
-                            } else {
-                                date = new Date(timestamp);
-                            }
-                        }
-
-                        recentActivities.push({
-                            student: studentName,
-                            unit: unitId.replace(/_/g, ' '),
-                            activity: activityLabel,
-                            score: activityData.score !== undefined ? `${activityData.score}%` : (activityData.completed ? 'Complete' : '-'),
-                            date: date,
-                            dateStr: date && !isNaN(date) ? date.toLocaleDateString() : '-'
-                        });
-                    }
-                });
-            });
+        const recentActivities = (this.dashboardAnalytics?.recentActivities || []).map(activity => {
+            const date = activity.occurredAt ? new Date(activity.occurredAt) : null;
+            return {
+                student: activity.student || 'Unknown',
+                unit: String(activity.unit || '').replace(/_/g, ' '),
+                activity: activityNames[activity.activityType] || activity.activityType || 'Activity',
+                score: activity.score !== undefined && activity.score !== null
+                    ? `${Math.round(Number(activity.score))}%`
+                    : (activity.completed ? 'Complete' : '-'),
+                dateStr: date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString() : '-'
+            };
         });
 
-        // Sort by date (most recent first)
-        recentActivities.sort((a, b) => {
-            if (!a.date) return 1;
-            if (!b.date) return -1;
-            return b.date - a.date;
-        });
-        recentActivities.splice(30); // Keep only 30 most recent
 
         if (recentActivities.length === 0) {
             table.innerHTML = '<p class="data-table__empty" style="color: var(--text-muted); text-align: center; padding: 2rem;">No vocabulary activity completed yet</p>';

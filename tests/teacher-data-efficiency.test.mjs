@@ -10,14 +10,52 @@ const migration = await readFile(new URL(
 ), 'utf8');
 const authProfileMethods = await readFile(new URL('../js/supabaseAuthProfileMethods.js', import.meta.url), 'utf8');
 const exportMethods = await readFile(new URL('../js/teacherDataExportDataMethods.js', import.meta.url), 'utf8');
+const progressPageMethods = await readFile(new URL(
+    '../js/teacherStudentProgress/teacherProgressPageMethods.js', import.meta.url
+), 'utf8');
+const dashboardMethods = await readFile(new URL('../js/teacherDataDashboardViewMethods.js', import.meta.url), 'utf8');
+const analyticsMigration = await readFile(new URL(
+    '../supabase/migrations/20260816230410_add_teacher_roster_filters_and_dashboard_analytics.sql',
+    import.meta.url
+), 'utf8');
 
 test('teacher roster uses a bounded paginated summary without full activity snapshots', () => {
     assert.match(migration, /list_student_progress_summaries_v1/i);
     assert.match(migration, /least\(greatest\(coalesce\(p_limit, 100\), 1\), 200\)/i);
     const summarySection = migration.split('create or replace function private.get_students_progress_by_ids_v1')[0];
     assert.doesNotMatch(summarySection, /student_progress_snapshot_v2/i);
-    assert.match(authProfileMethods, /while \(offset < total\)/);
+    assert.match(progressPageMethods, /listStudentProgressSummaries/);
+    assert.match(progressPageMethods, /limit: query\.pageSize/);
+    assert.match(progressPageMethods, /grade: query\.grade/);
+    assert.match(progressPageMethods, /section: query\.section/);
+    assert.match(progressPageMethods, /search: query\.search/);
+    assert.match(authProfileMethods, /while \(offset < total\)/, 'explicit bulk workflows retain full retrieval');
     assert.match(authProfileMethods, /list_student_progress_summaries_v1/);
+});
+
+test('teacher analytics use a server aggregate instead of expanding every student snapshot', () => {
+    assert.match(analyticsMigration, /get_teacher_dashboard_analytics_v1/i);
+    assert.match(analyticsMigration, /student_activity_progress/i);
+    assert.match(analyticsMigration, /limit 30/i);
+    assert.match(dashboardMethods, /getTeacherDashboardAnalytics/);
+    assert.doesNotMatch(dashboardMethods, /ensureStudentProgressDetails/);
+});
+
+test('data-management settings load together and expose section-level failures', () => {
+    assert.match(dashboardMethods, /Promise\.allSettled\(\[/);
+    assert.match(dashboardMethods, /loadSubjectSettings\(\{ surfaceErrors: true \}\)/);
+    assert.match(dashboardMethods, /loadGamificationSettings\(\{ surfaceErrors: true \}\)/);
+    assert.match(dashboardMethods, /loadSchoolCalendarSettings\(\{ surfaceErrors: true \}\)/);
+    assert.match(dashboardMethods, /subjects-save-status/);
+    assert.match(dashboardMethods, /gamification-save-status/);
+    assert.match(dashboardMethods, /school-calendar-save-status/);
+});
+
+test('roster failures preserve the last successful page and expose a retry state', () => {
+    assert.match(progressPageMethods, /studentProgressLastPage/);
+    assert.match(progressPageMethods, /applyStudentProgressPage\(this\.studentProgressLastPage\)/);
+    assert.match(progressPageMethods, /data-progress-retry/);
+    assert.doesNotMatch(progressPageMethods, /applyStudentProgressData\(\[\]\)/);
 });
 
 test('teacher detail and export requests use a bounded batch RPC', () => {

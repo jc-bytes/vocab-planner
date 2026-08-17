@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 globalThis.localStorage = {
@@ -61,6 +62,9 @@ const { StudentGameAccess } = await import('../js/student/studentGameAccessMetho
 const { readLocalArcadeSession, writeLocalArcadeSession, writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
 const { refreshLocalFormativeWindow } = await import('../js/student/studentArcadeTimeStorage.js');
 const { supabaseService } = await import('../js/supabaseService.js');
+const legacyScoreBridgeSource = await readFile(
+    new URL('../js/games/legacy-score-bridge.js', import.meta.url), 'utf8'
+);
 
 test('StudentGames owns explicit game components', () => {
     const manager = {};
@@ -105,6 +109,12 @@ test('StudentGames owns explicit game components', () => {
     ]) {
         assert.equal(state in manager, false, `${state} must not be stored on StudentManager`);
     }
+});
+
+test('legacy game score discovery caches the first matching global', () => {
+    assert.match(legacyScoreBridgeSource, /let cachedGame = null/);
+    assert.match(legacyScoreBridgeSource, /if \(cachedGame\?\.levelStats\) return cachedGame/);
+    assert.match(legacyScoreBridgeSource, /if \(!cachedGame \|\| cachedGame\.score === undefined\)/);
 });
 
 test('StudentGames runtime state is isolated per instance', () => {

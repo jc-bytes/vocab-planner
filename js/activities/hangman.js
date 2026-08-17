@@ -1,5 +1,6 @@
 import { createElement, $, notifications } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
+import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 export class HangmanActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -79,7 +80,7 @@ export class HangmanActivity {
         }
 
         const key = `hangman_state_${this.words.length}`;
-        const saved = localStorage.getItem(key);
+        const saved = readStudentActivityValue(key);
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -106,7 +107,7 @@ export class HangmanActivity {
         }
 
         const key = `hangman_state_${this.words.length}`;
-        localStorage.setItem(key, JSON.stringify(state));
+        writeStudentActivityValue(key, JSON.stringify(state));
     }
 
     startRound() {
@@ -269,7 +270,7 @@ export class HangmanActivity {
     restart() {
         // Clear saved state
         const key = `hangman_state_${this.words.length}`;
-        localStorage.removeItem(key);
+        removeStudentActivityValue(key);
         
         // Reset game state
         this.currentWordIndex = 0;

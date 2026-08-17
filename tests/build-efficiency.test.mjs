@@ -4,8 +4,10 @@ import { readFile } from 'node:fs/promises';
 
 const viteConfig = await readFile(new URL('../vite.config.mjs', import.meta.url), 'utf8');
 const serviceWorkerGenerator = await readFile(new URL('../scripts/generate-service-worker.mjs', import.meta.url), 'utf8');
+const desktopAssetCopier = await readFile(new URL('../scripts/copy-desktop-assets.mjs', import.meta.url), 'utf8');
 const teacherEntry = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 const teacherLazyFeatures = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
+const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
 
 test('student offline shell is generated from the student entry graph only', () => {
@@ -15,6 +17,27 @@ test('student offline shell is generated from the student entry graph only', () 
     assert.match(serviceWorkerGenerator, /reportGenerator-/);
     assert.match(serviceWorkerGenerator, /globPatterns:\s*\[\]/);
     assert.doesNotMatch(serviceWorkerGenerator, /assets\/\*\*\/\*\.\{js,css\}/);
+});
+
+test('large upstream game artifacts remain excluded from deployment assets', () => {
+    assert.match(desktopAssetCopier, /extension === '\.zip'/);
+    assert.match(desktopAssetCopier, /name === 'closure\.jar'/);
+    assert.match(desktopAssetCopier, /name === 'shader_minifier\.exe'/);
+    assert.match(desktopAssetCopier, /package-lock\.json/);
+    assert.match(desktopAssetCopier, /htmlGameEntries/);
+});
+
+test('large teacher feature DOM is inert until its lazy module opens', () => {
+    for (const templateId of [
+        'teacher-quizzes-view-template',
+        'teacher-data-management-view-template',
+        'teacher-sparks-modal-template'
+    ]) {
+        assert.match(teacherHtml, new RegExp(`<template id="${templateId}">`));
+        assert.match(teacherLazyFeatures, new RegExp(templateId));
+    }
+    assert.match(teacherLazyFeatures, /template\.content\.cloneNode\(true\)/);
+    assert.match(teacherLazyFeatures, /mountTeacherFeatureTemplates\(featureName\)/);
 });
 
 test('teacher feature bundles are loaded only when their views are opened', () => {

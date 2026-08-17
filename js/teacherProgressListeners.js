@@ -9,9 +9,18 @@ export function initTeacherProgressListeners(manager) {
         manager.showDashboard();
     });
 
-    $('#filter-grade').addEventListener('change', () => manager.applyFilters());
-    $('#filter-group').addEventListener('change', () => manager.applyFilters());
-    $('#filter-search').addEventListener('input', () => manager.applyFilters());
+    $('#filter-grade')?.addEventListener('change', () => manager.applyFilters());
+    $('#filter-group')?.addEventListener('change', () => manager.applyFilters());
+    $('#filter-search')?.addEventListener('input', () => manager.scheduleStudentProgressFilter());
+    $('#student-progress-pagination')?.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-progress-page]');
+        if (button && !button.disabled) manager.changeStudentProgressPage(button.dataset.progressPage);
+    });
+    $('#student-progress-status')?.addEventListener('click', (event) => {
+        if (event.target.closest('[data-progress-retry]')) {
+            manager.fetchStudentProgressPage({ forceRefresh: true }).catch(() => {});
+        }
+    });
 
     $('#close-detail-modal').addEventListener('click', () => {
         closeDialog('#student-detail-modal');

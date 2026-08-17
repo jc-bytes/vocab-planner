@@ -205,6 +205,7 @@ export class StudentActivityLauncher {
                     this.activities.handleIllustrationSave.bind(this.activities),
                     this.sm.unitWordHunt,
                     {
+                        ownerUserId: this.sm.currentUser?.uid || 'local-dev',
                         initialIndex: options.initialWordIndex || 0,
                         onWordChange: index => {
                             if (!isCurrentLaunch() || !unitId) return;

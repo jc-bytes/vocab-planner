@@ -41,6 +41,7 @@ const { StudentManager } = await import('../js/student.js');
 const { StudentProgressCloud } = await import('../js/student/studentProgressCloudMethods.js');
 const { StudentProgressCoins } = await import('../js/student/studentProgressCoinMethods.js');
 const { StudentProgressCore } = await import('../js/student/studentProgressCoreMethods.js');
+const { StudentProgressSyncQueue } = await import('../js/student/studentProgressSyncQueue.js');
 const { StudentCoinNotifications } = await import('../js/student/studentCoinNotifications.js');
 
 function createManager() {
@@ -58,17 +59,19 @@ function createManager() {
     };
 }
 
-test('StudentProgress owns explicit core, cloud, and coin components', () => {
+test('StudentProgress owns explicit core, cloud, sync queue, and coin components', () => {
     const manager = createManager();
     const progress = new StudentProgress(manager);
 
     assert.equal(progress.sm, manager);
     assert.ok(progress.core instanceof StudentProgressCore);
     assert.ok(progress.cloud instanceof StudentProgressCloud);
+    assert.ok(progress.syncQueue instanceof StudentProgressSyncQueue);
     assert.ok(progress.coins instanceof StudentProgressCoins);
     assert.ok(progress.notifications instanceof StudentCoinNotifications);
     assert.equal(progress.core.progress, progress);
     assert.equal(progress.cloud.progress, progress);
+    assert.equal(progress.syncQueue.progress, progress);
     assert.equal(progress.coins.progress, progress);
     assert.equal(progress.notifications.progress, progress);
     assert.ok(progress.clientId);

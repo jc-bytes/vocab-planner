@@ -1,4 +1,5 @@
 import { createElement } from '../main.js';
+import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const MAX_GUESSES = 6;
 
@@ -77,7 +78,7 @@ export class WordleActivity {
     }
 
     getLocalState() {
-        const saved = localStorage.getItem(`wordle_state_${this.words.length}`);
+        const saved = readStudentActivityValue(`wordle_state_${this.words.length}`);
         return saved ? JSON.parse(saved) : null;
     }
 
@@ -93,7 +94,7 @@ export class WordleActivity {
         };
 
         if (this.onSaveState) this.onSaveState(state);
-        localStorage.setItem(`wordle_state_${this.words.length}`, JSON.stringify(state));
+        writeStudentActivityValue(`wordle_state_${this.words.length}`, JSON.stringify(state));
     }
 
     addLetter(letter) {
@@ -190,7 +191,7 @@ export class WordleActivity {
     }
 
     restart() {
-        localStorage.removeItem(`wordle_state_${this.words.length}`);
+        removeStudentActivityValue(`wordle_state_${this.words.length}`);
         this.words.sort(() => Math.random() - 0.5);
         this.currentIndex = 0;
         this.currentGuess = '';

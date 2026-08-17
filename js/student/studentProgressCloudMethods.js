@@ -1,14 +1,19 @@
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
-import { mapSparkResponseRow } from '../services/sparkResponsesRepository.js';
 import { studentProgressRepository } from '../services/studentProgressRepository.js';
 import { imageDB } from '../db.js';
 import { classifySyncError } from '../services/syncQueuePolicy.js';
+import { StudentProgressSyncQueue } from './studentProgressSyncQueue.js';
 import {
     COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
     COIN_REFRESH_THROTTLE_MS,
     COIN_SYNC_INTERVAL_MS
 } from './studentProgressConstants.js';
+import {
+    getActiveStudentStorageOwner,
+    getStudentProgressStorageKey,
+    isActiveStudentStorageOwner
+} from './persistence/studentStorage.js';
 
 export class StudentProgressCloud {
     constructor(progress) {
@@ -24,6 +29,18 @@ export class StudentProgressCloud {
         this.focusSyncHandler = null;
         this.visibilitySyncHandler = null;
         this.onlineSyncHandler = null;
+        this.cloudGeneration = 0;
+        this.syncQueue = new StudentProgressSyncQueue(this);
+    }
+
+    isCurrentOwner(ownerUserId, options = {}) {
+        return Boolean(
+            ownerUserId
+            && this.sm.currentUser?.uid === ownerUserId
+            && isActiveStudentStorageOwner(ownerUserId)
+            && (!options.isCurrent || options.isCurrent())
+            && (!options.signal || !options.signal.aborted)
+        );
     }
 
     startCoinSync() {
@@ -31,9 +48,11 @@ export class StudentProgressCloud {
 
         this.stopCoinSync();
         const userId = this.sm.currentUser.uid;
+        const generation = this.cloudGeneration;
 
         this.storageSyncHandler = event => {
-            if (event.key === 'student_progress') {
+            if (this.isCurrentOwner(userId)
+                && event.key === getStudentProgressStorageKey(userId)) {
                 this.progress.applyLocalProgressFromStorage(event.newValue);
             }
         };
@@ -42,23 +61,24 @@ export class StudentProgressCloud {
         this.visibilitySyncHandler = () => {
             if (document.visibilityState === 'visible') {
                 if (this.sm.shouldDebugStudentDom?.()) console.log('VISIBILITY', document.visibilityState);
-                this.scheduleCoinRefresh({ silent: true, reason: 'visibilitychange' });
+                this.scheduleCoinRefresh({ silent: true, reason: 'visibilitychange', ownerUserId: userId, generation });
             }
         };
         document.addEventListener('visibilitychange', this.visibilitySyncHandler);
 
         this.focusSyncHandler = () => {
             if (this.sm.shouldDebugStudentDom?.()) console.log('FOCUS');
-            this.scheduleCoinRefresh({ silent: true, reason: 'focus' });
+            this.scheduleCoinRefresh({ silent: true, reason: 'focus', ownerUserId: userId, generation });
         };
         this.onlineSyncHandler = () => {
-            this.flushLocalSyncQueue({ silent: true });
-            this.scheduleCoinRefresh({ silent: true, reason: 'online', force: true });
+            this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
+            this.scheduleCoinRefresh({ silent: true, reason: 'online', force: true, ownerUserId: userId, generation });
         };
         window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
 
         this.coinRealtimeUnsubscribe = studentProgressRepository.subscribe(userId, progress => {
+            if (!this.isCurrentOwner(userId) || generation !== this.cloudGeneration) return;
             this.sm.logStudentDomUpdate?.('student-progress-realtime', { source: 'studentProgressRepository.subscribe' });
             this.applyRemoteCoinProgress(progress);
         });
@@ -68,13 +88,14 @@ export class StudentProgressCloud {
             : COIN_SYNC_INTERVAL_MS;
         this.coinSyncInterval = window.setInterval(() => {
             if (document.visibilityState === 'hidden') return;
-            this.scheduleCoinRefresh({ silent: true, reason: 'interval' });
+            this.scheduleCoinRefresh({ silent: true, reason: 'interval', ownerUserId: userId, generation });
         }, syncInterval);
 
-        this.flushLocalSyncQueue({ silent: true });
+        this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
     }
 
     stopCoinSync() {
+        this.cloudGeneration += 1;
         if (this.coinRealtimeUnsubscribe) {
             this.coinRealtimeUnsubscribe();
             this.coinRealtimeUnsubscribe = null;
@@ -109,6 +130,9 @@ export class StudentProgressCloud {
 
     scheduleCoinRefresh(options = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
+        const ownerUserId = options.ownerUserId || this.sm.currentUser.uid;
+        if (!this.isCurrentOwner(ownerUserId)
+            || (options.generation !== undefined && options.generation !== this.cloudGeneration)) return;
 
         if (this.coinRefreshInFlight) {
             this.coinRefreshPendingOptions = {
@@ -182,6 +206,9 @@ export class StudentProgressCloud {
 
     async refreshCoinsFromCloud(options = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
+        const ownerUserId = options.ownerUserId || this.sm.currentUser.uid;
+        const generation = options.generation ?? this.cloudGeneration;
+        if (!this.isCurrentOwner(ownerUserId, options) || generation !== this.cloudGeneration) return;
         if (this.coinRefreshInFlight) {
             this.coinRefreshPendingOptions = {
                 ...this.coinRefreshPendingOptions,
@@ -198,7 +225,8 @@ export class StudentProgressCloud {
                 reason: options.reason || ''
             });
             this.lastCoinRefreshAt = Date.now();
-            const progress = await studentProgressRepository.getSummary(this.sm.currentUser.uid);
+            const progress = await studentProgressRepository.getSummary(ownerUserId, options);
+            if (!this.isCurrentOwner(ownerUserId, options) || generation !== this.cloudGeneration) return;
             if (!progress) return;
             this.sm.logStudentDomUpdate?.('student-progress', {
                 source: 'refreshCoinsFromCloud:snapshot',
@@ -210,6 +238,7 @@ export class StudentProgressCloud {
                 console.warn('Could not refresh coins from cloud:', error);
             }
         } finally {
+            if (generation !== this.cloudGeneration) return;
             this.coinRefreshInFlight = false;
             const pendingOptions = this.coinRefreshPendingOptions;
             this.coinRefreshPendingOptions = null;
@@ -222,14 +251,18 @@ export class StudentProgressCloud {
     async loadCloudProgress(options = {}) {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
+        const ownerUserId = options.ownerUserId || this.sm.currentUser.uid;
+        if (!this.isCurrentOwner(ownerUserId, options)) return;
         try {
             let data = null;
 
             if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
                 data = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile, options);
             } else {
-                data = await studentProgressRepository.get(this.sm.currentUser.uid, options);
+                data = await studentProgressRepository.get(ownerUserId, options);
             }
+
+            if (!this.isCurrentOwner(ownerUserId, options)) return;
 
             if (!data) {
                 this.sm.setAuthStatus('Ready');
@@ -264,10 +297,12 @@ export class StudentProgressCloud {
             };
             this.sm.updateCoinDisplay();
             this.sm.studentProfile = mergedStudentProfile;
-            await this.restoreImagesFromProgress();
+            await this.restoreImagesFromProgress({ ...options, ownerUserId });
+            if (!this.isCurrentOwner(ownerUserId, options)) return;
 
             if (!hasWelcomeBonus && this.sm.coinData.balance === 0 && typeof supabaseService.claimStudentWelcomeBonus === 'function') {
                 const progress = await supabaseService.claimStudentWelcomeBonus({ clientId: this.progress.clientId });
+                if (!this.isCurrentOwner(ownerUserId, options)) return;
                 if (progress) {
                     const previousBalance = this.sm.coinData.balance;
                     this.applyRemoteCoinProgress(progress);
@@ -281,6 +316,7 @@ export class StudentProgressCloud {
 
             this.sm.setAuthStatus('Synced');
         } catch (error) {
+            if (!this.isCurrentOwner(ownerUserId, options)) return;
             console.error('Failed to load cloud progress:', error);
             // Check if we're offline
             const isOffline = !navigator.onLine;
@@ -299,16 +335,19 @@ export class StudentProgressCloud {
     async saveProgressToCloud() {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
+        const ownerUserId = this.sm.currentUser.uid;
         try {
             let progress = null;
             const unitPayload = this.buildUnitWorkSyncPayload();
             if (unitPayload && typeof supabaseService.syncStudentUnitWork === 'function') {
-                progress = await supabaseService.syncStudentUnitWork(unitPayload);
+                progress = await supabaseService.syncStudentUnitWork(unitPayload, { ownerUserId });
             } else if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
                 // Unit sync already ensures the row exists. Avoid a duplicate round trip
                 // whenever the current save contains unit work.
                 progress = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             }
+
+            if (!this.isCurrentOwner(ownerUserId)) return;
 
             if (progress) {
                 this.applyUnitProgressResult(progress, unitPayload || {});
@@ -316,10 +355,11 @@ export class StudentProgressCloud {
 
             this.sm.setAuthStatus('Synced');
         } catch (error) {
+            if (!this.isCurrentOwner(ownerUserId)) return;
             console.error('Failed to save progress to cloud:', error);
             const failure = classifySyncError(error, { online: navigator.onLine });
             if (failure.retryable) {
-                await this.enqueueProgressSync();
+                await this.enqueueProgressSync({ ownerUserId });
                 this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
             } else {
                 this.sm.setAuthStatus('Cloud rejected this change');
@@ -329,134 +369,27 @@ export class StudentProgressCloud {
     }
 
     buildUnitWorkSyncPayload() {
-        if (!this.sm.currentVocab || !this.sm.activities?.getUnitProgressKey) return null;
-        const unitKey = this.sm.activities.getUnitProgressKey(this.sm.currentVocab);
-        const unitProgress = this.sm.progressData.units?.[unitKey];
-        if (!unitKey || !unitProgress) return null;
-
-        const {
-            scores: _scores,
-            coins: _coins,
-            coinData: _coinData,
-            coinHistory: _coinHistory,
-            ...workPatch
-        } = unitProgress;
-
-        return {
-            eventId: `unit-work:${globalThis.crypto?.randomUUID?.()
-                || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
-            unitKey,
-            unitContext: {
-                unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
-                unitName: unitProgress.unitName || this.sm.currentVocab.name || '',
-                subjectSlug: unitProgress.subjectSlug || '',
-                trimester: unitProgress.trimester || '',
-                schoolYear: unitProgress.schoolYear || '',
-                grade: unitProgress.grade || this.sm.studentProfile?.grade || ''
-            },
-            workPatch
-        };
+        return this.syncQueue.buildUnitWorkSyncPayload();
     }
 
-    async enqueueProgressSync() {
-        try {
-            const payload = this.buildUnitWorkSyncPayload();
-            if (payload) {
-                await imageDB.enqueueSyncAction('student-unit-work', payload);
-            }
-        } catch (queueError) {
-            console.warn('Could not queue progress for later sync:', queueError);
-        }
+    async enqueueProgressSync(options = {}) {
+        return this.syncQueue.enqueueProgressSync(options);
     }
 
     async flushLocalSyncQueue(options = {}) {
-        if (this.sm.authDisabled || !this.sm.currentUser || !navigator.onLine) return;
-
-        let pending = [];
-        try {
-            pending = await imageDB.getPendingSyncActions();
-        } catch (error) {
-            if (!options.silent) console.warn('Could not read local sync queue:', error);
-            return;
-        }
-
-        if (pending.length === 0) return;
-        this.sm.setAuthStatus('Syncing local changes...');
-
-        let retryableFailures = 0;
-        let terminalFailures = 0;
-
-        for (const record of pending) {
-            try {
-                await this.syncQueuedRecord(record);
-                await imageDB.completeSyncAction(record.id);
-            } catch (error) {
-                const failure = classifySyncError(error, { online: navigator.onLine });
-                const updated = await imageDB.markSyncActionFailed(record, error, {
-                    terminal: !failure.retryable,
-                    reason: failure.reason
-                });
-                if (updated.status === 'failed') terminalFailures += 1;
-                else retryableFailures += 1;
-                if (!options.silent) console.warn('Could not sync queued local change:', error);
-            }
-        }
-
-        if (terminalFailures > 0) {
-            this.sm.setAuthStatus('Some local changes need attention');
-            if (!options.silent) {
-                notifications.warning('Some saved changes were rejected, but other work continued syncing.');
-            }
-        } else if (retryableFailures > 0) {
-            this.sm.setAuthStatus('Sync paused - saved locally');
-        } else {
-            this.sm.setAuthStatus('Synced');
-        }
+        return this.syncQueue.flushLocalSyncQueue(
+            options,
+            (record, syncOptions) => this.syncQueuedRecord(record, syncOptions)
+        );
     }
 
-    async syncQueuedRecord(record) {
-        if (record.type === 'student-unit-work' && typeof supabaseService.syncStudentUnitWork === 'function') {
-            const progress = await supabaseService.syncStudentUnitWork(record.payload || {});
-            this.applyUnitProgressResult(progress, record.payload || {});
-            return;
-        }
-        if (record.type === 'student-activity-progress' && typeof supabaseService.submitStudentActivityProgress === 'function') {
-            const progress = await supabaseService.submitStudentActivityProgress(record.payload || {});
-            if (this.sm.activities?.progressPersistence?.applyActivityProgressResult) {
-                this.sm.activities.progressPersistence.applyActivityProgressResult(progress, record.payload || {});
-            } else {
-                this.progress.applyProgressSnapshot(progress, { saveLocal: true });
-            }
-            return;
-        }
-        if (record.type === 'student-spark-response'
-            && typeof supabaseService.submitStudentSparkResponse === 'function') {
-            const saved = await supabaseService.submitStudentSparkResponse(record.payload || {});
-            const storageKey = String(record.payload?.storageKey || '');
-            const sparkId = String(record.payload?.sparkId || '');
-            if (storageKey && sparkId) {
-                try {
-                    const local = JSON.parse(localStorage.getItem(storageKey) || '{}');
-                    local[sparkId] = mapSparkResponseRow(saved);
-                    localStorage.setItem(storageKey, JSON.stringify(local));
-                    this.sm.activities?.updateArcadeGateDisplay?.();
-                } catch (storageError) {
-                    console.warn('Could not refresh the locally cached Spark response:', storageError);
-                }
-            }
-            return;
-        }
-        if (record.type === 'student-progress') {
-            await this.refreshCoinsFromCloud({ silent: true, reason: 'queued-progress', force: true });
-            return;
-        }
-        const error = new Error(`Unsupported offline sync action: ${record.type || 'unknown'}`);
-        error.code = 'INVALID_SYNC_ACTION';
-        error.status = 422;
-        throw error;
+    async syncQueuedRecord(record, options = {}) {
+        return this.syncQueue.syncQueuedRecord(record, options);
     }
 
-    async restoreImagesFromProgress() {
+    async restoreImagesFromProgress(options = {}) {
+        const ownerUserId = options.ownerUserId || this.sm.currentUser?.uid || getActiveStudentStorageOwner();
+        if (!this.isCurrentOwner(ownerUserId, options)) return;
         if (!this.sm.progressData.units) return;
         for (const [unitName, unitData] of Object.entries(this.sm.progressData.units)) {
             if (!unitData.images) continue;
@@ -464,8 +397,10 @@ export class StudentProgressCloud {
                 if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) continue;
 
                 try {
+                    if (!this.isCurrentOwner(ownerUserId, options)) return;
                     const blob = await this.dataURLToBlob(dataUrl);
-                    await imageDB.saveDrawing(unitName, word, blob);
+                    if (!this.isCurrentOwner(ownerUserId, options)) return;
+                    await imageDB.saveDrawing(unitName, word, blob, { ownerUserId });
                 } catch (error) {
                     console.error('Failed to restore image', unitName, word, error);
                 }

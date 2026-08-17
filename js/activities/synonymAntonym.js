@@ -1,5 +1,6 @@
 import { createElement, $ } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
+import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const MASTERY_ACCURACY = 80;
 
@@ -152,7 +153,7 @@ export class SynonymAntonymActivity {
     restoreState() {
         if (this.applySavedState(this.initialState)) return;
 
-        const saved = localStorage.getItem(this.getStorageKey());
+        const saved = readStudentActivityValue(this.getStorageKey());
         if (!saved) return;
 
         try {
@@ -209,7 +210,7 @@ export class SynonymAntonymActivity {
             updatedAt: new Date().toISOString()
         };
 
-        localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+        writeStudentActivityValue(this.getStorageKey(), JSON.stringify(state));
         if (typeof this.onSaveState === 'function') {
             this.onSaveState(state);
         }

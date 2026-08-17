@@ -20,7 +20,7 @@ const SCHOOL_CALENDAR_TRIMESTERS = [
 ];
 
 export const teacherSchoolCalendarSettingsMethods = {
-    async loadSchoolCalendarSettings() {
+    async loadSchoolCalendarSettings(options = {}) {
         if (this.authDisabled) {
             try {
                 const settings = JSON.parse(localStorage.getItem(SCHOOL_CALENDAR_LOCAL_KEY) || 'null');
@@ -28,6 +28,9 @@ export const teacherSchoolCalendarSettingsMethods = {
             } catch (error) {
                 console.error('Error loading local school calendar:', error);
                 this.schoolCalendar = getDefaultSchoolCalendar();
+                this.updateSchoolCalendarUI();
+                if (options.surfaceErrors) throw error;
+                return;
             }
             this.updateSchoolCalendarUI();
             return;
@@ -41,6 +44,7 @@ export const teacherSchoolCalendarSettingsMethods = {
             console.error('Error loading school calendar:', error);
             this.schoolCalendar = getDefaultSchoolCalendar();
             this.updateSchoolCalendarUI();
+            if (options.surfaceErrors) throw error;
         }
     },
 

@@ -1,87 +1,89 @@
-import { $ } from './main.js';
+import { $, notifications } from './main.js';
+import { teacherApi as supabaseService } from './services/teacherApi.js';
 
 const teacherDataDashboardViewMethods = {
     async showDataManagementView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.switchView('teacher-data-management-view');
-        this.loadSubjectSettings();
-        this.loadGamificationSettings();
-        this.loadSchoolCalendarSettings();
-        if (this.allStudentData.length === 0) {
-            await this.fetchAllStudentProgress();
-        }
+        const settingsLoad = Promise.allSettled([
+            this.loadSubjectSettings({ surfaceErrors: true }),
+            this.loadGamificationSettings({ surfaceErrors: true }),
+            this.loadSchoolCalendarSettings({ surfaceErrors: true })
+        ]);
         // Initialize data viewer if not already done
         if (!this.dataViewerInitialized) {
             this.initDataViewer();
         }
         this.initExportListeners();
-        this.populateExportGradeSelect();
         this.switchDataTab(options.tab || 'subjects');
+
+        const results = await settingsLoad;
+        [
+            { label: 'subjects', statusId: '#subjects-save-status' },
+            { label: 'coin settings', statusId: '#gamification-save-status' },
+            { label: 'school calendar', statusId: '#school-calendar-save-status' }
+        ].forEach((section, index) => {
+            const result = results[index];
+            if (result.status !== 'rejected') return;
+            console.error(`Unable to load ${section.label}:`, result.reason);
+            const status = $(section.statusId);
+            if (status) {
+                status.style.color = 'var(--danger-color)';
+                status.textContent = `Could not load ${section.label}. Try reopening this view.`;
+            }
+        });
+    },
+
+    async loadExportRosterData() {
+        try {
+            await this.getStudentProgressData({ showError: false });
+            this.populateExportGradeSelect();
+        } catch (error) {
+            console.error('Unable to load the export roster:', error);
+            notifications.error('The student list for exports is unavailable.');
+        }
     },
 
     async loadDashboardData() {
-        // Ensure student data is loaded
-        if (this.allStudentData.length === 0) {
-            await this.fetchAllStudentProgress();
+        const grade = $('#dashboard-grade-filter')?.value || '';
+        const generation = (this.dashboardLoadGeneration || 0) + 1;
+        this.dashboardLoadGeneration = generation;
+        const analyticsPromise = supabaseService.getTeacherDashboardAnalytics({ grade });
+        const libraryPromise = this.getTeacherLibrary();
+
+        try {
+            const analytics = await analyticsPromise;
+            if (generation !== this.dashboardLoadGeneration) return;
+            this.dashboardAnalytics = analytics;
+            this.populateDashboardGradeFilter();
+            $('#dashboard-total-students').textContent = analytics.totalStudents;
+            $('#dashboard-active-students').textContent = analytics.activeStudents;
+            $('#dashboard-avg-coins').textContent = analytics.averageCoins.toLocaleString();
+            await this.renderDashboardCharts();
+            this.renderRecentActivity();
+        } catch (error) {
+            if (generation !== this.dashboardLoadGeneration) return;
+            console.error('Unable to load dashboard analytics:', error);
+            notifications.error('Dashboard analytics are unavailable right now.');
+            ['dashboard-total-students', 'dashboard-active-students', 'dashboard-avg-coins']
+                .forEach(id => { const element = $(`#${id}`); if (element) element.textContent = '--'; });
         }
 
-        // Populate grade filter dropdown
-        this.populateDashboardGradeFilter();
-
-        // Get filtered data based on selected grade
-        const filteredData = this.getDashboardFilteredData();
-
-        // Load summary stats
-        const totalStudents = filteredData.length;
-        const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-        const activeStudents = filteredData.filter(s => {
-            const lastActive = this.getStudentUpdatedTime(s);
-            return lastActive > sevenDaysAgo;
-        }).length;
-
-        const totalCoins = filteredData.reduce((sum, s) => {
-            const coins = s.coinData?.balance || s.coins || 0;
-            return sum + coins;
-        }, 0);
-        const avgCoins = totalStudents > 0 ? Math.round(totalCoins / totalStudents) : 0;
-
-        // Update summary cards
-        $('#dashboard-total-students').textContent = totalStudents;
-        $('#dashboard-active-students').textContent = activeStudents;
-        $('#dashboard-avg-coins').textContent = avgCoins.toLocaleString();
-
-        // Load vocabulary count
         try {
-            const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
+            const { cloudVocabs, remoteVocabs, localVocabs } = await libraryPromise;
+            if (generation !== this.dashboardLoadGeneration) return;
             $('#dashboard-vocab-count').textContent = cloudVocabs.length + remoteVocabs.length + localVocabs.length;
         } catch (err) {
             console.error('Error loading vocab count:', err);
             $('#dashboard-vocab-count').textContent = '--';
         }
-
-        // Full activity snapshots are intentionally deferred until analytics is visible.
-        try {
-            await this.ensureStudentProgressDetails(filteredData.map(student => student.id));
-        } catch (error) {
-            console.error('Unable to load detailed student analytics:', error);
-        }
-
-        // Load charts
-        await this.renderDashboardCharts();
-        this.renderRecentActivity();
     },
 
     populateDashboardGradeFilter() {
         const gradeFilter = $('#dashboard-grade-filter');
         if (!gradeFilter) return;
 
-        // Get unique grades from student data (grade is in studentProfile.grade)
-        const grades = new Set();
-        this.allStudentData.forEach(student => {
-            const profile = student.studentProfile || {};
-            const grade = profile.grade || '';
-            if (grade) grades.add(grade);
-        });
+        const grades = new Set((this.dashboardAnalytics?.availableGrades || []).map(String));
 
         // Sort grades (handle both numeric and string grades)
         const sortedGrades = Array.from(grades).sort((a, b) => {
@@ -107,21 +109,6 @@ const teacherDataDashboardViewMethods = {
         if (currentValue && sortedGrades.includes(currentValue)) {
             gradeFilter.value = currentValue;
         }
-    },
-
-    getDashboardFilteredData() {
-        const gradeFilter = $('#dashboard-grade-filter');
-        const selectedGrade = gradeFilter?.value || '';
-
-        if (!selectedGrade) {
-            return this.allStudentData;
-        }
-
-        return this.allStudentData.filter(student => {
-            const profile = student.studentProfile || {};
-            const studentGrade = profile.grade || '';
-            return String(studentGrade) === String(selectedGrade);
-        });
     },
 };
 

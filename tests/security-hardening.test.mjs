@@ -22,7 +22,8 @@ test('student-controlled leaderboard, activity, and export values are HTML-escap
         assert.match(activity, new RegExp(`escapeHtml\\(activity\\.${field}\\)`));
     }
     assert.match(overview, /escapeHtml\(name\)/);
-    assert.match(overview, /escapeHtml\(grade\)/);
+    assert.match(overview, /escapeHtml\(label\)/);
+    assert.match(overview, /escapeHtml\(date\)/);
     for (const source of [viewer, preview]) {
         assert.match(source, /escapeHtml\(name\)/);
         assert.match(source, /escapeHtml\(item\.gameId \|\| '-'\)/);
@@ -119,6 +120,21 @@ test('CI runs the complete tests and fails on meaningful database findings', asy
     assert.match(workflow, /validate:[\s\S]*?deploy:[\s\S]*?needs: validate/);
     assert.match(workflow, /deploy:[\s\S]*?pages: write[\s\S]*?id-token: write/);
     assert.doesNotMatch(workflow, /uses: [^\s]+@v\d/);
+});
+
+test('CI exercises authentication, IndexedDB, activities, and sandboxing in Firefox and WebKit', async () => {
+    const [workflow, smoke] = await Promise.all([
+        read('.github/workflows/static.yml'),
+        read('scripts/ui-cross-browser-smoke.mjs')
+    ]);
+    assert.match(workflow, /playwright install --with-deps chromium firefox webkit/);
+    assert.match(workflow, /npm run test:ui:cross-browser/);
+    assert.match(smoke, /import \{ firefox, webkit \} from 'playwright'/);
+    assert.match(smoke, /AUDIT_TEACHER_EMAIL/);
+    assert.match(smoke, /AUDIT_STUDENT_EMAIL/);
+    assert.match(smoke, /activity\/flashcards/);
+    assert.match(smoke, /indexedDB\.open/);
+    assert.match(smoke, /parentCannotReadDocument/);
 });
 
 test('HTML games are sandboxed away from account storage', async () => {

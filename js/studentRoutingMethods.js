@@ -17,6 +17,13 @@ export class StudentRouting {
         this.pendingRoute = null;
     }
 
+    resetSession() {
+        this.games?.cleanupCurrentGame?.({ preserveSelection: false });
+        this.games = null;
+        this.gamesPromise = null;
+        this.reset();
+    }
+
     slugifyRouteId(value) {
         return String(value || '')
             .trim()

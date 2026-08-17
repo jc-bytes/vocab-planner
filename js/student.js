@@ -145,6 +145,10 @@ export class StudentManager {
         this.routing.reset();
     }
 
+    resetSessionRouting() {
+        this.routing.resetSession();
+    }
+
     setStudentWideShellMediaQuery(mediaQuery) {
         this.shell.setWideShellMediaQuery(mediaQuery);
     }

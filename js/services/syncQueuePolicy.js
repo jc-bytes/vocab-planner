@@ -15,6 +15,7 @@ const RETRYABLE_ERROR_CODES = new Set([
 
 const TERMINAL_ERROR_CODES = new Set([
     'REQUEST_ABORTED',
+    'SYNC_OWNER_MISMATCH',
     'PGRST116',
     'PGRST301'
 ]);

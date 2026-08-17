@@ -1,4 +1,5 @@
 import { createElement } from '../main.js';
+import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const FLASHCARD_MASTERY_VERSION = 3;
 
@@ -59,7 +60,7 @@ export class FlashcardsActivity {
         const keys = [this.getStorageKey(), this.getLegacyStorageKey()];
 
         for (const key of keys) {
-            const saved = localStorage.getItem(key);
+            const saved = readStudentActivityValue(key);
             if (!saved) continue;
 
             try {
@@ -110,7 +111,7 @@ export class FlashcardsActivity {
         };
 
         this.onSaveState?.(state);
-        localStorage.setItem(this.getStorageKey(), JSON.stringify(state));
+        writeStudentActivityValue(this.getStorageKey(), JSON.stringify(state));
     }
 
     reportProgress() {

@@ -13,6 +13,30 @@ const requireRpcResult = (mapper, data, error) => {
     return mapper(firstRow(data));
 };
 
+function createOwnerMismatchError() {
+    const error = new Error('The authenticated student does not own this saved browser work.');
+    error.code = 'SYNC_OWNER_MISMATCH';
+    error.status = 403;
+    return error;
+}
+
+async function resolveExpectedStudentOwner(service, options = {}) {
+    const expectedOwnerUserId = String(options.ownerUserId || '').trim();
+
+    if (options.verifyOwner === true || !expectedOwnerUserId) {
+        const { data, error } = await service.client.auth.getUser();
+        if (error) throw error;
+        const verifiedOwnerUserId = String(data?.user?.id || '').trim();
+        if (!verifiedOwnerUserId
+            || (expectedOwnerUserId && verifiedOwnerUserId !== expectedOwnerUserId)) {
+            throw createOwnerMismatchError();
+        }
+        return verifiedOwnerUserId;
+    }
+
+    return expectedOwnerUserId;
+}
+
 export function installSupabaseStudentWriteMethods(service) {
     service.ensureOwnStudentProgress = async function ensureOwnStudentProgress(studentProfile = {}, options = {}) {
         await this.init();
@@ -25,10 +49,12 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.submitStudentActivityProgress = async function submitStudentActivityProgress(payload = {}) {
+    service.submitStudentActivityProgress = async function submitStudentActivityProgress(payload = {}, options = {}) {
         await this.init();
+        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
         payload.eventId ||= createEventId('activity-progress');
-        const { data, error } = await this.client.rpc('submit_student_activity_progress_v3', {
+        const { data, error } = await this.client.rpc('submit_student_activity_progress_owned_v1', {
+            p_expected_user_id: expectedOwnerUserId,
             p_event_id: payload.eventId,
             p_unit_key: payload.unitKey,
             p_unit_context: payload.unitContext || {},
@@ -48,9 +74,11 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.submitStudentSparkResponse = async function submitStudentSparkResponse(payload = {}) {
+    service.submitStudentSparkResponse = async function submitStudentSparkResponse(payload = {}, options = {}) {
         await this.init();
-        const { data, error } = await this.client.rpc('submit_student_spark_response', {
+        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
+        const { data, error } = await this.client.rpc('submit_student_spark_response_owned_v1', {
+            p_expected_user_id: expectedOwnerUserId,
             p_spark_id: payload.sparkId,
             p_answers: payload.answers || {}
         });
@@ -73,10 +101,12 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.syncStudentUnitWork = async function syncStudentUnitWork(payload = {}) {
+    service.syncStudentUnitWork = async function syncStudentUnitWork(payload = {}, options = {}) {
         await this.init();
+        const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
         payload.eventId ||= createEventId('unit-work');
-        const { data, error } = await this.client.rpc('sync_student_unit_work_v2', {
+        const { data, error } = await this.client.rpc('sync_student_unit_work_owned_v1', {
+            p_expected_user_id: expectedOwnerUserId,
             p_event_id: payload.eventId,
             p_unit_key: payload.unitKey,
             p_unit_context: payload.unitContext || {},

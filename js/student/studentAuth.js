@@ -9,6 +9,10 @@ import { studentApi as supabaseService } from '../services/studentApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
 import { SessionInitializationCoordinator } from '../services/sessionInitialization.js';
 import { StudentAuthUi } from '../studentAuthUiMethods.js';
+import {
+    getActiveStudentStorageOwner,
+    setActiveStudentStorageOwner
+} from './persistence/studentStorage.js';
 
 const AUTH_REQUEST_TIMEOUT_MS = 8000;
 
@@ -70,6 +74,7 @@ export class StudentAuth {
 
     async initBackendAuth() {
         if (this.sm.authDisabled) {
+            setActiveStudentStorageOwner('local-dev');
             this.sm.currentUser = null;
             this.sm.currentRole = 'student';
             this.setAuthStatus('Local development');
@@ -122,11 +127,21 @@ export class StudentAuth {
     }
 
     async initializeBackendSignIn(user, context) {
+        const ownerChanged = getActiveStudentStorageOwner() !== user.uid;
+        if (ownerChanged) {
+            this.sm.progress.stopCoinSync();
+            this.sm.progress.cancelScheduledCloudSync();
+            this.sm.activities?.progressPersistence?.resetForSession?.();
+            this.sm.cleanupActivity?.();
+            this.sm.resetSessionRouting?.();
+            this.sm.progress.resetSessionState();
+        }
+        setActiveStudentStorageOwner(user.uid);
         this.sm.currentUser = user;
         localStorage.setItem('was_logged_in', 'true');
         // Restore the last verified local snapshot before making any network call.
         // This keeps the signed-in shell useful when the device starts offline.
-        this.sm.progress.loadLocalProgress();
+        this.sm.progress.loadLocalProgress({ ownerUserId: user.uid });
         
         // Update UI immediately (works offline)
         this.setAuthStatus('Signed in');
@@ -177,7 +192,7 @@ export class StudentAuth {
             return;
         }
 
-        const sessionFinished = await this.finishSignedInSession(user.uid);
+        const sessionFinished = await this.finishSignedInSession(user.uid, context);
         if (sessionFinished && context.isCurrent()) {
             this.sm.authInitialized = true;
         }
@@ -188,8 +203,9 @@ export class StudentAuth {
         return Boolean(this.sm.currentUser?.uid && (!userId || this.sm.currentUser.uid === userId));
     }
 
-    async finishSignedInSession(userId = this.sm.currentUser?.uid) {
-        if (!this.isStillSignedIn(userId)) return false;
+    async finishSignedInSession(userId = this.sm.currentUser?.uid, context = null) {
+        const isCurrent = () => this.isStillSignedIn(userId) && (!context || context.isCurrent());
+        if (!isCurrent()) return false;
 
         // Paint the cached dashboard immediately on repeat visits. Cloud progress
         // remains authoritative and replaces this snapshot as soon as it arrives.
@@ -201,42 +217,51 @@ export class StudentAuth {
         }
 
         if (!navigator.onLine) {
-            this.sm.progress.loadLocalProgress();
+            this.sm.progress.loadLocalProgress({ ownerUserId: userId });
             this.setAuthStatus('Signed in (Offline - Using local data)');
         } else {
             // Try to load cloud progress without letting a slow connection hold the UI forever.
             try {
                 await requestWithTimeout(
-                    signal => this.sm.progress.loadCloudProgress({ signal }),
-                    { timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Student progress' }
+                    signal => this.sm.progress.loadCloudProgress({
+                        signal,
+                        ownerUserId: userId,
+                        isCurrent
+                    }),
+                    {
+                        signal: context?.signal,
+                        timeoutMs: AUTH_REQUEST_TIMEOUT_MS,
+                        label: 'Student progress'
+                    }
                 );
             } catch (error) {
+                if (!isCurrent()) return false;
                 console.error('Failed to load cloud progress (may be offline):', error);
-                this.sm.progress.loadLocalProgress();
+                this.sm.progress.loadLocalProgress({ ownerUserId: userId });
                 this.setAuthStatus(navigator.onLine
                     ? 'Cloud load failed - using local data'
                     : 'Signed in (Offline - Using local data)');
             }
         }
 
-        if (!this.isStillSignedIn(userId)) return false;
+        if (!isCurrent()) return false;
 
         this.updateHeader();
         if (navigator.onLine) this.sm.progress.startCoinSync();
         await Promise.all([
             requestWithTimeout(
                 signal => this.sm.loadSubjectSettings({ signal }),
-                { timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Class subjects' }
+                { signal: context?.signal, timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Class subjects' }
             ).catch(error => console.warn('Using default subjects:', error)),
             requestWithTimeout(
                 signal => this.sm.activities.loadSchoolCalendar({ signal }),
-                { timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'School calendar' }
+                { signal: context?.signal, timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'School calendar' }
             ).catch(error => console.warn('Using the default school calendar:', error))
         ]);
-        if (!this.isStillSignedIn(userId)) return false;
+        if (!isCurrent()) return false;
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();
-        if (!this.isStillSignedIn(userId)) return false;
+        if (!isCurrent()) return false;
         const requiresProfile = !this.hasCompleteStudentProfile();
 
         if (requiresProfile) {
@@ -249,13 +274,26 @@ export class StudentAuth {
     handleBackendSignOut() {
         this.sessionCoordinator.invalidate();
         this.sm.progress.stopCoinSync();
-        this.sm.currentUser = null;
-        localStorage.removeItem('was_logged_in');
         this.sm.progress.cancelScheduledCloudSync();
+        this.sm.activities?.progressPersistence?.resetForSession?.();
+        this.sm.cleanupActivity?.();
+        this.sm.resetSessionRouting?.();
+        this.sm.currentUser = null;
+        this.sm.studentProfile = {
+            firstName: '',
+            lastName: '',
+            name: '',
+            grade: '',
+            group: '',
+            studentId: '',
+            email: ''
+        };
+        this.sm.progress.resetSessionState();
+        setActiveStudentStorageOwner('local-dev');
+        localStorage.removeItem('was_logged_in');
         this.updateGuestStatus(true);
         this.setAuthStatus('Signed out');
         this.sm.authInitialized = false;
-        this.sm.resetRouteState();
         this.sm.switchView('login-view');
     }
 

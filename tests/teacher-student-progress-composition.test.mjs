@@ -1,0 +1,165 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+globalThis.document = {
+    readyState: 'loading',
+    addEventListener() {},
+    getElementById() { return null; },
+    querySelector() { return null; },
+    querySelectorAll() { return []; },
+    createElement() {
+        return {
+            style: {},
+            dataset: {},
+            classList: { add() {}, remove() {}, toggle() {} },
+            appendChild() {},
+            addEventListener() {},
+            setAttribute() {},
+            querySelector() { return null; },
+            querySelectorAll() { return []; }
+        };
+    },
+    body: { appendChild() {} }
+};
+globalThis.window = { addEventListener() {}, removeEventListener() {} };
+
+const { installTeacherStudentProgressDataMethods } = await import('../js/teacherStudentProgressDataMethods.js');
+const { teacherProgressDataMethods } = await import('../js/teacherStudentProgress/teacherProgressDataMethods.js');
+const { teacherProgressPageMethods } = await import('../js/teacherStudentProgress/teacherProgressPageMethods.js');
+const {
+    importStudentRecordsWithConcurrency,
+    teacherStudentCsvImportMethods
+} = await import('../js/teacherStudentProgress/teacherStudentCsvImportMethods.js');
+const { teacherStudentProvisioningMethods } = await import('../js/teacherStudentProgress/teacherStudentProvisioningMethods.js');
+
+class TestTeacherManager {}
+installTeacherStudentProgressDataMethods(TestTeacherManager);
+
+test('teacher progress installer exposes progress, provisioning, and CSV workflows', () => {
+    const methodNames = [
+        'fetchAllStudentProgress',
+        'ensureStudentProgressDetails',
+        'applyFilters',
+        'validateAddStudentForm',
+        'handleAddStudentSubmit',
+        'handleStudentCsvImportFiles',
+        'parseStudentCsvText'
+    ];
+    methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
+});
+
+test('teacher progress responsibilities have one complete owner each', () => {
+    const groups = [
+        teacherProgressDataMethods,
+        teacherProgressPageMethods,
+        teacherStudentProvisioningMethods,
+        teacherStudentCsvImportMethods
+    ];
+    const methodNames = groups.flatMap(group => Object.keys(group));
+
+    assert.equal(methodNames.length, 33);
+    assert.equal(new Set(methodNames).size, methodNames.length);
+    methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
+    assert.deepEqual(
+        Object.keys(teacherStudentProvisioningMethods).sort(),
+        ['handleAddStudentSubmit', 'showAddStudentModal', 'updateAddStudentStatus', 'validateAddStudentForm']
+    );
+});
+
+test('teacher CSV placement is derived from bounded grade-section filenames', () => {
+    const manager = new TestTeacherManager();
+
+    assert.deepEqual(manager.getGradeSectionFromStudentCsvName('6a.csv'), { grade: '6', section: 'A' });
+    assert.deepEqual(manager.getGradeSectionFromStudentCsvName('9B-roster.csv'), { grade: '9', section: 'B' });
+    assert.equal(manager.getGradeSectionFromStudentCsvName('10A.csv'), null);
+    assert.equal(manager.getGradeSectionFromStudentCsvName('students.csv'), null);
+});
+
+test('teacher CSV parsing handles quoted fields and normalized bilingual headers', () => {
+    const manager = new TestTeacherManager();
+    const records = manager.parseStudentCsvText(
+        'Primer Nombre,Primer Apellido,Correo,Contraseña\n"Ana María",Ríos,ana@aid.edu.pa,school1234',
+        '6A.csv',
+        { grade: '6', section: 'A' }
+    );
+
+    assert.deepEqual(records, [{
+        sourceFile: '6A.csv',
+        rowNumber: 2,
+        profile: {
+            firstName: 'Ana María',
+            lastName: 'Ríos',
+            email: 'ana@aid.edu.pa',
+            grade: '6',
+            group: 'A'
+        },
+        password: 'school1234'
+    }]);
+});
+
+test('teacher CSV account creation uses a bounded concurrency limit and stable failure order', async () => {
+    const records = Array.from({ length: 8 }, (_, index) => ({
+        profile: { email: `student-${index}@aid.edu.pa` },
+        password: 'school1234'
+    }));
+    let active = 0;
+    let maxActive = 0;
+    const progress = [];
+
+    const result = await importStudentRecordsWithConcurrency(records, async profile => {
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        await new Promise(resolve => setTimeout(resolve, 4));
+        active -= 1;
+        if (profile.email === 'student-2@aid.edu.pa' || profile.email === 'student-6@aid.edu.pa') {
+            throw new Error(`Rejected ${profile.email}`);
+        }
+    }, {
+        concurrency: 3,
+        onProgress: state => progress.push(state.completed)
+    });
+
+    assert.equal(maxActive, 3);
+    assert.equal(result.created, 6);
+    assert.deepEqual(result.failed.map(item => item.record.profile.email), [
+        'student-2@aid.edu.pa',
+        'student-6@aid.edu.pa'
+    ]);
+    assert.equal(progress.length, records.length);
+    assert.deepEqual([...progress].sort((left, right) => left - right), [1, 2, 3, 4, 5, 6, 7, 8]);
+});
+
+test('teacher progress detail merging preserves summary identity fields', () => {
+    const manager = new TestTeacherManager();
+    manager.allStudentData = [{
+        id: 'student-1',
+        email: 'summary@aid.edu.pa',
+        mustChangePassword: true,
+        studentProfile: { firstName: 'Summary', grade: '6' }
+    }];
+
+    const merged = manager.mergeStudentProgressDetail({
+        id: 'student-1',
+        email: 'detail@aid.edu.pa',
+        studentProfile: { firstName: 'Detail', group: 'A' },
+        unitProgress: { unit: {} }
+    });
+
+    assert.equal(merged.email, 'summary@aid.edu.pa');
+    assert.equal(merged.mustChangePassword, true);
+    assert.deepEqual(merged.studentProfile, { firstName: 'Summary', group: 'A', grade: '6' });
+    assert.equal(merged.progressDetailLoaded, true);
+});
+
+test('teacher progress section choices stay scoped to the selected grade', () => {
+    const manager = new TestTeacherManager();
+    manager.allStudentData = [
+        { studentProfile: { grade: '6', group: 'A' } },
+        { studentProfile: { grade: '6', group: 'B' } },
+        { studentProfile: { grade: '7', group: 'A' } }
+    ];
+
+    assert.deepEqual(Array.from(manager.getAvailableSectionsForGrade('6')).sort(), ['A', 'B']);
+    assert.deepEqual(Array.from(manager.getAvailableSectionsForGrade('7')), ['A']);
+});

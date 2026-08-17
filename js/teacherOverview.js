@@ -1,4 +1,5 @@
 import { $, escapeHtml } from './main.js';
+import { teacherApi as supabaseService } from './services/teacherApi.js';
 
 export function installTeacherOverviewMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -7,8 +8,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
             this.renderOverviewLoadingState();
             this.loadOverviewVocabCount();
 
-            if (this.studentProgressCache) {
-                this.applyStudentProgressData(this.studentProgressCache.data);
+            if (this.overviewAnalytics) {
                 this.renderOverviewStats();
                 this.renderOverviewRecentActivity();
                 return;
@@ -18,22 +18,22 @@ export function installTeacherOverviewMethods(TeacherManager) {
         },
 
         renderOverviewLoadingState() {
-            $('#overview-total-students').textContent = this.studentProgressCache ? this.allStudentData.length : '--';
-            $('#overview-active-students').textContent = this.studentProgressCache ? $('#overview-active-students').textContent : '--';
-            $('#overview-avg-coins').textContent = this.studentProgressCache ? $('#overview-avg-coins').textContent : '--';
+            $('#overview-total-students').textContent = this.overviewAnalytics ? this.overviewAnalytics.totalStudents : '--';
+            $('#overview-active-students').textContent = this.overviewAnalytics ? this.overviewAnalytics.activeStudents : '--';
+            $('#overview-avg-coins').textContent = this.overviewAnalytics ? this.overviewAnalytics.averageCoins : '--';
             const recentContainer = $('#overview-recent-activity');
-            if (recentContainer && !this.studentProgressCache) {
+            if (recentContainer && !this.overviewAnalytics) {
                 recentContainer.innerHTML = '<div class="loading-spinner runtime-status">Loading recent activity...</div>';
             }
         },
 
         scheduleOverviewStudentDataLoad() {
-            if (this.overviewStudentLoadScheduled || this.studentProgressPromise) return;
+            if (this.overviewStudentLoadScheduled) return;
             this.overviewStudentLoadScheduled = true;
 
             const load = async () => {
                 try {
-                    await this.getStudentProgressData({ showError: false });
+                    this.overviewAnalytics = await supabaseService.getTeacherDashboardAnalytics();
                     if (this.getSectionForView('teacher-overview-view') === 'overview' && !$('#teacher-overview-view')?.classList.contains('hidden')) {
                         this.renderOverviewStats();
                         this.renderOverviewRecentActivity();
@@ -56,22 +56,10 @@ export function installTeacherOverviewMethods(TeacherManager) {
         },
 
         renderOverviewStats() {
-            const total = this.allStudentData.length;
-            const now = Date.now();
-            const sevenDays = 7 * 24 * 60 * 60 * 1000;
-            const active = this.allStudentData.filter(student => {
-                const time = this.getStudentUpdatedTime(student);
-                return time && now - time <= sevenDays;
-            }).length;
-            const totalCoins = this.allStudentData.reduce((sum, student) => {
-                const coins = student.coinData?.balance ?? student.coins ?? 0;
-                return sum + coins;
-            }, 0);
-            const avgCoins = total ? Math.round(totalCoins / total) : 0;
-
-            $('#overview-total-students').textContent = total || '--';
-            $('#overview-active-students').textContent = active || '0';
-            $('#overview-avg-coins').textContent = `${avgCoins}`;
+            const analytics = this.overviewAnalytics || {};
+            $('#overview-total-students').textContent = `${analytics.totalStudents ?? '--'}`;
+            $('#overview-active-students').textContent = `${analytics.activeStudents ?? '--'}`;
+            $('#overview-avg-coins').textContent = `${analytics.averageCoins ?? '--'}`;
         },
 
         async loadOverviewVocabCount() {
@@ -89,31 +77,29 @@ export function installTeacherOverviewMethods(TeacherManager) {
         renderOverviewRecentActivity() {
             const container = $('#overview-recent-activity');
             if (!container) return;
-            const recent = this.allStudentData
-                .map(student => ({ student, time: this.getStudentUpdatedTime(student) }))
-                .filter(item => item.time)
-                .sort((a, b) => b.time - a.time)
-                .slice(0, 20);
+            const activityLabels = {
+                matching: 'Matching', flashcards: 'Flashcards', quiz: 'Quiz', hangman: 'Hangman',
+                fillInBlank: 'Fill in Blank', wordSearch: 'Word Search', crossword: 'Crossword',
+                scramble: 'Word Scramble', wordle: 'Vocabulary Wordle', illustration: 'Word Hunt'
+            };
+            const recent = (this.overviewAnalytics?.recentActivities || []).slice(0, 20);
 
             if (recent.length === 0) {
                 container.innerHTML = '<p class="teacher-empty-state">No recent student activity yet.</p>';
                 return;
             }
 
-            container.innerHTML = recent.map(({ student, time }) => {
-                const profile = student.studentProfile || {};
-                const name = profile.firstName && profile.lastName
-                    ? `${profile.firstName} ${profile.lastName}`
-                    : (profile.name || student.email || 'Unknown student');
-                const grade = profile.grade ? `Grade ${profile.grade}` : 'No grade';
-                const date = new Date(time).toLocaleString();
+            container.innerHTML = recent.map(activity => {
+                const name = activity.student || 'Unknown student';
+                const label = activityLabels[activity.activityType] || activity.activityType || 'Activity';
+                const date = activity.occurredAt ? new Date(activity.occurredAt).toLocaleString() : '';
                 return `
                     <div class="teacher-activity-item">
                         <div>
                             <strong>${escapeHtml(name)}</strong>
-                            <span>${escapeHtml(grade)}</span>
+                            <span>${escapeHtml(label)}</span>
                         </div>
-                        <time>${date}</time>
+                        <time>${escapeHtml(date)}</time>
                     </div>
                 `;
             }).join('');

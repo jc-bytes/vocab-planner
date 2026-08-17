@@ -1,6 +1,7 @@
 
 import { createElement, $, notifications, openModal, closeModal } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
+import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 export class FillInBlankActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -46,7 +47,7 @@ export class FillInBlankActivity {
         }
 
         const key = `fib_state_${this.words.length} `;
-        const saved = localStorage.getItem(key);
+        const saved = readStudentActivityValue(key);
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -80,7 +81,7 @@ export class FillInBlankActivity {
         }
 
         const key = `fib_state_${this.words.length} `;
-        localStorage.setItem(key, JSON.stringify(state));
+        writeStudentActivityValue(key, JSON.stringify(state));
     }
 
     startRound() {
@@ -207,8 +208,8 @@ export class FillInBlankActivity {
     restart() {
         // Clear saved state
         const key = `fib_state_${this.words.length}`;
-        localStorage.removeItem(key);
-        localStorage.removeItem(key.trim());
+        removeStudentActivityValue(key);
+        removeStudentActivityValue(key.trim());
         
         // Reset game state
         this.currentIndex = 0;

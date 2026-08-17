@@ -8,6 +8,11 @@ function createService(responses = {}) {
     const service = {
         async init() {},
         client: {
+            auth: {
+                async getUser() {
+                    return { data: { user: { id: 'student-1' } }, error: null };
+                }
+            },
             async rpc(name, args) {
                 calls.push({ name, args });
                 const queue = responses[name] || [];
@@ -36,13 +41,14 @@ test('activity writes use one stable idempotency key and return a compact attemp
         activity: { unitKey: 'unit-1', activityType: 'matching', score: 100 }
     };
     const { service, calls } = createService({
-        submit_student_activity_progress_v3: [{ data: delta, error: null }]
+        submit_student_activity_progress_owned_v1: [{ data: delta, error: null }]
     });
     const payload = { unitKey: 'unit-1', activityType: 'matching', score: 100 };
 
     assert.deepEqual(await service.submitStudentActivityProgress(payload), delta);
     assert.match(payload.eventId, /^activity-progress:/);
     assert.equal(calls[0].args.p_event_id, payload.eventId);
+    assert.equal(calls[0].args.p_expected_user_id, 'student-1');
     assert.equal(calls[0].args.p_is_finished, false);
     assert.deepEqual(calls[0].args.p_metrics, {});
     assert.equal(calls[0].args.p_state_snapshot, null);
@@ -57,7 +63,7 @@ test('Spark responses submit the complete mixed-question answer map to the autho
         isComplete: true
     };
     const { service, calls } = createService({
-        submit_student_spark_response: [{ data: saved, error: null }]
+        submit_student_spark_response_owned_v1: [{ data: saved, error: null }]
     });
 
     assert.deepEqual(await service.submitStudentSparkResponse({
@@ -65,8 +71,8 @@ test('Spark responses submit the complete mixed-question answer map to the autho
         answers: saved.answers
     }), saved);
     assert.deepEqual(calls, [{
-        name: 'submit_student_spark_response',
-        args: { p_spark_id: 'spark-1', p_answers: saved.answers }
+        name: 'submit_student_spark_response_owned_v1',
+        args: { p_expected_user_id: 'student-1', p_spark_id: 'spark-1', p_answers: saved.answers }
     }]);
 });
 
@@ -74,7 +80,7 @@ test('unit work and wallet mutations use only normalized idempotent RPCs', async
     const unitDelta = { version: 2, unit: { unitKey: 'unit-1', states: {} } };
     const wallet = { version: 3, coins: 8, coinData: { balance: 8 } };
     const { service, calls } = createService({
-        sync_student_unit_work_v2: [{ data: unitDelta, error: null }],
+        sync_student_unit_work_owned_v1: [{ data: unitDelta, error: null }],
         spend_student_coins_v2: [{ data: wallet, error: null }]
     });
     const unitPayload = { unitKey: 'unit-1', workPatch: { note: 'saved' } };
@@ -85,7 +91,24 @@ test('unit work and wallet mutations use only normalized idempotent RPCs', async
     assert.match(unitPayload.eventId, /^unit-work:/);
     assert.match(spendPayload.eventId, /^spend-coins:/);
     assert.deepEqual(calls.map(call => call.name), [
-        'sync_student_unit_work_v2',
+        'sync_student_unit_work_owned_v1',
         'spend_student_coins_v2'
     ]);
+});
+
+test('offline replay verifies the live authenticated user before invoking its owner-bound RPC', async () => {
+    const { service, calls } = createService();
+    service.client.auth.getUser = async () => ({
+        data: { user: { id: 'student-b' } },
+        error: null
+    });
+
+    await assert.rejects(
+        service.syncStudentUnitWork(
+            { unitKey: 'unit-1', workPatch: { note: 'student-a work' } },
+            { ownerUserId: 'student-a', verifyOwner: true }
+        ),
+        error => error.code === 'SYNC_OWNER_MISMATCH' && error.status === 403
+    );
+    assert.deepEqual(calls, []);
 });

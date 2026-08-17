@@ -3217,16 +3217,6 @@ select:focus,
 
 /* Phase 2: student shell and dashboard hierarchy */
 @media (min-width: 901px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) {
-        display: grid;
-        grid-template-columns: 260px minmax(0, 1fr);
-        gap: 32px;
-        width: min(100%, 1440px);
-        max-width: 1440px;
-        min-height: 100vh;
-        padding: 0 40px 40px 0;
-    }
-
     .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
         position: sticky;
         top: 0;
@@ -3817,14 +3807,6 @@ section.student-continue-hero {
 
 /* Phase 2 correction: align the student shell with the reference fixed-sidebar model. */
 @media (min-width: 901px) {
-    .app-container:has(#student-tab-shell:not(.hidden)) {
-        display: block;
-        width: 100%;
-        max-width: none;
-        min-height: 100svh;
-        padding: 0;
-    }
-
     .app-container:has(#student-tab-shell:not(.hidden)) .student-app-header {
         position: fixed;
         inset: 0 auto 0 0;

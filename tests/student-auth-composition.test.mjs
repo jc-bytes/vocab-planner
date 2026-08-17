@@ -47,6 +47,7 @@ const { StudentManager } = await import('../js/student.js');
 const { StudentAuth } = await import('../js/student/studentAuth.js');
 const { StudentAuthUi } = await import('../js/studentAuthUiMethods.js');
 const { SessionInitializationCoordinator } = await import('../js/services/sessionInitialization.js');
+const { supabaseService } = await import('../js/supabaseService.js');
 
 function createManager() {
     return {
@@ -176,9 +177,12 @@ test('session initialization coalesces duplicate events and invalidates stale wo
     const coordinator = new SessionInitializationCoordinator();
     let calls = 0;
     let release;
+    let activeSignal;
     const waiting = new Promise(resolve => { release = resolve; });
     const initialize = async context => {
         calls += 1;
+        assert.equal(context.signal.aborted, false);
+        activeSignal = context.signal;
         await waiting;
         return context.isCurrent();
     };
@@ -190,10 +194,56 @@ test('session initialization coalesces duplicate events and invalidates stale wo
     await Promise.resolve();
     assert.equal(calls, 1);
     coordinator.invalidate();
+    assert.equal(activeSignal.aborted, true);
     release();
     assert.equal(await first, false);
 
     assert.equal(await coordinator.run('student-1', async context => context.isCurrent()), true);
     assert.equal(await coordinator.run('student-1', async () => { calls += 1; }), true);
     assert.equal(calls, 1);
+});
+
+test('Supabase initialization shares one in-flight session request', async () => {
+    const originalConfig = window.SUPABASE_CONFIG;
+    const originalState = {
+        client: supabaseService.client,
+        currentUser: supabaseService.currentUser,
+        currentSession: supabaseService.currentSession,
+        initPromise: supabaseService.initPromise,
+        initialized: supabaseService.initialized
+    };
+    let calls = 0;
+    let release;
+    window.SUPABASE_CONFIG = {
+        url: 'https://example.supabase.co',
+        publishableKey: 'test-publishable-key'
+    };
+    supabaseService.client = {
+        auth: {
+            getSession() {
+                calls += 1;
+                return new Promise(resolve => { release = resolve; });
+            }
+        }
+    };
+    supabaseService.currentUser = null;
+    supabaseService.currentSession = null;
+    supabaseService.initPromise = null;
+    supabaseService.initialized = false;
+
+    try {
+        const first = supabaseService.init();
+        const duplicate = supabaseService.init();
+        await Promise.resolve();
+        assert.equal(calls, 1);
+        release({ data: { session: null }, error: null });
+        const [firstResult, duplicateResult] = await Promise.all([first, duplicate]);
+        assert.equal(firstResult, supabaseService);
+        assert.equal(duplicateResult, supabaseService);
+        assert.equal(supabaseService.initialized, true);
+    } finally {
+        Object.assign(supabaseService, originalState);
+        if (originalConfig === undefined) delete window.SUPABASE_CONFIG;
+        else window.SUPABASE_CONFIG = originalConfig;
+    }
 });

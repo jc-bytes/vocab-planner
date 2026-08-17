@@ -1,5 +1,9 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { imageDB } from '../db.js';
+import {
+    getActiveStudentStorageOwner,
+    isActiveStudentStorageOwner
+} from './persistence/studentStorage.js';
 import { classifySyncError } from '../services/syncQueuePolicy.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
 import { sparkResponsesRepository } from '../services/sparkResponsesRepository.js';
@@ -194,8 +198,10 @@ export class StudentActivityHomeSpark {
     }
 
     async syncSparkLibraryState(state, sequence) {
+        const ownerUserId = this.sm.currentUser?.uid || getActiveStudentStorageOwner();
         try {
-            const saved = await sparkResponsesRepository.submit(state);
+            const saved = await sparkResponsesRepository.submit(state, { ownerUserId });
+            if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
             if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
             const progress = this.loadSparkLibraryProgress();
             progress[state.sparkId] = saved;
@@ -203,6 +209,7 @@ export class StudentActivityHomeSpark {
             this.activities.updateArcadeGateDisplay();
             this.sm.setAuthStatus?.('Synced');
         } catch (error) {
+            if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
             if (this.sparkResponseSyncSequence.get(state.sparkId) !== sequence) return;
             const failure = classifySyncError(error, { online: navigator.onLine });
             if (failure.retryable) {
@@ -211,7 +218,7 @@ export class StudentActivityHomeSpark {
                         sparkId: state.sparkId,
                         answers: state.answers || {},
                         storageKey: this.getSparkLibraryStorageKey()
-                    });
+                    }, { ownerUserId });
                 } catch (queueError) {
                     console.warn('Could not queue the Spark response for later sync:', queueError);
                 }

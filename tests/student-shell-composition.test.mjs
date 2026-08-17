@@ -74,6 +74,9 @@ test('StudentShell owns isolated lifecycle state', () => {
     assert.equal(first.dashboardMutationObserver, null);
     assert.deepEqual(first.sectionScrollPositions, {});
     assert.equal(first.wideShellMediaQuery, null);
+    assert.equal(first.scrollRestoreGeneration, 0);
+    assert.equal(first.scrollRestoreFrame, null);
+    assert.equal(first.scrollRestoreTimer, null);
 
     first.scrollSaveTimer = 12;
     first.dashboardMutationObserver = {};
@@ -84,6 +87,28 @@ test('StudentShell owns isolated lifecycle state', () => {
     assert.equal(second.dashboardMutationObserver, null);
     assert.deepEqual(second.sectionScrollPositions, {});
     assert.equal(second.wideShellMediaQuery, null);
+});
+
+test('scroll restoration owns one cancellable generation', () => {
+    const shell = new StudentShell({});
+    let cancelledFrame = null;
+    let clearedTimer = null;
+    const previousCancelFrame = window.cancelAnimationFrame;
+    const previousClearTimeout = window.clearTimeout;
+    window.cancelAnimationFrame = value => { cancelledFrame = value; };
+    window.clearTimeout = value => { clearedTimer = value; };
+    shell.scrollRestoreFrame = 17;
+    shell.scrollRestoreTimer = 29;
+
+    shell.cancelStudentScrollRestore();
+
+    assert.equal(shell.scrollRestoreGeneration, 1);
+    assert.equal(cancelledFrame, 17);
+    assert.equal(clearedTimer, 29);
+    assert.equal(shell.scrollRestoreFrame, null);
+    assert.equal(shell.scrollRestoreTimer, null);
+    window.cancelAnimationFrame = previousCancelFrame;
+    window.clearTimeout = previousClearTimeout;
 });
 
 test('student dashboard loading state hides real copy and resolves accessibly', () => {

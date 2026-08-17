@@ -3,6 +3,11 @@ import {
     LOCAL_COIN_AUTHORITY_MS
 } from './studentProgressConstants.js';
 import { getStudentExperience } from './studentExperience.js';
+import {
+    getStudentProgressStorageKey,
+    readStudentJson,
+    writeStudentJson
+} from './persistence/studentStorage.js';
 
 export class StudentProgressCore {
     constructor(progress) {
@@ -148,11 +153,22 @@ export class StudentProgressCore {
         return isFresh || newestUnsynced > cloudUpdated;
     }
 
-    loadLocalProgress() {
+    resetSessionState() {
+        this.sm.progressData = { studentProfile: {}, units: {} };
+        this.sm.coinData = { ...DEFAULT_COIN_DATA };
+        this.sm.coinHistory = [];
+        this.sm.coins = 0;
+        this.sm.updateCoinDisplay?.();
+        this.updateLevelDisplay();
+    }
+
+    loadLocalProgress(options = {}) {
         try {
-            const saved = localStorage.getItem('student_progress');
-            if (saved) {
-                const parsed = JSON.parse(saved);
+            const parsed = readStudentJson('progress', null, {
+                owner: options.ownerUserId || this.sm.currentUser,
+                legacyKeys: ['student_progress']
+            });
+            if (parsed) {
                 if (parsed && typeof parsed === 'object') {
                     this.sm.progressData = parsed;
                     if (this.sm.progressData.studentProfile && typeof this.sm.progressData.studentProfile === 'object') {
@@ -176,15 +192,13 @@ export class StudentProgressCore {
             }
         } catch (e) {
             console.error('Error loading progress:', e);
-            // Reset if corrupt
-            this.sm.progressData = { studentProfile: {}, units: {} };
-            this.sm.coinData = { ...DEFAULT_COIN_DATA };
-            this.sm.coinHistory = [];
+            this.resetSessionState();
         }
     }
 
-    saveLocalProgress(skipCloud = false) {
+    saveLocalProgress(skipCloud = false, options = {}) {
         try {
+            this.sm.progressData ||= { studentProfile: {}, units: {} };
             this.sm.progressData.studentProfile = this.sm.studentProfile;
             this.sm.coinData = this.normalizeCoinData(this.sm.coinData);
             this.sm.coinHistory = this.normalizeCoinHistory(this.sm.coinHistory);
@@ -193,7 +207,9 @@ export class StudentProgressCore {
             this.sm.progressData.coins = this.sm.coins;
             this.sm.progressData.coinData = this.sm.coinData;
             this.sm.progressData.coinHistory = this.sm.coinHistory;
-            localStorage.setItem('student_progress', JSON.stringify(this.sm.progressData));
+            writeStudentJson('progress', this.sm.progressData, {
+                owner: options.ownerUserId || this.sm.currentUser
+            });
             this.updateLevelDisplay();
             if (!navigator.onLine && this.sm.currentUser) {
                 this.sm.setAuthStatus('Saved locally - offline');
@@ -204,6 +220,10 @@ export class StudentProgressCore {
         } catch (e) {
             console.error('Error saving progress:', e);
         }
+    }
+
+    getLocalProgressStorageKey(ownerUserId = this.sm.currentUser) {
+        return getStudentProgressStorageKey(ownerUserId);
     }
 
     applyCoinSnapshot(coinData, coinHistory, options = {}) {

@@ -17,6 +17,7 @@ export class StudentProgress {
         this.scheduledCloudSaveTimeout = null;
         this.core = new StudentProgressCore(this);
         this.cloud = new StudentProgressCloud(this);
+        this.syncQueue = this.cloud.syncQueue;
         this.coins = new StudentProgressCoins(this);
         this.notifications = new StudentCoinNotifications(this);
     }
@@ -69,12 +70,20 @@ export class StudentProgress {
         return this.core.hasAuthoritativeLocalCoinActivity(cloudHistory, cloudUpdatedAt);
     }
 
-    loadLocalProgress() {
-        return this.core.loadLocalProgress();
+    loadLocalProgress(options = {}) {
+        return this.core.loadLocalProgress(options);
     }
 
-    saveLocalProgress(skipCloud = false) {
-        return this.core.saveLocalProgress(skipCloud);
+    saveLocalProgress(skipCloud = false, options = {}) {
+        return this.core.saveLocalProgress(skipCloud, options);
+    }
+
+    resetSessionState() {
+        return this.core.resetSessionState();
+    }
+
+    getLocalProgressStorageKey(ownerUserId) {
+        return this.core.getLocalProgressStorageKey(ownerUserId);
     }
 
     scheduleCloudSync() {
@@ -138,15 +147,15 @@ export class StudentProgress {
     }
 
     buildUnitWorkSyncPayload() {
-        return this.cloud.buildUnitWorkSyncPayload();
+        return this.syncQueue.buildUnitWorkSyncPayload();
     }
 
-    enqueueProgressSync() {
-        return this.cloud.enqueueProgressSync();
+    enqueueProgressSync(options = {}) {
+        return this.syncQueue.enqueueProgressSync(options);
     }
 
     flushLocalSyncQueue(options = {}) {
-        return this.cloud.flushLocalSyncQueue(options);
+        return this.syncQueue.flushLocalSyncQueue(options);
     }
 
     restoreImagesFromProgress() {

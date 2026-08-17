@@ -1,5 +1,6 @@
 
 import { createElement, $ } from '../main.js';
+import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 export class SpeedMatchActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -47,7 +48,7 @@ export class SpeedMatchActivity {
         }
 
         const key = `speedmatch_highscore_${this.words.length} `;
-        const saved = localStorage.getItem(key);
+        const saved = readStudentActivityValue(key);
         if (saved) {
             this.highScore = parseInt(saved, 10) || 0;
         }
@@ -57,7 +58,7 @@ export class SpeedMatchActivity {
         const key = `speedmatch_highscore_${this.words.length} `;
         if (this.score > this.highScore) {
             this.highScore = this.score;
-            localStorage.setItem(key, this.highScore);
+            writeStudentActivityValue(key, this.highScore);
 
             if (this.onSaveState) {
                 this.onSaveState({ highScore: this.highScore });

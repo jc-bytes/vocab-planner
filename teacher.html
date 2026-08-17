@@ -368,6 +368,8 @@
                     </div>
                     <div id="student-progress-cards" class="student-progress-cards" aria-live="polite"></div>
                     <div id="progress-loading" class="loading-spinner data-table__status hidden">Loading data...</div>
+                    <div id="student-progress-status" class="data-table__status hidden" role="status"></div>
+                    <nav id="student-progress-pagination" class="data-table__status hidden" aria-label="Student roster pages"></nav>
                 </div>
 
                 <!-- Bulk Action Toolbar -->
@@ -847,6 +849,7 @@
             </section>
 
             <!-- View: Quiz Maker -->
+            <template id="teacher-quizzes-view-template">
             <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
                 <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
                     <!-- Sidebar -->
@@ -967,8 +970,11 @@
                     </main>
                 </div>
             </section>
+            </template>
+            <div data-teacher-feature-mount="quizzes-view"></div>
 
             <!-- View: Data Management -->
+            <template id="teacher-data-management-view-template">
             <section id="teacher-data-management-view" class="view hidden" role="tabpanel" aria-labelledby="tab-data-settings">
                 <div class="teacher-page-heading page-header">
                     <div>
@@ -1443,11 +1449,14 @@
                     </button>
                 </div>
             </section>
+            </template>
+            <div data-teacher-feature-mount="data-management-view"></div>
 
         </main>
     </div>
 
     <!-- Spark Modal -->
+    <template id="teacher-sparks-modal-template">
     <div id="spark-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="spark-modal-title">
         <div class="modal-content spark-modal-content">
             <form id="spark-form">
@@ -1588,6 +1597,8 @@
             </form>
         </div>
     </div>
+    </template>
+    <div data-teacher-feature-mount="sparks-modal"></div>
 
     <!-- Word Editor Modal -->
     <div id="word-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">

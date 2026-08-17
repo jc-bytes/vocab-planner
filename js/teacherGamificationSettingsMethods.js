@@ -39,13 +39,14 @@ function showTransientGamificationStatus(statusEl, text, colorVar) {
 }
 
 export const teacherGamificationSettingsMethods = {
-    async loadGamificationSettings() {
+    async loadGamificationSettings(options = {}) {
         if (this.authDisabled) {
             try {
                 const settings = JSON.parse(localStorage.getItem(DEV_GAMIFICATION_SETTINGS_KEY) || '{}');
                 applyGamificationSettings(settings);
             } catch (error) {
                 console.error('Error loading local gamification settings:', error);
+                if (options.surfaceErrors) throw error;
             }
             return;
         }
@@ -55,6 +56,7 @@ export const teacherGamificationSettingsMethods = {
             if (settings) applyGamificationSettings(settings);
         } catch (error) {
             console.error('Error loading gamification settings:', error);
+            if (options.surfaceErrors) throw error;
         }
     },
 

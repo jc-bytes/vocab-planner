@@ -5,6 +5,7 @@ export class SessionInitializationCoordinator {
         this.inFlight = null;
         this.completedKey = '';
         this.completedResult = undefined;
+        this.activeController = null;
     }
 
     run(key, initialize, options = {}) {
@@ -17,12 +18,20 @@ export class SessionInitializationCoordinator {
             return Promise.resolve(this.completedResult);
         }
 
+        this.activeController?.abort(new Error('A newer student session replaced this initialization.'));
+        const controller = new AbortController();
         const generation = ++this.generation;
         this.activeKey = normalizedKey;
+        this.activeController = controller;
         const context = {
             key: normalizedKey,
             generation,
-            isCurrent: () => this.generation === generation && this.activeKey === normalizedKey
+            signal: controller.signal,
+            isCurrent: () => (
+                !controller.signal.aborted
+                && this.generation === generation
+                && this.activeKey === normalizedKey
+            )
         };
         const initialization = Promise.resolve().then(() => initialize(context));
         const promise = initialization.then(result => {
@@ -33,12 +42,17 @@ export class SessionInitializationCoordinator {
             return result;
         }).finally(() => {
             if (this.inFlight === promise) this.inFlight = null;
+            if (this.activeController === controller && !context.isCurrent()) {
+                this.activeController = null;
+            }
         });
         this.inFlight = promise;
         return promise;
     }
 
     invalidate() {
+        this.activeController?.abort(new Error('The student session ended.'));
+        this.activeController = null;
         this.generation += 1;
         this.activeKey = '';
         this.inFlight = null;

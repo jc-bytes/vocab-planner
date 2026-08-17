@@ -1,14 +1,18 @@
 import { $ } from '../main.js';
 import { getStudentGame } from './studentGameRegistry.js';
 import { StudentGameScoreMonitor } from './studentGameScoreMonitor.js';
+import { readStudentJson, writeStudentJson } from './persistence/studentStorage.js';
 
 const GAME_STORAGE_PREFIX = 'vocab-game-storage:';
 const MAX_GAME_STORAGE_ENTRIES = 250;
 const MAX_GAME_STORAGE_SIZE = 1_000_000;
 
-function readGameStorage(gameId) {
+function readGameStorage(gameId, ownerUserId) {
     try {
-        const entries = JSON.parse(localStorage.getItem(`${GAME_STORAGE_PREFIX}${gameId}`) || '[]');
+        const entries = readStudentJson(`game-storage:${gameId}`, [], {
+            owner: ownerUserId,
+            legacyKeys: [`${GAME_STORAGE_PREFIX}${gameId}`]
+        });
         return Array.isArray(entries) ? entries : [];
     } catch (_error) {
         return [];
@@ -59,12 +63,13 @@ export class StudentGameHtmlLoader {
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
+        const ownerUserId = this.games.sessionOwnerId;
         const storageChannel = globalThis.crypto?.randomUUID?.()
             || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
         iframe.name = `${GAME_STORAGE_PREFIX}${JSON.stringify({
             gameId,
             channel: storageChannel,
-            entries: readGameStorage(gameId)
+            entries: readGameStorage(gameId, ownerUserId)
         })}`;
         iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-downloads allow-pointer-lock');
         iframe.setAttribute('allow', 'fullscreen');
@@ -197,7 +202,7 @@ export class StudentGameHtmlLoader {
                 || data.channel !== storageChannel
                 || !isSafeStorageEntries(data.entries)) return;
             try {
-                localStorage.setItem(`${GAME_STORAGE_PREFIX}${gameId}`, JSON.stringify(data.entries));
+                writeStudentJson(`game-storage:${gameId}`, data.entries, { owner: ownerUserId });
             } catch (error) {
                 console.warn(`Could not persist sandboxed storage for ${gameId}:`, error);
             }

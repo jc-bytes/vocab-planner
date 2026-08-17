@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 import { STUDENT_GAME_REGISTRY } from '../js/student/studentGameRegistry.js';
+import { getStudentStorageKey } from '../js/student/persistence/studentStorage.js';
 
 const host = process.env.UI_GAME_SANDBOX_HOST || '127.0.0.1';
 const port = Number(process.env.UI_GAME_SANDBOX_PORT || 8124);
@@ -66,7 +67,7 @@ try {
         if (!frame) throw new Error(`${game.id} did not create a navigated game frame.`);
         await frame.waitForTimeout(900);
 
-        const storageKey = `vocab-game-storage:${game.id}`;
+        const storageKey = getStudentStorageKey(`game-storage:${game.id}`, 'local-dev');
         await frame.evaluate(() => localStorage.setItem('sandbox-smoke', 'saved'));
         await page.waitForFunction(key => localStorage.getItem(key)?.includes('sandbox-smoke'), storageKey);
         const isolation = await iframe.evaluate(element => ({
