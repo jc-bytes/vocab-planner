@@ -215,6 +215,23 @@ export class StudentRouting {
         return this.sm.activities.activityRouteTypes.includes(activityType);
     }
 
+    isLeavingActiveActivity(targetRoute = {}) {
+        const currentActivityType = this.sm.currentActivityType;
+        if (!currentActivityType) return false;
+        if (targetRoute.view !== 'activity') return true;
+        return targetRoute.activityType !== currentActivityType
+            || String(targetRoute.unitId || '') !== String(this.getCurrentVocabRouteId() || '');
+    }
+
+    async flushActivityProgressBeforeRoute(targetRoute = {}) {
+        if (!this.isLeavingActiveActivity(targetRoute)) return;
+        try {
+            await this.sm.activities.flushPendingActivityProgress?.();
+        } catch (error) {
+            console.warn('Could not finish saving activity progress before navigation:', error);
+        }
+    }
+
     showUnitsView(route = {}) {
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
@@ -314,6 +331,8 @@ export class StudentRouting {
 
     async applyRouteTarget(targetRoute) {
         try {
+            await this.flushActivityProgressBeforeRoute(targetRoute);
+
             if (targetRoute.view === 'invalid') {
                 this.setRoute({ view: 'units' }, { replace: true });
                 this.showUnitsView();

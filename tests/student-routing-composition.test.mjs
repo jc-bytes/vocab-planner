@@ -170,6 +170,52 @@ test('route lookup and activity validation use the StudentActivities-owned catal
     assert.equal(routing.isKnownActivityType('unknown-activity'), false);
 });
 
+test('every route out of an activity waits for pending verified progress', async () => {
+    const manager = createManager();
+    manager.currentActivityType = 'flashcards';
+    manager.currentVocab = { id: 'unit-1', name: 'Unit One' };
+    let releaseSync;
+    const events = [];
+    manager.activities.flushPendingActivityProgress = () => new Promise(resolve => {
+        releaseSync = () => {
+            events.push('synced');
+            resolve();
+        };
+    });
+    manager.cleanupActivity = () => events.push('cleanup');
+    manager.resetStudentVocabularyDrilldown = () => {};
+    manager.activities.renderDashboard = () => events.push('dashboard');
+    manager.switchView = view => events.push(view);
+    const routing = new StudentRouting(manager);
+
+    const leaving = routing.applyRouteTarget({ view: 'units' });
+    await Promise.resolve();
+    assert.deepEqual(events, []);
+
+    releaseSync();
+    await leaving;
+
+    assert.deepEqual(events, ['synced', 'cleanup', 'dashboard', 'vocab-selection-view']);
+});
+
+test('changing an illustration word route does not flush or interrupt the active activity', async () => {
+    const manager = createManager();
+    manager.currentActivityType = 'illustration';
+    manager.currentVocab = { id: 'unit-1', name: 'Unit One' };
+    let flushes = 0;
+    manager.activities.flushPendingActivityProgress = async () => { flushes += 1; };
+    const routing = new StudentRouting(manager);
+
+    await routing.flushActivityProgressBeforeRoute({
+        view: 'activity',
+        unitId: 'unit-1',
+        activityType: 'illustration',
+        word: 2
+    });
+
+    assert.equal(flushes, 0);
+});
+
 test('direct activity restoration keeps the unit menu deferred until the activity is ready', async () => {
     const manager = createManager();
     const vocab = { id: 'unit-1', name: 'Unit One' };

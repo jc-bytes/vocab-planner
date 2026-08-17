@@ -47,6 +47,7 @@ test('StudentListeners owns isolated lifecycle and export state', () => {
     assert.equal(first.sm, manager);
     assert.equal(first.initialized, false);
     assert.equal(first.finalReportExportInProgress, false);
+    assert.equal(first.activityExitInProgress, false);
     assert.deepEqual(first.disposers, []);
 
     first.initialized = true;
@@ -55,7 +56,42 @@ test('StudentListeners owns isolated lifecycle and export state', () => {
 
     assert.equal(second.initialized, false);
     assert.equal(second.finalReportExportInProgress, false);
+    assert.equal(second.activityExitInProgress, false);
     assert.deepEqual(second.disposers, []);
+});
+
+test('activity exit waits for verified progress before rendering the unit path', async () => {
+    let releaseSync;
+    const events = [];
+    const manager = {
+        activities: {
+            flushPendingActivityProgress: () => new Promise(resolve => {
+                releaseSync = () => {
+                    events.push('synced');
+                    resolve();
+                };
+            })
+        },
+        getCurrentVocabRouteId: () => 'unit-1',
+        cleanupActivity: () => events.push('cleanup'),
+        navigateTo: route => events.push(route)
+    };
+    const listeners = new StudentListeners(manager);
+
+    const exiting = listeners.exitActivity();
+    await Promise.resolve();
+    assert.deepEqual(events, []);
+    assert.equal(listeners.activityExitInProgress, true);
+
+    releaseSync();
+    await exiting;
+
+    assert.deepEqual(events, [
+        'synced',
+        'cleanup',
+        { view: 'unit', unitId: 'unit-1' }
+    ]);
+    assert.equal(listeners.activityExitInProgress, false);
 });
 
 test('StudentManager retains the listener bridge used by game settings', () => {

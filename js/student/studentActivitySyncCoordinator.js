@@ -69,6 +69,7 @@ export class StudentActivitySyncCoordinator {
             return state.inFlight || null;
         }
 
+        this.sm.setAuthStatus?.('Saving...');
         const promise = new Promise((resolve, reject) => state.waiters.push({ resolve, reject }));
         state.pending = { payload, fingerprint, ownerUserId };
         this.scheduleActivityProgressFlush(syncKey, Boolean(payload.isFinished || payload.isComplete));

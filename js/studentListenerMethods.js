@@ -18,6 +18,7 @@ export class StudentListeners {
         this.sm = studentManager;
         this.initialized = false;
         this.finalReportExportInProgress = false;
+        this.activityExitInProgress = false;
         this.disposers = [];
     }
 
@@ -51,6 +52,29 @@ export class StudentListeners {
         }
 
         if (window.lucide?.createIcons) window.lucide.createIcons({ root: button });
+    }
+
+    async exitActivity() {
+        if (this.activityExitInProgress) return;
+        this.activityExitInProgress = true;
+
+        const backButton = $('#back-to-menu-btn');
+        const closeButton = $('#close-activity-btn');
+        [backButton, closeButton].filter(Boolean).forEach(button => {
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+        });
+
+        const unitId = this.sm.getCurrentVocabRouteId();
+        try {
+            await this.sm.activities?.flushPendingActivityProgress?.();
+        } catch (error) {
+            console.warn('Could not finish saving activity progress before exit:', error);
+        } finally {
+            this.sm.cleanupActivity();
+            this.sm.navigateTo(unitId ? { view: 'unit', unitId } : { view: 'units' });
+            this.activityExitInProgress = false;
+        }
     }
 
     initListeners() {
@@ -268,17 +292,11 @@ export class StudentListeners {
         });
 
         this.addListener('#back-to-menu-btn', 'click', () => {
-            this.sm.cleanupActivity();
-            const unitId = this.sm.getCurrentVocabRouteId();
-            if (unitId) {
-                this.sm.navigateTo({ view: 'unit', unitId });
-            } else {
-                this.sm.navigateTo({ view: 'units' });
-            }
+            void this.exitActivity();
         });
 
         this.addListener('#close-activity-btn', 'click', () => {
-            $('#back-to-menu-btn')?.click();
+            void this.exitActivity();
         });
 
         this.addListener('#student-login-form', 'submit', (e) => this.sm.handleStudentLogin(e));
