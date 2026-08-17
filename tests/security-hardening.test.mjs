@@ -132,6 +132,7 @@ test('CI exercises authentication, IndexedDB, activities, and sandboxing in Fire
     assert.match(smoke, /import \{ firefox, webkit \} from 'playwright'/);
     assert.match(smoke, /AUDIT_TEACHER_EMAIL/);
     assert.match(smoke, /AUDIT_STUDENT_EMAIL/);
+    assert.match(smoke, /AUDIT_VOCABULARY_ID/);
     assert.match(smoke, /activity\/flashcards/);
     assert.match(smoke, /indexedDB\.open/);
     assert.match(smoke, /parentCannotReadDocument/);

@@ -1,3 +1,4 @@
+import '../css/teacherQuiz.css';
 import { installTeacherQuizBrowserMethods } from './teacherQuizBrowserMethods.js';
 import { installTeacherQuizCoreMethods } from './teacherQuizCoreMethods.js';
 import { installTeacherQuizLegacyMethods } from './teacherQuizLegacyMethods.js';

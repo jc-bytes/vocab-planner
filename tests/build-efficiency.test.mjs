@@ -7,6 +7,9 @@ const serviceWorkerGenerator = await readFile(new URL('../scripts/generate-servi
 const desktopAssetCopier = await readFile(new URL('../scripts/copy-desktop-assets.mjs', import.meta.url), 'utf8');
 const teacherEntry = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 const teacherLazyFeatures = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
+const teacherQuizEntry = await readFile(new URL('../js/teacherQuiz.js', import.meta.url), 'utf8');
+const teacherCss = await readFile(new URL('../css/teacher.css', import.meta.url), 'utf8');
+const teacherQuizCss = await readFile(new URL('../css/teacherQuiz.css', import.meta.url), 'utf8');
 const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
 
@@ -51,6 +54,15 @@ test('teacher feature bundles are loaded only when their views are opened', () =
         assert.doesNotMatch(teacherEntry, new RegExp(`from ['\"]\\./${eagerModule}`));
         assert.match(teacherLazyFeatures, new RegExp(`import\\(['\"]\\./${eagerModule}`));
     }
+});
+
+test('quiz maker styles load with the lazy quiz feature', () => {
+    assert.match(teacherQuizEntry, /import ['"]\.\.\/css\/teacherQuiz\.css['"]/);
+    assert.match(teacherQuizCss, /\/\* Quiz Maker Styles \*\//);
+    assert.match(teacherQuizCss, /\.quiz-maker-container/);
+    assert.match(teacherQuizCss, /\.document-page/);
+    assert.doesNotMatch(teacherCss, /\/\* Quiz Maker Styles \*\//);
+    assert.doesNotMatch(teacherQuizCss, /Tablet and small Chromebook responsive pass/);
 });
 
 test('the local Lucide registry covers icons present in the teacher shell', () => {

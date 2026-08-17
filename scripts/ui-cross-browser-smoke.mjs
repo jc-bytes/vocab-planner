@@ -5,6 +5,7 @@ import {
     AUDIT_PASSWORD,
     AUDIT_STUDENT_EMAIL,
     AUDIT_TEACHER_EMAIL,
+    AUDIT_VOCABULARY_ID,
     seedLocalAuditData
 } from './lib/local-supabase-audit.mjs';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
@@ -12,18 +13,29 @@ import { ensureViteServer } from './lib/local-vite-server.mjs';
 const host = process.env.UI_CROSS_BROWSER_HOST || '127.0.0.1';
 const port = Number(process.env.UI_CROSS_BROWSER_PORT || 8125);
 const baseUrl = (process.env.UI_CROSS_BROWSER_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
-const activityPath = '/student.html#/unit/grade6_t1_may_week3_awareness_product/activity/flashcards';
+const activityPath = `/student.html#/unit/${AUDIT_VOCABULARY_ID}/activity/flashcards`;
 const sandboxGame = {
     id: 'trapdoor-trials',
     path: 'js/games/trapdoor-trials/index.html',
     scoreMessageType: 'trapdoor-trials-score'
 };
+const browserEngines = new Map([
+    ['firefox', ['Firefox', firefox]],
+    ['webkit', ['WebKit', webkit]]
+]);
+const selectedEngines = String(process.env.UI_CROSS_BROWSER_ENGINES || 'firefox,webkit')
+    .split(',')
+    .map(value => value.trim().toLowerCase())
+    .filter(Boolean);
 
-function trackPageProblems(page, label, problems) {
+function trackPageProblems(page, label, problems, options = {}) {
     page.on('console', message => {
         if (message.type() === 'error') problems.push(`[${label}] console.error: ${message.text()}`);
     });
-    page.on('pageerror', error => problems.push(`[${label}] pageerror: ${error.message}`));
+    page.on('pageerror', error => {
+        const ignored = (options.ignoredPageErrors || []).some(pattern => pattern.test(error.message));
+        if (!ignored) problems.push(`[${label}] pageerror: ${error.message}`);
+    });
 }
 
 async function addLocalSupabaseOverride(context, browserConfig) {
@@ -118,7 +130,8 @@ async function verifySandboxGame(page) {
 }
 
 async function runEngine(name, browserType, browserConfig) {
-    const browser = await browserType.launch();
+    console.log(`${name}: launching...`);
+    const browser = await browserType.launch({ timeout: 20000 });
     const problems = [];
     try {
         const teacherContext = await browser.newContext();
@@ -131,6 +144,7 @@ async function runEngine(name, browserType, browserConfig) {
         trackPageProblems(teacherPage, `${name}:teacher`, problems);
         trackPageProblems(studentPage, `${name}:student`, problems);
 
+        console.log(`${name}: checking teacher authentication and navigation...`);
         await login(teacherPage, {
             pagePath: '/teacher.html',
             form: { selector: '#teacher-login-form', email: '#teacher-email', password: '#teacher-password' },
@@ -139,9 +153,17 @@ async function runEngine(name, browserType, browserConfig) {
             ready: '#teacher-tab-shell:not(.hidden)',
             error: '#teacher-login-error'
         });
+        await teacherPage.locator('#tab-vocabulary').click();
+        await teacherPage.locator('#teacher-dashboard-view:not(.hidden)').waitFor({ timeout: 15000 });
+        await teacherPage.locator('#vocabulary-tab-quizzes').click();
+        await teacherPage.locator('#vocabulary-quizzes-panel:not(.hidden)').waitFor({ timeout: 15000 });
+        await teacherPage.waitForFunction(() => (
+            getComputedStyle(document.querySelector('.quiz-tool-tabs')).display === 'grid'
+        ), null, { timeout: 15000 });
         await teacherPage.locator('#tab-sparks').click();
         await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
 
+        console.log(`${name}: checking student authentication and activity routing...`);
         await login(studentPage, {
             pagePath: '/student.html',
             form: { selector: '#student-login-form', email: '#login-email', password: '#login-password' },
@@ -151,17 +173,36 @@ async function runEngine(name, browserType, browserConfig) {
             error: '#login-error'
         });
         await studentPage.goto(`${baseUrl}${activityPath}`, { waitUntil: 'domcontentloaded' });
-        await studentPage.locator('#activity-view:not(.hidden)').waitFor({ timeout: 15000 });
+        try {
+            await studentPage.locator('#activity-view:not(.hidden)').waitFor({ timeout: 15000 });
+        } catch (error) {
+            const state = await studentPage.evaluate(() => ({
+                hash: location.hash,
+                activeView: document.querySelector('.view.active')?.id || '',
+                loginError: document.querySelector('#login-error')?.textContent?.trim() || '',
+                activityText: document.querySelector('#activity-view')?.textContent?.trim().slice(0, 240) || ''
+            }));
+            throw new Error(`Activity route did not open: ${JSON.stringify(state)}`, { cause: error });
+        }
+        console.log(`${name}: checking IndexedDB...`);
         await verifyIndexedDb(studentPage);
 
+        console.log(`${name}: checking sandboxed game isolation...`);
         const sandboxPage = await studentContext.newPage();
-        trackPageProblems(sandboxPage, `${name}:sandbox`, problems);
+        trackPageProblems(sandboxPage, `${name}:sandbox`, problems, {
+            ignoredPageErrors: [/sandboxed and lacks the "allow-same-origin" flag/i]
+        });
         await verifySandboxGame(sandboxPage);
 
         if (problems.length) {
             throw new Error(`${name} emitted browser errors:\n${problems.join('\n')}`);
         }
         console.log(`${name} cross-browser smoke passed.`);
+    } catch (error) {
+        if (problems.length) {
+            error.message = `${error.message}\n${problems.join('\n')}`;
+        }
+        throw error;
     } finally {
         await browser.close().catch(() => {});
     }
@@ -177,9 +218,12 @@ const server = await ensureViteServer({
 });
 
 try {
-    await runEngine('Firefox', firefox, seeded.browserConfig);
-    await runEngine('WebKit', webkit, seeded.browserConfig);
-    console.log('Firefox and WebKit focused smoke coverage passed.');
+    for (const engineName of selectedEngines) {
+        const engine = browserEngines.get(engineName);
+        if (!engine) throw new Error(`Unsupported cross-browser engine: ${engineName}`);
+        await runEngine(engine[0], engine[1], seeded.browserConfig);
+    }
+    console.log(`${selectedEngines.map(name => browserEngines.get(name)[0]).join(' and ')} focused smoke coverage passed.`);
 } finally {
     server?.kill();
 }

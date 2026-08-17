@@ -16,6 +16,10 @@ import { subjectsRepository } from '../js/services/subjectsRepository.js';
 import { teacherExportRepository } from '../js/services/teacherExportRepository.js';
 import { vocabularyRepository } from '../js/services/vocabularyRepository.js';
 import { supabaseService } from '../js/supabaseService.js';
+import {
+    getActiveStudentStorageOwner,
+    setActiveStudentStorageOwner
+} from '../js/student/persistence/studentStorage.js';
 
 const RUN_ID = `acceptance-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const IDS = {
@@ -51,13 +55,19 @@ async function withServiceClient(client, callback) {
     const previousClient = supabaseService.client;
     const previousUser = supabaseService.currentUser;
     const previousSession = supabaseService.currentSession;
+    const previousInitialized = supabaseService.initialized;
+    const previousInitPromise = supabaseService.initPromise;
     supabaseService.client = client;
+    supabaseService.initialized = true;
+    supabaseService.initPromise = null;
     try {
         return await callback();
     } finally {
         supabaseService.client = previousClient;
         supabaseService.currentUser = previousUser;
         supabaseService.currentSession = previousSession;
+        supabaseService.initialized = previousInitialized;
+        supabaseService.initPromise = previousInitPromise;
     }
 }
 
@@ -613,6 +623,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 let applicationCallbacks = 0;
                 let applicationLastMarker = 0;
                 let repeatedInitMarker = 0;
+                const previousStorageOwner = getActiveStudentStorageOwner();
                 try {
                     const storage = new Map();
                     globalThis.sessionStorage = {
@@ -643,6 +654,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                             applicationCallbacks += 1;
                         }
                     };
+                    setActiveStudentStorageOwner(student.id);
 
                     await withServiceClient(studentClient, async () => {
                         progress.startCoinSync();
@@ -668,6 +680,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                         await waitFor(() => studentClient.getChannels().length === 0, 'Application teardown did not remove channels.');
                     });
                 } finally {
+                    setActiveStudentStorageOwner(previousStorageOwner);
                     globalThis.window = originalGlobals.window;
                     globalThis.document = originalGlobals.document;
                     globalThis.sessionStorage = originalGlobals.sessionStorage;

@@ -9,6 +9,7 @@ export const AUDIT_SPARK_IDS = [
     'audit-current-spark',
     'audit-future-spark'
 ];
+export const AUDIT_VOCABULARY_ID = 'grade6_t2_august_week1_knowledge_cards';
 
 function execFileText(command, args, options = {}) {
     return new Promise((resolve, reject) => {
@@ -243,6 +244,30 @@ export async function seedLocalAuditData() {
     await runCommand('supabase', ['migration', 'up', '--local'], { stdio: 'ignore' });
     const admin = createLocalAdminClient(status);
     const users = await seedAuditUsers(admin);
+
+    await admin.from('vocabularies').upsert({
+        id: AUDIT_VOCABULARY_ID,
+        name: 'Cross-browser Audit Vocabulary',
+        description: 'Stable local vocabulary used by authenticated browser smoke tests.',
+        grades: ['6'],
+        subject_slug: 'technology',
+        assigned_date: '2026-08-01',
+        trimester: '2',
+        month: 'August',
+        week: 1,
+        activity_settings: {
+            requiredActivities: ['flashcards'],
+            additionalActivities: []
+        },
+        words: [
+            { word: 'browser', definition: 'Software used to open and interact with websites.' },
+            { word: 'storage', definition: 'A place where a device keeps information.' },
+            { word: 'network', definition: 'Connected devices that exchange information.' },
+            { word: 'sandbox', definition: 'An isolated environment for running code safely.' }
+        ],
+        owner_id: users.teacher.id,
+        updated_at: new Date().toISOString()
+    }, { onConflict: 'id' }).throwOnError();
 
     const auditSparks = buildAuditSparks({ teacherId: users.teacher.id });
     await admin

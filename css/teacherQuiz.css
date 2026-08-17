@@ -1,0 +1,904 @@
+/* Quiz Maker Styles */
+.app-container:has(#quiz-maker-view:not(.hidden)) {
+    max-width: min(96vw, 1800px);
+}
+
+.app-container:has(#quiz-maker-view:not(.hidden))>.teacher-main {
+    padding: 1rem;
+}.quiz-maker-container {
+    color: var(--text-main);
+    gap: 1.25rem !important;
+}
+
+.quiz-sidebar {
+    width: clamp(380px, 26vw, 500px) !important;
+    flex: 0 0 clamp(380px, 26vw, 500px);
+    background: rgba(15, 23, 42, 0.18);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+}
+
+.quiz-maker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    margin-bottom: 0.85rem;
+}
+
+.quiz-maker-header .btn {
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    font-weight: var(--type-button-weight);
+    white-space: nowrap;
+}
+
+.quiz-maker-header .text-btn {
+    justify-content: flex-start;
+    padding: 0.35rem 0.55rem;
+}
+
+.quiz-maker-header .primary-btn {
+    justify-content: center;
+    padding: 0.35rem 0.9rem;
+    min-width: 0;
+}
+
+.quiz-canvas {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: clamp(1rem, 2vw, 2.25rem) !important;
+    background: rgba(15, 23, 42, 0.3) !important;
+    border: 0;
+    box-shadow: none;
+}
+
+.quiz-section-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.quiz-section-toolbar select {
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
+}
+
+.quiz-section-toolbar .btn {
+    width: 100%;
+    white-space: nowrap;
+}
+
+.quiz-section-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 0.75rem;
+}
+
+.quiz-section-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.85rem 0;
+}
+
+.quiz-section-card:first-child {
+    border-top: 0;
+}
+
+.quiz-section-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 0.7rem;
+}
+
+.quiz-section-card-header>div:first-child {
+    min-width: 0;
+}
+
+.quiz-section-card-header strong {
+    display: block;
+    overflow-wrap: anywhere;
+    line-height: 1.15;
+}
+
+.quiz-section-kicker {
+    display: block;
+    color: var(--text-muted);
+    font-size: var(--type-caption-size);
+    font-weight: 700;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.quiz-section-actions {
+    display: flex;
+    gap: 0.2rem;
+    flex: 0 0 auto;
+}
+
+.quiz-section-actions .btn {
+    min-width: 28px;
+    padding: 0.15rem 0.3rem;
+}
+
+.quiz-section-actions .btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.quiz-section-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    min-width: 0;
+}
+
+.quiz-section-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--text-muted);
+    font-size: var(--type-caption-size);
+    font-weight: 700;
+}
+
+.quiz-section-fields input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.45rem 0.5rem;
+    text-align: center;
+}
+
+.quiz-tool-note {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-style: italic;
+    line-height: 1.4;
+    margin-top: 0.55rem;
+}
+
+.quiz-tool-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.quiz-tool-tab {
+    min-width: 0;
+    min-height: 34px;
+    padding: 0.35rem 0.25rem;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: var(--type-caption-size);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+.quiz-tool-tab.active {
+    background: rgba(99, 102, 241, 0.24);
+    color: var(--text-main);
+    box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.4);
+}
+
+.quiz-tool-panel {
+    display: none;
+}
+
+.quiz-tool-panel.active {
+    display: block;
+}
+
+.rubric-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(15, 23, 42, 0.62);
+}
+
+.rubric-modal-panel {
+    width: min(92vw, 620px);
+    max-height: min(84vh, 760px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #fff;
+    color: #111827;
+    box-shadow: 0 24px 70px -28px rgba(0, 0, 0, 0.55);
+}
+
+.rubric-modal-header {
+    padding: 1.25rem 1.35rem 0.85rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.rubric-modal-eyebrow {
+    margin: 0 0 0.2rem;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.rubric-modal-header h3 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.2rem;
+}
+
+.rubric-modal-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    overflow-y: auto;
+    padding: 1.1rem 1.35rem;
+}
+
+.rubric-row-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.rubric-row-top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 88px;
+    gap: 0.75rem;
+}
+
+.rubric-row-edit label {
+    margin: 0;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: var(--type-form-label-weight);
+}
+
+.rubric-row-edit input,
+.rubric-row-edit textarea {
+    width: 100%;
+    margin-top: 0.25rem;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #111827;
+}
+
+.rubric-row-edit textarea {
+    min-height: 72px;
+    resize: vertical;
+}
+
+.rubric-points-field input {
+    text-align: center;
+}
+
+.rubric-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0.9rem 1.35rem 1.1rem;
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.rubric-modal-footer .text-btn {
+    color: #475569;
+}
+
+.question-card {
+    background: white;
+    color: #1f2937;
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.question-card:active {
+    cursor: grabbing;
+}
+
+.question-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 0.5rem;
+}
+
+.q-type {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.q-points {
+    width: 50px;
+    padding: 2px 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-right: 0.5rem;
+    background: white;
+    color: #111;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-icon:hover {
+    opacity: 1;
+}
+
+.q-prompt {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    resize: vertical;
+    min-height: 60px;
+    background: #fff;
+    color: #111;
+}
+
+.q-prompt:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.q-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.option-input {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: #fff;
+    color: #111;
+}
+
+.q-answer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.q-answer {
+    flex: 1;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    background: #f9fafb;
+    color: #111;
+}
+
+/* Document Editor Styles (WYSIWYG) */
+.document-page {
+    background: white;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto;
+    padding: 0.45in;
+    border: 1px solid #111827;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    color: #000;
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.3;
+    position: relative;
+    /* Preview Scaling */
+    transform-origin: top center;
+    transform: none;
+    zoom: var(--preview-scale, 1);
+    margin-bottom: 2rem;
+}
+
+.document-page.no-page-border {
+    border-color: transparent;
+}
+
+@media print {
+    .document-page {
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        transform: none !important;
+        zoom: 1 !important;
+    }
+}
+
+.doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    /* Light gray by default, can be black in print */
+    padding-bottom: 1rem;
+}
+
+.doc-logo {
+    width: 80px;
+    height: 80px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #999;
+    background: #f9fafb;
+}
+
+.doc-title-section {
+    text-align: center;
+    flex: 1;
+    padding: 0 1rem;
+}
+
+.doc-school-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.doc-quiz-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.doc-meta-info {
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.doc-score-box {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #000;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #d1d5db;
+    /* Placeholder color */
+}
+
+.doc-instructions {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 12pt;
+}
+
+.doc-instructions h4 {
+    font-size: 12pt;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    color: #475569;
+}
+
+.doc-info-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.doc-info-pill {
+    border: 1px dashed #cbd5e1;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 12pt;
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+}
+
+.doc-info-label {
+    font-weight: 600;
+    margin-right: 0.5rem;
+    color: #64748b;
+}
+
+.doc-rubric {
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.doc-rubric-header {
+    background: #f1f5f9;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.doc-rubric-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.doc-rubric-table th,
+.doc-rubric-table td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.doc-rubric-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+}
+
+.doc-questions-container {
+    min-height: 200px;
+    border: 2px dashed transparent;
+    transition: border-color 0.2s;
+}
+
+.doc-questions-container.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+/* Override question card styles for document view */
+.document-page .question-card {
+    border: none;
+    box-shadow: none;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 1rem 0;
+    margin-bottom: 0;
+    background: transparent;
+}
+
+.document-page .question-card:last-child {
+    border-bottom: none;
+}
+
+.document-page .q-header {
+    border-bottom: none;
+    margin-bottom: 0.25rem;
+    background: transparent;
+    padding-bottom: 0;
+}
+
+.document-page .q-type {
+    display: none;
+    /* Hide type tag in final doc view, or keep small? Let's hide for "print look" */
+}
+
+.document-page .q-prompt {
+    border: 1px solid transparent;
+    /* Editable but looks like text */
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    resize: none;
+    min-height: auto;
+    font-weight: 500;
+}
+
+.document-page .q-prompt:hover,
+.document-page .q-prompt:focus {
+    border-color: #e5e7eb;
+    background: #fff;
+    padding: 0.5rem;
+}
+
+.document-page .q-options {
+    margin-left: 1.5rem;
+}
+
+.document-page .section-header {
+    display: block;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.document-page .doc-q-card {
+    margin-bottom: 1rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.document-page .q-option {
+    line-height: 1.35;
+}
+
+.document-page .tf-question-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.document-page .tf-answer-line {
+    display: inline-block;
+    width: 48px;
+    min-width: 48px;
+    border-bottom: 1px solid #000;
+    transform: translateY(-0.15rem);
+}
+
+.document-page .matching-definition {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+}
+
+.document-page .matching-answer-line {
+    display: inline-block;
+    width: 36px;
+    border-bottom: 1px solid #000;
+    transform: translateY(-0.15rem);
+}
+
+.document-page .option-input {
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    /* Ensure it takes space */
+    color: #000;
+    /* Ensure text is black */
+}
+
+.document-page .option-input:hover,
+.document-page .option-input:focus {
+    border-color: #e5e7eb;
+    background: #fff;
+    padding: 0.2rem 0.5rem;
+}
+
+/* Rubric Grid Styles */
+.doc-rubric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    /* Reduced from 2rem */
+}
+
+.doc-rubric-item {
+    padding: 0.5rem 0.75rem;
+    /* Reduced from 1rem */
+    border-bottom: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+}
+
+.doc-rubric-item:nth-child(2n) {
+    border-right: none;
+}
+
+/* Remove bottom border for the last row items if they are the last ones */
+/* But we have a total row at the bottom spanning full width */
+
+.rubric-title {
+    font-weight: 700;
+    font-size: 12pt;
+    /* Slightly smaller */
+    margin-bottom: 0.1rem;
+    color: #111;
+}
+
+.rubric-desc {
+    font-size: 12pt;
+    /* Slightly smaller */
+    color: #4b5563;
+    line-height: 1.3;
+}
+
+.rubric-pts {
+    font-weight: 700;
+    color: #000;
+}
+
+.doc-rubric-total {
+    grid-column: 1 / -1;
+    /* Span full width */
+    text-align: right;
+    padding: 0.5rem 1rem;
+    /* Reduced padding */
+    font-weight: 700;
+    font-size: 12pt;
+    /* Matched to rubric title size */
+    background: #fff;
+    border-top: 1px solid #e5e7eb;
+    /* Ensure separation */
+}
+
+/* Reference Header Styles */
+.band {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    gap: 10px;
+    /* Reduced gap */
+    align-items: center;
+    padding: 10px 14px;
+    /* Reduced padding */
+    border-radius: 16px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: linear-gradient(135deg, #f8fafc, #eef2ff);
+    margin-bottom: 1rem;
+    /* Reduced margin */
+}
+
+.band .logo {
+    width: 64px;
+    /* Reduced size */
+    height: 64px;
+    border-radius: 16px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+}
+
+.band .logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.band .grade-note {
+    width: 64px;
+    /* Reduced size */
+    height: 64px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(15, 23, 42, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #0f172a;
+    min-width: 64px;
+    min-height: 64px;
+    box-sizing: border-box;
+}
+
+.band h3 {
+    margin: 0;
+    font-size: 12pt;
+    text-align: center;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.band h3:not(:first-child) {
+    margin-top: 1px;
+}
+
+.band .meta {
+    text-align: center;
+    font-weight: 700;
+    font-size: 12pt;
+    margin-top: 2px;
+    color: #475569;
+}
+
+/* View Mode Question Cards */
+.question-card.view-mode {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.question-card.view-mode:hover {
+    background: #f8fafc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.question-card.view-mode .q-item {
+    padding: 0.5rem;
+}
+
+/* Edit Mode Question Cards */
+.question-card.edit-mode {
+    background: #fff;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Ensure view mode questions look clean */
+.question-card.view-mode .q-prompt {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.question-card.view-mode .q-option {
+    color: #374151;
+}
