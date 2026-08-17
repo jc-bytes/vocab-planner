@@ -1,0 +1,441 @@
+[
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/lats summatives/7th grade Rhythm_Game_Working_Code_40_Point_Rubric.docx",
+    "paragraphs": [],
+    "tables": [
+      [
+        [
+          "",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Daily Grade #4\nRhythm Game Working Code - 7th Grade",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Daily Grade #4\nRhythm Game Working Code - 7th Grade",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Daily Grade #4\nRhythm Game Working Code - 7th Grade",
+          ""
+        ],
+        [
+          "Name: ___________________________________",
+          "Name: ___________________________________",
+          "Date: ______________",
+          "Group: 7° A B",
+          "Group: 7° A B"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Teacher: Porfirio Rios",
+          "Score____ / 40",
+          "",
+          ""
+        ],
+        [
+          "Task: Finish your working rhythm game. The submitted project must open and run correctly, include the required sprites and variables, use connected scripts that control the game, respond correctly to player input, manage scoring and timing as intended, and work without game-breaking errors. No presentation or oral explanation is required.",
+          "Task: Finish your working rhythm game. The submitted project must open and run correctly, include the required sprites and variables, use connected scripts that control the game, respond correctly to player input, manage scoring and timing as intended, and work without game-breaking errors. No presentation or oral explanation is required.",
+          "Task: Finish your working rhythm game. The submitted project must open and run correctly, include the required sprites and variables, use connected scripts that control the game, respond correctly to player input, manage scoring and timing as intended, and work without game-breaking errors. No presentation or oral explanation is required.",
+          "Task: Finish your working rhythm game. The submitted project must open and run correctly, include the required sprites and variables, use connected scripts that control the game, respond correctly to player input, manage scoring and timing as intended, and work without game-breaking errors. No presentation or oral explanation is required.",
+          "Task: Finish your working rhythm game. The submitted project must open and run correctly, include the required sprites and variables, use connected scripts that control the game, respond correctly to player input, manage scoring and timing as intended, and work without game-breaking errors. No presentation or oral explanation is required."
+        ],
+        [
+          "Name, class, and date",
+          "Enter your complete name, class, and date on the submitted project or required evidence.",
+          "Enter your complete name, class, and date on the submitted project or required evidence.",
+          "Awarded: ____ / 1 pt",
+          "Awarded: ____ / 1 pt"
+        ],
+        [
+          "Finished working game and submission",
+          "4 checks: (1) the rhythm game is finished; (2) the project opens and starts correctly; (3) the game can be played from beginning to end without a game-breaking error; and (4) the finished project is submitted in the correct place and format.",
+          "4 checks: (1) the rhythm game is finished; (2) the project opens and starts correctly; (3) the game can be played from beginning to end without a game-breaking error; and (4) the finished project is submitted in the correct place and format.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no submitted game\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no submitted game\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Required sprites and variables",
+          "4 checks: the project (1) includes the required sprites or game objects; (2) includes the required variables; (3) initializes important variables correctly when the game starts; and (4) uses the sprites and variables correctly during gameplay.",
+          "4 checks: the project (1) includes the required sprites or game objects; (2) includes the required variables; (3) initializes important variables correctly when the game starts; and (4) uses the sprites and variables correctly during gameplay.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or required components are missing\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or required components are missing\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Connected scripts and game logic",
+          "4 checks: (1) required scripts begin with an appropriate event or condition; (2) blocks are connected in the correct order; (3) scripts produce the intended game actions or outputs; and (4) the main game logic works together without broken or conflicting required scripts.",
+          "4 checks: (1) required scripts begin with an appropriate event or condition; (2) blocks are connected in the correct order; (3) scripts produce the intended game actions or outputs; and (4) the main game logic works together without broken or conflicting required scripts.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or core logic does not work\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or core logic does not work\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Player input and scoring",
+          "4 checks: the game (1) detects the required player inputs; (2) responds correctly when the player acts at the correct time; (3) changes the score correctly for successful actions; and (4) does not incorrectly award points for missed or invalid actions.",
+          "4 checks: the game (1) detects the required player inputs; (2) responds correctly when the player acts at the correct time; (3) changes the score correctly for successful actions; and (4) does not incorrectly award points for missed or invalid actions.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or input/scoring does not work\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or input/scoring does not work\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Scratch platform understanding and usage",
+          "4 checks: (1) uses Scratch correctly to create and run the game; (2) uses appropriate sprites, scripts, and variables for the required gameplay; (3) connects blocks correctly so the scripts work as intended; and (4) demonstrates understanding of the platform by organizing and testing the project without broken or unnecessary code.",
+          "4 checks: (1) uses Scratch correctly to create and run the game; (2) uses appropriate sprites, scripts, and variables for the required gameplay; (3) connects blocks correctly so the scripts work as intended; and (4) demonstrates understanding of the platform by organizing and testing the project without broken or unnecessary code.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or gameplay is not functional\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or gameplay is not functional\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Punctuality, readiness, and respect",
+          "4 checks: (1) Submits the finished game by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, cables, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 checks: (1) Submits the finished game by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, cables, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts"
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/lats summatives/8th grade Ultrasonic_Sensor_Project_Slides_40_Point_Rubric (1).docx",
+    "paragraphs": [],
+    "tables": [
+      [
+        [
+          "",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nUltrasonic Sensor Project Slides - 8th A & B",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nUltrasonic Sensor Project Slides - 8th A & B",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nUltrasonic Sensor Project Slides - 8th A & B",
+          ""
+        ],
+        [
+          "Name: ___________________________________",
+          "Name: ___________________________________",
+          "Date: ______________",
+          "Group: 8° A B",
+          "Group: 8° A B"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Teacher: Porfirio Rios",
+          "Score____ / 40",
+          "",
+          ""
+        ],
+        [
+          "Task: Create a Canva presentation about ultrasonic sensors with at least four slides. Explain what an ultrasonic sensor is and how it measures distance; identify and explain its main parts; connect the sensor using the teacher-provided code and obtain stable distance readings; and record at least five actual readings with units, a Near/Far threshold, and an explanation of why the threshold is reliable. Use English throughout the activity. Enter your full name, class, and date; submit the completed presentation as instructed in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Create a Canva presentation about ultrasonic sensors with at least four slides. Explain what an ultrasonic sensor is and how it measures distance; identify and explain its main parts; connect the sensor using the teacher-provided code and obtain stable distance readings; and record at least five actual readings with units, a Near/Far threshold, and an explanation of why the threshold is reliable. Use English throughout the activity. Enter your full name, class, and date; submit the completed presentation as instructed in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Create a Canva presentation about ultrasonic sensors with at least four slides. Explain what an ultrasonic sensor is and how it measures distance; identify and explain its main parts; connect the sensor using the teacher-provided code and obtain stable distance readings; and record at least five actual readings with units, a Near/Far threshold, and an explanation of why the threshold is reliable. Use English throughout the activity. Enter your full name, class, and date; submit the completed presentation as instructed in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Create a Canva presentation about ultrasonic sensors with at least four slides. Explain what an ultrasonic sensor is and how it measures distance; identify and explain its main parts; connect the sensor using the teacher-provided code and obtain stable distance readings; and record at least five actual readings with units, a Near/Far threshold, and an explanation of why the threshold is reliable. Use English throughout the activity. Enter your full name, class, and date; submit the completed presentation as instructed in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Create a Canva presentation about ultrasonic sensors with at least four slides. Explain what an ultrasonic sensor is and how it measures distance; identify and explain its main parts; connect the sensor using the teacher-provided code and obtain stable distance readings; and record at least five actual readings with units, a Near/Far threshold, and an explanation of why the threshold is reliable. Use English throughout the activity. Enter your full name, class, and date; submit the completed presentation as instructed in Google Classroom. Each non-English title or explanation loses its corresponding English check."
+        ],
+        [
+          "Name, class, and date",
+          "Enter your complete name, class, and date in the final presentation.",
+          "Enter your complete name, class, and date in the final presentation.",
+          "Awarded: ____ / 1 pt",
+          "Awarded: ____ / 1 pt"
+        ],
+        [
+          "Four-slide structure, title, and student name",
+          "4 checks: (1) uses a Canva presentation; (2) includes at least four slides; (3) Slide 1 has a clear title about ultrasonic sensors; and (4) Slide 1 includes the student's full name.",
+          "4 checks: (1) uses a Canva presentation; (2) includes at least four slides; (3) Slide 1 has a clear title about ultrasonic sensors; and (4) Slide 1 includes the student's full name.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no presentation\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no presentation\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "What is an ultrasonic sensor?",
+          "4 checks: explains that an ultrasonic sensor (1) measures distance; (2) sends a high-frequency sound pulse; (3) listens for the returning echo; and (4) uses the echo's travel time to determine distance.",
+          "4 checks: explains that an ultrasonic sensor (1) measures distance; (2) sends a high-frequency sound pulse; (3) listens for the returning echo; and (4) uses the echo's travel time to determine distance.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Parts of the ultrasonic sensor",
+          "4 checks: correctly identifies and explains (1) VCC/power; (2) GND/ground; (3) TRIG and the transmitting element that sends the pulse; and (4) ECHO and the receiving element that detects the return. Labels or a clear diagram may be used.",
+          "4 checks: correctly identifies and explains (1) VCC/power; (2) GND/ground; (3) TRIG and the transmitting element that sends the pulse; and (4) ECHO and the receiving element that detects the return. Labels or a clear diagram may be used.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no parts identified\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no parts identified\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Sensor connection and data collection",
+          "4 checks: using the teacher-provided code, the student (1) connects VCC and GND correctly; (2) connects TRIG and ECHO to the assigned pins; (3) keeps the circuit safe, powered correctly, and organized; and (4) obtains stable readings at different object distances. Writing the code is not assessed.",
+          "4 checks: using the teacher-provided code, the student (1) connects VCC and GND correctly; (2) connects TRIG and ECHO to the assigned pins; (3) keeps the circuit safe, powered correctly, and organized; and (4) obtains stable readings at different object distances. Writing the code is not assessed.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no working setup\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no working setup\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Five distance readings and a reliable near/far threshold",
+          "4 checks: Slide 4 (1) records at least 5 actual distance readings; (2) gives the unit for every reading; (3) states one numerical threshold and clearly defines which values are Near and which are Far; and (4) uses the collected readings or repeated tests to explain why the threshold is reliable.",
+          "4 checks: Slide 4 (1) records at least 5 actual distance readings; (2) gives the unit for every reading; (3) states one numerical threshold and clearly defines which values are Near and which are Far; and (4) uses the collected readings or repeated tests to explain why the threshold is reliable.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no readings/threshold\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no readings/threshold\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Punctuality, readiness, and respect",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, sensor, cables, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, sensor, cables, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts"
+        ],
+        [
+          "Comments",
+          "Comments",
+          "Comments",
+          "Comments",
+          "Comments"
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/lats summatives/8th grade Integrated_Circuits_or_Devices_Poster_40_Point_Rubric.docx",
+    "paragraphs": [],
+    "tables": [
+      [
+        [
+          "",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Activity\nIntegrated Circuits or Devices Poster",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Activity\nIntegrated Circuits or Devices Poster",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Activity\nIntegrated Circuits or Devices Poster",
+          ""
+        ],
+        [
+          "Name: ___________________________________",
+          "Name: ___________________________________",
+          "Date: ______________",
+          "Group 8th A B",
+          "Group 8th A B"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Teacher: Porfirio Rios",
+          "Score____ / 40",
+          "",
+          ""
+        ],
+        [
+          "Task: Design a one-page digital poster titled “Integrated Circuits or Devices” using the template in Google Classroom and the teacher-provided sources. Explain the selected circuit or device, include three accurate facts, present at least two advantages, and add relevant images or icons. Use English throughout. Enter your full name, class, and date and submit the completed poster in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Design a one-page digital poster titled “Integrated Circuits or Devices” using the template in Google Classroom and the teacher-provided sources. Explain the selected circuit or device, include three accurate facts, present at least two advantages, and add relevant images or icons. Use English throughout. Enter your full name, class, and date and submit the completed poster in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Design a one-page digital poster titled “Integrated Circuits or Devices” using the template in Google Classroom and the teacher-provided sources. Explain the selected circuit or device, include three accurate facts, present at least two advantages, and add relevant images or icons. Use English throughout. Enter your full name, class, and date and submit the completed poster in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Design a one-page digital poster titled “Integrated Circuits or Devices” using the template in Google Classroom and the teacher-provided sources. Explain the selected circuit or device, include three accurate facts, present at least two advantages, and add relevant images or icons. Use English throughout. Enter your full name, class, and date and submit the completed poster in Google Classroom. Each non-English title or explanation loses its corresponding English check.",
+          "Task: Design a one-page digital poster titled “Integrated Circuits or Devices” using the template in Google Classroom and the teacher-provided sources. Explain the selected circuit or device, include three accurate facts, present at least two advantages, and add relevant images or icons. Use English throughout. Enter your full name, class, and date and submit the completed poster in Google Classroom. Each non-English title or explanation loses its corresponding English check."
+        ],
+        [
+          "Name, class, and date",
+          "Enter your complete name, class, and date in the final poster.",
+          "Enter your complete name, class, and date in the final poster.",
+          "Awarded: ____ / 1 pt",
+          "Awarded: ____ / 1 pt"
+        ],
+        [
+          "Poster structure, title, and template",
+          "4 checks: (1) uses the teacher-provided Canva poster template; (2) creates one complete poster; (3) includes a clear title about the selected integrated circuit or device; and (4) the required sections are easy to identify.",
+          "4 checks: (1) uses the teacher-provided Canva poster template; (2) creates one complete poster; (3) includes a clear title about the selected integrated circuit or device; and (4) the required sections are easy to identify.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no poster\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no poster\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "What they are",
+          "4 checks: (1) clearly identifies the selected integrated circuit or device; (2) explains what it is; (3) includes at least three accurate facts or characteristics; and (4) explains what it does or how it is used.",
+          "4 checks: (1) clearly identifies the selected integrated circuit or device; (2) explains what it is; (3) includes at least three accurate facts or characteristics; and (4) explains what it does or how it is used.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Advantages",
+          "4 checks: (1) includes at least two relevant advantages; (2) clearly explains the first advantage; (3) clearly explains the second advantage; and (4) both advantages relate directly to the selected circuit or device.",
+          "4 checks: (1) includes at least two relevant advantages; (2) clearly explains the first advantage; (3) clearly explains the second advantage; and (4) both advantages relate directly to the selected circuit or device.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no advantages\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no advantages\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Use of provided sources and accuracy",
+          "4 checks: (1) uses the teacher-provided sources; (2) the description matches the sources; (3) the advantages are supported by the sources; and (4) the poster contains no incorrect or unsupported claims.",
+          "4 checks: (1) uses the teacher-provided sources; (2) the description matches the sources; (3) the advantages are supported by the sources; and (4) the poster contains no incorrect or unsupported claims.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or information is not source-based\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or information is not source-based\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Images, readability, and English",
+          "4 checks: (1) includes at least one relevant image or icon; (2) visuals support the topic; (3) text is readable, organized, and fits the template; and (4) the title, labels, and explanations are written in clear English.",
+          "4 checks: (1) includes at least one relevant image or icon; (2) visuals support the topic; (3) text is readable, organized, and fits the template; and (4) the title, labels, and explanations are written in clear English.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or poster is not readable\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or poster is not readable\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Punctuality, readiness, and respect",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts"
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/lats summatives/9th grade Careful_Handling_of_Data_Presentation_40_Point_Rubric.docx",
+    "paragraphs": [],
+    "tables": [
+      [
+        [
+          "",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nCareful Handling of Data Presentation - 9th A & B",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nCareful Handling of Data Presentation - 9th A & B",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nCareful Handling of Data Presentation - 9th A & B",
+          ""
+        ],
+        [
+          "Name: ___________________________________",
+          "Name: ___________________________________",
+          "Date: ______________",
+          "Group: __________",
+          "Group: __________"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Teacher: Porfirio Rios",
+          "Score____ / 40",
+          "",
+          ""
+        ],
+        [
+          "Task: Design a four-slide presentation about the careful handling of data in modern society using the template in Google Classroom. Slide 1 must include a title, your name, selected topic, and main question. Slide 2 must explain the topic and why it is important. Slide 3 must include one real-life example and three evidence statements. Slide 4 must include one risk, three recommendations, and a final conclusion. Use English throughout the presentation. Use short sentences, clear images or icons, and readable text. Each non-English required item loses its corresponding English check.",
+          "Task: Design a four-slide presentation about the careful handling of data in modern society using the template in Google Classroom. Slide 1 must include a title, your name, selected topic, and main question. Slide 2 must explain the topic and why it is important. Slide 3 must include one real-life example and three evidence statements. Slide 4 must include one risk, three recommendations, and a final conclusion. Use English throughout the presentation. Use short sentences, clear images or icons, and readable text. Each non-English required item loses its corresponding English check.",
+          "Task: Design a four-slide presentation about the careful handling of data in modern society using the template in Google Classroom. Slide 1 must include a title, your name, selected topic, and main question. Slide 2 must explain the topic and why it is important. Slide 3 must include one real-life example and three evidence statements. Slide 4 must include one risk, three recommendations, and a final conclusion. Use English throughout the presentation. Use short sentences, clear images or icons, and readable text. Each non-English required item loses its corresponding English check.",
+          "Task: Design a four-slide presentation about the careful handling of data in modern society using the template in Google Classroom. Slide 1 must include a title, your name, selected topic, and main question. Slide 2 must explain the topic and why it is important. Slide 3 must include one real-life example and three evidence statements. Slide 4 must include one risk, three recommendations, and a final conclusion. Use English throughout the presentation. Use short sentences, clear images or icons, and readable text. Each non-English required item loses its corresponding English check.",
+          "Task: Design a four-slide presentation about the careful handling of data in modern society using the template in Google Classroom. Slide 1 must include a title, your name, selected topic, and main question. Slide 2 must explain the topic and why it is important. Slide 3 must include one real-life example and three evidence statements. Slide 4 must include one risk, three recommendations, and a final conclusion. Use English throughout the presentation. Use short sentences, clear images or icons, and readable text. Each non-English required item loses its corresponding English check."
+        ],
+        [
+          "Name, class, and date",
+          "Enter your complete name, class, and date in the final presentation.",
+          "Enter your complete name, class, and date in the final presentation.",
+          "Awarded: ____ / 1 pt",
+          "Awarded: ____ / 1 pt"
+        ],
+        [
+          "Four-slide structure, title, topic, and question",
+          "4 checks: (1) uses the teacher-provided presentation template; (2) includes at least four slides; (3) Slide 1 has a clear title, the student's full name, and the selected topic; and (4) Slide 1 includes one clear main question related to the topic.",
+          "4 checks: (1) uses the teacher-provided presentation template; (2) includes at least four slides; (3) Slide 1 has a clear title, the student's full name, and the selected topic; and (4) Slide 1 includes one clear main question related to the topic.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no presentation\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no presentation\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Topic explanation and importance",
+          "4 checks: Slide 2 (1) clearly explains the selected data topic; (2) uses accurate information; (3) explains why the topic is important in modern society; and (4) connects the explanation to careful or responsible handling of data.",
+          "4 checks: Slide 2 (1) clearly explains the selected data topic; (2) uses accurate information; (3) explains why the topic is important in modern society; and (4) connects the explanation to careful or responsible handling of data.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no explanation\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Real-life example and evidence",
+          "4 checks: Slide 3 (1) includes one clear real-life example related to the selected topic; and includes (2) a first, (3) a second, and (4) a third accurate evidence statement that supports or explains the example.",
+          "4 checks: Slide 3 (1) includes one clear real-life example related to the selected topic; and includes (2) a first, (3) a second, and (4) a third accurate evidence statement that supports or explains the example.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no example/evidence\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no example/evidence\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Risk and recommendations",
+          "4 checks: Slide 4 (1) identifies one realistic risk related to the selected topic; and gives (2) a first, (3) a second, and (4) a third practical recommendation for handling data more carefully or responsibly.",
+          "4 checks: Slide 4 (1) identifies one realistic risk related to the selected topic; and gives (2) a first, (3) a second, and (4) a third practical recommendation for handling data more carefully or responsibly.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no risk/recommendations\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no risk/recommendations\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Conclusion, visuals, readability, and English",
+          "4 checks: (1) Slide 4 includes a clear final conclusion that answers or responds to the main question; (2) uses short, understandable sentences; (3) includes clear and relevant images or icons and readable text; and (4) all required presentation content is written in clear English.",
+          "4 checks: (1) Slide 4 includes a clear final conclusion that answers or responds to the main question; (2) uses short, understandable sentences; (3) includes clear and relevant images or icons and readable text; and (4) all required presentation content is written in clear English.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or presentation is not readable\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or presentation is not readable\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Punctuality, readiness, and respect",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, and workspace carefully; and (4) begins on time, follows directions, and does not interfere with another student’s device or work.",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts"
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/lats summatives/7th grade Pair_Programming_Self_Reflection_Poster_40_Point_Rubric.docx",
+    "paragraphs": [],
+    "tables": [
+      [
+        [
+          "",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nPair Programming Self-Reflection Poster",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nPair Programming Self-Reflection Poster",
+          "Academia Internacional David\nRobotics and Technology\n2nd Trimester - Summative Project\nPair Programming Self-Reflection Poster",
+          ""
+        ],
+        [
+          "Name: ___________________________________",
+          "Name: ___________________________________",
+          "Date: ______________",
+          "Group: 7° A B",
+          "Group: 7° A B"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Teacher: Porfirio Rios",
+          "Score____ / 40",
+          "",
+          ""
+        ],
+        [
+          "Task: Create a one-page digital poster reflecting on your pair-programming experience. Explain the driver and navigator roles, your effort, communication, organization, and how you responded to feedback. Use short reflection statements, a clear layout, and readable text.",
+          "Task: Create a one-page digital poster reflecting on your pair-programming experience. Explain the driver and navigator roles, your effort, communication, organization, and how you responded to feedback. Use short reflection statements, a clear layout, and readable text.",
+          "Task: Create a one-page digital poster reflecting on your pair-programming experience. Explain the driver and navigator roles, your effort, communication, organization, and how you responded to feedback. Use short reflection statements, a clear layout, and readable text.",
+          "Task: Create a one-page digital poster reflecting on your pair-programming experience. Explain the driver and navigator roles, your effort, communication, organization, and how you responded to feedback. Use short reflection statements, a clear layout, and readable text.",
+          "Task: Create a one-page digital poster reflecting on your pair-programming experience. Explain the driver and navigator roles, your effort, communication, organization, and how you responded to feedback. Use short reflection statements, a clear layout, and readable text."
+        ],
+        [
+          "Name, class,\nand date",
+          "Enter your complete name, class, and date on the final poster.",
+          "Enter your complete name, class, and date on the final poster.",
+          "Awarded: ____ / 1 pt",
+          "Awarded: ____ / 1 pt"
+        ],
+        [
+          "Poster structure and\ndriver/navigator roles",
+          "4 checks: (1) creates a one-page digital poster with a clear title; (2) explains the driver role; (3) explains the navigator role; and (4) describes how the roles were used, shared, or changed during the pair-programming activity.",
+          "4 checks: (1) creates a one-page digital poster with a clear title; (2) explains the driver role; (3) explains the navigator role; and (4) describes how the roles were used, shared, or changed during the pair-programming activity.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no poster\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no poster\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Effort and\nparticipation",
+          "3 checks: the reflection (1) gives one specific example of participation or contribution; (3) identifies one thing done well; and (3) identifies one realistic area for improvement.",
+          "3 checks: the reflection (1) gives one specific example of participation or contribution; (3) identifies one thing done well; and (3) identifies one realistic area for improvement.",
+          "7 pts = 3 checks\n5 pts = 2\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts",
+          "7 pts = 3 checks\n5 pts = 2\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Communication and\nteamwork",
+          "4 checks: the reflection (1) explains how they communicated; (2) gives one example of listening, explaining, asking, or answering; (3) describes how both partners worked together; and (4) identifies one way communication could be maintained or improved.",
+          "4 checks: the reflection (1) explains how they communicated; (2) gives one example of listening, explaining, asking, or answering; (3) describes how both partners worked together; and (4) identifies one way communication could be maintained or improved.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Organization and\nproblem solving",
+          "4 checks: the reflection (1) explains how they organized the task or divided the work; (2) gives one example of staying focused or prepared; (3) describes how the pair handled a problem or difficulty; and (4) identifies one organizational strategy that helped or could help next time.",
+          "4 checks: the reflection (1) explains how they organized the task or divided the work; (2) gives one example of staying focused or prepared; (3) describes how the pair handled a problem or difficulty; and (4) identifies one organizational strategy that helped or could help next time.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Responding to\nfeedback",
+          "4 checks: the reflection (1) identifies feedback received from a partner, peer, or teacher; (2) explains how the student responded to the feedback; (3) describes one change, correction, or improvement made because of it; and (4) states how feedback can help future work.",
+          "4 checks: the reflection (1) identifies feedback received from a partner, peer, or teacher; (2) explains how the student responded to the feedback; (3) describes one change, correction, or improvement made because of it; and (4) states how feedback can help future work.",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts",
+          "7 pts = 4 checks\n5 pts = 2–3\n3 pts = 1\n0 pts = 0 or no reflection\nAwarded: ____ / 7 pts"
+        ],
+        [
+          "Punctuality,\nreadiness, and\nrespect",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, cables, and workspace carefully; and (4) begins on time, follows directions, works respectfully with the partner, and does not interfere with another student’s device or work.",
+          "4 checks: (1) Submits all required work by the deadline; (2) arrives with a charged computer, charger, login access, pen, and notebook; (3) handles the computer, charger, cables, and workspace carefully; and (4) begins on time, follows directions, works respectfully with the partner, and does not interfere with another student’s device or work.",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts",
+          "4 = 4 steps\n3 = 2–3\n1 = 1\n0 = none\nAwarded: ____ / 4 pts"
+        ],
+        [
+          "Comments",
+          "Comments",
+          "Comments",
+          "Comments",
+          "Comments"
+        ]
+      ]
+    ]
+  }
+]

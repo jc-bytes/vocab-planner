@@ -1,0 +1,152 @@
+[
+  {
+    "name": "7th_Grade_Final_Project_Rhythm_Game_2026_Rubric_Google_Classroom_Rubric.xlsx",
+    "criteria": 7,
+    "maximum": 90,
+    "bands": [
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        5,
+        2
+      ]
+    ],
+    "formulaCount": 0,
+    "unusedCount": 0,
+    "errorScan": "{\"kind\":\"notice\",\"message\":\"Cell search matched 0 entries.\"}",
+    "previewPath": "/Users/pjriosc/Documents/Technology 6A/outputs/final_project_google_classroom_rubrics_20260816/work/persisted_previews/7th_Grade_Final_Project_Rhythm_Game_2026_Rubric_Google_Classroom_Rubric.png",
+    "tableInspect": "{\"kind\":\"table\",\"sheet\":\"Template\",\"address\":\"A1:E37\",\"rows\":37,\"cols\":5,\"values\":[[\"It is recommended that you do not edit rubrics in spreadsheet format\",null,null,null,null],[\"v1.0-s\",null,null,null,null],[\"Required Game Components\",null,null,null,null],[\"Includes all required game components: D/F/J/K controls, target creation and movement, collision checks, score, timer...\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Includes all required game components: D/F/J/K controls, target creation and movement, collision checks, scor...\",\"12 pts: Includes most required components, but one or two are missing or incomplete.\",\"8 pts: Includes some required components, but several important parts are missing or incomplete.\",\"4 pts: Game is largely incomplete and includes very few of the required components.\"],[\"Programming Structures\",null,null,null,null],[\"Correctly uses events, broadcasts, loops, conditions, variables, and collision checks.\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Correctly uses events, broadcasts, loops, conditions, variables, and collision checks.\",\"12 pts: Uses most required programming structures correctly, with minor errors or incomplete sections.\",\"8 pts: Uses some required structures, but major errors or incomplete scripts affect the program.\",\"4 pts: Uses very few required programming structures or the scripts do not demonstrate the expected programming conce...\"]],\"valuesTruncated\":true,\"valuesPreviewRows\":12,\"valuesPreviewCols\":5,\"valuesPreviewAddress\":\"A1:E12\"}"
+  },
+  {
+    "name": "8th_Grade_Final_Project_RFID_Sensor_2026_Rubric_Google_Classroom_Rubric.xlsx",
+    "criteria": 7,
+    "maximum": 90,
+    "bands": [
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        5,
+        2
+      ]
+    ],
+    "formulaCount": 0,
+    "unusedCount": 0,
+    "errorScan": "{\"kind\":\"notice\",\"message\":\"Cell search matched 0 entries.\"}",
+    "previewPath": "/Users/pjriosc/Documents/Technology 6A/outputs/final_project_google_classroom_rubrics_20260816/work/persisted_previews/8th_Grade_Final_Project_RFID_Sensor_2026_Rubric_Google_Classroom_Rubric.png",
+    "tableInspect": "{\"kind\":\"table\",\"sheet\":\"Template\",\"address\":\"A1:E37\",\"rows\":37,\"cols\":5,\"values\":[[\"It is recommended that you do not edit rubrics in spreadsheet format\",null,null,null,null],[\"v1.0-s\",null,null,null,null],[\"Hardware Connections\",null,null,null,null],[\"Connects the RFID reader and selects the correct LED, uses the correct switch configuration for the project.\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Connects the RFID reader and selects the correct LED, uses the correct switch configuration for the project.\",\"12 pts: Connects most components correctly, but one connection or configuration is missing, loose, or incorrect.\",\"8 pts: Connects some components correctly, but the circuit or configuration is incomplete or unstable,\",\"4 pts: Circuit is mostly incomplete, incorrectly connected, or unsafe to test.\"],[\"Code and Arduino Knowledge\",null,null,null,null],[\"Understanding of code and Arduino IDE. Uploads and starts the sketch, detects the RFID card, activates the LED correc...\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Understanding of code and Arduino IDE. Uploads and starts the sketch, detects the RFID card, activates the LE...\",\"12 pts: Understanding of code and Arduino IDE. System works mostly as expected, but one function is incomplete or inc...\",\"8 pts: Limited of code and Arduino IDE. System shows partial functionality, but RFID detection or the LED response do...\",\"4 pts: Limited of code and Arduino IDE or the system does not demonstrate the required RFID-to-LED response.\"]],\"valuesTruncated\":true,\"valuesPreviewRows\":12,\"valuesPreviewCols\":5,\"valuesPreviewAddress\":\"A1:E12\"}"
+  },
+  {
+    "name": "9th_Grade_Final_Project_Data_Analysis_2026_Rubric_Google_Classroom_Rubric.xlsx",
+    "criteria": 7,
+    "maximum": 90,
+    "bands": [
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        16,
+        12,
+        8,
+        4
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        5,
+        3
+      ]
+    ],
+    "formulaCount": 0,
+    "unusedCount": 0,
+    "errorScan": "{\"kind\":\"notice\",\"message\":\"Cell search matched 0 entries.\"}",
+    "previewPath": "/Users/pjriosc/Documents/Technology 6A/outputs/final_project_google_classroom_rubrics_20260816/work/persisted_previews/9th_Grade_Final_Project_Data_Analysis_2026_Rubric_Google_Classroom_Rubric.png",
+    "tableInspect": "{\"kind\":\"table\",\"sheet\":\"Template\",\"address\":\"A1:E37\",\"rows\":37,\"cols\":5,\"values\":[[\"It is recommended that you do not edit rubrics in spreadsheet format\",null,null,null,null],[\"v1.0-s\",null,null,null,null],[\"Required Slide Content\",null,null,null,null],[\"Includes a title/name, data question, chart, 3 evidence statements, 1 limitation, 1 recommendation, and 1 responsible...\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Includes a title/name, data question, chart, 3 evidence statements, 1 limitation, 1 recommendation, and 1 res...\",\"12 pts: Includes most required content, but one or two elements are missing or incomplete.\",\"8 pts: Includes some required content, but several important elements are missing or incomplete.\",\"4 pts: Includes very limited required content or does not adequately address the assigned presentation.\"],[\"Evidence and Data Analysis\",null,null,null,null],[\"Uses 3 accurate evidence statements with specific values or visible patterns and uses them to support the conclusion.\",null,null,null,null],[null,16,12,8,4],[null,\"16 points\",\"12 points\",\"8 points\",\"4 points\"],[null,\"16 pts: Uses 3 accurate evidence statements with specific values or visible patterns and uses them to support the con...\",\"12 pts: Uses mostly accurate evidence from the chart, but one statement is vague, inaccurate, or unsupported.\",\"8 pts: Uses limited evidence from the chart or gives a conclusion that is only partially supported by the data.\",\"4 pts: Provides little or no accurate evidence from the chart and does not support the conclusion with data.\"]],\"valuesTruncated\":true,\"valuesPreviewRows\":12,\"valuesPreviewCols\":5,\"valuesPreviewAddress\":\"A1:E12\"}"
+  }
+]

@@ -41,8 +41,10 @@ function createFlashcards(words) {
     activity.questionReadyCards = new Set();
     activity.firstAttemptCorrectCards = new Set();
     activity.attemptsByCard = {};
+    activity.definitionOptionOrders = {};
     activity.feedback = '';
     activity.feedbackTone = '';
+    activity.reviewLockedCardIndex = null;
     return activity;
 }
 
@@ -59,6 +61,22 @@ test('definition options contain one correct answer and unique distractors', () 
     assert.equal(options.length, 4);
     assert.equal(options.includes('A visual display of data.'), true);
     assert.equal(new Set(options.map(option => activity.normalizeDefinition(option))).size, options.length);
+});
+
+test('reopening a question reshuffles choices and moves the correct answer', () => {
+    const activity = createFlashcards([
+        { word: 'Chart', definition: 'A visual display of data.' },
+        { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' },
+        { word: 'Sensor', definition: 'A component that detects changes.' },
+        { word: 'Dataset', definition: 'A collection of related data.' }
+    ]);
+
+    const firstOrder = activity.getDefinitionOptions();
+    const secondOrder = activity.getDefinitionOptions();
+    const correctDefinition = 'A visual display of data.';
+
+    assert.notDeepEqual(secondOrder, firstOrder);
+    assert.notEqual(secondOrder.indexOf(correctDefinition), firstOrder.indexOf(correctDefinition));
 });
 
 test('a correct answer unlocks the card and records first-attempt accuracy', () => {
@@ -97,6 +115,43 @@ test('mistakes provide a retry and do not prevent eventual mastery', () => {
     assert.equal(score.score, 100);
     assert.equal(score.accuracy, 0);
     assert.equal(score.isComplete, true);
+});
+
+test('a correct answer shows the definition without locking navigation', () => {
+    const activity = createFlashcards([
+        { word: 'Chart', definition: 'A visual display of data.' },
+        { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' }
+    ]);
+    activity.render = () => {};
+
+    activity.startCurrentQuestion();
+    const result = activity.recordAnswer('A visual display of data.');
+
+    assert.equal(result.correct, true);
+    assert.equal(activity.isCurrentCardReviewLocked(), false);
+    assert.equal(activity.isFlipped, true);
+});
+
+test('an incorrect answer keeps the definition open until the student retries', () => {
+    const activity = createFlashcards([
+        { word: 'Chart', definition: 'A visual display of data.' },
+        { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' }
+    ]);
+    activity.render = () => {};
+
+    activity.startCurrentQuestion();
+    const result = activity.recordAnswer('A calculation entered in a spreadsheet.');
+    activity.beginIncorrectAnswerReview();
+
+    assert.equal(result.correct, false);
+    assert.equal(activity.isCurrentCardReviewLocked(), true);
+    assert.equal(activity.isFlipped, true);
+
+    // The student explicitly reopens the question after reviewing.
+    activity.completeAnswerReview();
+    assert.equal(activity.isCurrentCardReviewLocked(), false);
+    assert.equal(activity.isFlipped, false);
+    assert.equal(activity.isCurrentQuestionReady(), true);
 });
 
 test('students study the definition before the question becomes available', () => {
@@ -157,7 +212,7 @@ test('versioned mastery state restores answered cards and attempts', () => {
     assert.equal(activity.isCurrentQuestionReady(), false);
 });
 
-test('version 3 state restores the study-to-question stage', () => {
+test('unfinished version 3 state reopens on the study side', () => {
     const activity = createFlashcards([
         { word: 'Chart', definition: 'A visual display of data.' },
         { word: 'Formula', definition: 'A calculation entered in a spreadsheet.' }
@@ -173,6 +228,6 @@ test('version 3 state restores the study-to-question stage', () => {
 
     activity.restoreState();
 
-    assert.equal(activity.isCurrentQuestionReady(), true);
-    assert.equal(activity.isFlipped, false);
+    assert.equal(activity.isCurrentQuestionReady(), false);
+    assert.equal(activity.isFlipped, true);
 });

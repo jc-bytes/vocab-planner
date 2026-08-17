@@ -17,8 +17,10 @@ export class FlashcardsActivity {
         this.questionReadyCards = new Set();
         this.firstAttemptCorrectCards = new Set();
         this.attemptsByCard = {};
+        this.definitionOptionOrders = {};
         this.feedback = '';
         this.feedbackTone = '';
+        this.reviewLockedCardIndex = null;
 
         this.container.classList.add('flashcards-activity-container');
         this.container.closest('#activity-view')?.classList.add('flashcards-active');
@@ -48,9 +50,10 @@ export class FlashcardsActivity {
             this.answeredCards = new Set(this.sanitizeCardIndexes(state.answeredCards));
             this.firstAttemptCorrectCards = new Set(this.sanitizeCardIndexes(state.firstAttemptCorrectCards));
             this.attemptsByCard = this.sanitizeAttempts(state.attemptsByCard);
-            if (Number(state.masteryVersion) >= FLASHCARD_MASTERY_VERSION) {
-                this.questionReadyCards = new Set(this.sanitizeCardIndexes(state.questionReadyCards));
-            }
+            // An unfinished card should always reopen on its study side. Restoring
+            // the transient question stage can hide the definition before the
+            // student has had a chance to review it in the new session.
+            this.questionReadyCards = new Set();
             this.syncCardViewMode();
         }
         return true;
@@ -150,6 +153,21 @@ export class FlashcardsActivity {
         return this.questionReadyCards.has(this.currentIndex);
     }
 
+    isCurrentCardReviewLocked() {
+        return this.reviewLockedCardIndex === this.currentIndex;
+    }
+
+    beginIncorrectAnswerReview() {
+        this.reviewLockedCardIndex = this.currentIndex;
+        this.isFlipped = true;
+    }
+
+    completeAnswerReview() {
+        this.reviewLockedCardIndex = null;
+        this.isFlipped = false;
+        this.render();
+    }
+
     syncCardViewMode() {
         this.isFlipped = this.isCurrentCardAnswered() || !this.isCurrentQuestionReady();
     }
@@ -177,13 +195,25 @@ export class FlashcardsActivity {
         return String(word?.definition || word?.matchText || word?.example || `The meaning of ${word?.word || 'this word'}`).trim();
     }
 
-    getStableOptionRank(option) {
-        const seed = `${this.words[this.currentIndex]?.word || ''}:${this.currentIndex}:${option}`;
-        let hash = 0;
-        for (let index = 0; index < seed.length; index += 1) {
-            hash = ((hash << 5) - hash + seed.charCodeAt(index)) | 0;
+    shuffleDefinitionOptions(options) {
+        const shuffled = [...options];
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1));
+            [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
         }
-        return hash;
+
+        const previous = this.definitionOptionOrders[this.currentIndex];
+        const correctKey = this.normalizeDefinition(this.getDefinition());
+        if (previous?.length === shuffled.length && shuffled.length > 1) {
+            const previousCorrectIndex = previous.findIndex(option => this.normalizeDefinition(option) === correctKey);
+            const nextCorrectIndex = shuffled.findIndex(option => this.normalizeDefinition(option) === correctKey);
+            if (previousCorrectIndex === nextCorrectIndex) {
+                shuffled.push(shuffled.shift());
+            }
+        }
+
+        this.definitionOptionOrders[this.currentIndex] = [...shuffled];
+        return shuffled;
     }
 
     getDefinitionOptions() {
@@ -214,8 +244,7 @@ export class FlashcardsActivity {
             }
         });
 
-        return [correct, ...distractors.slice(0, 3)]
-            .sort((a, b) => this.getStableOptionRank(a) - this.getStableOptionRank(b));
+        return this.shuffleDefinitionOptions([correct, ...distractors.slice(0, 3)]);
     }
 
     render() {
@@ -231,13 +260,16 @@ export class FlashcardsActivity {
         const wrapper = createElement('div', 'flashcard-wrapper flashcard-mastery-wrapper');
         const cardScene = createElement('div', 'card-scene');
         const card = createElement('button', 'flashcard');
+        const reviewLocked = this.isCurrentCardReviewLocked();
         card.type = 'button';
-        card.setAttribute('aria-label', this.isCurrentCardAnswered()
+        card.setAttribute('aria-label', reviewLocked
+            ? 'Review the vocabulary word and definition'
+            : this.isCurrentCardAnswered()
             ? 'Flip flashcard'
             : this.isCurrentQuestionReady()
                 ? 'Vocabulary term shown while answering the definition question'
                 : 'Study the vocabulary definition and example');
-        card.setAttribute('aria-disabled', this.isCurrentCardAnswered() ? 'false' : 'true');
+        card.setAttribute('aria-disabled', !reviewLocked && this.isCurrentCardAnswered() ? 'false' : 'true');
         if (this.isFlipped) card.classList.add('is-flipped');
 
         const word = this.words[this.currentIndex];
@@ -268,7 +300,9 @@ export class FlashcardsActivity {
         const hint = createElement('p', 'hint');
 
         heading.textContent = word.word || '';
-        hint.textContent = this.isCurrentCardAnswered()
+        hint.textContent = this.isCurrentCardReviewLocked()
+            ? 'Review the definition'
+            : this.isCurrentCardAnswered()
             ? 'Tap to review the definition'
             : this.isCurrentQuestionReady()
                 ? 'Choose the matching definition'
@@ -281,6 +315,7 @@ export class FlashcardsActivity {
     createBackFace(word) {
         const back = createElement('div', 'card-face card-back');
         const content = createElement('div', 'card-content');
+        const heading = createElement('h2', 'flashcard-definition-term', word.word || '');
         const partOfSpeech = createElement('span', 'pos-tag');
         const definition = createElement('p', 'definition');
         const example = createElement('p', 'example');
@@ -289,6 +324,7 @@ export class FlashcardsActivity {
         definition.textContent = this.getDefinition(word);
         example.textContent = word.example ? `“${word.example}”` : '';
 
+        content.appendChild(heading);
         if (word.part_of_speech) content.appendChild(partOfSpeech);
         content.appendChild(definition);
         if (word.example) content.appendChild(example);
@@ -300,15 +336,36 @@ export class FlashcardsActivity {
         const check = createElement('section', 'flashcard-mastery-check');
         check.setAttribute('aria-label', `Definition check for ${word.word || 'vocabulary word'}`);
 
-        const heading = createElement('h3', null, this.isCurrentCardAnswered()
+        const reviewLocked = this.isCurrentCardReviewLocked();
+        const heading = createElement('h3', null, reviewLocked
+            ? 'Review the definition'
+            : this.isCurrentCardAnswered()
             ? 'Definition mastered'
             : this.isCurrentQuestionReady()
                 ? `Which definition matches “${word.word || ''}”?`
                 : `Study “${word.word || ''}”`);
         check.appendChild(heading);
 
+        if (reviewLocked) {
+            const message = 'Not quite. Review the word and definition, then reopen the question when you are ready.';
+            const feedback = createElement(
+                'p',
+                'flashcard-feedback is-incorrect',
+                message
+            );
+            feedback.setAttribute('aria-live', 'polite');
+            check.appendChild(feedback);
+            const retryButton = createElement('button', 'btn primary-btn flashcard-start-question', 'Try question again');
+            retryButton.type = 'button';
+            retryButton.addEventListener('click', () => this.completeAnswerReview());
+            check.appendChild(retryButton);
+            return check;
+        }
+
         if (this.isCurrentCardAnswered()) {
-            check.appendChild(createElement('p', 'flashcard-feedback is-correct', 'Correct. Review the card, then continue.'));
+            const feedback = createElement('p', 'flashcard-feedback is-correct', 'Correct. Review the card, then continue.');
+            feedback.setAttribute('aria-live', 'polite');
+            check.appendChild(feedback);
             return check;
         }
 
@@ -360,13 +417,16 @@ export class FlashcardsActivity {
 
         const previousButton = controls.querySelector('#prev-card');
         const nextButton = controls.querySelector('#next-card');
-        previousButton.disabled = this.currentIndex === 0;
+        const reviewLocked = this.isCurrentCardReviewLocked();
+        previousButton.disabled = this.currentIndex === 0 || reviewLocked;
 
         const isLastCard = this.currentIndex === this.words.length - 1;
-        nextButton.disabled = isLastCard || !this.isCurrentCardAnswered();
-        nextButton.textContent = isLastCard
-            ? (this.isCurrentCardAnswered() ? 'Completed' : 'Answer to finish')
-            : 'Next';
+        nextButton.disabled = isLastCard || !this.isCurrentCardAnswered() || reviewLocked;
+        nextButton.textContent = reviewLocked
+            ? 'Review first'
+            : (isLastCard
+                ? (this.isCurrentCardAnswered() ? 'Completed' : 'Answer to finish')
+                : 'Next');
         return controls;
     }
 
@@ -383,7 +443,7 @@ export class FlashcardsActivity {
         if (correct) {
             this.answeredCards.add(this.currentIndex);
             if (priorAttempts === 0) this.firstAttemptCorrectCards.add(this.currentIndex);
-            this.feedback = 'Correct! The next card is now unlocked.';
+            this.feedback = 'Correct! Review the definition before continuing.';
             this.feedbackTone = 'is-correct';
             this.isFlipped = true;
         } else {
@@ -399,13 +459,16 @@ export class FlashcardsActivity {
 
     handleAnswer(selectedDefinition) {
         const result = this.recordAnswer(selectedDefinition);
+        if (!result.correct && !result.alreadyAnswered && !result.questionNotReady) {
+            this.beginIncorrectAnswerReview();
+        }
         this.saveState();
         if (result.correct) this.reportProgress();
         this.render();
     }
 
     handleCardFlip(card) {
-        if (!this.isCurrentCardAnswered()) return;
+        if (!this.isCurrentCardAnswered() || this.isCurrentCardReviewLocked()) return;
         card.classList.toggle('is-flipped');
         this.isFlipped = !this.isFlipped;
         this.saveState();
@@ -413,7 +476,7 @@ export class FlashcardsActivity {
 
     goToPrevious(event) {
         event.stopPropagation();
-        if (this.currentIndex === 0) return;
+        if (this.currentIndex === 0 || this.isCurrentCardReviewLocked()) return;
         this.currentIndex -= 1;
         this.syncCardViewMode();
         this.feedback = '';
@@ -424,12 +487,18 @@ export class FlashcardsActivity {
 
     goToNext(event) {
         event.stopPropagation();
-        if (this.currentIndex >= this.words.length - 1 || !this.isCurrentCardAnswered()) return;
+        if (this.currentIndex >= this.words.length - 1
+            || !this.isCurrentCardAnswered()
+            || this.isCurrentCardReviewLocked()) return;
         this.currentIndex += 1;
         this.syncCardViewMode();
         this.feedback = '';
         this.feedbackTone = '';
         this.render();
         this.saveState();
+    }
+
+    destroy() {
+        this.reviewLockedCardIndex = null;
     }
 }

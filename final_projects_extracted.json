@@ -1,0 +1,480 @@
+[
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 7°/EXAMS /II Trimester/7th_Grade_Final_Project_Rhythm_Game_2026_Rubric.docx",
+    "paragraphs": [
+      "Academia Internacional David",
+      "D/F/J/K Rhythm Game Project",
+      "7th Grade Final Project",
+      "Second Trimester",
+      "Project Overview",
+      "You will complete, test, and present a D/F/J/K rhythm game in Scratch. This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input.",
+      "Learning Objectives",
+      "Identify the main sprites, variables, broadcasts, and loops in the rhythm game",
+      "Use D, F, J, and K keyboard inputs to control the game",
+      "Explain how targets, collisions, score, time, and tempo work together",
+      "Implement programming structures such as events, conditions, loops, and variables",
+      "Complete the target creation, movement, scoring, and missed-note systems",
+      "Use visual and sound feedback to communicate game results",
+      "Break down the game into manageable programming tasks",
+      "Examine how different scripts work together as one system",
+      "Test and refine the game for accurate and consistent behavior",
+      "Assess the effectiveness of the controls and feedback",
+      "Make one improvement based on testing results",
+      "Present the completed game and explain its main programming features",
+      "Project Plan",
+      "Starter Code - Part 1",
+      "Build the teacher-guided starter code and review the project requirements",
+      "Add the D, F, J, and K key sprites",
+      "Add the target sprites and starting positions",
+      "Create the score, time, and tempo variables",
+      "Add the main green-flag setup and first broadcasts",
+      "Save the starter project correctly",
+      "Check that each partner understands the completed parts",
+      "Prepare the project for testing",
+      "Starter Code Testing",
+      "Run the starter project and check the D, F, J, and K controls",
+      "Check variables, targets, and broadcasts",
+      "Record one error and the correction made",
+      "Save the corrected version of the project",
+      "Complete the Rhythm Game",
+      "Finish the target movement and collision checks",
+      "Complete score, missed-note, timer, and tempo behavior",
+      "Add music and player feedback",
+      "Test each new section after building it",
+      "Final Testing and Improvement",
+      "Test the complete game using the final checklist",
+      "Fix remaining errors in the controls, score, timer, or targets",
+      "Make one small improvement to the game",
+      "Save and submit the final Scratch project",
+      "Presentation Slides",
+      "Create four slides using the template in Google Classroom",
+      "Include the game purpose, one code screenshot, one corrected error, and one improvement",
+      "Use short text, clear screenshots, and English",
+      "Practice explaining the project without reading every word",
+      "Final Presentation & Reflection",
+      "Demonstrate the completed rhythm game",
+      "Present the four slides to the class",
+      "Explain one important script, one correction, and one improvement",
+      "Reflect on what you learned by answering the following questions:",
+      "Which part of the rhythm game was most challenging to build or debug, and how did you solve the problem?",
+      "How do the keyboard input, targets, score, and feedback work together to create the final game?",
+      "Academia Internacional David",
+      "D/F/J/K Rhythm Game Project",
+      "7th Grade Final Project - Second Trimester",
+      "7th A and 7th B"
+    ],
+    "tables": [
+      [
+        [
+          "Name: ______________________________",
+          "Name: ______________________________",
+          "Date: ______________________",
+          "Date: ______________________"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Group: 7th ____",
+          "Group: 7th ____",
+          "Total points: ____/90pts"
+        ],
+        [
+          "Project Overview: You will complete, test, and present a D/F/J/K rhythm game in Scratch.  This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input.",
+          "Project Overview: You will complete, test, and present a D/F/J/K rhythm game in Scratch.  This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input.",
+          "Project Overview: You will complete, test, and present a D/F/J/K rhythm game in Scratch.  This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input.",
+          "Project Overview: You will complete, test, and present a D/F/J/K rhythm game in Scratch.  This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input.",
+          "Project Overview: You will complete, test, and present a D/F/J/K rhythm game in Scratch.  This project combines programming, game design, testing, and explanation to create an interactive game that responds to keyboard input."
+        ]
+      ],
+      [
+        [
+          "Criteria",
+          "16",
+          "12",
+          "12",
+          "8",
+          "4"
+        ],
+        [
+          "Required Game Components",
+          "Includes all required game components: D/F/J/K controls, target creation and movement, collision checks, score, timer, tempo/music, missed-note feedback, and game ending.",
+          "Includes most required components, but one or two are missing or incomplete.",
+          "Includes most required components, but one or two are missing or incomplete.",
+          "Includes some required components, but several important parts are missing or incomplete.",
+          "Game is largely incomplete and includes very few of the required components."
+        ],
+        [
+          "Programming Structures",
+          "Correctly uses events, broadcasts, loops, conditions, variables, and collision checks.",
+          "Uses most required programming structures correctly, with minor errors or incomplete sections.",
+          "Uses most required programming structures correctly, with minor errors or incomplete sections.",
+          "Uses some required structures, but major errors or incomplete scripts affect the program.",
+          "Uses very few required programming structures or the scripts do not demonstrate the expected programming concepts."
+        ],
+        [
+          "Game Functionality",
+          "Keyboard input, target movement, collision detection, score, timer, missed-note response, and game ending all work correctly.",
+          "Game works mostly as intended, but errors affect one or two parts of gameplay.",
+          "Game works mostly as intended, but errors affect one or two parts of gameplay.",
+          "Game shows partial functionality, but important errors prevent it from working consistently as intended.",
+          "Game has very limited functionality or cannot be successfully played."
+        ],
+        [
+          "Presentation and Code Explanation",
+          "Presents 4 complete slides in English, demonstrates the game, includes a readable code screenshot, and accurately explains the script trigger and at least 3 blocks or structures.",
+          "Presents and demonstrates the game, but part of the code explanation or slide content is incomplete or unclear.",
+          "Presents and demonstrates the game, but part of the code explanation or slide content is incomplete or unclear.",
+          "Gives a partial presentation or demonstration and shows limited understanding of the code.",
+          "Gives little or no presentation or cannot adequately explain how the game code works."
+        ],
+        [
+          "Questions",
+          "Answers all 4 questions correctly and shows clear understanding of the project.",
+          "Answers most questions correctly and shows good understanding.",
+          "Answers most questions correctly and shows good understanding.",
+          "Answers some questions correctly but shows partial understanding.",
+          "Answers few or no questions correctly and shows limited understanding."
+        ],
+        [
+          "Criteria",
+          "5",
+          "5",
+          "2",
+          "2",
+          "2"
+        ],
+        [
+          "Punctuality",
+          "Finishes on time. Comes prepared to work while working on the project. Uses class time well.",
+          "Finishes on time. Comes prepared to work while working on the project. Uses class time well.",
+          "Does not finish on time. Is often unprepared or does not use class time well.",
+          "Does not finish on time. Is often unprepared or does not use class time well.",
+          "Does not finish on time. Is often unprepared or does not use class time well."
+        ],
+        [
+          "Responsibility",
+          "Keeps the workspace organized, follows instructions, submits presentation before presentation.",
+          "Keeps the workspace organized, follows instructions, submits presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation."
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 8°/EXAMS /II Trimester/8th_Grade_Final_Project_RFID_Sensor_2026_Rubric.docx",
+    "paragraphs": [
+      "Academia Internacional David",
+      "RFID Sensor and LED System Project",
+      "8th Grade Final Project",
+      "Second Trimester",
+      "Project Overview",
+      "You will connect, program, test, and present an RFID sensor and LED system using the Freenove Arduino kit. This project combines electronics, programming, sensor input, and communication to explain how sensors are becoming increasingly ubiquitous in modern society.",
+      "Learning Objectives",
+      "Identify common sensors and describe what each one detects",
+      "Explain the meaning of sensor ubiquity in modern society",
+      "Describe an RFID sensor as an input device",
+      "Connect an RFID reader and LED safely to the Freenove Arduino board",
+      "Upload and run the teacher-provided RFID sketch",
+      "Explain the input-process-output sequence of the system",
+      "Test whether the RFID reader detects a card consistently",
+      "Explain how the LED communicates the result of a card scan",
+      "Identify modern uses of RFID and other sensors",
+      "Create four clear presentation slides using project evidence",
+      "Demonstrate the completed system and explain how it works",
+      "Use English to communicate technical information during the presentation",
+      "Project Plan",
+      "Sensors in Everyday Life",
+      "Review sensor and ubiquity vocabulary",
+      "Identify examples of motion, temperature, light, ultrasonic, touch, and RFID sensors",
+      "Explain what each sensor detects and how its data is used",
+      "Create four slides about sensors in everyday life",
+      "Use short explanations, clear images, and English",
+      "Submit the slides in Google Classroom",
+      "Record feedback and one change to make",
+      "Prepare for the ultrasonic sensor activity",
+      "Ultrasonic Ranging Sketch",
+      "Connect and run the teacher-provided ultrasonic sensor sketch",
+      "Record at least 5 distance readings",
+      "Identify one reliable near/far threshold",
+      "Save and submit the completed work",
+      "Sensor Challenge and Review",
+      "Review input-process-output",
+      "Choose one sensor-controlled output example",
+      "Explain how a sensor reading can control an output",
+      "Prepare for the RFID sensor project",
+      "RFID Sensor and LED System",
+      "Connect the RFID reader to the Freenove Arduino board",
+      "Connect one LED with the correct resistor",
+      "Upload the teacher-provided RFID sketch and test card detection",
+      "Confirm that the LED responds to the RFID card",
+      "Presentation Slides",
+      "Create four slides using the template in Google Classroom",
+      "Include the project purpose, how RFID works, the circuit and LED response, and sensor ubiquity",
+      "Use short text, clear images or screenshots, and English",
+      "Practice explaining the system without reading every word",
+      "Final Presentation & Reflection",
+      "Demonstrate the RFID sensor and LED response",
+      "Present the four slides to the class",
+      "Explain the input, process, output, and modern uses of sensors",
+      "Reflect on what you learned by answering the following questions:",
+      "How does the RFID sensor, Arduino code, and LED work together as one system?",
+      "Why have sensors become more ubiquitous in schools, homes, transportation, stores, and workplaces?",
+      "Academia Internacional David",
+      "RFID Sensor and LED System Project",
+      "8th Grade Final Project - Second Trimester",
+      "8th A and 8th B"
+    ],
+    "tables": [
+      [
+        [
+          "Name: ______________________________",
+          "Name: ______________________________",
+          "Date: ______________________"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Group: 8th ____",
+          "Total points: ____/90pts"
+        ],
+        [
+          "Project Overview: You will connect, program, test, and present an RFID sensor and LED system using the Freenove Arduino kit. This project combines electronics, programming, sensor input, and communication to explain how sensors are becoming increasingly ubiquitous in modern society.",
+          "Project Overview: You will connect, program, test, and present an RFID sensor and LED system using the Freenove Arduino kit. This project combines electronics, programming, sensor input, and communication to explain how sensors are becoming increasingly ubiquitous in modern society.",
+          "Project Overview: You will connect, program, test, and present an RFID sensor and LED system using the Freenove Arduino kit. This project combines electronics, programming, sensor input, and communication to explain how sensors are becoming increasingly ubiquitous in modern society."
+        ]
+      ],
+      [
+        [
+          "Criteria",
+          "16",
+          "12",
+          "12",
+          "8",
+          "4"
+        ],
+        [
+          "Hardware Connections",
+          "Connects the RFID reader and selects the correct LED, uses the correct switch configuration for the project.",
+          "Connects most components correctly, but one connection or configuration is missing, loose, or incorrect.",
+          "Connects most components correctly, but one connection or configuration is missing, loose, or incorrect.",
+          "Connects some components correctly, but the circuit or configuration is incomplete or unstable,",
+          "Circuit is mostly incomplete, incorrectly connected, or unsafe to test."
+        ],
+        [
+          "Code and Arduino Knowledge",
+          "Understanding of code and Arduino IDE. Uploads and starts the sketch, detects the RFID card, activates the LED correctly, and works consistently across repeated scans.",
+          "Understanding of code and Arduino IDE. System works mostly as expected, but one function is incomplete or inconsistent.",
+          "Understanding of code and Arduino IDE. System works mostly as expected, but one function is incomplete or inconsistent.",
+          "Limited of code and Arduino IDE. System shows partial functionality, but RFID detection or the LED response does not work reliably.",
+          "Limited of code and Arduino IDE or the system does not demonstrate the required RFID-to-LED response."
+        ],
+        [
+          "Four-Slide Content",
+          "Explains the project purpose, how RFID works, the circuit/code and LED response, and sensor ubiquity with at least 3 modern examples.",
+          "Explains most required topics and includes at least 2 modern examples of sensor use.",
+          "Explains most required topics and includes at least 2 modern examples of sensor use.",
+          "Includes some required information, but important explanations or examples are missing or inaccurate.",
+          "Includes very limited relevant information about RFID, the project, or sensor ubiquity."
+        ],
+        [
+          "Presentation and Explanation",
+          "Presents in English for 1–2 minutes, demonstrates the system, correctly explains input-process-output, and explains the LED response.",
+          "Presents in English and demonstrates the system, but the presentation is slightly outside the 1–2 minute limit or one explanation is incomplete or unclear.",
+          "Presents in English and demonstrates the system, but the presentation is slightly outside the 1–2 minute limit or one explanation is incomplete or unclear.",
+          "Gives a short or incomplete presentation, is clearly outside the 1–2 minute limit, or shows limited understanding of how the system works.",
+          "Does not adequately demonstrate or explain how the system works and does not meet the required presentation time."
+        ],
+        [
+          "Questions",
+          "Answers correctly all 4 questions related to the presentations.",
+          "Answers correctly at least two questions related to the presentations.",
+          "Answers correctly at least two questions related to the presentations.",
+          "Answers correctly at least one questions related to the presentations.",
+          "Answers correctly at least one question related to the presentations."
+        ],
+        [
+          "Criteria",
+          "5",
+          "5",
+          "2",
+          "2",
+          "2"
+        ],
+        [
+          "Punctuality and Preparation",
+          "Finishes and submits on time, brings required materials and login information, and uses class time for the assigned project.",
+          "Finishes and submits on time, brings required materials and login information, and uses class time for the assigned project.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work."
+        ],
+        [
+          "Lab Responsibility",
+          "Handles the Arduino and components safely, keeps the workspace organized, follows instructions, and returns all materials correctly.",
+          "Handles the Arduino and components safely, keeps the workspace organized, follows instructions, and returns all materials correctly.",
+          "Handles equipment unsafely, ignores instructions, leaves the workspace disorganized, or does not return materials correctly.",
+          "Handles equipment unsafely, ignores instructions, leaves the workspace disorganized, or does not return materials correctly.",
+          "Handles equipment unsafely, ignores instructions, leaves the workspace disorganized, or does not return materials correctly."
+        ]
+      ]
+    ]
+  },
+  {
+    "path": "/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026/TECHNOLOGY 9°/EXAMS /II Trimester/9th_Grade_Final_Project_Data_Analysis_2026_Rubric.docx",
+    "paragraphs": [
+      "Academia Internacional David",
+      "Data Analysis and Responsible Use Project",
+      "9th Grade Final Project",
+      "Second Trimester",
+      "Project Overview",
+      "You will analyze a dataset and chart, prepare a four-slide presentation, and explain how data should be used carefully and responsibly in modern society. This project combines data interpretation, evidence, limitations, recommendations, privacy, and oral communication.",
+      "Learning Objectives",
+      "Identify the question represented by a dataset and chart",
+      "Read values, patterns, and differences from a chart",
+      "Write evidence statements supported by the displayed data",
+      "Distinguish evidence from unsupported opinions",
+      "Identify one limitation that affects what can be concluded from the data",
+      "Make one recommendation supported by the analysis",
+      "Explain why personal and collected data should be handled carefully",
+      "Identify privacy, consent, and responsible-sharing considerations",
+      "Create four clear presentation slides using project evidence",
+      "Present conclusions using accurate data and clear English",
+      "Answer questions about the data, limitation, and recommendation",
+      "Use feedback to improve the final presentation",
+      "Project plan",
+      "Careful Handling of Data",
+      "Review personal data and privacy vocabulary",
+      "Identify examples of information that should be shared carefully",
+      "Analyze short situations involving collection and sharing of data",
+      "Identify who has access to the data and whether sharing is appropriate",
+      "Write one rule for handling personal data carefully",
+      "Submit the class activity in Google Classroom",
+      "Prepare for the responsible-data poster activity",
+      "Responsible Data Use",
+      "Review privacy, consent, and responsible data sharing",
+      "Analyze examples of responsible and irresponsible data use",
+      "Identify one risk and one safer action for each example",
+      "Complete the assigned data-handling activity",
+      "Second 45 minutes: Data Poster",
+      "Create a one-page digital poster about careful handling of data",
+      "Include three rules, one private-data example, and one responsible-sharing example",
+      "Use short explanations, clear visuals, and English",
+      "Submit the poster in Google Classroom",
+      "Data Analysis Planning",
+      "Review the assigned dataset and Daily Grade #4 chart",
+      "Write the data question and identify three evidence statements",
+      "Identify one limitation of the data",
+      "Write one recommendation supported by the analysis",
+      "Organize the information for the final presentation",
+      "Presentation Slides",
+      "Create four slides using the template in Google Classroom",
+      "Include the data question, chart, three evidence statements, one limitation, and one recommendation",
+      "Include one connection to careful or responsible use of data",
+      "Use short text, readable visuals, and English",
+      "Final Presentation & Reflection",
+      "Present the four slides to the class",
+      "Explain the chart using evidence rather than unsupported opinions",
+      "Explain the limitation, recommendation, and responsible-data connection",
+      "Reflect on what you learned by answering the following questions:",
+      "What conclusion is best supported by your chart, and which data values support it?",
+      "What is one limitation of your data, and how should it affect the way the results are used?",
+      "Academia Internacional David",
+      "Data Analysis and Responsible Use Project",
+      "9th Grade Final Project - Second Trimester",
+      "9th A and 9th B"
+    ],
+    "tables": [
+      [
+        [
+          "Name: ______________________________",
+          "Date: ______________________",
+          "Date: ______________________"
+        ],
+        [
+          "Teacher: Porfirio Rios",
+          "Group: 9th ____",
+          "Total points: ____/90pts"
+        ],
+        [
+          "Project Overview: You will analyze a dataset and chart, prepare a four-slide presentation, and explain how data should be used carefully and responsibly in modern society. This project combines data interpretation, evidence, limitations, recommendations, privacy, and oral communication.",
+          "Project Overview: You will analyze a dataset and chart, prepare a four-slide presentation, and explain how data should be used carefully and responsibly in modern society. This project combines data interpretation, evidence, limitations, recommendations, privacy, and oral communication.",
+          "Project Overview: You will analyze a dataset and chart, prepare a four-slide presentation, and explain how data should be used carefully and responsibly in modern society. This project combines data interpretation, evidence, limitations, recommendations, privacy, and oral communication."
+        ]
+      ],
+      [
+        [
+          "Criteria",
+          "16",
+          "12",
+          "12",
+          "8",
+          "4"
+        ],
+        [
+          "Required Slide Content",
+          "Includes a title/name, data question, chart, 3 evidence statements, 1 limitation, 1 recommendation, and 1 responsible-data-use connection.",
+          "Includes most required content, but one or two elements are missing or incomplete.",
+          "Includes most required content, but one or two elements are missing or incomplete.",
+          "Includes some required content, but several important elements are missing or incomplete.",
+          "Includes very limited required content or does not adequately address the assigned presentation."
+        ],
+        [
+          "Evidence and Data Analysis",
+          "Uses 3 accurate evidence statements with specific values or visible patterns and uses them to support the conclusion.",
+          "Uses mostly accurate evidence from the chart, but one statement is vague, inaccurate, or unsupported.",
+          "Uses mostly accurate evidence from the chart, but one statement is vague, inaccurate, or unsupported.",
+          "Uses limited evidence from the chart or gives a conclusion that is only partially supported by the data.",
+          "Provides little or no accurate evidence from the chart and does not support the conclusion with data."
+        ],
+        [
+          "Recommendation and Responsible Use",
+          "Gives an evidence-based recommendation, and explains a privacy, consent, and responsible-data-use consideration.",
+          "Explains most of these ideas correctly, but one part is incomplete, unclear, or weakly connected to the data.",
+          "Explains most of these ideas correctly, but one part is incomplete, unclear, or weakly connected to the data.",
+          "Shows partial understanding, but important explanations are missing or not clearly connected to the data.",
+          "Gives little or no meaningful explanation of limitations, recommendations, or responsible data use."
+        ],
+        [
+          "Presentation and Explanation",
+          "Presents all 4 slides in English for 1–2 minutes, explains rather than reads, cites at least 2 data values, explains the limitation and recommendation.",
+          "Presents in English and explains the project, but is slightly outside the 1–2 minute limit or one part of the explanation is incomplete or read directly from the slides.",
+          "Presents in English and explains the project, but is slightly outside the 1–2 minute limit or one part of the explanation is incomplete or read directly from the slides.",
+          "Gives a partial presentation, is clearly outside the 1–2 minute limit, relies heavily on reading, or shows limited understanding of the data.",
+          "Gives little or no presentation or does not adequately explain the data and conclusions."
+        ],
+        [
+          "Questions",
+          "Answers all 4 questions correctly and shows clear understanding of the project.",
+          "Answers most questions correctly and shows good understanding.",
+          "Answers most questions correctly and shows good understanding.",
+          "Answers some questions correctly but shows partial understanding.",
+          "Answers few or no questions correctly and shows limited understanding."
+        ],
+        [
+          "Criteria",
+          "5",
+          "5",
+          "3",
+          "3",
+          "3"
+        ],
+        [
+          "Punctuality and Preparation",
+          "Finishes and submits on time, brings required materials and login information, and uses class time for the assigned project.",
+          "Finishes and submits on time, brings required materials and login information, and uses class time for the assigned project.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work.",
+          "Does not finish or submit on time, is missing required materials or login information, or repeatedly uses class time for unrelated work."
+        ],
+        [
+          "Responsibility",
+          "Keeps the workspace organized, follows instructions, submits presentation before presentation.",
+          "Keeps the workspace organized, follows instructions, submits presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation.",
+          "Ignores instructions, leaves the workspace disorganized, or does not submit presentation before presentation."
+        ]
+      ]
+    ]
+  }
+]

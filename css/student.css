@@ -8284,6 +8284,14 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     line-height: 1.55;
 }
 
+.card-back .flashcard-definition-term {
+    margin: 0 0 0.75rem;
+    color: var(--primary-color);
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
 .flashcard-start-question {
     width: 100%;
     min-height: 48px;
