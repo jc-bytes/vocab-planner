@@ -88,9 +88,9 @@ class NotificationManager {
             color: white;
             cursor: pointer;
             padding: 0;
-            width: 44px;
-            height: 44px;
-            min-width: 44px;
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
