@@ -1,0 +1,57 @@
+{
+  "id": "MOD-CYBERSECURITY-RISK-01",
+  "title": "Cybersecurity Threats and Risk Decisions",
+  "slug": "cybersecurity-risk",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "9"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Basic account, password, file, and network vocabulary",
+    "Teacher introduction to the assigned section"
+  ],
+  "objectives": [
+    "Distinguish an asset, threat, vulnerability, and protection in a scenario.",
+    "Identify phishing, brute-force attacks, malware families, and DDoS attacks from evidence.",
+    "Rate probability and impact separately using scenario facts.",
+    "Recommend a specific protection and explain how it changes risk.",
+    "Save and export a reconstructable six-risk analysis."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved application record",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 150,
+  "sections": [
+    "START-01",
+    "THREAT-LEARN-01",
+    "THREAT-PRACTICE-01",
+    "RISK-LEARN-01",
+    "RISK-PRACTICE-01",
+    "PROTECTION-LEARN-01",
+    "PROTECTION-PRACTICE-01",
+    "RISK-RECORD-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/cybersecurity-risk",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Use printed scenario cards, a probability-impact matrix, and the six-risk analysis sheet."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

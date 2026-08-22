@@ -36,25 +36,25 @@ tags:
 
 - Grade index: [[00 Navigation/Grade Indexes/6th Grade Technology - Index|6th Grade Technology Index]]
 - June classes: [[00 Navigation/Month Classes/June Classes - 2026|June Classes - 2026]]
-- Annual plan: [[6th Grade Technology/Annual Plans/6° Technology and Robotics - Annual Plan - 2026|6° Technology and Robotics - Annual Plan - 2026]]
+- Annual plan: [[6th Grade Technology/Planning/Annual/6° Technology and Robotics - Annual Plan - 2026|6° Technology and Robotics - Annual Plan - 2026]]
 
 ### 7th Grade Technology
 
 - Grade index: [[00 Navigation/Grade Indexes/7th Grade Technology - Index|7th Grade Technology Index]]
 - June classes: [[00 Navigation/Month Classes/June Classes - 2026|June Classes - 2026]]
-- Annual plan: [[7th Grade Technology/Annual Plans/7° Technology and Robotics - Annual Plan - 2026|7° Technology and Robotics - Annual Plan - 2026]]
+- Annual plan: [[7th Grade Technology/Planning/Annual/7° Technology and Robotics - Annual Plan - 2026|7° Technology and Robotics - Annual Plan - 2026]]
 
 ### 8th Grade Technology
 
 - Grade index: [[00 Navigation/Grade Indexes/8th Grade Technology - Index|8th Grade Technology Index]]
 - June classes: [[00 Navigation/Month Classes/June Classes - 2026|June Classes - 2026]]
-- Annual plan: [[8th Grade Technology/Annual Plans/8° Technology and Robotics - Annual Plan - 2026|8° Technology and Robotics - Annual Plan - 2026]]
+- Annual plan: [[8th Grade Technology/Planning/Annual/8° Technology and Robotics - Annual Plan - 2026|8° Technology and Robotics - Annual Plan - 2026]]
 
 ### 9th Grade Technology
 
 - Grade index: [[00 Navigation/Grade Indexes/9th Grade Technology - Index|9th Grade Technology Index]]
 - June classes: [[00 Navigation/Month Classes/June Classes - 2026|June Classes - 2026]]
-- Annual plan: [[9th Grade Technology/Annual Plans/9° Technology and Robotics - Annual Plan - 2026|9° Technology and Robotics - Annual Plan - 2026]]
+- Annual plan: [[9th Grade Technology/Planning/Annual/9° Technology and Robotics - Annual Plan - 2026|9° Technology and Robotics - Annual Plan - 2026]]
 
 ## Secondary Indexes
 

@@ -1,0 +1,58 @@
+{
+  "id": "MOD-SPREADSHEET-ANALYSIS-01",
+  "title": "Spreadsheet Formulas and Charts",
+  "slug": "spreadsheet-analysis",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "7"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Identify rows, columns, cells, and simple cell references",
+    "Enter text and numbers in a spreadsheet"
+  ],
+  "objectives": [
+    "Use SUM, AVERAGE, MIN, MAX, and autofill with cell references.",
+    "Build and label a chart that answers a data question.",
+    "Use sorting, filtering, conditional formatting, and COUNTIF to examine patterns.",
+    "Write conclusions supported by exact spreadsheet values."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved spreadsheet filename or share link, formulas, chart decision, and two conclusions",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 142,
+  "sections": [
+    "START-01",
+    "FORMULA-LEARN-01",
+    "FORMULA-PRACTICE-01",
+    "CHART-LEARN-01",
+    "CHART-PRACTICE-01",
+    "ANALYSIS-LEARN-01",
+    "ANALYSIS-PRACTICE-01",
+    "ANALYSIS-RECORD-01",
+    "REVIEW-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/spreadsheet-analysis",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "software": "Google Sheets, Microsoft Excel, or another spreadsheet program for the application task",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Complete the printed formula, chart-selection, sorting, filtering, and conclusion activities."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

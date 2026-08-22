@@ -1,0 +1,960 @@
+[
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary.docx",
+    "basename": "9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Ten required terms",
+        "description": "Includes all 10 named terms.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes all 10 named terms.",
+          "Includes 9 terms.",
+          "Includes 6–8 terms.",
+          "Includes 0–5 terms."
+        ]
+      },
+      {
+        "title": "Ten definitions",
+        "description": "All 10 are accurate, clear, and based on the source.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 are accurate, clear, and based on the source.",
+          "Nine are accurate; one needs correction.",
+          "Six to eight are accurate.",
+          "Zero to five are accurate."
+        ]
+      },
+      {
+        "title": "Ten examples",
+        "description": "All 10 examples correctly match their terms.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 examples correctly match their terms.",
+          "Nine examples are correct.",
+          "Six to eight examples are correct.",
+          "Zero to five examples are correct."
+        ]
+      },
+      {
+        "title": "Three-to-five-sentence connection",
+        "description": "Names the setting, change, and correct file-size result in 3–5 sentences.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names the setting, change, and correct file-size result in 3–5 sentences.",
+          "Includes all three ideas; one needs detail.",
+          "Includes only one or two accurate ideas or misses the length.",
+          "Missing or contradicts the taught relationship."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check.docx",
+    "basename": "9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Vocabulary meanings",
+        "description": "All five meanings are accurate in context.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All five meanings are accurate in context.",
+          "Four are accurate.",
+          "Two or three are accurate.",
+          "Zero or one is accurate."
+        ]
+      },
+      {
+        "title": "Image operations",
+        "description": "Both operations, results, and units are correct.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both operations, results, and units are correct.",
+          "Both results are correct; one operation or unit is incomplete.",
+          "One result is correct or both show partial work.",
+          "Both are missing or incorrect."
+        ]
+      },
+      {
+        "title": "Sound and quality reasoning",
+        "description": "Correctly distinguishes rate from size and explains detail/file-size change.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly distinguishes rate from size and explains detail/file-size change.",
+          "Meanings are correct; one relationship needs detail.",
+          "One meaning or relationship is correct.",
+          "Missing or incorrect."
+        ]
+      },
+      {
+        "title": "Compression recommendation",
+        "description": "Names one taught change, one size benefit, and one quality cost.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names one taught change, one size benefit, and one quality cost.",
+          "All three are present; one needs detail.",
+          "Only one or two accurate parts are present.",
+          "Missing or unsupported."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis.docx",
+    "basename": "9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Six threat identifications",
+        "description": "All six fit the fixed scenarios.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six fit the fixed scenarios.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit."
+        ]
+      },
+      {
+        "title": "Six protection choices",
+        "description": "All six are safe and match the threats.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six are safe and match the threats.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit or an unsafe action appears."
+        ]
+      },
+      {
+        "title": "Three evidence justifications",
+        "description": "All three name the clue, explain the threat, and explain protection effect.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All three name the clue, explain the threat, and explain protection effect.",
+          "All three exist; one explanation needs detail.",
+          "Only one or two are complete.",
+          "None is complete."
+        ]
+      },
+      {
+        "title": "School protection rule",
+        "description": "Uses one taught protection and explains broad school benefit safely.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses one taught protection and explains broad school benefit safely.",
+          "Safe and broad; one reason needs detail.",
+          "Partly useful or weakly explained.",
+          "Missing, unsafe, or unrelated."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map.docx",
+    "basename": "9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Fixed records R1–R6",
+        "description": "All six have asset and threat/event analysis.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six have asset and threat/event analysis.",
+          "Five are complete.",
+          "Three or four are complete.",
+          "Zero to two are complete."
+        ]
+      },
+      {
+        "title": "Probability and impact",
+        "description": "All ratings are separate, consistent, and supported by record facts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All ratings are separate, consistent, and supported by record facts.",
+          "All ratings exist; one or two facts need correction.",
+          "Several ratings or facts are missing.",
+          "Mostly missing or arbitrary."
+        ]
+      },
+      {
+        "title": "Six protections",
+        "description": "Every record has a feasible taught protection and effect.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every record has a feasible taught protection and effect.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit or an unsafe action appears."
+        ]
+      },
+      {
+        "title": "Priority paragraph",
+        "description": "Uses record ID, probability, impact, and a fact to defend priority.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses record ID, probability, impact, and a fact to defend priority.",
+          "All supports appear; one needs detail.",
+          "Only one or two supports appear.",
+          "Missing or contradicts the map."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal.docx",
+    "basename": "9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned problem, users, and goal",
+        "description": "Option, fixed problem/users, need, and measurable goal are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Option, fixed problem/users, need, and measurable goal are complete.",
+          "All are present; one needs detail.",
+          "Two are missing or broad.",
+          "No usable assigned problem and goal."
+        ]
+      },
+      {
+        "title": "Product, tool, and labeled design",
+        "description": "Allowed product/tool, resources, location, and input-process/output design are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Allowed product/tool, resources, location, and input-process/output design are complete.",
+          "All are present; one needs correction.",
+          "Several parts are incomplete.",
+          "No feasible product and design."
+        ]
+      },
+      {
+        "title": "Criteria C1–C3",
+        "description": "All fixed inputs, expected results, and measurable pass rules are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All fixed inputs, expected results, and measurable pass rules are complete.",
+          "All three exist; one result/rule needs detail.",
+          "Only one or two are complete.",
+          "No usable criteria."
+        ]
+      },
+      {
+        "title": "Evidence plan and limitation",
+        "description": "All seven named evidence items and one realistic limitation appear.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "All seven named evidence items and one realistic limitation appear.",
+          "All appear; one needs detail.",
+          "Several are missing.",
+          "No checkable evidence plan."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "In both weeks, uses the brief, states project/role, locates the product, and begins the named task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "In both weeks, uses the brief, states project/role, locates the product, and begins the named task.",
+          "All four actions occur with one reminder.",
+          "Only two or three occur or repeated reminders are needed.",
+          "Zero or one occurs; no preparation evidence."
+        ]
+      },
+      {
+        "title": "Participation and role",
+        "description": "Completes the assigned role and useful work at every checkpoint.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role and useful work at every checkpoint.",
+          "One checkpoint or detail is incomplete.",
+          "Only part of the role is completed.",
+          "No usable individual contribution evidence."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "Uses files, materials, time, and communication safely and completes the handoff.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses files, materials, time, and communication safely and completes the handoff.",
+          "One corrected reminder is needed.",
+          "Repeated reminders are needed.",
+          "Unsafe use or blocked group progress."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "At least three dated entries each name task, result, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "At least three dated entries each name task, result, and next step.",
+          "Two are complete and one is partial.",
+          "One is complete or entries are vague.",
+          "No checkable individual log."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the assigned role without missing parts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role without missing parts.",
+          "Completes it with one prompt or small missing part.",
+          "Completes only part or needs several prompts.",
+          "Does not complete the role or approved make-up."
+        ]
+      },
+      {
+        "title": "Five-point explanation",
+        "description": "Clearly explains problem, product, process, test result, and improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clearly explains problem, product, process, test result, and improvement.",
+          "Explains four points.",
+          "Explains two or three points.",
+          "Explains zero or one point."
+        ]
+      },
+      {
+        "title": "Respect and cleanup",
+        "description": "Listens, follows directions, and completes the assigned cleanup/return task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Listens, follows directions, and completes the assigned cleanup/return task.",
+          "One corrected reminder.",
+          "Repeated reminders or one part incomplete.",
+          "Participation or cleanup evidence is absent."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Names one specific result, challenge, and improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names one specific result, challenge, and improvement.",
+          "All three appear; one needs detail.",
+          "Only one or two are clear.",
+          "Missing or unrelated."
+        ]
+      },
+      {
+        "title": "Evidence completion and submission check",
+        "description": "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every named part is complete, identifiable, and accessible in the required file or approved paper fallback.",
+          "One named part, label, or filename detail needs correction; the work remains checkable.",
+          "Several named parts or labels are missing, but some checkable evidence is submitted.",
+          "No checkable digital or approved paper evidence is submitted."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/9th grade - IIIT - Final Project Packet and Rubric - STEM Project.docx",
+    "basename": "9th grade - IIIT - Final Project Packet and Rubric - STEM Project - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Approved problem and design",
+        "description": "Assigned option, problem, users, goal, approved tool, resources, labeled design, and C1–C3 are complete and consistent.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Assigned option, problem, users, goal, approved tool, resources, labeled design, and C1–C3 are complete and consistent.",
+          "Most elements are complete; one or two need correction.",
+          "Several elements are missing or broad.",
+          "No usable approved plan."
+        ]
+      },
+      {
+        "title": "Prototype or product",
+        "description": "The checkable product performs the card's required action for all three fixed inputs.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "The checkable product performs the card's required action for all three fixed inputs.",
+          "The main action works for two inputs or has one minor issue.",
+          "Only one input works or the product is partial.",
+          "No checkable product or paper equivalent."
+        ]
+      },
+      {
+        "title": "Controlled testing",
+        "description": "Records at least three trials using C1–C3, expected and actual results, pass status, and evidence location.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least three trials using C1–C3, expected and actual results, pass status, and evidence location.",
+          "Three trials exist; one or two fields need detail.",
+          "Fewer than three complete trials or inconsistent conditions.",
+          "No meaningful test record."
+        ]
+      },
+      {
+        "title": "Evidence-based improvement",
+        "description": "Names a weakness proved by results, makes one focused change, repeats an equivalent test, and compares before/after results.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names a weakness proved by results, makes one focused change, repeats an equivalent test, and compares before/after results.",
+          "All steps appear; one link needs detail.",
+          "A change exists but evidence or comparison is weak.",
+          "No evidence-based improvement."
+        ]
+      },
+      {
+        "title": "Logbook and files",
+        "description": "v1, final, records file, dated log entries, decisions, feedback, and next actions are complete and accessible.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "v1, final, records file, dated log entries, decisions, feedback, and next actions are complete and accessible.",
+          "Most items are complete; one or two need correction.",
+          "Documentation has several gaps.",
+          "Documentation is mostly missing."
+        ]
+      },
+      {
+        "title": "Demo and reflection",
+        "description": "In 1–2 minutes shows the product and explains problem, users, tool, choice, three results, improvement, limitation, and learning; reflection answers all seven prompts.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "In 1–2 minutes shows the product and explains problem, users, tool, choice, three results, improvement, limitation, and learning; reflection answers all seven prompts.",
+          "Most explanation and reflection parts are clear.",
+          "Several required parts are missing or vague.",
+          "Demo/reflection evidence is missing."
+        ]
+      }
+    ]
+  }
+]

@@ -10,7 +10,7 @@ tags:
 
 ## Start
 
-- Annual plan: [[9th Grade Technology/Annual Plans/9° Technology and Robotics - Annual Plan - 2026|9° Technology and Robotics - Annual Plan - 2026]]
+- Annual plan: [[9th Grade Technology/Planning/Annual/9° Technology and Robotics - Annual Plan - 2026|9° Technology and Robotics - Annual Plan - 2026]]
 - Current month: [[00 Navigation/Month Classes/June Classes - 2026|June Classes - 2026]]
 - Month classes index: [[00 Navigation/Month Classes/Month Classes Index|Month Classes Index]]
 - Planning resources: [[00 Navigation/Indexes/Planning Resources Index|Planning Resources Index]]
@@ -33,31 +33,31 @@ tags:
 
 ### 1st Trimester
 
-- March: [[9th Grade Technology/Monthly Draft Planning/1st Trimester/9° Technology - March|9° Technology - March]]
-- April: [[9th Grade Technology/Monthly Draft Planning/1st Trimester/9° Technology - April|9° Technology - April]]
-- May: [[9th Grade Technology/Monthly Draft Planning/1st Trimester/9° Technology - May|9° Technology - May]]
+- March: [[9th Grade Technology/Planning/Drafts/1st Trimester/9° Technology - March|9° Technology - March]]
+- April: [[9th Grade Technology/Planning/Drafts/1st Trimester/9° Technology - April|9° Technology - April]]
+- May: [[9th Grade Technology/Planning/Drafts/1st Trimester/9° Technology - May|9° Technology - May]]
 
 ### 2nd Trimester
 
-- June: [[9th Grade Technology/Monthly Draft Planning/2nd Trimester/9° Technology - June|9° Technology - June]]
-- July: [[9th Grade Technology/Monthly Draft Planning/2nd Trimester/9° Technology - July|9° Technology - July]]
-- August: [[9th Grade Technology/Monthly Draft Planning/2nd Trimester/9° Technology - August|9° Technology - August]]
-- September: [[9th Grade Technology/Monthly Draft Planning/2nd Trimester/9° Technology - September|9° Technology - September]]
+- June: [[9th Grade Technology/Planning/Drafts/2nd Trimester/9° Technology - June|9° Technology - June]]
+- July: [[9th Grade Technology/Planning/Drafts/2nd Trimester/9° Technology - July|9° Technology - July]]
+- August: [[9th Grade Technology/Planning/Drafts/2nd Trimester/9° Technology - August|9° Technology - August]]
+- September: [[9th Grade Technology/Planning/Drafts/2nd Trimester/9° Technology - September|9° Technology - September]]
 
 ### 3rd Trimester
 
-- September: [[9th Grade Technology/Monthly Draft Planning/3rd Trimester/9° Technology - September|9° Technology - September]]
-- October: [[9th Grade Technology/Monthly Draft Planning/3rd Trimester/9° Technology - October|9° Technology - October]]
-- November: [[9th Grade Technology/Monthly Draft Planning/3rd Trimester/9° Technology - November|9° Technology - November]]
-- December: [[9th Grade Technology/Monthly Draft Planning/3rd Trimester/9° Technology - December|9° Technology - December]]
+- September: [[9th Grade Technology/Planning/Drafts/3rd Trimester/9° Technology - September|9° Technology - September]]
+- October: [[9th Grade Technology/Planning/Drafts/3rd Trimester/9° Technology - October|9° Technology - October]]
+- November: [[9th Grade Technology/Planning/Drafts/3rd Trimester/9° Technology - November|9° Technology - November]]
+- December: [[9th Grade Technology/Planning/Drafts/3rd Trimester/9° Technology - December|9° Technology - December]]
 
 ## Planning Resources
 
 - Full resources index: [[00 Navigation/Indexes/Planning Resources Index|Planning Resources Index]]
-- [[9th Grade Technology/Assestments/Curriculum Breakdown|Curriculum Breakdown]]
-- [[9th Grade Technology/Assestments/Final Assessment Map - 9th Grade Technology 2026|Final Assessment Map - 9th Grade Technology 2026]]
-- [[9th Grade Technology/Assestments/Planning Review - 9th Grade Technology 2026|Planning Review - 9th Grade Technology 2026]]
-- [[9th Grade Technology/Assestments/Second Pass Quality Check - 9th Grade Technology 2026|Second Pass Quality Check - 9th Grade Technology 2026]]
-- [[9th Grade Technology/Assestments/Third Pass Teacher Reality Check - 9th Grade Technology 2026|Third Pass Teacher Reality Check - 9th Grade Technology 2026]]
-- [[9th Grade Technology/Assestments/simple-classroom-progress|9th Grade Technology - Simple Classroom Progress]]
-- [[9th Grade Technology/Monthly Draft Planning/1st Trimester/Weekly Goals|Weekly Goals]]
+- [[9th Grade Technology/Planning/Reviews/Curriculum Breakdown|Curriculum Breakdown]]
+- [[9th Grade Technology/Planning/Reviews/Final Assessment Map - 9th Grade Technology 2026|Final Assessment Map - 9th Grade Technology 2026]]
+- [[9th Grade Technology/Planning/Reviews/Planning Review - 9th Grade Technology 2026|Planning Review - 9th Grade Technology 2026]]
+- [[9th Grade Technology/Planning/Reviews/Second Pass Quality Check - 9th Grade Technology 2026|Second Pass Quality Check - 9th Grade Technology 2026]]
+- [[9th Grade Technology/Planning/Reviews/Third Pass Teacher Reality Check - 9th Grade Technology 2026|Third Pass Teacher Reality Check - 9th Grade Technology 2026]]
+- [[9th Grade Technology/Planning/Reviews/simple-classroom-progress|9th Grade Technology - Simple Classroom Progress]]
+- [[9th Grade Technology/Planning/Drafts/1st Trimester/Weekly Goals|Weekly Goals]]

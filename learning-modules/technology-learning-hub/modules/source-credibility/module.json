@@ -1,0 +1,57 @@
+{
+  "id": "MOD-SOURCE-CREDIBILITY-01",
+  "title": "Credible Sources, Licensing, and Credit",
+  "slug": "source-credibility",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "7",
+    "8",
+    "9"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Identify a source title and link",
+    "Use three teacher-assigned source cards or webpages"
+  ],
+  "objectives": [
+    "Evaluate a source by checking author, date, evidence, and purpose.",
+    "Choose a source that fits a specific research question.",
+    "Distinguish ownership, permission, license, and credit.",
+    "Write a traceable media or data credit."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved three-source evaluation, source decision, and complete credit",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 115,
+  "sections": [
+    "START-01",
+    "CREDIBILITY-LEARN-01",
+    "CREDIBILITY-PRACTICE-01",
+    "CREDIT-LEARN-01",
+    "CREDIT-PRACTICE-01",
+    "SOURCE-RECORD-01",
+    "REVIEW-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/source-credibility",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Use printed source cards and the four-part credibility and media-credit checks."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

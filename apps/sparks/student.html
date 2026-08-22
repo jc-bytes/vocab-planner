@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Practice school vocabulary, complete learning activities, play review games, and track progress in Vocabulary Master.">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' blob: data:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co http://127.0.0.1:54321 ws://127.0.0.1:54321 http://localhost:54321 ws://localhost:54321; base-uri 'self'; form-action 'self'; object-src 'none'">
+    <title>Vocabulary Master - Student</title>
+    <link rel="stylesheet" href="css/student.css?v=flashcard-layout-20260816b">
+    <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
+    <link rel="stylesheet" href="css/typography.css?v=typography-month-navigation-20260815a">
+    <link rel="stylesheet" href="css/student-design-system.css?v=student-design-system-20260815a"
+        data-student-design-system>
+</head>
+
+<body class="student-site">
+    <div class="app-container">
+        <header class="app-header student-app-header">
+            <button id="student-sidebar-toggle" class="student-sidebar-toggle" type="button"
+                aria-expanded="true" aria-controls="student-tab-shell student-subject-picker"
+                aria-label="Collapse navigation" title="Collapse navigation">
+                <i data-lucide="panel-left-close" aria-hidden="true"></i>
+            </button>
+            <nav id="student-tab-shell" class="teacher-tab-shell student-tab-shell hidden" aria-label="Student sections">
+                <button id="student-mobile-menu-toggle" class="teacher-mobile-menu-toggle student-mobile-menu-toggle"
+                    type="button" aria-expanded="false" aria-controls="student-tabs"
+                    aria-label="Open student sections menu">
+                    <i data-lucide="menu"></i>
+                    <span id="student-mobile-section-label">Today</span>
+                </button>
+                <div id="student-tabs" class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
+                    <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
+                        aria-selected="true" aria-label="Today" title="Today" data-tooltip="Today" data-section="today">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Today</span>
+                    </button>
+                    <button class="teacher-tab student-tab" id="student-tab-vocabulary" type="button" role="tab"
+                        aria-selected="false" aria-label="Vocabulary" title="Vocabulary" data-tooltip="Vocabulary" data-section="vocabulary">
+                        <i data-lucide="book-open"></i>
+                        <span>Vocabulary</span>
+                    </button>
+                    <button class="teacher-tab student-tab" id="student-tab-sparks" type="button" role="tab"
+                        aria-selected="false" aria-label="Sparks" title="Sparks" data-tooltip="Sparks" data-section="sparks">
+                        <i data-lucide="sparkles"></i>
+                        <span>Sparks</span>
+                    </button>
+                    <button class="teacher-tab student-tab" id="student-tab-arcade" type="button" role="tab"
+                        aria-selected="false" aria-label="Arcade" title="Arcade" data-tooltip="Arcade" data-section="arcade">
+                        <i data-lucide="gamepad-2"></i>
+                        <span>Arcade</span>
+                    </button>
+                </div>
+            </nav>
+            <div class="header-actions">
+                <!-- Authenticated/User Status -->
+                <div id="user-info" style="display:none; align-items: center; gap: 1rem;">
+                    <div id="coin-balance" class="coin-badge" title="Your Coins" style="display:none;">
+                        <i data-lucide="coins" aria-hidden="true"></i>
+                        <span class="student-coin-label">Coins</span>
+                        <span data-coin-balance-value>0</span>
+                    </div>
+                    <span id="auth-status" class="status-dot" title="Syncing" aria-label="Syncing"></span>
+                    <button id="mobile-edit-profile-btn" class="btn text-btn icon-btn student-mobile-profile-btn" title="Student profile" aria-label="Student profile">
+                        <i data-lucide="user"></i>
+                    </button>
+                    <button id="sign-out-btn" class="btn text-btn icon-btn" title="Sign out" aria-label="Sign out">
+                        <i data-lucide="log-out"></i>
+                        <span class="student-sign-out-label">Log out</span>
+                    </button>
+                </div>
+                <div id="guest-status" style="display:none; align-items: center; gap: 1rem;">
+                    <span style="font-size:0.85rem; color:var(--text-muted);">Signed out</span>
+                    <button id="guest-signin-btn" class="btn text-btn btn-compact" style="display:none;">Sign In</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="student-top-bar" aria-label="Student identity and progress">
+            <div class="student-sidebar-context" aria-label="Student class context">
+                <div id="student-subject-picker" class="student-subject-picker"></div>
+            </div>
+            <div class="header-left">
+                <div class="student-identity">
+                    <div id="student-level-display" class="student-level-display" role="progressbar"
+                        aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+                        aria-label="Level 1 Explorer. 0 of 100 experience points. 100 experience points to Level 2.">
+                        <div class="student-level-heading">
+                            <span class="student-level-badge">LEVEL <strong data-student-level>1</strong></span>
+                            <span class="student-level-divider" aria-hidden="true">/</span>
+                            <span class="student-level-title" data-student-level-title>Explorer</span>
+                        </div>
+                        <div class="student-xp-track" aria-hidden="true">
+                            <span class="student-xp-fill" data-student-xp-fill></span>
+                        </div>
+                        <div class="student-xp-meta">
+                            <span><strong data-student-xp-current>0</strong> / <span data-student-xp-goal>100</span> XP</span>
+                            <span id="welcome-header" class="student-topbar-name">Welcome!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <!-- Loading View -->
+            <section id="loading-view" class="view active">
+                <div class="student-session-loader" role="status" aria-label="Loading student session">
+                    <div class="student-session-loader-orbit" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div class="student-session-loader-wordmark" aria-hidden="true"></div>
+                </div>
+            </section>
+
+            <!-- Login View -->
+            <section id="login-view" class="view hidden">
+                <div class="login-container">
+                    <div class="auth-hero-icon" aria-hidden="true">
+                        <i data-lucide="graduation-cap"></i>
+                    </div>
+                    <p class="auth-kicker">Vocabulary Master</p>
+                    <h2>Student Access</h2>
+
+                    <div id="student-login-panel" class="card auth-panel">
+                        <form id="student-login-form">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <div class="password-field">
+                                    <input type="password" id="login-password" autocomplete="current-password" minlength="6" required>
+                                    <button type="button" class="password-toggle" aria-label="Show password"
+                                        aria-controls="login-password" title="Show password">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn primary-btn" style="width: 100%;">Log In</button>
+                        </form>
+                    </div>
+
+                    <div id="login-error" class="form-feedback" role="alert" aria-live="assertive" style="color: var(--danger-color); margin-top: 1rem; display: none;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Main Menu -->
+            <section id="main-menu-view" class="view hidden student-home-loading" aria-busy="true">
+                <div class="student-dashboard-heading" hidden>
+                    <div>
+                        <h2 id="student-home-heading">Your next learning step</h2>
+                    </div>
+                </div>
+                <div id="student-home-dashboard" class="student-home-dashboard">
+                    <div class="student-dashboard-skeleton" role="status" aria-label="Loading dashboard">
+                        <div class="student-dashboard-skeleton-line student-dashboard-skeleton-title"></div>
+                        <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-hero">
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-badge"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-hero-title"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-meta"></div>
+                            <div class="student-dashboard-skeleton-progress">
+                                <div class="student-dashboard-skeleton-line"></div>
+                                <div class="student-dashboard-skeleton-line"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-button"></div>
+                        </div>
+                        <div class="student-dashboard-skeleton-lower">
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card student-dashboard-skeleton-card--spark">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vocabulary Selection View -->
+            <section id="vocab-selection-view" class="view hidden student-page-loading" aria-busy="true">
+                <div class="section-header vocab-selection-header page-header">
+                    <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
+                    <div class="vocab-page-intro page-header__content">
+                        <h2 class="page-header__title">Vocabulary Units</h2>
+                        <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb"></div>
+                    </div>
+                    <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
+                    <div id="vocab-view-toggle" class="vocab-view-toggle segmented-control" role="group" aria-label="Vocabulary view"></div>
+                </div>
+                <div id="vocab-list" class="vocab-grid">
+                    <div class="student-page-skeleton student-page-skeleton--units" role="status" aria-label="Loading vocabulary units">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-card-grid">
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                            <div class="student-loading-surface student-loading-unit-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: General Technology Sparks -->
+            <section id="student-sparks-view" class="view hidden student-page-loading" aria-busy="true">
+                <div class="section-header spark-library-header page-header">
+                    <div class="page-header__content">
+                        <h2 class="page-header__title">Sparks</h2>
+                    </div>
+                    <div id="spark-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
+                </div>
+                <div id="student-sparks-library" class="student-sparks-library" aria-live="polite">
+                    <div class="student-page-skeleton student-page-skeleton--sparks" role="status" aria-label="Loading Sparks">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-surface student-loading-reading-card">
+                            <div class="student-loading-reading-copy"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-reading-line"></span><span class="student-loading-line student-loading-reading-line student-loading-reading-line--short"></span></div>
+                            <div class="student-loading-response-panel"><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-response-box"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Activity Menu -->
+            <section id="activity-menu-view" class="view hidden">
+                <div class="section-header">
+                    <div class="activity-menu-hero">
+                        <div class="activity-menu-title-block">
+                            <h2 id="current-unit-title">Unit Title</h2>
+                            <nav id="current-unit-subject" class="unit-subject-label teacher-library-breadcrumb breadcrumb"
+                                aria-label="Vocabulary location"></nav>
+                            <p id="current-unit-description" class="activity-menu-unit-description"></p>
+                        </div>
+                        <div class="activity-menu-status">
+                            <details id="student-vocab-export-menu" class="student-export-menu">
+                                <summary class="btn secondary-btn activity-export-btn">
+                                    <i data-lucide="download"></i>
+                                    <span>Export</span>
+                                    <i data-lucide="chevron-down"></i>
+                                </summary>
+                                <div class="student-export-menu-panel" role="menu" aria-label="Export options">
+                                    <button id="download-word-hunt-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                        <i data-lucide="file-down"></i>
+                                        <span>Word Hunt PDF</span>
+                                    </button>
+                                    <button id="generate-final-report-btn" class="student-export-menu-item" type="button" role="menuitem">
+                                        <i data-lucide="file-text"></i>
+                                        <span>Final Report</span>
+                                    </button>
+                                    <div class="student-export-menu-divider" role="separator"></div>
+                                    <p class="student-export-menu-label">Completed activities</p>
+                                    <div id="completed-activity-export-options" class="student-activity-export-options" aria-live="polite">
+                                        <p class="student-export-menu-empty">Complete an activity to unlock its PDF.</p>
+                                    </div>
+                                </div>
+                            </details>
+                            <button id="back-to-vocab" class="btn secondary-btn activity-menu-close-btn activity-back-control"
+                                type="button" aria-label="Close unit and return to Units" title="Close unit">
+                                <i data-lucide="x" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="activities-grid" aria-label="Vocabulary activities"></div>
+            </section>
+
+            <!-- View: Activity Container -->
+            <section id="activity-view" class="view hidden">
+                <div class="activity-header">
+                    <button id="back-to-menu-btn" class="btn text-btn">
+                        <i data-lucide="arrow-left" aria-hidden="true"></i>
+                        <span>Back</span>
+                    </button>
+                    <h2 id="activity-header-title" class="activity-header-title"></h2>
+                    <div class="activity-header-actions">
+                        <div id="activity-time-indicator" class="activity-time-indicator" role="status" hidden></div>
+                        <div id="activity-progress-indicator" class="hidden">Progress: 0%</div>
+                        <button id="close-activity-btn" class="btn activity-close-btn" type="button"
+                            aria-label="Close activity and return to activities" title="Close activity">
+                            <i data-lucide="x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="activity-container"></div>
+            </section>
+
+            <!-- View: Arcade -->
+            <section id="arcade-view" class="view hidden student-page-loading" aria-busy="true">
+                <!-- Game Area -->
+                <div class="arcade-container">
+                    <div class="student-page-skeleton student-page-skeleton--arcade" role="status" aria-label="Loading Arcade">
+                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
+                        <div class="student-loading-surface student-loading-arcade-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-arcade-art"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
+                    </div>
+                    <div id="game-selection">
+                        <header class="arcade-selection-intro">
+                            <div>
+                                <h2>Choose your next challenge</h2>
+                                <p id="arcade-time-balance">Complete a formative activity after every 10 minutes of Arcade play.</p>
+                            </div>
+                            <div class="arcade-game-count"><strong id="arcade-game-total">22</strong><span>games</span></div>
+                        </header>
+                        <div class="game-selection-row">
+                            <button id="prev-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Previous game">
+                                <i data-lucide="chevron-left" aria-hidden="true"></i>
+                            </button>
+                            <div id="current-game-card" class="card game-card">
+                                <!-- Game card will be dynamically inserted here -->
+                            </div>
+                            <button id="next-game-select-btn" class="btn secondary-btn game-select-nav-btn" aria-label="Next game">
+                                <i data-lucide="chevron-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="game-selection-actions">
+                            <button id="show-leaderboard-btn" class="btn secondary-btn">View leaderboard <span aria-hidden="true">↗</span></button>
+                        </div>
+                    </div>
+                    <div id="game-stage" class="hidden">
+                        <div class="game-header">
+                            <div id="game-timer">Time: 0:00</div>
+                            <div id="game-score" style="display: none; font-weight: bold; color: var(--primary-color);">Score: 0</div>
+                            <button id="add-time-btn" class="btn accent-btn">+1 Min (Loading...)</button>
+                            <button id="exit-game-btn" class="btn secondary-btn">Exit</button>
+                        </div>
+                        <canvas id="game-canvas" width="800" height="600"
+                            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboard-modal-title">
+        <div class="modal-content" style="max-width: 600px; width: 90%; max-height: 80vh;">
+            <div class="modal-header">
+                <h3 id="leaderboard-modal-title" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="trophy" aria-hidden="true"></i>
+                    <span>Leaderboard</span>
+                </h3>
+                <button id="close-leaderboard-modal" class="btn text-btn" aria-label="Close leaderboard">
+                    <i data-lucide="circle-x" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 id="current-game-name" style="margin: 0 0 1rem 0; text-align: center; color: var(--text-muted);">Galactic Breaker</h4>
+                <div id="leaderboard-list" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 60vh; overflow-y: auto;">
+                    <!-- Scores will be injected here -->
+                    <div class="student-page-skeleton student-page-skeleton--list" role="status" aria-label="Loading scores">
+                        <div class="student-loading-list">
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                            <span class="student-loading-line student-loading-list-row"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Profile Modal -->
+    <div id="profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" data-modal-required="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="profile-modal-title">Student Profile</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-secondary" style="margin-bottom: 1rem; color: var(--text-muted);">Please enter your details to start.</p>
+                <div class="form-group">
+                    <label for="student-firstname">First Name</label>
+                    <input type="text" id="student-firstname" placeholder="First Name">
+                </div>
+                <div class="form-group">
+                    <label for="student-lastname">Last Name</label>
+                    <input type="text" id="student-lastname" placeholder="Last Name">
+                </div>
+                <div class="form-group">
+                    <label for="student-grade">Grade</label>
+                    <select id="student-grade">
+                        <option value="">Select Grade</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="student-group">Section Letter</label>
+                    <input type="text" id="student-group" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" placeholder="A">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-profile-btn" class="btn primary-btn">Start Learning</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forced Password Change Modal -->
+    <div id="force-password-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="force-password-modal-title" data-modal-required="true">
+        <div class="modal-content" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3 id="force-password-modal-title">Change Password</h3>
+            </div>
+            <form id="change-password-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="change-password-new">New Password</label>
+                        <div class="password-field">
+                            <input type="password" id="change-password-new" autocomplete="new-password" minlength="10" required>
+                            <button type="button" class="password-toggle" aria-label="Show password"
+                                aria-controls="change-password-new" title="Show password">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="change-password-confirm">Confirm New Password</label>
+                        <div class="password-field">
+                            <input type="password" id="change-password-confirm" autocomplete="new-password" minlength="10" required>
+                            <button type="button" class="password-toggle" aria-label="Show password"
+                                aria-controls="change-password-confirm" title="Show password">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="change-password-status" class="form-feedback" style="color: var(--danger-color);"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn primary-btn">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/studentEarlyShell.js" type="module"></script>
+    <script src="js/icons.js?v=student-unit-close-icon-20260815a" type="module"></script>
+    <script src="js/student.js" type="module"></script>
+</body>
+
+</html>

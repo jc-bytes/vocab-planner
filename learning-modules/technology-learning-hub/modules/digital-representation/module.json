@@ -1,0 +1,58 @@
+{
+  "id": "MOD-DIGITAL-REPRESENTATION-01",
+  "title": "Binary, Images, and Sound",
+  "slug": "digital-representation",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "8",
+    "9"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Whole-number addition and multiplication",
+    "Teacher introduction to the assigned section"
+  ],
+  "objectives": [
+    "Convert four-bit unsigned values between binary and decimal.",
+    "Calculate pixel count and simple uncompressed image size.",
+    "Explain how RGB values represent color.",
+    "Calculate simple mono sound size and explain quality-size trade-offs.",
+    "Save and export reconstructable practice evidence."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved application record",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 140,
+  "sections": [
+    "START-01",
+    "BINARY-LEARN-01",
+    "BINARY-PRACTICE-01",
+    "IMAGE-LEARN-01",
+    "IMAGE-PRACTICE-01",
+    "SOUND-LEARN-01",
+    "SOUND-PRACTICE-01",
+    "MEDIA-RECORD-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/digital-representation",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Complete printed binary, image-size, sound-size, and quality trade-off activities."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

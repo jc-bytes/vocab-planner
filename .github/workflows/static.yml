@@ -23,6 +23,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/sparks
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -31,6 +34,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: apps/sparks/package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Install Playwright browsers
@@ -80,7 +84,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
-          path: dist-desktop
+          path: apps/sparks/dist-desktop
 
   deploy:
     needs: validate

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Foundations printable fallback</title>
+  <style>
+    body{max-width:850px;margin:32px auto;padding:0 24px;font:15px/1.45 Arial,sans-serif;color:#172631}h1,h2{color:#143c55}h1{font-size:28px}h2{margin-top:28px;font-size:20px;border-bottom:2px solid #143c55;padding-bottom:5px}.meta{padding:12px;border:1px solid #9baab3;background:#eef4f7}.box{min-height:54px;border:1px solid #9baab3;margin:8px 0;padding:10px}.source{padding:12px 14px;border-left:5px solid #e4a900;background:#fff1b8}.wrong{color:#8f3028;text-decoration:line-through}.write{display:inline-block;min-width:90px;border-bottom:1px solid #333}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #7f909a;padding:8px;text-align:left}th{background:#dcecf2}.chart{height:210px;border-left:2px solid #333;border-bottom:2px solid #333;display:flex;align-items:end;justify-content:space-around;padding:0 20px;margin:28px 30px 42px}.bar{width:70px;background:#1d7a72;color:white;text-align:center;padding-top:6px}.small{font-size:12px;color:#566773}.page-break{break-before:page}@media print{body{margin:0;max-width:none}.no-print{display:none}h2{break-after:avoid}.box,table,.chart{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <button class="no-print" onclick="window.print()">Print this packet</button>
+  <p class="small">MOD-DATA-SPREADSHEETS-01 v0.5.0 · Grade 6 Foundation · Offline fallback</p>
+  <h1>Data Foundations and Spreadsheets</h1>
+  <div class="meta">Name: ______________________________ Class: ______ Date: ______________</div>
+  <p>This packet is practice. Your teacher provides formal assessment directions separately.</p>
+
+  <h2>1. Read a table</h2>
+  <p>A <strong>title</strong> names the whole table. A <strong>header</strong> names a column. A <strong>record</strong> is one complete row. A <strong>value</strong> is one item in a cell.</p>
+  <table><caption><strong>Minutes Spent in School Clubs</strong></caption><thead><tr><th>Student ID</th><th>Club</th><th>Minutes</th></tr></thead><tbody><tr><td>A01</td><td>Art</td><td>35</td></tr><tr><td>A02</td><td>Math</td><td>50</td></tr><tr><td>A03</td><td>Science</td><td>45</td></tr><tr><td>A04</td><td>Music</td><td>30</td></tr></tbody></table>
+  <ol><li>Write the title: <span class="box"></span></li><li>Write two headers: <span class="box"></span></li><li>Copy the complete A03 record. Include all three cells: <span class="box"></span></li><li>Circle one value in the Minutes column.</li></ol>
+
+  <h2>2. Clean data</h2>
+  <p class="source"><strong>Source note:</strong> The club teacher checked the original records. A02 joined Math. A03 spent 45 minutes in Science. A04 spent 30 minutes in Music and should appear only once.</p>
+  <p>Use the note to correct the table. You may correct any cell. Cross out one repeated row.</p>
+  <table><thead><tr><th>Student ID</th><th>Club</th><th>Minutes</th></tr></thead><tbody><tr><td>A01</td><td>Art</td><td>35</td></tr><tr><td>A02</td><td><span class="wrong">math</span><br><span class="write"></span></td><td>50</td></tr><tr><td>A03</td><td>Science</td><td><span class="write"></span></td></tr><tr><td>A04</td><td>Music</td><td><span class="wrong">thirty</span><br><span class="write"></span></td></tr><tr><td>A04</td><td>Music</td><td>thirty</td></tr></tbody></table>
+
+  <div class="page-break"></div>
+  <h2>3. Use formulas</h2>
+  <p>A formula begins with an equals sign. <strong>SUM</strong> finds a total. <strong>AVERAGE</strong> finds the typical value in a range.</p>
+  <table><thead><tr><th></th><th>A</th><th>B</th></tr></thead><tbody><tr><th>1</th><td>Club</td><td>Minutes</td></tr><tr><th>2</th><td>Art</td><td>35</td></tr><tr><th>3</th><td>Math</td><td>50</td></tr><tr><th>4</th><td>Science</td><td>45</td></tr><tr><th>5</th><td>Music</td><td>30</td></tr><tr><th>6</th><td>Total</td><td>Write the SUM formula here: ____________________</td></tr><tr><th>7</th><td>Average</td><td>Write the AVERAGE formula here: _______________</td></tr></tbody></table>
+
+  <h2>4. Understand charts</h2>
+  <p><strong>A chart turns table data into a picture.</strong> Column and bar charts compare categories. A line chart shows change over time. A pie chart shows parts of a whole. A clear chart has a title and labels that name its categories and values.</p>
+
+  <h2>5. Build a column chart</h2>
+  <p>Enter four categories and values in A2:B5. Select A1:B5. Choose Column, then add a title and both axis labels.</p>
+  <table><thead><tr><th></th><th>A</th><th>B</th></tr></thead><tbody><tr><th>1</th><td>Category header: __________</td><td>Value header: __________</td></tr><tr><th>2</th><td></td><td></td></tr><tr><th>3</th><td></td><td></td></tr><tr><th>4</th><td></td><td></td></tr><tr><th>5</th><td></td><td></td></tr></tbody></table>
+  <p>Selected range: __________ Chart type: Column / Bar / Line / Pie</p><div class="box">Chart title, bottom label, and side label:</div><div class="box">Draw the completed column chart:</div>
+
+  <h2>6. Read a column chart</h2>
+  <p>Title: Minutes Spent in School Clubs · X-axis: Club · Y-axis: Minutes</p>
+  <div class="chart" aria-label="Column chart"><div class="bar" style="height:105px">Art<br>35</div><div class="bar" style="height:150px">Math<br>50</div><div class="bar" style="height:135px">Science<br>45</div><div class="bar" style="height:90px">Music<br>30</div></div>
+  <ol><li>Which club has the largest value? ____________________</li><li>How many more minutes does Math have than Music? ______</li><li>What is the total number of minutes? ______</li></ol>
+  <div class="box">Write one conclusion using a club name and a value:</div>
+
+  <h2>7. Review</h2>
+  <ul><li>I can identify the title, headers, records, categories, and values.</li><li>I can correct data without guessing.</li><li>I can write SUM and AVERAGE formulas.</li><li>I can label a column chart.</li><li>I can write a conclusion that matches the chart.</li></ul>
+  <p>Teacher check: ______________________________</p>
+</body>
+</html>

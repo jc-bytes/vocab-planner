@@ -18,6 +18,17 @@ Use this vault as a month-first teaching system.
 5. Use the monthly schedule for dated teaching blocks and the month classes page for broader planning.
 6. Fill in `Materials ready`, `Google Classroom item`, `Make-up option`, and `After-class notes` as needed.
 
+## Publishing Work in Google Classroom
+
+1. Open the lesson package's `Google Classroom Assignment Instructions.md` file.
+2. Confirm the post is marked `Ready` in the package manifest and contains no blanks or teacher placeholders.
+3. Attach the exact template, source files, example, review material, and rubric named in the instructions.
+4. Verify that the directions, attachments, checklist, and rubric require the same evidence and use the same counts, filenames, formats, and point values.
+5. Paste the prepared student block into Google Classroom without shortening consequential requirements.
+6. Preview the post as a student and confirm that the first step and submission method are obvious.
+
+Do not improvise a shorter Classroom summary for an assessed task. If the published requirements change, update the package specification, directions, template, example, checklist, and rubric before students begin.
+
 ## When To Use Each Page
 
 - Month class pages: normal teaching and weekly planning.
@@ -30,5 +41,5 @@ Use this vault as a month-first teaching system.
 
 ## What To Keep Collapsed
 
-- Keep `Class Notes (Generated)` collapsed in the file tree unless you need to inspect the generated files directly.
+- Keep `Materials/Class Notes` collapsed in the file tree unless you need to inspect the generated files directly.
 - Work from `00 Navigation` first.

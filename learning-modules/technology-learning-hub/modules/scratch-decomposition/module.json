@@ -1,0 +1,59 @@
+{
+  "id": "MOD-SCRATCH-DECOMPOSITION-01",
+  "title": "Scratch Decomposition, Loops, and Lists",
+  "slug": "scratch-decomposition",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "7",
+    "8"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Use basic Scratch events, sequence, conditions, and variables",
+    "Open and save a Scratch project"
+  ],
+  "objectives": [
+    "Break a Scratch program into a main program and named custom blocks.",
+    "Choose repeat, forever, or repeat until for a stated task.",
+    "Use a list to store and read related values.",
+    "Record a repeatable test and debug one likely cause at a time."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved Scratch filename or share link, code-structure explanation, and typed test record",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 142,
+  "sections": [
+    "START-01",
+    "DECOMPOSE-LEARN-01",
+    "DECOMPOSE-PRACTICE-01",
+    "LOOPS-LEARN-01",
+    "LOOPS-PRACTICE-01",
+    "DEBUG-LEARN-01",
+    "DEBUG-PRACTICE-01",
+    "BUILD-RECORD-01",
+    "REVIEW-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/scratch-decomposition",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "software": "Scratch online or Scratch desktop for the application task",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Complete the printed code-tracing, loop-selection, debugging, and program-planning activities."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

@@ -1,0 +1,1381 @@
+{
+  "catalogVersion": "1.0.0",
+  "lastUpdated": "2026-08-20",
+  "allowedStatuses": [
+    "prototype",
+    "draft",
+    "pilot",
+    "ready",
+    "needs-revision",
+    "deprecated",
+    "legacy-prototype"
+  ],
+  "modules": [
+    {
+      "id": "MOD-SCI-REPORT-01",
+      "title": "Write a Scientific Report",
+      "slug": "scientific-report-writing",
+      "version": "0.2.0",
+      "status": "prototype",
+      "recommendedGrades": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "tracks": [
+        "Foundation",
+        "Core",
+        "Extension"
+      ],
+      "sourcePath": "technology-learning-hub/modules/scientific-report-writing",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-19",
+      "estimatedMinutes": 420,
+      "prerequisites": [
+        "A teacher-approved scientific project or investigation plan",
+        "Basic paragraph writing in English",
+        "Access to one shared Google Doc per group for the normal workflow"
+      ],
+      "objectives": [
+        "Plan every required section of a scientific report",
+        "Write claims that match collected evidence",
+        "Use reliable sources and connect citations to references",
+        "Revise a group report with grammar, structure, and rubric checks"
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Start here",
+          "entryPath": "#start",
+          "estimatedMinutes": "15"
+        },
+        {
+          "id": "PLAN-01",
+          "title": "Research question",
+          "entryPath": "#research-question",
+          "estimatedMinutes": "20"
+        },
+        {
+          "id": "PLAN-02",
+          "title": "Problem statement",
+          "entryPath": "#problem-statement",
+          "estimatedMinutes": "25"
+        },
+        {
+          "id": "PLAN-03",
+          "title": "Objectives",
+          "entryPath": "#objectives",
+          "estimatedMinutes": "20"
+        },
+        {
+          "id": "PLAN-04",
+          "title": "Hypothesis and variables",
+          "entryPath": "#hypothesis-variables",
+          "estimatedMinutes": "25"
+        },
+        {
+          "id": "RESEARCH-01",
+          "title": "Theoretical framework",
+          "entryPath": "#theoretical-framework",
+          "estimatedMinutes": "35"
+        },
+        {
+          "id": "RESEARCH-02",
+          "title": "Methodology",
+          "entryPath": "#methodology",
+          "estimatedMinutes": "35"
+        },
+        {
+          "id": "FIND-01",
+          "title": "Results",
+          "entryPath": "#results",
+          "estimatedMinutes": "30"
+        },
+        {
+          "id": "FIND-02",
+          "title": "Analysis and discussion",
+          "entryPath": "#analysis-discussion",
+          "estimatedMinutes": "35"
+        },
+        {
+          "id": "FIND-03",
+          "title": "Conclusions",
+          "entryPath": "#conclusions",
+          "estimatedMinutes": "25"
+        },
+        {
+          "id": "FIND-04",
+          "title": "Limitations and recommendations",
+          "entryPath": "#limitations",
+          "estimatedMinutes": "20"
+        },
+        {
+          "id": "FINISH-01",
+          "title": "Title",
+          "entryPath": "#title",
+          "estimatedMinutes": "15"
+        },
+        {
+          "id": "FINISH-02",
+          "title": "Abstract and keywords",
+          "entryPath": "#abstract-keywords",
+          "estimatedMinutes": "30"
+        },
+        {
+          "id": "FINISH-03",
+          "title": "Table of contents",
+          "entryPath": "#table-of-contents",
+          "estimatedMinutes": "15"
+        },
+        {
+          "id": "FINISH-04",
+          "title": "References",
+          "entryPath": "#references",
+          "estimatedMinutes": "25"
+        },
+        {
+          "id": "FINISH-05",
+          "title": "Appendices",
+          "entryPath": "#appendices",
+          "estimatedMinutes": "15"
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Final review",
+          "entryPath": "#final-review",
+          "estimatedMinutes": "35"
+        }
+      ],
+      "evidence": [
+        "Shared group Google Doc containing the scientific report",
+        "Downloadable module progress record with the linked group document and section review states"
+      ],
+      "knownRisks": [
+        "Google Doc content is not synchronized; students open and edit the group document in a separate tab",
+        "Progress is stored only in the current browser and device",
+        "The Harper grammar package is in early access and its suggestions require student judgment",
+        "The module requires a monitored classroom pilot before ready status"
+      ],
+      "planningUse": "Prototype only. Use in a monitored pilot with a printed report outline and checklist as the offline fallback."
+    },
+    {
+      "id": "MOD-DATA-SPREADSHEETS-01",
+      "title": "Data Foundations and Spreadsheets",
+      "slug": "data-spreadsheets",
+      "version": "0.5.0",
+      "status": "prototype",
+      "recommendedGrades": [
+        6,
+        7
+      ],
+      "tracks": [
+        "Foundation"
+      ],
+      "sourcePath": "technology-learning-hub/modules/data-spreadsheets",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-19",
+      "estimatedMinutes": 195,
+      "prerequisites": [
+        "Read short English instructions with teacher support",
+        "Use a mouse and keyboard on a school computer",
+        "Recognize numbers and simple categories in a table"
+      ],
+      "objectives": [
+        "Find the title, column names, rows, and cells in a data table",
+        "Correct common data-quality and formatting problems",
+        "Use SUM and AVERAGE formulas in a guided spreadsheet example",
+        "Identify common chart types and the parts of a column chart",
+        "Build and label one column chart",
+        "Answer questions and write a conclusion that matches chart evidence"
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Start here",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "TABLE-LEARN-01",
+          "title": "Learn tables",
+          "entryPath": "#read-table",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "TABLE-PRACTICE-01",
+          "title": "Practice tables",
+          "entryPath": "#table-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "CLEAN-LEARN-01",
+          "title": "Learn cleaning",
+          "entryPath": "#clean-learn",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "CLEAN-PRACTICE-01",
+          "title": "Practice cleaning",
+          "entryPath": "#clean-data",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "FORMULA-LEARN-01",
+          "title": "Learn formulas",
+          "entryPath": "#formula-learn",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "FORMULA-PRACTICE-01",
+          "title": "Practice formulas",
+          "entryPath": "#formulas",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "CHART-BASICS-01",
+          "title": "Understand charts",
+          "entryPath": "#chart-basics",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "CHART-TYPES-PRACTICE-01",
+          "title": "Practice choosing charts",
+          "entryPath": "#chart-types",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "CHART-PRACTICE-01",
+          "title": "Practice building charts",
+          "entryPath": "#chart",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "INTERPRET-LEARN-01",
+          "title": "Learn chart reading",
+          "entryPath": "#interpret-learn",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "INTERPRET-PRACTICE-01",
+          "title": "Practice chart reading",
+          "entryPath": "#interpret",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Practice history and export",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Immutable local attempt history with datasets, responses, scores, and editing snapshots",
+        "Downloadable HTML practice report that reconstructs saved tables, formulas, charts, and written responses"
+      ],
+      "knownRisks": [
+        "Progress is stored only in the current browser and device",
+        "Shared school computers require students to export their report and reset progress before the next user",
+        "The module requires a monitored Grade 6 pilot before ready status",
+        "Formal assessment directions and scoring tools remain outside the public module"
+      ],
+      "planningUse": "Prototype only. Assign paired Learn and Practice section IDs. Practice sections rotate datasets and save reconstructable attempts. Use HISTORY-01 to review and export evidence."
+    },
+    {
+      "id": "MOD-3D-MODELLING-01",
+      "title": "3D Modelling Foundations",
+      "slug": "3d-modelling-foundations",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        6
+      ],
+      "tracks": [
+        "Foundation"
+      ],
+      "sourcePath": "technology-learning-hub/modules/3d-modelling-foundations",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 129,
+      "prerequisites": [
+        "Use a mouse and keyboard",
+        "Recognize simple solid shapes"
+      ],
+      "objectives": [
+        "Read width, height, depth, and common model views",
+        "Choose move, resize, rotate, duplicate, and group deliberately",
+        "Plan, build, and test a fixed three-shape desk organizer"
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Start",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "3D-LEARN-01",
+          "title": "Understand 3D space",
+          "entryPath": "#space",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "3D-VIEWS-PRACTICE-01",
+          "title": "Practice reading 3D views",
+          "entryPath": "#views",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "TRANSFORM-LEARN-01",
+          "title": "Learn modelling moves",
+          "entryPath": "#transform-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "TRANSFORM-PRACTICE-01",
+          "title": "Practice modelling moves",
+          "entryPath": "#transform-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "COMBINE-LEARN-01",
+          "title": "Combine simple shapes",
+          "entryPath": "#combine-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "COMBINE-PRACTICE-01",
+          "title": "Practice combining shapes",
+          "entryPath": "#combine-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "MODEL-PLAN-01",
+          "title": "Plan a desk organizer",
+          "entryPath": "#plan",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "TINKERCAD-HANDOFF-01",
+          "title": "Build and check in Tinkercad",
+          "entryPath": "#handoff",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Practice history and export",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved practice attempts",
+        "Desk-organizer plan and Tinkercad build record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "Tinkercad remains a separate external tool",
+        "A monitored Grade 6 classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module for formative November work. Use the printable fallback if access fails. Do not count module completion as a formal grade."
+    },
+    {
+      "id": "MOD-MICROBIT-SENSING-01",
+      "title": "micro:bit Inputs, Variables, and Sensors",
+      "slug": "microbit-sensing",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        6
+      ],
+      "tracks": [
+        "Foundation"
+      ],
+      "sourcePath": "technology-learning-hub/modules/microbit-sensing",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 189,
+      "prerequisites": [
+        "Use a mouse and keyboard",
+        "Follow a short sequence",
+        "Compare whole numbers"
+      ],
+      "objectives": [
+        "Identify micro:bit inputs, outputs, and key parts",
+        "Trace and build a fixed button counter with a variable",
+        "Use a condition and threshold in a fixed light-sensor response",
+        "Test both branches and explain evidence"
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Start",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "BOARD-LEARN-01",
+          "title": "Meet the micro:bit",
+          "entryPath": "#board",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "PARTS-PRACTICE-01",
+          "title": "Practice parts",
+          "entryPath": "#parts-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "IO-LEARN-01",
+          "title": "Learn input and output",
+          "entryPath": "#io-learn",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "IO-PRACTICE-01",
+          "title": "Practice input and output",
+          "entryPath": "#io-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "VARIABLES-LEARN-01",
+          "title": "Learn variables",
+          "entryPath": "#variables-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "VARIABLES-PRACTICE-01",
+          "title": "Practice variables",
+          "entryPath": "#variables-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "CONDITIONS-LEARN-01",
+          "title": "Learn conditions",
+          "entryPath": "#conditions-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "CONDITIONS-PRACTICE-01",
+          "title": "Practice conditions",
+          "entryPath": "#conditions-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "SENSOR-LAB-01",
+          "title": "Test a light threshold",
+          "entryPath": "#sensor-lab",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "DEBUG-PRACTICE-01",
+          "title": "Practice debugging",
+          "entryPath": "#debug-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "COUNTER-RECORD-01",
+          "title": "Counter build record",
+          "entryPath": "#counter-plan",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "NIGHT-LIGHT-RECORD-01",
+          "title": "Night-light build record",
+          "entryPath": "#night-plan",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Practice history and export",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved practice attempts",
+        "Counter and sensor test records",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "Physical-board use depends on available micro:bits and cables; the MakeCode simulator is the fallback",
+        "A monitored Grade 6 classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module for formative November and December work. Use fixed counter and night-light builds. Do not treat module completion as a sixth formal grade."
+    },
+    {
+      "id": "MOD-SPREADSHEET-ANALYSIS-01",
+      "title": "Spreadsheet Formulas and Charts",
+      "slug": "spreadsheet-analysis",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        7
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/spreadsheet-analysis",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 142,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice spreadsheet formulas and charts through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Turn a table into evidence",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "FORMULA-LEARN-01",
+          "title": "Use cell references and functions",
+          "entryPath": "#formula-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "FORMULA-PRACTICE-01",
+          "title": "Practice spreadsheet calculations",
+          "entryPath": "#formula-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "CHART-LEARN-01",
+          "title": "Match the chart to the question",
+          "entryPath": "#chart-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "CHART-PRACTICE-01",
+          "title": "Practice chart decisions",
+          "entryPath": "#chart-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "ANALYSIS-LEARN-01",
+          "title": "Sort, filter, and check patterns",
+          "entryPath": "#analysis-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "ANALYSIS-PRACTICE-01",
+          "title": "Practice sorting and filtering",
+          "entryPath": "#analysis-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "ANALYSIS-RECORD-01",
+          "title": "Record a spreadsheet investigation",
+          "entryPath": "#analysis-record",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Check the spreadsheet before you submit",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-SCRATCH-DECOMPOSITION-01",
+      "title": "Scratch Decomposition, Loops, and Lists",
+      "slug": "scratch-decomposition",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        7,
+        8
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/scratch-decomposition",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 142,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice scratch decomposition, loops, and lists through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Plan code in smaller parts",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "DECOMPOSE-LEARN-01",
+          "title": "Break the problem into subroutines",
+          "entryPath": "#decompose-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "DECOMPOSE-PRACTICE-01",
+          "title": "Practice breaking down a Scratch task",
+          "entryPath": "#decompose-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "LOOPS-LEARN-01",
+          "title": "Choose a loop that matches the task",
+          "entryPath": "#loops-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "LOOPS-PRACTICE-01",
+          "title": "Practice loops and lists",
+          "entryPath": "#loops-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "DEBUG-LEARN-01",
+          "title": "Test one part at a time",
+          "entryPath": "#debug-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "DEBUG-PRACTICE-01",
+          "title": "Practice finding a useful next step",
+          "entryPath": "#debug-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "BUILD-RECORD-01",
+          "title": "Record a Scratch build",
+          "entryPath": "#build-record",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Check the Scratch project before you submit",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-SCRATCH-RHYTHM-01",
+      "title": "Build a 4-Lane Rhythm Game in Scratch",
+      "slug": "scratch-rhythm-game",
+      "version": "0.13.0",
+      "status": "prototype",
+      "recommendedGrades": [
+        7
+      ],
+      "tracks": [
+        "Foundation",
+        "Core"
+      ],
+      "sourcePath": "../standalone-sites/osu-like-scratch-game-guide",
+      "publishedUrl": "https://jc-bytes.github.io/scratch-rhythm-game-guide/",
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-21",
+      "estimatedMinutes": 120,
+      "prerequisites": [
+        "Open Scratch and save a project",
+        "Drag, connect, and edit Scratch blocks"
+      ],
+      "objectives": [
+        "Build and test one complete rhythm-game lane before duplicating it.",
+        "Use variables, loops, conditions, operators, keyboard input, and the Music extension in a working game.",
+        "Duplicate a tested sprite pattern and change only the lane position and control key."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Prepare the Scratch project",
+          "entryPath": "#step-1",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "CONTROLLER-01",
+          "title": "Build the timer and beat controller",
+          "entryPath": "#step-2",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "LANE-01",
+          "title": "Build and test the first goal and ball",
+          "entryPath": "#step-4",
+          "estimatedMinutes": 50
+        },
+        {
+          "id": "DUPLICATE-01",
+          "title": "Copy the first lane to make four lanes",
+          "entryPath": "#step-10",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "TEST-SUBMIT-01",
+          "title": "Test, save, and submit the project",
+          "entryPath": "#step-11",
+          "estimatedMinutes": 15
+        }
+      ],
+      "evidence": [
+        "Saved .sb3 project with four working lanes",
+        "Visible score and time variables",
+        "Completed test checklist"
+      ],
+      "knownRisks": [
+        "Progress is stored only in the current browser and device",
+        "The module still needs a monitored classroom pilot"
+      ],
+      "planningUse": "Prototype module. Pilot it with Grade 7 and keep the printed guide available as the internet fallback."
+    },
+    {
+      "id": "MOD-SOURCE-CREDIBILITY-01",
+      "title": "Credible Sources, Licensing, and Credit",
+      "slug": "source-credibility",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        7,
+        8,
+        9
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/source-credibility",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 115,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice credible sources, licensing, and credit through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Check before you use",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "CREDIBILITY-LEARN-01",
+          "title": "Use four credibility checks",
+          "entryPath": "#credibility-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "CREDIBILITY-PRACTICE-01",
+          "title": "Practice credibility checks",
+          "entryPath": "#credibility-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "CREDIT-LEARN-01",
+          "title": "Use media with permission and credit",
+          "entryPath": "#credit-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "CREDIT-PRACTICE-01",
+          "title": "Practice licensing and credit",
+          "entryPath": "#credit-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "SOURCE-RECORD-01",
+          "title": "Record a three-source decision",
+          "entryPath": "#source-record",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Check the source decision before you submit",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-SENSOR-SYSTEMS-01",
+      "title": "Sensor Systems, Thresholds, and Testing",
+      "slug": "sensor-systems",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        7,
+        8
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/sensor-systems",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 147,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice sensor systems, thresholds, and testing through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Turn a sensor reading into an action",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "SYSTEM-LEARN-01",
+          "title": "Trace input, process, signal, and output",
+          "entryPath": "#system-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "SYSTEM-PRACTICE-01",
+          "title": "Practice tracing sensor systems",
+          "entryPath": "#system-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "THRESHOLD-LEARN-01",
+          "title": "Use a threshold rule",
+          "entryPath": "#threshold-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "THRESHOLD-PRACTICE-01",
+          "title": "Practice threshold decisions",
+          "entryPath": "#threshold-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "TESTING-LEARN-01",
+          "title": "Build a useful test table",
+          "entryPath": "#testing-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "TESTING-PRACTICE-01",
+          "title": "Practice debugging with evidence",
+          "entryPath": "#testing-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "SYSTEM-RECORD-01",
+          "title": "Record a sensor-system plan",
+          "entryPath": "#system-record",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Check the sensor plan before you submit",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-APP-DESIGN-01",
+      "title": "App Screens, Events, and Test Cases",
+      "slug": "app-design",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        8
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/app-design",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 190,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice app screens, events, and test cases through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Plan an app before building it",
+          "entryPath": "#start",
+          "estimatedMinutes": 7
+        },
+        {
+          "id": "USER-LEARN-01",
+          "title": "Start with the user and problem",
+          "entryPath": "#user-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "USER-PRACTICE-01",
+          "title": "Practice defining users and features",
+          "entryPath": "#user-practice",
+          "estimatedMinutes": 25
+        },
+        {
+          "id": "EVENTS-LEARN-01",
+          "title": "Connect screens with events",
+          "entryPath": "#events-learn",
+          "estimatedMinutes": 18
+        },
+        {
+          "id": "EVENTS-PRACTICE-01",
+          "title": "Practice a screen and event map",
+          "entryPath": "#events-practice",
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "TESTING-LEARN-01",
+          "title": "Write test cases before building",
+          "entryPath": "#testing-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "TESTING-PRACTICE-01",
+          "title": "Practice writing app test cases",
+          "entryPath": "#testing-practice",
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "PLAN-RECORD-01",
+          "title": "Create a three-screen app plan",
+          "entryPath": "#plan-record",
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Review the app plan",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-PYTHON-FUNDAMENTALS-01",
+      "title": "Python Input, Arithmetic, and Debugging",
+      "slug": "python-fundamentals",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        8
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/python-fundamentals",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 233,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice python input, arithmetic, and debugging through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Read and run a small Python program",
+          "entryPath": "#start",
+          "estimatedMinutes": 7
+        },
+        {
+          "id": "ARITHMETIC-LEARN-01",
+          "title": "Use input, variables, and arithmetic",
+          "entryPath": "#arithmetic-learn",
+          "estimatedMinutes": 18
+        },
+        {
+          "id": "ARITHMETIC-PRACTICE-01",
+          "title": "Run and trace five arithmetic tasks",
+          "entryPath": "#arithmetic-practice",
+          "estimatedMinutes": 35
+        },
+        {
+          "id": "DEBUG-LEARN-01",
+          "title": "Classify errors before fixing them",
+          "entryPath": "#debug-learn",
+          "estimatedMinutes": 18
+        },
+        {
+          "id": "DEBUG-PRACTICE-01",
+          "title": "Correct and retest five Python errors",
+          "entryPath": "#debug-practice",
+          "estimatedMinutes": 40
+        },
+        {
+          "id": "PROGRAM-LEARN-01",
+          "title": "Plan a calculator with input, process, and output",
+          "entryPath": "#program-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "PROGRAM-PRACTICE-01",
+          "title": "Build and test a small calculator",
+          "entryPath": "#program-practice",
+          "estimatedMinutes": 45
+        },
+        {
+          "id": "PROGRAM-RECORD-01",
+          "title": "Create and test a Python calculator",
+          "entryPath": "#program-record",
+          "estimatedMinutes": 35
+        },
+        {
+          "id": "REVIEW-01",
+          "title": "Review the program and evidence",
+          "entryPath": "#review",
+          "estimatedMinutes": 10
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-DIGITAL-REPRESENTATION-01",
+      "title": "Binary, Images, and Sound",
+      "slug": "digital-representation",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        8,
+        9
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/digital-representation",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 140,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice binary, images, and sound through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Represent information with numbers",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "BINARY-LEARN-01",
+          "title": "Read place values in binary",
+          "entryPath": "#binary-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "BINARY-PRACTICE-01",
+          "title": "Practice binary conversion",
+          "entryPath": "#binary-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "IMAGE-LEARN-01",
+          "title": "Build an image from pixels and RGB values",
+          "entryPath": "#image-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "IMAGE-PRACTICE-01",
+          "title": "Practice pixels, RGB, and image size",
+          "entryPath": "#image-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "SOUND-LEARN-01",
+          "title": "Represent sound with samples",
+          "entryPath": "#sound-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "SOUND-PRACTICE-01",
+          "title": "Practice sound representation",
+          "entryPath": "#sound-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "MEDIA-RECORD-01",
+          "title": "Record a media representation check",
+          "entryPath": "#media-record",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-CYBERSECURITY-RISK-01",
+      "title": "Cybersecurity Threats and Risk Decisions",
+      "slug": "cybersecurity-risk",
+      "version": "0.1.0",
+      "status": "pilot",
+      "recommendedGrades": [
+        9
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "technology-learning-hub/modules/cybersecurity-risk",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-20",
+      "estimatedMinutes": 150,
+      "prerequisites": [
+        "Teacher introduction and assigned class materials"
+      ],
+      "objectives": [
+        "Practice cybersecurity threats and risk decisions through short explanations, repeated activities, and one saved application record."
+      ],
+      "sections": [
+        {
+          "id": "START-01",
+          "title": "Choose protection from evidence",
+          "entryPath": "#start",
+          "estimatedMinutes": 5
+        },
+        {
+          "id": "THREAT-LEARN-01",
+          "title": "Separate assets, threats, vulnerabilities, and protections",
+          "entryPath": "#threat-learn",
+          "estimatedMinutes": 18
+        },
+        {
+          "id": "THREAT-PRACTICE-01",
+          "title": "Practice identifying cyber threats",
+          "entryPath": "#threat-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "RISK-LEARN-01",
+          "title": "Rate probability and impact separately",
+          "entryPath": "#risk-learn",
+          "estimatedMinutes": 15
+        },
+        {
+          "id": "RISK-PRACTICE-01",
+          "title": "Practice probability-impact ratings",
+          "entryPath": "#risk-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "PROTECTION-LEARN-01",
+          "title": "Recommend a protection that changes the risk",
+          "entryPath": "#protection-learn",
+          "estimatedMinutes": 12
+        },
+        {
+          "id": "PROTECTION-PRACTICE-01",
+          "title": "Practice security recommendations",
+          "entryPath": "#protection-practice",
+          "estimatedMinutes": 20
+        },
+        {
+          "id": "RISK-RECORD-01",
+          "title": "Record a six-risk analysis",
+          "entryPath": "#risk-record",
+          "estimatedMinutes": 30
+        },
+        {
+          "id": "HISTORY-01",
+          "title": "Review and export your practice",
+          "entryPath": "#history",
+          "estimatedMinutes": 10
+        }
+      ],
+      "evidence": [
+        "Saved repeated practice attempts",
+        "Saved application record",
+        "Downloadable HTML practice report"
+      ],
+      "knownRisks": [
+        "Progress is stored only on the current browser and device",
+        "A monitored classroom pilot is still required"
+      ],
+      "planningUse": "Pilot module. Assign exact section IDs and keep the printable fallback available. Formal assessments use separate directions and scoring tools."
+    },
+    {
+      "id": "MOD-DATA-FOUNDATIONS-LEGACY-01",
+      "title": "Data Detectives and Chart Practice",
+      "slug": "data-detectives-legacy",
+      "version": "0.0.0-legacy",
+      "status": "legacy-prototype",
+      "recommendedGrades": [
+        9
+      ],
+      "tracks": [
+        "Core"
+      ],
+      "sourcePath": "legacy/data-detectives",
+      "publishedUrl": null,
+      "owner": "Porfirio Rios",
+      "lastReviewed": "2026-08-17",
+      "estimatedMinutes": null,
+      "prerequisites": [
+        "Basic understanding of tables, rows, and columns"
+      ],
+      "objectives": [
+        "Identify and responsibly correct common data-quality problems",
+        "Record and explain data-cleaning decisions",
+        "Practice choosing and interpreting charts"
+      ],
+      "sections": [
+        {
+          "id": "S1",
+          "title": "Data Cleaning Practice",
+          "entryPath": "index.html",
+          "estimatedMinutes": "15-20"
+        },
+        {
+          "id": "S2",
+          "title": "Chart Practice",
+          "entryPath": "charts.html",
+          "estimatedMinutes": null
+        }
+      ],
+      "evidence": [
+        "Downloadable practice report from the data-cleaning activity"
+      ],
+      "knownRisks": [
+        "README describes only the original data-cleaning activity and does not document the site's expanded scope",
+        "Assessment pages, datasets, progress behavior, routes, accessibility, responsive behavior, and public/private separation require a full migration audit",
+        "No central-hub published URL or stable ready-version route exists"
+      ],
+      "planningUse": "Do not reference as a ready module. Preserve it as a legacy prototype and migrate it into the central Technology Learning Hub before normal planning use."
+    }
+  ]
+}

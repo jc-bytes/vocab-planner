@@ -1,0 +1,602 @@
+{
+  "grade": "6",
+  "trimester": "IIIT",
+  "totalPointsEach": 40,
+  "rubrics": [
+    {
+      "summative": 1,
+      "title": "Technology Vocabulary Table",
+      "dates": "6A Sep 15; 6B Sep 16; 6C Sep 18",
+      "docx": "6th grade - IIIT - Summative 1 - Technology Vocabulary Table.docx",
+      "xlsx": "6th grade - IIIT - Summative 1 - Technology Vocabulary Table - Google Classroom Rubric.xlsx",
+      "criteria": [
+        {
+          "name": "Completed assigned entries",
+          "description": "Exactly 10 assigned vocabulary rows are required.",
+          "levels": [
+            [
+              9,
+              "All 10 rows are complete."
+            ],
+            [
+              7,
+              "Exactly 8-9 rows are complete."
+            ],
+            [
+              5,
+              "Exactly 5-7 rows are complete."
+            ],
+            [
+              2,
+              "Exactly 0-4 rows are complete."
+            ]
+          ]
+        },
+        {
+          "name": "Accurate definitions",
+          "description": "Each row explains the assigned technology word in student-friendly language.",
+          "levels": [
+            [
+              9,
+              "All 10 definitions are accurate."
+            ],
+            [
+              7,
+              "Exactly 8-9 definitions are accurate."
+            ],
+            [
+              5,
+              "Exactly 5-7 definitions are accurate."
+            ],
+            [
+              2,
+              "Exactly 0-4 definitions are accurate."
+            ]
+          ]
+        },
+        {
+          "name": "Connected examples or visuals",
+          "description": "Each row gives a concrete matching example or a clear visual description.",
+          "levels": [
+            [
+              9,
+              "All 10 examples or visual descriptions match."
+            ],
+            [
+              7,
+              "Exactly 8-9 match."
+            ],
+            [
+              5,
+              "Exactly 5-7 match."
+            ],
+            [
+              2,
+              "Exactly 0-4 match."
+            ]
+          ]
+        },
+        {
+          "name": "Technology sentences",
+          "description": "Each row uses the assigned word correctly in one complete technology sentence.",
+          "levels": [
+            [
+              9,
+              "All 10 sentences are complete and correct."
+            ],
+            [
+              7,
+              "Exactly 8-9 are complete and correct."
+            ],
+            [
+              5,
+              "Exactly 5-7 are complete and correct."
+            ],
+            [
+              2,
+              "Exactly 0-4 are complete and correct."
+            ]
+          ]
+        },
+        {
+          "name": "Readiness and responsible work",
+          "description": "Four announced checks: own or assigned charged computer and school login ready; begins on time; uses files, measuring tools, devices, and materials responsibly; submits or returns evidence by the deadline. A forgotten or uncharged personal computer, unprepared login, lateness, or repeated responsibility reminders may lower only these 4 readiness points; academic criteria score the work itself. A documented school system, account, network, or hardware failure uses the equal fallback without deduction.",
+          "levels": [
+            [
+              4,
+              "All 4 checks are met, or an equal fallback is completed for a documented school-controlled failure."
+            ],
+            [
+              3,
+              "Exactly 3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              0,
+              "No checks are met and no usable equal fallback is completed."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "summative": 2,
+      "title": "Narrative-to-Spreadsheet Data Table",
+      "dates": "6A Sep 29; 6B Sep 30; 6C Oct 2",
+      "docx": "6th grade - IIIT - Summative 2 - Narrative-to-Spreadsheet Data Table.docx",
+      "xlsx": "6th grade - IIIT - Summative 2 - Narrative-to-Spreadsheet Data Table - Google Classroom Rubric.xlsx",
+      "criteria": [
+        {
+          "name": "Eight extracted records",
+          "description": "The fixed narrative contains exactly eight records.",
+          "levels": [
+            [
+              9,
+              "All 8 records match the narrative."
+            ],
+            [
+              7,
+              "Exactly 6-7 records match."
+            ],
+            [
+              5,
+              "Exactly 3-5 records match."
+            ],
+            [
+              2,
+              "Exactly 0-2 records match."
+            ]
+          ]
+        },
+        {
+          "name": "Headers and data placement",
+          "description": "Four checks: exact headers Student ID, Club, Minutes; each fact is in the correct column; category capitalization matches the narrative; Minutes cells contain numbers.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Readable spreadsheet",
+          "description": "Four checks: headers are visible; columns show full values; all eight records remain visible; the header row has one consistent emphasis.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Evidence sentence",
+          "description": "Three checks: one complete sentence; names a Student ID or club; states one exact matching value.",
+          "levels": [
+            [
+              9,
+              "All 3 checks are met."
+            ],
+            [
+              7,
+              "Exactly 2 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1 check is met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Readiness and responsible work",
+          "description": "Four announced checks: own or assigned charged computer and school login ready; begins on time; uses files, measuring tools, devices, and materials responsibly; submits or returns evidence by the deadline. A forgotten or uncharged personal computer, unprepared login, lateness, or repeated responsibility reminders may lower only these 4 readiness points; academic criteria score the work itself. A documented school system, account, network, or hardware failure uses the equal fallback without deduction.",
+          "levels": [
+            [
+              4,
+              "All 4 checks are met, or an equal fallback is completed for a documented school-controlled failure."
+            ],
+            [
+              3,
+              "Exactly 3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              0,
+              "No checks are met and no usable equal fallback is completed."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "summative": 3,
+      "title": "STEAM Individual Work Process",
+      "dates": "6A Oct 13; 6B Oct 14; 6C Oct 16",
+      "docx": "6th grade - IIIT - Summative 3 - STEAM Individual Work Process.docx",
+      "xlsx": "6th grade - IIIT - Summative 3 - STEAM Individual Work Process - Google Classroom Rubric.xlsx",
+      "criteria": [
+        {
+          "name": "Assigned project and role plan",
+          "description": "Four checks: identifies the existing assigned project; states its problem and goal; names own role and first task; names the evidence location.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Three dated individual contributions",
+          "description": "Each entry names an exact action, checkable file/part/calculation/explanation, result, and next step that matches the group work.",
+          "levels": [
+            [
+              9,
+              "All 3 dated entries are complete and verifiable."
+            ],
+            [
+              7,
+              "Exactly 2 entries are complete and verifiable."
+            ],
+            [
+              5,
+              "Exactly 1 entry is complete and verifiable."
+            ],
+            [
+              2,
+              "No entry is complete and verifiable."
+            ]
+          ]
+        },
+        {
+          "name": "Test and improvement record",
+          "description": "Five checks: expected result; action or test; actual result; evidence location; next change with reason.",
+          "levels": [
+            [
+              9,
+              "All 5 checks are met."
+            ],
+            [
+              7,
+              "Exactly 4 checks are met."
+            ],
+            [
+              5,
+              "Exactly 2-3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 0-1 checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Individual evidence handoff",
+          "description": "Four checks: current evidence opens or is available; it matches the stated role; teacher can verify the contribution; packet is individually identified.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Readiness and responsible work",
+          "description": "Four announced checks: own or assigned charged computer and school login ready; begins on time; uses files, measuring tools, devices, and materials responsibly; submits or returns evidence by the deadline. A forgotten or uncharged personal computer, unprepared login, lateness, or repeated responsibility reminders may lower only these 4 readiness points; academic criteria score the work itself. A documented school system, account, network, or hardware failure uses the equal fallback without deduction.",
+          "levels": [
+            [
+              4,
+              "All 4 checks are met, or an equal fallback is completed for a documented school-controlled failure."
+            ],
+            [
+              3,
+              "Exactly 3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              0,
+              "No checks are met and no usable equal fallback is completed."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "summative": 4,
+      "title": "STEAM Expo Explanation and Closure",
+      "dates": "6A, 6B, 6C Oct 22; closure by Oct 23",
+      "docx": "6th grade - IIIT - Summative 4 - STEAM Expo Explanation and Closure.docx",
+      "xlsx": "6th grade - IIIT - Summative 4 - STEAM Expo Explanation and Closure - Google Classroom Rubric.xlsx",
+      "criteria": [
+        {
+          "name": "Assigned expo or make-up role",
+          "description": "Four checks: role is identified; role is completed; student follows the speaking/demonstration/materials order; participation is safe and respectful.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Project explanation",
+          "description": "Five school-expo checks: identifies what was created; explains the problem or need; explains how it works; states what was learned; explains how it can help make the world better.",
+          "levels": [
+            [
+              9,
+              "All 5 checks are clear and accurate."
+            ],
+            [
+              7,
+              "Exactly 4 checks are clear and accurate."
+            ],
+            [
+              5,
+              "Exactly 2-3 checks are clear and accurate."
+            ],
+            [
+              2,
+              "Exactly 0-1 checks are clear and accurate."
+            ]
+          ]
+        },
+        {
+          "name": "Own contribution and project evidence",
+          "description": "Three checks: explains own contribution; gives one real test or progress result; gives one supported improvement.",
+          "levels": [
+            [
+              9,
+              "All 3 checks are complete and supported."
+            ],
+            [
+              7,
+              "Exactly 2 checks are complete and supported."
+            ],
+            [
+              5,
+              "Exactly 1 check is complete and supported."
+            ],
+            [
+              2,
+              "No check is complete and supported."
+            ]
+          ]
+        },
+        {
+          "name": "Individual reflection and closure",
+          "description": "Five checks: role reflection; contribution evidence; audience or teacher question/comment; next improvement; cleanup or materials return.",
+          "levels": [
+            [
+              9,
+              "All 5 checks are met."
+            ],
+            [
+              7,
+              "Exactly 4 checks are met."
+            ],
+            [
+              5,
+              "Exactly 2-3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 0-1 checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Readiness and responsible work",
+          "description": "Four announced checks: own or assigned charged computer and school login ready; begins on time; uses files, measuring tools, devices, and materials responsibly; submits or returns evidence by the deadline. A forgotten or uncharged personal computer, unprepared login, lateness, or repeated responsibility reminders may lower only these 4 readiness points; academic criteria score the work itself. A documented school system, account, network, or hardware failure uses the equal fallback without deduction.",
+          "levels": [
+            [
+              4,
+              "All 4 checks are met, or an equal fallback is completed for a documented school-controlled failure."
+            ],
+            [
+              3,
+              "Exactly 3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              0,
+              "No checks are met and no usable equal fallback is completed."
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "summative": 5,
+      "title": "Narrative Data Table and Column Chart",
+      "dates": "6A Oct 26; 6B Oct 28; 6C Oct 28",
+      "docx": "6th grade - IIIT - Summative 5 - Narrative Data Table and Column Chart.docx",
+      "xlsx": "6th grade - IIIT - Summative 5 - Narrative Data Table and Column Chart - Google Classroom Rubric.xlsx",
+      "criteria": [
+        {
+          "name": "Four extracted records",
+          "description": "The fixed paragraph gives four club-and-response records.",
+          "levels": [
+            [
+              9,
+              "All 4 records match the paragraph."
+            ],
+            [
+              7,
+              "Exactly 3 records match."
+            ],
+            [
+              5,
+              "Exactly 1-2 records match."
+            ],
+            [
+              2,
+              "No records match."
+            ]
+          ]
+        },
+        {
+          "name": "Data range and column chart",
+          "description": "Four checks: all four categories; exact values; selected range includes both headers; chart type is Column.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Chart labels",
+          "description": "Three checks: title is Club Survey Responses; horizontal axis is Club; vertical axis is Responses.",
+          "levels": [
+            [
+              9,
+              "All 3 labels are exact."
+            ],
+            [
+              7,
+              "Exactly 2 labels are exact."
+            ],
+            [
+              5,
+              "Exactly 1 label is exact."
+            ],
+            [
+              2,
+              "No labels are exact."
+            ]
+          ]
+        },
+        {
+          "name": "Questions and conclusion",
+          "description": "Four checks: three required answers are correct; conclusion is a complete sentence; conclusion names a club; conclusion includes a matching number.",
+          "levels": [
+            [
+              9,
+              "All 4 checks are met."
+            ],
+            [
+              7,
+              "Exactly 3 checks are met."
+            ],
+            [
+              5,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              2,
+              "No checks are met."
+            ]
+          ]
+        },
+        {
+          "name": "Readiness and responsible work",
+          "description": "Four announced checks: own or assigned charged computer and school login ready; begins on time; uses files, measuring tools, devices, and materials responsibly; submits or returns evidence by the deadline. A forgotten or uncharged personal computer, unprepared login, lateness, or repeated responsibility reminders may lower only these 4 readiness points; academic criteria score the work itself. A documented school system, account, network, or hardware failure uses the equal fallback without deduction.",
+          "levels": [
+            [
+              4,
+              "All 4 checks are met, or an equal fallback is completed for a documented school-controlled failure."
+            ],
+            [
+              3,
+              "Exactly 3 checks are met."
+            ],
+            [
+              2,
+              "Exactly 1-2 checks are met."
+            ],
+            [
+              0,
+              "No checks are met and no usable equal fallback is completed."
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

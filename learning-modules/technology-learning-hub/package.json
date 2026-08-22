@@ -1,0 +1,21 @@
+{
+  "name": "technology-learning-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "sync:secondary-catalog": "node scripts/sync-secondary-module-catalog.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@citation-js/core": "^0.8.2",
+    "@citation-js/plugin-csl": "^0.8.2",
+    "harper.js": "^2.4.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.3"
+  }
+}

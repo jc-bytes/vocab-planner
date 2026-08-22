@@ -1,0 +1,59 @@
+{
+  "id": "MOD-SENSOR-SYSTEMS-01",
+  "title": "Sensor Systems, Thresholds, and Testing",
+  "slug": "sensor-systems",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "7",
+    "8"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Identify input, process, and output in a simple system",
+    "Read a sensor value and evaluate a comparison condition"
+  ],
+  "objectives": [
+    "Trace an ultrasonic input through threshold logic, a Bluetooth signal, and a sound output.",
+    "Predict results below, at, and above a threshold.",
+    "Record expected and actual results in a repeatable test table.",
+    "Use test evidence to identify and retest one likely correction."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved system plan, boundary rule, test plan, and fallback description",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 147,
+  "sections": [
+    "START-01",
+    "SYSTEM-LEARN-01",
+    "SYSTEM-PRACTICE-01",
+    "THRESHOLD-LEARN-01",
+    "THRESHOLD-PRACTICE-01",
+    "TESTING-LEARN-01",
+    "TESTING-PRACTICE-01",
+    "SYSTEM-RECORD-01",
+    "REVIEW-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/sensor-systems",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "software": "MakeCode and assigned micro:bit hardware, or the labeled simulator fallback",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Use printed system diagrams, threshold tables, and test records. A labeled paper simulation replaces unavailable hardware."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

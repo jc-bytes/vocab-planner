@@ -1,0 +1,2876 @@
+[
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 1 - Rubric for Summative 1 - Spreadsheet Vocabulary and Examples.docx",
+    "basename": "7th grade - IIIT - Week 1 - Rubric for Summative 1 - Spreadsheet Vocabulary and Examples - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Required terms",
+        "description": "Includes every assigned spreadsheet term.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes every assigned spreadsheet term.",
+          "One term is missing or unclear.",
+          "Several terms are missing or unclear.",
+          "Most terms are missing."
+        ]
+      },
+      {
+        "title": "Definitions",
+        "description": "Definitions are accurate and student-friendly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Definitions are accurate and student-friendly.",
+          "Most definitions are accurate.",
+          "Several definitions need correction.",
+          "Definitions are mostly missing or incorrect."
+        ]
+      },
+      {
+        "title": "Examples",
+        "description": "Every term has a correct spreadsheet example.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every term has a correct spreadsheet example.",
+          "One example needs clarification.",
+          "Several examples are weak or incorrect.",
+          "Examples are mostly missing."
+        ]
+      },
+      {
+        "title": "Organization",
+        "description": "The table is complete, consistent, and easy to read.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "The table is complete, consistent, and easy to read.",
+          "One formatting issue remains.",
+          "Several entries are difficult to check.",
+          "The work is incomplete or unreadable."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 2 - Rubric for Summative 2 - Spreadsheet Formulas and Chart.docx",
+    "basename": "7th grade - IIIT - Week 2 - Rubric for Summative 2 - Spreadsheet Formulas and Chart - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Formulas",
+        "description": "Uses the assigned formulas correctly and shows correct results.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses the assigned formulas correctly and shows correct results.",
+          "One formula or result needs correction.",
+          "Several formulas need support.",
+          "Formulas are missing or do not work."
+        ]
+      },
+      {
+        "title": "Data range",
+        "description": "Uses the complete assigned range with no extra or missing values.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses the complete assigned range with no extra or missing values.",
+          "One range reference needs correction.",
+          "Several values are missing or misplaced.",
+          "No usable range is selected."
+        ]
+      },
+      {
+        "title": "Chart",
+        "description": "Creates the correct chart with an accurate title and labels.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Creates the correct chart with an accurate title and labels.",
+          "Chart works with one minor label or type issue.",
+          "Chart is present but difficult to interpret.",
+          "Chart is missing or unrelated."
+        ]
+      },
+      {
+        "title": "Interpretation",
+        "description": "Writes a specific conclusion supported by the formula results and chart.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Writes a specific conclusion supported by the formula results and chart.",
+          "Conclusion is supported but needs one detail.",
+          "Conclusion is vague or partly supported.",
+          "Conclusion is missing or unsupported."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 6 - Rubric for Summative 3 - Scratch Subroutine and Loop.docx",
+    "basename": "7th grade - IIIT - Week 6 - Rubric for Summative 3 - Scratch Subroutine and Loop - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Decomposition",
+        "description": "Breaks the task into clear parts with a useful plan.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Breaks the task into clear parts with a useful plan.",
+          "Plan is usable with one unclear part.",
+          "Plan is incomplete or needs repeated support.",
+          "No usable plan is provided."
+        ]
+      },
+      {
+        "title": "Custom block",
+        "description": "Creates and calls a custom block that performs the intended task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Creates and calls a custom block that performs the intended task.",
+          "Custom block works with one minor issue.",
+          "Custom block is incomplete or called incorrectly.",
+          "No usable custom block is present."
+        ]
+      },
+      {
+        "title": "Loop",
+        "description": "Uses a loop correctly to reduce repeated blocks.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses a loop correctly to reduce repeated blocks.",
+          "Loop mostly works with one correction.",
+          "Loop is present but does not control repetition correctly.",
+          "Loop is missing."
+        ]
+      },
+      {
+        "title": "Testing record",
+        "description": "Records at least 3 tests, results, and one improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least 3 tests, results, and one improvement.",
+          "Records 2 complete tests and an improvement.",
+          "Testing record is incomplete or vague.",
+          "No checkable testing record is provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 7 - Rubric for Summative 4 - Source Credibility and Image Credit.docx",
+    "basename": "7th grade - IIIT - Week 7 - Rubric for Summative 4 - Source Credibility and Image Credit - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Source checks",
+        "description": "Checks author or organization, date, evidence, and purpose for each source.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Checks author or organization, date, evidence, and purpose for each source.",
+          "One check is incomplete.",
+          "Several checks are vague or missing.",
+          "Sources are accepted without checks."
+        ]
+      },
+      {
+        "title": "Credibility decisions",
+        "description": "Makes accurate decisions and explains each with source evidence.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Makes accurate decisions and explains each with source evidence.",
+          "Most decisions are accurate; one explanation needs detail.",
+          "Several decisions lack evidence.",
+          "Decisions are missing or unsupported."
+        ]
+      },
+      {
+        "title": "Image credit",
+        "description": "Creates a complete credit with creator, title, source, and license when available.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Creates a complete credit with creator, title, source, and license when available.",
+          "Credit is usable with one missing element.",
+          "Several credit elements are missing.",
+          "Credit is missing or unusable."
+        ]
+      },
+      {
+        "title": "Responsible use",
+        "description": "Uses only approved material and clearly separates fact from opinion.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses only approved material and clearly separates fact from opinion.",
+          "One small responsible-use issue is corrected.",
+          "Needs repeated reminders about use or attribution.",
+          "Uses unapproved material or misrepresents a source."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 9 - Rubric for Summative 5 - Mandrake Detection System Design Plan.docx",
+    "basename": "7th grade - IIIT - Week 9 - Rubric for Summative 5 - Mandrake Detection System Design Plan - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Goal and user",
+        "description": "States a clear user need and a testable system goal.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "States a clear user need and a testable system goal.",
+          "Goal is clear but one detail needs refinement.",
+          "Goal is broad or only partly testable.",
+          "Goal or user need is missing."
+        ]
+      },
+      {
+        "title": "Input-process-output",
+        "description": "Identifies a suitable sensor input, decision process, and warning output.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Identifies a suitable sensor input, decision process, and warning output.",
+          "All three parts are present; one needs detail.",
+          "One part is missing or connections are unclear.",
+          "The system flow is not usable."
+        ]
+      },
+      {
+        "title": "Flowchart and components",
+        "description": "Provides a logical flowchart and complete component list.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Provides a logical flowchart and complete component list.",
+          "Both are present with one minor omission.",
+          "One is incomplete or difficult to follow.",
+          "Flowchart and components are mostly missing."
+        ]
+      },
+      {
+        "title": "Test plan",
+        "description": "Defines at least 3 measurable tests including safe conditions and expected results.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Defines at least 3 measurable tests including safe conditions and expected results.",
+          "Defines 3 tests; one needs a clearer expected result.",
+          "Tests are vague or incomplete.",
+          "No usable test plan is provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/7th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "7th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+          "Is ready with one minor reminder or missing item.",
+          "Needs repeated reminders or is unprepared in one session.",
+          "Is unprepared for most observed work or does not begin."
+        ]
+      },
+      {
+        "title": "Participation and role",
+        "description": "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+          "Completes the role with one incomplete checkpoint or reminder.",
+          "Completes only part of the role and needs frequent support.",
+          "Provides no usable contribution evidence."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "Uses files, materials, class time, and group communication safely and responsibly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses files, materials, class time, and group communication safely and responsibly.",
+          "Works responsibly with one corrected reminder.",
+          "Needs repeated reminders about materials, files, time, or conduct.",
+          "Uses resources unsafely or prevents group progress."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "Records at least 3 dated entries naming the task, result, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least 3 dated entries naming the task, result, and next step.",
+          "Records 2 complete entries and one partial entry.",
+          "Records 1 complete entry or unclear fragments.",
+          "Provides no checkable individual log."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/7th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "7th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the assigned speaking, support, or demonstration role at the expo.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned speaking, support, or demonstration role at the expo.",
+          "Completes the role with one prompt or small missing part.",
+          "Completes only part of the role or needs several prompts.",
+          "Does not complete the role or approved make-up."
+        ]
+      },
+      {
+        "title": "Project explanation",
+        "description": "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+          "Explains 4 of the 5 points clearly.",
+          "Explains 2-3 points or several are unclear.",
+          "Explains 0-1 point or gives no checkable explanation."
+        ]
+      },
+      {
+        "title": "Respect and cleanup",
+        "description": "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+          "Meets all expectations with one corrected reminder.",
+          "Meets only some expectations and needs repeated reminders.",
+          "Does not meet participation or cleanup expectations."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Records one specific result, one challenge, and one improvement from the project experience.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records one specific result, one challenge, and one improvement from the project experience.",
+          "Includes all three parts; one needs more detail.",
+          "Includes one or two clear parts.",
+          "Reflection is missing or unrelated."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/7th grade - IIIT - Final Project Packet and Rubric - Mandrake Detection System.docx",
+    "basename": "7th grade - IIIT - Final Project Packet and Rubric - Mandrake Detection System - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Project purpose",
+        "description": "Purpose and Mandrake behavior are explained clearly.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Purpose and Mandrake behavior are explained clearly.",
+          "Purpose is explained with some detail.",
+          "Purpose is basic or partly unclear.",
+          "Purpose is missing."
+        ]
+      },
+      {
+        "title": "System parts and input/output",
+        "description": "micro:bit, sensor, threshold, signal, and output are connected accurately.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "micro:bit, sensor, threshold, signal, and output are connected accurately.",
+          "Most system parts are explained.",
+          "Some parts are named but not connected.",
+          "System explanation is missing or incorrect."
+        ]
+      },
+      {
+        "title": "Code and logic",
+        "description": "Code plan uses sensor input and threshold logic correctly.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Code plan uses sensor input and threshold logic correctly.",
+          "Code mostly matches the intended behavior.",
+          "Code is incomplete or only partly connected.",
+          "Code evidence is missing."
+        ]
+      },
+      {
+        "title": "Testing and reliability",
+        "description": "Test evidence supports threshold choice and improvement.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Test evidence supports threshold choice and improvement.",
+          "Some test evidence is present.",
+          "Testing is limited or unclear.",
+          "No meaningful test evidence."
+        ]
+      },
+      {
+        "title": "Result and improvement",
+        "description": "Final result is shown with a realistic improvement.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Final result is shown with a realistic improvement.",
+          "Result is shown with a simple improvement.",
+          "Result or improvement is vague.",
+          "Result is not shown."
+        ]
+      },
+      {
+        "title": "Presentation and responsibility",
+        "description": "Clear presentation, reflection, preparation, and safe material use.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clear presentation, reflection, preparation, and safe material use.",
+          "Mostly complete presentation and responsible work.",
+          "Presentation or readiness is incomplete.",
+          "Presentation/submission is missing."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 1 - Rubric for Summative 1 - App Vocabulary and Decomposition.docx",
+    "basename": "8th grade - IIIT - Week 1 - Rubric for Summative 1 - App Vocabulary and Decomposition - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Required terms",
+        "description": "Includes every assigned app-design and decomposition term.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes every assigned app-design and decomposition term.",
+          "One term is missing or unclear.",
+          "Several terms are missing or unclear.",
+          "Most terms are missing."
+        ]
+      },
+      {
+        "title": "Definitions",
+        "description": "Definitions are accurate and student-friendly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Definitions are accurate and student-friendly.",
+          "Most definitions are accurate.",
+          "Several need correction.",
+          "Definitions are mostly missing or incorrect."
+        ]
+      },
+      {
+        "title": "Examples",
+        "description": "Every term has a correct app or algorithm example.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every term has a correct app or algorithm example.",
+          "One example needs clarification.",
+          "Several examples are weak.",
+          "Examples are mostly missing."
+        ]
+      },
+      {
+        "title": "Task breakdown",
+        "description": "Breaks one app goal into clear, ordered subtasks.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Breaks one app goal into clear, ordered subtasks.",
+          "Breakdown is usable with one unclear step.",
+          "Steps are incomplete or poorly ordered.",
+          "No usable breakdown is provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 2 - Rubric for Summative 2 - App Screen and Event Map.docx",
+    "basename": "8th grade - IIIT - Week 2 - Rubric for Summative 2 - App Screen and Event Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Screen map",
+        "description": "Shows every required screen and a clear purpose for each.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Shows every required screen and a clear purpose for each.",
+          "One screen or purpose needs detail.",
+          "Several screens are missing or unclear.",
+          "No usable screen map is provided."
+        ]
+      },
+      {
+        "title": "Navigation",
+        "description": "Connections show how users move between screens without dead ends.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Connections show how users move between screens without dead ends.",
+          "One connection needs correction.",
+          "Several links are missing or confusing.",
+          "Navigation is not usable."
+        ]
+      },
+      {
+        "title": "Events and actions",
+        "description": "Pairs each user event with the correct app action.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Pairs each user event with the correct app action.",
+          "Most pairs are correct; one needs detail.",
+          "Several event-action pairs are incorrect.",
+          "Events and actions are mostly missing."
+        ]
+      },
+      {
+        "title": "Testing scenarios",
+        "description": "Includes at least 3 user tests with expected results.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes at least 3 user tests with expected results.",
+          "Includes 3 tests; one expected result is vague.",
+          "Tests are incomplete or repetitive.",
+          "No usable tests are provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 7 - Rubric for Summative 3 - Python Arithmetic and Output.docx",
+    "basename": "8th grade - IIIT - Week 7 - Rubric for Summative 3 - Python Arithmetic and Output - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Variables and values",
+        "description": "Uses meaningful variable names and correct numeric values.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses meaningful variable names and correct numeric values.",
+          "One name or value needs correction.",
+          "Several variables are unclear or incorrect.",
+          "Variables are missing or unusable."
+        ]
+      },
+      {
+        "title": "Operations",
+        "description": "Uses the required arithmetic operations correctly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses the required arithmetic operations correctly.",
+          "One operation needs correction.",
+          "Several operations are incorrect.",
+          "No working arithmetic is present."
+        ]
+      },
+      {
+        "title": "Output",
+        "description": "Displays correct, clearly labeled results for every calculation.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Displays correct, clearly labeled results for every calculation.",
+          "Results are correct with one unclear label.",
+          "Several results or labels are incorrect.",
+          "No usable output is produced."
+        ]
+      },
+      {
+        "title": "Testing",
+        "description": "Tests at least 3 inputs and records expected and actual results.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Tests at least 3 inputs and records expected and actual results.",
+          "Tests 2-3 inputs with one missing detail.",
+          "Testing is limited or unclear.",
+          "No checkable tests are provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 8 - Rubric for Summative 4 - Python Debugging.docx",
+    "basename": "8th grade - IIIT - Week 8 - Rubric for Summative 4 - Python Debugging - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Error identification",
+        "description": "Correctly identifies every assigned syntax or logic error.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly identifies every assigned syntax or logic error.",
+          "Identifies most errors; one needs correction.",
+          "Several errors are missed.",
+          "Errors are not identified."
+        ]
+      },
+      {
+        "title": "Corrections",
+        "description": "Produces working corrected code without changing the intended task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Produces working corrected code without changing the intended task.",
+          "Code works after one minor correction.",
+          "Code only partly works or changes the task.",
+          "No working correction is provided."
+        ]
+      },
+      {
+        "title": "Explanation",
+        "description": "Explains what caused each error and why the fix works.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains what caused each error and why the fix works.",
+          "Most explanations are accurate.",
+          "Several explanations are vague or incorrect.",
+          "Explanations are missing."
+        ]
+      },
+      {
+        "title": "Test log",
+        "description": "Records inputs, expected output, actual output, and final status for at least 3 tests.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records inputs, expected output, actual output, and final status for at least 3 tests.",
+          "Records 3 tests with one missing field.",
+          "Records fewer than 3 usable tests.",
+          "No test log is provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 9 - Rubric for Summative 5 - Digital Representation and Binary.docx",
+    "basename": "8th grade - IIIT - Week 9 - Rubric for Summative 5 - Digital Representation and Binary - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Binary conversion",
+        "description": "Correctly converts every assigned value between binary and decimal.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly converts every assigned value between binary and decimal.",
+          "One conversion error remains.",
+          "Several conversions need correction.",
+          "Conversions are mostly missing or incorrect."
+        ]
+      },
+      {
+        "title": "Image representation",
+        "description": "Accurately explains pixels, resolution, and color depth with an example.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Accurately explains pixels, resolution, and color depth with an example.",
+          "Explanation is accurate with one missing detail.",
+          "Several ideas are confused.",
+          "Explanation is missing or incorrect."
+        ]
+      },
+      {
+        "title": "Sound representation",
+        "description": "Accurately explains samples, sample rate, and bit depth with an example.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Accurately explains samples, sample rate, and bit depth with an example.",
+          "Explanation is accurate with one missing detail.",
+          "Several ideas are confused.",
+          "Explanation is missing or incorrect."
+        ]
+      },
+      {
+        "title": "File-size reasoning",
+        "description": "Compares two representations and correctly predicts the larger file with evidence.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Compares two representations and correctly predicts the larger file with evidence.",
+          "Prediction is correct but evidence needs detail.",
+          "Reasoning is only partly supported.",
+          "Prediction or evidence is missing."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/8th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "8th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+          "Is ready with one minor reminder or missing item.",
+          "Needs repeated reminders or is unprepared in one session.",
+          "Is unprepared for most observed work or does not begin."
+        ]
+      },
+      {
+        "title": "Participation and role",
+        "description": "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+          "Completes the role with one incomplete checkpoint or reminder.",
+          "Completes only part of the role and needs frequent support.",
+          "Provides no usable contribution evidence."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "Uses files, materials, class time, and group communication safely and responsibly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses files, materials, class time, and group communication safely and responsibly.",
+          "Works responsibly with one corrected reminder.",
+          "Needs repeated reminders about materials, files, time, or conduct.",
+          "Uses resources unsafely or prevents group progress."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "Records at least 3 dated entries naming the task, result, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least 3 dated entries naming the task, result, and next step.",
+          "Records 2 complete entries and one partial entry.",
+          "Records 1 complete entry or unclear fragments.",
+          "Provides no checkable individual log."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/8th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "8th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the assigned speaking, support, or demonstration role at the expo.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned speaking, support, or demonstration role at the expo.",
+          "Completes the role with one prompt or small missing part.",
+          "Completes only part of the role or needs several prompts.",
+          "Does not complete the role or approved make-up."
+        ]
+      },
+      {
+        "title": "Project explanation",
+        "description": "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+          "Explains 4 of the 5 points clearly.",
+          "Explains 2-3 points or several are unclear.",
+          "Explains 0-1 point or gives no checkable explanation."
+        ]
+      },
+      {
+        "title": "Respect and cleanup",
+        "description": "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+          "Meets all expectations with one corrected reminder.",
+          "Meets only some expectations and needs repeated reminders.",
+          "Does not meet participation or cleanup expectations."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Records one specific result, one challenge, and one improvement from the project experience.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records one specific result, one challenge, and one improvement from the project experience.",
+          "Includes all three parts; one needs more detail.",
+          "Includes one or two clear parts.",
+          "Reflection is missing or unrelated."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/8th grade - IIIT - Final Project Packet and Rubric - Scratch + micro:bit Game.docx",
+    "basename": "8th grade - IIIT - Final Project Packet and Rubric - Scratch + micro:bit Game - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Game design",
+        "description": "Goal, controls, scoring/win condition, sprites, and challenge are clear.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Goal, controls, scoring/win condition, sprites, and challenge are clear.",
+          "Most design requirements are present.",
+          "Design is partial or unclear.",
+          "Design evidence is missing."
+        ]
+      },
+      {
+        "title": "micro:bit input",
+        "description": "micro:bit or simulator input controls the game clearly.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "micro:bit or simulator input controls the game clearly.",
+          "Input works with minor issues.",
+          "Input is attempted but unreliable.",
+          "Input evidence is missing."
+        ]
+      },
+      {
+        "title": "Scratch code and game logic",
+        "description": "Events, movement, loop, condition, and feedback work together.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Events, movement, loop, condition, and feedback work together.",
+          "Most code logic works.",
+          "Some code works but game logic is limited.",
+          "Game cannot be checked."
+        ]
+      },
+      {
+        "title": "Testing and debugging",
+        "description": "Peer test notes and fixes clearly improve the game.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Peer test notes and fixes clearly improve the game.",
+          "Some testing and at least one fix are shown.",
+          "Testing is limited or unclear.",
+          "No meaningful testing evidence."
+        ]
+      },
+      {
+        "title": "Documentation and reflection",
+        "description": "Saved-file evidence, notes, and reflection explain choices and improvement.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Saved-file evidence, notes, and reflection explain choices and improvement.",
+          "Most documentation is present.",
+          "Documentation has gaps.",
+          "Documentation is mostly missing."
+        ]
+      },
+      {
+        "title": "Presentation and responsibility",
+        "description": "Clear demo, explanation, timely submission, and respectful audience behavior.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clear demo, explanation, timely submission, and respectful audience behavior.",
+          "Mostly complete presentation and submission.",
+          "Presentation is incomplete.",
+          "Presentation/submission is missing."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary.docx",
+    "basename": "9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Required terms",
+        "description": "Includes every assigned media-representation term.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes every assigned media-representation term.",
+          "One term is missing or unclear.",
+          "Several terms are missing or unclear.",
+          "Most terms are missing."
+        ]
+      },
+      {
+        "title": "Definitions",
+        "description": "Definitions are accurate and student-friendly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Definitions are accurate and student-friendly.",
+          "Most definitions are accurate.",
+          "Several need correction.",
+          "Definitions are mostly missing or incorrect."
+        ]
+      },
+      {
+        "title": "Examples",
+        "description": "Every term has a correct image, sound, or file example.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every term has a correct image, sound, or file example.",
+          "One example needs clarification.",
+          "Several examples are weak.",
+          "Examples are mostly missing."
+        ]
+      },
+      {
+        "title": "Connections",
+        "description": "Clearly connects quality settings to storage or transmission cost.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clearly connects quality settings to storage or transmission cost.",
+          "Connection is accurate but needs one detail.",
+          "Connection is vague or partly incorrect.",
+          "No usable connection is explained."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check.docx",
+    "basename": "9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Image concepts",
+        "description": "Correctly applies pixel, resolution, color depth, and compression concepts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly applies pixel, resolution, color depth, and compression concepts.",
+          "One image concept needs correction.",
+          "Several concepts are confused.",
+          "Image concepts are mostly incorrect."
+        ]
+      },
+      {
+        "title": "Sound concepts",
+        "description": "Correctly applies sample, sample rate, sample size, microphone, and speaker concepts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly applies sample, sample rate, sample size, microphone, and speaker concepts.",
+          "One sound concept needs correction.",
+          "Several concepts are confused.",
+          "Sound concepts are mostly incorrect."
+        ]
+      },
+      {
+        "title": "Quality and file size",
+        "description": "Correctly predicts how settings affect quality and file size.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly predicts how settings affect quality and file size.",
+          "One prediction needs correction.",
+          "Several predictions lack evidence.",
+          "Predictions are missing or incorrect."
+        ]
+      },
+      {
+        "title": "Justification",
+        "description": "Uses technical evidence to justify every extended response.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses technical evidence to justify every extended response.",
+          "Most responses are justified.",
+          "Justifications are vague or incomplete.",
+          "Justifications are missing."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis.docx",
+    "basename": "9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Threat identification",
+        "description": "Correctly identifies the threat in every assigned scenario.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly identifies the threat in every assigned scenario.",
+          "One identification needs correction.",
+          "Several threats are misidentified.",
+          "Threats are mostly not identified."
+        ]
+      },
+      {
+        "title": "Protection choice",
+        "description": "Chooses a practical protection matched to each threat.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Chooses a practical protection matched to each threat.",
+          "Most protections fit; one needs refinement.",
+          "Several protections are weak or mismatched.",
+          "Protections are missing or unsafe."
+        ]
+      },
+      {
+        "title": "Justification",
+        "description": "Explains why each selected protection reduces the stated risk.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains why each selected protection reduces the stated risk.",
+          "Most explanations are accurate.",
+          "Several explanations are vague.",
+          "Explanations are missing."
+        ]
+      },
+      {
+        "title": "Responsible response",
+        "description": "Includes safe reporting, privacy, and account actions without blaming the user.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes safe reporting, privacy, and account actions without blaming the user.",
+          "Response is responsible with one missing action.",
+          "Several actions are incomplete.",
+          "Response recommends unsafe or irresponsible action."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map.docx",
+    "basename": "9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Six risks",
+        "description": "Identifies 6 realistic risks for the assigned system or context.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Identifies 6 realistic risks for the assigned system or context.",
+          "Identifies 5-6 risks; one is vague.",
+          "Identifies 3-4 usable risks.",
+          "Fewer than 3 usable risks are included."
+        ]
+      },
+      {
+        "title": "Probability and impact",
+        "description": "Rates probability and impact consistently with clear reasons.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Rates probability and impact consistently with clear reasons.",
+          "Most ratings are consistent; one needs correction.",
+          "Several ratings lack reasons.",
+          "Ratings are mostly missing or arbitrary."
+        ]
+      },
+      {
+        "title": "Protection strategies",
+        "description": "Matches a feasible protection to every risk.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Matches a feasible protection to every risk.",
+          "One protection needs refinement.",
+          "Several protections are weak or missing.",
+          "Protections are mostly absent or unsafe."
+        ]
+      },
+      {
+        "title": "Priority recommendation",
+        "description": "Chooses the highest-priority risk and justifies the choice with probability and impact.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Chooses the highest-priority risk and justifies the choice with probability and impact.",
+          "Recommendation is supported but needs one detail.",
+          "Priority is named with weak support.",
+          "Recommendation is missing or unsupported."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal.docx",
+    "basename": "9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Problem, users, and goal",
+        "description": "Defines a specific problem, intended users, and a testable goal.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Defines a specific problem, intended users, and a testable goal.",
+          "All three are present; one needs detail.",
+          "One is missing or too broad.",
+          "The proposal lacks a usable problem and goal."
+        ]
+      },
+      {
+        "title": "Design and resources",
+        "description": "Includes a clear concept, suitable tools, materials, and realistic scope.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes a clear concept, suitable tools, materials, and realistic scope.",
+          "Plan is realistic with one missing detail.",
+          "Several resources or design decisions are unclear.",
+          "Design is not feasible or is missing."
+        ]
+      },
+      {
+        "title": "Test criteria",
+        "description": "Defines at least 3 measurable success criteria tied to the goal.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Defines at least 3 measurable success criteria tied to the goal.",
+          "Defines 3 criteria; one needs clearer measurement.",
+          "Criteria are vague or incomplete.",
+          "No usable test criteria are provided."
+        ]
+      },
+      {
+        "title": "Evidence plan",
+        "description": "Explains how saved files, project logs, and typed test records will show progress and results.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains how saved files, project logs, and typed test records will show progress and results.",
+          "Evidence plan is usable with one missing element.",
+          "Evidence is vague or difficult to verify.",
+          "No checkable evidence plan is provided."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Is ready in both STEAM work weeks, knows the assigned project and role, and begins promptly.",
+          "Is ready with one minor reminder or missing item.",
+          "Needs repeated reminders or is unprepared in one session.",
+          "Is unprepared for most observed work or does not begin."
+        ]
+      },
+      {
+        "title": "Participation and role",
+        "description": "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role and contributes useful work at every checkpoint, regardless of project subject.",
+          "Completes the role with one incomplete checkpoint or reminder.",
+          "Completes only part of the role and needs frequent support.",
+          "Provides no usable contribution evidence."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "Uses files, materials, class time, and group communication safely and responsibly.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses files, materials, class time, and group communication safely and responsibly.",
+          "Works responsibly with one corrected reminder.",
+          "Needs repeated reminders about materials, files, time, or conduct.",
+          "Uses resources unsafely or prevents group progress."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "Records at least 3 dated entries naming the task, result, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least 3 dated entries naming the task, result, and next step.",
+          "Records 2 complete entries and one partial entry.",
+          "Records 1 complete entry or unclear fragments.",
+          "Provides no checkable individual log."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the assigned speaking, support, or demonstration role at the expo.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned speaking, support, or demonstration role at the expo.",
+          "Completes the role with one prompt or small missing part.",
+          "Completes only part of the role or needs several prompts.",
+          "Does not complete the role or approved make-up."
+        ]
+      },
+      {
+        "title": "Project explanation",
+        "description": "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Explains the problem, product, process, test result, and improvement, even when the project belongs to another subject.",
+          "Explains 4 of the 5 points clearly.",
+          "Explains 2-3 points or several are unclear.",
+          "Explains 0-1 point or gives no checkable explanation."
+        ]
+      },
+      {
+        "title": "Respect and cleanup",
+        "description": "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Listens respectfully, follows expo directions, and completes the assigned cleanup task.",
+          "Meets all expectations with one corrected reminder.",
+          "Meets only some expectations and needs repeated reminders.",
+          "Does not meet participation or cleanup expectations."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Records one specific result, one challenge, and one improvement from the project experience.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records one specific result, one challenge, and one improvement from the project experience.",
+          "Includes all three parts; one needs more detail.",
+          "Includes one or two clear parts.",
+          "Reflection is missing or unrelated."
+        ]
+      },
+      {
+        "title": "Punctuality, readiness, and respect",
+        "description": "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Submits the required file or record on time, arrives with the assigned computer and login, and works respectfully.",
+          "Submits on time with one minor readiness or respect reminder.",
+          "Submits usable evidence, but lateness or repeated reminders affect the work.",
+          "Does not submit usable evidence, is not ready to work, or does not follow respectful-work expectations."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/9th grade - IIIT - Final Project Packet and Rubric - STEM Project.docx",
+    "basename": "9th grade - IIIT - Final Project Packet and Rubric - STEM Project - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Problem and design",
+        "description": "Problem, users, goal, tools, sketch/model, materials, and test criteria are clear.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Problem, users, goal, tools, sketch/model, materials, and test criteria are clear.",
+          "Most design elements are clear.",
+          "Design is partial or broad.",
+          "Design evidence is missing."
+        ]
+      },
+      {
+        "title": "Prototype or product",
+        "description": "Prototype/product addresses the problem and shows the planned feature clearly.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Prototype/product addresses the problem and shows the planned feature clearly.",
+          "Prototype/product mostly works.",
+          "Prototype/product is partial.",
+          "Prototype/product cannot be checked."
+        ]
+      },
+      {
+        "title": "Testing evidence",
+        "description": "At least three trials or clear evidence compare results to criteria.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "At least three trials or clear evidence compare results to criteria.",
+          "Some testing evidence is present.",
+          "Testing is limited or unclear.",
+          "No meaningful testing evidence."
+        ]
+      },
+      {
+        "title": "Improvement and iteration",
+        "description": "Improvement responds to evidence and is explained clearly.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Improvement responds to evidence and is explained clearly.",
+          "Improvement is present with some explanation.",
+          "Improvement is vague or not evidence-based.",
+          "No improvement evidence."
+        ]
+      },
+      {
+        "title": "Logbook and reflection",
+        "description": "Logbook, saved project files and typed test records, notes, and reflection are complete.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Logbook, saved project files and typed test records, notes, and reflection are complete.",
+          "Most documentation is present.",
+          "Documentation has gaps.",
+          "Documentation is mostly missing."
+        ]
+      },
+      {
+        "title": "Presentation and responsibility",
+        "description": "Clear demo, explanation, safe material use, and timely submission.",
+        "points": [
+          15,
+          11,
+          7,
+          0
+        ],
+        "levels": [
+          "Exceeds expectations",
+          "Meets expectations",
+          "Approaching expectations",
+          "Not yet demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clear demo, explanation, safe material use, and timely submission.",
+          "Mostly complete presentation and responsible work.",
+          "Presentation or responsibility evidence is incomplete.",
+          "Presentation/submission is missing."
+        ]
+      }
+    ]
+  }
+]

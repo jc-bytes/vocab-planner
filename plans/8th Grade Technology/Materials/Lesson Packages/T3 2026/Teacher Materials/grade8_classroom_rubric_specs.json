@@ -1,0 +1,966 @@
+[
+  {
+    "basename": "8th grade - IIIT - 2026-09-24 - Daily Grade 1 - Club Signup App Screen and Event Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Screens and elements",
+        "description": "Use of the three supplied screens and five supplied elements.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 screens and all 5 elements are correctly placed.",
+          "All screens and 4 elements are correctly placed.",
+          "2 screens or 2\u20133 elements are usable.",
+          "Fewer than 2 screens or 2 elements are usable."
+        ]
+      },
+      {
+        "title": "Events and navigation",
+        "description": "Four event-to-action pairs and directional connections.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "4 correct pairs and all navigation arrows are usable.",
+          "3 correct pairs and most arrows are usable.",
+          "2 correct pairs or unclear arrows.",
+          "0\u20131 correct pair."
+        ]
+      },
+      {
+        "title": "Stored data",
+        "description": "Use of the supplied selected_club value.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Value is captured, stored, and used in confirmation.",
+          "Value is captured and stored but its final use is partly unclear.",
+          "Value is named but flow is incomplete.",
+          "Value is absent or unrelated."
+        ]
+      },
+      {
+        "title": "Fixed tests",
+        "description": "Expected results for the three supplied test inputs.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 expected results are complete and consistent with the map.",
+          "2 are complete and consistent.",
+          "1 is complete and consistent.",
+          "No consistent test result."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-11-12 - Daily Grade 2 - Python Debugging Find and Fix Five Errors - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Error identification",
+        "description": "Identification of the five supplied practiced errors E1\u2013E5.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 causes are identified accurately.",
+          "4 causes are accurate.",
+          "2\u20133 causes are accurate.",
+          "0\u20131 cause is accurate."
+        ]
+      },
+      {
+        "title": "Corrections",
+        "description": "Exact corrected lines for E1\u2013E5.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 corrections are accurate.",
+          "4 are accurate.",
+          "2\u20133 are accurate.",
+          "0\u20131 is accurate."
+        ]
+      },
+      {
+        "title": "Explanations",
+        "description": "Why each correction fixes the named problem.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 explanations connect cause to correction.",
+          "4 do.",
+          "2\u20133 do.",
+          "0\u20131 does."
+        ]
+      },
+      {
+        "title": "Fixed tests",
+        "description": "Runs for 6/3, 4/0, and 5/2 with required status behavior.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 tests are recorded and correct.",
+          "2 are recorded and correct.",
+          "1 is recorded and correct.",
+          "No correct recorded test."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-10-22 - Daily Grade 3 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the individual speaking, demonstration, setup, or support role.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Role is complete and independent.",
+          "Role is complete with one prompt.",
+          "Role is partly complete.",
+          "No demonstrated role."
+        ]
+      },
+      {
+        "title": "Five-point explanation",
+        "description": "Explains problem, goal, own contribution, one test result, and one improvement.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 points are accurate.",
+          "4 are accurate.",
+          "2\u20133 are usable.",
+          "0\u20131 is usable."
+        ]
+      },
+      {
+        "title": "Evidence response",
+        "description": "Answers one teacher question using the shared product or log.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Answer cites specific evidence.",
+          "Answer is accurate but general.",
+          "Answer is partly accurate.",
+          "No usable answer."
+        ]
+      },
+      {
+        "title": "Closure and reflection",
+        "description": "Completes cleanup/file return and the fixed individual reflection.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both are complete and specific.",
+          "Both are complete; one detail is general.",
+          "Only one is usable.",
+          "Neither is usable."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-10-15 - Daily Grade 4 - STEAM Project Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Role and first task",
+        "description": "Assigned project subject, role, first task, and success rule in the shared log.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 fields are accurate and specific.",
+          "3 fields are accurate.",
+          "1\u20132 fields are usable.",
+          "No usable individual role record."
+        ]
+      },
+      {
+        "title": "Dated individual contribution",
+        "description": "One preparation contribution names action, result, and next step.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 parts are specific and teacher-observed.",
+          "All parts are present; one is general.",
+          "Only 1\u20132 parts are usable.",
+          "No usable contribution evidence."
+        ]
+      },
+      {
+        "title": "Test and improvement",
+        "description": "One test row records condition, expected result, actual result, and next improvement.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 fields are accurate and connected.",
+          "3 fields are accurate.",
+          "1\u20132 fields are usable.",
+          "No usable test evidence."
+        ]
+      },
+      {
+        "title": "Safe file and material routine",
+        "description": "Observable responsible handling, file organization, and respectful collaboration.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 routines are independent.",
+          "All are shown with one reminder.",
+          "Repeated reminders are needed.",
+          "No safe/responsible routine is demonstrated."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-11-19 - Daily Grade 5 - Binary Numbers and Digital Representation - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Vocabulary",
+        "description": "Matching of six supplied representation terms.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 matches are accurate.",
+          "5 are accurate.",
+          "3\u20134 are accurate.",
+          "0\u20132 are accurate."
+        ]
+      },
+      {
+        "title": "Decimal to binary",
+        "description": "Four-bit conversions for 2, 6, and 10.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 conversions and place values are correct.",
+          "2 are correct.",
+          "1 is correct.",
+          "No correct conversion."
+        ]
+      },
+      {
+        "title": "Binary to decimal",
+        "description": "Conversions for 0100, 1011, and 1111.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 conversions and place values are correct.",
+          "2 are correct.",
+          "1 is correct.",
+          "No correct conversion."
+        ]
+      },
+      {
+        "title": "Representation explanations",
+        "description": "Two fixed explanations about shared rules and leading zeros.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both explanations are accurate and use the supplied examples.",
+          "Both are mostly accurate; one detail is unclear.",
+          "One explanation is accurate.",
+          "Neither explanation is accurate."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-09-28 and 2026-09-30 - Appreciation Grade 1 - App Development Work Habits and File Responsibility - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Task order",
+        "description": "Uses the supplied app-development steps in order.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All steps are completed in order without prompting.",
+          "All steps are completed with one prompt.",
+          "Some steps are skipped or need repeated prompts.",
+          "No usable task sequence is shown."
+        ]
+      },
+      {
+        "title": "Independent correction or help request",
+        "description": "Records one specific correction or clear help request.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Record names the issue, action, and result.",
+          "Record names the issue and action.",
+          "Record is vague or incomplete.",
+          "No usable record."
+        ]
+      },
+      {
+        "title": "File organization",
+        "description": "Opens, names, saves, and locates the correct app file.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All four actions are correct and independent.",
+          "Three actions are correct.",
+          "One or two actions are correct.",
+          "No checkable app file or equal fallback."
+        ]
+      },
+      {
+        "title": "Assigned app edit",
+        "description": "Completes the supplied screen or event edit.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Edit is complete, accurate, and checkable.",
+          "Edit works with one minor issue.",
+          "Edit is partly complete.",
+          "No usable edit."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-10-01 - Appreciation Grade 2 - App Testing Revision and Reflection - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Three fixed tests",
+        "description": "Expected, actual, and pass/fail results for all three supplied cases.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 records are complete and accurate.",
+          "2 are complete and accurate.",
+          "1 is complete and accurate.",
+          "No accurate complete test."
+        ]
+      },
+      {
+        "title": "Evidence-based revision",
+        "description": "One screen, event, label, or arrow is revised from a test result.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Revision is specific and directly fixes the evidence.",
+          "Revision fits the evidence with one unclear detail.",
+          "Revision is present but weakly connected.",
+          "No usable revision."
+        ]
+      },
+      {
+        "title": "Change explanation",
+        "description": "States exactly what changed and why it improves the app.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both parts are specific and accurate.",
+          "Both are present; one is general.",
+          "Only one part is usable.",
+          "No usable explanation."
+        ]
+      },
+      {
+        "title": "Fixed reflection",
+        "description": "Completes all four supplied reflection sentences.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 are specific and supported by the work.",
+          "3 are complete and specific.",
+          "1\u20132 are usable.",
+          "No usable reflection."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "basename": "8th grade - IIIT - 2026-12-03 - Exam - Catch the Star Scratch + microbit Game - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Supplied game design",
+        "description": "Catch the Star sprites, starts, goal, controls, score, and obstacle.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 8 supplied elements are implemented accurately.",
+          "6\u20137 are accurate.",
+          "3\u20135 are accurate.",
+          "0\u20132 are accurate."
+        ]
+      },
+      {
+        "title": "Input mapping",
+        "description": "A/left and B/right mappings and labeled hardware fallback.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both directions work and mapping is explained accurately.",
+          "Both work; explanation has one gap.",
+          "One direction works or mapping is incomplete.",
+          "No working required input."
+        ]
+      },
+      {
+        "title": "Scratch logic",
+        "description": "Reset, movement, forever loop, conditions, score, and feedback behaviors.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 required behaviors work together.",
+          "4\u20135 work.",
+          "2\u20133 work.",
+          "0\u20131 works."
+        ]
+      },
+      {
+        "title": "Testing and debugging",
+        "description": "Five fixed tests, peer feedback, one correction, and same-condition retest.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 tests plus feedback, correction, and retest are complete.",
+          "4 tests plus correction/retest are complete.",
+          "2\u20133 tests or partial correction evidence.",
+          "0\u20131 test and no usable correction."
+        ]
+      },
+      {
+        "title": "Documentation and reflection",
+        "description": "Build log, speaking notes, and five reflection responses.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All three records are complete and specific.",
+          "All are present; one has gaps.",
+          "Only one or two are usable.",
+          "No usable documentation."
+        ]
+      },
+      {
+        "title": "Live demonstration",
+        "description": "90\u2013120 second demo covers goal, controls, logic, test correction, and future step.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 points are accurate within time and project opens.",
+          "4 points are accurate or time is slightly outside range.",
+          "2\u20133 points are usable.",
+          "0\u20131 point is usable or no demo."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "9 of 90 points: checkpoint readiness, punctual starts, responsible file and material care, milestones, and final handoff. Documented school-controlled failures use the fallback without deduction.",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Exceeds",
+          "Meets",
+          "Developing",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+          "One readiness, punctuality, or milestone issue is corrected after one reminder; final evidence remains checkable.",
+          "Readiness or milestone issues repeat, or one session lacks the device or login; some fallback project work is completed.",
+          "Readiness is not shown across checkpoints and the approved fallback or final evidence is not completed."
+        ]
+      }
+    ]
+  }
+]

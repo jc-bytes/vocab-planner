@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sensor Systems printable fallback</title>
+    <style>
+      body {
+        font:
+          17px/1.5 Arial,
+          sans-serif;
+        max-width: 900px;
+        margin: 32px auto;
+        padding: 0 24px;
+        color: #12394d;
+      }
+      h1,
+      h2 {
+        color: #0f4962;
+      }
+      section {
+        border-top: 2px solid #9bb7c3;
+        padding: 18px 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        border: 1px solid #6f929f;
+        padding: 8px;
+        text-align: left;
+      }
+      .answer {
+        display: inline-block;
+        min-width: 180px;
+        border-bottom: 1px solid #234;
+        margin: 0 4px;
+      }
+      @media print {
+        body {
+          margin: 0;
+          max-width: none;
+        }
+        section {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sensor Systems, Thresholds, and Testing</h1>
+    <p><strong>MOD-SENSOR-SYSTEMS-01 v0.1.0 · Printable fallback</strong></p>
+    <h2>Student record</h2>
+    <p>
+      Name: <span class="answer"></span> Class:
+      <span class="answer"></span> Date: <span class="answer"></span>
+    </p>
+    <section>
+      <h2>System model</h2>
+      <p>
+        Ultrasonic distance input → threshold process → Bluetooth signal → sound
+        output
+      </p>
+    </section>
+    <section>
+      <h2>System practice, five activities</h2>
+      <ol>
+        <li>Name the part that provides distance.</li>
+        <li>Name the step that decides whether the Mandrake was removed.</li>
+        <li>Name the part that carries the alert.</li>
+        <li>Name the output that warns the user.</li>
+        <li>
+          The sensor works but no alert is sent. State what to check next.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>Threshold practice, five activities</h2>
+      <p>Rule: if distance &gt; 18 cm, send ALERT.</p>
+      <ol>
+        <li>Predict 12 cm. <span class="answer"></span></li>
+        <li>Predict 18 cm. <span class="answer"></span></li>
+        <li>Predict 25 cm. <span class="answer"></span></li>
+        <li>Write values below, at, and above the boundary.</li>
+        <li>
+          The alert happens too late. Describe one controlled change and retest.
+        </li>
+      </ol>
+    </section>
+    <section>
+      <h2>Testing practice, five activities</h2>
+      <table>
+        <tr>
+          <th>Distance</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Pass?</th>
+        </tr>
+        <tr>
+          <td>17</td>
+          <td>No alert</td>
+          <td>No alert</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>18</td>
+          <td>No alert</td>
+          <td>Alert</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>19</td>
+          <td>Alert</td>
+          <td>Alert</td>
+          <td>Yes</td>
+        </tr>
+      </table>
+      <ol>
+        <li>Name the failed trial.</li>
+        <li>State the likely operator error.</li>
+        <li>Explain how to check whether the correction is reliable.</li>
+        <li>Write a useful improvement note.</li>
+        <li>Explain how a simulator preserves the same test.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>Application record</h2>
+      <p>
+        Purpose:
+        _________________________________________________________________
+      </p>
+      <p>
+        Input, process, signal, output:
+        ____________________________________________
+      </p>
+      <p>
+        Threshold condition and boundary result:
+        __________________________________
+      </p>
+      <table>
+        <tr>
+          <th>Distance</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Pass?</th>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+      <p>
+        One change and retest:
+        ___________________________________________________
+      </p>
+    </section>
+    <section>
+      <h2>Submission check</h2>
+      <p>
+        Submit these pages as the labeled simulation record. If hardware or
+        MakeCode becomes available, also submit the saved project or share link.
+        Include the typed test table with the saved project evidence.
+      </p>
+    </section>
+  </body>
+</html>

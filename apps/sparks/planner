@@ -1,0 +1,344 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
+
+DEFAULT_PORT="${PLANNER_PORT:-8000}"
+DEFAULT_HOST="${PLANNER_HOST:-127.0.0.1}"
+SCHOOL_DRIVE_DIR="${PLANNER_SCHOOL_DRIVE_DIR:-/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026}"
+REMOTE_SUPABASE_PROJECT_REF="${REMOTE_SUPABASE_PROJECT_REF:-ifofhiypzffruzhiukst}"
+REMOTE_SUPABASE_URL="${REMOTE_SUPABASE_URL:-https://ifofhiypzffruzhiukst.supabase.co}"
+
+has_supabase_placeholder() {
+  local value="$1"
+  [[ "$value" == *YOUR_PROJECT_REF* || "$value" == *YOUR_SUPABASE* || "$value" == *your_key_here* ]]
+}
+
+has_vite_supabase_config() {
+  local url="${VITE_SUPABASE_URL:-}"
+  local key="${VITE_SUPABASE_PUBLISHABLE_KEY:-${VITE_SUPABASE_ANON_KEY:-}}"
+  [[ -n "$url" && -n "$key" ]] || return 1
+  ! has_supabase_placeholder "$url" && ! has_supabase_placeholder "$key"
+}
+
+env_file_has_vite_supabase_config() {
+  local file="$1"
+  [[ -f "$file" ]] || return 1
+  local url_line key_line
+  url_line="$(grep -E '^VITE_SUPABASE_URL=' "$file" | tail -n 1 || true)"
+  key_line="$(grep -E '^(VITE_SUPABASE_PUBLISHABLE_KEY|VITE_SUPABASE_ANON_KEY)=' "$file" | tail -n 1 || true)"
+  [[ -n "$url_line" && -n "$key_line" ]] || return 1
+  ! has_supabase_placeholder "$url_line" && ! has_supabase_placeholder "$key_line"
+}
+
+load_remote_supabase_config_from_cli() {
+  command -v supabase >/dev/null 2>&1 || return 1
+  command -v node >/dev/null 2>&1 || return 1
+
+  local key
+  key="$(
+    supabase projects api-keys --project-ref "$REMOTE_SUPABASE_PROJECT_REF" --output json 2>/dev/null \
+      | node -e '
+const fs = require("fs");
+const input = fs.readFileSync(0, "utf8");
+const data = JSON.parse(input);
+const rows = Array.isArray(data)
+  ? data
+  : Array.isArray(data.api_keys)
+    ? data.api_keys
+    : Object.values(data).find(Array.isArray) || [];
+const publishable = rows.find(row =>
+  row
+  && row.type === "publishable"
+  && typeof row.api_key === "string"
+  && row.api_key.startsWith("sb_publishable_")
+);
+const anon = rows.find(row =>
+  row
+  && row.name === "anon"
+  && row.type === "legacy"
+  && typeof row.api_key === "string"
+);
+const selected = publishable || anon;
+if (!selected) process.exit(1);
+process.stdout.write(selected.api_key);
+'
+  )" || return 1
+
+  [[ -n "$key" ]] || return 1
+  has_supabase_placeholder "$key" && return 1
+  export VITE_SUPABASE_URL="$REMOTE_SUPABASE_URL"
+  export VITE_SUPABASE_PUBLISHABLE_KEY="$key"
+  export ALLOW_PRODUCTION_SUPABASE_IN_DEV="${ALLOW_PRODUCTION_SUPABASE_IN_DEV:-1}"
+  echo "Loaded remote Supabase browser config from the linked CLI project."
+}
+
+ensure_supabase_config_for_vite() {
+  if has_vite_supabase_config \
+    || env_file_has_vite_supabase_config ".env.local" \
+    || env_file_has_vite_supabase_config ".env"; then
+    return
+  fi
+
+  load_remote_supabase_config_from_cli && return
+  warn_if_supabase_config_missing
+}
+
+warn_if_supabase_config_missing() {
+  cat <<'EOF'
+
+Supabase browser config is missing.
+The app will open, but login will show "Supabase is not configured."
+
+Create .env.local from .env.example and add your Supabase publishable key:
+  cp .env.example .env.local
+  open .env.local
+
+Never use a service_role or secret key in Vite/browser env vars.
+
+EOF
+}
+
+default_port_for_target() {
+  case "${1:-}" in
+    teacher) echo "${PLANNER_TEACHER_PORT:-8001}" ;;
+    *) echo "$DEFAULT_PORT" ;;
+  esac
+}
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./planner run student [--port 8000]
+  ./planner run teacher [--port 8001]
+  ./planner run home [--port 8000]
+  ./planner build student|teacher|all
+  ./planner preview student|teacher|all [--port 4173]
+  ./planner deploy student|teacher|all
+  ./planner sync all|5|6|7|8|9 [--apply] [--kinds monthly|annual|all]
+
+Deploy behavior:
+  By default, deploy builds dist-desktop and prints the target files.
+  Set PLANNER_DEPLOY_CMD to run a real deploy command after a successful build.
+
+Sync behavior:
+  By default, sync is a dry run and only shows what would be copied.
+  Add --apply to copy changed Word files to the official Google Drive folder.
+
+Examples:
+  ./planner run student
+  ./planner build teacher
+  ./planner sync all
+  ./planner sync 5
+  ./planner sync 6 --apply
+  PLANNER_DEPLOY_CMD="npx netlify deploy --dir dist-desktop" ./planner deploy all
+USAGE
+}
+
+die() {
+  echo "planner: $*" >&2
+  exit 1
+}
+
+page_for_target() {
+  case "${1:-}" in
+    student) echo "student.html" ;;
+    teacher) echo "teacher.html" ;;
+    home|index|all) echo "index.html" ;;
+    *) die "unknown target '${1:-}'. Use student, teacher, home, or all." ;;
+  esac
+}
+
+parse_port() {
+  local port="$1"
+  shift || true
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --port)
+        [[ $# -ge 2 ]] || die "--port needs a value"
+        port="$2"
+        shift 2
+        ;;
+      *)
+        die "unknown option '$1'"
+        ;;
+    esac
+  done
+  echo "$port"
+}
+
+open_url() {
+  [[ "${PLANNER_NO_OPEN:-0}" == "1" ]] && return
+  local url="$1"
+  if command -v open >/dev/null 2>&1; then
+    (sleep 1 && open "$url" >/dev/null 2>&1) &
+  fi
+}
+
+vite_bin() {
+  if [[ -x "./node_modules/.bin/vite" ]]; then
+    echo "./node_modules/.bin/vite"
+    return
+  fi
+
+  if command -v vite >/dev/null 2>&1; then
+    command -v vite
+    return
+  fi
+
+  die "Vite is not installed. Run npm install, then try again."
+}
+
+run_vite() {
+  "$(vite_bin)" "$@"
+}
+
+run_target() {
+  local target="${1:-student}"
+  shift || true
+  local port
+  port="$(parse_port "$(default_port_for_target "$target")" "$@")"
+  local page
+  page="$(page_for_target "$target")"
+  local url="http://${DEFAULT_HOST}:${port}/${page}"
+
+  echo "Starting ${target} with Vite at ${url}"
+  ensure_supabase_config_for_vite
+  open_url "$url"
+  run_vite --host "$DEFAULT_HOST" --port "$port"
+}
+
+build_target() {
+  local target="${1:-all}"
+  page_for_target "$target" >/dev/null
+  echo "Building ${target} via Vite multi-page build..."
+  ensure_supabase_config_for_vite
+  npm run desktop:build:web
+  echo "Build complete: dist-desktop/$(page_for_target "$target")"
+}
+
+preview_target() {
+  local target="${1:-all}"
+  shift || true
+  local port
+  port="$(parse_port "${PLANNER_PREVIEW_PORT:-4173}" "$@")"
+  local page
+  page="$(page_for_target "$target")"
+  local url="http://${DEFAULT_HOST}:${port}/${page}"
+
+  echo "Building before preview..."
+  ensure_supabase_config_for_vite
+  npm run desktop:build:web
+  echo "Starting preview for ${target} at ${url}"
+  open_url "$url"
+  run_vite preview --outDir dist-desktop --host "$DEFAULT_HOST" --port "$port"
+}
+
+deploy_target() {
+  local target="${1:-all}"
+  page_for_target "$target" >/dev/null
+
+  echo "Building ${target} before deploy..."
+  ensure_supabase_config_for_vite
+  npm run desktop:build:web
+
+  if [[ -n "${PLANNER_DEPLOY_CMD:-}" ]]; then
+    echo "Running deploy command: ${PLANNER_DEPLOY_CMD}"
+    bash -lc "$PLANNER_DEPLOY_CMD"
+    return
+  fi
+
+  cat <<EOF
+No PLANNER_DEPLOY_CMD is configured, so nothing was uploaded.
+
+Built output:
+  dist-desktop/
+
+Primary page:
+  dist-desktop/$(page_for_target "$target")
+
+To deploy, set PLANNER_DEPLOY_CMD. Example:
+  PLANNER_DEPLOY_CMD="npx netlify deploy --dir dist-desktop" ./planner deploy ${target}
+EOF
+}
+
+grade_arg_for_sync() {
+  case "${1:-all}" in
+    all) echo "5th 6th 7th 8th 9th" ;;
+    5|5th) echo "5th" ;;
+    6|6th) echo "6th" ;;
+    7|7th) echo "7th" ;;
+    8|8th) echo "8th" ;;
+    9|9th) echo "9th" ;;
+    *) die "unknown sync target '${1:-}'. Use all, 5, 6, 7, 8, or 9." ;;
+  esac
+}
+
+sync_plans() {
+  local target="${1:-all}"
+  shift || true
+  local grades
+  grades="$(grade_arg_for_sync "$target")"
+  local apply=false
+  local kinds=("monthly")
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --apply)
+        apply=true
+        shift
+        ;;
+      --kinds)
+        [[ $# -ge 2 ]] || die "--kinds needs a value"
+        case "$2" in
+          monthly|annual|all) kinds=("$2") ;;
+          *) die "unknown --kinds value '$2'. Use monthly, annual, or all." ;;
+        esac
+        shift 2
+        ;;
+      *)
+        die "unknown sync option '$1'"
+        ;;
+    esac
+  done
+
+  [[ -d "$SCHOOL_DRIVE_DIR" ]] || die "official school folder not found: $SCHOOL_DRIVE_DIR"
+
+  echo "Syncing Word planning files from this project to the official school Google Drive folder."
+  echo "Target grades: $grades"
+  echo "Document group: ${kinds[*]}"
+  echo "Mode: $([[ "$apply" == true ]] && echo "copy files" || echo "dry run")"
+  echo
+
+  local cmd=(
+    python3 ../../tools/planning/sync_school_word_plans.py
+    --layout school
+    --dest "$SCHOOL_DRIVE_DIR"
+    --grades $grades
+    --kinds "${kinds[@]}"
+  )
+  if [[ "$apply" == true ]]; then
+    cmd+=(--apply)
+  fi
+
+  "${cmd[@]}"
+}
+
+main() {
+  local command="${1:-}"
+  [[ -n "$command" ]] || { usage; exit 0; }
+  shift || true
+
+  case "$command" in
+    run) run_target "${1:-student}" "${@:2}" ;;
+    build) build_target "${1:-all}" ;;
+    preview) preview_target "${1:-all}" "${@:2}" ;;
+    deploy) deploy_target "${1:-all}" ;;
+    sync) sync_plans "${1:-all}" "${@:2}" ;;
+    help|-h|--help) usage ;;
+    *) usage; die "unknown command '$command'" ;;
+  esac
+}
+
+main "$@"

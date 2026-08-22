@@ -1,0 +1,56 @@
+{
+  "id": "MOD-PYTHON-FUNDAMENTALS-01",
+  "title": "Python Input, Arithmetic, and Debugging",
+  "slug": "python-fundamentals",
+  "version": "0.1.0",
+  "status": "pilot",
+  "gradeRange": [
+    "8"
+  ],
+  "track": "Core",
+  "prerequisites": [
+    "Ability to type and save a plain-text file",
+    "Access to the teacher-assigned Python editor for live code runs"
+  ],
+  "objectives": [
+    "Trace keyboard input, numeric conversion, variables, arithmetic, and labeled output.",
+    "Classify syntax, name, type, and logic errors and correct one cause at a time.",
+    "Build and test a short calculator with saved code and repeatable test records."
+  ],
+  "evidence": [
+    "Saved repeated practice attempts",
+    "Saved application record",
+    "Exported HTML practice report"
+  ],
+  "estimatedMinutes": 233,
+  "sections": [
+    "START-01",
+    "ARITHMETIC-LEARN-01",
+    "ARITHMETIC-PRACTICE-01",
+    "DEBUG-LEARN-01",
+    "DEBUG-PRACTICE-01",
+    "PROGRAM-LEARN-01",
+    "PROGRAM-PRACTICE-01",
+    "PROGRAM-RECORD-01",
+    "REVIEW-01",
+    "HISTORY-01"
+  ],
+  "sourcePath": "technology-learning-hub/modules/python-fundamentals",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-20",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "device": "Computer with a modern browser",
+    "account": "No account required for module practice",
+    "internet": "Not required when served locally",
+    "storage": "Progress remains in this browser and device",
+    "offline": "Trace and correct the printed Python programs, then complete the input-process-output and test tables."
+  },
+  "accessibility": [
+    "Keyboard-accessible controls",
+    "Visible focus",
+    "Semantic headings and form labels",
+    "No color-only meaning"
+  ],
+  "formalAssessment": "Separate teacher directions and rubric are required."
+}

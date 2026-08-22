@@ -1,0 +1,494 @@
+[
+  {
+    "kind": "daily",
+    "folder": "Daily",
+    "title": "Daily Grade 1 — Spreadsheet Vocabulary and Cell References — September 18, 2026",
+    "label": "2026-09-18 - Daily Grade 1 - Spreadsheet Vocabulary and Cell References",
+    "max": 40,
+    "criteria": [
+      [
+        "Required terms",
+        9,
+        [
+          "All 10 fixed terms are present.",
+          "8–9 fixed terms are present.",
+          "4–7 fixed terms are present.",
+          "0–3 fixed terms are present."
+        ]
+      ],
+      [
+        "Definitions",
+        9,
+        [
+          "10 definitions are accurate and student-friendly.",
+          "8–9 definitions are accurate.",
+          "4–7 definitions are accurate.",
+          "0–3 definitions are accurate."
+        ]
+      ],
+      [
+        "Examples",
+        9,
+        [
+          "10 examples correctly match their terms.",
+          "8–9 examples correctly match.",
+          "4–7 examples correctly match.",
+          "0–3 examples correctly match."
+        ]
+      ],
+      [
+        "Cell references",
+        9,
+        [
+          "All 6 fixed cell-reference answers are correct.",
+          "4–5 fixed cell-reference answers are correct.",
+          "2–3 fixed cell-reference answers are correct.",
+          "0–1 fixed cell-reference answers are correct."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "daily",
+    "folder": "Daily",
+    "title": "Daily Grade 2 — Spreadsheet Formulas and Column Chart — September 25, 2026",
+    "label": "2026-09-25 - Daily Grade 2 - Spreadsheet Formulas and Column Chart",
+    "max": 40,
+    "criteria": [
+      [
+        "Fixed data",
+        9,
+        [
+          "Both headers, all 8 rows, and all 16 values match the fixed CSV.",
+          "Headers and 8 rows are present; 1–2 values are incorrect.",
+          "Headers are present; 4–7 rows are complete and accurate.",
+          "Fewer than 4 accurate data rows are present."
+        ]
+      ],
+      [
+        "Formulas",
+        9,
+        [
+          "SUM, AVERAGE, and MAX all use B2:B9 and return correct visible results.",
+          "2 of the 3 required formulas and results are correct.",
+          "1 of the 3 required formulas and results is correct.",
+          "No required formula produces a correct result."
+        ]
+      ],
+      [
+        "Column chart",
+        9,
+        [
+          "All 4 checks pass: column type, A1:B9, exact title, both axis labels.",
+          "3 of 4 chart checks pass.",
+          "1–2 of 4 chart checks pass.",
+          "No usable chart is present."
+        ]
+      ],
+      [
+        "Interpretation",
+        9,
+        [
+          "Both answers are correct, cite exact values, and the comparison gives the correct difference.",
+          "Both answers are correct; one value or difference is missing.",
+          "One answer is correct and supported by a value.",
+          "Neither answer is supported by the fixed data."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "daily",
+    "folder": "Daily",
+    "title": "Daily Grade 3 — STEAM Expo Participation and Closure — October 23, 2026",
+    "label": "2026-10-23 - Daily Grade 3 - STEAM Expo Participation and Closure",
+    "max": 40,
+    "criteria": [
+      [
+        "Assigned expo role",
+        9,
+        [
+          "All 4 announced individual role actions are completed.",
+          "3 of 4 role actions are completed.",
+          "1–2 role actions are completed.",
+          "0 role actions are completed after make-up."
+        ]
+      ],
+      [
+        "Project explanation",
+        9,
+        [
+          "All 5 explanation parts are accurate and clear.",
+          "4 of 5 explanation parts are accurate.",
+          "2–3 explanation parts are accurate.",
+          "0–1 explanation parts are accurate after make-up."
+        ]
+      ],
+      [
+        "Respect and closure",
+        9,
+        [
+          "All 4 listening, speech, safety, and cleanup checks are observed.",
+          "3 of 4 closure checks are observed.",
+          "1–2 closure checks are observed.",
+          "0 checks are observed, or unsafe conduct prevents closure."
+        ]
+      ],
+      [
+        "Individual Technology reflection",
+        9,
+        [
+          "Contribution, result evidence, and next improvement are all specific.",
+          "All 3 parts are present; one lacks detail.",
+          "1–2 usable reflection parts are present.",
+          "No usable reflection is submitted after make-up."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "daily",
+    "folder": "Daily",
+    "title": "Daily Grade 4 — STEAM Preparation and Work Process — October 16, 2026",
+    "label": "2026-10-16 - Daily Grade 4 - STEAM Preparation and Work Process",
+    "max": 40,
+    "criteria": [
+      [
+        "Preparation",
+        9,
+        [
+          "All 4 announced preparation checks are observed.",
+          "3 of 4 preparation checks are observed.",
+          "1–2 preparation checks are observed.",
+          "0 preparation checks are observed after make-up."
+        ]
+      ],
+      [
+        "Assigned role work",
+        9,
+        [
+          "All 4 individual role-work checkpoints are completed.",
+          "3 of 4 checkpoints are completed.",
+          "1–2 checkpoints are completed.",
+          "0 checkpoints are completed after make-up."
+        ]
+      ],
+      [
+        "Responsible work",
+        9,
+        [
+          "All 4 safety, materials, focus, and team-role checks are observed.",
+          "3 of 4 responsible-work checks are observed.",
+          "1–2 checks are observed.",
+          "0 checks are observed, or unsafe conduct prevents work."
+        ]
+      ],
+      [
+        "Individual Technology log",
+        9,
+        [
+          "All 3 entries name task, result/evidence, and next step.",
+          "All 3 entries exist; one required part is missing.",
+          "1–2 usable entries are complete.",
+          "No usable individual log is submitted after make-up."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "daily",
+    "folder": "Daily",
+    "title": "Daily Grade 5 — Scratch Custom Block and Repeat Loop — October 2, 2026",
+    "label": "2026-10-02 - Daily Grade 5 - Scratch Custom Block and Repeat Loop",
+    "max": 40,
+    "criteria": [
+      [
+        "Four-part plan",
+        9,
+        [
+          "Start, reset position, repeated movement, and finish message are all correctly ordered.",
+          "3 of 4 plan parts are correct.",
+          "1–2 of 4 plan parts are correct.",
+          "No usable program plan is present."
+        ]
+      ],
+      [
+        "Custom block",
+        9,
+        [
+          "Exact name, one movement job, definition, and active call all pass.",
+          "3 of 4 custom-block checks pass.",
+          "1–2 of 4 custom-block checks pass.",
+          "No defined and called custom block is present."
+        ]
+      ],
+      [
+        "Loop",
+        9,
+        [
+          "repeat 4 contains the call, creates 4 equal moves, and replaces copied movement.",
+          "3 of the 4 loop checks pass.",
+          "1–2 of the 4 loop checks pass.",
+          "No functioning required loop is present."
+        ]
+      ],
+      [
+        "Testing",
+        9,
+        [
+          "All 3 fixed tests include actual results; each failed test has a correction.",
+          "All 3 tests have results; one required detail is missing.",
+          "1–2 fixed tests have usable results.",
+          "No usable fixed test is recorded."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "appreciation",
+    "folder": "Appreciation",
+    "title": "Appreciation Grade 1 — Digital Work Habits and File Responsibility — November 6, 2026",
+    "label": "2026-11-06 - Appreciation Grade 1 - Digital Work Habits and File Responsibility",
+    "max": 40,
+    "criteria": [
+      [
+        "Folder plan",
+        9,
+        [
+          "All 6 fixed files are placed in the correct announced folders.",
+          "4–5 files are placed correctly.",
+          "2–3 files are placed correctly.",
+          "0–1 files are placed correctly."
+        ]
+      ],
+      [
+        "File names",
+        9,
+        [
+          "All 6 filenames follow the supplied name, class, task, and version rules.",
+          "4–5 filenames follow the rules.",
+          "2–3 filenames follow the rules.",
+          "0–1 filenames follow the rules."
+        ]
+      ],
+      [
+        "Fixed responsibility decisions",
+        9,
+        [
+          "All 6 fixed file-responsibility decisions and reasons are correct.",
+          "4–5 decisions are correct.",
+          "2–3 decisions are correct.",
+          "0–1 decisions are correct."
+        ]
+      ],
+      [
+        "Verification record",
+        9,
+        [
+          "All 4 checks record location, open/read test, final version, and submission/fallback.",
+          "3 of 4 verification checks are complete.",
+          "1–2 verification checks are complete.",
+          "No usable verification record is submitted."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "appreciation",
+    "folder": "Appreciation",
+    "title": "Appreciation Grade 2 — Mandrake Project Process and Peer Feedback — November 27, 2026",
+    "label": "2026-11-27 - Appreciation Grade 2 - Mandrake Project Process and Peer Feedback",
+    "max": 40,
+    "criteria": [
+      [
+        "Milestone preparation",
+        9,
+        [
+          "All 4 fixed milestone checks are complete before peer review.",
+          "3 of 4 milestone checks are complete.",
+          "1–2 milestone checks are complete.",
+          "No milestone check is complete."
+        ]
+      ],
+      [
+        "Process log",
+        9,
+        [
+          "All 3 dated entries state action, result, and next step.",
+          "All 3 entries exist; one required detail is missing.",
+          "1–2 usable entries are complete.",
+          "No usable process entry is submitted."
+        ]
+      ],
+      [
+        "Peer feedback",
+        9,
+        [
+          "All 4 fixed peer-review checks cite visible project evidence.",
+          "3 of 4 peer-review checks are usable.",
+          "1–2 peer-review checks are usable.",
+          "No usable peer feedback is recorded."
+        ]
+      ],
+      [
+        "Revision and retest",
+        9,
+        [
+          "Before issue, selected change, reason, and same-condition retest result are all specific.",
+          "3 of 4 revision/retest parts are specific.",
+          "1–2 revision/retest parts are usable.",
+          "No usable revision or retest is recorded."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        4,
+        [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      ]
+    ]
+  },
+  {
+    "kind": "exam",
+    "folder": "Exam Projects",
+    "title": "Exam — Mandrake Obstacle-Detection System — December 4, 2026",
+    "label": "2026-12-04 - Exam - Mandrake Obstacle-Detection System",
+    "max": 90,
+    "criteria": [
+      [
+        "Project purpose",
+        14,
+        [
+          "All 4 checks are accurate: user, removal problem, distance input, warning result.",
+          "3 of 4 purpose checks are accurate.",
+          "1–2 of 4 purpose checks are accurate.",
+          "No accurate purpose check is present."
+        ]
+      ],
+      [
+        "System parts and flow",
+        14,
+        [
+          "All 8 assigned roles/parts and all 4 input-process-signal-output stages are correct.",
+          "At least 7 roles/parts and 3–4 stages are correct.",
+          "At least 4 roles/parts and 2 stages are correct.",
+          "Fewer than 4 roles/parts or 2 stages are correct."
+        ]
+      ],
+      [
+        "Code and threshold logic",
+        14,
+        [
+          "All 6 fixed logic steps are present; >18 and no alert at 18 are correct.",
+          "5 of 6 logic steps and the boundary result are correct.",
+          "3–4 logic steps are correct or the boundary is ambiguous.",
+          "Fewer than 3 logic steps are correct."
+        ]
+      ],
+      [
+        "Testing and reliability",
+        13,
+        [
+          "All 6 fixed trials include expected/actual/pass evidence and use the same setup.",
+          "5 of 6 trials are complete and comparable.",
+          "3–4 trials are complete and comparable.",
+          "0–2 usable trials are recorded."
+        ]
+      ],
+      [
+        "Result and improvement",
+        13,
+        [
+          "Observed result/limitation, controlled change, same-condition retest, and evidence-based decision are all present.",
+          "3 of 4 result/improvement checks are present.",
+          "1–2 of 4 checks are present.",
+          "No usable result or improvement evidence is present."
+        ]
+      ],
+      [
+        "Explanation and individual evidence",
+        13,
+        [
+          "All 6 explanation parts, 3 dated log entries, and all 6 reflection answers are complete.",
+          "5 explanation parts, 3 log entries, and 5 reflection answers are complete.",
+          "3–4 explanation parts, 1–2 log entries, or 3–4 reflection answers are complete.",
+          "Fewer than 3 explanation parts or 3 reflection answers are complete after make-up."
+        ]
+      ],
+      [
+        "Punctuality, responsibility, and readiness",
+        9,
+        [
+          "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+          "One readiness, punctuality, or milestone issue is corrected after one reminder; final evidence remains checkable.",
+          "Readiness or milestone issues repeat, or one session lacks the device or login; some fallback project work is completed.",
+          "Readiness is not shown across checkpoints and the approved fallback or final evidence is not completed."
+        ]
+      ]
+    ]
+  }
+]

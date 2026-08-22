@@ -1,0 +1,58 @@
+{
+  "id": "MOD-DATA-SPREADSHEETS-01",
+  "title": "Data Foundations and Spreadsheets",
+  "slug": "data-spreadsheets",
+  "version": "0.5.0",
+  "status": "prototype",
+  "recommendedGrades": [6, 7],
+  "tracks": ["Foundation"],
+  "owner": "Porfirio Rios",
+  "lastReviewed": "2026-08-19",
+  "estimatedMinutes": 195,
+  "prerequisites": [
+    "Read short English instructions with teacher support",
+    "Use a mouse and keyboard on a school computer",
+    "Recognize numbers and simple categories in a table"
+  ],
+  "objectives": [
+    "Find the title, column names, rows, and cells in a data table",
+    "Correct common data-quality and formatting problems",
+    "Use SUM and AVERAGE formulas in a guided spreadsheet example",
+    "Identify common chart types and the parts of a column chart",
+    "Build and label one column chart",
+    "Answer questions and write a conclusion that matches chart evidence"
+  ],
+  "sections": [
+    {"id": "START-01", "title": "Start here", "entryPath": "#start", "estimatedMinutes": 5},
+    {"id": "TABLE-LEARN-01", "title": "Learn tables", "entryPath": "#read-table", "estimatedMinutes": 10},
+    {"id": "TABLE-PRACTICE-01", "title": "Practice tables", "entryPath": "#table-practice", "estimatedMinutes": 20},
+    {"id": "CLEAN-LEARN-01", "title": "Learn cleaning", "entryPath": "#clean-learn", "estimatedMinutes": 10},
+    {"id": "CLEAN-PRACTICE-01", "title": "Practice cleaning", "entryPath": "#clean-data", "estimatedMinutes": 25},
+    {"id": "FORMULA-LEARN-01", "title": "Learn formulas", "entryPath": "#formula-learn", "estimatedMinutes": 10},
+    {"id": "FORMULA-PRACTICE-01", "title": "Practice formulas", "entryPath": "#formulas", "estimatedMinutes": 25},
+    {"id": "CHART-BASICS-01", "title": "Understand charts", "entryPath": "#chart-basics", "estimatedMinutes": 10},
+    {"id": "CHART-TYPES-PRACTICE-01", "title": "Practice choosing charts", "entryPath": "#chart-types", "estimatedMinutes": 15},
+    {"id": "CHART-PRACTICE-01", "title": "Practice building charts", "entryPath": "#chart", "estimatedMinutes": 25},
+    {"id": "INTERPRET-LEARN-01", "title": "Learn chart reading", "entryPath": "#interpret-learn", "estimatedMinutes": 10},
+    {"id": "INTERPRET-PRACTICE-01", "title": "Practice chart reading", "entryPath": "#interpret", "estimatedMinutes": 20},
+    {"id": "HISTORY-01", "title": "Practice history and export", "entryPath": "#review", "estimatedMinutes": 10}
+  ],
+  "evidence": [
+    "Immutable local attempt history with datasets, responses, scores, and editing snapshots",
+    "Downloadable HTML practice report that reconstructs the student's saved tables, formulas, charts, and written responses"
+  ],
+  "requirements": {
+    "device": "School computer or laptop; pairs may share one device",
+    "software": "Modern web browser; spreadsheet software is needed only for the separate class assignment",
+    "account": "None for module practice",
+    "internet": "Required for first load unless the module was cached or copied locally",
+    "offline": "Printable fallback included at printable-fallback.html"
+  },
+  "knownRisks": [
+    "Progress is saved only in the current browser and device",
+    "Shared school computers require students to export their report and reset progress before the next user",
+    "The module needs a monitored Grade 6 pilot before ready status",
+    "The public practice module does not replace formal assessment directions or rubrics"
+  ],
+  "planningUse": "Prototype only. Pilot with the printable fallback and keep Summative Activities #1, #2, and #5 outside the module."
+}

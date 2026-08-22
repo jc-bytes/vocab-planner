@@ -1,0 +1,34 @@
+{
+  "id": "MOD-SCI-REPORT-01",
+  "title": "Write a Scientific Report",
+  "slug": "scientific-report-writing",
+  "version": "0.2.0",
+  "status": "prototype",
+  "recommendedGrades": [6, 7, 8, 9],
+  "defaultTrack": "Foundation",
+  "estimatedMinutes": 420,
+  "sourcePath": "learning-modules/technology-learning-hub/modules/scientific-report-writing",
+  "publishedUrl": null,
+  "lastReviewed": "2026-08-19",
+  "owner": "Porfirio Rios",
+  "requirements": {
+    "devices": "One web-capable device per group or student",
+    "software": "Modern browser and Google Docs for the normal group-writing workflow",
+    "account": "A school Google account is required only for Google Docs",
+    "internet": "Required to open and collaborate in Google Docs; the module can be revisited offline after its assets have loaded",
+    "storage": "Module progress, the group Doc link, and the reference list are stored only in the current browser and device",
+    "offlineFallback": "Print the module guide and report outline, then write in a local document or on paper until Google Docs is available"
+  },
+  "privacy": {
+    "studentAccounts": "The public module does not request a student account",
+    "writingLab": "Text pasted into the Writing Lab is processed in the browser and is not saved",
+    "personalData": "Only an optional group name, Google Doc link, and source metadata entered in the reference maker are stored locally"
+  },
+  "sources": [
+    "Feria Científica Nacional del Ingenio Juvenil 2026: Estructura del informe escrito",
+    "Instructivo: Estructura del Informe Escrito, Proyecto Científico",
+    "Instrumento de Evaluación: Proyectos Científicos",
+    "Evaluación del potencial alimenticio de la cáscara de plátano",
+    "Citation.js, MIT-licensed APA and CSL bibliography formatter"
+  ]
+}

@@ -1,0 +1,3527 @@
+[
+  {
+    "grade": 6,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/6th Grade Technology/Assessments/Rubrics/IIIT/6th grade - IIIT - Week 1 - Rubric for Summative 1.docx",
+    "basename": "6th grade - IIIT - Week 1 - Rubric for Summative 1 - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Completed assigned entries",
+        "description": "Exactly 10 assigned vocabulary rows are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 rows are complete.",
+          "8-9 rows are complete.",
+          "5-7 rows are complete.",
+          "0-4 rows are complete."
+        ]
+      },
+      {
+        "title": "Accurate definitions",
+        "description": "Each definition states the correct technology meaning in student-friendly words.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 definitions are accurate.",
+          "8-9 definitions are accurate.",
+          "5-7 definitions are accurate.",
+          "0-4 definitions are accurate."
+        ]
+      },
+      {
+        "title": "Connected examples or visuals",
+        "description": "Each row includes a concrete example or visual description that matches the word.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 examples or visuals match.",
+          "8-9 examples or visuals match.",
+          "5-7 examples or visuals match.",
+          "0-4 examples or visuals match."
+        ]
+      },
+      {
+        "title": "Technology sentences",
+        "description": "Each complete sentence uses the assigned word with its technology meaning.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 sentences are complete and correct.",
+          "8-9 sentences are complete and correct.",
+          "5-7 sentences are complete and correct.",
+          "0-4 sentences are complete and correct."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/6th Grade Technology/Assessments/Rubrics/IIIT/6th grade - IIIT - Week 2 - Rubric for Summative 2.docx",
+    "basename": "6th grade - IIIT - Week 2 - Rubric for Summative 2 - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Complete and correct records",
+        "description": "The table contains the eight fixed source records with exact values.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 8 records are complete and correct.",
+          "6-7 records are complete and correct.",
+          "3-5 records are complete and correct.",
+          "0-2 records are complete and correct."
+        ]
+      },
+      {
+        "title": "Headers and consistent data",
+        "description": "Four checks: exact three headers; category spelling matches source; category capitalization matches source; Minutes values are numeric.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 data checks are met.",
+          "3 data checks are met.",
+          "1-2 data checks are met.",
+          "No data checks are met."
+        ]
+      },
+      {
+        "title": "Readable table formatting",
+        "description": "Four checks: headers are visible; columns are wide enough; all eight records remain visible; the header row has one consistent emphasis.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 readability checks are met.",
+          "3 readability checks are met.",
+          "1-2 readability checks are met.",
+          "No readability checks are met."
+        ]
+      },
+      {
+        "title": "Evidence sentence",
+        "description": "Three checks: complete sentence; names a category or Student ID; states an exact matching value from the fixed table.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 sentence checks are met.",
+          "2 sentence checks are met.",
+          "1 sentence check is met.",
+          "No sentence checks are met."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/6th Grade Technology/Assessments/Rubrics/IIIT/6th grade - IIIT - Week 5 - Rubric for Summative 3.docx",
+    "basename": "6th grade - IIIT - Week 5 - Rubric for Summative 3 - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned project and role plan",
+        "description": "Four checks: existing assigned project/subject; individual role; first task; file or material location.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 plan checks are recorded.",
+          "3 plan checks are recorded.",
+          "1-2 plan checks are recorded.",
+          "No plan checks are recorded."
+        ]
+      },
+      {
+        "title": "Individual contribution checkpoints",
+        "description": "Teacher observation and the individual record show useful assigned work at three checkpoints.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Useful assigned work is shown at all 3 checkpoints.",
+          "Useful assigned work is shown at 2 checkpoints.",
+          "Useful assigned work is shown at 1 checkpoint.",
+          "No useful assigned work is shown at a checkpoint."
+        ]
+      },
+      {
+        "title": "Test and improvement record",
+        "description": "Four checks: expected result; actual result; success rule; next change.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 test checks are recorded.",
+          "3 test checks are recorded.",
+          "1-2 test checks are recorded.",
+          "No test checks are recorded."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "Each dated entry includes task, result/evidence, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "At least 3 complete dated entries.",
+          "2 complete dated entries.",
+          "1 complete dated entry.",
+          "No complete dated entry."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/6th Grade Technology/Assessments/Rubrics/IIIT/6th grade - IIIT - Week 6 - Rubric for Summative 4.docx",
+    "basename": "6th grade - IIIT - Week 6 - Rubric for Summative 4 - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Four checks: starts role on cue; completes assigned explanation or demonstration; handles assigned file/material; completes role handoff.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 role checks are observed.",
+          "3 role checks are observed.",
+          "1-2 role checks are observed.",
+          "No role checks are observed."
+        ]
+      },
+      {
+        "title": "Five-point project explanation",
+        "description": "Required points: what was created; problem addressed; how it works; what was learned; how it can help.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 required points are explained.",
+          "4 required points are explained.",
+          "2-3 required points are explained.",
+          "0-1 required points are explained."
+        ]
+      },
+      {
+        "title": "Respectful participation and cleanup",
+        "description": "Three checks: listens while others present; follows expo directions; completes assigned cleanup.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 participation checks are observed.",
+          "2 participation checks are observed.",
+          "1 participation check is observed.",
+          "No participation checks are observed."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Three required parts: one specific result; one challenge; one next improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 reflection parts are specific.",
+          "2 reflection parts are specific.",
+          "1 reflection part is specific.",
+          "No reflection part is specific."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 6,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/6th Grade Technology/Assessments/Rubrics/IIIT/6th grade - IIIT - Week 7 - Rubric for Summative 5.docx",
+    "basename": "6th grade - IIIT - Week 7 - Rubric for Summative 5 - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Fixed data and column chart",
+        "description": "Four checks: all four categories; exact four values; column chart type; complete selected range including headers.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 chart-data checks are met.",
+          "3 chart-data checks are met.",
+          "1-2 chart-data checks are met.",
+          "No chart-data checks are met."
+        ]
+      },
+      {
+        "title": "Chart title and axis labels",
+        "description": "Three exact labels: title Students in School Clubs; horizontal axis Club; vertical axis Students.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 exact labels are present.",
+          "2 exact labels are present.",
+          "1 exact label is present.",
+          "No exact label is present."
+        ]
+      },
+      {
+        "title": "Three chart answers",
+        "description": "Each answer names the correct category and/or exact value requested by the fixed questions.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 answers are correct and complete.",
+          "2 answers are correct and complete.",
+          "1 answer is correct and complete.",
+          "No answer is correct and complete."
+        ]
+      },
+      {
+        "title": "Evidence-based conclusion",
+        "description": "Three checks: complete sentence; names a specific comparison or pattern; includes a matching value or difference.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 conclusion checks are met.",
+          "2 conclusion checks are met.",
+          "1 conclusion check is met.",
+          "No conclusion check is met."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 1 - Rubric for Summative 1 - Spreadsheet Vocabulary and Examples.docx",
+    "basename": "7th grade - IIIT - Week 1 - Rubric for Summative 1 - Spreadsheet Vocabulary and Examples - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Required terms",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 fixed terms are present.",
+          "8–9 fixed terms are present.",
+          "4–7 fixed terms are present.",
+          "0–3 fixed terms are present."
+        ]
+      },
+      {
+        "title": "Definitions",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "10 definitions are accurate and student-friendly.",
+          "8–9 definitions are accurate.",
+          "4–7 definitions are accurate.",
+          "0–3 definitions are accurate."
+        ]
+      },
+      {
+        "title": "Examples",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "10 examples correctly match their terms.",
+          "8–9 examples correctly match.",
+          "4–7 examples correctly match.",
+          "0–3 examples correctly match."
+        ]
+      },
+      {
+        "title": "Organization",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 checks pass: required headers, one term per row, readable text, correct pairing.",
+          "3 of 4 organization checks pass.",
+          "1–2 of 4 organization checks pass.",
+          "0 of 4 organization checks pass."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 2 - Rubric for Summative 2 - Spreadsheet Formulas and Chart.docx",
+    "basename": "7th grade - IIIT - Week 2 - Rubric for Summative 2 - Spreadsheet Formulas and Chart - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Fixed data",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both headers, all 8 rows, and all 16 values match the fixed CSV.",
+          "Headers and 8 rows are present; 1–2 values are incorrect.",
+          "Headers are present; 4–7 rows are complete and accurate.",
+          "Fewer than 4 accurate data rows are present."
+        ]
+      },
+      {
+        "title": "Formulas",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "SUM, AVERAGE, and MAX all use B2:B9 and return correct visible results.",
+          "2 of the 3 required formulas and results are correct.",
+          "1 of the 3 required formulas and results is correct.",
+          "No required formula produces a correct result."
+        ]
+      },
+      {
+        "title": "Column chart",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 checks pass: column type, A1:B9, exact title, both axis labels.",
+          "3 of 4 chart checks pass.",
+          "1–2 of 4 chart checks pass.",
+          "No usable chart is present."
+        ]
+      },
+      {
+        "title": "Interpretation",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both answers are correct, cite exact values, and the comparison gives the correct difference.",
+          "Both answers are correct; one value or difference is missing.",
+          "One answer is correct and supported by a value.",
+          "Neither answer is supported by the fixed data."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 6 - Rubric for Summative 3 - Scratch Subroutine and Loop.docx",
+    "basename": "7th grade - IIIT - Week 6 - Rubric for Summative 3 - Scratch Subroutine and Loop - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Four-part plan",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Start, reset position, repeated movement, and finish message are all correctly ordered.",
+          "3 of 4 plan parts are correct.",
+          "1–2 of 4 plan parts are correct.",
+          "No usable program plan is present."
+        ]
+      },
+      {
+        "title": "Custom block",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Exact name, one movement job, definition, and active call all pass.",
+          "3 of 4 custom-block checks pass.",
+          "1–2 of 4 custom-block checks pass.",
+          "No defined and called custom block is present."
+        ]
+      },
+      {
+        "title": "Loop",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "repeat 4 contains the call, creates 4 equal moves, and replaces copied movement.",
+          "3 of the 4 loop checks pass.",
+          "1–2 of the 4 loop checks pass.",
+          "No functioning required loop is present."
+        ]
+      },
+      {
+        "title": "Testing",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 fixed tests include actual results; each failed test has a correction.",
+          "All 3 tests have results; one required detail is missing.",
+          "1–2 fixed tests have usable results.",
+          "No usable fixed test is recorded."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 7 - Rubric for Summative 4 - Source Credibility and Image Credit.docx",
+    "basename": "7th grade - IIIT - Week 7 - Rubric for Summative 4 - Source Credibility and Image Credit - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Source checks",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 12 author, date, evidence, and purpose cells are accurate.",
+          "9–11 source-check cells are accurate.",
+          "5–8 source-check cells are accurate.",
+          "0–4 source-check cells are accurate."
+        ]
+      },
+      {
+        "title": "Credibility decision",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Source A is chosen and both reasons accurately cite different card facts.",
+          "Source A is chosen; one reason is specific and accurate.",
+          "A decision is present but only one weak/partly accurate card reason supports it.",
+          "No supported decision is present."
+        ]
+      },
+      {
+        "title": "Media credit",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Creator, title, original source, and license are all accurate.",
+          "3 of 4 credit parts are accurate.",
+          "1–2 of 4 credit parts are accurate.",
+          "No accurate traceable credit part is present."
+        ]
+      },
+      {
+        "title": "Responsible use",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 checks pass: fixed cards only, opinion identified, commercial purpose identified, no unsupported claim.",
+          "3 of 4 responsible-use checks pass.",
+          "1–2 of 4 checks pass.",
+          "0 responsible-use checks pass."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Daily/7th grade - IIIT - Week 9 - Rubric for Summative 5 - Mandrake Detection System Design Plan.docx",
+    "basename": "7th grade - IIIT - Week 9 - Rubric for Summative 5 - Mandrake Detection System Design Plan - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "User need and goal",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "User need plus detection input, threshold, and warning result are all stated measurably.",
+          "User need and 2 of 3 measurable goal parts are present.",
+          "User need or only 1 measurable goal part is present.",
+          "No usable need or measurable goal is present."
+        ]
+      },
+      {
+        "title": "System chain",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 checks pass: distance input, >18 process, boundary result, Bluetooth signal, sound output.",
+          "4 of 5 system checks pass.",
+          "2–3 of 5 system checks pass.",
+          "0–1 system checks pass."
+        ]
+      },
+      {
+        "title": "Flow and components",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 fixed flow steps and all 8 assigned roles/parts are present.",
+          "5 flow steps and at least 7 roles/parts are present.",
+          "3–4 flow steps and at least 4 roles/parts are present.",
+          "Fewer than 3 flow steps or 4 roles/parts are present."
+        ]
+      },
+      {
+        "title": "Boundary tests",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "17, 18, and 19 cm each have correct Bluetooth, sound, and safe/setup predictions.",
+          "All 3 tests exist; one prediction/detail is incorrect or missing.",
+          "1–2 tests have correct output predictions.",
+          "No usable boundary test is present."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/7th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "7th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 announced preparation checks are observed.",
+          "3 of 4 preparation checks are observed.",
+          "1–2 of 4 preparation checks are observed.",
+          "0 of 4 preparation checks are observed after the make-up opportunity."
+        ]
+      },
+      {
+        "title": "Assigned role work",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 role-work checkpoints are completed.",
+          "3 of 4 checkpoints are completed.",
+          "1–2 of 4 checkpoints are completed.",
+          "0 checkpoints are completed after the make-up opportunity."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 safety, materials, focus, and team-role checks are observed.",
+          "3 of 4 responsible-work checks are observed.",
+          "1–2 of 4 responsible-work checks are observed.",
+          "0 checks are observed, or unsafe conduct prevents work."
+        ]
+      },
+      {
+        "title": "Individual log",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 entries name task, result/evidence, and next step.",
+          "All 3 entries exist; one required part is missing.",
+          "1–2 usable entries are complete.",
+          "No usable individual log is submitted after make-up."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/7th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "7th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 announced role actions are completed.",
+          "3 of 4 role actions are completed.",
+          "1–2 of 4 role actions are completed.",
+          "0 role actions are completed after the make-up opportunity."
+        ]
+      },
+      {
+        "title": "Project explanation",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 explanation parts are accurate and clear.",
+          "4 of 5 explanation parts are accurate.",
+          "2–3 of 5 explanation parts are accurate.",
+          "0–1 explanation parts are accurate after make-up."
+        ]
+      },
+      {
+        "title": "Respect and closure",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 listening, speech, safety, and cleanup checks are observed.",
+          "3 of 4 closure checks are observed.",
+          "1–2 of 4 closure checks are observed.",
+          "0 checks are observed, or unsafe conduct prevents closure."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Contribution, result evidence, and next improvement are all specific.",
+          "All 3 parts are present; one lacks a specific detail.",
+          "1–2 usable reflection parts are present.",
+          "No usable reflection is submitted after make-up."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(4 pts)",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 7,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/7th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/7th grade - IIIT - Final Project Packet and Rubric - Mandrake Detection System.docx",
+    "basename": "7th grade - IIIT - Final Project Packet and Rubric - Mandrake Detection System - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Project purpose",
+        "description": "(14 pts)",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 4 checks are accurate: user, removal problem, distance input, warning result.",
+          "3 of 4 purpose checks are accurate.",
+          "1–2 of 4 purpose checks are accurate.",
+          "No accurate purpose check is present."
+        ]
+      },
+      {
+        "title": "System parts and flow",
+        "description": "(14 pts)",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 8 assigned roles/parts and all 4 input-process-signal-output stages are correct.",
+          "At least 7 roles/parts and 3–4 stages are correct.",
+          "At least 4 roles/parts and 2 stages are correct.",
+          "Fewer than 4 roles/parts or 2 stages are correct."
+        ]
+      },
+      {
+        "title": "Code and threshold logic",
+        "description": "(14 pts)",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 fixed logic steps are present; >18 and no alert at 18 are correct.",
+          "5 of 6 logic steps and the boundary result are correct.",
+          "3–4 logic steps are correct or the boundary is ambiguous.",
+          "Fewer than 3 logic steps are correct."
+        ]
+      },
+      {
+        "title": "Testing and reliability",
+        "description": "(13 pts)",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 fixed trials include expected/actual/pass evidence and use the same setup.",
+          "5 of 6 trials are complete and comparable.",
+          "3–4 trials are complete and comparable.",
+          "0–2 usable trials are recorded."
+        ]
+      },
+      {
+        "title": "Result and improvement",
+        "description": "(13 pts)",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Observed result/limitation, controlled change, same-condition retest, and evidence-based decision are all present.",
+          "3 of 4 result/improvement checks are present.",
+          "1–2 of 4 checks are present.",
+          "No usable result or improvement evidence is present."
+        ]
+      },
+      {
+        "title": "Explanation and individual evidence",
+        "description": "(13 pts)",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 explanation parts, 3 dated log entries, and all 6 reflection answers are complete.",
+          "5 explanation parts, 3 log entries, and 5 reflection answers are complete.",
+          "3–4 explanation parts, 1–2 log entries, or 3–4 reflection answers are complete.",
+          "Fewer than 3 explanation parts or 3 reflection answers are complete after make-up."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "(9 pts)",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+          "One readiness, punctuality, or milestone issue is corrected after one reminder; final evidence remains checkable.",
+          "Readiness or milestone issues repeat, or one session lacks the device or login; some fallback project work is completed.",
+          "Readiness is not shown across checkpoints and the approved fallback or final evidence is not completed."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 1 - Rubric for Summative 1 - App Vocabulary and Decomposition.docx",
+    "basename": "8th grade - IIIT - Week 1 - Rubric for Summative 1 - App Vocabulary and Decomposition - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Required entries",
+        "description": "Completeness of the fixed ten-term table.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 terms each have a definition and example.",
+          "8–9 terms each have both entries.",
+          "5–7 terms each have both entries.",
+          "0–4 terms have both entries."
+        ]
+      },
+      {
+        "title": "Definition accuracy",
+        "description": "Accuracy of the ten definitions against the supplied reference.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "9–10 definitions are accurate.",
+          "7–8 are accurate.",
+          "4–6 are accurate.",
+          "0–3 are accurate."
+        ]
+      },
+      {
+        "title": "Example accuracy",
+        "description": "How clearly each example shows the named app concept.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "9–10 examples fit the term.",
+          "7–8 fit the term.",
+          "4–6 fit the term.",
+          "0–3 fit the term."
+        ]
+      },
+      {
+        "title": "Decomposition",
+        "description": "Five ordered, distinct action steps for the fixed homework-app goal.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "5 distinct ordered action steps cover the full goal.",
+          "4 distinct steps cover most of the goal.",
+          "2–3 usable steps are present.",
+          "0–1 usable step is present."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 2 - Rubric for Summative 2 - App Screen and Event Map.docx",
+    "basename": "8th grade - IIIT - Week 2 - Rubric for Summative 2 - App Screen and Event Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Screens and elements",
+        "description": "Use of the three supplied screens and five supplied elements.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 screens and all 5 elements are correctly placed.",
+          "All screens and 4 elements are correctly placed.",
+          "2 screens or 2–3 elements are usable.",
+          "Fewer than 2 screens or 2 elements are usable."
+        ]
+      },
+      {
+        "title": "Events and navigation",
+        "description": "Four event-to-action pairs and directional connections.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "4 correct pairs and all navigation arrows are usable.",
+          "3 correct pairs and most arrows are usable.",
+          "2 correct pairs or unclear arrows.",
+          "0–1 correct pair."
+        ]
+      },
+      {
+        "title": "Stored data",
+        "description": "Use of the supplied selected_club value.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Value is captured, stored, and used in confirmation.",
+          "Value is captured and stored but its final use is partly unclear.",
+          "Value is named but flow is incomplete.",
+          "Value is absent or unrelated."
+        ]
+      },
+      {
+        "title": "Fixed tests",
+        "description": "Expected results for the three supplied test inputs.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 expected results are complete and consistent with the map.",
+          "2 are complete and consistent.",
+          "1 is complete and consistent.",
+          "No consistent test result."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 7 - Rubric for Summative 3 - Python Arithmetic and Output.docx",
+    "basename": "8th grade - IIIT - Week 7 - Rubric for Summative 3 - Python Arithmetic and Output - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Inputs and variables",
+        "description": "Two supplied inputs are converted with int and stored clearly.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both inputs use int and meaningful variables correctly.",
+          "Both inputs work; one name or conversion detail is weak.",
+          "Only one input is converted and stored correctly.",
+          "No working numeric input."
+        ]
+      },
+      {
+        "title": "Calculations",
+        "description": "Required sum, difference, and product.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 calculations use the required operators correctly.",
+          "2 are correct.",
+          "1 is correct.",
+          "No required calculation is correct."
+        ]
+      },
+      {
+        "title": "Labeled output",
+        "description": "Three required results are printed with clear labels.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 labels and values are correct.",
+          "2 labels and values are correct.",
+          "1 label and value is correct.",
+          "No required labeled result."
+        ]
+      },
+      {
+        "title": "Fixed tests",
+        "description": "Recorded results for 8/3, 0/5, and 12/4.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 tests show exact actual output and correct pass/fail.",
+          "2 tests are complete and accurate.",
+          "1 test is complete and accurate.",
+          "No complete accurate test."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 8 - Rubric for Summative 4 - Python Debugging.docx",
+    "basename": "8th grade - IIIT - Week 8 - Rubric for Summative 4 - Python Debugging - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Error identification",
+        "description": "Identification of the five supplied practiced errors E1–E5.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 causes are identified accurately.",
+          "4 causes are accurate.",
+          "2–3 causes are accurate.",
+          "0–1 cause is accurate."
+        ]
+      },
+      {
+        "title": "Corrections",
+        "description": "Exact corrected lines for E1–E5.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 corrections are accurate.",
+          "4 are accurate.",
+          "2–3 are accurate.",
+          "0–1 is accurate."
+        ]
+      },
+      {
+        "title": "Explanations",
+        "description": "Why each correction fixes the named problem.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 explanations connect cause to correction.",
+          "4 do.",
+          "2–3 do.",
+          "0–1 does."
+        ]
+      },
+      {
+        "title": "Fixed tests",
+        "description": "Runs for 6/3, 4/0, and 5/2 with required status behavior.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 tests are recorded and correct.",
+          "2 are recorded and correct.",
+          "1 is recorded and correct.",
+          "No correct recorded test."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Daily/8th grade - IIIT - Week 9 - Rubric for Summative 5 - Digital Representation and Binary.docx",
+    "basename": "8th grade - IIIT - Week 9 - Rubric for Summative 5 - Digital Representation and Binary - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Vocabulary",
+        "description": "Matching of six supplied representation terms.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 matches are accurate.",
+          "5 are accurate.",
+          "3–4 are accurate.",
+          "0–2 are accurate."
+        ]
+      },
+      {
+        "title": "Decimal to binary",
+        "description": "Four-bit conversions for 2, 6, and 10.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 conversions and place values are correct.",
+          "2 are correct.",
+          "1 is correct.",
+          "No correct conversion."
+        ]
+      },
+      {
+        "title": "Binary to decimal",
+        "description": "Conversions for 0100, 1011, and 1111.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 3 conversions and place values are correct.",
+          "2 are correct.",
+          "1 is correct.",
+          "No correct conversion."
+        ]
+      },
+      {
+        "title": "Representation explanations",
+        "description": "Two fixed explanations about shared rules and leading zeros.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both explanations are accurate and use the supplied examples.",
+          "Both are mostly accurate; one detail is unclear.",
+          "One explanation is accurate.",
+          "Neither explanation is accurate."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/8th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "8th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Role preparation",
+        "description": "Assigned project, subject, role, first task, and success rule.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 fields are accurate in the shared log.",
+          "4 fields are accurate.",
+          "2–3 fields are accurate.",
+          "0–1 field is accurate."
+        ]
+      },
+      {
+        "title": "Individual contributions",
+        "description": "Three dated individual contribution entries.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "3 entries name action, result, and next step.",
+          "3 entries are present; one lacks a result or next step.",
+          "1–2 usable entries are present.",
+          "No usable entry."
+        ]
+      },
+      {
+        "title": "Safe work routine",
+        "description": "Observed handling, workspace, and shared-material routine.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All three routines are followed independently.",
+          "Two are followed independently; one reminder is needed.",
+          "Repeated reminders are needed.",
+          "Unsafe action continues after correction."
+        ]
+      },
+      {
+        "title": "Test and explanation",
+        "description": "One test record plus 30–60 second explanation of own contribution.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Test has all 4 fields and explanation is specific.",
+          "Test or explanation has one missing detail.",
+          "Only the test or explanation is usable.",
+          "Neither is usable."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/8th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "8th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Expo role",
+        "description": "Completion of the assigned role with the shared project or fallback.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Role is completed independently and product is ready.",
+          "Role is completed with one prompt.",
+          "Role is partly completed.",
+          "No demonstrated role completion."
+        ]
+      },
+      {
+        "title": "Five-point explanation",
+        "description": "Problem, goal, contribution, test result, and improvement.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 points are specific and accurate.",
+          "4 points are specific and accurate.",
+          "2–3 points are usable.",
+          "0–1 point is usable."
+        ]
+      },
+      {
+        "title": "Evidence response",
+        "description": "Answer to one teacher question using shared project evidence.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Answer cites a specific log, test, or product result.",
+          "Answer is accurate but evidence is general.",
+          "Answer is partly accurate.",
+          "No usable answer."
+        ]
+      },
+      {
+        "title": "Closure and reflection",
+        "description": "Assigned closure task and five-field individual reflection.",
+        "points": [
+          9,
+          6,
+          3,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Closure is complete and all 5 reflection fields are specific.",
+          "Closure and 4 fields are complete.",
+          "Only closure or 2–3 fields are complete.",
+          "Neither is complete."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "4/40: charged computer and login; on-time start; responsible use; deadline. School-controlled failures use the fallback without deduction.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 8,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/8th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/8th grade - IIIT - Final Project Packet and Rubric - Scratch + micro:bit Game.docx",
+    "basename": "8th grade - IIIT - Final Project Packet and Rubric - Scratch + micro:bit Game - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Supplied game design",
+        "description": "Catch the Star sprites, starts, goal, controls, score, and obstacle.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 8 supplied elements are implemented accurately.",
+          "6–7 are accurate.",
+          "3–5 are accurate.",
+          "0–2 are accurate."
+        ]
+      },
+      {
+        "title": "Input mapping",
+        "description": "A/left and B/right mappings and labeled hardware fallback.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both directions work and mapping is explained accurately.",
+          "Both work; explanation has one gap.",
+          "One direction works or mapping is incomplete.",
+          "No working required input."
+        ]
+      },
+      {
+        "title": "Scratch logic",
+        "description": "Reset, movement, forever loop, conditions, score, and feedback behaviors.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 6 required behaviors work together.",
+          "4–5 work.",
+          "2–3 work.",
+          "0–1 works."
+        ]
+      },
+      {
+        "title": "Testing and debugging",
+        "description": "Five fixed tests, peer feedback, one correction, and same-condition retest.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 tests plus feedback, correction, and retest are complete.",
+          "4 tests plus correction/retest are complete.",
+          "2–3 tests or partial correction evidence.",
+          "0–1 test and no usable correction."
+        ]
+      },
+      {
+        "title": "Documentation and reflection",
+        "description": "Build log, speaking notes, and five reflection responses.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All three records are complete and specific.",
+          "All are present; one has gaps.",
+          "Only one or two are usable.",
+          "No usable documentation."
+        ]
+      },
+      {
+        "title": "Live demonstration",
+        "description": "90–120 second demo covers goal, controls, logic, test correction, and future step.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 5 points are accurate within time and project opens.",
+          "4 points are accurate or time is slightly outside range.",
+          "2–3 points are usable.",
+          "0–1 point is usable or no demo."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "9 of 90 points: checkpoint readiness, punctual starts, responsible file and material care, milestones, and final handoff. Documented school-controlled failures use the fallback without deduction.",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+          "One readiness, punctuality, or milestone issue is corrected after one reminder; final evidence remains checkable.",
+          "Readiness or milestone issues repeat, or one session lacks the device or login; some fallback project work is completed.",
+          "Readiness is not shown across checkpoints and the approved fallback or final evidence is not completed."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary.docx",
+    "basename": "9th grade - IIIT - Week 1 - Rubric for Summative 1 - Audiovisual Representation Vocabulary - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Ten required terms",
+        "description": "Includes all 10 named terms.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Includes all 10 named terms.",
+          "Includes 9 terms.",
+          "Includes 6–8 terms.",
+          "Includes 0–5 terms."
+        ]
+      },
+      {
+        "title": "Ten definitions",
+        "description": "All 10 are accurate, clear, and based on the source.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 are accurate, clear, and based on the source.",
+          "Nine are accurate; one needs correction.",
+          "Six to eight are accurate.",
+          "Zero to five are accurate."
+        ]
+      },
+      {
+        "title": "Ten examples",
+        "description": "All 10 examples correctly match their terms.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All 10 examples correctly match their terms.",
+          "Nine examples are correct.",
+          "Six to eight examples are correct.",
+          "Zero to five examples are correct."
+        ]
+      },
+      {
+        "title": "Three-to-five-sentence connection",
+        "description": "Names the setting, change, and correct file-size result in 3–5 sentences.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names the setting, change, and correct file-size result in 3–5 sentences.",
+          "Includes all three ideas; one needs detail.",
+          "Includes only one or two accurate ideas or misses the length.",
+          "Missing or contradicts the taught relationship."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check.docx",
+    "basename": "9th grade - IIIT - Week 2 - Rubric for Summative 2 - Image and Sound Representation Check - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Vocabulary meanings",
+        "description": "All five meanings are accurate in context.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All five meanings are accurate in context.",
+          "Four are accurate.",
+          "Two or three are accurate.",
+          "Zero or one is accurate."
+        ]
+      },
+      {
+        "title": "Image operations",
+        "description": "Both operations, results, and units are correct.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Both operations, results, and units are correct.",
+          "Both results are correct; one operation or unit is incomplete.",
+          "One result is correct or both show partial work.",
+          "Both are missing or incorrect."
+        ]
+      },
+      {
+        "title": "Sound and quality reasoning",
+        "description": "Correctly distinguishes rate from size and explains detail/file-size change.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Correctly distinguishes rate from size and explains detail/file-size change.",
+          "Meanings are correct; one relationship needs detail.",
+          "One meaning or relationship is correct.",
+          "Missing or incorrect."
+        ]
+      },
+      {
+        "title": "Compression recommendation",
+        "description": "Names one taught change, one size benefit, and one quality cost.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names one taught change, one size benefit, and one quality cost.",
+          "All three are present; one needs detail.",
+          "Only one or two accurate parts are present.",
+          "Missing or unsupported."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis.docx",
+    "basename": "9th grade - IIIT - Week 6 - Rubric for Summative 3 - Cybersecurity Scenario Analysis - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Six threat identifications",
+        "description": "All six fit the fixed scenarios.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six fit the fixed scenarios.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit."
+        ]
+      },
+      {
+        "title": "Six protection choices",
+        "description": "All six are safe and match the threats.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six are safe and match the threats.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit or an unsafe action appears."
+        ]
+      },
+      {
+        "title": "Three evidence justifications",
+        "description": "All three name the clue, explain the threat, and explain protection effect.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All three name the clue, explain the threat, and explain protection effect.",
+          "All three exist; one explanation needs detail.",
+          "Only one or two are complete.",
+          "None is complete."
+        ]
+      },
+      {
+        "title": "School protection rule",
+        "description": "Uses one taught protection and explains broad school benefit safely.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses one taught protection and explains broad school benefit safely.",
+          "Safe and broad; one reason needs detail.",
+          "Partly useful or weakly explained.",
+          "Missing, unsafe, or unrelated."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map.docx",
+    "basename": "9th grade - IIIT - Week 7 - Rubric for Summative 4 - Cybersecurity Risk Map - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Fixed records R1–R6",
+        "description": "All six have asset and threat/event analysis.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All six have asset and threat/event analysis.",
+          "Five are complete.",
+          "Three or four are complete.",
+          "Zero to two are complete."
+        ]
+      },
+      {
+        "title": "Probability and impact",
+        "description": "All ratings are separate, consistent, and supported by record facts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All ratings are separate, consistent, and supported by record facts.",
+          "All ratings exist; one or two facts need correction.",
+          "Several ratings or facts are missing.",
+          "Mostly missing or arbitrary."
+        ]
+      },
+      {
+        "title": "Six protections",
+        "description": "Every record has a feasible taught protection and effect.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Every record has a feasible taught protection and effect.",
+          "Five fit.",
+          "Three or four fit.",
+          "Zero to two fit or an unsafe action appears."
+        ]
+      },
+      {
+        "title": "Priority paragraph",
+        "description": "Uses record ID, probability, impact, and a fact to defend priority.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses record ID, probability, impact, and a fact to defend priority.",
+          "All supports appear; one needs detail.",
+          "Only one or two supports appear.",
+          "Missing or contradicts the map."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Daily/9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal.docx",
+    "basename": "9th grade - IIIT - Week 9 - Rubric for Summative 5 - STEM Project Proposal - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned problem, users, and goal",
+        "description": "Option, fixed problem/users, need, and measurable goal are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Option, fixed problem/users, need, and measurable goal are complete.",
+          "All are present; one needs detail.",
+          "Two are missing or broad.",
+          "No usable assigned problem and goal."
+        ]
+      },
+      {
+        "title": "Product, tool, and labeled design",
+        "description": "Allowed product/tool, resources, location, and input-process/output design are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Allowed product/tool, resources, location, and input-process/output design are complete.",
+          "All are present; one needs correction.",
+          "Several parts are incomplete.",
+          "No feasible product and design."
+        ]
+      },
+      {
+        "title": "Criteria C1–C3",
+        "description": "All fixed inputs, expected results, and measurable pass rules are complete.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All fixed inputs, expected results, and measurable pass rules are complete.",
+          "All three exist; one result/rule needs detail.",
+          "Only one or two are complete.",
+          "No usable criteria."
+        ]
+      },
+      {
+        "title": "Evidence plan and limitation",
+        "description": "All seven named evidence items and one realistic limitation appear.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "All seven named evidence items and one realistic limitation appear.",
+          "All appear; one needs detail.",
+          "Several are missing.",
+          "No checkable evidence plan."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process.docx",
+    "basename": "9th grade - IIIT - Week 4 - Rubric for Appreciation Grade 1 - STEAM Preparation and Work Process - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Preparation",
+        "description": "In both weeks, uses the brief, states project/role, locates the product, and begins the named task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "In both weeks, uses the brief, states project/role, locates the product, and begins the named task.",
+          "All four actions occur with one reminder.",
+          "Only two or three occur or repeated reminders are needed.",
+          "Zero or one occurs; no preparation evidence."
+        ]
+      },
+      {
+        "title": "Participation and role",
+        "description": "Completes the assigned role and useful work at every checkpoint.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role and useful work at every checkpoint.",
+          "One checkpoint or detail is incomplete.",
+          "Only part of the role is completed.",
+          "No usable individual contribution evidence."
+        ]
+      },
+      {
+        "title": "Responsible work",
+        "description": "Uses files, materials, time, and communication safely and completes the handoff.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Uses files, materials, time, and communication safely and completes the handoff.",
+          "One corrected reminder is needed.",
+          "Repeated reminders are needed.",
+          "Unsafe use or blocked group progress."
+        ]
+      },
+      {
+        "title": "Individual work log",
+        "description": "At least three dated entries each name task, result, and next step.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "At least three dated entries each name task, result, and next step.",
+          "Two are complete and one is partial.",
+          "One is complete or entries are vague.",
+          "No checkable individual log."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Appreciation/9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure.docx",
+    "basename": "9th grade - IIIT - Week 5 - Rubric for Appreciation Grade 2 - STEAM Expo Participation and Closure - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Assigned expo role",
+        "description": "Completes the assigned role without missing parts.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Completes the assigned role without missing parts.",
+          "Completes it with one prompt or small missing part.",
+          "Completes only part or needs several prompts.",
+          "Does not complete the role or approved make-up."
+        ]
+      },
+      {
+        "title": "Five-point explanation",
+        "description": "Clearly explains problem, product, process, test result, and improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Clearly explains problem, product, process, test result, and improvement.",
+          "Explains four points.",
+          "Explains two or three points.",
+          "Explains zero or one point."
+        ]
+      },
+      {
+        "title": "Respect and cleanup",
+        "description": "Listens, follows directions, and completes the assigned cleanup/return task.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Listens, follows directions, and completes the assigned cleanup/return task.",
+          "One corrected reminder.",
+          "Repeated reminders or one part incomplete.",
+          "Participation or cleanup evidence is absent."
+        ]
+      },
+      {
+        "title": "Individual reflection",
+        "description": "Names one specific result, challenge, and improvement.",
+        "points": [
+          9,
+          7,
+          5,
+          2
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names one specific result, challenge, and improvement.",
+          "All three appear; one needs detail.",
+          "Only one or two are clear.",
+          "Missing or unrelated."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device and login ready; on time; responsible use; deadline met.",
+        "points": [
+          4,
+          3,
+          2,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device and login ready; on time; responsible use; deadline met.",
+          "One issue corrected after one reminder; work remains checkable.",
+          "Device or login missing, late or unprepared, or repeated reminders; some fallback work.",
+          "No device or login and no fallback, no checkable work, or responsible-use rules refused."
+        ]
+      }
+    ]
+  },
+  {
+    "grade": 9,
+    "source": "/Users/pjriosc/Documents/Technology 6A/plans/9th Grade Technology/Assessments/Rubrics/IIIT/Exam Projects/9th grade - IIIT - Final Project Packet and Rubric - STEM Project.docx",
+    "basename": "9th grade - IIIT - Final Project Packet and Rubric - STEM Project - Google Classroom Rubric.xlsx",
+    "criteria": [
+      {
+        "title": "Approved problem and design",
+        "description": "Assigned option, problem, users, goal, approved tool, resources, labeled design, and C1–C3 are complete and consistent.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Assigned option, problem, users, goal, approved tool, resources, labeled design, and C1–C3 are complete and consistent.",
+          "Most elements are complete; one or two need correction.",
+          "Several elements are missing or broad.",
+          "No usable approved plan."
+        ]
+      },
+      {
+        "title": "Prototype or product",
+        "description": "The checkable product performs the card's required action for all three fixed inputs.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "The checkable product performs the card's required action for all three fixed inputs.",
+          "The main action works for two inputs or has one minor issue.",
+          "Only one input works or the product is partial.",
+          "No checkable product or paper equivalent."
+        ]
+      },
+      {
+        "title": "Controlled testing",
+        "description": "Records at least three trials using C1–C3, expected and actual results, pass status, and evidence location.",
+        "points": [
+          14,
+          10,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Records at least three trials using C1–C3, expected and actual results, pass status, and evidence location.",
+          "Three trials exist; one or two fields need detail.",
+          "Fewer than three complete trials or inconsistent conditions.",
+          "No meaningful test record."
+        ]
+      },
+      {
+        "title": "Evidence-based improvement",
+        "description": "Names a weakness proved by results, makes one focused change, repeats an equivalent test, and compares before/after results.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Names a weakness proved by results, makes one focused change, repeats an equivalent test, and compares before/after results.",
+          "All steps appear; one link needs detail.",
+          "A change exists but evidence or comparison is weak.",
+          "No evidence-based improvement."
+        ]
+      },
+      {
+        "title": "Logbook and files",
+        "description": "v1, final, records file, dated log entries, decisions, feedback, and next actions are complete and accessible.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "v1, final, records file, dated log entries, decisions, feedback, and next actions are complete and accessible.",
+          "Most items are complete; one or two need correction.",
+          "Documentation has several gaps.",
+          "Documentation is mostly missing."
+        ]
+      },
+      {
+        "title": "Demo and reflection",
+        "description": "In 1–2 minutes shows the product and explains problem, users, tool, choice, three results, improvement, limitation, and learning; reflection answers all seven prompts.",
+        "points": [
+          13,
+          9,
+          5,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "In 1–2 minutes shows the product and explains problem, users, tool, choice, three results, improvement, limitation, and learning; reflection answers all seven prompts.",
+          "Most explanation and reflection parts are clear.",
+          "Several required parts are missing or vague.",
+          "Demo/reflection evidence is missing."
+        ]
+      },
+      {
+        "title": "Punctuality, responsibility, and readiness",
+        "description": "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+        "points": [
+          9,
+          7,
+          4,
+          0
+        ],
+        "levels": [
+          "Complete evidence",
+          "Minor gap",
+          "Partial evidence",
+          "Not demonstrated"
+        ],
+        "levelDescriptions": [
+          "Device, login, and materials are ready at every checkpoint; starts and milestones are on time; files are organized; final evidence is submitted.",
+          "One readiness, punctuality, or milestone issue is corrected after one reminder; final evidence remains checkable.",
+          "Readiness or milestone issues repeat, or one session lacks the device or login; some fallback project work is completed.",
+          "Readiness is not shown across checkpoints and the approved fallback or final evidence is not completed."
+        ]
+      }
+    ]
+  }
+]

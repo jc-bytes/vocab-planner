@@ -1,0 +1,9 @@
+<!-- Converted from: 7th Grade Final Project - IIIT - 2026.pdf -->
+
+> **Archived source text — do not assign.** The active closed-world exam is **Mandrake Obstacle-Detection System**, December 4, 2026. Use `Materials/Lesson Packages/T3 2026/Mandrake Project/01 Project Brief.md`, its fixed packet, and the dated rubric.
+
+Academia Internacional David Mandrake Detection System Presentation  7th Grade Final Project Third Trimester 
+Mandrake Detection System Project Overview In this project, you will recreate the behavior of a Mandrágora (Mandrake) from the Harry Potter universe. You will use a micro:bit, an ultrasonic sensor, and a computer or speaker to play the Mandrake scream when it is removed from its pot. The micro:bit will constantly measure distance using the ultrasonic sensor. When the Mandrágora is inside the pot, the distance is short. When you lift the Mandrágora out, the distance becomes much larger. The micro:bit will detect this change and send a Bluetooth signal to the computer to play the scream sound. Objectives • Understand how input (distance) controls output (sound). • Learn how sensors work with micro:bit. • Practice explaining your system clearly in a short presentation. Your Presentation (1–1:30 minutes) Use this structure to prepare your explanation: 
+
+
+1. State your project’s name and purpose. Example: “My project is a Mandrágora Detection System. It senses when the Mandrake is removed and plays a scream sound.” 2. Explain how it works: parts, sensor reading, and Bluetooth signal. Example: “The ultrasonic sensor measures distance. When the distance gets bigger, the micro:bit sends a Bluetooth message to play the sound.” 3. Describe one challenge you had and how you fixed it. Example: “The distance reading was unstable, so I adjusted the sensor’s position.” 4. Show the final result and what you would improve. Example: “The system works well now. I would improve it by making the detection faster.”

@@ -1,0 +1,31 @@
+{
+  "id": "MOD-DOMAIN-TOPIC-01",
+  "title": "Module Title",
+  "slug": "module-title",
+  "version": "0.1.0",
+  "status": "prototype",
+  "recommendedGrades": [],
+  "tracks": [
+    "Foundation",
+    "Core",
+    "Extension"
+  ],
+  "sourcePath": "technology-learning-hub/modules/module-title",
+  "publishedUrl": null,
+  "owner": "Porfirio Rios",
+  "lastReviewed": null,
+  "estimatedMinutes": null,
+  "prerequisites": [],
+  "objectives": [],
+  "sections": [
+    {
+      "id": "S1",
+      "title": "Start",
+      "entryPath": "/modules/module-title/start",
+      "estimatedMinutes": 10
+    }
+  ],
+  "evidence": [],
+  "knownRisks": [],
+  "planningUse": "Do not reference until status is ready, or pilot with a verified fallback."
+}
