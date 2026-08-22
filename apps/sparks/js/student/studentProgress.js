@@ -50,10 +50,6 @@ export class StudentProgress {
         return this.core.normalizeCoinHistory(history);
     }
 
-    mergeCoinHistories(...histories) {
-        return this.core.mergeCoinHistories(...histories);
-    }
-
     timestampMs(value) {
         return this.core.timestampMs(value);
     }
@@ -64,10 +60,6 @@ export class StudentProgress {
 
     getUnsyncedLocalCoinHistory(cloudHistory = []) {
         return this.core.getUnsyncedLocalCoinHistory(cloudHistory);
-    }
-
-    hasAuthoritativeLocalCoinActivity(cloudHistory = [], cloudUpdatedAt = null) {
-        return this.core.hasAuthoritativeLocalCoinActivity(cloudHistory, cloudUpdatedAt);
     }
 
     loadLocalProgress(options = {}) {
@@ -82,17 +74,13 @@ export class StudentProgress {
         return this.core.resetSessionState();
     }
 
-    getLocalProgressStorageKey(ownerUserId) {
-        return this.core.getLocalProgressStorageKey(ownerUserId);
-    }
-
     scheduleCloudSync() {
         if (!this.sm.currentUser) return;
         this.sm.setAuthStatus('Saving...');
         this.cancelScheduledCloudSync();
         this.scheduledCloudSaveTimeout = setTimeout(() => {
             this.scheduledCloudSaveTimeout = null;
-            this.saveProgressToCloud();
+            this.cloud.saveProgressToCloud();
         }, 1000);
     }
 
@@ -140,10 +128,6 @@ export class StudentProgress {
 
     loadCloudProgress(options = {}) {
         return this.cloud.loadCloudProgress(options);
-    }
-
-    saveProgressToCloud() {
-        return this.cloud.saveProgressToCloud();
     }
 
     buildUnitWorkSyncPayload() {

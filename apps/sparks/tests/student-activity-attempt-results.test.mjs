@@ -11,6 +11,10 @@ const timingSql = await readFile(new URL(
     '../supabase/migrations/20260821022219_add_active_activity_time_limits.sql',
     import.meta.url
 ), 'utf8');
+const expiredAttemptSql = await readFile(new URL(
+    '../supabase/migrations/20260822144658_replace_expired_activity_attempts.sql',
+    import.meta.url
+), 'utf8');
 const flashcardAccuracySql = await readFile(new URL(
     '../supabase/migrations/20260821022218_tolerate_inconsistent_flashcard_accuracy_counts.sql',
     import.meta.url
@@ -90,6 +94,21 @@ test('timed attempts resume, record active seconds, and keep the limit snapshot'
     assert.match(timingSql, /from public\.student_activity_progress progress[\s\S]*progress\.is_complete/i);
     assert.match(timingSql, /if not already_completed then[\s\S]*activityTimeLimits/i);
     assert.match(timingSql, /'practiceOnly', already_completed/i);
+});
+
+test('activity launches replace unfinished attempts that the completion RPC would reject as expired', () => {
+    assert.match(
+        expiredAttemptSql,
+        /started_at >= now\(\) - interval '4 hours'/i
+    );
+    assert.match(
+        expiredAttemptSql,
+        /finished_at is null[\s\S]*completed_at is null[\s\S]*started_at >= now\(\) - interval '4 hours'/i
+    );
+    assert.match(
+        expiredAttemptSql,
+        /if attempt_row\.id is null then[\s\S]*insert into private\.student_activity_attempts/i
+    );
 });
 
 test('late overrides require teacher access and a reason through narrow RPCs', () => {

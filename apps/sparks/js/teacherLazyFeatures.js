@@ -1,7 +1,10 @@
 import { notifications, setupModal } from './main.js';
 import { initTeacherSettingsListeners } from './teacherSettingsListeners.js';
+import { createFeatureContext } from './services/featureContext.js';
 
 const featurePromises = new Map();
+const initializedFeatures = new WeakMap();
+const featureContexts = new WeakMap();
 
 const featureTemplateIds = {
     sparks: ['teacher-sparks-modal-template'],
@@ -22,42 +25,61 @@ function mountTeacherFeatureTemplates(featureName) {
     });
 }
 
+function captureFeatureMethods(installMethods) {
+    class FeatureMethods {}
+    installMethods(FeatureMethods);
+    return Object.getOwnPropertyDescriptors(FeatureMethods.prototype);
+}
+
+function getFeatureContext(manager, featureName, methods) {
+    let managerContexts = featureContexts.get(manager);
+    if (!managerContexts) {
+        managerContexts = new Map();
+        featureContexts.set(manager, managerContexts);
+    }
+    if (managerContexts.has(featureName)) return managerContexts.get(featureName);
+
+    const context = createFeatureContext(manager, methods);
+    managerContexts.set(featureName, context);
+    return context;
+}
+
 const featureDefinitions = {
-    sparks: async manager => {
-        setupModal('#spark-modal', {
-            dismissible: true,
-            onClose: () => {
-                manager.editingSparkId = null;
-                manager.sparkModalMode = 'create';
-                manager.setSparkModalStatus?.('');
-            }
-        });
+    sparks: async () => {
         const module = await import('./teacherSparks.js');
-        module.installTeacherSparkMethods(manager.constructor);
-        if (!manager.sparkListenersInitialized) {
-            manager.sparkListenersInitialized = true;
-            module.initTeacherSparksListeners(manager);
-        }
+        return {
+            methods: captureFeatureMethods(module.installTeacherSparkMethods),
+            initialize(manager) {
+                setupModal('#spark-modal', {
+                    dismissible: true,
+                    onClose: () => {
+                        manager.editingSparkId = null;
+                        manager.sparkModalMode = 'create';
+                        manager.setSparkModalStatus?.('');
+                    }
+                });
+                module.initTeacherSparksListeners(manager);
+            }
+        };
     },
-    groups: async manager => {
+    groups: async () => {
         const module = await import('./teacherGroups.js');
-        module.installTeacherGroupsMethods(manager.constructor);
+        return { methods: captureFeatureMethods(module.installTeacherGroupsMethods) };
     },
-    dataManagement: async manager => {
+    dataManagement: async () => {
         const module = await import('./teacherDataManagement.js');
-        module.installTeacherDataManagementMethods(manager.constructor);
-        if (!manager.dataManagementSettingsListenersInitialized) {
-            manager.dataManagementSettingsListenersInitialized = true;
-            initTeacherSettingsListeners(manager);
-        }
+        return {
+            methods: captureFeatureMethods(module.installTeacherDataManagementMethods),
+            initialize: initTeacherSettingsListeners
+        };
     },
-    wordHuntReview: async manager => {
+    wordHuntReview: async () => {
         const module = await import('./teacherWordHuntReview.js');
-        module.installTeacherWordHuntReviewMethods(manager.constructor);
+        return { methods: captureFeatureMethods(module.installTeacherWordHuntReviewMethods) };
     },
-    quizzes: async manager => {
+    quizzes: async () => {
         const module = await import('./teacherQuiz.js');
-        module.installTeacherQuizMethods(manager.constructor);
+        return { methods: captureFeatureMethods(module.installTeacherQuizMethods) };
     }
 };
 
@@ -65,23 +87,34 @@ async function ensureTeacherFeature(manager, featureName) {
     if (!featurePromises.has(featureName)) {
         const loader = featureDefinitions[featureName];
         mountTeacherFeatureTemplates(featureName);
-        featurePromises.set(featureName, loader(manager).catch(error => {
+        featurePromises.set(featureName, loader().catch(error => {
             featurePromises.delete(featureName);
             throw error;
         }));
     }
-    await featurePromises.get(featureName);
+    const feature = await featurePromises.get(featureName);
+    const context = getFeatureContext(manager, featureName, feature.methods);
+    let initialized = initializedFeatures.get(manager);
+    if (!initialized) {
+        initialized = new Set();
+        initializedFeatures.set(manager, initialized);
+    }
+    if (!initialized.has(featureName)) {
+        feature.initialize?.(context);
+        initialized.add(featureName);
+    }
+    return { feature, context };
 }
 
 function installLazyMethod(TeacherManager, methodName, featureName) {
     async function lazyFeatureMethod(...args) {
         try {
-            await ensureTeacherFeature(this, featureName);
-            const installedMethod = this[methodName];
-            if (installedMethod === lazyFeatureMethod) {
+            const { feature, context } = await ensureTeacherFeature(this, featureName);
+            const installedMethod = feature.methods[methodName]?.value;
+            if (typeof installedMethod !== 'function') {
                 throw new Error(`${featureName} did not install ${methodName}.`);
             }
-            return installedMethod.apply(this, args);
+            return installedMethod.apply(context, args);
         } catch (error) {
             console.error(`Could not load teacher feature ${featureName}:`, error);
             notifications.error('That teacher tool could not load. Please try again.');

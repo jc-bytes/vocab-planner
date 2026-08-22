@@ -81,10 +81,6 @@ export class StudentActivities {
         return this.schedule.getTrimesterLabel(trimester);
     }
 
-    getTrimesterShortLabel(trimester) {
-        return this.schedule.getTrimesterShortLabel(trimester);
-    }
-
     getTrimesterOrder(trimester) {
         return this.schedule.getTrimesterOrder(trimester);
     }
@@ -205,10 +201,6 @@ export class StudentActivities {
         return this.vocabularyData.renderSubjectPicker(targetId);
     }
 
-    loadCloudVocabularies() {
-        return this.vocabularyData.loadCloudVocabularies();
-    }
-
     loadVocabularyOverride(vocabMeta) {
         return this.vocabularyData.loadVocabularyOverride(vocabMeta);
     }
@@ -227,10 +219,6 @@ export class StudentActivities {
 
     initWordCoverage() {
         return this.coverage.initWordCoverage();
-    }
-
-    getUnpracticedWords(activityType, allWords) {
-        return this.coverage.getUnpracticedWords(activityType, allWords);
     }
 
     markWordsPracticed(activityType, words) {

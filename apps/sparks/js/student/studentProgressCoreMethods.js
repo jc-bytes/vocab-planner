@@ -1,10 +1,6 @@
-import {
-    DEFAULT_COIN_DATA,
-    LOCAL_COIN_AUTHORITY_MS
-} from './studentProgressConstants.js';
+import { DEFAULT_COIN_DATA } from './studentProgressConstants.js';
 import { getStudentExperience } from './studentExperience.js';
 import {
-    getStudentProgressStorageKey,
     readStudentJson,
     writeStudentJson
 } from './persistence/studentStorage.js';
@@ -119,10 +115,6 @@ export class StudentProgressCore {
             .slice(-100);
     }
 
-    mergeCoinHistories(...histories) {
-        return this.normalizeCoinHistory(histories.flat());
-    }
-
     timestampMs(value) {
         if (!value) return 0;
         if (typeof value === 'object' && value.seconds !== undefined) return value.seconds * 1000;
@@ -140,17 +132,6 @@ export class StudentProgressCore {
     getUnsyncedLocalCoinHistory(cloudHistory = []) {
         const cloudKeys = new Set(this.normalizeCoinHistory(cloudHistory).map(entry => entry.id));
         return this.normalizeCoinHistory(this.sm.coinHistory).filter(entry => !cloudKeys.has(entry.id));
-    }
-
-    hasAuthoritativeLocalCoinActivity(cloudHistory = [], cloudUpdatedAt = null) {
-        const unsynced = this.getUnsyncedLocalCoinHistory(cloudHistory);
-        if (unsynced.length === 0) return false;
-
-        const newestUnsynced = this.latestCoinHistoryMs(unsynced);
-        const cloudUpdated = this.timestampMs(cloudUpdatedAt);
-        const isFresh = Date.now() - newestUnsynced <= LOCAL_COIN_AUTHORITY_MS;
-
-        return isFresh || newestUnsynced > cloudUpdated;
     }
 
     resetSessionState() {
@@ -220,10 +201,6 @@ export class StudentProgressCore {
         } catch (e) {
             console.error('Error saving progress:', e);
         }
-    }
-
-    getLocalProgressStorageKey(ownerUserId = this.sm.currentUser) {
-        return getStudentProgressStorageKey(ownerUserId);
     }
 
     applyCoinSnapshot(coinData, coinHistory, options = {}) {

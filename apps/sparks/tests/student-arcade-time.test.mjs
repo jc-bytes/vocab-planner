@@ -7,6 +7,10 @@ const migrationUrl = new URL(
     import.meta.url
 );
 const sql = await readFile(migrationUrl, 'utf8');
+const completionSafetySql = await readFile(new URL(
+    '../supabase/migrations/20260822145927_keep_activity_completion_when_arcade_reward_fails.sql',
+    import.meta.url
+), 'utf8');
 
 test('Arcade time is a protected server-authoritative wallet', () => {
     for (const table of ['student_arcade_time', 'student_arcade_time_ledger']) {
@@ -25,6 +29,13 @@ test('one first-time formative completion refreshes a non-stacking ten-minute wi
     assert.match(sql, /next_balance := 600/i);
     assert.match(sql, /seconds_added := greatest\(0, next_balance - wallet\.available_seconds\)/i);
     assert.match(sql, /lifetime_earned_seconds = lifetime_earned_seconds \+ seconds_added/i);
+});
+
+test('Arcade reward bookkeeping cannot reject a valid activity completion', () => {
+    assert.match(completionSafetySql, /v_event_key text :=/i);
+    assert.doesNotMatch(completionSafetySql, /\bevent_key text :=/i);
+    assert.match(completionSafetySql, /new\.user_id, v_event_key, seconds_added/i);
+    assert.match(completionSafetySql, /exception when others then[\s\S]*return new/i);
 });
 
 test('each Arcade minute atomically requires earned time and the server coin price', () => {

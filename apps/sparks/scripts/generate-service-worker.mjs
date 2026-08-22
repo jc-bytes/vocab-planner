@@ -1,29 +1,13 @@
 import { generateSW } from 'workbox-build';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { collectStudentPrecacheFiles } from './student-precache.mjs';
 
 const manifest = JSON.parse(await readFile('dist-desktop/.vite/manifest.json', 'utf8'));
 const studentEntryKey = Object.keys(manifest).find(key => manifest[key].isEntry && manifest[key].src === 'student.html');
 if (!studentEntryKey) throw new Error('The Vite manifest does not contain the student entry.');
 
-const precacheFiles = new Set(['student.html', 'vocabularies/manifest.json']);
-const visitedChunks = new Set();
-
-function collectStudentChunk(key) {
-  if (!key || visitedChunks.has(key)) return;
-  visitedChunks.add(key);
-  const chunk = manifest[key];
-  if (!chunk) return;
-  if (chunk.file) precacheFiles.add(chunk.file);
-  (chunk.css || []).forEach(file => precacheFiles.add(file));
-  (chunk.assets || []).forEach(file => precacheFiles.add(file));
-  (chunk.imports || []).forEach(collectStudentChunk);
-  (chunk.dynamicImports || [])
-    .filter(dynamicKey => !String(manifest[dynamicKey]?.file || '').includes('reportGenerator-'))
-    .forEach(collectStudentChunk);
-}
-
-collectStudentChunk(studentEntryKey);
+const precacheFiles = collectStudentPrecacheFiles(manifest, studentEntryKey);
 
 let precacheBytes = 0;
 const additionalManifestEntries = await Promise.all(Array.from(precacheFiles).sort().map(async url => {

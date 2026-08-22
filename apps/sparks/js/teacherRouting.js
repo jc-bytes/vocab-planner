@@ -1,22 +1,11 @@
+import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
+
 export function installTeacherRoutingMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
-        safeDecodeRoutePart(value) {
-            try {
-                return decodeURIComponent(value);
-            } catch {
-                return value;
-            }
-        },
-
         parseRoute(hash = window.location.hash) {
-            const rawHash = String(hash || '');
-            if (!rawHash || rawHash === '#') return null;
-
-            const routeText = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
-            const [rawPath, rawQuery = ''] = routeText.split('?');
-            const path = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
-            const parts = path.split('/').filter(Boolean).map(part => this.safeDecodeRoutePart(part));
-            const params = new URLSearchParams(rawQuery);
+            const location = parseHashLocation(hash);
+            if (!location) return null;
+            const { parts, params } = location;
 
             if (parts[0] !== 'teacher') return null;
             if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
@@ -118,11 +107,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         },
 
         setRoute(route, options = {}) {
-            const hash = this.buildRoute(route);
-            if (window.location.hash === hash) return;
-            const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
-            const method = options.replace ? 'replaceState' : 'pushState';
-            window.history[method](null, '', nextUrl);
+            writeHashLocation(this.buildRoute(route), options);
         },
 
         updateTeacherRouteForView(viewId, options = {}) {

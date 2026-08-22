@@ -14,14 +14,35 @@ const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
 const typographyCss = await readFile(new URL('../css/typography.css', import.meta.url), 'utf8');
 const landingCss = await readFile(new URL('../css/landing.css', import.meta.url), 'utf8');
+const { collectStudentPrecacheFiles } = await import('../scripts/student-precache.mjs');
 
 test('student offline shell is generated from the student entry graph only', () => {
     assert.match(viteConfig, /manifest:\s*true/);
     assert.match(serviceWorkerGenerator, /manifest\.json/);
     assert.match(serviceWorkerGenerator, /src === 'student\.html'/);
-    assert.match(serviceWorkerGenerator, /reportGenerator-/);
     assert.match(serviceWorkerGenerator, /globPatterns:\s*\[\]/);
     assert.doesNotMatch(serviceWorkerGenerator, /assets\/\*\*\/\*\.\{js,css\}/);
+
+    const manifest = {
+        'student.html': {
+            file: 'assets/student.js',
+            css: ['assets/student.css'],
+            imports: ['shared.js'],
+            dynamicImports: ['activity.js']
+        },
+        'shared.js': { file: 'assets/shared.js' },
+        'activity.js': { file: 'assets/activity.js' }
+    };
+    assert.deepEqual(
+        Array.from(collectStudentPrecacheFiles(manifest, 'student.html')).sort(),
+        [
+            'assets/shared.js',
+            'assets/student.css',
+            'assets/student.js',
+            'student.html',
+            'vocabularies/manifest.json'
+        ]
+    );
 });
 
 test('large upstream game artifacts remain excluded from deployment assets', () => {
@@ -56,6 +77,8 @@ test('teacher feature bundles are loaded only when their views are opened', () =
         assert.doesNotMatch(teacherEntry, new RegExp(`from ['\"]\\./${eagerModule}`));
         assert.match(teacherLazyFeatures, new RegExp(`import\\(['\"]\\./${eagerModule}`));
     }
+    assert.doesNotMatch(teacherLazyFeatures, /manager\.constructor/);
+    assert.match(teacherLazyFeatures, /feature\.methods\[methodName\]/);
 });
 
 test('quiz maker styles load with the lazy quiz feature', () => {

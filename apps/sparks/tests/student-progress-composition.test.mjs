@@ -131,7 +131,6 @@ test('StudentProgress declares its stable lifecycle interface directly', () => {
         'startCoinSync',
         'stopCoinSync',
         'loadCloudProgress',
-        'saveProgressToCloud',
         'flushLocalSyncQueue',
         'addCoins',
         'deductCoins',
@@ -221,7 +220,7 @@ test('scheduled cloud saving is owned and cancellable by StudentProgress', () =>
     globalThis.clearTimeout = timer => {
         clearedTimer = timer;
     };
-    progress.saveProgressToCloud = () => {
+    progress.cloud.saveProgressToCloud = () => {
         saveCount += 1;
     };
 

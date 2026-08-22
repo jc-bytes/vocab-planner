@@ -1,4 +1,4 @@
-/* Student entry stylesheet generated from style.css; includes shared primitives used by the student UI. */:root {
+/* Student entry stylesheet; includes shared primitives used by the student UI. */:root {
     --form-control-line-height: var(--line-height-body);
     /* Celestial Academy tokens */
     --color-surface: #0b1326;

@@ -1,5 +1,6 @@
 import { notifications } from './notifications.js';
 import { setStudentPageLoading } from './student/studentLoadingSkeletons.js';
+import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
 
 export class StudentRouting {
     constructor(studentManager) {
@@ -57,29 +58,16 @@ export class StudentRouting {
         return this.gamesPromise;
     }
 
-    safeDecodeRoutePart(value) {
-        try {
-            return decodeURIComponent(value);
-        } catch {
-            return value;
-        }
-    }
-
     parseRoute(hash = window.location.hash) {
-        const rawHash = String(hash || '');
-        if (!rawHash || rawHash === '#') return null;
-
-        const routeText = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
-        const [rawPath, rawQuery = ''] = routeText.split('?');
-        const path = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
-        const parts = path.split('/').filter(Boolean).map(part => this.safeDecodeRoutePart(part));
+        const location = parseHashLocation(hash);
+        if (!location) return null;
+        const { parts, params } = location;
 
         if (parts.length === 1 && parts[0] === 'menu') {
             return { view: 'menu' };
         }
 
         if (parts.length === 1 && parts[0] === 'units') {
-            const params = new URLSearchParams(rawQuery);
             return {
                 view: 'units',
                 all: params.get('all') === '1',
@@ -102,7 +90,6 @@ export class StudentRouting {
             }
 
             if (parts.length === 4 && parts[2] === 'activity' && parts[3]) {
-                const params = new URLSearchParams(rawQuery);
                 const wordParam = params.get('word');
                 let word = null;
                 let wordWasInvalid = false;
@@ -163,12 +150,7 @@ export class StudentRouting {
     }
 
     setRoute(route, options = {}) {
-        const hash = this.buildRoute(route);
-        if (window.location.hash === hash) return;
-
-        const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
-        const method = options.replace ? 'replaceState' : 'pushState';
-        window.history[method](null, '', nextUrl);
+        writeHashLocation(this.buildRoute(route), options);
     }
 
     async navigateTo(route, options = {}) {

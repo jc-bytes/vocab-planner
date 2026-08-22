@@ -175,6 +175,81 @@ test('completed multiple-choice state starts a fresh round instead of restoring 
     }
 });
 
+test('multiple-choice activities reject restored counters that the server would reject', () => {
+    for (const [ActivityClass, mode] of [
+        [QuizActivity, 'quiz-v1'],
+        [SynonymAntonymActivity, 'synonym-antonym-v1']
+    ]) {
+        const activity = Object.assign(Object.create(ActivityClass.prototype), {
+            words: [{ word: 'data' }, { word: 'model' }],
+            questions: [],
+            totalQuestions: 2,
+            currentIndex: 0,
+            score: 0,
+            answeredCount: 0,
+            selectedAnswers: [],
+            isFinished: false
+        });
+
+        assert.equal(activity.applySavedState({
+            mode,
+            wordsLength: 2,
+            wordKeys: ['data', 'model'],
+            questions: [
+                { word: 'data', options: ['A', 'B'] },
+                { word: 'model', options: ['C', 'D'] }
+            ],
+            currentIndex: 1,
+            score: 3,
+            answeredCount: 2,
+            selectedAnswers: [
+                { selected: 'A', correct: 'A', isCorrect: true },
+                { selected: 'C', correct: 'C', isCorrect: true }
+            ],
+            isFinished: false
+        }), false);
+    }
+});
+
+test('multiple-choice activities still restore consistent in-progress answers', () => {
+    for (const [ActivityClass, mode] of [
+        [QuizActivity, 'quiz-v1'],
+        [SynonymAntonymActivity, 'synonym-antonym-v1']
+    ]) {
+        const activity = Object.assign(Object.create(ActivityClass.prototype), {
+            words: [{ word: 'data' }, { word: 'model' }],
+            questions: [],
+            totalQuestions: 2,
+            currentIndex: 0,
+            score: 0,
+            answeredCount: 0,
+            selectedAnswers: [],
+            isFinished: false
+        });
+        const state = {
+            mode,
+            wordsLength: 2,
+            wordKeys: ['data', 'model'],
+            questions: [
+                { word: 'data', options: ['A', 'B'] },
+                { word: 'model', options: ['C', 'D'] }
+            ],
+            currentIndex: 1,
+            score: 1,
+            answeredCount: 1,
+            selectedAnswers: [
+                { selected: 'A', correct: 'A', isCorrect: true }
+            ],
+            isFinished: false
+        };
+
+        assert.equal(activity.applySavedState(state), true);
+        assert.equal(activity.score, 1);
+        assert.equal(activity.answeredCount, 1);
+        assert.deepEqual(activity.selectedAnswers, state.selectedAnswers);
+    }
+});
+
 test('accuracy activities distinguish finishing a round from mastering the activity', async () => {
     const [quizSource, synonymAntonymSource] = await Promise.all([
         readFile(new URL('../js/activities/quiz.js', import.meta.url), 'utf8'),

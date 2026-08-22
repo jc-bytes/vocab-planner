@@ -1,10 +1,8 @@
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
-import { studentApi } from '../services/studentApi.js';
 import { vocabularyRepository } from '../services/vocabularyRepository.js';
 import {
     getVocabSubjectSlug,
-    loadCloudVocabularyList,
     loadManifest,
     loadVocabularyFile
 } from '../services/vocabularyApi.js';
@@ -314,29 +312,6 @@ export class StudentActivityVocabularyData {
             this.sm.selectSubject(subjectSlug);
         }));
         container.appendChild(picker);
-    }
-
-    async loadCloudVocabularies() {
-        if (this.sm.authDisabled) {
-            this.activities.cloudVocabs = [];
-            return;
-        }
-
-        try {
-            this.activities.cloudVocabs = await loadCloudVocabularyList(studentApi);
-        } catch (error) {
-            console.error('Failed to load cloud vocabularies:', error);
-            const isOffline = !navigator.onLine;
-            if (isOffline) {
-                // Silently fail offline - we'll use local/manifest vocabularies
-                this.activities.cloudVocabs = [];
-            } else {
-                notifications.warning('Could not load cloud vocabularies. Using local versions.');
-                this.activities.cloudVocabs = [];
-            }
-            // Re-throw to let caller know we failed
-            throw error;
-        }
     }
 
     async loadVocabularyOverride(vocabMeta, options = {}) {

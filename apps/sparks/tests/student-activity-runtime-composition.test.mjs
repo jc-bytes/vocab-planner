@@ -42,7 +42,6 @@ const { ActivityTimeoutController } = await import('../js/activities/activityTim
 const { WordSearchActivity } = await import('../js/activities/wordSearch.js');
 const { attachWritingChecker } = await import('../js/studentWritingSuggestions.js');
 const { StudentManager } = await import('../js/student.js');
-const { StudentActivityAvailability } = await import('../js/student/studentActivityAvailability.js');
 const { StudentActivityBrowser } = await import('../js/student/studentActivityBrowserMethods.js');
 const { StudentActivityBrowserCards } = await import('../js/student/studentActivityBrowserCards.js');
 const { StudentActivityBrowserNavigation } = await import('../js/student/studentActivityBrowserNavigation.js');
@@ -620,10 +619,10 @@ test('StudentActivities owns explicit calendar and schedule components', () => {
 
     assert.ok(activities.calendar instanceof StudentActivityCalendar);
     assert.ok(activities.schedule instanceof StudentActivitySchedule);
-    assert.ok(activities.schedule.availability instanceof StudentActivityAvailability);
     assert.equal(activities.calendar.activities, activities);
     assert.equal(activities.schedule.activities, activities);
-    assert.equal(activities.schedule.availability.schedule, activities.schedule);
+    assert.equal(typeof activities.schedule.isStudentVocabularyAvailable, 'function');
+    assert.equal(typeof activities.schedule.getVocabularyWeekStartDate, 'function');
     assert.equal(activities.calendar.sm, manager);
 });
 
@@ -718,7 +717,6 @@ test('StudentManager omits owner-only legacy forwarding methods', () => {
         'loadManifest',
         'loadVocabulary',
         'showActivityMenu',
-        'loadCloudVocabularies',
         'startActivity',
         'formatTime',
         'updateArcadeUI',
@@ -803,7 +801,6 @@ test('StudentActivities declares its vocabulary data interface directly', () => 
         'getVisibleVocabularyList',
         'getGradeMatchedVocabularySources',
         'renderSubjectPicker',
-        'loadCloudVocabularies',
         'loadVocabularyOverride',
         'mergeVocabularyData',
         'loadVocabulary'
@@ -819,7 +816,6 @@ test('StudentActivities declares its vocabulary data interface directly', () => 
 test('StudentActivities declares its progress-flow and coverage interfaces directly', () => {
     for (const method of [
         'initWordCoverage',
-        'getUnpracticedWords',
         'markWordsPracticed',
         'getWordCoverageStats',
         'getPrioritizedWords',

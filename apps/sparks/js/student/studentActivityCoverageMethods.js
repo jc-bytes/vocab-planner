@@ -28,23 +28,6 @@ export class StudentActivityCoverage {
         this.wordCoverage = this.sm.progressData.wordCoverage[vocabName];
     }
 
-    getUnpracticedWords(activityType, allWords) {
-        if (!this.wordCoverage[activityType]) {
-            this.wordCoverage[activityType] = {};
-        }
-        
-        const practiced = this.wordCoverage[activityType];
-        const unpracticed = allWords.filter(w => !practiced[w.word]);
-        
-        // If all words have been practiced, reset and return all
-        if (unpracticed.length === 0) {
-            this.wordCoverage[activityType] = {};
-            return [...allWords];
-        }
-        
-        return unpracticed;
-    }
-
     markWordsPracticed(activityType, words) {
         if (!this.wordCoverage[activityType]) {
             this.wordCoverage[activityType] = {};

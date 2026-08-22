@@ -1,5 +1,6 @@
 import { createElement, $ } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
+import { hasConsistentMultipleChoiceState } from './multipleChoiceState.js';
 import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const MASTERY_ACCURACY = 80;
@@ -179,6 +180,7 @@ export class QuizActivity {
             this.totalQuestions = this.questions.length;
             return true;
         }
+        if (!hasConsistentMultipleChoiceState(state, this.totalQuestions)) return false;
 
         if (Array.isArray(state.questions) && state.questions.length === this.totalQuestions) {
             this.questions = state.questions;
@@ -297,6 +299,8 @@ export class QuizActivity {
     }
 
     handleAnswer(btn, selected, correct) {
+        if (this.selectedAnswers[this.currentIndex]) return;
+
         // Disable all buttons
         const buttons = this.container.querySelectorAll('.option-btn');
         buttons.forEach(b => b.disabled = true);
