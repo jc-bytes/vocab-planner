@@ -1,5 +1,5 @@
 import { $ } from './main.js';
-import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { supabaseService } from './supabaseService.js';
 import { SessionInitializationCoordinator } from './services/sessionInitialization.js';
 
 export const DEV_AUTH_DISABLED = false;

@@ -1,5 +1,5 @@
 import { $, $$, createElement, escapeHtml, notifications, openModal } from './main.js';
-import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { supabaseService } from './supabaseService.js';
 
 class TeacherStudentProgressRenderMethods {
     renderProgressTable() {

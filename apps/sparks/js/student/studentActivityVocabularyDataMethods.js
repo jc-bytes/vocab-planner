@@ -15,38 +15,6 @@ export class StudentActivityVocabularyData {
         this.sm = activities.sm;
     }
 
-    getCurrentTrimesterKey(...args) {
-        return this.activities.getCurrentTrimesterKey(...args);
-    }
-
-    getVocabTrimesterKey(...args) {
-        return this.activities.getVocabTrimesterKey(...args);
-    }
-
-    getTrimesterLabel(...args) {
-        return this.activities.getTrimesterLabel(...args);
-    }
-
-    filterStudentAvailableVocabulary(...args) {
-        return this.activities.filterStudentAvailableVocabulary(...args);
-    }
-
-    ensureUnitProgress(...args) {
-        return this.activities.ensureUnitProgress(...args);
-    }
-
-    initWordCoverage(...args) {
-        return this.activities.initWordCoverage(...args);
-    }
-
-    migrateLegacyWordHuntImages(...args) {
-        return this.activities.migrateLegacyWordHuntImages(...args);
-    }
-
-    showActivityMenu(...args) {
-        return this.activities.showActivityMenu(...args);
-    }
-
     async loadManifest() {
         const data = await loadManifest();
         if (data) {
@@ -163,20 +131,22 @@ export class StudentActivityVocabularyData {
         }
 
         if (currentTrimesterOnly) {
-            const currentTrimester = this.getCurrentTrimesterKey();
-            vocabs = vocabs.filter(v => this.getVocabTrimesterKey(v) === currentTrimester);
+            const currentTrimester = this.activities.calendar.getCurrentTrimesterKey();
+            vocabs = vocabs.filter(
+                vocab => this.activities.schedule.getVocabTrimesterKey(vocab) === currentTrimester
+            );
 
             if (vocabs.length === 0) {
                 const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
                 return {
                     vocabs: [],
-                    message: `No ${selectedSubject.name} ${this.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
+                    message: `No ${selectedSubject.name} ${this.activities.schedule.getTrimesterLabel(currentTrimester)} vocabularies found${gradeContext}.`
                 };
             }
         }
 
         if (availableOnly) {
-            vocabs = this.filterStudentAvailableVocabulary(vocabs);
+            vocabs = this.activities.schedule.filterStudentAvailableVocabulary(vocabs);
 
             if (vocabs.length === 0) {
                 const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
@@ -396,7 +366,7 @@ export class StudentActivityVocabularyData {
         }
 
         if (!options.deferActivityMenu) {
-            this.showActivityMenu(options);
+            this.activities.menu.showActivityMenu(options);
         }
 
         const pendingOverride = overridePromise
@@ -406,10 +376,10 @@ export class StudentActivityVocabularyData {
                     const merged = this.mergeVocabularyData({ meta: vocabMeta, fileData, override });
                     this.applyVocabularyData(merged);
                     if (!options.deferActivityMenu && !this.sm.currentActivityType) {
-                        this.showActivityMenu(options);
+                        this.activities.menu.showActivityMenu(options);
                     }
                 }
-                await this.migrateLegacyWordHuntImages();
+                await this.activities.wordHunt.migrateLegacyWordHuntImages();
             })
             .catch(error => {
                 if (!signal.aborted) console.warn('Could not finish loading live vocabulary settings:', error);
@@ -424,12 +394,12 @@ export class StudentActivityVocabularyData {
 
     applyVocabularyData(vocabData) {
         this.sm.currentVocab = vocabData;
-        const unitProgress = this.ensureUnitProgress(vocabData);
+        const unitProgress = this.activities.progressFlow.ensureUnitProgress(vocabData);
         this.sm.unitScores = unitProgress.scores;
         this.sm.unitImages = unitProgress.images;
         this.sm.unitWordHunt = unitProgress.wordHunt;
         this.sm.unitStates = unitProgress.states;
-        this.initWordCoverage();
+        this.activities.coverage.initWordCoverage();
     }
 
     renderVocabularyLoading(vocabMeta = {}, options = {}) {

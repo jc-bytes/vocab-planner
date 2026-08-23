@@ -10,10 +10,6 @@ export class StudentActivitySchedule {
         this.activities = activities;
     }
 
-    getCurrentTrimesterKey(...args) {
-        return this.activities.getCurrentTrimesterKey(...args);
-    }
-
     getVocabSchedule(vocab, date = new Date()) {
         let assignedDate = vocab.assignedDate || '';
         let month = String(vocab.month || '').trim().toLowerCase();
@@ -247,7 +243,7 @@ export class StudentActivitySchedule {
 
         return {
             date: currentDate,
-            trimester: this.getCurrentTrimesterKey(currentDate),
+            trimester: this.activities.calendar.getCurrentTrimesterKey(currentDate),
             month: monthKey,
             monthIndex: currentDate.getMonth()
         };

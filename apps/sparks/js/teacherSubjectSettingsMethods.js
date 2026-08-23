@@ -1,5 +1,5 @@
 import { $, createElement, escapeHtml, notifications } from './main.js';
-import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { supabaseService } from './supabaseService.js';
 import { subjectsRepository } from './services/subjectsRepository.js';
 import {
     DEFAULT_SUBJECT_SLUG,

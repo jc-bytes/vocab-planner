@@ -14,14 +14,10 @@ export class StudentActivityWordHunt {
         this.wordHuntExportInProgress = false;
     }
 
-    getCurrentUnitProgress(...args) {
-        return this.activities.getCurrentUnitProgress(...args);
-    }
-
     async uploadWordHuntImage(word, blob, imageInfo = {}) {
         if (this.sm.authDisabled || !this.sm.currentUser) return null;
 
-        const unitProgress = this.getCurrentUnitProgress();
+        const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
         const path = studentApi.buildWordHuntImagePath({
             userId: this.sm.currentUser.uid,
             schoolYear: unitProgress.schoolYear,
@@ -86,7 +82,7 @@ export class StudentActivityWordHunt {
     }
 
     getReportWordHuntEntries() {
-        const unitProgress = this.getCurrentUnitProgress();
+        const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
         const progressEntries = unitProgress?.wordHunt || {};
         const localEntries = this.getLocalWordHuntEntries(this.sm.currentVocab);
         const liveEntries = this.sm.activityInstance && typeof this.sm.activityInstance.getWordHuntEntries === 'function'
@@ -129,7 +125,7 @@ export class StudentActivityWordHunt {
             }
 
             const wordHunt = this.getReportWordHuntEntries();
-            const unitProgress = this.getCurrentUnitProgress();
+            const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
             const { ReportGenerator } = await import('../reportGenerator.js');
             await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
                 wordHunt,
@@ -150,7 +146,7 @@ export class StudentActivityWordHunt {
         if (this.sm.authDisabled || !this.sm.currentUser || !this.sm.currentVocab) return;
 
         const unitName = this.sm.currentVocab.name;
-        const unitProgress = this.getCurrentUnitProgress();
+        const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
         const images = unitProgress.images || {};
         const wordHunt = unitProgress.wordHunt || {};
         let changed = false;
@@ -198,7 +194,7 @@ export class StudentActivityWordHunt {
         const unitName = vocabName || (this.sm.currentVocab ? this.sm.currentVocab.name : null);
         if (!unitName) return;
         const unitProgress = this.sm.currentVocab && this.sm.currentVocab.name === unitName
-            ? this.getCurrentUnitProgress()
+            ? this.activities.progressFlow.getCurrentUnitProgress()
             : (this.sm.progressData.units?.[unitName] || null);
         if (!unitProgress) return;
 

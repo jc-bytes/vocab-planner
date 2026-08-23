@@ -1,5 +1,5 @@
 import { $, createElement, notifications } from '../main.js';
-import { teacherApi as supabaseService } from '../services/teacherApi.js';
+import { supabaseService } from '../supabaseService.js';
 
 export const teacherProgressDataMethods = {
 async showProgressView() {

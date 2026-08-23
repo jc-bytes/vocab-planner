@@ -1,5 +1,5 @@
 import { $, closeModal, notifications, openModal } from '../main.js';
-import { teacherApi as supabaseService } from '../services/teacherApi.js';
+import { supabaseService } from '../supabaseService.js';
 
 const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
 

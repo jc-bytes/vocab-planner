@@ -38,7 +38,7 @@ const { teacherWordHuntReviewImageMethods } = await import('../js/teacherWordHun
 const { teacherWordHuntReviewInteractionMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewInteractionMethods.js');
 const { teacherWordHuntReviewStateMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewStateMethods.js');
 const { teacherWordHuntReviewViewMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewViewMethods.js');
-const { teacherApi } = await import('../js/services/teacherApi.js');
+const { supabaseService } = await import('../js/supabaseService.js');
 
 class TeacherWordHuntReviewHarness {}
 installTeacherWordHuntReviewMethods(TeacherWordHuntReviewHarness);
@@ -208,9 +208,9 @@ test('Word Hunt loading uses its narrow data request and caches repeat visits', 
         throw new Error('Word Hunt review must not load complete student progress.');
     };
 
-    const originalGetWordHuntReviewData = teacherApi.getWordHuntReviewData;
+    const originalGetWordHuntReviewData = supabaseService.getWordHuntReviewData;
     let requests = 0;
-    teacherApi.getWordHuntReviewData = async () => {
+    supabaseService.getWordHuntReviewData = async () => {
         requests += 1;
         return [];
     };
@@ -223,6 +223,6 @@ test('Word Hunt loading uses its narrow data request and caches repeat visits', 
         await manager.loadWordHuntReview({ forceRefresh: true });
         assert.equal(requests, 2);
     } finally {
-        teacherApi.getWordHuntReviewData = originalGetWordHuntReviewData;
+        supabaseService.getWordHuntReviewData = originalGetWordHuntReviewData;
     }
 });

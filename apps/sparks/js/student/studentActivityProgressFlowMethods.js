@@ -14,18 +14,6 @@ export class StudentActivityProgressFlow {
         this.gateDisplay = new StudentActivityGateDisplay(this);
     }
 
-    getVocabTrimesterKey(...args) {
-        return this.activities.getVocabTrimesterKey(...args);
-    }
-
-    scheduleIdleTask(...args) {
-        return this.activities.scheduleIdleTask(...args);
-    }
-
-    loadActivityClass(...args) {
-        return this.activities.loadActivityClass(...args);
-    }
-
     getUnitGrade(vocab = this.sm.currentVocab) {
         const profileGrade = this.sm.studentProfile?.grade;
         if (profileGrade) return String(profileGrade);
@@ -53,7 +41,7 @@ export class StudentActivityProgressFlow {
             unitId: this.sm.getVocabRouteId(vocab),
             unitName: vocab.name || '',
             subjectSlug: getVocabSubjectSlug(vocab),
-            trimester: this.getVocabTrimesterKey(vocab),
+            trimester: this.activities.schedule.getVocabTrimesterKey(vocab),
             schoolYear: existing.schoolYear || getCurrentSchoolYear(),
             grade: this.getUnitGrade(vocab),
             scores: existing.scores || {},
@@ -406,10 +394,10 @@ export class StudentActivityProgressFlow {
         if (this.activityPreloadKeys.has(key)) return;
         this.activityPreloadKeys.add(key);
 
-        this.scheduleIdleTask(() => {
+        this.activities.calendar.scheduleIdleTask(() => {
             Promise.all([
                 import('./studentFeatureStyles.js'),
-                this.loadActivityClass(activityType)
+                this.activities.moduleLoader.loadActivityClass(activityType)
             ]).catch(() => {});
         }, 900);
     }

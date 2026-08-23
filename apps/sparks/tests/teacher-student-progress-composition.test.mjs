@@ -32,7 +32,7 @@ const {
     teacherStudentCsvImportMethods
 } = await import('../js/teacherStudentProgress/teacherStudentCsvImportMethods.js');
 const { teacherStudentProvisioningMethods } = await import('../js/teacherStudentProgress/teacherStudentProvisioningMethods.js');
-const { teacherApi } = await import('../js/services/teacherApi.js');
+const { supabaseService } = await import('../js/supabaseService.js');
 
 class TestTeacherManager {}
 installTeacherStudentProgressDataMethods(TestTeacherManager);
@@ -172,9 +172,9 @@ test('identity roster requests are shared and cached across teacher tools', asyn
     manager.allStudentData = [];
     manager.filteredStudentData = [];
 
-    const originalListStudentIdentityRoster = teacherApi.listStudentIdentityRoster;
+    const originalListStudentIdentityRoster = supabaseService.listStudentIdentityRoster;
     let requests = 0;
-    teacherApi.listStudentIdentityRoster = async () => {
+    supabaseService.listStudentIdentityRoster = async () => {
         requests += 1;
         await Promise.resolve();
         return [{ id: 'student-1', studentProfile: { grade: '6', group: 'A' } }];
@@ -194,6 +194,6 @@ test('identity roster requests are shared and cached across teacher tools', asyn
         await manager.getStudentRosterData({ forceRefresh: true });
         assert.equal(requests, 2);
     } finally {
-        teacherApi.listStudentIdentityRoster = originalListStudentIdentityRoster;
+        supabaseService.listStudentIdentityRoster = originalListStudentIdentityRoster;
     }
 });

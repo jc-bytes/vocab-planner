@@ -1,5 +1,5 @@
 import { $, $$, setupModal } from './main.js';
-import { teacherApi as supabaseService } from './services/teacherApi.js';
+import { supabaseService } from './supabaseService.js';
 
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
 

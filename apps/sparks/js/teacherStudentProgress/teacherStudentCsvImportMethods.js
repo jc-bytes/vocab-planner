@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { $, notifications } from '../main.js';
-import { teacherApi as supabaseService } from '../services/teacherApi.js';
+import { supabaseService } from '../supabaseService.js';
 
 export async function importStudentRecordsWithConcurrency(
     records,

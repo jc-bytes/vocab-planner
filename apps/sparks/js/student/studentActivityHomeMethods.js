@@ -14,54 +14,6 @@ export class StudentActivityHome {
         return this.spark.currentSparkSessionCache;
     }
 
-    getUnitProgressKey(...args) {
-        return this.activities.getUnitProgressKey(...args);
-    }
-
-    getActivityFlowConfig(...args) {
-        return this.activities.getActivityFlowConfig(...args);
-    }
-
-    renderSubjectPicker(...args) {
-        return this.activities.renderSubjectPicker(...args);
-    }
-
-    getVisibleVocabularyList(...args) {
-        return this.activities.getVisibleVocabularyList(...args);
-    }
-
-    getVocabSchedule(...args) {
-        return this.activities.getVocabSchedule(...args);
-    }
-
-    getVocabTrimesterKey(...args) {
-        return this.activities.getVocabTrimesterKey(...args);
-    }
-
-    getTrimesterLabel(...args) {
-        return this.activities.getTrimesterLabel(...args);
-    }
-
-    formatVocabularyCardTitle(...args) {
-        return this.activities.formatVocabularyCardTitle(...args);
-    }
-
-    formatVocabularyPurpose(...args) {
-        return this.activities.formatVocabularyPurpose(...args);
-    }
-
-    getVocabularyPurposeClass(...args) {
-        return this.activities.getVocabularyPurposeClass(...args);
-    }
-
-    loadVocabulary(...args) {
-        return this.activities.loadVocabulary(...args);
-    }
-
-    scheduleFirstVocabularyPreload(...args) {
-        return this.activities.scheduleFirstVocabularyPreload(...args);
-    }
-
     getUnitProgressSummary(vocab) {
         const completion = this.activities.getUnitRequiredCompletion(vocab);
         const { scores } = completion;
@@ -90,7 +42,7 @@ export class StudentActivityHome {
         if (!container) return;
         this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'renderStudentHome:clear' });
 
-        this.renderSubjectPicker('#student-subject-picker');
+        this.activities.vocabularyData.renderSubjectPicker('#student-subject-picker');
         container.innerHTML = '';
 
         try {
@@ -99,7 +51,7 @@ export class StudentActivityHome {
             console.warn('Could not refresh the current Spark gate', error);
         }
 
-        const { vocabs, message } = this.getVisibleVocabularyList({
+        const { vocabs, message } = this.activities.vocabularyData.getVisibleVocabularyList({
             availableOnly: true,
             currentTrimesterOnly: true
         });
@@ -108,7 +60,7 @@ export class StudentActivityHome {
         const currentMonth = today.getMonth();
         const currentWeek = Math.floor((today.getDate() - 1) / 7) + 1;
         const decoratedVocabs = vocabs.map(vocab => {
-            const schedule = this.getVocabSchedule(vocab, today);
+            const schedule = this.activities.schedule.getVocabSchedule(vocab, today);
             return {
                 kind: 'vocabulary',
                 id: `vocab:${vocab.path || vocab.name || ''}`,
@@ -201,7 +153,7 @@ export class StudentActivityHome {
         });
         this.bindHomePanelTabs(container);
         this.loadAndRenderCurrentSpark(container.querySelector('.student-spark-host'));
-        this.scheduleFirstVocabularyPreload(container);
+        this.activities.browser.cards.scheduleFirstVocabularyPreload(container);
 
         if (window.lucide) {
             window.lucide.createIcons({ root: container });
@@ -307,7 +259,9 @@ export class StudentActivityHome {
         const progressText = progress.requiredTotal > 0
             ? `${progress.completedRequired}/${progress.requiredTotal} required complete`
             : `${progress.bestScore}% best score`;
-        const scheduleText = schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab));
+        const scheduleText = schedule.label || this.activities.schedule.getTrimesterLabel(
+            this.activities.schedule.getVocabTrimesterKey(vocab)
+        );
 
         hero.style.setProperty('--subject-color', subject.color);
         hero.innerHTML = `
@@ -337,7 +291,7 @@ export class StudentActivityHome {
             hero.addEventListener('pointerenter', preload, { once: true });
             hero.addEventListener('focus', preload, { once: true });
         }
-        hero.addEventListener('click', () => this.loadVocabulary(vocab));
+        hero.addEventListener('click', () => this.activities.vocabularyData.loadVocabulary(vocab));
         return hero;
     }
 
@@ -373,7 +327,9 @@ export class StudentActivityHome {
         } else if (access.next?.vocab) {
             const continueButton = createElement('button', 'btn secondary-btn', 'Continue required work');
             continueButton.type = 'button';
-            continueButton.addEventListener('click', () => this.loadVocabulary(access.next.vocab));
+            continueButton.addEventListener('click', () => (
+                this.activities.vocabularyData.loadVocabulary(access.next.vocab)
+            ));
             notice.appendChild(continueButton);
         }
 
@@ -533,7 +489,11 @@ export class StudentActivityHome {
             <div class="student-home-unit-icon"><i data-lucide="book-open"></i></div>
             <div class="student-home-unit-copy">
                 <strong>${escapeHtml(vocab.name || 'Vocabulary Unit')}</strong>
-                <span>Vocabulary · ${escapeHtml(subject.name)} · ${escapeHtml(schedule.label || this.getTrimesterLabel(this.getVocabTrimesterKey(vocab)))}</span>
+                <span>Vocabulary · ${escapeHtml(subject.name)} · ${escapeHtml(
+                    schedule.label || this.activities.schedule.getTrimesterLabel(
+                        this.activities.schedule.getVocabTrimesterKey(vocab)
+                    )
+                )}</span>
             </div>
             <div class="student-home-unit-status">
                 <span>${progressText}</span>
@@ -545,7 +505,7 @@ export class StudentActivityHome {
             card.addEventListener('pointerenter', preload, { once: true });
             card.addEventListener('focus', preload, { once: true });
         }
-        card.addEventListener('click', () => this.loadVocabulary(vocab));
+        card.addEventListener('click', () => this.activities.vocabularyData.loadVocabulary(vocab));
         return card;
     }
 

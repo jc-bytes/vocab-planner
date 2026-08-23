@@ -7,45 +7,19 @@ export class StudentActivityBrowserNavigation {
         this.sm = browser.sm;
     }
 
-    buildVocabularyMonthGroups(...args) {
-        return this.browser.buildVocabularyMonthGroups(...args);
-    }
-
-    getCurrentTrimesterKey(...args) {
-        return this.browser.getCurrentTrimesterKey(...args);
-    }
-
-    getMonthLabel(...args) {
-        return this.browser.getMonthLabel(...args);
-    }
-
-    getMonthOrder(...args) {
-        return this.browser.getMonthOrder(...args);
-    }
-
-    getTrimesterLabel(...args) {
-        return this.browser.getTrimesterLabel(...args);
-    }
-
-    normalizeMonthKey(...args) {
-        return this.browser.normalizeMonthKey(...args);
-    }
-
-    renderDashboard(...args) {
-        return this.browser.renderDashboard(...args);
-    }
-
     getAutomaticStudentVocabularyLocation(trimesterGroups) {
         const stored = this.sm.getStoredStudentVocabularyLocation();
         const storedMonths = trimesterGroups.has(stored.trimester)
-            ? this.buildVocabularyMonthGroups(trimesterGroups.get(stored.trimester))
+            ? this.activities.schedule.buildVocabularyMonthGroups(trimesterGroups.get(stored.trimester))
             : null;
         if (storedMonths?.has(stored.month)) return stored;
 
-        const currentMonth = this.normalizeMonthKey(new Date().toLocaleString('en-US', { month: 'long' }));
-        const currentTrimester = this.getCurrentTrimesterKey();
+        const currentMonth = this.activities.schedule.normalizeMonthKey(
+            new Date().toLocaleString('en-US', { month: 'long' })
+        );
+        const currentTrimester = this.activities.calendar.getCurrentTrimesterKey();
         const currentTrimesterMonths = trimesterGroups.has(currentTrimester)
-            ? this.buildVocabularyMonthGroups(trimesterGroups.get(currentTrimester))
+            ? this.activities.schedule.buildVocabularyMonthGroups(trimesterGroups.get(currentTrimester))
             : null;
 
         if (currentTrimesterMonths?.has(currentMonth)) {
@@ -54,20 +28,23 @@ export class StudentActivityBrowserNavigation {
 
         const candidates = [];
         trimesterGroups.forEach((vocabs, trimester) => {
-            this.buildVocabularyMonthGroups(vocabs).forEach((_monthVocabs, month) => {
+            this.activities.schedule.buildVocabularyMonthGroups(vocabs).forEach((_monthVocabs, month) => {
                 if (month !== 'other') candidates.push({ trimester, month });
             });
         });
         candidates.sort((a, b) => {
-            const distance = Math.abs(this.getMonthOrder(a.month) - this.getMonthOrder(currentMonth))
-                - Math.abs(this.getMonthOrder(b.month) - this.getMonthOrder(currentMonth));
-            return distance || this.getMonthOrder(a.month) - this.getMonthOrder(b.month);
+            const distance = Math.abs(this.activities.schedule.getMonthOrder(a.month) - this.activities.schedule.getMonthOrder(currentMonth))
+                - Math.abs(this.activities.schedule.getMonthOrder(b.month) - this.activities.schedule.getMonthOrder(currentMonth));
+            return distance
+                || this.activities.schedule.getMonthOrder(a.month) - this.activities.schedule.getMonthOrder(b.month);
         });
         return candidates[0] || null;
     }
 
     isCurrentAcademicMonth(monthKey) {
-        return monthKey === this.normalizeMonthKey(new Date().toLocaleString('en-US', { month: 'long' }));
+        return monthKey === this.activities.schedule.normalizeMonthKey(
+            new Date().toLocaleString('en-US', { month: 'long' })
+        );
     }
 
     appendCurrentMonthBadge(target, monthKey) {
@@ -95,7 +72,7 @@ export class StudentActivityBrowserNavigation {
             const separator = createElement('span', 'teacher-library-breadcrumb-separator breadcrumb__separator', '/');
             separator.setAttribute('aria-hidden', 'true');
             nav.appendChild(separator);
-            const trimesterLabel = this.getTrimesterLabel(selectedTrimester);
+            const trimesterLabel = this.activities.schedule.getTrimesterLabel(selectedTrimester);
             const trimesterNode = selectedMonth
                 ? this.createStudentBreadcrumbButton(trimesterLabel, () => {
                     this.sm.studentVocabularyDrilldown = { trimester: selectedTrimester, month: null };
@@ -113,7 +90,7 @@ export class StudentActivityBrowserNavigation {
             const monthNode = createElement(
                 'span',
                 'teacher-library-breadcrumb-current breadcrumb__current',
-                this.getMonthLabel(selectedMonth)
+                this.activities.schedule.getMonthLabel(selectedMonth)
             );
             monthNode.setAttribute('aria-current', 'page');
             nav.appendChild(monthNode);
@@ -137,7 +114,7 @@ export class StudentActivityBrowserNavigation {
     setStudentVocabularyViewMode(mode) {
         this.activities.studentVocabularyViewMode = mode === 'rows' ? 'rows' : 'cards';
         localStorage.setItem('student_vocabulary_view_mode', this.activities.studentVocabularyViewMode);
-        this.renderDashboard();
+        this.browser.renderDashboard();
     }
 
     renderStudentVocabularyViewControls() {
@@ -166,7 +143,9 @@ export class StudentActivityBrowserNavigation {
 
     renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups) {
         const sortedMonths = Array.from(monthGroups.keys())
-            .sort((monthA, monthB) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB));
+            .sort((monthA, monthB) => (
+                this.activities.schedule.getMonthOrder(monthA) - this.activities.schedule.getMonthOrder(monthB)
+            ));
         const currentIndex = sortedMonths.indexOf(selectedMonth);
         const previousMonth = currentIndex > 0 ? sortedMonths[currentIndex - 1] : null;
         const nextMonth = currentIndex >= 0 && currentIndex < sortedMonths.length - 1
@@ -199,7 +178,11 @@ export class StudentActivityBrowserNavigation {
 
         const currentLabel = createElement('div', 'student-vocab-month-nav-current month-navigation__current');
         currentLabel.setAttribute('aria-current', 'date');
-        currentLabel.appendChild(createElement('span', null, this.getMonthLabel(selectedMonth)));
+        currentLabel.appendChild(createElement(
+            'span',
+            null,
+            this.activities.schedule.getMonthLabel(selectedMonth)
+        ));
 
         const nextButton = createElement(
             'button',

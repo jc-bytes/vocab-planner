@@ -1,7 +1,5 @@
 import { $ } from './main.js';
-import {
-    teacherApi as supabaseService
-} from './services/teacherApi.js';
+import { supabaseService } from './supabaseService.js';
 
 class TeacherStudentProgressCoinMethods {
     updateCoinStatus(message, state = 'muted') {

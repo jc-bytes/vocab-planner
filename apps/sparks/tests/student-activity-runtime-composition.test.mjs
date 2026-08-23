@@ -567,6 +567,72 @@ test('StudentActivities owns explicit browser and home components', () => {
     assert.equal(activities.home.sm, manager);
 });
 
+test('browser navigation does not duplicate calendar and schedule interfaces', () => {
+    for (const method of [
+        'buildVocabularyMonthGroups',
+        'getCurrentTrimesterKey',
+        'getMonthLabel',
+        'getMonthOrder',
+        'getTrimesterLabel',
+        'normalizeMonthKey',
+        'renderDashboard'
+    ]) {
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(StudentActivityBrowserNavigation.prototype, method),
+            false,
+            `${method} belongs to navigation's collaborators, not its interface`
+        );
+    }
+});
+
+test('student activity collaborators call their owners without parent pass-throughs', () => {
+    const duplicatedMethods = new Map([
+        [StudentActivitySchedule, ['getCurrentTrimesterKey']],
+        [StudentActivityProgressFlow, ['getVocabTrimesterKey', 'scheduleIdleTask', 'loadActivityClass']],
+        [StudentActivityWordHunt, ['getCurrentUnitProgress']],
+        [StudentActivityVocabularyData, [
+            'getCurrentTrimesterKey',
+            'getVocabTrimesterKey',
+            'getTrimesterLabel',
+            'filterStudentAvailableVocabulary',
+            'showActivityMenu'
+        ]]
+    ]);
+
+    duplicatedMethods.forEach((methods, ActivityModule) => {
+        methods.forEach(method => {
+            assert.equal(
+                Object.prototype.hasOwnProperty.call(ActivityModule.prototype, method),
+                false,
+                `${ActivityModule.name}.${method} duplicates a collaborator interface`
+            );
+        });
+    });
+});
+
+test('student home keeps presentation behavior without duplicating collaborator interfaces', () => {
+    for (const method of [
+        'getUnitProgressKey',
+        'getActivityFlowConfig',
+        'renderSubjectPicker',
+        'getVisibleVocabularyList',
+        'getVocabSchedule',
+        'getVocabTrimesterKey',
+        'getTrimesterLabel',
+        'formatVocabularyCardTitle',
+        'formatVocabularyPurpose',
+        'getVocabularyPurposeClass',
+        'loadVocabulary',
+        'scheduleFirstVocabularyPreload'
+    ]) {
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(StudentActivityHome.prototype, method),
+            false,
+            `${method} belongs to a student home collaborator`
+        );
+    }
+});
+
 test('pending local Spark answers win over older cloud data until offline sync completes', () => {
     const sparkHome = new StudentActivityHomeSpark({ activities: {}, sm: {} });
     const local = {
@@ -676,6 +742,20 @@ test('StudentActivities declares its stable runtime interface directly', () => {
             Object.prototype.hasOwnProperty.call(StudentActivities.prototype, method),
             true,
             `${method} must be declared by StudentActivities`
+        );
+    }
+});
+
+test('StudentActivities keeps vocabulary-loading collaborators behind its implementation', () => {
+    for (const method of [
+        'ensureUnitProgress',
+        'initWordCoverage',
+        'migrateLegacyWordHuntImages'
+    ]) {
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(StudentActivities.prototype, method),
+            false,
+            `${method} is internal wiring and must not expand the StudentActivities interface`
         );
     }
 });
@@ -815,12 +895,10 @@ test('StudentActivities declares its vocabulary data interface directly', () => 
 
 test('StudentActivities declares its progress-flow and coverage interfaces directly', () => {
     for (const method of [
-        'initWordCoverage',
         'markWordsPracticed',
         'getWordCoverageStats',
         'getPrioritizedWords',
         'getUnitProgressKey',
-        'ensureUnitProgress',
         'getActivityFlowConfig',
         'getUnitRequiredCompletion',
         'getPendingRequiredWork',
@@ -847,7 +925,6 @@ test('StudentActivities declares its Word Hunt interface directly', () => {
         'getReportWordHuntEntries',
         'setWordHuntExportButtonState',
         'downloadWordHuntSubmission',
-        'migrateLegacyWordHuntImages',
         'handleIllustrationSave'
     ]) {
         assert.equal(

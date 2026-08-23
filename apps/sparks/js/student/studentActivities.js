@@ -217,10 +217,6 @@ export class StudentActivities {
         return this.progressPersistence.startVerifiedActivityAttempt(activityType, options);
     }
 
-    initWordCoverage() {
-        return this.coverage.initWordCoverage();
-    }
-
     markWordsPracticed(activityType, words) {
         return this.coverage.markWordsPracticed(activityType, words);
     }
@@ -243,10 +239,6 @@ export class StudentActivities {
 
     getUnitProgressKey(vocab = this.sm.currentVocab) {
         return this.progressFlow.getUnitProgressKey(vocab);
-    }
-
-    ensureUnitProgress(vocab = this.sm.currentVocab) {
-        return this.progressFlow.ensureUnitProgress(vocab);
     }
 
     getCurrentUnitProgress() {
@@ -367,10 +359,6 @@ export class StudentActivities {
 
     downloadWordHuntSubmission() {
         return this.wordHunt.downloadWordHuntSubmission();
-    }
-
-    migrateLegacyWordHuntImages() {
-        return this.wordHunt.migrateLegacyWordHuntImages();
     }
 
     handleIllustrationSave(vocabName, word, payload) {

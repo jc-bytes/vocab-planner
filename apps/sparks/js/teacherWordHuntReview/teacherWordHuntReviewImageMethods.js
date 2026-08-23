@@ -1,5 +1,5 @@
 import { $, escapeHtml } from '../main.js';
-import { teacherApi as supabaseService } from '../services/teacherApi.js';
+import { supabaseService } from '../supabaseService.js';
 
 export const teacherWordHuntReviewImageMethods = {
 async loadWordHuntReviewImages(row) {
@@ -32,4 +32,3 @@ revokeWordHuntReviewImageUrls() {
         this.wordHuntReviewImageUrls = [];
     },
 };
-

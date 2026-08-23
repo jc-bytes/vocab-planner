@@ -1,6 +1,6 @@
 import { $, notifications } from '../main.js';
 import { toDate } from '../services/dateUtils.js';
-import { teacherApi as supabaseService } from '../services/teacherApi.js';
+import { supabaseService } from '../supabaseService.js';
 import { getWordHuntQuality } from '../services/wordHuntQuality.js';
 import {
     getWordHuntReviewStudentName as getStudentName,

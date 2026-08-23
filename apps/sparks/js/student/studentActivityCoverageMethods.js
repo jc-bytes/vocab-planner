@@ -7,14 +7,10 @@ export class StudentActivityCoverage {
         this.wordCoverage = {};
     }
 
-    getUnitProgressKey(...args) {
-        return this.activities.getUnitProgressKey(...args);
-    }
-
     initWordCoverage() {
         if (!this.sm.currentVocab) return;
         
-        const vocabName = this.getUnitProgressKey(this.sm.currentVocab);
+        const vocabName = this.activities.progressFlow.getUnitProgressKey(this.sm.currentVocab);
         
         // Load from progress data or initialize
         if (!this.sm.progressData.wordCoverage) {
@@ -43,7 +39,7 @@ export class StudentActivityCoverage {
         
         // Save coverage data
         if (this.sm.currentVocab) {
-            const vocabName = this.getUnitProgressKey(this.sm.currentVocab);
+            const vocabName = this.activities.progressFlow.getUnitProgressKey(this.sm.currentVocab);
             if (!this.sm.progressData.wordCoverage) {
                 this.sm.progressData.wordCoverage = {};
             }
