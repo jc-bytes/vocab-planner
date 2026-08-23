@@ -56,6 +56,17 @@ test('the server derives accuracy counts from activity evidence', () => {
 });
 
 test('invalid optional action counts do not reject launches or valid Flashcards mastery', () => {
+    const alterSignature = flashcardAccuracySql.match(
+        /alter function private\.submit_student_activity_progress_v3\(([\s\S]*?)\) rename/i
+    );
+    assert.ok(alterSignature, 'the migration must rename the existing v3 function');
+    assert.deepEqual(
+        alterSignature[1].split(',').map(type => type.trim()).filter(Boolean),
+        [
+            'text', 'text', 'jsonb', 'text', 'numeric', 'boolean', 'boolean',
+            'jsonb', 'jsonb', 'jsonb', 'jsonb', 'text', 'boolean', 'text'
+        ]
+    );
     assert.match(flashcardAccuracySql, /rename to submit_student_activity_progress_v3_strict_legacy/i);
     assert.match(flashcardAccuracySql, /p_activity_type, ''\)\) in \(/i);
     assert.match(flashcardAccuracySql, /attempted_count > 0[\s\S]*correct_count <= attempted_count/i);

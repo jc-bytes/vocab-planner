@@ -8,7 +8,7 @@ begin
     ) is null then
         alter function private.submit_student_activity_progress_v3(
             text, text, jsonb, text, numeric, boolean, boolean, jsonb, jsonb,
-            jsonb, text, boolean, text
+            jsonb, jsonb, text, boolean, text
         ) rename to submit_student_activity_progress_v3_strict_legacy;
     end if;
 end;
