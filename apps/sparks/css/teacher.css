@@ -2096,6 +2096,10 @@ body {
     gap: var(--spacing-md);
 }
 
+.teacher-settings-grid--actions {
+    align-items: end;
+}
+
 .teacher-settings-grid .form-group {
     margin: 0;
 }

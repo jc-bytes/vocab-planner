@@ -265,3 +265,19 @@ test('Teacher vocabulary views keep only data-driven color values inline', () =>
         assert.match(teacherCss, declaration);
     }
 });
+
+test('Teacher settings keeps layout presentation separate from tab state', () => {
+    const templateStart = teacherHtml.indexOf('<template id="teacher-data-management-view-template">');
+    const exportStart = teacherHtml.indexOf('id="data-export-section"', templateStart);
+    assert.ok(templateStart >= 0 && exportStart > templateStart, 'Missing bounded teacher settings template');
+    const settingsTemplate = teacherHtml.slice(templateStart, exportStart);
+
+    assert.doesNotMatch(settingsTemplate, /style="align-items:/,
+        'Settings action layout must use its feature class');
+    assert.match(settingsTemplate, /class="teacher-settings-grid teacher-settings-grid--actions"/);
+    assert.match(settingsTemplate, /id="data-gamification-section"[^>]*style="display: none;"/,
+        'Initial settings tab visibility remains runtime state for Task 14');
+    assert.match(settingsTemplate, /id="data-calendar-section"[^>]*style="display: none;"/,
+        'Initial settings tab visibility remains runtime state for Task 14');
+    assert.match(teacherCss, /\.teacher-settings-grid--actions\s*\{[^}]*align-items:\s*end;/s);
+});

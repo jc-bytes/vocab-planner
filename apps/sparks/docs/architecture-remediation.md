@@ -711,3 +711,13 @@ This evidence-backed dead-code correction is tracked under completed Task 6 rath
 - Verification: 30 focused inline-style, Vocabulary ownership, security, and brand-color assertions; then the complete `npm test` suite, nine-width student regression, 13-game sandbox smoke, production build, and built three-page smoke passed. Deployment remains 13.6 MB with 2,330 transformed modules. Teacher HTML is 106.98/14.81 kB raw/gzip, teacher CSS is 139.95/22.58 kB, and the service worker remains 20 files totaling 1,026,797 bytes.
 
 Task 12 remains in progress for settings, Data Export, Data Viewer, and Data Reset. Each will remain a separate bounded change, with runtime visibility, drag state, progress width, and reset locking left in JavaScript until Task 14.
+
+### Task 12h, move the Subjects settings grid alignment into feature CSS
+
+- Replaced the sole fixed layout style in the teacher Settings panels with the `teacher-settings-grid--actions` modifier. The general grid remains shared by Subjects, Coins, and Calendar; only the Subjects row opts into bottom alignment.
+- Preserved the initial inline `display:none` state for the Coins and Calendar panels and the existing runtime `switchDataTab()` assignments. No settings data, repository call, form control, save action, routing, or tab listener changed.
+- Extended the inline-style contract to require class-owned layout while explicitly preserving the two runtime visibility values for Task 14.
+- Independent comparison against `0648b93d` found byte-identical Subjects-panel screenshots and exact computed geometry at 1280x900 and 390x844. Simulated initial and selected Coins/Calendar states also matched at both widths.
+- Verification: focused inline-style, teacher-data, form, button, accessibility, and source smoke checks; then the complete `npm test` suite, nine-width student regression, 13-game sandbox smoke, production build, and built three-page smoke passed. Deployment remains 13.6 MB with 2,330 modules; teacher HTML is 106.98/14.80 kB raw/gzip, teacher CSS is 140.00/22.59 kB, and service-worker precache remains 1,026,797 bytes.
+
+Task 12 remains in progress. Data Export is next; its static template and generated preview presentation will move together while progress width, visibility, and reset unlocking remain runtime state.
