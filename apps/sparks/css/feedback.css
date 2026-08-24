@@ -23,7 +23,6 @@
     z-index: 1000;
     padding: var(--spacing-md);
     background: rgba(0, 0, 0, 0.8);
-    animation: fadeIn 0.3s ease;
 }
 
 .completion-overlay .completion-screen {
@@ -35,7 +34,6 @@
     border-radius: 1rem;
     background: var(--color-surface);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: scaleIn 0.3s ease;
 }
 
 :where(.student-site) .completion-overlay .completion-screen {

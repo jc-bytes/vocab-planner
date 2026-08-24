@@ -567,3 +567,11 @@ Task 9 is complete. Task 10 will replace only duplicated visual-identity literal
 - Verification: the final complete `npm test` suite, focused theme/brand/shared-UI/auth/data checks, student design audit, production build, and built three-page smoke passed. The build remains 13.6 MB with 2,330 transformed modules; student feature and Quiz Maker CSS remain lazy, and the service worker precaches 20 files totaling 1,030,502 bytes.
 
 Task 10 is complete. Next is the focused completion-animation ownership correction found by the architecture review, followed by Task 11's evidence-based `!important` audit.
+
+### Post-Task 9 review correction, localize completion animations
+
+- Removed `fadeIn` and `scaleIn` declarations from the shared feedback foundation and placed them beside their teacher-owned keyframes. The student entry continues to have no completion animation, preserving the established behavior in both shells.
+- Strengthened the feedback contract so shared CSS cannot depend on consumer-owned keyframes and teacher CSS must own both the declarations and definitions.
+- Verification: the feedback contract, 9-width/6-view student shell regression, source and built three-page smoke, and production build passed. Deployment remains 13.6 MB with lazy student and Quiz Maker CSS separate.
+
+The architecture-review correction is complete. Task 11 will now inspect `!important` declarations one component/viewport family at a time and remove only those proven unnecessary.

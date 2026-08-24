@@ -518,6 +518,14 @@ body {
 }
 
 /* Completion animations remain teacher-owned; the student entry has no matching keyframes. */
+.completion-overlay {
+    animation: fadeIn 0.3s ease;
+}
+
+.completion-overlay .completion-screen {
+    animation: scaleIn 0.3s ease;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }

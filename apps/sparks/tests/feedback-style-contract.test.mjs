@@ -88,6 +88,9 @@ test('entry and lazy styles keep refinements without recreating the shared struc
     }
 
     assert.match(studentCss, /\.status-dot\[data-state="synced"\]\s*\{[^}]*box-shadow:[^;]*0 0 18px rgba\(16, 185, 129, 0\.42\)/s);
+    assert.doesNotMatch(feedbackCss, /animation:\s*(?:fadeIn|scaleIn)/, 'shared feedback must not depend on consumer-owned keyframes');
+    assert.match(teacherCss, /\.completion-overlay\s*\{[^}]*animation:\s*fadeIn 0\.3s ease/s);
+    assert.match(teacherCss, /\.completion-overlay \.completion-screen\s*\{[^}]*animation:\s*scaleIn 0\.3s ease/s);
     assert.match(teacherCss, /@keyframes fadeIn/);
     assert.match(teacherCss, /@keyframes scaleIn/);
 });
