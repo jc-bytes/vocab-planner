@@ -306,3 +306,11 @@ Task 5 remains in progress. Next is the student Arcade-duration policy and stale
 - Verification: 15 student game tests, 74 student progress/security tests, 139 student activity tests, 5 listener tests, three-page UI smoke, 8 build-efficiency tests, and the production build passed. Games remain lazy in `studentGames`; deployment remains 15.1 MB and the student entry is 242.48 kB raw, 62.17 kB gzip.
 
 Task 5 remains in progress. Next is removal of stale static game metadata that the registry already replaces at runtime.
+
+### Task 5g, remove stale static game metadata
+
+- Replaced the hardcoded `22` game count and first-game leaderboard name in the student HTML shell with neutral loading text. Runtime already fills both from the game registry.
+- Added an ownership contract preventing numeric game counts and the first registered game name from returning to the static shell.
+- Verification: 21 activity/game registry contracts plus all 12 activity loaders, 15 student game tests, three-page UI smoke, and 8 build-efficiency tests passed.
+
+Task 5 implementation is complete pending its full-suite checkpoint and independent review. The installer URL is intentionally deferred because changing a product download destination requires evidence the repository does not contain. Account-policy duplication is deferred to the authentication/data-boundary phase; navigation duplication belongs to the page-registry phase.
