@@ -585,3 +585,12 @@ The architecture-review correction is complete. Task 11 will now inspect `!impor
 - Verification: focused specificity and build-efficiency checks, production build, and built three-page smoke passed. The lazy Quiz CSS decreased from 12.48/3.10 to 12.44/3.09 kB raw/gzip; deployment remains 13.6 MB and the Quiz bundle stays lazy.
 
 Task 11 remains in progress while the smaller teacher-entry candidates are verified independently. The student shell's layered responsive overrides will not be changed without exact viewport evidence.
+
+### Task 11b, simplify teacher dashboard and Word Hunt specificity
+
+- Removed unnecessary importance from dashboard summary alignment and icon spacing. The owned `.data-summary-stat .teacher-stat-icon` selector already outranks the generic icon rule.
+- Scoped the Word Hunt separator color to `.word-hunt-review-breadcrumb .word-hunt-review-separator`, matching the generic breadcrumb-span selector's specificity so normal source order applies.
+- Extended the specificity contract to require these owned selectors and reject `!important` in their blocks.
+- Verification: focused specificity, teacher data, and Teacher Word Hunt suites plus source UI smoke passed. Independent Chromium comparison against `9adb6c48` at 1280x720 and 390x720 found identical computed values and byte-identical screenshots for both affected surfaces.
+
+Task 11 remains in progress. Next is the isolated lazy student activity subset; inline-dependent teacher dialog/login rules remain separate.

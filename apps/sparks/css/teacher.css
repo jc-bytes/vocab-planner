@@ -3895,12 +3895,12 @@ body {
     min-width: 0;
     padding: 0.85rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    text-align: left !important;
+    text-align: left;
 }
 
 .data-summary-stat .teacher-stat-icon {
     grid-row: 1 / span 2;
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
 }
 
 .data-chart-frame {
@@ -4021,8 +4021,8 @@ body {
     color: #7dd3fc;
 }
 
-.word-hunt-review-separator {
-    color: rgba(203, 213, 245, 0.55) !important;
+.word-hunt-review-breadcrumb .word-hunt-review-separator {
+    color: rgba(203, 213, 245, 0.55);
 }
 
 .word-hunt-view-toggle {
