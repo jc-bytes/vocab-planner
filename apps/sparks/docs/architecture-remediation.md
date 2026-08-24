@@ -594,3 +594,12 @@ Task 11 remains in progress while the smaller teacher-entry candidates are verif
 - Verification: focused specificity, teacher data, and Teacher Word Hunt suites plus source UI smoke passed. Independent Chromium comparison against `9adb6c48` at 1280x720 and 390x720 found identical computed values and byte-identical screenshots for both affected surfaces.
 
 Task 11 remains in progress. Next is the isolated lazy student activity subset; inline-dependent teacher dialog/login rules remain separate.
+
+### Task 11c, simplify lazy Flashcards and game-stage specificity
+
+- Removed importance from the lazy Flashcards controls' base width/max-height and the visible game stage's min-width. No HTML or runtime code assigns those properties to the target elements.
+- Preserved the stronger Flashcards mastery/mobile refinement at 820px and below; it remains the correct responsive owner and produces the same widths.
+- Extended the specificity contract only around these migrated foundation rules, without claiming the remaining activity-responsive exceptions are ready to remove.
+- Verification: the specificity contract, 139 activity tests, 15 game tests, 9-width/6-view student shell regression, and 13-game sandbox smoke passed. Independent Chromium comparison at 1280x900, 820x1000, and 390x844 found identical computed styles and byte-identical screenshots for Flashcards and the visible game stage.
+
+Task 11 remains in progress for the bounded teacher dialog/login candidates. Word Search runtime overrides, `.hidden`, reduced-motion safeguards, the Arcade shell bridge, and the layered student responsive shell remain justified or deferred with evidence.

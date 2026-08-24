@@ -16,8 +16,9 @@ const sharedStylePaths = [
     'css/typography.css'
 ];
 
-const [teacherQuizCss, ...sharedStyles] = await Promise.all([
+const [teacherQuizCss, studentFeatureCss, ...sharedStyles] = await Promise.all([
     read('css/teacherQuiz.css'),
+    read('css/student-features.css'),
     ...sharedStylePaths.map(read)
 ]);
 
@@ -58,4 +59,15 @@ test('teacher dashboard and Word Hunt refinements win through owned selector sco
         assert.ok(block, `Missing ${selector} rule`);
         assert.doesNotMatch(block, /!important/);
     }
+});
+
+test('lazy Flashcards and game-stage foundations do not escalate specificity', () => {
+    for (const selector of ['\\.flashcard-controls', '#game-stage:not\\(\\.hidden\\)']) {
+        const block = studentFeatureCss.match(new RegExp(`${selector}\\s*\\{([^}]*)\\}`))?.[1];
+        assert.ok(block, `Missing ${selector} rule`);
+        assert.doesNotMatch(block, /!important/);
+    }
+
+    assert.match(studentFeatureCss, /\.flashcard-controls\s*\{[^}]*width:\s*100%;[^}]*max-height:\s*none;/s);
+    assert.match(studentFeatureCss, /#game-stage:not\(\.hidden\)\s*\{[^}]*min-width:\s*0;/s);
 });
