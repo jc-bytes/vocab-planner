@@ -637,6 +637,7 @@ test('migrated launch dispatch stays on the registered lifecycle path', () => {
     assert.doesNotMatch(source, /case ['"]wordle['"]/);
     assert.doesNotMatch(source, /case ['"]speed-match['"]/);
     assert.doesNotMatch(source, /case ['"]fill-in-blank['"]/);
+    assert.doesNotMatch(source, /case ['"]word-search['"]/);
 });
 
 test('registered Flashcards startup does not record practice coverage', () => {

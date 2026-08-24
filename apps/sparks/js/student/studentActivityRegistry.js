@@ -55,6 +55,10 @@ function isWordleWordPlayable(word = {}) {
     return /^[a-zA-Z\s-]+$/.test(label) && letters.length >= 3 && letters.length <= 10;
 }
 
+function isWordSearchWordPlayable(word = {}) {
+    return String(word.word || '').trim().length >= 4;
+}
+
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
     return {
         words: restore(
@@ -101,6 +105,16 @@ function prepareWordleActivity({ savedState, wordLimit, prioritize, restore }) {
     };
 }
 
+function prepareWordSearchActivity({ savedState, wordLimit, prioritize, restore }) {
+    return {
+        words: restore(
+            savedState,
+            prioritize(wordLimit, isWordSearchWordPlayable),
+            isWordSearchWordPlayable
+        )
+    };
+}
+
 function preparePrioritizedActivity({ wordLimit, prioritize }) {
     return {
         words: prioritize(wordLimit)
@@ -121,6 +135,27 @@ function createWordListActivity({
         onProgress,
         onSaveState,
         savedState
+    );
+}
+
+function createWordSearchActivity({
+    ActivityClass,
+    container,
+    prepared,
+    onProgress,
+    onSaveState,
+    savedState,
+    persistenceId,
+    onNewRound
+}) {
+    return new ActivityClass(
+        container,
+        prepared.words,
+        onProgress,
+        persistenceId,
+        onSaveState,
+        savedState,
+        { onNewPuzzle: onNewRound }
     );
 }
 
@@ -266,7 +301,11 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'word-search', title: 'Word Search', description: 'Find hidden vocabulary words.',
         icon: 'search', settingKey: 'wordSearch',
-        exportName: 'WordSearchActivity', load: () => import('../activities/wordSearch.js')
+        exportName: 'WordSearchActivity', load: () => import('../activities/wordSearch.js'),
+        isPlayable: isWordSearchWordPlayable,
+        prepare: prepareWordSearchActivity,
+        create: createWordSearchActivity,
+        selectCoverageWords: ({ instance }) => instance.words
     },
     {
         id: 'crossword', title: 'Crossword', description: 'Solve definitions.',

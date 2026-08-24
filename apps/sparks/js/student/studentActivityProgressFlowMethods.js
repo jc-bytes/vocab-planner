@@ -141,8 +141,6 @@ export class StudentActivityProgressFlow {
         }
 
         switch (activityType) {
-            case 'word-search':
-                return String(word.word || '').trim().length >= 4;
             case 'crossword':
                 return (
                     String(word.word || '').length > 1 &&

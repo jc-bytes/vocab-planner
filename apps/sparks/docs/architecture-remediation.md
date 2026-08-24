@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Nine activities migrated: full suite at Matching checkpoint; 135 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Nine ordinary activity lifecycles now belong to their descriptors. Illustration, Word Search, and Crossword retain special launch branches until migrated separately. |
+| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Ten activities migrated with focused and production-build verification | Ten activity lifecycles now belong to their descriptors. Illustration and Crossword retain special launch branches until migrated separately. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -220,6 +220,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Added contracts for the unchanged default, constructor-selected coverage, invalid selector cleanup, and registry definition failures.
 - Verification: 95 focused registry/runtime tests, registry browser smoke, 137 student activity tests, 8 build-efficiency tests, and the production build passed. Deployment remains 15.1 MB and activity modules remain lazy chunks.
 
+### Task 4j, migrate Word Search
+
+- Added Word Search eligibility, filtered prioritized restoration, special constructor mapping, and constructor-selected coverage to its descriptor. Removed only its launcher and progress-flow switch cases.
+- Passed two narrow host inputs through the registered lifecycle: the stable vocabulary persistence ID and a guarded new-round callback. The descriptor maps them to Word Search's existing constructor without receiving a manager, repository, route object, or persistence service.
+- Preserved the `wordSearch` limit, least-practiced selection, saved word order, grid persistence, current-launch guard, explicit state reset before a new puzzle, lazy loading, and post-construction coverage of only words actually placed in the grid.
+- Unified fallback selection and saved-state restoration on the descriptor's trimmed four-character eligibility predicate, preventing stale whitespace-padded terms from bypassing the availability rule.
+- Verification: registry browser smoke, 6 Word Search ownership/behavior tests, 138 student activity tests, 72 progress tests, 14 routing tests, 8 build-efficiency tests, and the production build passed. Word Search remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.80 kB raw, 66.43 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Nine activities are complete. The three remaining activities have special host behavior and will be migrated only after their narrow descriptor seams are proven.
+Task 4 continues one descriptor at a time. Ten activities are complete. Crossword can now use the proven coverage selector; Illustration remains intentionally special and will receive only a narrow feature context.

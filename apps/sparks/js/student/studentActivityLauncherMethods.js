@@ -39,7 +39,9 @@ export class StudentActivityLauncher {
             prepared,
             onProgress: context.onProgress,
             onSaveState: context.onSaveState,
-            savedState: context.savedState
+            savedState: context.savedState,
+            persistenceId: context.persistenceId,
+            onNewRound: context.onNewRound
         });
         if (!instance || !['object', 'function'].includes(typeof instance)) {
             throw activityDescriptorContractError(
@@ -238,6 +240,14 @@ export class StudentActivityLauncher {
                         ),
                         onProgress,
                         onSaveState,
+                        persistenceId: vocab.id || vocab.name,
+                        onNewRound: () => {
+                            if (!isCurrentLaunch()) return;
+                            this.activities.resetActivityState(type);
+                            this.startActivity(type, { fromRoute: true }).catch(error => {
+                                console.error(`Failed to restart ${type}:`, error);
+                            });
+                        },
                         markWordsPracticed: words => this.activities.markWordsPracticed(type, words)
                     });
                 }
@@ -279,34 +289,6 @@ export class StudentActivityLauncher {
                         }
                     }
                 );
-                break;
-            case 'word-search':
-                const wordSearchLimit = getActivityWordLimit('wordSearch');
-                const wordSearchWords = this.activities.restoreWordsFromState(
-                    savedState,
-                    getPrioritized(wordSearchLimit, w => w.word.length >= 4),
-                    w => w.word.length >= 4
-                );
-                // Pass vocab ID (or name as fallback) for stable persistence
-                const vocabID = vocab.id || vocab.name;
-                activityInstance = new ActivityClass(
-                    container,
-                    wordSearchWords,
-                    onProgress,
-                    vocabID,
-                    onSaveState,
-                    savedState,
-                    {
-                        onNewPuzzle: () => {
-                            if (!isCurrentLaunch()) return;
-                            this.activities.resetActivityState('word-search');
-                            this.startActivity('word-search', { fromRoute: true }).catch(error => {
-                                console.error('Failed to restart word search:', error);
-                            });
-                        }
-                    }
-                );
-                this.activities.markWordsPracticed(type, activityInstance.words);
                 break;
             case 'crossword':
                 const crosswordWords = getPrioritized(getActivityWordLimit('crossword'));

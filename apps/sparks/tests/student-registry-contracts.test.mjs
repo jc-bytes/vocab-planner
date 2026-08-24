@@ -404,6 +404,64 @@ test('Fill in Blank descriptor owns example eligibility and prioritized lifecycl
     }), { words });
 });
 
+test('Word Search descriptor owns restoration, host construction, and placed coverage', () => {
+    const descriptor = getStudentActivity('word-search');
+    assert.equal(descriptor.isPlayable({ word: 'Data' }), true);
+    assert.equal(descriptor.isPlayable({ word: ' CPU ' }), false);
+
+    const savedState = { wordKeys: ['Router'] };
+    const fallbackWords = [{ word: 'Database' }];
+    const restoredWords = [{ word: 'Router' }];
+    const prepared = descriptor.prepare({
+        savedState,
+        wordLimit: 7,
+        prioritize(limit, filter) {
+            assert.equal(limit, 7);
+            assert.equal(filter({ word: 'Data' }), true);
+            assert.equal(filter({ word: 'CPU' }), false);
+            return fallbackWords;
+        },
+        restore(state, fallback, filter) {
+            assert.equal(state, savedState);
+            assert.equal(fallback, fallbackWords);
+            assert.equal(filter({ word: 'Router' }), true);
+            return restoredWords;
+        }
+    });
+    assert.deepEqual(prepared, { words: restoredWords });
+
+    const container = {};
+    const onProgress = () => {};
+    const onSaveState = () => {};
+    const onNewRound = () => {};
+    class WordSearchActivityDouble {
+        constructor(...args) {
+            this.args = args;
+            this.words = [{ word: 'Placed' }];
+        }
+    }
+    const instance = descriptor.create({
+        ActivityClass: WordSearchActivityDouble,
+        container,
+        prepared,
+        onProgress,
+        onSaveState,
+        savedState,
+        persistenceId: 'unit-17',
+        onNewRound
+    });
+    assert.deepEqual(instance.args, [
+        container,
+        restoredWords,
+        onProgress,
+        'unit-17',
+        onSaveState,
+        savedState,
+        { onNewPuzzle: onNewRound }
+    ]);
+    assert.deepEqual(descriptor.selectCoverageWords({ instance, prepared }), instance.words);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));
