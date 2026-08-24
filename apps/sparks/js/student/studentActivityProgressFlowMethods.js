@@ -141,11 +141,6 @@ export class StudentActivityProgressFlow {
         }
 
         switch (activityType) {
-            case 'synonym-antonym':
-                return (
-                    String(word.word || '').trim().length > 0
-                    && (word.synonyms?.length > 0 || word.antonyms?.length > 0)
-                );
             case 'word-search':
                 return String(word.word || '').trim().length >= 4;
             case 'crossword':

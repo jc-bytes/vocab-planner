@@ -240,6 +240,44 @@ test('quiz descriptor owns eligibility and restorable prioritized preparation', 
     assert.equal(quiz.create, getStudentActivity('matching').create);
 });
 
+test('synonym and antonym descriptor owns eligible state-restorable preparation', () => {
+    const descriptor = getStudentActivity('synonym-antonym');
+    assert.equal(descriptor.isPlayable({ word: 'Result', synonyms: ['outcome'] }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Input', antonyms: ['output'] }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Result' }), false);
+    assert.equal(descriptor.isPlayable({ word: ' ', synonyms: ['outcome'] }), false);
+
+    const savedState = { wordKeys: ['Result'] };
+    const fallbackWords = [{ word: 'Input', antonyms: ['output'] }];
+    const restoredWords = [{ word: 'Result', synonyms: ['outcome'] }];
+    const calls = [];
+    const prepared = descriptor.prepare({
+        savedState,
+        wordLimit: 4,
+        prioritize(limit, filter) {
+            calls.push(['prioritize', limit, filter(restoredWords[0]), filter({ word: 'Result' })]);
+            return fallbackWords;
+        },
+        restore(state, fallback, filter) {
+            calls.push([
+                'restore',
+                state,
+                fallback,
+                filter({ word: 'Input', antonyms: ['output'] }),
+                filter({ word: ' ', synonyms: ['outcome'] })
+            ]);
+            return restoredWords;
+        }
+    });
+
+    assert.deepEqual(prepared, { words: restoredWords });
+    assert.deepEqual(calls, [
+        ['prioritize', 4, true, false],
+        ['restore', savedState, fallbackWords, true, false]
+    ]);
+    assert.equal(descriptor.create, getStudentActivity('matching').create);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Matching, Flashcards, and Quiz: full suite at Matching checkpoint; 133 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Three activities now own eligibility, preparation, and construction hooks. The other 9 activities retain their existing launch branches until migrated separately. |
+| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Matching, Flashcards, Quiz, and Synonym & Antonym: full suite at Matching checkpoint; 133 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Four activities now own eligibility, preparation, and construction hooks. The other 8 activities retain their existing launch branches until migrated separately. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -155,6 +155,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Confirmed the current `prepared.words` coverage default remains correct only for ordinary word-list activities. Word Search and Crossword require an optional coverage selector before their migrations because they record constructor-filtered words.
 - Verification: registry browser smoke, 133 activity, 14 routing, package ownership, and 8 build-efficiency tests passed. Production build remains 15.1 MB.
 
+### Task 4d, migrate Synonym & Antonym
+
+- Added Synonym & Antonym eligibility, filtered prioritized restoration, and construction to its descriptor. Removed only its launcher and progress-flow switch cases.
+- Preserved the `synonymAntonym` teacher setting, least-practiced selection, saved word order, constructor state, post-construction coverage, multiple-choice evidence, server mastery rules, and report mapping.
+- Applied the checkpoint eligibility rule to stale restoration: a saved word must still have a nonblank label and at least one synonym or antonym. Valid saved state is unchanged; invalid state falls back to prioritized eligible words.
+- Did not change the existing sparse-data behavior. Vocabulary with too few distinct distractors can still reach the activity's owned “Not enough data” state; changing that would be a product decision rather than an architecture migration.
+- Verification: registry browser smoke, 133 activity, 72 progress, 14 security, and 8 build-efficiency tests passed. The activity remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 258.34 kB raw, 66.47 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Matching, Flashcards, and modern student Quiz are complete; the next activity must be traced and migrated without changing the remaining launch branches.
+Task 4 continues one descriptor at a time. Four activities are complete; the next activity must be traced and migrated without changing the remaining launch branches.

@@ -201,17 +201,6 @@ export class StudentActivityLauncher {
                 }
 
                 switch (type) {
-            case 'synonym-antonym':
-                const synonymLimit = getActivityWordLimit('synonymAntonym');
-                const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);
-                const synonymWords = this.activities.restoreWordsFromState(
-                    savedState,
-                    getPrioritized(synonymLimit, synonymFilter),
-                    synonymFilter
-                );
-                activityInstance = new ActivityClass(container, synonymWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, synonymWords);
-                break;
             case 'illustration':
                 // Illustration: non-replayable, use sequential words
                 const illustrationWords = this.activities.getWordHuntWords(settings)

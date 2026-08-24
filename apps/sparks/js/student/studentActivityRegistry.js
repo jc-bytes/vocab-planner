@@ -30,6 +30,14 @@ function hasWordAndDefinition(word = {}) {
     );
 }
 
+function hasSynonymOrAntonym(word = {}) {
+    return word.synonyms?.length > 0 || word.antonyms?.length > 0;
+}
+
+function isSynonymAntonymWordPlayable(word = {}) {
+    return String(word.word || '').trim().length > 0 && hasSynonymOrAntonym(word);
+}
+
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
     return {
         words: restore(
@@ -52,6 +60,16 @@ function prepareQuizActivity({ savedState, wordLimit, prioritize, restore }) {
             savedState,
             prioritize(wordLimit),
             hasWordAndDefinition
+        )
+    };
+}
+
+function prepareSynonymAntonymActivity({ savedState, wordLimit, prioritize, restore }) {
+    return {
+        words: restore(
+            savedState,
+            prioritize(wordLimit, isSynonymAntonymWordPlayable),
+            isSynonymAntonymWordPlayable
         )
     };
 }
@@ -198,7 +216,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'synonym-antonym', title: 'Synonym & Antonym', description: 'Challenge your word knowledge.',
         icon: 'repeat-2', settingKey: 'synonymAntonym',
-        exportName: 'SynonymAntonymActivity', load: () => import('../activities/synonymAntonym.js')
+        exportName: 'SynonymAntonymActivity', load: () => import('../activities/synonymAntonym.js'),
+        isPlayable: isSynonymAntonymWordPlayable,
+        prepare: prepareSynonymAntonymActivity,
+        create: createWordListActivity
     },
     {
         id: 'word-search', title: 'Word Search', description: 'Find hidden vocabulary words.',
