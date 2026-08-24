@@ -356,3 +356,11 @@ Task 6 remains in progress. The remaining high-confidence candidates are isolate
 - Verification: package refactor checks, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Deployment remains 13.6 MB and the student entry remains 242.48 kB raw, 62.17 kB gzip.
 
 Task 6 remains in progress. Next is the independently confirmed group of four isolated unused declarations; their owning modules and active siblings will remain intact.
+
+### Task 6e, remove isolated unused declarations
+
+- Removed four exports that occurred only at their definitions: the unused request abort classifier, local coin-authority duration, structured-writing alias, and stylesheet-ready marker.
+- Preserved the request timeout implementation, three live progress timing constants, native writing checker, and the stylesheet side-effect module. The three lazy feature imports still load the shared CSS without exposing a false readiness API.
+- Verification: package refactor checks, 75 student progress tests, 139 student activity tests, 10 build-efficiency tests, and the production build passed. Deployment remains 13.6 MB; the student entry decreased from 242.48/62.17 kB to 242.36/62.12 kB raw/gzip, and the empty stylesheet marker chunk disappeared.
+
+Task 6 remains in progress. Remaining decisions are the tested-but-runtime-unused vocabulary compatibility exports and isolated CSS selectors; both require their own ownership checks before removal.

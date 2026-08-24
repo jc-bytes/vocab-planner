@@ -17,7 +17,3 @@ export function attachWritingChecker(root, selector = '[data-writing-check]') {
     // spellcheck does not create timers, listeners, workers, or network requests.
     return () => {};
 }
-
-export function attachStructuredWritingChecker(root) {
-    return attachWritingChecker(root, '[data-response-text]');
-}

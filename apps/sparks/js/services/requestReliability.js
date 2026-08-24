@@ -7,12 +7,6 @@ export function createRequestError(message, code, cause = null) {
     return error;
 }
 
-export function isAbortError(error) {
-    return error?.name === 'AbortError'
-        || error?.code === 'REQUEST_ABORTED'
-        || error?.code === 'REQUEST_TIMEOUT';
-}
-
 export async function requestWithTimeout(createRequest, options = {}) {
     const timeoutMs = Number(options.timeoutMs) > 0
         ? Number(options.timeoutMs)
