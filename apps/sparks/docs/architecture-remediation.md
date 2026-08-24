@@ -48,7 +48,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
-| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls; cards | Complete suite, UI-family contracts, computed-style and pixel comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons, controls, and card shells are centralized; dialogs, navigation, feedback, containers, and typography remain. |
+| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls; cards; dialogs | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons, controls, cards, and dialog shells are centralized; navigation, feedback, containers, and typography remain. |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
@@ -466,3 +466,16 @@ Task 9 remains in progress. Task 9c will investigate the shared card family and 
 - Production deployment remains 13.6 MB. Teacher entry CSS is 141.81/22.75 kB raw/gzip and student entry CSS is 221.69/33.78 kB; the 49.98/9.91 kB student feature CSS and 12.48/3.10 kB Quiz Maker CSS remain lazy.
 
 Task 9 remains in progress. Task 9d will investigate shared dialogs and modals without merging activity-internal overlays or the Quiz Maker document surface.
+
+### Task 9d, migrate the shared dialog family
+
+- Added `css/dialogs.css` as the structural owner for the student and teacher app-shell backdrop, panel, header, footer, close control, hidden state, and close-control focus ring. Student and teacher load it after the other shared UI foundations and before page-owned refinements; landing does not load unused dialog CSS.
+- Removed the exact duplicated desktop dialog core from student and teacher entry styles. Shared close-control text and focus colors now consume semantic tokens with values identical to the previous aliases/literal.
+- Preserved student and teacher mobile differences, Student Detail and activity-preview sizing, typography roles, FIB and Spark Reading modifiers, completion overlays, and the lazy Quiz Maker rubric dialog. Existing responsive `!important` rules remain until their inline-width dependencies are addressed in Tasks 11 and 12.
+- Added `test:dialogs` to the complete suite. It guards stylesheet order, one structural owner, semantic-token use, seven static dialogs' ARIA contract, the shared focus lifecycle owner, and feature-owned activity/Quiz dialog variants.
+- Verification: the complete `npm test` suite passed, including 139 student activity tests, 6 Teacher Sparks tests, 9 viewport widths, three-page UI smoke, and 13 sandboxed games. Focused design-system and shared UI contracts, source and built UI smoke, production builds, and independent source/cascade review passed.
+- Production deployment remains 13.6 MB. The shared foundation CSS grew from 5.33/1.38 to 6.33/1.60 kB raw/gzip while teacher entry CSS decreased to 140.87/22.57 kB and student entry CSS to 220.75/33.60 kB. Lazy student feature and Quiz Maker CSS remain separate and unchanged.
+- Independent review found declaration-for-declaration equivalence and unchanged later precedence. Its browser runtime was unavailable, so authenticated modal screenshots and live computed-style inspection are recorded as unknown rather than passed. Source/built smoke and responsive shell checks passed.
+- Investigation found a separate pre-existing bug: the lazy Teacher Spark editor's X and Cancel controls mount after the old generic click binding and are inert, although backdrop and Escape closing work. This will be repaired as a separate behavior task so the CSS extraction stays independently verifiable.
+
+Task 9 remains in progress. Next is the focused lazy Spark dialog lifecycle repair, followed by the navigation family.

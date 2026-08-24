@@ -772,8 +772,7 @@ body {
 .teacher-action-card:focus-visible,
 .teacher-library-choice-card:focus-visible,
 .teacher-vocab-card:focus-visible,
-.teacher-vocab-pick-card:focus-visible,
-.close-modal:focus-visible {
+.teacher-vocab-pick-card:focus-visible {
     outline: 3px solid rgba(14, 165, 233, 0.8);
     outline-offset: 3px;
 }
@@ -5127,43 +5126,6 @@ body {
 }
 
 /* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: var(--spacing-md);
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-content {
-    width: min(92vw, 600px);
-    max-width: 600px;
-    max-height: min(88vh, 900px);
-    overflow-y: auto;
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.8);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-}
 
 .activity-student-preview-modal {
     align-items: stretch;
@@ -5189,24 +5151,6 @@ body {
 .activity-student-preview-header h3 {
     margin: 0;
 }
-.close-modal {
-    background: none;
-    border: none;
-    font-size: var(--type-button-icon-size);
-    line-height: var(--type-button-icon-line-height);
-    cursor: pointer;
-    color: var(--text-muted);
-    min-width: var(--touch-target);
-    min-height: var(--touch-target);
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-lg);
-}
-
 #student-detail-modal .modal-content {
     padding: var(--spacing-lg);
 }
