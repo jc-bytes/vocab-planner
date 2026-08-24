@@ -34,29 +34,29 @@ const teacherDataDashboardRecentActivityMethods = {
 
 
         if (recentActivities.length === 0) {
-            table.innerHTML = '<p class="data-table__empty" style="color: var(--text-muted); text-align: center; padding: 2rem;">No vocabulary activity completed yet</p>';
+            table.innerHTML = '<p class="data-table__empty data-dashboard-empty">No vocabulary activity completed yet</p>';
             return;
         }
 
         table.innerHTML = `
-            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+            <table class="data-table data-dashboard-table">
                 <thead>
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Student</th>
-                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Vocabulary</th>
-                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: left; color: var(--text-muted);">Activity</th>
-                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Score</th>
-                        <th class="data-table__header-cell" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">Date</th>
+                    <tr>
+                        <th class="data-table__header-cell">Student</th>
+                        <th class="data-table__header-cell">Vocabulary</th>
+                        <th class="data-table__header-cell">Activity</th>
+                        <th class="data-table__header-cell data-dashboard-table__numeric">Score</th>
+                        <th class="data-table__header-cell data-dashboard-table__numeric">Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${recentActivities.map(activity => `
-                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
-                            <td class="data-table__cell" style="padding: 0.75rem;">${escapeHtml(activity.student)}</td>
-                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; color: var(--text-muted);">${escapeHtml(activity.unit)}</td>
-                            <td class="data-table__cell" style="padding: 0.75rem;">${escapeHtml(activity.activity)}</td>
-                            <td class="data-table__cell data-table__metric" style="padding: 0.75rem; text-align: right; color: var(--primary-color);">${escapeHtml(activity.score)}</td>
-                            <td class="data-table__cell data-table__secondary" style="padding: 0.75rem; text-align: right; color: var(--text-muted);">${escapeHtml(activity.dateStr)}</td>
+                        <tr>
+                            <td class="data-table__cell">${escapeHtml(activity.student)}</td>
+                            <td class="data-table__cell data-table__secondary">${escapeHtml(activity.unit)}</td>
+                            <td class="data-table__cell">${escapeHtml(activity.activity)}</td>
+                            <td class="data-table__cell data-table__metric data-dashboard-table__numeric">${escapeHtml(activity.score)}</td>
+                            <td class="data-table__cell data-table__secondary data-dashboard-table__numeric">${escapeHtml(activity.dateStr)}</td>
                         </tr>
                     `).join('')}
                 </tbody>

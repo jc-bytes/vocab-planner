@@ -625,3 +625,15 @@ Task 11 is complete. Task 12 will move owned teacher inline layout styles featur
 - Verification: focused inline-style, specificity, form, button, and build/lazy contracts; the final complete `npm test` suite; production build; source/built three-page smoke; 9-width student regression; and 13-game sandbox smoke passed. The build remains 13.6 MB with 2,330 transformed modules; Quiz CSS remains a separate 13.24/3.27 kB raw/gzip lazy asset.
 
 Task 12 remains in progress. The next bounded change will inspect one additional teacher feature and move only static presentation that has a clear owner; calculated runtime styles will remain in JavaScript.
+
+### Task 12b, move Analytics Dashboard presentation into its feature namespace
+
+- Removed 18 static inline-style attributes from the Analytics Dashboard template and 14 generated style attributes from its Recent Activity renderer. The existing `.data-dashboard-*`, `.data-summary-*`, and `.data-chart-*` namespace in `teacher.css` now owns the complete static presentation.
+- Kept the data-management feature lazy and left routing, aggregate requests, grade filtering, chart calculations, metric updates, and runtime tab visibility unchanged. Recent Activity still escapes every student-controlled value before rendering.
+- Used existing ancestor scope plus one meaningful active-metric modifier and one numeric-column modifier instead of creating a class for each declaration. Shared table typography remains shared; dashboard spacing, alignment, borders, and semantic colors remain feature-owned.
+- Preserved two subtle cascade details found during review: the grade select uses the original `background` shorthand so it does not regain the shared arrow image, and only table headers receive physical left alignment while ordinary body cells retain their baseline logical `start` alignment.
+- Extended `test:teacher-inline-styles` to reject static inline Dashboard presentation, require the exact owned CSS contract, keep the dashboard rules free of `!important`, and prove runtime tab visibility remains in `switchDataTab()`.
+- Independent Chromium comparison against `68c5e897` found zero computed-style or bounding-rectangle differences and byte-identical screenshots at 1280x900, 1024x900, and 390x844 using the real stylesheet chain and embedded Inter fonts.
+- Verification: the final complete `npm test` suite; focused inline-style, specificity, form, typography, teacher-data, security, and build/lazy checks; production build; source/built three-page smoke; 9-width student regression; and 13-game sandbox smoke passed. Deployment remains 13.6 MB with 2,330 transformed modules. Teacher HTML is 108.02/15.23 kB raw/gzip, teacher CSS is 137.42/22.05 kB, and the lazy data-management chunk decreased to 41.56/9.57 kB.
+
+Task 12 remains in progress. Next, inspect another bounded teacher surface; keep visibility, progress, drag state, calculated dimensions, and state-selected colors in JavaScript until the shared-feedback task provides a justified state-class seam.

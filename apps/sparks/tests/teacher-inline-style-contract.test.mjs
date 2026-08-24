@@ -5,10 +5,12 @@ import { readFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = path => readFile(new URL(path, root), 'utf8');
 
-const [teacherHtml, teacherCss, teacherQuizCss] = await Promise.all([
+const [teacherHtml, teacherCss, teacherQuizCss, dashboardRecentActivity, teacherDataViewer] = await Promise.all([
     read('teacher.html'),
     read('css/teacher.css'),
-    read('css/teacherQuiz.css')
+    read('css/teacherQuiz.css'),
+    read('js/teacherDataDashboardRecentActivityMethods.js'),
+    read('js/teacherDataViewer.js')
 ]);
 
 function quizTemplate() {
@@ -44,4 +46,50 @@ test('Quiz responsive layout stays with the lazy feature instead of the teacher 
         'The established responsive layout keeps the clamped sidebar width');
     assert.doesNotMatch(teacherCss, /@media \(max-width: 1024px\)[\s\S]*?\.quiz-maker-container\s*\{/);
     assert.doesNotMatch(teacherQuizCss, /!important/);
+});
+
+test('Analytics Dashboard delegates static presentation to its owned stylesheet', () => {
+    const start = teacherHtml.indexOf('<!-- Dashboard Tab -->');
+    const end = teacherHtml.indexOf('<!-- Export Tab -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Analytics Dashboard template');
+    const dashboardTemplate = teacherHtml.slice(start, end);
+
+    assert.doesNotMatch(dashboardTemplate, /\sstyle=/,
+        'Analytics Dashboard markup must not recreate static styles inline');
+    assert.doesNotMatch(dashboardRecentActivity, /style=/,
+        'Recent Activity rendering must use dashboard-owned classes');
+
+    for (const selector of [
+        '.data-dashboard-panel',
+        '.data-dashboard-header h3',
+        '.data-dashboard-header p',
+        '.data-grade-filter-card label',
+        '.data-grade-filter-card select',
+        '.data-summary-stat .card-metric',
+        '.data-summary-stat--active .card-metric',
+        '.data-summary-stat .card-secondary',
+        '.data-dashboard-empty',
+        '.data-dashboard-table'
+    ]) {
+        const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        assert.match(teacherCss, new RegExp(`${escaped}[^\\{]*\\{`), `Teacher CSS must own ${selector}`);
+    }
+
+    for (const declaration of [
+        /\.data-dashboard-panel\s*\{[^}]*display:\s*none;/s,
+        /\.data-dashboard-header h3\s*\{[^}]*margin:\s*0 0 0\.5rem;[^}]*color:\s*var\(--color-text\);[^}]*font-size:\s*1\.3rem;[^}]*font-weight:\s*600;/s,
+        /\.data-grade-filter-card select\s*\{[^}]*min-width:\s*150px;[^}]*padding:\s*0\.5rem 1rem;[^}]*border:\s*1px solid var\(--color-border\);[^}]*border-radius:\s*6px;[^}]*background:\s*rgba\(15, 23, 42, 0\.6\);[^}]*color:\s*var\(--color-text\);/s,
+        /\.data-summary-stat--active \.card-metric\s*\{[^}]*color:\s*var\(--color-success\);/s,
+        /\.data-dashboard-table\s*\{[^}]*width:\s*100%;[^}]*border-collapse:\s*collapse;/s,
+        /\.data-dashboard-table \.data-dashboard-table__numeric\s*\{[^}]*text-align:\s*right;/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+
+    const dashboardCssStart = teacherCss.indexOf('.data-dashboard-panel');
+    const dashboardCssEnd = teacherCss.indexOf('.word-hunt-review-shell', dashboardCssStart);
+    assert.ok(dashboardCssStart >= 0 && dashboardCssEnd > dashboardCssStart);
+    assert.doesNotMatch(teacherCss.slice(dashboardCssStart, dashboardCssEnd), /!important/);
+    assert.match(teacherDataViewer, /content\.style\.display\s*=\s*isActive\s*\?\s*'block'\s*:\s*'none'/,
+        'Tab visibility remains runtime state instead of static presentation');
 });

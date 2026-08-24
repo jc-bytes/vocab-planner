@@ -3843,6 +3843,10 @@ body {
     margin: 0;
 }
 
+.data-dashboard-panel {
+    display: none;
+}
+
 .data-dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -3852,12 +3856,41 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.data-dashboard-header h3 {
+    margin: 0 0 0.5rem;
+    color: var(--color-text);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.data-dashboard-header p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
 .data-grade-filter-card {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     flex-wrap: wrap;
     padding: 0;
+}
+
+.data-grade-filter-card label {
+    color: var(--color-text);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.data-grade-filter-card select {
+    min-width: 150px;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.6);
+    color: var(--color-text);
 }
 
 .data-summary-grid,
@@ -3903,6 +3936,24 @@ body {
     margin-bottom: 0;
 }
 
+.data-summary-stat .card-metric {
+    color: var(--color-brand);
+}
+
+.data-summary-stat--active .card-metric {
+    color: var(--color-success);
+}
+
+.data-summary-stat .card-secondary {
+    color: var(--color-text-muted);
+}
+
+.data-chart-card > .card-title,
+.data-recent-card > .card-title {
+    margin: 0 0 1rem;
+    color: var(--color-text);
+}
+
 .data-chart-frame {
     position: relative;
     height: 300px;
@@ -3921,6 +3972,47 @@ body {
 
 .data-table-region table {
     min-width: 640px;
+}
+
+.data-dashboard-empty {
+    padding: 2rem;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.data-dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-dashboard-table thead tr {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-dashboard-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-dashboard-table .data-table__header-cell,
+.data-dashboard-table .data-table__cell {
+    padding: 0.75rem;
+}
+
+.data-dashboard-table .data-table__header-cell {
+    color: var(--color-text-muted);
+    text-align: left;
+}
+
+.data-dashboard-table .data-table__secondary {
+    color: var(--color-text-muted);
+}
+
+.data-dashboard-table .data-table__metric {
+    color: var(--color-brand);
+}
+
+.data-dashboard-table .data-dashboard-table__numeric {
+    text-align: right;
 }
 
 .word-hunt-review-shell {
