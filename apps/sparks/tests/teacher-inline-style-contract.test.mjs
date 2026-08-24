@@ -165,3 +165,39 @@ test('Add Student modal delegates static presentation to its feature classes', (
     assert.ok(addStudentCssStart >= 0 && addStudentCssEnd > addStudentCssStart);
     assert.doesNotMatch(teacherCss.slice(addStudentCssStart, addStudentCssEnd), /!important/);
 });
+
+test('Student Detail delegates static presentation without disturbing runtime state styles', () => {
+    const start = teacherHtml.indexOf('<!-- Modal: Student Details -->');
+    const end = teacherHtml.indexOf('<!-- View: Editor -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Student Detail modal');
+    const detailTemplate = teacherHtml.slice(start, end);
+    const showStart = studentProgressRenderer.indexOf('    async showStudentDetails(');
+    const renderEnd = studentProgressRenderer.indexOf('    formatActivityDuration(', showStart);
+    assert.ok(showStart >= 0 && renderEnd > showStart, 'Missing bounded Student Detail renderer');
+    const detailRenderer = studentProgressRenderer.slice(showStart, renderEnd);
+
+    assert.doesNotMatch(detailTemplate, /\sstyle=/,
+        'Student Detail markup must not recreate static styles inline');
+    assert.doesNotMatch(detailRenderer, /style=/,
+        'Student Detail generated markup must use feature-owned classes');
+    assert.match(detailRenderer, /tempOutput\.style\.display\s*=\s*'none'/,
+        'Temporary-password visibility remains runtime state for Task 14');
+
+    for (const declaration of [
+        /\.student-detail-section \.modal-section-title,[\s\S]*?\.student-detail-unit-title\s*\{[^}]*margin-bottom:\s*0\.5rem;/s,
+        /\.student-detail-control-row\s*\{[^}]*align-items:\s*center;[^}]*gap:\s*0\.75rem;/s,
+        /\.student-detail-control-row--coins,[\s\S]*?\.student-detail-quick-actions\s*\{[^}]*gap:\s*0\.5rem;/s,
+        /\.student-detail-coin-input\s*\{[^}]*width:\s*90px;/s,
+        /\.student-detail-action-button\s*\{[^}]*padding:\s*0\.5rem 1rem;/s,
+        /\.student-detail-temp-password\s*\{[^}]*display:\s*none;[^}]*margin-top:\s*0\.75rem;[^}]*padding:\s*0\.75rem 0;[^}]*border-top:\s*1px solid rgba\(255, 255, 255, 0\.1\);[^}]*color:\s*var\(--color-text\);/s,
+        /\.student-detail-activity-list\s*\{[^}]*display:\s*grid;[^}]*gap:\s*0;[^}]*margin-top:\s*1rem;/s,
+        /\.student-detail-unit-results\s*\{[^}]*min-width:\s*0;[^}]*padding-top:\s*0\.5rem;[^}]*border-top:\s*1px solid var\(--color-border\);/s,
+        /\.student-detail-score\s*\{[^}]*color:\s*var\(--color-brand\);/s,
+        /#student-detail-modal \.modal-content\s*\{[^}]*width:\s*min\(92vw, 800px\) !important;[^}]*max-width:\s*800px;[^}]*max-height:\s*88vh !important;/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+
+    assert.doesNotMatch(teacherCss, /#detail-activity-list[^\{]*\[style\*="display: flex"\]/,
+        'Student Detail layout must not depend on inline-style substring selectors');
+});

@@ -5051,6 +5051,72 @@ body {
     margin: 0;
 }
 
+.student-detail-section .modal-section-title,
+.student-detail-unit-title {
+    margin-bottom: 0.5rem;
+}
+
+.student-detail-control-row,
+.student-detail-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.student-detail-control-row {
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.student-detail-control-row--coins,
+.student-detail-quick-actions {
+    gap: 0.5rem;
+}
+
+.student-detail-quick-actions {
+    margin-top: 0.5rem;
+}
+
+.student-detail-coin-input {
+    width: 90px;
+}
+
+.student-detail-action-button {
+    padding: 0.5rem 1rem;
+}
+
+.student-detail-status,
+.student-detail-message {
+    color: var(--color-text-muted);
+}
+
+.student-detail-message--error {
+    color: var(--color-danger);
+}
+
+.student-detail-temp-password {
+    display: none;
+    margin-top: 0.75rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text);
+}
+
+.student-detail-activity-list {
+    display: grid;
+    gap: 0;
+    margin-top: 1rem;
+}
+
+.student-detail-unit-results {
+    min-width: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.student-detail-score {
+    color: var(--color-brand);
+}
+
 .student-detail-activity-row {
     padding: 0.85rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -5319,6 +5385,7 @@ button.activity-card {
 
 #student-detail-modal .modal-content {
     width: min(92vw, 800px) !important;
+    max-width: 800px;
     max-height: 88vh !important;
     overflow-x: hidden;
 }
@@ -5330,13 +5397,6 @@ button.activity-card {
 .mini-stat-value {
     min-width: 0;
     overflow-wrap: anywhere;
-}
-
-#detail-activity-list .student-detail-activity-row>div,
-#detail-activity-list .student-detail-activity-row div[style*="display: flex"] {
-    min-width: 0;
-    flex-wrap: wrap;
-    gap: 0.35rem;
 }
 
 @media (min-width: 900px) {

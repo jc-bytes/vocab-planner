@@ -171,7 +171,7 @@ class TeacherStudentProgressRenderMethods {
             if (this.activeStudentId === student.id) {
                 const list = $('#detail-activity-list');
                 if (list) {
-                    list.innerHTML = '<p class="modal-secondary" style="color: var(--danger-color);">Activity details are unavailable right now. Please try again.</p>';
+                    list.innerHTML = '<p class="modal-secondary student-detail-message student-detail-message--error">Activity details are unavailable right now. Please try again.</p>';
                 }
             }
         }
@@ -215,7 +215,7 @@ class TeacherStudentProgressRenderMethods {
         if (loading) {
             list.innerHTML = '<div class="loading-spinner runtime-status">Loading activity details...</div>';
         } else if (Object.keys(units).length === 0) {
-            list.innerHTML = '<p class="modal-secondary" style="color: var(--text-muted);">No activity data recorded.</p>';
+            list.innerHTML = '<p class="modal-secondary student-detail-message">No activity data recorded.</p>';
         } else {
             for (const [unitName, unitData] of Object.entries(units)) {
                 const card = createElement('div', 'student-detail-activity-row');
@@ -255,7 +255,7 @@ class TeacherStudentProgressRenderMethods {
                             <div class="modal-activity-meta teacher-activity-result-row">
                                 <span class="modal-activity-name">${escapeHtml(activity)}</span>
                                 <span class="teacher-activity-result-timing">${timingLabel}${lateStatus}${reason}</span>
-                                <span class="modal-inline-metric" style="color: var(--primary-color);">${data.score}%</span>
+                                <span class="modal-inline-metric student-detail-score">${data.score}%</span>
                                 ${overrideAction}
                             </div>
                         `;
@@ -263,9 +263,9 @@ class TeacherStudentProgressRenderMethods {
                 }
 
                 card.innerHTML = `
-                    <h4 class="modal-section-title" style="margin-bottom: 0.5rem;">${unitName}</h4>
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 0.5rem;">
-                        ${scoresHtml || '<span class="modal-secondary" style="color: var(--text-muted);">No scores yet</span>'}
+                    <h4 class="modal-section-title student-detail-unit-title">${unitName}</h4>
+                    <div class="student-detail-unit-results">
+                        ${scoresHtml || '<span class="modal-secondary student-detail-message">No scores yet</span>'}
                     </div>
                 `;
                 list.appendChild(card);

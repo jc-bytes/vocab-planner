@@ -599,7 +599,7 @@
 
             <!-- Modal: Student Details -->
             <div id="student-detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detail-student-name">
-                <div class="modal-content" style="max-width: 800px; width: 90%;">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h2 id="detail-student-name">Student Name</h2>
                         <button id="close-detail-modal" class="btn text-btn btn-icon-only" aria-label="Close student details"><i data-lucide="circle-x" aria-hidden="true"></i></button>
@@ -636,29 +636,29 @@
                             </div>
                         </div>
                         <section class="student-detail-section">
-                            <h4 class="modal-section-title" style="margin-bottom:0.5rem;">Adjust Coins</h4>
-                            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-                                <input type="number" id="coin-adjust-input" value="10" min="1" style="width:90px;">
-                                <button id="coin-adjust-btn" class="btn primary-btn" style="padding:0.5rem 1rem;">Add
+                            <h4 class="modal-section-title">Adjust Coins</h4>
+                            <div class="student-detail-control-row student-detail-control-row--coins">
+                                <input type="number" id="coin-adjust-input" class="student-detail-coin-input" value="10" min="1">
+                                <button id="coin-adjust-btn" class="btn primary-btn student-detail-action-button">Add
                                     Coins</button>
-                                <div id="coin-adjust-status" class="form-feedback" style="color:var(--text-muted);"></div>
+                                <div id="coin-adjust-status" class="form-feedback student-detail-status"></div>
                             </div>
-                            <div style="display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
+                            <div class="student-detail-quick-actions">
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="5">+5</button>
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="10">+10</button>
                                 <button class="btn secondary-btn quick-coin-btn" data-amount="25">+25</button>
                             </div>
                         </section>
                         <section class="student-detail-section">
-                            <h4 class="modal-section-title" style="margin-bottom:0.5rem;">Password Reset</h4>
-                            <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
-                                <button id="reset-student-password-btn" class="btn secondary-btn" style="padding:0.5rem 1rem;">Reset Password</button>
-                                <div id="reset-password-status" class="form-feedback" style="color:var(--text-muted);"></div>
+                            <h4 class="modal-section-title">Password Reset</h4>
+                            <div class="student-detail-control-row">
+                                <button id="reset-student-password-btn" class="btn secondary-btn student-detail-action-button">Reset Password</button>
+                                <div id="reset-password-status" class="form-feedback student-detail-status"></div>
                             </div>
-                            <div id="temporary-password-output" class="modal-code" style="display:none; margin-top:0.75rem; padding:0.75rem 0; border-top:1px solid rgba(255,255,255,0.1); color:var(--text-color);"></div>
+                            <div id="temporary-password-output" class="modal-code student-detail-temp-password"></div>
                         </section>
                         <h3 class="modal-section-title">Activity Progress</h3>
-                        <div id="detail-activity-list" style="display: grid; gap: 0; margin-top: 1rem;">
+                        <div id="detail-activity-list" class="student-detail-activity-list">
                             <!-- Activity details populated here -->
                         </div>
                     </div>
