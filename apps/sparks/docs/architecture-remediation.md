@@ -380,3 +380,11 @@ Task 6 remains in progress. Only CSS selectors with exact DOM/reference evidence
 - Verification: exact JS/HTML selector tracing, 10 Flashcards behavior tests, package refactor checks, three-page UI smoke, and the production build passed. Shared feature CSS decreased by 0.41 kB raw and student CSS by 0.05 kB raw; deployment remains 13.6 MB.
 
 Task 6 remains in progress. The final deletion group is three isolated teacher component selectors with no HTML, JavaScript, template, or runtime-ID owner.
+
+### Task 6h, remove orphan teacher component styles
+
+- Removed `.glass-panel`, `.back-link`, and `.runtime-pill` style families after exact source/template tracing found no element or dynamic class owner. Kept similarly named student theme variables and all live teacher status indicators.
+- Verification: 11 teacher data tests, 8 teacher progress composition tests, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Teacher CSS decreased from 149.89/24.40 kB to 149.14/24.27 kB raw/gzip.
+- The optional local responsive harness remains unavailable because `supabase start` exits 1 in this environment, matching the recorded baseline Docker limitation; it is reported as unknown, not passed.
+
+Task 6 implementation is complete pending the full-suite checkpoint and independent architecture review.
