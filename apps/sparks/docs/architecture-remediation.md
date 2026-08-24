@@ -45,7 +45,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
-| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror; obsolete save stubs; orphan build assets | Package refactor, 75 progress, 139 activity, 10 build-efficiency and 5 report tests; UI smoke; production builds | Removing only code with complete caller/import evidence. |
+| 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
@@ -333,7 +333,7 @@ Task 6 remains in progress while independent traces check the audit's no-op stor
 
 - Deleted the unreferenced ZIP `SaveSystem`. It had no imports, script tags, tests, or build entry and depended on an undeclared `JSZip` global plus an obsolete image-store API.
 - Removed `main.js`'s exported no-op `store`. No caller read it, and its TODO save/load methods explicitly deferred to the real backend and browser-storage owners.
-- Added a focused ownership guard so neither a second global store nor the deleted save module quietly returns.
+- Added a focused ownership guard so the deleted `store` export form and `js/saveSystem.js` path do not quietly return.
 - Kept active ZIP/PDF export code and browser activity persistence unchanged; this deletion removes no live persistence path.
 - Verification: 9 build-efficiency tests, package refactor checks, 139 student activity tests, 5 report tests, three-page UI smoke, and the production build passed. Deployment remains 15.1 MB and the student entry remains 242.48 kB raw, 62.17 kB gzip.
 
@@ -387,4 +387,10 @@ Task 6 remains in progress. The final deletion group is three isolated teacher c
 - Verification: 11 teacher data tests, 8 teacher progress composition tests, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Teacher CSS decreased from 149.89/24.40 kB to 149.14/24.27 kB raw/gzip.
 - The optional local responsive harness remains unavailable because `supabase start` exits 1 in this environment, matching the recorded baseline Docker limitation; it is reported as unknown, not passed.
 
-Task 6 implementation is complete pending the full-suite checkpoint and independent architecture review.
+### Task 6 checkpoint review
+
+- The complete `npm test` suite passed, including 9 viewport widths, all three page smokes, and 13 sandboxed HTML games. The production build passed with 2,323 modules, a 13.6 MB deployment, the 18-file student offline shell, and a 242.36/62.12 kB raw/gzip student entry.
+- Independent review found no unsafe deletion, missed live caller, broken published interface, new coupling, or runtime regression. It confirmed that `package.json` is private, removed selectors have no dynamic owners, and live WebP/font/lazy-feature assets remain delivered.
+- Database-driven vocabulary images, intentional game source/reference artwork, and intertwined responsive selectors were explicitly retained because repository evidence does not prove they are obsolete.
+
+Task 6 is complete. Task 7 will trace legacy quiz reachability separately before any removal.
