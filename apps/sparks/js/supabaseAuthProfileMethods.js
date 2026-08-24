@@ -1,12 +1,12 @@
 import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
 import {
-    DEFAULT_COIN_DATA,
     mapProfileRow,
     normalizeProfile,
     normalizeUser,
     profilePayload,
     toClientTimestamp
 } from './services/supabaseValues.js';
+import { DEFAULT_COIN_DATA } from './studentProgressDefaults.js';
 
 function normalizeTeacherProgressRecord(record, { detailed = false } = {}) {
     if (!record) return null;

@@ -1,4 +1,4 @@
-import { DEFAULT_COIN_DATA } from './studentProgressConstants.js';
+import { DEFAULT_COIN_DATA } from '../studentProgressDefaults.js';
 import { getStudentExperience } from './studentExperience.js';
 import {
     readStudentJson,

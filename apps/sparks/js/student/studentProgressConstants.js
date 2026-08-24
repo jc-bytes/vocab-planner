@@ -1,11 +1,3 @@
-export const DEFAULT_COIN_DATA = {
-    balance: 0,
-    giftCoins: 0,
-    totalEarned: 0,
-    totalSpent: 0,
-    totalGifted: 0
-};
-
 export const COIN_SYNC_INTERVAL_MS = 30000;
 export const COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS = 10 * 60 * 1000;
 export const COIN_REFRESH_THROTTLE_MS = 60 * 1000;

@@ -279,3 +279,11 @@ Task 5 remains in progress. Next is the verified arcade/gamification configurati
 - Verification: 15 student game tests, 73 student progress/security tests, 139 student activity tests, 11 teacher data tests, 4 teacher activity-flow tests, three-page UI smoke, 8 build-efficiency tests, and the production build passed. Deployment remains 15.1 MB and the student entry is 255.52 kB raw, 65.74 kB gzip.
 
 Task 5 remains in progress. Next are smaller verified shared-data and environment authorities; installer destination remains deferred because the repository does not prove the release URL.
+
+### Task 5d, centralize the student coin-data default
+
+- Moved the initial coin-wallet shape to one neutral progress defaults module used by Supabase mapping, authentication fallback records, and student progress initialization.
+- Kept synchronization timing constants in the student progress feature; they are behavior owned by that feature, not shared data shape.
+- Verification: 12 repository tests, 73 student progress tests, 7 student authentication tests, and 8 build-efficiency tests passed.
+
+Task 5 remains in progress. Next is Supabase build/runtime configuration authority, followed by remaining proven UI metadata and Arcade-duration copies.

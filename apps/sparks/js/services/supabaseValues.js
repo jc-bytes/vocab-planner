@@ -1,10 +1,4 @@
-export const DEFAULT_COIN_DATA = Object.freeze({
-    balance: 0,
-    giftCoins: 0,
-    totalEarned: 0,
-    totalSpent: 0,
-    totalGifted: 0
-});
+import { DEFAULT_COIN_DATA } from '../studentProgressDefaults.js';
 
 export const WORD_HUNT_IMAGE_BUCKET = 'word-hunt-images';
 
