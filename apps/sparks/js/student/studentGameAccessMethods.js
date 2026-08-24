@@ -1,4 +1,5 @@
 import { studentApi } from '../services/studentApi.js';
+import { ARCADE_MINUTE_SECONDS } from './studentArcadePolicy.js';
 import { consumeLocalArcadeMinute, readLocalArcadeTime } from './studentArcadeTimeStorage.js';
 
 export class StudentGameAccess {
@@ -26,11 +27,13 @@ export class StudentGameAccess {
 
     async startMinute(gameId) {
         if (this.sm.authDisabled) {
-            if (this.getAvailableSeconds() < 60) return null;
+            if (this.getAvailableSeconds() < ARCADE_MINUTE_SECONDS) return null;
             const coinCost = this.games.getExchangeRate();
             if (!await this.sm.progress.deductCoins(coinCost)) return null;
             this.arcadeTime = consumeLocalArcadeMinute();
-            return this.arcadeTime ? { arcadeTime: this.arcadeTime, minuteSeconds: 60, coinCost } : null;
+            return this.arcadeTime
+                ? { arcadeTime: this.arcadeTime, minuteSeconds: ARCADE_MINUTE_SECONDS, coinCost }
+                : null;
         }
 
         if (!this.sm.currentUser) return null;

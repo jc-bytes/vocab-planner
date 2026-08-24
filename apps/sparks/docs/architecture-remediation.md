@@ -44,7 +44,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
-| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy, flow policy, catalog tooling, gamification config and UI | Focused student/teacher/config tests, UI smoke, production build | Activity policies and client economy defaults now have one authority. Remaining verified duplicates are being handled separately. |
+| 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
@@ -313,4 +313,10 @@ Task 5 remains in progress. Next is removal of stale static game metadata that t
 - Added an ownership contract preventing numeric game counts and the first registered game name from returning to the static shell.
 - Verification: 21 activity/game registry contracts plus all 12 activity loaders, 15 student game tests, three-page UI smoke, and 8 build-efficiency tests passed.
 
-Task 5 implementation is complete pending its full-suite checkpoint and independent review. The installer URL is intentionally deferred because changing a product download destination requires evidence the repository does not contain. Account-policy duplication is deferred to the authentication/data-boundary phase; navigation duplication belongs to the page-registry phase.
+The installer URL is intentionally deferred because changing a product download destination requires evidence the repository does not contain. Account-policy duplication is deferred to the authentication/data-boundary phase; navigation duplication belongs to the page-registry phase.
+
+### Task 5 checkpoint review
+
+- The complete test suite passed, including the 9-width student shell regression, three-page UI smoke, and all 13 sandboxed HTML games.
+- Independent review found two misses before closure: remaining Arcade minute literals and an active production-development override in `.env.example`. Both were removed, ownership/config tests were added, and the focused game, progress, registry, and auth/config suites passed again.
+- Task 5 is complete. Contextual report labels remain intentionally separate, SQL security/reward authorities remain independent, and no giant global constants module was introduced.

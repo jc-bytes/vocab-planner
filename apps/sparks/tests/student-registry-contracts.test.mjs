@@ -646,5 +646,5 @@ test('student shell does not duplicate game registry metadata', async () => {
     assert.match(studentHtml, /id="arcade-game-total">…</);
     assert.match(studentHtml, /id="current-game-name"[^>]*>Loading game…</);
     assert.doesNotMatch(studentHtml, /id="arcade-game-total">\d+</);
-    assert.doesNotMatch(studentHtml, /id="current-game-name"[^>]*>Galactic Breaker</);
+    assert.equal(studentHtml.includes(STUDENT_GAME_REGISTRY[0].name), false);
 });

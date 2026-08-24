@@ -56,7 +56,11 @@ const { StudentManager } = await import('../js/student.js');
 const { StudentGameHtmlLoader } = await import('../js/student/studentGameHtmlLoaderMethods.js');
 const { StudentGameLeaderboard } = await import('../js/student/studentGameLeaderboardMethods.js');
 const { StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
-const { MAX_QUEUED_ARCADE_SECONDS } = await import('../js/student/studentArcadePolicy.js');
+const {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_SECONDS,
+    MAX_QUEUED_ARCADE_SECONDS
+} = await import('../js/student/studentArcadePolicy.js');
 const { StudentGameScoreMonitor } = await import('../js/student/studentGameScoreMonitor.js');
 const { StudentGameSettings } = await import('../js/student/studentGameSettingsMethods.js');
 const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
@@ -282,7 +286,10 @@ test('local Arcade minutes require and consume both coins and formative-earned t
     const values = new Map();
     globalThis.localStorage.getItem = key => values.get(key) ?? null;
     globalThis.localStorage.setItem = (key, value) => values.set(key, value);
-    writeLocalArcadeTime({ availableSeconds: 600, lifetimeEarnedSeconds: 600 });
+    writeLocalArcadeTime({
+        availableSeconds: FORMATIVE_PASS_SECONDS,
+        lifetimeEarnedSeconds: FORMATIVE_PASS_SECONDS
+    });
 
     let coinCharges = 0;
     const manager = {
@@ -301,8 +308,8 @@ test('local Arcade minutes require and consume both coins and formative-earned t
     const minute = await games.startArcadeMinute('snake');
 
     assert.equal(coinCharges, 10);
-    assert.equal(minute.minuteSeconds, 60);
-    assert.equal(games.getAvailableArcadeSeconds(), 540);
+    assert.equal(minute.minuteSeconds, ARCADE_MINUTE_SECONDS);
+    assert.equal(games.getAvailableArcadeSeconds(), FORMATIVE_PASS_SECONDS - ARCADE_MINUTE_SECONDS);
 });
 
 test('no coins are charged when a student has no formative-earned Arcade time', async () => {
@@ -327,22 +334,25 @@ test('formative completions refresh the window instead of stacking extra Arcade 
     const values = new Map();
     globalThis.localStorage.getItem = key => values.get(key) ?? null;
     globalThis.localStorage.setItem = (key, value) => values.set(key, value);
-    writeLocalArcadeTime({ availableSeconds: 420, lifetimeEarnedSeconds: 600 });
+    writeLocalArcadeTime({
+        availableSeconds: FORMATIVE_PASS_SECONDS - (3 * ARCADE_MINUTE_SECONDS),
+        lifetimeEarnedSeconds: FORMATIVE_PASS_SECONDS
+    });
 
     const refreshed = refreshLocalFormativeWindow();
     const repeated = refreshLocalFormativeWindow();
 
-    assert.equal(refreshed.availableSeconds, 600);
-    assert.equal(refreshed.lifetimeEarnedSeconds, 780);
-    assert.equal(repeated.availableSeconds, 600);
-    assert.equal(repeated.lifetimeEarnedSeconds, 780);
+    assert.equal(refreshed.availableSeconds, FORMATIVE_PASS_SECONDS);
+    assert.equal(refreshed.lifetimeEarnedSeconds, FORMATIVE_PASS_SECONDS + (3 * ARCADE_MINUTE_SECONDS));
+    assert.equal(repeated.availableSeconds, FORMATIVE_PASS_SECONDS);
+    assert.equal(repeated.lifetimeEarnedSeconds, FORMATIVE_PASS_SECONDS + (3 * ARCADE_MINUTE_SECONDS));
 });
 
 test('manual time additions cannot queue more than ten minutes', () => {
     const games = new StudentGames({});
     games.gameTimeRemaining = MAX_QUEUED_ARCADE_SECONDS - 30;
 
-    games.addGameTime(60);
+    games.addGameTime(ARCADE_MINUTE_SECONDS);
 
     assert.equal(games.gameTimeRemaining, MAX_QUEUED_ARCADE_SECONDS);
 });

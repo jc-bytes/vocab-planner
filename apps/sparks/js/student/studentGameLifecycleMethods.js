@@ -115,7 +115,7 @@ export class StudentGameLifecycle {
 
             // If there's time remaining, offer to play again
             if (this.games.gameTimeRemaining > 0) {
-                const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.games.gameTimeRemaining / 60)}:${(this.games.gameTimeRemaining % 60).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
+                const playAgain = confirm(`Game Over! Score: ${score}\n\nYou have ${Math.floor(this.games.gameTimeRemaining / ARCADE_MINUTE_SECONDS)}:${(this.games.gameTimeRemaining % ARCADE_MINUTE_SECONDS).toString().padStart(2, '0')} remaining.\n\nPlay again?`);
 
                 if (playAgain) {
                     this.restartCurrentGame(type);

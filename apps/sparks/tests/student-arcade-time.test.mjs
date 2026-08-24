@@ -70,6 +70,20 @@ test('client Arcade duration policy stays aligned with the server allowance', ()
     assert.equal(FORMATIVE_PASS_SECONDS % ARCADE_MINUTE_SECONDS, 0);
 });
 
+test('Arcade runtime consumers use the shared minute policy', async () => {
+    const sources = await Promise.all([
+        'studentGameAccessMethods.js',
+        'studentGames.js',
+        'studentGameLifecycleMethods.js'
+    ].map(file => readFile(new URL(`../js/student/${file}`, import.meta.url), 'utf8')));
+    const [access, games, lifecycle] = sources;
+
+    assert.match(access, /ARCADE_MINUTE_SECONDS/);
+    assert.doesNotMatch(access, /getAvailableSeconds\(\) < 60|minuteSeconds: 60/);
+    assert.doesNotMatch(games, /addGameTime\(seconds = 60\)/);
+    assert.doesNotMatch(lifecycle, /gameTimeRemaining \/ 60|gameTimeRemaining % 60/);
+});
+
 test('client Arcade exchange rates normalize to the server policy', () => {
     assert.equal(normalizeExchangeRate(undefined), 10);
     assert.equal(normalizeExchangeRate('25'), 25);

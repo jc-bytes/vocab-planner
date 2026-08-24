@@ -138,7 +138,7 @@ export class StudentGames {
         return this.lifecycle.pauseGame();
     }
 
-    addGameTime(seconds = 60) {
+    addGameTime(seconds) {
         return this.lifecycle.addGameTime(seconds);
     }
 
