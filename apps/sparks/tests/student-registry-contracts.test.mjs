@@ -193,6 +193,36 @@ test('flashcards descriptor owns eligibility and limited sequential preparation'
     assert.equal(flashcards.create, getStudentActivity('matching').create);
 });
 
+test('quiz descriptor owns eligibility and restorable prioritized preparation', () => {
+    const quiz = getStudentActivity('quiz');
+    assert.equal(quiz.isPlayable({ word: 'Router', definition: 'Connects networks' }), true);
+    assert.equal(quiz.isPlayable({ word: 'Router', definition: '' }), false);
+
+    const savedState = { wordKeys: ['Cell'] };
+    const fallbackWords = [{ word: 'Router', definition: 'Connects networks' }];
+    const restoredWords = [{ word: 'Cell', definition: 'Spreadsheet location' }];
+    const calls = [];
+    const prepared = quiz.prepare({
+        savedState,
+        wordLimit: 5,
+        prioritize(limit) {
+            calls.push(['prioritize', limit]);
+            return fallbackWords;
+        },
+        restore(state, fallback) {
+            calls.push(['restore', state, fallback]);
+            return restoredWords;
+        }
+    });
+
+    assert.deepEqual(prepared, { words: restoredWords });
+    assert.deepEqual(calls, [
+        ['prioritize', 5],
+        ['restore', savedState, fallbackWords]
+    ]);
+    assert.equal(quiz.create, getStudentActivity('matching').create);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

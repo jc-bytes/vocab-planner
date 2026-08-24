@@ -420,6 +420,7 @@ test('migrated launch dispatch stays on the registered lifecycle path', () => {
     assert.match(source, /activityInstance\s*=\s*this\.startActivityWithStateRecovery/);
     assert.doesNotMatch(source, /case ['"]matching['"]/);
     assert.doesNotMatch(source, /case ['"]flashcards['"]/);
+    assert.doesNotMatch(source, /case ['"]quiz['"]/);
 });
 
 test('registered Flashcards startup does not record practice coverage', () => {

@@ -198,12 +198,6 @@ export class StudentActivityLauncher {
                 }
 
                 switch (type) {
-            case 'quiz':
-                const quizLimit = getActivityWordLimit('quiz');
-                const quizWords = this.activities.restoreWordsFromState(savedState, getPrioritized(quizLimit));
-                activityInstance = new ActivityClass(container, quizWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, quizWords);
-                break;
             case 'synonym-antonym':
                 const synonymLimit = getActivityWordLimit('synonymAntonym');
                 const synonymFilter = w => (w.synonyms?.length > 0 || w.antonyms?.length > 0);

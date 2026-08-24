@@ -43,6 +43,12 @@ function prepareFlashcardsActivity({ playableWords, wordLimit }) {
     };
 }
 
+function preparePrioritizedRestorableActivity({ savedState, wordLimit, prioritize, restore }) {
+    return {
+        words: restore(savedState, prioritize(wordLimit))
+    };
+}
+
 function createWordListActivity({
     ActivityClass,
     container,
@@ -177,7 +183,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'quiz', title: 'Quiz', description: 'Test your knowledge.',
         icon: 'circle-help', settingKey: 'quiz',
-        exportName: 'QuizActivity', load: () => import('../activities/quiz.js')
+        exportName: 'QuizActivity', load: () => import('../activities/quiz.js'),
+        isPlayable: hasWordAndDefinition,
+        prepare: preparePrioritizedRestorableActivity,
+        create: createWordListActivity
     },
     {
         id: 'synonym-antonym', title: 'Synonym & Antonym', description: 'Challenge your word knowledge.',
