@@ -37,12 +37,9 @@ test('Quiz print reset relies on its later cascade instead of important declarat
     assert.doesNotMatch(printBlock, /transform:\s*none|!important/);
 });
 
-test('remaining Quiz layout overrides are explicitly bounded until inline styles migrate', () => {
+test('Quiz Maker styles do not require important specificity', () => {
     const importantDeclarations = [...teacherQuizCss.matchAll(/!important/g)].length;
-    assert.equal(importantDeclarations, 4);
-    assert.match(teacherQuizCss, /\.quiz-maker-container\s*\{[^}]*gap:\s*1\.25rem !important/s);
-    assert.match(teacherQuizCss, /\.quiz-sidebar\s*\{[^}]*width:[^;]+!important/s);
-    assert.match(teacherQuizCss, /\.quiz-canvas\s*\{[^}]*padding:[^;]+!important[^}]*background:[^;]+!important/s);
+    assert.equal(importantDeclarations, 0);
 });
 
 test('teacher dashboard and Word Hunt refinements win through owned selector scope', () => {

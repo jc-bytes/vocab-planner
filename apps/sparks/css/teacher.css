@@ -5265,23 +5265,6 @@ button.activity-card {
         margin-bottom: var(--spacing-md) !important;
     }
 
-    .quiz-maker-container {
-        flex-direction: column !important;
-        height: auto !important;
-        min-height: 0;
-    }
-
-    .quiz-sidebar {
-        width: 100% !important;
-        max-height: none !important;
-    }
-
-    .quiz-canvas {
-        width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
     .teacher-overview-grid {
         grid-template-columns: 1fr;
     }

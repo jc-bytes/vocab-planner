@@ -51,7 +51,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 9. Migrate shared UI families | DONE | Buttons; inputs/form controls; cards; dialogs; navigation; feedback; containers; typography ownership | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Repeated shared UI foundations are centralized while page-responsive and feature-owned behavior remains local. Existing typography authority now exclusively owns font delivery. |
 | 10. Reduce literal brand colors | DONE | Theme status roles; migrated shared styles; app-shell identity effects; known UI fallbacks; contract test | Complete suite, focused theme/UI contracts, 9-width regression, source/built smoke, production build, independent computed/pixel review | Canonical identity/status hues in migrated areas now derive from semantic tokens. Contextual game and feature palettes remain owned locally. |
 | 11. Reduce unnecessary `!important` | DONE | Quiz print; teacher dashboard/Word Hunt/login; lazy Flashcards/game stage; specificity guard | Complete suite, focused feature/style checks, computed/pixel comparisons, 9-width regression, source/built smoke, production build, independent review | Removed 9 proven-redundant declarations. Required state, inline-bridge, reduced-motion, and layered responsive exceptions remain documented rather than removed speculatively. |
-| 12. Clean up owned inline styles | TODO | | | |
+| 12. Clean up owned inline styles | IN PROGRESS | Quiz Maker template and lazy feature CSS; inline-style/specificity contracts | Complete suite, focused ownership/lazy checks, three-viewport pixel comparison, production build, source/built smoke | Quiz Maker now has one feature-owned presentation authority with zero inline styles or `!important`; other teacher features remain to inspect incrementally. |
 | 13. Create lightweight shared UI modules | TODO | | | |
 | 14. Standardize application feedback | TODO | | | |
 | 15. Map teacher feature dependencies | TODO | | | |
@@ -613,3 +613,15 @@ Task 11 remains in progress for the bounded teacher dialog/login candidates. Wor
 - Production deployment remains 13.6 MB with 2,330 transformed modules. Lazy student feature CSS is 49.81/9.87 kB raw/gzip and lazy Quiz CSS is 12.44/3.09 kB.
 
 Task 11 is complete. Task 12 will move owned teacher inline layout styles feature by feature, beginning with Quiz Maker so its four remaining lazy-style specificity bridges can be removed safely.
+
+### Task 12a, move Quiz Maker presentation into its lazy feature stylesheet
+
+- Removed every static inline style from the inert Quiz Maker template and gave the few anonymous elements feature-owned class names. Form behavior, IDs, ARIA, copy, document generation, and runtime-calculated presentation remain unchanged.
+- Moved the effective container, sidebar, tool, canvas, list, and empty-state presentation into `teacherQuiz.css`, which still loads only when the Quiz feature opens. Moved the Quiz-specific 1024px rules out of the eager teacher entry so the feature owns its complete cascade.
+- Removed the four remaining lazy Quiz specificity bridges and six eager responsive importance flags. Application CSS now contains 1,016 `!important` occurrences, down from 1,026 at Task 11 close; `teacherQuiz.css` contains none.
+- The first independent comparison caught a real responsive regression: the old equal-specificity/later-source cascade kept the sidebar clamped at 1024px and mobile widths. Removed the proposed full-width override, documented that established behavior in the contract, and reran the comparison before completion.
+- Added `test:teacher-inline-styles` to the complete suite. It requires static Quiz presentation to stay out of the template, keeps base and responsive ownership in the lazy stylesheet, preserves the clamped responsive sidebar, and prevents new Quiz `!important` declarations.
+- Independent Chromium comparison against `1b1836c6` found identical computed styles, bounding rectangles, and byte-identical screenshots at 1280x900, 1024x900, and 390x844 with identical font handling. The comparison covered the container, sidebar, header, controls, canvas, list, and empty state.
+- Verification: focused inline-style, specificity, form, button, and build/lazy contracts; the final complete `npm test` suite; production build; source/built three-page smoke; 9-width student regression; and 13-game sandbox smoke passed. The build remains 13.6 MB with 2,330 transformed modules; Quiz CSS remains a separate 13.24/3.27 kB raw/gzip lazy asset.
+
+Task 12 remains in progress. The next bounded change will inspect one additional teacher feature and move only static presentation that has a clear owner; calculated runtime styles will remain in JavaScript.

@@ -866,10 +866,9 @@
             <!-- View: Quiz Maker -->
             <template id="teacher-quizzes-view-template">
             <section id="quiz-maker-view" class="view hidden" role="tabpanel" aria-labelledby="vocabulary-tab-quizzes">
-                <div class="quiz-maker-container" style="display: flex; height: calc(100vh - 80px); gap: 1rem;">
+                <div class="quiz-maker-container">
                     <!-- Sidebar -->
-                    <aside class="quiz-sidebar"
-                        style="width: 360px; display: flex; flex-direction: column; overflow-y: auto;">
+                    <aside class="quiz-sidebar">
                         <div class="quiz-maker-header">
                             <button id="quiz-maker-back-btn" class="btn text-btn" type="button">
                                 <i data-lucide="arrow-left"></i>
@@ -880,7 +879,7 @@
                                 Export Word
                             </button>
                         </div>
-                        <h3 style="margin-bottom: 1rem;">Quiz Tools</h3>
+                        <h3>Quiz Tools</h3>
 
                         <div class="quiz-tool-tabs" role="tablist" aria-label="Quiz builder tools">
                             <button class="quiz-tool-tab active" type="button" data-quiz-tool-tab="build">Build</button>
@@ -890,7 +889,7 @@
                         </div>
 
                         <div class="tool-section quiz-tool-panel active" data-quiz-tool-panel="build">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Quiz
+                            <h4 class="quiz-tool-heading">Quiz
                                 Sections</h4>
                             <div class="quiz-section-toolbar">
                                 <select id="quiz-section-type-select" aria-label="Question section type">
@@ -919,65 +918,62 @@
                         </div>
 
                         <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="details">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Document
+                            <h4 class="quiz-tool-heading">Document
                                 Details</h4>
                             <div class="form-group">
-                                <label for="quiz-title-input" style="font-size: 0.8rem;">Quiz Title</label>
-                                <input type="text" id="quiz-title-input" style="width: 100%;">
+                                <label for="quiz-title-input">Quiz Title</label>
+                                <input type="text" id="quiz-title-input">
                             </div>
                             <div class="form-group">
-                                <label for="quiz-school-input" style="font-size: 0.8rem;">School Name</label>
-                                <input type="text" id="quiz-school-input" value="ACADEMIA INTERNACIONAL DE DAVID"
-                                    style="width: 100%;">
+                                <label for="quiz-school-input">School Name</label>
+                                <input type="text" id="quiz-school-input" value="ACADEMIA INTERNACIONAL DE DAVID">
                             </div>
                             <div class="form-group">
-                                <label for="quiz-teacher-input" style="font-size: 0.8rem;">Teacher Name</label>
-                                <input type="text" id="quiz-teacher-input" value="Porfirio Rios" style="width: 100%;">
+                                <label for="quiz-teacher-input">Teacher Name</label>
+                                <input type="text" id="quiz-teacher-input" value="Porfirio Rios">
                             </div>
                             <div class="form-group">
-                                <label for="quiz-grade-input" style="font-size: 0.8rem;">Grade</label>
-                                <input type="text" id="quiz-grade-input" placeholder="Grade 9" style="width: 100%;">
+                                <label for="quiz-grade-input">Grade</label>
+                                <input type="text" id="quiz-grade-input" placeholder="Grade 9">
                             </div>
                             <div class="form-group">
-                                <label for="quiz-instructions-input" style="font-size: 0.8rem;">Instructions</label>
-                                <textarea id="quiz-instructions-input" rows="3" style="width: 100%;"></textarea>
+                                <label for="quiz-instructions-input">Instructions</label>
+                                <textarea id="quiz-instructions-input" rows="3"></textarea>
                             </div>
                         </div>
 
                         <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="rubric">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Rubric</h4>
+                            <h4 class="quiz-tool-heading">Rubric</h4>
                             <div class="form-group">
-                                <span class="form-label" style="font-size: 0.8rem;">Rubric</span>
-                                <button id="edit-rubric-btn" class="btn secondary-btn"
-                                    style="width:100%; font-size:0.8rem;">Edit Rubric Table</button>
+                                <span class="form-label">Rubric</span>
+                                <button id="edit-rubric-btn" class="btn secondary-btn">Edit Rubric Table</button>
                             </div>
                         </div>
 
                         <div class="tool-section quiz-tool-panel" data-quiz-tool-panel="style">
-                            <h4 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Page Style</h4>
+                            <h4 class="quiz-tool-heading">Page Style</h4>
                             <div class="form-group">
-                                <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
+                                <label class="quiz-border-option">
                                     <input type="checkbox" id="quiz-border-toggle" checked> Show Border
                                 </label>
                             </div>
                             <div class="form-group">
-                                <label for="quiz-font-select" style="font-size: 0.8rem;">Font</label>
-                                <select id="quiz-font-select" style="width:100%;">
+                                <label for="quiz-font-select">Font</label>
+                                <select id="quiz-font-select">
                                     <option value="Arial, sans-serif">Arial 12 pt</option>
                                 </select>
                             </div>
                         </div>
 
-                        <button id="quiz-maker-close-btn" class="btn text-btn" type="button" style="width: 100%;">Close
+                        <button id="quiz-maker-close-btn" class="btn text-btn" type="button">Close
                             Editor</button>
                     </aside>
 
                     <!-- Main Canvas -->
-                    <main class="quiz-canvas"
-                        style="flex: 1; overflow-y: auto; background: #f3f4f6; padding: 2rem;">
-                        <div id="quiz-questions-list" class="quiz-list" style="max-width: 800px; margin: 0 auto;">
+                    <main class="quiz-canvas">
+                        <div id="quiz-questions-list" class="quiz-list">
                             <!-- Questions injected here -->
-                            <div style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                            <div class="quiz-empty-state">
                                 <p>Quiz is empty.</p>
                                 <p>Use the sidebar to add questions.</p>
                             </div>
