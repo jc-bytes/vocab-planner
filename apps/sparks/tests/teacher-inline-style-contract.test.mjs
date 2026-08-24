@@ -201,3 +201,25 @@ test('Student Detail delegates static presentation without disturbing runtime st
     assert.doesNotMatch(teacherCss, /#detail-activity-list[^\{]*\[style\*="display: flex"\]/,
         'Student Detail layout must not depend on inline-style substring selectors');
 });
+
+test('Teacher loading and login views delegate static presentation to auth classes', () => {
+    const start = teacherHtml.indexOf('<!-- View: Loading -->');
+    const end = teacherHtml.indexOf('<!-- View: Overview -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded teacher loading and login views');
+    const authTemplate = teacherHtml.slice(start, end);
+
+    assert.doesNotMatch(authTemplate, /style="(?=[^"]*(?:width|height|margin|padding|color|background|border))/,
+        'Teacher auth markup must keep only runtime display state inline');
+    assert.match(authTemplate, /id="teacher-login-error"[^>]*style="display:none;"/,
+        'Initial login-error visibility remains with the auth state owner for Task 14');
+
+    for (const declaration of [
+        /\.teacher-session-loading\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*height:\s*60vh;/s,
+        /\.teacher-session-loading__spinner\s*\{[^}]*width:\s*50px;[^}]*height:\s*50px;[^}]*border-width:\s*4px;/s,
+        /\.teacher-session-loading__message\s*\{[^}]*margin-top:\s*1rem;[^}]*color:\s*var\(--color-text-muted\);/s,
+        /\.teacher-login-submit\s*\{[^}]*width:\s*100%;/s,
+        /\.teacher-login-error\s*\{[^}]*margin-top:\s*1rem;[^}]*padding:\s*1rem;[^}]*border-radius:\s*8px;[^}]*background:\s*rgba\(239, 68, 68, 0\.15\);[^}]*color:\s*var\(--color-danger\);/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+});

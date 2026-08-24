@@ -2728,6 +2728,37 @@ body {
     font-size: clamp(1.65rem, 4vw, 2rem);
 }
 
+.teacher-session-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+}
+
+.teacher-session-loading__spinner {
+    width: 50px;
+    height: 50px;
+    border-width: 4px;
+}
+
+.teacher-session-loading__message {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+}
+
+.teacher-login-submit {
+    width: 100%;
+}
+
+.teacher-login-error {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+}
+
 .teacher-auth-switch {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
