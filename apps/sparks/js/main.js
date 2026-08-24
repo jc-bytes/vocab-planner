@@ -188,23 +188,6 @@ export function closeModal(elementOrSelector, options = {}) {
     }
 }
 
-// Simple state management
-export const store = {
-    vocabularies: [],
-    currentVocab: null,
-    studentProgress: {},
-    
-    saveProgress() {
-        // TODO: Implement save logic
-        // Progress saving is handled by backend/Drive services
-    },
-    
-    loadProgress(json) {
-        // TODO: Implement load logic
-        // Progress loading is handled by backend/Drive services
-    }
-};
-
 // Utility to fetch JSON
 const jsonCache = new Map();
 

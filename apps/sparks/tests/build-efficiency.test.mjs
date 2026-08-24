@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 
 const viteConfig = await readFile(new URL('../vite.config.mjs', import.meta.url), 'utf8');
 const serviceWorkerGenerator = await readFile(new URL('../scripts/generate-service-worker.mjs', import.meta.url), 'utf8');
@@ -14,7 +14,13 @@ const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
 const typographyCss = await readFile(new URL('../css/typography.css', import.meta.url), 'utf8');
 const landingCss = await readFile(new URL('../css/landing.css', import.meta.url), 'utf8');
+const mainModule = await readFile(new URL('../js/main.js', import.meta.url), 'utf8');
 const { collectStudentPrecacheFiles } = await import('../scripts/student-precache.mjs');
+
+test('obsolete client save stubs do not return as a second persistence system', async () => {
+    assert.doesNotMatch(mainModule, /export const store\s*=/);
+    await assert.rejects(access(new URL('../js/saveSystem.js', import.meta.url)));
+});
 
 test('student offline shell is generated from the student entry graph only', () => {
     assert.match(viteConfig, /manifest:\s*true/);

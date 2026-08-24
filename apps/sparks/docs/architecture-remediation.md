@@ -45,7 +45,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
-| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror | Package refactor, 75 progress, 139 activity, and 8 build-efficiency tests | Removing only code with complete caller/import evidence. |
+| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror; obsolete save stubs | Package refactor, 75 progress, 139 activity, 9 build-efficiency and 5 report tests; UI smoke; production build | Removing only code with complete caller/import evidence. |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
@@ -328,3 +328,13 @@ The installer URL is intentionally deferred because changing a product download 
 - Verification: package refactor checks, 75 student progress tests, 139 student activity tests, and 8 build-efficiency tests passed.
 
 Task 6 remains in progress while independent traces check the audit's no-op store, save-system, utility, CSS, and asset candidates for actual reachability.
+
+### Task 6b, remove obsolete client save stubs
+
+- Deleted the unreferenced ZIP `SaveSystem`. It had no imports, script tags, tests, or build entry and depended on an undeclared `JSZip` global plus an obsolete image-store API.
+- Removed `main.js`'s exported no-op `store`. No caller read it, and its TODO save/load methods explicitly deferred to the real backend and browser-storage owners.
+- Added a focused ownership guard so neither a second global store nor the deleted save module quietly returns.
+- Kept active ZIP/PDF export code and browser activity persistence unchanged; this deletion removes no live persistence path.
+- Verification: 9 build-efficiency tests, package refactor checks, 139 student activity tests, 5 report tests, three-page UI smoke, and the production build passed. Deployment remains 15.1 MB and the student entry remains 242.48 kB raw, 62.17 kB gzip.
+
+Task 6 remains in progress. Independent traces have identified additional isolated CSS/build-asset candidates; each will be verified and removed as a separate coherent group.
