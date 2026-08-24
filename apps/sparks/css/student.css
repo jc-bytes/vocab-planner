@@ -1,44 +1,5 @@
 /* Student entry stylesheet; includes shared primitives used by the student UI. */:root {
     --form-control-line-height: var(--line-height-body);
-    /* Celestial Academy tokens */
-    --color-surface: #0b1326;
-    --color-surface-container-lowest: #060e20;
-    --color-surface-container-low: #131b2e;
-    --color-surface-container: #171f33;
-    --color-surface-container-high: #222a3d;
-    --color-surface-container-highest: #2d3449;
-    --color-on-surface: #dae2fd;
-    --color-on-surface-variant: #c2c6d6;
-    --color-outline: #8c909f;
-    --color-outline-variant: #424754;
-    --color-primary: #adc6ff;
-    --color-on-primary: #002e6a;
-    --color-primary-container: #4d8eff;
-    --color-secondary: #ddb7ff;
-    --color-tertiary: #ffb786;
-    --color-success: #10b981;
-    --color-warning: #ffc800;
-    --color-danger: #ff4b4b;
-    --color-xp: #e4f222;
-    --color-glass-stroke: rgba(255, 255, 255, 0.12);
-    --glass-panel: rgba(22, 24, 58, 0.78);
-    --glass-panel-strong: rgba(25, 27, 66, 0.9);
-    --glass-panel-subtle: rgba(10, 18, 38, 0.78);
-    --glass-blur: 24px;
-
-    /* Existing semantic aliases */
-    --primary-color: var(--color-primary);
-    --primary-hover: #d8e2ff;
-    --secondary-color: var(--color-secondary);
-    --accent-color: var(--color-tertiary);
-    --bg-color: var(--color-surface);
-    --card-bg: var(--glass-panel);
-    --text-main: var(--color-on-surface);
-    --text-muted: var(--color-on-surface-variant);
-    --border-color: var(--color-glass-stroke);
-    --danger-color: var(--color-danger);
-    --success-color: var(--color-success);
-
     /* Spacing */
     --spacing-1: 0.5rem;
     --spacing-2: 1rem;
@@ -63,9 +24,6 @@
     --shadow-sm: 0 8px 18px -18px rgb(0 0 0 / 0.65);
     --shadow-md: 0 18px 42px -28px rgb(0 0 0 / 0.72);
     --shadow-lg: 0 28px 70px -42px rgb(0 0 0 / 0.82);
-    --glow-primary: 0 18px 38px -24px rgba(173, 198, 255, 0.9);
-    --glow-secondary: 0 18px 38px -24px rgba(221, 183, 255, 0.85);
-    --glow-xp: 0 14px 34px -24px rgba(228, 242, 34, 0.95);
 }body {
     margin: 0;
     font-family: 'Inter', sans-serif;

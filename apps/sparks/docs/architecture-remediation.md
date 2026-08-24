@@ -47,7 +47,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
-| 8. Introduce semantic design tokens | TODO | | | |
+| 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
 | 9. Migrate shared UI families | TODO | | | |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
@@ -416,3 +416,15 @@ Task 7 remains in progress. Next, the unreachable modal, methods, listeners, pro
 - The local cross-browser harness remains unavailable because `supabase start` exits 1 without the baseline Docker service. Direct unauthenticated browser inspection reached the expected login boundary; no authenticated post-change session was available, so that specific path is recorded as unknown rather than passed.
 
 Task 7 is complete. Task 8 will introduce a semantic token layer without changing the established visual identity.
+
+### Task 8, introduce the semantic theme authority
+
+- Added `css/theme.css` as the single application color-theme authority. It defines brand, on-brand, information, background, surface, raised surface, text, muted text, border, success, warning, danger, focus, and interactive-state contracts.
+- Preserved the established landing/teacher palette as the shared default and the established Celestial student palette as a scoped `.student-site` variant. A recursive independent comparison confirmed every moved legacy palette and glow property resolves to its previous value.
+- Moved legacy color aliases out of the three entry stylesheets and mapped them to semantic tokens in the central file. These aliases are intentionally temporary migration bridges for Tasks 9 and 10, not a second theme authority.
+- Each Vite application entry now loads the theme once before page-owned styles. Embedded games and join redirects remain isolated; lazy student feature and teacher Quiz styles inherit the tokens without importing the theme or becoming eager.
+- Added `test:theme` to the complete suite. Its ownership contract requires the semantic surface, scoped student variant, entry ordering, compatibility mappings, and removal of entry-owned palette aliases.
+- Verification: the complete `npm test` suite passed, including 9 viewport widths, three-page UI smoke, and 13 sandboxed games. The student design-system audit, focused architecture/accessibility checks, and independent diff review passed.
+- Production build passed with 2,323 modules and a 13.6 MB deployment. Student feature CSS and teacher Quiz CSS remain separate lazy assets; the generated student service worker precaches the themed student entry CSS. No native `color-scheme` behavior was introduced.
+
+Task 8 is complete. Task 9 will migrate shared UI families one at a time, beginning with buttons, while preserving the compatibility aliases until their consumers are retired.

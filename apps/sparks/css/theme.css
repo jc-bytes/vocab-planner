@@ -1,0 +1,104 @@
+/*
+ * Sparks theme authority.
+ *
+ * New shared UI should consume the semantic --color-* tokens. The legacy
+ * aliases remain while existing component families migrate incrementally.
+ * Feature artwork and embedded games own their contextual palettes.
+ */
+
+:root {
+    /* Shared semantic theme */
+    --color-brand: #6366f1;
+    --color-brand-hover: #4f46e5;
+    --color-on-brand: #ffffff;
+    --color-info: #0ea5e9;
+    --color-accent: #f97316;
+    --color-background: #0f172a;
+    --color-surface: rgba(15, 23, 42, 0.65);
+    --color-surface-raised: rgba(30, 41, 59, 0.9);
+    --color-text: #f8fafc;
+    --color-text-muted: #cbd5f5;
+    --color-border: rgba(255, 255, 255, 0.125);
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+    --color-focus: #a5b4fc;
+    --color-interactive: var(--color-brand);
+    --color-on-interactive: var(--color-on-brand);
+    --color-interactive-hover: var(--color-brand-hover);
+    --color-interactive-disabled: rgba(203, 213, 245, 0.45);
+
+    /* Compatibility aliases for component families not migrated yet. */
+    --primary-color: var(--color-brand);
+    --primary-hover: var(--color-brand-hover);
+    --secondary-color: var(--color-info);
+    --accent-color: var(--color-accent);
+    --bg-color: var(--color-background);
+    --card-bg: var(--color-surface);
+    --text-main: var(--color-text);
+    --text-muted: var(--color-text-muted);
+    --border-color: var(--color-border);
+    --danger-color: var(--color-danger);
+    --success-color: var(--color-success);
+}
+
+/* The student shell intentionally retains its established Celestial palette. */
+.student-site {
+    --color-brand: #adc6ff;
+    --color-brand-hover: #d8e2ff;
+    --color-on-brand: #002e6a;
+    --color-info: #0ea5e9;
+    --color-secondary: #ddb7ff;
+    --color-accent: #ffb786;
+    --color-background: #0b1326;
+    --color-surface: #0b1326;
+    --color-surface-raised: rgba(22, 24, 58, 0.78);
+    --color-text: #dae2fd;
+    --color-text-muted: #c2c6d6;
+    --color-border: rgba(255, 255, 255, 0.12);
+    --color-success: #10b981;
+    --color-warning: #ffc800;
+    --color-danger: #ff4b4b;
+    --color-focus: #adc6ff;
+    --color-interactive: var(--color-brand);
+    --color-on-interactive: var(--color-on-brand);
+    --color-interactive-hover: var(--color-brand-hover);
+    --color-interactive-disabled: rgba(194, 198, 214, 0.45);
+
+    /* Student palette details used by existing feature styles. */
+    --color-surface-container-lowest: #060e20;
+    --color-surface-container-low: #131b2e;
+    --color-surface-container: #171f33;
+    --color-surface-container-high: #222a3d;
+    --color-surface-container-highest: #2d3449;
+    --color-on-surface: var(--color-text);
+    --color-on-surface-variant: var(--color-text-muted);
+    --color-outline: #8c909f;
+    --color-outline-variant: #424754;
+    --color-primary: var(--color-brand);
+    --color-on-primary: var(--color-on-brand);
+    --color-primary-container: #4d8eff;
+    --color-tertiary: var(--color-accent);
+    --color-xp: #e4f222;
+    --color-glass-stroke: var(--color-border);
+    --glass-panel: var(--color-surface-raised);
+    --glass-panel-strong: rgba(25, 27, 66, 0.9);
+    --glass-panel-subtle: rgba(10, 18, 38, 0.78);
+    --glass-blur: 24px;
+    --glow-primary: 0 18px 38px -24px rgba(173, 198, 255, 0.9);
+    --glow-secondary: 0 18px 38px -24px rgba(221, 183, 255, 0.85);
+    --glow-xp: 0 14px 34px -24px rgba(228, 242, 34, 0.95);
+
+    /* Resolve compatibility aliases in the student scope. */
+    --primary-color: var(--color-brand);
+    --primary-hover: var(--color-brand-hover);
+    --secondary-color: var(--color-secondary);
+    --accent-color: var(--color-accent);
+    --bg-color: var(--color-background);
+    --card-bg: var(--color-surface-raised);
+    --text-main: var(--color-text);
+    --text-muted: var(--color-text-muted);
+    --border-color: var(--color-border);
+    --danger-color: var(--color-danger);
+    --success-color: var(--color-success);
+}

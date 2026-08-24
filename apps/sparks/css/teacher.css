@@ -1,17 +1,4 @@
 :root {
-    /* Updated palette */
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
-    --secondary-color: #0ea5e9;
-    --accent-color: #f97316;
-    --bg-color: #0f172a;
-    --card-bg: rgba(15, 23, 42, 0.65);
-    --text-main: #f8fafc;
-    --text-muted: #cbd5f5;
-    --border-color: rgba(255, 255, 255, 0.125);
-    --danger-color: #f87171;
-    --success-color: #34d399;
-
     /* Spacing */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
