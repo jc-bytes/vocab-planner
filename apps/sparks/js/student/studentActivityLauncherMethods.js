@@ -7,9 +7,10 @@ import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingS
 
 const ACTIVITY_DESCRIPTOR_CONTRACT_ERROR = 'ACTIVITY_DESCRIPTOR_CONTRACT';
 
-function activityDescriptorContractError(message) {
+function activityDescriptorContractError(message, cause) {
     const error = new TypeError(message);
     error.code = ACTIVITY_DESCRIPTOR_CONTRACT_ERROR;
+    if (cause !== undefined) error.cause = cause;
     return error;
 }
 
@@ -47,7 +48,33 @@ export class StudentActivityLauncher {
         }
 
         if (descriptor.tracksCoverage) {
-            context.markWordsPracticed(prepared.words);
+            let coverageWords = prepared.words;
+            if (descriptor.selectCoverageWords) {
+                try {
+                    coverageWords = descriptor.selectCoverageWords({ instance, prepared });
+                } catch (error) {
+                    try {
+                        instance.destroy?.();
+                    } catch (cleanupError) {
+                        console.warn('Could not clean up an activity after a coverage contract error:', cleanupError);
+                    }
+                    throw activityDescriptorContractError(
+                        `Activity ${descriptor.id || 'descriptor'} selectCoverageWords() failed: ${error?.message || 'unknown error'}`,
+                        error
+                    );
+                }
+                if (!Array.isArray(coverageWords)) {
+                    try {
+                        instance.destroy?.();
+                    } catch (cleanupError) {
+                        console.warn('Could not clean up an activity after a coverage contract error:', cleanupError);
+                    }
+                    throw activityDescriptorContractError(
+                        `Activity ${descriptor.id || 'descriptor'} selectCoverageWords() must return a words array`
+                    );
+                }
+            }
+            context.markWordsPracticed(coverageWords);
         }
         return instance;
     }

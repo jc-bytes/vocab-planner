@@ -194,7 +194,7 @@ export function defineStudentActivityRegistry(activities) {
         if (activity.routeable === false) {
             throw new TypeError(`Activity ${activity.id} cannot disable routing in the student activity registry`);
         }
-        for (const field of ['isPlayable', 'prepare', 'create']) {
+        for (const field of ['isPlayable', 'prepare', 'create', 'selectCoverageWords']) {
             if (hasOwn(activity, field) && typeof activity[field] !== 'function') {
                 throw new TypeError(`Activity ${activity.id} ${field} must be a function`);
             }
@@ -204,6 +204,12 @@ export function defineStudentActivityRegistry(activities) {
         }
         if (hasOwn(activity, 'prepare') && !hasOwn(activity, 'isPlayable')) {
             throw new TypeError(`Activity ${activity.id} must provide isPlayable with prepare and create`);
+        }
+        if (hasOwn(activity, 'selectCoverageWords') && !hasOwn(activity, 'prepare')) {
+            throw new TypeError(`Activity ${activity.id} selectCoverageWords requires a registered lifecycle`);
+        }
+        if (hasOwn(activity, 'selectCoverageWords') && activity.tracksCoverage === false) {
+            throw new TypeError(`Activity ${activity.id} cannot select coverage words when coverage is disabled`);
         }
 
         return Object.freeze({

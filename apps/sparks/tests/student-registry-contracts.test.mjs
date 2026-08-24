@@ -80,6 +80,15 @@ test('activity registry definition validates and freezes descriptors', () => {
     assert.equal(configuredRegistry[0].nonReplayable, true);
     assert.equal(configuredRegistry[0].prepare, prepare);
     assert.equal(configuredRegistry[0].create, create);
+
+    const selectCoverageWords = () => [];
+    const coverageRegistry = defineStudentActivityRegistry([validActivity({
+        isPlayable: () => true,
+        prepare,
+        create,
+        selectCoverageWords
+    })]);
+    assert.equal(coverageRegistry[0].selectCoverageWords, selectCoverageWords);
 });
 
 test('activity registry definition rejects malformed descriptors clearly', () => {
@@ -125,6 +134,15 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
     assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {} })]), /prepare and create together/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ create() {} })]), /prepare and create together/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {}, create() {} })]), /provide isPlayable/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ selectCoverageWords: null })]), /selectCoverageWords must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ selectCoverageWords() {} })]), /requires a registered lifecycle/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({
+        tracksCoverage: false,
+        isPlayable: () => true,
+        prepare: () => ({ words: [] }),
+        create: () => ({}),
+        selectCoverageWords: () => []
+    })]), /coverage is disabled/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: 20 })]), /server-authoritative/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: undefined })]), /server-authoritative/);
 });

@@ -411,6 +411,129 @@ test('registered activity startup prepares, constructs, then records coverage', 
     ]);
 });
 
+test('registered activity coverage can use constructor-selected words', () => {
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    const preparedWords = [{ word: 'Prepared' }];
+    const placedWords = [{ word: 'Placed' }];
+    const instance = { placedWords };
+    const coverageCalls = [];
+    const result = launcher.createRegisteredActivity({
+        id: 'constructor-filtered',
+        tracksCoverage: true,
+        prepare: () => ({ words: preparedWords }),
+        create: () => instance,
+        selectCoverageWords(context) {
+            assert.equal(context.instance, instance);
+            assert.deepEqual(context.prepared, { words: preparedWords });
+            return context.instance.placedWords;
+        }
+    }, class ActivityDouble {}, {
+        container: {},
+        savedState: null,
+        wordLimit: 1,
+        playableWords: [],
+        prioritize() {},
+        restore() {},
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed(words) {
+            coverageCalls.push(words);
+        }
+    });
+
+    assert.equal(result, instance);
+    assert.deepEqual(coverageCalls, [placedWords]);
+});
+
+test('invalid constructor-selected coverage cleans up and fails as a contract error', () => {
+    const calls = [];
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    const instance = {
+        destroy() {
+            calls.push('destroy');
+        }
+    };
+
+    assert.throws(() => launcher.createRegisteredActivity({
+        id: 'broken-coverage',
+        tracksCoverage: true,
+        prepare: () => ({ words: [{ word: 'Prepared' }] }),
+        create: () => instance,
+        selectCoverageWords: () => null
+    }, class ActivityDouble {}, {
+        container: {},
+        savedState: null,
+        wordLimit: 1,
+        playableWords: [],
+        prioritize() {},
+        restore() {},
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed() {
+            calls.push('coverage');
+        }
+    }), error => {
+        assert.equal(error.code, 'ACTIVITY_DESCRIPTOR_CONTRACT');
+        assert.match(error.message, /selectCoverageWords\(\) must return a words array/);
+        return true;
+    });
+
+    assert.deepEqual(calls, ['destroy']);
+});
+
+test('a thrown coverage selector preserves saved state and is not retried', () => {
+    const calls = [];
+    const selectorFailure = new Error('selector bug');
+    const launcher = new StudentActivityLauncher({
+        sm: {},
+        resetActivityState() {
+            calls.push('reset');
+        }
+    });
+
+    assert.throws(() => launcher.startActivityWithStateRecovery(
+        'crossword',
+        { currentCell: 4 },
+        savedState => launcher.createRegisteredActivity({
+            id: 'crossword',
+            tracksCoverage: true,
+            prepare: () => ({ words: [{ word: 'Prepared' }] }),
+            create() {
+                calls.push(['create', savedState]);
+                return {
+                    destroy() {
+                        calls.push('destroy');
+                    }
+                };
+            },
+            selectCoverageWords() {
+                throw selectorFailure;
+            }
+        }, class ActivityDouble {}, {
+            container: {},
+            savedState,
+            wordLimit: 1,
+            playableWords: [],
+            prioritize() {},
+            restore() {},
+            onProgress() {},
+            onSaveState() {},
+            markWordsPracticed() {
+                calls.push('coverage');
+            }
+        })
+    ), error => {
+        assert.equal(error.code, 'ACTIVITY_DESCRIPTOR_CONTRACT');
+        assert.equal(error.cause, selectorFailure);
+        return true;
+    });
+
+    assert.deepEqual(calls, [
+        ['create', { currentCell: 4 }],
+        'destroy'
+    ]);
+});
+
 test('registered activity startup rejects malformed preparation clearly', () => {
     const launcher = new StudentActivityLauncher({ sm: {} });
     assert.throws(() => launcher.createRegisteredActivity({

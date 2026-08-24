@@ -212,6 +212,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Recorded separate latent reliability debt for focused tests: restored shuffled words and counters are weakly validated, regex metacharacters in a word are not escaped when building the blank, and local persistence uses inconsistent trailing-space keys. The checked catalog currently has valid examples containing their words and no regex-metacharacter terms, so this migration does not change product behavior.
 - Verification: registry browser smoke, 135 student activity tests, 72 progress tests, 14 security tests, 8 build-efficiency tests, and the production build passed. Fill in Blank remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.41 kB raw, 66.32 kB gzip.
 
+### Task 4 coverage selector contract
+
+- Added one optional lifecycle hook for activities whose constructor filters the prepared input: `selectCoverageWords({ instance, prepared })`. Ordinary activities keep the existing `prepared.words` default.
+- Registry validation rejects malformed selectors, selectors without a registered lifecycle, and selectors on activities that disable coverage.
+- Runtime validation requires the selector to return an array. Contract failure destroys the just-created instance, records no coverage, preserves saved state through the existing non-recoverable descriptor error path, and never starts the activity timer.
+- Added contracts for the unchanged default, constructor-selected coverage, invalid selector cleanup, and registry definition failures.
+- Verification: 95 focused registry/runtime tests, registry browser smoke, 137 student activity tests, 8 build-efficiency tests, and the production build passed. Deployment remains 15.1 MB and activity modules remain lazy chunks.
+
 ## Remaining work
 
 Task 4 continues one descriptor at a time. Nine activities are complete. The three remaining activities have special host behavior and will be migrated only after their narrow descriptor seams are proven.
