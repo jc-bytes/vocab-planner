@@ -76,6 +76,28 @@ function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore })
     };
 }
 
+function prepareIllustrationActivity({ featureContext = {} }) {
+    const sourceWords = Array.isArray(featureContext.sourceWords) ? featureContext.sourceWords : [];
+    const settings = featureContext.activitySettings || {};
+    let selectedWords;
+
+    if (featureContext.isRequired && settings.wordHuntSelectionMode !== 'custom') {
+        selectedWords = sourceWords;
+    } else {
+        selectedWords = sourceWords.filter(word => (
+            word.wordHunt === true
+            || word.wordHunt === 'true'
+            || word.word_hunt === true
+        ));
+        if (selectedWords.length === 0) {
+            const fallbackLimit = settings.illustration || sourceWords.length;
+            selectedWords = sourceWords.slice(0, fallbackLimit);
+        }
+    }
+
+    return { words: selectedWords.filter(hasWord) };
+}
+
 function prepareFlashcardsActivity({ playableWords, wordLimit }) {
     return {
         words: playableWords.slice(0, wordLimit)
@@ -166,6 +188,32 @@ function createWordSearchActivity({
     );
 }
 
+function createIllustrationActivity({
+    ActivityClass,
+    container,
+    prepared,
+    onProgress,
+    featureContext
+}) {
+    return new ActivityClass(
+        container,
+        prepared.words,
+        featureContext.vocabName,
+        onProgress,
+        featureContext.onSave,
+        featureContext.initialData,
+        {
+            ownerUserId: featureContext.ownerUserId,
+            initialIndex: featureContext.initialIndex,
+            onWordChange: featureContext.onWordChange,
+            uploadImage: featureContext.uploadImage,
+            loadImage: featureContext.loadImage,
+            onDownloadWordHunt: featureContext.onDownloadWordHunt,
+            researchContext: featureContext.researchContext
+        }
+    );
+}
+
 function requireNonEmptyString(activity, field, index) {
     if (typeof activity[field] !== 'string' || !activity[field].trim()) {
         throw new TypeError(`Activity descriptor at index ${index} must provide a non-empty ${field}`);
@@ -228,7 +276,7 @@ export function defineStudentActivityRegistry(activities) {
             throw new TypeError(`Activity ${activity.id} cannot define client XP; rewards are server-authoritative`);
         }
 
-        for (const field of ['routeable', 'tracksCoverage', 'nonReplayable']) {
+        for (const field of ['routeable', 'tracksCoverage', 'nonReplayable', 'allowStartupStateReset']) {
             if (hasOwn(activity, field) && typeof activity[field] !== 'boolean') {
                 throw new TypeError(`Activity ${activity.id} ${field} must be a boolean`);
             }
@@ -236,19 +284,13 @@ export function defineStudentActivityRegistry(activities) {
         if (activity.routeable === false) {
             throw new TypeError(`Activity ${activity.id} cannot disable routing in the student activity registry`);
         }
-        for (const field of ['isPlayable', 'prepare', 'create', 'selectCoverageWords']) {
-            if (hasOwn(activity, field) && typeof activity[field] !== 'function') {
-                throw new TypeError(`Activity ${activity.id} ${field} must be a function`);
+        for (const field of ['isPlayable', 'prepare', 'create']) {
+            if (typeof activity[field] !== 'function') {
+                throw new TypeError(`Activity ${activity.id} must provide a ${field} function`);
             }
         }
-        if (hasOwn(activity, 'prepare') !== hasOwn(activity, 'create')) {
-            throw new TypeError(`Activity ${activity.id} must provide prepare and create together`);
-        }
-        if (hasOwn(activity, 'prepare') && !hasOwn(activity, 'isPlayable')) {
-            throw new TypeError(`Activity ${activity.id} must provide isPlayable with prepare and create`);
-        }
-        if (hasOwn(activity, 'selectCoverageWords') && !hasOwn(activity, 'prepare')) {
-            throw new TypeError(`Activity ${activity.id} selectCoverageWords requires a registered lifecycle`);
+        if (hasOwn(activity, 'selectCoverageWords') && typeof activity.selectCoverageWords !== 'function') {
+            throw new TypeError(`Activity ${activity.id} selectCoverageWords must be a function`);
         }
         if (hasOwn(activity, 'selectCoverageWords') && activity.tracksCoverage === false) {
             throw new TypeError(`Activity ${activity.id} cannot select coverage words when coverage is disabled`);
@@ -258,6 +300,7 @@ export function defineStudentActivityRegistry(activities) {
             routeable: true,
             tracksCoverage: true,
             nonReplayable: false,
+            allowStartupStateReset: true,
             ...activity
         });
     });
@@ -270,7 +313,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
         id: 'illustration', title: 'Word Hunt', description: 'Find a definition, image, and two examples.',
         icon: 'compass', settingKey: 'illustration',
         exportName: 'IllustrationActivity', load: () => import('../activities/illustration.js'),
-        nonReplayable: true, tracksCoverage: false
+        nonReplayable: true, tracksCoverage: false, allowStartupStateReset: false,
+        isPlayable: hasWord,
+        prepare: prepareIllustrationActivity,
+        create: createIllustrationActivity
     },
     {
         id: 'matching', title: 'Matching', description: 'Match words to definitions.',

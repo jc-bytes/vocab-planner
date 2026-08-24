@@ -621,24 +621,88 @@ test('registered activity startup rejects a missing factory instance before cove
     assert.deepEqual(calls, []);
 });
 
-test('migrated launch dispatch stays on the registered lifecycle path', () => {
+test('activity launch dispatch has one registered lifecycle path', () => {
     const source = StudentActivityLauncher.prototype.startActivity.toString();
 
-    assert.match(source, /activityDescriptor\?\.prepare\s*&&\s*activityDescriptor\?\.create/);
     assert.match(source, /return this\.createRegisteredActivity\(activityDescriptor, ActivityClass/);
     assert.match(source, /wordLimit:\s*getActivityWordLimit\(activityDescriptor\.settingKey\)/);
     assert.match(source, /activityInstance\s*=\s*this\.startActivityWithStateRecovery/);
-    assert.doesNotMatch(source, /case ['"]matching['"]/);
-    assert.doesNotMatch(source, /case ['"]flashcards['"]/);
-    assert.doesNotMatch(source, /case ['"]quiz['"]/);
-    assert.doesNotMatch(source, /case ['"]synonym-antonym['"]/);
-    assert.doesNotMatch(source, /case ['"]hangman['"]/);
-    assert.doesNotMatch(source, /case ['"]scramble['"]/);
-    assert.doesNotMatch(source, /case ['"]wordle['"]/);
-    assert.doesNotMatch(source, /case ['"]speed-match['"]/);
-    assert.doesNotMatch(source, /case ['"]fill-in-blank['"]/);
-    assert.doesNotMatch(source, /case ['"]word-search['"]/);
-    assert.doesNotMatch(source, /case ['"]crossword['"]/);
+    assert.doesNotMatch(source, /switch\s*\(type\)/);
+    assert.doesNotMatch(source, /not implemented yet/);
+});
+
+test('Illustration feature context exposes only its required data and capabilities', async () => {
+    const calls = [];
+    const activities = {
+        sm: {
+            subjects: [{ slug: 'technology', name: 'Technology' }],
+            currentUser: { uid: 'student-3' },
+            unitWordHunt: { Data: { definition: 'Facts' } },
+            setRoute(route, options) {
+                calls.push(['route', route, options]);
+            }
+        },
+        getActivityFlowConfig: () => ({ required: ['flashcards', 'illustration'] }),
+        getUnitGrade: () => '6',
+        handleIllustrationSave(...args) {
+            calls.push(['save', ...args]);
+        },
+        uploadWordHuntImage: async (...args) => {
+            calls.push(['upload', ...args]);
+            return { imagePath: 'saved.webp' };
+        },
+        loadWordHuntImage: async path => {
+            calls.push(['load', path]);
+            return 'image';
+        },
+        downloadWordHuntSubmission: () => calls.push(['download'])
+    };
+    const launcher = new StudentActivityLauncher(activities);
+    const vocab = {
+        name: 'Internet Safety',
+        subjectSlug: 'technology',
+        words: [{ word: 'Password' }]
+    };
+    let current = true;
+    const context = launcher.createIllustrationFeatureContext({
+        vocab,
+        settings: { illustration: 1 },
+        options: { initialWordIndex: 2 },
+        unitId: 'unit-9',
+        isCurrentLaunch: () => current
+    });
+
+    assert.deepEqual(Object.keys(context).sort(), [
+        'activitySettings', 'initialData', 'initialIndex', 'isRequired', 'loadImage',
+        'onDownloadWordHunt', 'onSave', 'onWordChange', 'ownerUserId', 'researchContext',
+        'sourceWords', 'uploadImage', 'vocabName'
+    ]);
+    assert.equal(context.ownerUserId, 'student-3');
+    assert.equal(context.initialIndex, 2);
+    assert.equal(context.isRequired, true);
+    assert.deepEqual(context.researchContext, {
+        grade: '6',
+        subjectName: 'Technology',
+        subjectSlug: 'technology',
+        unitName: 'Internet Safety'
+    });
+
+    context.onWordChange(1);
+    current = false;
+    context.onWordChange(2);
+    await context.uploadImage('Password', 'blob', { width: 160 });
+    await context.loadImage('saved.webp');
+    context.onDownloadWordHunt();
+    context.onSave('Internet Safety', 'Password', { definition: 'Secret text' });
+    assert.deepEqual(calls, [
+        ['route', {
+            view: 'activity', unitId: 'unit-9', activityType: 'illustration', word: 2
+        }, { replace: true }],
+        ['upload', 'Password', 'blob', { width: 160 }],
+        ['load', 'saved.webp'],
+        ['download'],
+        ['save', 'Internet Safety', 'Password', { definition: 'Secret text' }]
+    ]);
 });
 
 test('registered Flashcards startup does not record practice coverage', () => {
@@ -728,6 +792,7 @@ test('activity recovery does not discard protected Word Hunt work', () => {
     assert.throws(() => launcher.startActivityWithStateRecovery('illustration', {}, () => {
         throw new TypeError('startup error');
     }), /startup error/);
+    assert.equal(getStudentActivity('illustration').allowStartupStateReset, false);
 });
 
 test('activity launch errors distinguish catalog problems from connectivity problems', () => {

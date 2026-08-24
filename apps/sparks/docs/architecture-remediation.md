@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Eleven activities migrated with focused and production-build verification | Every activity except Illustration now owns its lifecycle through the registry. |
+| 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -236,6 +236,17 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Recorded separate persistence debt: Crossword's local key uses only the selected word count while generic reset uses the full vocabulary count, so limited or filtered units can retain fallback state and equal-sized units can collide. This migration keeps the existing cloud/local behavior unchanged.
 - Verification: registry browser smoke, 138 student activity tests including 11 Crossword behavior tests, 72 progress tests, 8 build-efficiency tests, and the production build passed. Crossword remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.55 kB raw, 66.33 kB gzip.
 
+### Task 4l, migrate Illustration and close activity migration
+
+- Added Illustration's nonblank eligibility, exact three-mode Word Hunt selection policy, special constructor mapping, and protected startup-reset policy to its descriptor.
+- The launcher now builds one explicit Word Hunt feature context containing only source data and required callbacks. The registry receives no manager, repository, raw database client, or route implementation.
+- Preserved raw-word selection before eligibility filtering, required-unit selection, custom flags including the legacy key, fallback limiting, owner-scoped draft state, image upload/load, PDF export, research context, and deep-link word changes.
+- Replaced the hardcoded Illustration recovery exception with `allowStartupStateReset: false`. Flashcards remains non-replayable but retains ordinary stale-state recovery, so the two policies are not conflated.
+- Removed the obsolete launch switch, eligibility switch, and `getWordHuntWords` forwarding path. Production registry contracts now require every activity to own eligibility, preparation, and construction.
+- Independent review found that the generic validator still permitted descriptors without the now-mandatory lifecycle. Tightened registration to require `isPlayable`, `prepare`, and `create`, so incomplete descriptors fail before reaching a student session.
+- Recorded separate reliability debt: Illustration starts its asynchronous `init()` from the constructor without awaiting or retaining the promise. Startup timing and error semantics are unchanged during this architecture migration.
+- Verification: 18 registry contracts plus the 12-module browser smoke, 139 student activity tests, 9 Illustration tests, 14 routing tests, 5 report tests, 3 student API tests, 8 build-efficiency tests, the complete `npm test` suite, and the production build passed. Illustration remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.14 kB raw, 66.21 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Eleven activities are complete. Illustration remains intentionally special and will receive only a narrow feature context.
+Task 4 is complete. Task 5 will verify and consolidate only duplicated configuration that still has more than one genuine authority.

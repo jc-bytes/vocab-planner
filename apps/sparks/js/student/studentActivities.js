@@ -249,10 +249,6 @@ export class StudentActivities {
         return this.progressFlow.restoreWordsFromState(initialState, fallbackWords, filter);
     }
 
-    getWordHuntWords(settings = {}) {
-        return this.progressFlow.getWordHuntWords(settings);
-    }
-
     getDefaultRequiredActivities(vocab = this.sm.currentVocab) {
         return this.progressFlow.getDefaultRequiredActivities(vocab);
     }

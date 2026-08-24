@@ -33,6 +33,9 @@ function validActivity(overrides = {}) {
         icon: 'circle',
         exportName: 'SampleActivity',
         load: async () => ({ SampleActivity: class SampleActivity {} }),
+        isPlayable: () => true,
+        prepare: () => ({ words: [] }),
+        create: () => ({}),
         ...overrides
     };
 }
@@ -61,6 +64,7 @@ test('activity registry definition validates and freezes descriptors', () => {
     assert.equal(registry[0].routeable, true);
     assert.equal(registry[0].tracksCoverage, true);
     assert.equal(registry[0].nonReplayable, false);
+    assert.equal(registry[0].allowStartupStateReset, true);
     assert.equal(Object.hasOwn(source, 'routeable'), false, 'definition must not add defaults to the input');
     assert.equal(Object.hasOwn(source, 'tracksCoverage'), false, 'definition must not add defaults to the input');
     assert.equal(Object.hasOwn(source, 'nonReplayable'), false, 'definition must not add defaults to the input');
@@ -120,22 +124,20 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
     assert.throws(() => defineStudentActivityRegistry([validActivity({ load: null })]), /lazy loader/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ exportName: 'Sample' })]), /end with Activity/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ tracksCoverage: 'yes' })]), /must be a boolean/);
-    for (const field of ['routeable', 'tracksCoverage', 'nonReplayable']) {
+    for (const field of ['routeable', 'tracksCoverage', 'nonReplayable', 'allowStartupStateReset']) {
         assert.throws(
             () => defineStudentActivityRegistry([validActivity({ [field]: undefined })]),
             new RegExp(`${field} must be a boolean`)
         );
     }
     assert.throws(() => defineStudentActivityRegistry([validActivity({ routeable: false })]), /cannot disable routing/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ isPlayable: 1 })]), /isPlayable must be a function/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare: null })]), /prepare must be a function/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ create: true })]), /create must be a function/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ create: undefined })]), /create must be a function/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {} })]), /prepare and create together/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ create() {} })]), /prepare and create together/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {}, create() {} })]), /provide isPlayable/);
+    for (const field of ['isPlayable', 'prepare', 'create']) {
+        assert.throws(
+            () => defineStudentActivityRegistry([validActivity({ [field]: undefined })]),
+            new RegExp(`must provide a ${field} function`)
+        );
+    }
     assert.throws(() => defineStudentActivityRegistry([validActivity({ selectCoverageWords: null })]), /selectCoverageWords must be a function/);
-    assert.throws(() => defineStudentActivityRegistry([validActivity({ selectCoverageWords() {} })]), /requires a registered lifecycle/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({
         tracksCoverage: false,
         isPlayable: () => true,
@@ -202,6 +204,95 @@ test('matching descriptor owns eligibility, word preparation, and construction',
         savedState
     });
     assert.deepEqual(instance.args, [container, restoredWords, onProgress, onSaveState, savedState]);
+});
+
+test('Illustration descriptor preserves selection policies and special construction', () => {
+    const descriptor = getStudentActivity('illustration');
+    const sourceWords = [
+        { word: 'Algorithm' },
+        { word: 'Data', wordHunt: true },
+        { word: 'Network', word_hunt: true },
+        { word: '   ', wordHunt: true }
+    ];
+    assert.equal(descriptor.isPlayable(sourceWords[0]), true);
+    assert.equal(descriptor.isPlayable(sourceWords[3]), false);
+    assert.equal(descriptor.allowStartupStateReset, false);
+    assert.equal(descriptor.nonReplayable, true);
+    assert.equal(descriptor.tracksCoverage, false);
+
+    assert.deepEqual(descriptor.prepare({
+        featureContext: {
+            sourceWords,
+            activitySettings: { illustration: 1 },
+            isRequired: true
+        }
+    }).words, sourceWords.slice(0, 3));
+    assert.deepEqual(descriptor.prepare({
+        featureContext: {
+            sourceWords,
+            activitySettings: { wordHuntSelectionMode: 'custom' },
+            isRequired: true
+        }
+    }).words, sourceWords.slice(1, 3));
+    assert.deepEqual(descriptor.prepare({
+        featureContext: {
+            sourceWords: [{ word: 'Algorithm' }, { word: 'Variable' }],
+            activitySettings: { illustration: 1 },
+            isRequired: false
+        }
+    }).words, [{ word: 'Algorithm' }]);
+    assert.deepEqual(descriptor.prepare({
+        featureContext: {
+            sourceWords: [{ word: ' ', wordHunt: true }, { word: 'Fallback' }],
+            activitySettings: {},
+            isRequired: false
+        }
+    }).words, [], 'selection must happen before eligibility filtering');
+
+    const prepared = { words: sourceWords.slice(0, 2) };
+    const featureContext = {
+        vocabName: 'Computing',
+        onSave() {},
+        initialData: { Algorithm: { definition: 'Steps' } },
+        ownerUserId: 'student-7',
+        initialIndex: 1,
+        onWordChange() {},
+        uploadImage() {},
+        loadImage() {},
+        onDownloadWordHunt() {},
+        researchContext: { grade: '6', subjectName: 'Technology' }
+    };
+    const container = {};
+    const onProgress = () => {};
+    class IllustrationActivityDouble {
+        constructor(...args) {
+            this.args = args;
+        }
+    }
+    const instance = descriptor.create({
+        ActivityClass: IllustrationActivityDouble,
+        container,
+        prepared,
+        onProgress,
+        featureContext
+    });
+    assert.deepEqual(instance.args, [
+        container,
+        prepared.words,
+        'Computing',
+        onProgress,
+        featureContext.onSave,
+        featureContext.initialData,
+        {
+            ownerUserId: 'student-7',
+            initialIndex: 1,
+            onWordChange: featureContext.onWordChange,
+            uploadImage: featureContext.uploadImage,
+            loadImage: featureContext.loadImage,
+            onDownloadWordHunt: featureContext.onDownloadWordHunt,
+            researchContext: featureContext.researchContext
+        }
+    ]);
 });
 
 test('flashcards descriptor owns eligibility and limited sequential preparation', () => {
@@ -487,6 +578,9 @@ test('activity registry is the complete route and module source', () => {
         assert.ok(activity.title && activity.description, `${activity.id} must provide card copy`);
         assert.ok(activity.icon || activity.iconMarkup, `${activity.id} must provide a card icon`);
         assert.ok(activity.settingKey, `${activity.id} must provide its teacher setting key`);
+        assert.equal(typeof activity.isPlayable, 'function', `${activity.id} must own eligibility`);
+        assert.equal(typeof activity.prepare, 'function', `${activity.id} must own preparation`);
+        assert.equal(typeof activity.create, 'function', `${activity.id} must own construction`);
     }
 
     assert.deepEqual(VOCAB_ACTIVITY_OPTIONS, STUDENT_ACTIVITY_REGISTRY.map(activity => ({

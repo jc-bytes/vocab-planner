@@ -20,13 +20,47 @@ export class StudentActivityLauncher {
         this.sm = activities.sm;
     }
 
+    createIllustrationFeatureContext({ vocab, settings, options, unitId, isCurrentLaunch }) {
+        const subjectSlug = getVocabSubjectSlug(vocab);
+        const subject = getSubjectBySlug(this.sm.subjects, subjectSlug);
+        return {
+            sourceWords: vocab.words,
+            activitySettings: settings,
+            isRequired: this.activities.getActivityFlowConfig(vocab).required.includes('illustration'),
+            vocabName: vocab.name,
+            initialData: this.sm.unitWordHunt,
+            ownerUserId: this.sm.currentUser?.uid || 'local-dev',
+            initialIndex: options.initialWordIndex || 0,
+            onSave: this.activities.handleIllustrationSave.bind(this.activities),
+            onWordChange: index => {
+                if (!isCurrentLaunch() || !unitId) return;
+                this.sm.setRoute({
+                    view: 'activity',
+                    unitId,
+                    activityType: 'illustration',
+                    word: index + 1
+                }, { replace: true });
+            },
+            uploadImage: (word, blob, imageInfo) => this.activities.uploadWordHuntImage(word, blob, imageInfo),
+            loadImage: path => this.activities.loadWordHuntImage(path),
+            onDownloadWordHunt: () => this.activities.downloadWordHuntSubmission(),
+            researchContext: {
+                grade: this.activities.getUnitGrade(vocab),
+                subjectName: subject.name,
+                subjectSlug,
+                unitName: vocab.name || ''
+            }
+        };
+    }
+
     createRegisteredActivity(descriptor, ActivityClass, context) {
         const prepared = descriptor.prepare({
             savedState: context.savedState,
             wordLimit: context.wordLimit,
             playableWords: context.playableWords,
             prioritize: context.prioritize,
-            restore: context.restore
+            restore: context.restore,
+            featureContext: context.featureContext
         });
         if (!prepared || !Array.isArray(prepared.words)) {
             throw activityDescriptorContractError(
@@ -41,7 +75,8 @@ export class StudentActivityLauncher {
             onSaveState: context.onSaveState,
             savedState: context.savedState,
             persistenceId: context.persistenceId,
-            onNewRound: context.onNewRound
+            onNewRound: context.onNewRound,
+            featureContext: context.featureContext
         });
         if (!instance || !['object', 'function'].includes(typeof instance)) {
             throw activityDescriptorContractError(
@@ -227,73 +262,32 @@ export class StudentActivityLauncher {
 
         let activityInstance = null;
         try {
+            const featureContext = type === 'illustration'
+                ? this.createIllustrationFeatureContext({ vocab, settings, options, unitId, isCurrentLaunch })
+                : null;
             activityInstance = this.startActivityWithStateRecovery(type, initialState, savedState => {
-                if (activityDescriptor?.prepare && activityDescriptor?.create) {
-                    return this.createRegisteredActivity(activityDescriptor, ActivityClass, {
-                        container,
-                        savedState,
-                        wordLimit: getActivityWordLimit(activityDescriptor.settingKey),
-                        playableWords,
-                        prioritize: getPrioritized,
-                        restore: (state, fallbackWords, filter) => (
-                            this.activities.restoreWordsFromState(state, fallbackWords, filter)
-                        ),
-                        onProgress,
-                        onSaveState,
-                        persistenceId: vocab.id || vocab.name,
-                        onNewRound: () => {
-                            if (!isCurrentLaunch()) return;
-                            this.activities.resetActivityState(type);
-                            this.startActivity(type, { fromRoute: true }).catch(error => {
-                                console.error(`Failed to restart ${type}:`, error);
-                            });
-                        },
-                        markWordsPracticed: words => this.activities.markWordsPracticed(type, words)
-                    });
-                }
-
-                switch (type) {
-            case 'illustration':
-                // Illustration: non-replayable, use sequential words
-                const illustrationWords = this.activities.getWordHuntWords(settings)
-                    .filter(word => this.activities.isActivityWordPlayable(type, word));
-                const wordHuntSubjectSlug = getVocabSubjectSlug(vocab);
-                const wordHuntSubject = getSubjectBySlug(this.sm.subjects, wordHuntSubjectSlug);
-                activityInstance = new ActivityClass(
+                return this.createRegisteredActivity(activityDescriptor, ActivityClass, {
                     container,
-                    illustrationWords,
-                    vocab.name,
+                    savedState,
+                    wordLimit: getActivityWordLimit(activityDescriptor.settingKey),
+                    playableWords,
+                    prioritize: getPrioritized,
+                    restore: (state, fallbackWords, filter) => (
+                        this.activities.restoreWordsFromState(state, fallbackWords, filter)
+                    ),
                     onProgress,
-                    this.activities.handleIllustrationSave.bind(this.activities),
-                    this.sm.unitWordHunt,
-                    {
-                        ownerUserId: this.sm.currentUser?.uid || 'local-dev',
-                        initialIndex: options.initialWordIndex || 0,
-                        onWordChange: index => {
-                            if (!isCurrentLaunch() || !unitId) return;
-                            this.sm.setRoute({
-                                view: 'activity',
-                                unitId,
-                                activityType: 'illustration',
-                                word: index + 1
-                            }, { replace: true });
-                        },
-                        uploadImage: (word, blob, imageInfo) => this.activities.uploadWordHuntImage(word, blob, imageInfo),
-                        loadImage: path => this.activities.loadWordHuntImage(path),
-                        onDownloadWordHunt: () => this.activities.downloadWordHuntSubmission(),
-                        researchContext: {
-                            grade: this.activities.getUnitGrade(vocab),
-                            subjectName: wordHuntSubject.name,
-                            subjectSlug: wordHuntSubjectSlug,
-                            unitName: vocab.name || ''
-                        }
-                    }
-                );
-                break;
-            default:
-                container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
-            }
-                return activityInstance;
+                    onSaveState,
+                    persistenceId: vocab.id || vocab.name,
+                    onNewRound: () => {
+                        if (!isCurrentLaunch()) return;
+                        this.activities.resetActivityState(type);
+                        this.startActivity(type, { fromRoute: true }).catch(error => {
+                            console.error(`Failed to restart ${type}:`, error);
+                        });
+                    },
+                    featureContext,
+                    markWordsPracticed: words => this.activities.markWordsPracticed(type, words)
+                });
             });
         } catch (error) {
             if (!isCurrentLaunch()) return;
@@ -321,7 +315,8 @@ export class StudentActivityLauncher {
         try {
             return createActivity(initialState);
         } catch (error) {
-            if (type === 'illustration' || error?.code === ACTIVITY_DESCRIPTOR_CONTRACT_ERROR) {
+            const descriptor = getStudentActivity(type);
+            if (descriptor?.allowStartupStateReset === false || error?.code === ACTIVITY_DESCRIPTOR_CONTRACT_ERROR) {
                 throw error;
             }
 

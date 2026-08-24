@@ -75,29 +75,6 @@ export class StudentActivityProgressFlow {
         return restoredWords.length === wordKeys.length ? restoredWords : fallbackWords;
     }
 
-    getWordHuntWords(settings = {}) {
-        if (!this.sm.currentVocab?.words) return [];
-
-        const flow = this.getActivityFlowConfig(this.sm.currentVocab);
-        const wordHuntIsRequired = flow.required.includes('illustration');
-        const customSelection = settings.wordHuntSelectionMode === 'custom';
-        if (wordHuntIsRequired && !customSelection) {
-            return [...this.sm.currentVocab.words];
-        }
-
-        const selectedWords = this.sm.currentVocab.words.filter(word => (
-            word.wordHunt === true ||
-            word.wordHunt === 'true' ||
-            word.word_hunt === true
-        ));
-        if (selectedWords.length > 0) {
-            return selectedWords;
-        }
-
-        const fallbackLimit = settings.illustration || this.sm.currentVocab.words.length;
-        return this.sm.currentVocab.words.slice(0, fallbackLimit);
-    }
-
     getDefaultRequiredActivities(vocab = this.sm.currentVocab) {
         const purpose = String(vocab?.purpose || '').trim().toLowerCase();
         if (purpose === 'practice') {
@@ -140,12 +117,7 @@ export class StudentActivityProgressFlow {
             return descriptor.isPlayable(word);
         }
 
-        switch (activityType) {
-            case 'illustration':
-                return String(word.word || '').trim().length > 0;
-            default:
-                return false;
-        }
+        return false;
     }
 
     getRequiredActivityMinimum(vocab = this.sm.currentVocab) {
