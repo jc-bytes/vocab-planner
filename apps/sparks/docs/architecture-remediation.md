@@ -42,7 +42,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 0. Establish baseline | DONE | `docs/architecture-remediation.md` | Full suite, design audit, production build, built-page smoke, dependency audit, independent review | Source and built application are green. Local Supabase checks remain unknown because Docker is unavailable. |
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
-| 3. Client/server activity parity | TODO | | | |
+| 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match both effective server access and vocabulary-flow allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | TODO | | | |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
@@ -109,6 +109,15 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Added an explicit persisted ID-to-setting-key compatibility fixture. A derived projection alone would not detect an accidental stored-key rename.
 - Added a Chromium smoke test that imports every lazy activity module and verifies its declared constructor. A Node-only test was rejected because real activity imports initialize browser-owned notification code.
 - Preserved the 15.1 MB deployment limit and lazy feature build checks.
+
+### Task 3, client/server activity parity
+
+- Added a migration-order parity test for the two server-owned vocabulary activity allowlists.
+- Targets the effective `private.assert_student_activity_access(uuid, text, text, text)` and `private.normalize_vocabulary_activity_flow()` definitions by signature.
+- Requires the server access list, server flow list, and client registry to contain the same 12 IDs.
+- Rejects ambiguous arrays, computed SQL expressions, duplicate IDs, overload mismatch, and a later drop of the selected function.
+- Keeps classroom activity types and the weekly Spark reading flow out of this contract because they belong to separate systems.
+- Does not compare XP. Reward amounts remain a separate server-only policy and the client registry rejects XP fields.
 
 ## Remaining work
 
