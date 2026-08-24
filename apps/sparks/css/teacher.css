@@ -573,48 +573,10 @@ body {
     text-align: right;
 }
 
-/* Completion Screen */
-.completion-screen {
-    text-align: center;
-    padding: 2rem;
-}
-
-.completion-screen h2 {
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
-}
-
-.completion-screen p {
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-}
-
-.completion-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
-}
-
+/* Completion animations remain teacher-owned; the student entry has no matching keyframes. */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-.completion-overlay .completion-screen {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 1rem;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: scaleIn 0.3s ease;
 }
 
 @keyframes scaleIn {
@@ -666,33 +628,6 @@ body {
 .landing-footer a:hover {
     color: #bae6fd;
     text-decoration: underline;
-}
-
-.status-dot {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 0.85rem;
-    height: 0.85rem;
-    border-radius: 999px;
-    background: var(--text-muted);
-    box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.14);
-}
-
-.status-dot[data-state="synced"] {
-    background: var(--success-color);
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
-}
-
-.status-dot[data-state="pending"] {
-    background: #fbbf24;
-    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.16);
-}
-
-.status-dot[data-state="offline"],
-.status-dot[data-state="error"] {
-    background: var(--danger-color);
-    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
 }
 
 .student-export-menu {
@@ -5285,16 +5220,6 @@ button.activity-card {
 
 .modal-footer {
     flex-wrap: wrap;
-}
-
-.completion-overlay {
-    padding: var(--spacing-md);
-}
-
-.completion-overlay .completion-screen {
-    width: min(92vw, 520px);
-    max-height: 86vh;
-    overflow-y: auto;
 }
 
 /* Teacher minimum tablet safety */

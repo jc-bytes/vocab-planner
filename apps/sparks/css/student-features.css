@@ -1380,12 +1380,6 @@
     padding-right: 0.15rem;
 }.modal-footer {
     flex-wrap: wrap;
-}.completion-overlay {
-    padding: var(--spacing-md);
-}.completion-overlay .completion-screen {
-    width: min(92vw, 520px);
-    max-height: 86vh;
-    overflow-y: auto;
 }/* Word search */.word-search-wrapper {
     width: 100% !important;
     max-width: 1040px !important;

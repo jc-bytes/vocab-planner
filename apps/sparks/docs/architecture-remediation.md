@@ -510,3 +510,16 @@ Task 9 remains in progress. Next is an architecture review of the recent shared-
 - Optional test hardening remains: authenticated modal screenshots, an identical-font navigation pixel rerun, and a repeated Spark-view close-listener assertion. These are evidence gaps or defense-in-depth, not demonstrated product regressions.
 
 No corrective task was added. Task 9 continues with the status/feedback family.
+
+### Task 9g, migrate shared status and completion feedback styles
+
+- Added `css/feedback.css` as the structural owner for cloud status dots and activity completion screens/overlays. Student and teacher load it after navigation and before page-owned styles; landing does not load unused feedback CSS.
+- Removed the exact duplicated status and completion declarations from student and teacher entry styles and the duplicated completion sizing from lazy student features. Preserved the later Celestial synced glow, XP reward visuals, activity/game feedback, empty/loading states, inline form statuses, and both existing toast systems for Tasks 12-14.
+- Migrated text, surface, border, success, and danger colors to semantic tokens without changing resolved values. The student completion surface is explicitly scoped to the raised surface, while teacher uses the base surface. The pending indicator remains `#fbbf24` because the current student warning token is `#ffc800`; changing it here would alter the established visual state.
+- Kept `fadeIn` and `scaleIn` keyframes teacher-owned. Both entries already referenced those names, but only teacher defined them, so moving the keyframes into shared CSS would newly animate student completions. This asymmetric animation behavior is intentional preservation debt for a later product-level decision.
+- Added `test:feedback` to the complete suite. It guards stylesheet order, one structural owner, semantic-token use, student and teacher refinements, status-state accessibility wiring, and representative completion producers without introducing a shared behavior abstraction.
+- Verification: the complete `npm test` suite passed, including 139 activity tests, 9 responsive widths, three-page source smoke, and 13 sandboxed games. Focused feedback, theme, activity, and build-efficiency checks, built three-page smoke, production build, scoped diff checks, and independent review passed.
+- Independent Chromium comparison against `c71cab13` at 390x844 and 1280x900 found zero computed-property differences and pixel-identical screenshots for student and teacher status states and completion overlays, including the real lazy student feature CSS path.
+- Production deployment remains 13.6 MB with 2,329 transformed modules. Shared foundation CSS is 9.94/2.25 kB raw/gzip; teacher entry CSS decreased to 137.49/22.04 kB, student entry CSS to 217.39/33.10 kB, and lazy student feature CSS to 49.84/9.88 kB. Quiz Maker remains a separate lazy 12.48/3.10 kB CSS asset.
+
+Task 9 remains in progress. Next is the shared container family, followed by the existing typography authority review.
