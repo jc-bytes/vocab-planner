@@ -5,6 +5,7 @@ import {
     DEFAULT_REQUIRED_BY_PURPOSE,
     VOCAB_ACTIVITY_IDS
 } from './studentActivityConstants.js';
+import { getStudentActivity } from './studentActivityRegistry.js';
 
 export class StudentActivityProgressFlow {
     constructor(activities) {
@@ -134,12 +135,12 @@ export class StudentActivityProgressFlow {
     }
 
     isActivityWordPlayable(activityType, word = {}) {
+        const descriptor = getStudentActivity(activityType);
+        if (descriptor?.isPlayable) {
+            return descriptor.isPlayable(word);
+        }
+
         switch (activityType) {
-            case 'matching':
-                return (
-                    String(word.word || '').trim().length >= 2
-                    && String(word.definition || '').trim().length > 0
-                );
             case 'synonym-antonym':
                 return (
                     String(word.word || '').trim().length > 0

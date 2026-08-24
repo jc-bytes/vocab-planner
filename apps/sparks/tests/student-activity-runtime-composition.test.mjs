@@ -60,6 +60,7 @@ const { StudentActivityResultProcessor } = await import('../js/student/studentAc
 const { StudentActivityStateStore } = await import('../js/student/studentActivityStateStore.js');
 const { StudentActivitySyncCoordinator } = await import('../js/student/studentActivitySyncCoordinator.js');
 const { StudentActivityProgressFlow } = await import('../js/student/studentActivityProgressFlowMethods.js');
+const { getStudentActivity } = await import('../js/student/studentActivityRegistry.js');
 const { StudentActivitySchedule } = await import('../js/student/studentActivityScheduleMethods.js');
 const { StudentActivitySession } = await import('../js/student/studentActivitySession.js');
 const { StudentActivityVocabularyData } = await import('../js/student/studentActivityVocabularyDataMethods.js');
@@ -370,6 +371,94 @@ test('activity startup automatically retries once without stale saved state', ()
     assert.deepEqual(activity, { started: true });
     assert.deepEqual(receivedStates, [savedState, null]);
     assert.deepEqual(resetTypes, ['hangman']);
+});
+
+test('registered activity startup prepares, constructs, then records coverage', () => {
+    const calls = [];
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    const words = [{ word: 'Data', definition: 'Facts' }];
+    const instance = {};
+    const descriptor = {
+        tracksCoverage: true,
+        prepare(context) {
+            calls.push(['prepare', context.savedState, context.wordLimit]);
+            return { words };
+        },
+        create(context) {
+            calls.push(['create', context.prepared.words, context.savedState]);
+            return instance;
+        }
+    };
+
+    const result = launcher.createRegisteredActivity(descriptor, class ActivityDouble {}, {
+        container: {},
+        savedState: { round: 1 },
+        wordLimit: 4,
+        prioritize() {},
+        restore() {},
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed(practicedWords) {
+            calls.push(['coverage', practicedWords]);
+        }
+    });
+
+    assert.equal(result, instance);
+    assert.deepEqual(calls, [
+        ['prepare', { round: 1 }, 4],
+        ['create', words, { round: 1 }],
+        ['coverage', words]
+    ]);
+});
+
+test('Matching launch dispatch stays on the registered lifecycle path', () => {
+    const source = StudentActivityLauncher.prototype.startActivity.toString();
+
+    assert.match(source, /activityDescriptor\?\.prepare\s*&&\s*activityDescriptor\?\.create/);
+    assert.match(source, /return this\.createRegisteredActivity\(activityDescriptor, ActivityClass/);
+    assert.match(source, /wordLimit:\s*getActivityWordLimit\(activityDescriptor\.settingKey\)/);
+    assert.match(source, /activityInstance\s*=\s*this\.startActivityWithStateRecovery/);
+    assert.doesNotMatch(source, /case ['"]matching['"]/);
+});
+
+test('matching descriptor startup retries stale state before recording coverage', () => {
+    const resetTypes = [];
+    const practiced = [];
+    const receivedStates = [];
+    const launcher = new StudentActivityLauncher({
+        sm: {},
+        resetActivityState(type) {
+            resetTypes.push(type);
+        }
+    });
+    const descriptor = getStudentActivity('matching');
+    const words = [{ word: 'Data', definition: 'Facts' }];
+    class MatchingActivityDouble {
+        constructor(container, receivedWords, onProgress, onSaveState, savedState) {
+            receivedStates.push(savedState);
+            if (savedState) throw new TypeError('stale matching state');
+            this.words = receivedWords;
+        }
+    }
+    const create = savedState => launcher.createRegisteredActivity(descriptor, MatchingActivityDouble, {
+        container: {},
+        savedState,
+        wordLimit: 3,
+        prioritize: () => words,
+        restore: (_state, fallbackWords) => fallbackWords,
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed(coveredWords) {
+            practiced.push(coveredWords);
+        }
+    });
+
+    const activity = launcher.startActivityWithStateRecovery('matching', { wordKeys: ['Data'] }, create);
+
+    assert.deepEqual(activity.words, words);
+    assert.deepEqual(receivedStates, [{ wordKeys: ['Data'] }, null]);
+    assert.deepEqual(resetTypes, ['matching']);
+    assert.deepEqual(practiced, [words], 'coverage must record only after successful construction');
 });
 
 test('activity recovery does not discard protected Word Hunt work', () => {

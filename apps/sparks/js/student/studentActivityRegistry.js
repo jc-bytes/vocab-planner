@@ -16,6 +16,37 @@ const HANGMAN_ICON = `
     </svg>
 `;
 
+function isMatchingWordPlayable(word = {}) {
+    return (
+        String(word.word || '').trim().length >= 2
+        && String(word.definition || '').trim().length > 0
+    );
+}
+
+function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
+    const filter = word => word.word.length >= 2;
+    return {
+        words: restore(savedState, prioritize(wordLimit, filter), filter)
+    };
+}
+
+function createMatchingActivity({
+    ActivityClass,
+    container,
+    prepared,
+    onProgress,
+    onSaveState,
+    savedState
+}) {
+    return new ActivityClass(
+        container,
+        prepared.words,
+        onProgress,
+        onSaveState,
+        savedState
+    );
+}
+
 function requireNonEmptyString(activity, field, index) {
     if (typeof activity[field] !== 'string' || !activity[field].trim()) {
         throw new TypeError(`Activity descriptor at index ${index} must provide a non-empty ${field}`);
@@ -91,6 +122,9 @@ export function defineStudentActivityRegistry(activities) {
                 throw new TypeError(`Activity ${activity.id} ${field} must be a function`);
             }
         }
+        if (hasOwn(activity, 'prepare') !== hasOwn(activity, 'create')) {
+            throw new TypeError(`Activity ${activity.id} must provide prepare and create together`);
+        }
 
         return Object.freeze({
             routeable: true,
@@ -113,7 +147,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'matching', title: 'Matching', description: 'Match words to definitions.',
         icon: 'puzzle', settingKey: 'matching',
-        exportName: 'MatchingActivity', load: () => import('../activities/matching.js')
+        exportName: 'MatchingActivity', load: () => import('../activities/matching.js'),
+        isPlayable: isMatchingWordPlayable,
+        prepare: prepareMatchingActivity,
+        create: createMatchingActivity
     },
     {
         id: 'flashcards', title: 'Flashcards', description: 'Study words and images.',

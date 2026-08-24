@@ -2,12 +2,35 @@ import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
+import { getStudentActivity } from './studentActivityRegistry.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityLauncher {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
+    }
+
+    createRegisteredActivity(descriptor, ActivityClass, context) {
+        const prepared = descriptor.prepare({
+            savedState: context.savedState,
+            wordLimit: context.wordLimit,
+            prioritize: context.prioritize,
+            restore: context.restore
+        });
+        const instance = descriptor.create({
+            ActivityClass,
+            container: context.container,
+            prepared,
+            onProgress: context.onProgress,
+            onSaveState: context.onSaveState,
+            savedState: context.savedState
+        });
+
+        if (descriptor.tracksCoverage) {
+            context.markWordsPracticed(prepared.words);
+        }
+        return instance;
     }
 
     async startActivity(type, options = {}) {
@@ -134,6 +157,7 @@ export class StudentActivityLauncher {
         };
         const initialState = this.sm.unitStates ? this.sm.unitStates[type] : null;
         const settings = vocab.activitySettings || {};
+        const activityDescriptor = getStudentActivity(type);
         const playableWords = vocab.words.filter(word => this.activities.isActivityWordPlayable(type, word));
         if (!isCurrentLaunch()) return;
         container.innerHTML = '';
@@ -156,18 +180,22 @@ export class StudentActivityLauncher {
         let activityInstance = null;
         try {
             activityInstance = this.startActivityWithStateRecovery(type, initialState, savedState => {
+                if (activityDescriptor?.prepare && activityDescriptor?.create) {
+                    return this.createRegisteredActivity(activityDescriptor, ActivityClass, {
+                        container,
+                        savedState,
+                        wordLimit: getActivityWordLimit(activityDescriptor.settingKey),
+                        prioritize: getPrioritized,
+                        restore: (state, fallbackWords, filter) => (
+                            this.activities.restoreWordsFromState(state, fallbackWords, filter)
+                        ),
+                        onProgress,
+                        onSaveState,
+                        markWordsPracticed: words => this.activities.markWordsPracticed(type, words)
+                    });
+                }
+
                 switch (type) {
-            case 'matching':
-                const matchingLimit = getActivityWordLimit('matching');
-                const matchingWords = this.activities.restoreWordsFromState(
-                    savedState,
-                    getPrioritized(matchingLimit, w => w.word.length >= 2),
-                    w => w.word.length >= 2
-                );
-                activityInstance = new ActivityClass(container, matchingWords, onProgress, onSaveState, savedState);
-                // Mark words as used when activity starts
-                this.activities.markWordsPracticed(type, matchingWords);
-                break;
             case 'flashcards':
                 // Flashcards: use all words (non-replayable, study mode)
                 const flashcardsLimit = getActivityWordLimit('flashcards');

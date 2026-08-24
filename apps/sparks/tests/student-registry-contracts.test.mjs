@@ -65,16 +65,19 @@ test('activity registry definition validates and freezes descriptors', () => {
     assert.equal(Object.hasOwn(source, 'tracksCoverage'), false, 'definition must not add defaults to the input');
     assert.equal(Object.hasOwn(source, 'nonReplayable'), false, 'definition must not add defaults to the input');
 
+    const prepare = () => {};
     const create = () => {};
     const configured = validActivity({
         tracksCoverage: false,
         nonReplayable: true,
+        prepare,
         create
     });
     const configuredRegistry = defineStudentActivityRegistry([configured]);
     assert.equal(configuredRegistry[0].routeable, true);
     assert.equal(configuredRegistry[0].tracksCoverage, false);
     assert.equal(configuredRegistry[0].nonReplayable, true);
+    assert.equal(configuredRegistry[0].prepare, prepare);
     assert.equal(configuredRegistry[0].create, create);
 });
 
@@ -118,8 +121,56 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
     assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare: null })]), /prepare must be a function/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ create: true })]), /create must be a function/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ create: undefined })]), /create must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {} })]), /prepare and create together/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ create() {} })]), /prepare and create together/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: 20 })]), /server-authoritative/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: undefined })]), /server-authoritative/);
+});
+
+test('matching descriptor owns eligibility, word preparation, and construction', () => {
+    const matching = getStudentActivity('matching');
+    assert.equal(matching.isPlayable({ word: 'AI', definition: 'Artificial intelligence' }), true);
+    assert.equal(matching.isPlayable({ word: ' A ', definition: 'Letter' }), false);
+    assert.equal(matching.isPlayable({ word: 'Data', definition: '   ' }), false);
+
+    const restoredWords = [{ word: 'Router', definition: 'Network device' }];
+    const calls = [];
+    const prepared = matching.prepare({
+        savedState: { wordKeys: ['Router'] },
+        wordLimit: 6,
+        prioritize(limit, filter) {
+            calls.push(['prioritize', limit, filter({ word: 'AI' }), filter({ word: 'A' })]);
+            return [{ word: 'Fallback', definition: 'Backup' }];
+        },
+        restore(state, fallback, filter) {
+            calls.push(['restore', state, fallback, filter({ word: 'IT' }), filter({ word: 'I' })]);
+            return restoredWords;
+        }
+    });
+    assert.deepEqual(prepared, { words: restoredWords });
+    assert.deepEqual(calls, [
+        ['prioritize', 6, true, false],
+        ['restore', { wordKeys: ['Router'] }, [{ word: 'Fallback', definition: 'Backup' }], true, false]
+    ]);
+
+    const container = {};
+    const onProgress = () => {};
+    const onSaveState = () => {};
+    const savedState = { round: 2 };
+    class MatchingActivityDouble {
+        constructor(...args) {
+            this.args = args;
+        }
+    }
+    const instance = matching.create({
+        ActivityClass: MatchingActivityDouble,
+        container,
+        prepared,
+        onProgress,
+        onSaveState,
+        savedState
+    });
+    assert.deepEqual(instance.args, [container, restoredWords, onProgress, onSaveState, savedState]);
 });
 
 test('activity registry is the complete route and module source', () => {
