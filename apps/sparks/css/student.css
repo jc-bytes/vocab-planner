@@ -110,7 +110,7 @@
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.08);
     color: #e0f2fe;
-    box-shadow: 0 18px 45px -24px rgba(14, 165, 233, 0.85);
+    box-shadow: 0 18px 45px -24px color-mix(in srgb, var(--color-info) 85%, transparent);
 }.brand-mark {
     width: 3.35rem;
     height: 3.35rem;
@@ -232,7 +232,7 @@
 }#activity-menu-view .activity-menu-summary-meter div {
     height: 100%;
     border-radius: inherit;
-    background: var(--primary-color, #6366f1);
+    background: var(--color-brand);
     transition: width 0.3s ease;
 }#activity-menu-view .activity-flow-section {
     max-width: 1000px;

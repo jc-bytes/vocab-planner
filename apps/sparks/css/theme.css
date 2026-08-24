@@ -24,6 +24,9 @@
     --color-success: #34d399;
     --color-warning: #fbbf24;
     --color-danger: #f87171;
+    --color-status-success-glow: #10b981;
+    --color-status-pending: #fbbf24;
+    --color-status-danger-glow: #f87171;
     --color-focus: rgba(14, 165, 233, 0.8);
     --color-interactive: var(--color-brand);
     --color-on-interactive: var(--color-on-brand);

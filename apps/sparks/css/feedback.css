@@ -55,16 +55,16 @@
 
 .status-dot[data-state="synced"] {
     background: var(--color-success);
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-status-success-glow) 16%, transparent);
 }
 
 .status-dot[data-state="pending"] {
-    background: #fbbf24;
-    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.16);
+    background: var(--color-status-pending);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-status-pending) 16%, transparent);
 }
 
 .status-dot[data-state="offline"],
 .status-dot[data-state="error"] {
     background: var(--color-danger);
-    box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-status-danger-glow) 16%, transparent);
 }

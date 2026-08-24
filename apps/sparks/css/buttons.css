@@ -33,12 +33,12 @@
 .primary-btn {
     background: linear-gradient(120deg, var(--color-brand), var(--color-info));
     color: var(--color-on-brand);
-    box-shadow: 0 10px 25px -10px rgba(99, 102, 241, 0.8);
+    box-shadow: 0 10px 25px -10px color-mix(in srgb, var(--color-brand) 80%, transparent);
 }
 
 .primary-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 35px -12px rgba(99, 102, 241, 0.9);
+    box-shadow: 0 15px 35px -12px color-mix(in srgb, var(--color-brand) 90%, transparent);
 }
 
 .secondary-btn {
@@ -55,11 +55,11 @@
 .accent-btn {
     background: linear-gradient(120deg, var(--color-accent), #fb923c);
     color: var(--color-on-accent);
-    box-shadow: 0 10px 25px -10px rgba(249, 115, 22, 0.8);
+    box-shadow: 0 10px 25px -10px color-mix(in srgb, var(--color-accent) 80%, transparent);
 }
 
 .danger-btn {
-    border: 1px solid rgba(248, 113, 113, 0.55);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 55%, transparent);
     background: rgba(239, 68, 68, 0.16);
     color: #fecaca;
 }

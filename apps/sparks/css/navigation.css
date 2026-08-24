@@ -113,9 +113,9 @@
 }
 
 .teacher-tab.active {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--color-brand) 20%, transparent);
     color: var(--color-text);
-    box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.45);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-brand) 45%, transparent);
 }
 
 .teacher-tab:focus-visible {

@@ -49,7 +49,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
 | 9. Migrate shared UI families | DONE | Buttons; inputs/form controls; cards; dialogs; navigation; feedback; containers; typography ownership | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Repeated shared UI foundations are centralized while page-responsive and feature-owned behavior remains local. Existing typography authority now exclusively owns font delivery. |
-| 10. Reduce literal brand colors | TODO | | | |
+| 10. Reduce literal brand colors | DONE | Theme status roles; migrated shared styles; app-shell identity effects; known UI fallbacks; contract test | Complete suite, focused theme/UI contracts, 9-width regression, source/built smoke, production build, independent computed/pixel review | Canonical identity/status hues in migrated areas now derive from semantic tokens. Contextual game and feature palettes remain owned locally. |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
 | 13. Create lightweight shared UI modules | TODO | | | |
@@ -547,3 +547,23 @@ Task 9 remains in progress. The typography audit found the current shared author
 - Production deployment remains 13.6 MB with 2,330 transformed modules. Landing CSS is 23.82/4.07 kB raw/gzip, teacher entry CSS is 135.96/21.78 kB, student entry CSS is 215.86/32.84 kB, lazy student CSS is 49.84/9.88 kB, and Quiz Maker CSS remains lazy at 12.48/3.10 kB. The build emits each Inter WOFF2 asset once; the service worker precaches 20 files totaling 1,029,760 bytes.
 
 Task 9 is complete. Task 10 will replace only duplicated visual-identity literals in migrated/shared areas with semantic tokens and add a narrow regression guard.
+
+### Architecture review after Tasks 9g-9i
+
+- Independent review found no runtime blocker, eager dependency, cascade regression, or unnecessary abstraction. Task 9 remains correctly marked complete.
+- Confirmed the four Inter faces have one owner, responsive/sidebar/auth layout remains page-owned, and lazy student/Quiz CSS stays in separate build assets.
+- Found one real hidden style dependency: shared completion rules reference animation names whose keyframes are teacher-owned. Student animations are intentionally inert today. A focused behavior-preserving correction will move the animation declarations beside the teacher keyframes after Task 10 instead of making the keyframes global.
+- Task 9h exact pixel parity remains unproven and is still documented as an evidence gap, not a passing result.
+
+### Task 10, reduce literal brand colors
+
+- Replaced canonical brand, information, accent, danger, and status hue literals in the migrated button, form, navigation, feedback, and landing foundations with semantic tokens plus `color-mix()` opacity. Cards, dialogs, containers, and typography contained no canonical identity duplicates.
+- Added explicit shared status-color roles where the glow or pending color intentionally differs from the generic theme status token. This preserves the teacher success glow and keeps pending `#fbbf24` independent from the student warning color `#ffc800`.
+- Migrated landing/teacher background identity gradients, shared brand-mark glows, both activity-summary meters, teacher export controls, and known generated authentication/data-viewer UI fallbacks. The inline layout styles remain for Task 12; only their duplicate color authority changed.
+- Kept contextual game, activity, chart, subject, illustration, Celestial glass, and lazy Quiz palettes feature-owned. This is a narrow identity-color contract, not a global ban on CSS literals.
+- Added `test:brand-colors` to the complete suite. It derives configured identity channels from `theme.css`, rejects direct duplicates in migrated foundations, requires the shared status roles, checks app-shell consumers, and prevents known application UI producers from recreating the default brand fallback.
+- Independent Chromium review found student desktop and mobile screenshots pixel-identical against `e1edb2ef`. Teacher computed values differed only in equivalent browser serialization (`rgba(...)` versus `color(srgb ... / alpha)`), with identical channels and alpha; student overrides and both activity meter colors remained unchanged.
+- Landing and teacher screenshot comparisons in the temporary baseline were invalidated by different font delivery, so exact pixel parity for those pages is recorded as unproven. Focused computed-color checks, the 9-width regression, and source/built route smoke passed.
+- Verification: the final complete `npm test` suite, focused theme/brand/shared-UI/auth/data checks, student design audit, production build, and built three-page smoke passed. The build remains 13.6 MB with 2,330 transformed modules; student feature and Quiz Maker CSS remain lazy, and the service worker precaches 20 files totaling 1,030,502 bytes.
+
+Task 10 is complete. Next is the focused completion-animation ownership correction found by the architecture review, followed by Task 11's evidence-based `!important` audit.

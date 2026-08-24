@@ -77,7 +77,7 @@ const teacherDataViewerMethods = {
             fileLoader.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                fileLoader.style.borderColor = 'var(--primary-color, #6366f1)';
+                fileLoader.style.borderColor = 'var(--color-brand)';
                 fileLoader.style.background = 'rgba(99, 102, 241, 0.2)';
             });
 

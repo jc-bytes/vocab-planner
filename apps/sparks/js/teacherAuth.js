@@ -323,7 +323,7 @@ class TeacherAuthMethods {
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <a class="card-action" href="${deployedUrl}" target="_blank"
                    style="display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; 
-                          background: var(--primary-color, #6366f1); color: white; padding: 0.75rem 1.5rem; 
+                          background: var(--color-brand); color: white; padding: 0.75rem 1.5rem;
                           border-radius: 8px; text-decoration: none; transition: all 0.2s;">
                     <i data-lucide="arrow-right" aria-hidden="true"></i>
                     <span>Open in Browser</span>
