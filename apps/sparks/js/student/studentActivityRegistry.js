@@ -30,6 +30,10 @@ function hasWordAndDefinition(word = {}) {
     );
 }
 
+function hasWord(word = {}) {
+    return String(word.word || '').trim().length > 0;
+}
+
 function hasSynonymOrAntonym(word = {}) {
     return word.synonyms?.length > 0 || word.antonyms?.length > 0;
 }
@@ -71,6 +75,12 @@ function prepareSynonymAntonymActivity({ savedState, wordLimit, prioritize, rest
             prioritize(wordLimit, isSynonymAntonymWordPlayable),
             isSynonymAntonymWordPlayable
         )
+    };
+}
+
+function preparePrioritizedActivity({ wordLimit, prioritize }) {
+    return {
+        words: prioritize(wordLimit)
     };
 }
 
@@ -234,7 +244,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'hangman', title: 'Hangman', description: 'Guess the word.',
         iconMarkup: HANGMAN_ICON, settingKey: 'hangman',
-        exportName: 'HangmanActivity', load: () => import('../activities/hangman.js')
+        exportName: 'HangmanActivity', load: () => import('../activities/hangman.js'),
+        isPlayable: hasWord,
+        prepare: preparePrioritizedActivity,
+        create: createWordListActivity
     },
     {
         id: 'scramble', title: 'Word Scramble', description: 'Unscramble the letters.',

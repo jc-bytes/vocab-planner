@@ -278,6 +278,26 @@ test('synonym and antonym descriptor owns eligible state-restorable preparation'
     assert.equal(descriptor.create, getStudentActivity('matching').create);
 });
 
+test('hangman descriptor owns eligibility and prioritized preparation', () => {
+    const hangman = getStudentActivity('hangman');
+    assert.equal(hangman.isPlayable({ word: 'Loop' }), true);
+    assert.equal(hangman.isPlayable({ word: '   ' }), false);
+
+    const words = [{ word: 'Loop' }, { word: 'Array' }];
+    const calls = [];
+    const prepared = hangman.prepare({
+        wordLimit: 3,
+        prioritize(limit) {
+            calls.push(limit);
+            return words;
+        }
+    });
+
+    assert.deepEqual(prepared, { words });
+    assert.deepEqual(calls, [3]);
+    assert.equal(hangman.create, getStudentActivity('matching').create);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

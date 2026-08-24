@@ -271,11 +271,6 @@ export class StudentActivityLauncher {
                 activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, activityInstance.placedWords);
                 break;
-            case 'hangman':
-                const hangmanWords = getPrioritized(getActivityWordLimit('hangman'));
-                activityInstance = new ActivityClass(container, hangmanWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, hangmanWords);
-                break;
             case 'scramble':
                 const scrambleWords = getPrioritized(getActivityWordLimit('scramble'));
                 activityInstance = new ActivityClass(container, scrambleWords, onProgress, onSaveState, savedState);

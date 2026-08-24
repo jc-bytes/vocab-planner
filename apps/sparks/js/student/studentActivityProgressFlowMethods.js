@@ -166,7 +166,6 @@ export class StudentActivityProgressFlow {
                     && String(word.definition || '').trim().length > 0
                 );
             case 'illustration':
-            case 'hangman':
             case 'scramble':
                 return String(word.word || '').trim().length > 0;
             default:
