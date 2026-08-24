@@ -45,7 +45,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
-| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror; obsolete save stubs | Package refactor, 75 progress, 139 activity, 9 build-efficiency and 5 report tests; UI smoke; production build | Removing only code with complete caller/import evidence. |
+| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror; obsolete save stubs; orphan build assets | Package refactor, 75 progress, 139 activity, 10 build-efficiency and 5 report tests; UI smoke; production builds | Removing only code with complete caller/import evidence. |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
@@ -338,3 +338,12 @@ Task 6 remains in progress while independent traces check the audit's no-op stor
 - Verification: 9 build-efficiency tests, package refactor checks, 139 student activity tests, 5 report tests, three-page UI smoke, and the production build passed. Deployment remains 15.1 MB and the student entry remains 242.48 kB raw, 62.17 kB gzip.
 
 Task 6 remains in progress. Independent traces have identified additional isolated CSS/build-asset candidates; each will be verified and removed as a separate coherent group.
+
+### Task 6c, remove orphan delivery and generated artifacts
+
+- Removed the unreferenced 1.51 MB PNG duplicate of the live continuation artwork. Student CSS uses the 29 kB WebP twin, now protected by a build-efficiency ownership test.
+- Removed an unimported duplicate Inter stylesheet. The landing and application typography owners already bundle the same local font faces, and an existing contract prevents the old icon-loader dependency from returning.
+- Removed two tracked Python bytecode artifacts with no source, import, script, or build role. No source scripts or runtime assets were removed.
+- Verification: exact reference tracing, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Deployment fell from 15.1 MB to 13.6 MB while entry chunks and the 18-file student offline shell remained unchanged.
+
+Task 6 remains in progress. The remaining high-confidence candidates are isolated unused helpers and narrowly unreferenced CSS selectors; uncertain database-driven images and intentional game source artwork remain untouched.

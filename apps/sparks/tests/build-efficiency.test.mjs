@@ -22,6 +22,11 @@ test('obsolete client save stubs do not return as a second persistence system', 
     await assert.rejects(access(new URL('../js/saveSystem.js', import.meta.url)));
 });
 
+test('student continuation art keeps only the optimized delivery asset', async () => {
+    await access(new URL('../images/ui/student-continue-data-wave.webp', import.meta.url));
+    await assert.rejects(access(new URL('../images/ui/student-continue-data-wave.png', import.meta.url)));
+});
+
 test('student offline shell is generated from the student entry graph only', () => {
     assert.match(viteConfig, /manifest:\s*true/);
     assert.match(serviceWorkerGenerator, /manifest\.json/);
