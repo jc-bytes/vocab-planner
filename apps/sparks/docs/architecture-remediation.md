@@ -297,3 +297,12 @@ Task 5 remains in progress. Next is Supabase build/runtime configuration authori
 - Verification: 10 student authentication/config tests, 14 security-hardening tests, and the production build passed. Deployment remains 15.1 MB and the student entry is 255.46 kB raw, 65.73 kB gzip.
 
 Task 5 remains in progress. Next is the student Arcade-duration policy and stale static game metadata.
+
+### Task 5f, centralize Arcade duration policy
+
+- Added one student Arcade policy for the billed minute, formative-pass window, and maximum queued session.
+- Replaced duration literals in local storage, session clamping, game lifecycle, listeners, autosave feedback, and dynamically rendered Arcade copy. Static HTML now shows a neutral loading message until runtime policy is available.
+- Kept the server allowance independently authoritative and extended its parity test to the shared client duration.
+- Verification: 15 student game tests, 74 student progress/security tests, 139 student activity tests, 5 listener tests, three-page UI smoke, 8 build-efficiency tests, and the production build passed. Games remain lazy in `studentGames`; deployment remains 15.1 MB and the student entry is 242.48 kB raw, 62.17 kB gzip.
+
+Task 5 remains in progress. Next is removal of stale static game metadata that the registry already replaces at runtime.

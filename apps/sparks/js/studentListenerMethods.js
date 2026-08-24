@@ -1,7 +1,11 @@
 import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 import { STUDENT_WIDE_SHELL_MEDIA_QUERY } from './studentShellMethods.js';
-import { MAX_GAME_TIME_SECONDS } from './student/studentGameLifecycleMethods.js';
+import {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_MINUTES,
+    MAX_QUEUED_ARCADE_SECONDS
+} from './student/studentArcadePolicy.js';
 
 const STUDENT_RESIZE_DEBOUNCE_MS = 120;
 
@@ -242,8 +246,8 @@ export class StudentListeners {
         this.addListener('#add-time-btn', 'click', async () => {
             const games = await this.sm.getGames();
             if (games.isAddingGameTime) return;
-            if (games.gameTimeRemaining > MAX_GAME_TIME_SECONDS - 60) {
-                notifications.warning('You can queue a maximum of 10 minutes.');
+            if (games.gameTimeRemaining > MAX_QUEUED_ARCADE_SECONDS - ARCADE_MINUTE_SECONDS) {
+                notifications.warning(`You can queue a maximum of ${FORMATIVE_PASS_MINUTES} minutes.`);
                 games.updateGameTimer();
                 return;
             }
@@ -253,7 +257,7 @@ export class StudentListeners {
             try {
                 const minute = await games.startArcadeMinute(gameId);
                 if (minute) {
-                    games.addGameTime(minute.minuteSeconds || 60);
+                    games.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
                     await games.updateArcadeUI({ force: false });
                 } else {
                     notifications.warning('Complete another formative activity before continuing your Arcade break.');

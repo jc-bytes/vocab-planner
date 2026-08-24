@@ -1,9 +1,12 @@
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getStudentGame } from './studentGameRegistry.js';
+import {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_MINUTES,
+    MAX_QUEUED_ARCADE_SECONDS
+} from './studentArcadePolicy.js';
 import { writeLocalArcadeSession } from './studentArcadeTimeStorage.js';
-
-export const MAX_GAME_TIME_SECONDS = 600;
 
 export class StudentGameLifecycle {
     constructor(games) {
@@ -44,8 +47,8 @@ export class StudentGameLifecycle {
             return true;
         }
 
-        if (this.games.getAvailableArcadeSeconds() < 60) {
-            notifications.warning('Complete a formative activity before starting another 10-minute Arcade break.');
+        if (this.games.getAvailableArcadeSeconds() < ARCADE_MINUTE_SECONDS) {
+            notifications.warning(`Complete a formative activity before starting another ${FORMATIVE_PASS_MINUTES}-minute Arcade break.`);
             await this.sm.navigateTo({ view: 'units' });
             return false;
         }
@@ -57,7 +60,7 @@ export class StudentGameLifecycle {
         try {
             const minute = await this.games.startArcadeMinute(type);
             if (minute) {
-                this.games.gameTimeRemaining = minute.minuteSeconds || 60;
+                this.games.gameTimeRemaining = minute.minuteSeconds || ARCADE_MINUTE_SECONDS;
                 this.games.savedGameId = type;
                 await this.games.updateArcadeUI({ force: false });
                 this.launchGame(type, { resetTimer: true });
@@ -265,7 +268,7 @@ export class StudentGameLifecycle {
             }
 
             if (minute) {
-                this.addGameTime(minute.minuteSeconds || 60);
+                this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
                 await this.games.updateArcadeUI({ force: false });
 
                 // Visual feedback for extension (non-blocking)
@@ -289,9 +292,9 @@ export class StudentGameLifecycle {
 
             this.clearGameTimer();
 
-            const needsFormativeCheck = this.games.getAvailableArcadeSeconds() < 60;
+            const needsFormativeCheck = this.games.getAvailableArcadeSeconds() < ARCADE_MINUTE_SECONDS;
             const message = needsFormativeCheck
-                ? 'Your 10-minute Arcade break is complete. Finish another formative activity to continue.'
+                ? `Your ${FORMATIVE_PASS_MINUTES}-minute Arcade break is complete. Finish another formative activity to continue.`
                 : `Time up! You need ${exchangeRate} coins for the next minute.`;
             notifications.warning(message);
             this.stopCurrentGame();
@@ -305,25 +308,27 @@ export class StudentGameLifecycle {
         }
     }
 
-    addGameTime(seconds = 60) {
+    addGameTime(seconds = ARCADE_MINUTE_SECONDS) {
         const increment = Number.isFinite(seconds) ? seconds : 0;
         this.games.gameTimeRemaining = Math.min(
-            MAX_GAME_TIME_SECONDS,
+            MAX_QUEUED_ARCADE_SECONDS,
             Math.max(0, this.games.gameTimeRemaining + increment)
         );
         this.updateGameTimer();
     }
 
     updateGameTimer() {
-        const mins = Math.floor(this.games.gameTimeRemaining / 60);
-        const secs = this.games.gameTimeRemaining % 60;
+        const mins = Math.floor(this.games.gameTimeRemaining / ARCADE_MINUTE_SECONDS);
+        const secs = this.games.gameTimeRemaining % ARCADE_MINUTE_SECONDS;
         const timerEl = $('#game-timer');
         if (timerEl) timerEl.textContent = `Time: ${mins}:${secs.toString().padStart(2, '0')}`;
         const addTimeBtn = $('#add-time-btn');
         if (addTimeBtn) {
-            const atManualLimit = this.games.gameTimeRemaining > MAX_GAME_TIME_SECONDS - 60;
+            const atManualLimit = this.games.gameTimeRemaining > MAX_QUEUED_ARCADE_SECONDS - ARCADE_MINUTE_SECONDS;
             addTimeBtn.disabled = atManualLimit || this.games.isAddingGameTime;
-            addTimeBtn.title = atManualLimit ? 'Maximum queued Arcade time is 10 minutes.' : '';
+            addTimeBtn.title = atManualLimit
+                ? `Maximum queued Arcade time is ${FORMATIVE_PASS_MINUTES} minutes.`
+                : '';
         }
         writeLocalArcadeSession(this.games.sessionOwnerId, {
             remainingSeconds: this.games.gameTimeRemaining,

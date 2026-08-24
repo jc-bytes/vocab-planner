@@ -6,6 +6,11 @@ import {
     normalizeExchangeRate,
     resolveArcadeEconomySettings
 } from '../js/gamificationConfig.js';
+import {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_SECONDS,
+    MAX_QUEUED_ARCADE_SECONDS
+} from '../js/student/studentArcadePolicy.js';
 
 const migrationUrl = new URL(
     '../supabase/migrations/20260816152559_add_arcade_time_allowance.sql',
@@ -31,7 +36,7 @@ test('one first-time formative completion refreshes a non-stacking ten-minute wi
     assert.match(sql, /after insert or update of is_complete on public\.student_activity_progress/i);
     assert.match(sql, /new\.activity_type = 'flashcards'/i);
     assert.match(sql, /tg_op = 'UPDATE' and old\.is_complete/i);
-    assert.match(sql, /next_balance := 600/i);
+    assert.match(sql, new RegExp(`next_balance := ${FORMATIVE_PASS_SECONDS}`, 'i'));
     assert.match(sql, /seconds_added := greatest\(0, next_balance - wallet\.available_seconds\)/i);
     assert.match(sql, /lifetime_earned_seconds = lifetime_earned_seconds \+ seconds_added/i);
 });
@@ -52,11 +57,17 @@ test('each Arcade minute atomically requires earned time and the server coin pri
         `least\\(${ARCADE_ECONOMY.maximumExchangeRate}, greatest\\(${ARCADE_ECONOMY.minimumExchangeRate},`,
         'i'
     ));
-    assert.match(sql, /wallet\.available_seconds < 60/i);
+    assert.match(sql, new RegExp(`wallet\\.available_seconds < ${ARCADE_MINUTE_SECONDS}`, 'i'));
     assert.match(sql, /coin_balance < coin_cost/i);
     assert.match(sql, /available_seconds = next_seconds/i);
     assert.match(sql, /coins = coin_balance, coin_data = next_coin_data/i);
     assert.match(sql, /private\.store_student_progress_event_receipt/i);
+});
+
+test('client Arcade duration policy stays aligned with the server allowance', () => {
+    assert.equal(FORMATIVE_PASS_SECONDS, 600);
+    assert.equal(MAX_QUEUED_ARCADE_SECONDS, FORMATIVE_PASS_SECONDS);
+    assert.equal(FORMATIVE_PASS_SECONDS % ARCADE_MINUTE_SECONDS, 0);
 });
 
 test('client Arcade exchange rates normalize to the server policy', () => {

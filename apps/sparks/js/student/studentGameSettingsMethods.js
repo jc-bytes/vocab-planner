@@ -6,6 +6,10 @@ import {
     resolveArcadeEconomySettings
 } from '../gamificationConfig.js';
 import { settingsRepository } from '../services/settingsRepository.js';
+import {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_MINUTES
+} from './studentArcadePolicy.js';
 
 export class StudentGameSettings {
     constructor(games) {
@@ -16,8 +20,8 @@ export class StudentGameSettings {
 
     formatTime(seconds) {
         if (!seconds) return '0s';
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
+        const mins = Math.floor(seconds / ARCADE_MINUTE_SECONDS);
+        const secs = seconds % ARCADE_MINUTE_SECONDS;
         if (mins > 0) {
             return `${mins}m ${secs}s`;
         }
@@ -71,7 +75,7 @@ export class StudentGameSettings {
 
         const timeBalance = $('#arcade-time-balance');
         if (timeBalance) {
-            timeBalance.textContent = 'Complete a formative activity after every 10 minutes of Arcade play.';
+            timeBalance.textContent = `Complete a formative activity after every ${FORMATIVE_PASS_MINUTES} minutes of Arcade play.`;
         }
     }
 
@@ -104,7 +108,7 @@ export class StudentGameSettings {
             </div>
             <div class="game-cost">
                 <span>Play rate</span><strong>${exchangeRate} coins / min</strong>
-                <span>Learning check</span><strong>One formative activity every 10 min</strong>
+                <span>Learning check</span><strong>One formative activity every ${FORMATIVE_PASS_MINUTES} min</strong>
             </div>
             <button id="play-current-game-btn" class="btn primary-btn">
                 <i data-lucide="play" aria-hidden="true"></i>

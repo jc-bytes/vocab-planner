@@ -1,6 +1,11 @@
+import {
+    ARCADE_MINUTE_SECONDS,
+    FORMATIVE_PASS_SECONDS,
+    MAX_QUEUED_ARCADE_SECONDS
+} from './studentArcadePolicy.js';
+
 const STORAGE_KEY = 'student_arcade_time_v1';
 const SESSION_STORAGE_PREFIX = 'student_arcade_session_v1:';
-const FORMATIVE_PASS_SECONDS = 600;
 
 function normalize(value = {}) {
     return {
@@ -35,9 +40,9 @@ export function refreshLocalFormativeWindow() {
 
 export function consumeLocalArcadeMinute() {
     const wallet = readLocalArcadeTime();
-    if (wallet.availableSeconds < 60) return null;
-    wallet.availableSeconds -= 60;
-    wallet.lifetimeUsedSeconds += 60;
+    if (wallet.availableSeconds < ARCADE_MINUTE_SECONDS) return null;
+    wallet.availableSeconds -= ARCADE_MINUTE_SECONDS;
+    wallet.lifetimeUsedSeconds += ARCADE_MINUTE_SECONDS;
     return writeLocalArcadeTime(wallet);
 }
 
@@ -49,7 +54,7 @@ export function readLocalArcadeSession(studentId) {
     try {
         const saved = JSON.parse(localStorage.getItem(sessionKey(studentId)) || '{}');
         return {
-            remainingSeconds: Math.min(600, Math.max(0, Math.floor(Number(saved.remainingSeconds) || 0))),
+            remainingSeconds: Math.min(MAX_QUEUED_ARCADE_SECONDS, Math.max(0, Math.floor(Number(saved.remainingSeconds) || 0))),
             gameId: String(saved.gameId || '').slice(0, 120),
             updatedAt: saved.updatedAt || ''
         };
@@ -60,7 +65,7 @@ export function readLocalArcadeSession(studentId) {
 
 export function writeLocalArcadeSession(studentId, value = {}) {
     const session = {
-        remainingSeconds: Math.min(600, Math.max(0, Math.floor(Number(value.remainingSeconds) || 0))),
+        remainingSeconds: Math.min(MAX_QUEUED_ARCADE_SECONDS, Math.max(0, Math.floor(Number(value.remainingSeconds) || 0))),
         gameId: String(value.gameId || '').slice(0, 120),
         updatedAt: new Date().toISOString()
     };
@@ -75,5 +80,3 @@ export function writeLocalArcadeSession(studentId, value = {}) {
     }
     return session;
 }
-
-export { FORMATIVE_PASS_SECONDS };

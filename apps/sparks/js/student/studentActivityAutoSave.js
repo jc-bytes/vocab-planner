@@ -1,5 +1,6 @@
 import { $ } from '../main.js';
 import { resolveActivityCoinRewards } from '../gamificationConfig.js';
+import { FORMATIVE_PASS_MINUTES } from './studentArcadePolicy.js';
 import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
 import { getStudentActivity } from './studentActivityRegistry.js';
 
@@ -31,7 +32,7 @@ export class StudentActivityAutoSave {
         if (this.sm.authDisabled && activityType !== 'flashcards'
             && !wasComplete && Boolean(persistedScoreData.isComplete)) {
             refreshLocalFormativeWindow();
-            this.sm.showToast?.('Formative complete: Arcade is ready for 10 minutes!');
+            this.sm.showToast?.(`Formative complete: Arcade is ready for ${FORMATIVE_PASS_MINUTES} minutes!`);
         }
         this.persistence.syncActivityProgressToCloud(activityType, scoreData, {
             ...settings,

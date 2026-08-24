@@ -55,7 +55,8 @@ const { StudentGames } = await import('../js/student/studentGames.js');
 const { StudentManager } = await import('../js/student.js');
 const { StudentGameHtmlLoader } = await import('../js/student/studentGameHtmlLoaderMethods.js');
 const { StudentGameLeaderboard } = await import('../js/student/studentGameLeaderboardMethods.js');
-const { MAX_GAME_TIME_SECONDS, StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
+const { StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
+const { MAX_QUEUED_ARCADE_SECONDS } = await import('../js/student/studentArcadePolicy.js');
 const { StudentGameScoreMonitor } = await import('../js/student/studentGameScoreMonitor.js');
 const { StudentGameSettings } = await import('../js/student/studentGameSettingsMethods.js');
 const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
@@ -339,11 +340,11 @@ test('formative completions refresh the window instead of stacking extra Arcade 
 
 test('manual time additions cannot queue more than ten minutes', () => {
     const games = new StudentGames({});
-    games.gameTimeRemaining = MAX_GAME_TIME_SECONDS - 30;
+    games.gameTimeRemaining = MAX_QUEUED_ARCADE_SECONDS - 30;
 
     games.addGameTime(60);
 
-    assert.equal(games.gameTimeRemaining, MAX_GAME_TIME_SECONDS);
+    assert.equal(games.gameTimeRemaining, MAX_QUEUED_ARCADE_SECONDS);
 });
 
 test('queued Arcade time survives recreation without another charge', () => {
