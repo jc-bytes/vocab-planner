@@ -1,6 +1,9 @@
-import { $ } from '../main.js';
+import { $, $$, closeModal as closeDialog } from '../main.js';
 
 export function initTeacherSparksListeners(manager) {
+    $$('#spark-modal .close-modal').forEach(button => {
+        button.addEventListener('click', () => closeDialog('#spark-modal'));
+    });
     $('#add-spark-btn')?.addEventListener('click', () => manager.openSparkModal());
     $('#save-spark-draft-btn')?.addEventListener('click', () => manager.saveSparkFromForm('draft'));
     $('#schedule-spark-btn')?.addEventListener('click', () => manager.saveSparkFromForm('scheduled'));
@@ -64,4 +67,3 @@ export function initTeacherSparksListeners(manager) {
         manager.selectSparkMonth(select.value);
     });
 }
-

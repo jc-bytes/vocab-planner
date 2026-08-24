@@ -28,6 +28,8 @@ globalThis.window = {
 };
 
 const { installTeacherSparkMethods } = await import('../js/teacherSparks.js');
+const { initTeacherSparksListeners } = await import('../js/teacherSparks/teacherSparkListeners.js');
+const { setupModal } = await import('../js/main.js');
 const { getPanamaDateValue } = await import('../js/services/dateUtils.js');
 const { teacherSparkDataMethods } = await import('../js/teacherSparks/teacherSparkDataMethods.js');
 const { teacherSparkEditorMethods } = await import('../js/teacherSparks/teacherSparkEditorMethods.js');
@@ -69,6 +71,64 @@ test('Teacher Sparks installs the complete stable feature surface', () => {
     ];
 
     expectedMethods.forEach(name => assert.equal(typeof TeacherSparkHarness.prototype[name], 'function'));
+});
+
+test('lazy Spark close controls use the shared dialog lifecycle', () => {
+    const originalQuerySelector = document.querySelector;
+    const originalQuerySelectorAll = document.querySelectorAll;
+    const listeners = [];
+    const attributes = new Map();
+    const classes = new Set();
+    const content = {
+        hasAttribute: name => attributes.has(`content:${name}`),
+        setAttribute(name, value) { attributes.set(`content:${name}`, value); }
+    };
+    const modal = {
+        dataset: {},
+        hasAttribute: name => attributes.has(name),
+        getAttribute: name => attributes.get(name) ?? null,
+        setAttribute(name, value) { attributes.set(name, value); },
+        removeAttribute(name) { attributes.delete(name); },
+        querySelector(selector) { return selector === '.modal-content' ? content : null; },
+        querySelectorAll() { return []; },
+        addEventListener() {},
+        classList: {
+            contains: value => classes.has(value),
+            add: value => classes.add(value)
+        }
+    };
+    const closeButtons = Array.from({ length: 2 }, () => ({
+        addEventListener(type, handler) { listeners.push({ type, handler }); }
+    }));
+    const manager = {
+        editingSparkId: 'spark-1',
+        sparkModalMode: 'edit',
+        setSparkModalStatus(value) { this.sparkModalStatus = value; }
+    };
+
+    try {
+        document.querySelector = selector => selector === '#spark-modal' ? modal : null;
+        document.querySelectorAll = selector => selector === '#spark-modal .close-modal' ? closeButtons : [];
+        setupModal(modal, {
+            onClose: () => {
+                manager.editingSparkId = null;
+                manager.sparkModalMode = 'create';
+                manager.setSparkModalStatus('');
+            }
+        });
+        initTeacherSparksListeners(manager);
+
+        assert.equal(listeners.length, 2);
+        assert.ok(listeners.every(listener => listener.type === 'click'));
+        listeners[0].handler();
+        assert.ok(classes.has('hidden'));
+        assert.equal(manager.editingSparkId, null);
+        assert.equal(manager.sparkModalMode, 'create');
+        assert.equal(manager.sparkModalStatus, '');
+    } finally {
+        document.querySelector = originalQuerySelector;
+        document.querySelectorAll = originalQuerySelectorAll;
+    }
 });
 
 test('Teacher Sparks responsibilities are complete and owned by one component each', () => {

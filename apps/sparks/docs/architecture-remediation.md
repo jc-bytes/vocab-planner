@@ -479,3 +479,13 @@ Task 9 remains in progress. Task 9d will investigate shared dialogs and modals w
 - Investigation found a separate pre-existing bug: the lazy Teacher Spark editor's X and Cancel controls mount after the old generic click binding and are inert, although backdrop and Escape closing work. This will be repaired as a separate behavior task so the CSS extraction stays independently verifiable.
 
 Task 9 remains in progress. Next is the focused lazy Spark dialog lifecycle repair, followed by the navigation family.
+
+### Task 9e, repair the lazy Spark dialog close lifecycle
+
+- Confirmed that the Spark editor template mounts only when the Teacher Sparks feature loads, after the eager generic close-button scan has already run. The editor's X and Cancel controls therefore had no click handler; backdrop and Escape closing still worked through `setupModal`.
+- Bound exactly the two `#spark-modal .close-modal` controls during the feature's existing one-time lazy initialization. Both now call the established shared `closeModal` lifecycle rather than mutating classes or duplicating cleanup logic.
+- Preserved save behavior: successful persistence still closes through the same lifecycle; validation and repository failures keep the editor open. The registered `onClose` continues to clear the editing ID, restore create mode, clear status, and return focus when an opener remains connected.
+- Added a focused runtime test that mounts a modal lifecycle, proves both lazy controls receive click handlers, closes through the shared API, and verifies editor state reset. Independent review confirmed the feature initializer cannot duplicate listeners across repeated navigation.
+- Verification: 7 Teacher Sparks tests, 11 lazy/build-efficiency tests, the dialog contract, the complete `npm test` suite, source and built three-page UI smoke, production builds, and independent review passed. Deployment remains 13.6 MB and the Teacher Sparks feature remains lazy.
+
+Task 9 remains in progress. Task 9f will investigate the shared navigation family.
