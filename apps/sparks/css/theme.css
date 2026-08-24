@@ -13,6 +13,7 @@
     --color-on-brand: #ffffff;
     --color-on-accent: #ffffff;
     --color-info: #0ea5e9;
+    --color-link: var(--color-info);
     --color-accent: #f97316;
     --color-background: #0f172a;
     --color-surface: rgba(15, 23, 42, 0.65);
@@ -51,6 +52,7 @@
     --color-on-accent: #502400;
     --color-info: #0ea5e9;
     --color-secondary: #ddb7ff;
+    --color-link: var(--color-secondary);
     --color-accent: #ffb786;
     --color-background: #0b1326;
     --color-surface: #0b1326;

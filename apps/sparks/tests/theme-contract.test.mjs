@@ -21,6 +21,7 @@ const requiredSemanticTokens = [
     'on-brand',
     'on-accent',
     'info',
+    'link',
     'background',
     'surface',
     'surface-raised',

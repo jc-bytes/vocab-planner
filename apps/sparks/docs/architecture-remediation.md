@@ -489,3 +489,15 @@ Task 9 remains in progress. Next is the focused lazy Spark dialog lifecycle repa
 - Verification: 7 Teacher Sparks tests, 11 lazy/build-efficiency tests, the dialog contract, the complete `npm test` suite, source and built three-page UI smoke, production builds, and independent review passed. Deployment remains 13.6 MB and the Teacher Sparks feature remains lazy.
 
 Task 9 remains in progress. Task 9f will investigate the shared navigation family.
+
+### Task 9f, migrate the shared navigation family
+
+- Added `css/navigation.css` as the structural owner for the shared top-level tab shell, mobile menu control, tab list/items, and vocabulary-library breadcrumbs. Student and teacher load it after the other shared foundations and before page-owned styles; landing does not load unused navigation CSS.
+- Removed the duplicated base declarations from `student.css` and `teacher.css` while preserving every responsive rail/sidebar rule, the student 1120/1121 transition, teacher 1180 compact behavior, collapsed states, feature tabs, segmented controls, and all route/listener code.
+- Added a semantic `--color-link` role because student breadcrumbs intentionally use the Celestial secondary color while teacher breadcrumbs use the information color. Shared navigation otherwise consumes semantic text, muted text, border, and focus tokens; contextual translucent active/surface colors retain their exact existing values.
+- Kept the existing teacher-named classes as the live student/teacher DOM contract and retained transitional breadcrumb selectors for the student and lazy Quiz renderers. No generic router, markup migration, compatibility adapter, or `!important` was introduced.
+- Added `test:navigation` to the complete suite. It guards stylesheet order, one structural owner, semantic-token use, retained responsive ownership, top-level tab counts, tab semantics, and mobile `aria-expanded`/`aria-controls` wiring. The theme contract now includes the link role.
+- Verification: the complete `npm test` suite passed, including the 1120/1121 student shell transition, three-page source smoke, and 13 sandboxed games. Focused navigation, theme, and student-shell contracts, built three-page smoke, production builds, scoped diff checks, and independent source/cascade review passed. The independent computed-style run found only font-dependent width differences because its baseline archive initially lacked Inter; the identical-font rerun was interrupted, so exact pixel equivalence is recorded as incomplete rather than passed.
+- Production deployment remains 13.6 MB with 2,328 transformed modules. Teacher entry CSS is 138.66/22.30 kB raw/gzip and student entry CSS is 218.42/33.31 kB; lazy student feature and Quiz Maker CSS remain separate.
+
+Task 9 remains in progress. Next is an architecture review of the recent shared-UI changes, followed by status/feedback styling.
