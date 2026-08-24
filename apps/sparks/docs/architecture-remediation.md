@@ -501,3 +501,12 @@ Task 9 remains in progress. Task 9f will investigate the shared navigation famil
 - Production deployment remains 13.6 MB with 2,328 transformed modules. Teacher entry CSS is 138.66/22.30 kB raw/gzip and student entry CSS is 218.42/33.31 kB; lazy student feature and Quiz Maker CSS remain separate.
 
 Task 9 remains in progress. Next is an architecture review of the recent shared-UI changes, followed by status/feedback styling.
+
+### Architecture review after Tasks 9c-9f
+
+- Independent review of commits `b03ff894`, `28829e0f`, `91158a6c`, and `62c7ff2f` found no blocker, high-confidence regression, new eager dependency, circular dependency, or unnecessary abstraction.
+- Confirmed the shared card, dialog, and navigation owners remain narrow while page-responsive and lazy feature refinements retain later precedence. The Spark repair continues through the existing lazy initializer and shared dialog lifecycle.
+- Confirmed the teacher/student breadcrumb compatibility selectors are still required by live renderers. They should be removed only when both emit the canonical typography classes, not replaced with another alias now.
+- Optional test hardening remains: authenticated modal screenshots, an identical-font navigation pixel rerun, and a repeated Spark-view close-listener assertion. These are evidence gaps or defense-in-depth, not demonstrated product regressions.
+
+No corrective task was added. Task 9 continues with the status/feedback family.
