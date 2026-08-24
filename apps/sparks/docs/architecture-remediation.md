@@ -347,3 +347,12 @@ Task 6 remains in progress. Independent traces have identified additional isolat
 - Verification: exact reference tracing, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Deployment fell from 15.1 MB to 13.6 MB while entry chunks and the 18-file student offline shell remained unchanged.
 
 Task 6 remains in progress. The remaining high-confidence candidates are isolated unused helpers and narrowly unreferenced CSS selectors; uncertain database-driven images and intentional game source artwork remain untouched.
+
+### Task 6d, remove dead shared utility exports
+
+- Removed `main.js`'s unused JSON cache/fetch helper and safe-async/error wrapper. Repository-wide tracing found no importer, caller, HTML handler, or global exposure; the error helper was referenced only by the dead wrapper.
+- Kept the active notification service, modal helpers, password controls, and Lucide refresh behavior unchanged.
+- These exports were already absent from production output through tree shaking, so this change reduces the source interface without changing delivered code.
+- Verification: package refactor checks, 10 build-efficiency tests, three-page UI smoke, and the production build passed. Deployment remains 13.6 MB and the student entry remains 242.48 kB raw, 62.17 kB gzip.
+
+Task 6 remains in progress. Next is the independently confirmed group of four isolated unused declarations; their owning modules and active siblings will remain intact.

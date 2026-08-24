@@ -188,29 +188,6 @@ export function closeModal(elementOrSelector, options = {}) {
     }
 }
 
-// Utility to fetch JSON
-const jsonCache = new Map();
-
-export async function fetchJSON(path, options = {}) {
-    if (!options.fresh && jsonCache.has(path)) {
-        return jsonCache.get(path);
-    }
-
-    try {
-        const url = new URL(path, window.location.href);
-        url.searchParams.set('_', Date.now().toString());
-        const response = await fetch(url.toString(), { cache: 'no-store' });
-        if (!response.ok) throw new Error(`Failed to load ${path}`);
-        const data = await response.json();
-        jsonCache.set(path, data);
-        return data;
-    } catch (error) {
-        console.error('Error fetching JSON:', error);
-        notifications.error(`Failed to load ${path}. Please check your connection.`);
-        return null;
-    }
-}
-
 function refreshLucideIcons(root = document) {
     if (window.lucide?.createIcons) {
         const iconRoot = root?.querySelectorAll ? root : document;
@@ -249,31 +226,3 @@ if (document.readyState === 'loading') {
 }
 
 window.addEventListener('load', refreshLucideIcons);
-
-// Consistent error handler utility
-export function handleError(error, userMessage = null, context = '') {
-    const message = userMessage || (error?.message || 'An unexpected error occurred');
-    
-    // Log error with context for debugging
-    if (context) {
-        console.error(`[${context}]`, error);
-    } else {
-        console.error(error);
-    }
-    
-    // Show user-friendly notification
-    notifications.error(message);
-    
-    // Return error for potential further handling
-    return error;
-}
-
-// Safe async wrapper for operations that should never fail silently
-export async function safeAsync(fn, errorMessage = 'Operation failed', context = '') {
-    try {
-        return await fn();
-    } catch (error) {
-        handleError(error, errorMessage, context);
-        return null;
-    }
-}
