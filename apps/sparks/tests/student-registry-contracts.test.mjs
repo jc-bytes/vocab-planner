@@ -298,6 +298,17 @@ test('hangman descriptor owns eligibility and prioritized preparation', () => {
     assert.equal(hangman.create, getStudentActivity('matching').create);
 });
 
+test('word scramble descriptor uses the shared nonblank prioritized lifecycle', () => {
+    const hangman = getStudentActivity('hangman');
+    const scramble = getStudentActivity('scramble');
+
+    assert.equal(scramble.isPlayable, hangman.isPlayable);
+    assert.equal(scramble.prepare, hangman.prepare);
+    assert.equal(scramble.create, hangman.create);
+    assert.equal(scramble.isPlayable({ word: 'Algorithm' }), true);
+    assert.equal(scramble.isPlayable({ word: '' }), false);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Five activities migrated: full suite at Matching checkpoint; 133 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Matching, Flashcards, Quiz, Synonym & Antonym, and Hangman own their lifecycle hooks. The other 7 activities retain existing launch branches until migrated separately. |
+| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Six activities migrated: full suite at Matching checkpoint; 133 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Matching, Flashcards, Quiz, Synonym & Antonym, Hangman, and Scramble own lifecycle hooks. The other 6 activities retain existing launch branches until migrated separately. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -171,6 +171,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Recorded an existing reliability edge for later focused work: Hangman's local storage key uses the prepared word count, while reset logic appears to use the full vocabulary count. This migration does not silently alter persisted-state cleanup.
 - Verification: registry browser smoke, 133 activity, 72 progress, and 8 build-efficiency tests passed. Production build keeps Hangman dynamic, deployment remains 15.1 MB, and the student entry is 258.22 kB raw, 66.46 kB gzip.
 
+### Task 4f, migrate Word Scramble
+
+- Added Scramble to the shared nonblank-word, prioritized-limit, standard-constructor lifecycle. Removed only its launcher and progress-flow cases.
+- Preserved the `scramble` setting, least-practiced selection, prepared-word coverage, constructor state, internal shuffled order, versioned state validation, edit-distance feedback, and server evidence rules.
+- Reused the exact Hangman lifecycle hooks because their host behavior is identical. Scramble's game logic and persistence remain owned by `ScrambleActivity`.
+- Recorded a parallel existing cleanup edge: Scramble's modern local key includes the first selected word and prepared count, while generic reset logic appears to remove an older count-only key. This requires a separate persistence test and is not silently changed here.
+- Verification: registry browser smoke, the Scramble and runtime/security activity tests, 72 progress tests, and 8 build-efficiency tests passed. Production build keeps Scramble dynamic, deployment remains 15.1 MB, and the student entry is 258.09 kB raw, 66.43 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Five activities are complete. Word Search is intentionally deferred until the optional instance-based coverage selector is introduced; simpler word-list activities continue first.
+Task 4 continues one descriptor at a time. Six activities are complete. Word Search is intentionally deferred until the optional instance-based coverage selector is introduced; simpler word-list activities continue first.

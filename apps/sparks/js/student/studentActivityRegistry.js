@@ -252,7 +252,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'scramble', title: 'Word Scramble', description: 'Unscramble the letters.',
         icon: 'shuffle', settingKey: 'scramble',
-        exportName: 'ScrambleActivity', load: () => import('../activities/scramble.js')
+        exportName: 'ScrambleActivity', load: () => import('../activities/scramble.js'),
+        isPlayable: hasWord,
+        prepare: preparePrioritizedActivity,
+        create: createWordListActivity
     },
     {
         id: 'wordle', title: 'Vocabulary Wordle', description: 'Guess words from clues.',
