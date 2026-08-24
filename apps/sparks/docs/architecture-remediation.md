@@ -364,3 +364,12 @@ Task 6 remains in progress. Next is the independently confirmed group of four is
 - Verification: package refactor checks, 75 student progress tests, 139 student activity tests, 10 build-efficiency tests, and the production build passed. Deployment remains 13.6 MB; the student entry decreased from 242.48/62.17 kB to 242.36/62.12 kB raw/gzip, and the empty stylesheet marker chunk disappeared.
 
 Task 6 remains in progress. Remaining decisions are the tested-but-runtime-unused vocabulary compatibility exports and isolated CSS selectors; both require their own ownership checks before removal.
+
+### Task 6f, narrow the vocabulary compatibility barrel
+
+- Removed four vocabulary-loader exports with no production caller: two cache invalidators, the manifest-list convenience wrapper, and a cloud-list wrapper that duplicated repository access.
+- Removed the cloud repository and subject-slug imports that existed only for the dead wrapper. The live manifest, file-loading, preload, caching, timeout, normalization, and repository paths remain unchanged.
+- Updated the compatibility-barrel contract to describe the smaller real interface instead of preserving unused methods solely because a test listed them.
+- Verification: 5 vocabulary API contracts, package refactor checks, 75 student progress tests, 139 student activity tests, 10 build-efficiency tests, and the production build passed. Deployment and entry sizes remain unchanged.
+
+Task 6 remains in progress. Only CSS selectors with exact DOM/reference evidence remain before the full Task 6 checkpoint.

@@ -1,6 +1,5 @@
-import { vocabularyRepository } from './vocabularyRepository.js';
 import { requestWithTimeout } from './requestReliability.js';
-import { getVocabSubjectSlug, withDefaultSubject } from './vocabularySubjects.js';
+import { withDefaultSubject } from './vocabularySubjects.js';
 
 const MANIFEST_CACHE_KEY = 'vocab_manifest_cache_v4';
 
@@ -58,14 +57,6 @@ async function fetchJsonFromNetwork(path, { fresh = false, signal = null, timeou
     return response.json();
 }
 
-export function invalidateManifestCache() {
-    try {
-        localStorage.removeItem(MANIFEST_CACHE_KEY);
-    } catch (error) {
-        console.warn('Could not clear vocabulary manifest cache:', error);
-    }
-}
-
 export async function loadManifest({ fresh = false } = {}) {
     const cached = readManifestCache();
 
@@ -86,11 +77,6 @@ export async function loadManifest({ fresh = false } = {}) {
         }
         return null;
     }
-}
-
-export async function loadManifestVocabularyList(options = {}) {
-    const manifest = await loadManifest(options);
-    return Array.isArray(manifest?.vocabularies) ? manifest.vocabularies.map(withDefaultSubject) : [];
 }
 
 function readVocabFileCache() {
@@ -137,21 +123,6 @@ function writeCachedVocabFile(path, data) {
     writeVocabFileCache(cache);
 }
 
-export function invalidateVocabularyFileCache(path) {
-    try {
-        if (!path) {
-            localStorage.removeItem(VOCAB_FILE_CACHE_KEY);
-            return;
-        }
-
-        const cache = readVocabFileCache();
-        delete cache.entries[path];
-        writeVocabFileCache(cache);
-    } catch (error) {
-        console.warn('Could not clear vocabulary file cache:', error);
-    }
-}
-
 export async function loadVocabularyFile(path, { fresh = false, silent = false, signal = null, timeoutMs = 10000 } = {}) {
     const normalizedPath = String(path || '').trim();
     if (!normalizedPath) return null;
@@ -193,13 +164,3 @@ export async function loadVocabularyFile(path, { fresh = false, silent = false, 
 export function preloadVocabularyFile(path) {
     return loadVocabularyFile(path, { silent: true }).catch(() => null);
 }
-
-export async function loadCloudVocabularyList(api) {
-    await api.init();
-    return (await vocabularyRepository.listMetadata()).map(vocabulary => ({
-        ...vocabulary,
-        subjectSlug: getVocabSubjectSlug(vocabulary),
-        __source: 'cloud'
-    }));
-}
-

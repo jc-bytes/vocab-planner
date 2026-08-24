@@ -17,10 +17,7 @@ test('vocabulary API remains a complete compatibility barrel with one owner per 
     assert.deepEqual(Object.keys(vocabularyApi).sort(), exportNames.sort());
     assert.deepEqual(
         Object.keys(vocabularyLoader).sort(),
-        [
-            'invalidateManifestCache', 'invalidateVocabularyFileCache', 'loadCloudVocabularyList',
-            'loadManifest', 'loadManifestVocabularyList', 'loadVocabularyFile', 'preloadVocabularyFile'
-        ]
+        ['loadManifest', 'loadVocabularyFile', 'preloadVocabularyFile']
     );
 });
 
