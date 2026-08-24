@@ -368,6 +368,24 @@ test('Speed Match descriptor uses the shared defined-word prioritized lifecycle'
     }), { words });
 });
 
+test('Fill in Blank descriptor owns example eligibility and prioritized lifecycle', () => {
+    const descriptor = getStudentActivity('fill-in-blank');
+    assert.equal(descriptor.isPlayable({ word: 'Loop', example: 'A loop repeats instructions.' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Loop', example: '   ' }), false);
+    assert.equal(descriptor.isPlayable({ word: ' ', example: 'A loop repeats instructions.' }), false);
+    assert.equal(descriptor.prepare, getStudentActivity('hangman').prepare);
+    assert.equal(descriptor.create, getStudentActivity('matching').create);
+
+    const words = [{ word: 'Loop', example: 'A loop repeats instructions.' }];
+    assert.deepEqual(descriptor.prepare({
+        wordLimit: 3,
+        prioritize(limit) {
+            assert.equal(limit, 3);
+            return words;
+        }
+    }), { words });
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

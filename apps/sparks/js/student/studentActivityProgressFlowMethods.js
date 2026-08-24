@@ -149,11 +149,6 @@ export class StudentActivityProgressFlow {
                     /^[a-zA-Z]+$/.test(String(word.word || ''))
                     && String(word.definition || '').trim().length > 0
                 );
-            case 'fill-in-blank':
-                return (
-                    String(word.word || '').trim().length > 0
-                    && String(word.example || '').trim().length > 0
-                );
             case 'illustration':
                 return String(word.word || '').trim().length > 0;
             default:

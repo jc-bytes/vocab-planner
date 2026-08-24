@@ -286,11 +286,6 @@ export class StudentActivityLauncher {
                 activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, activityInstance.placedWords);
                 break;
-            case 'fill-in-blank':
-                const fibWords = getPrioritized(getActivityWordLimit('fillInBlank'), w => w.example);
-                activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, fibWords);
-                break;
             default:
                 container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
             }

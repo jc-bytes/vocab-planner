@@ -30,6 +30,13 @@ function hasWordAndDefinition(word = {}) {
     );
 }
 
+function hasWordAndExample(word = {}) {
+    return (
+        String(word.word || '').trim().length > 0
+        && String(word.example || '').trim().length > 0
+    );
+}
+
 function hasWord(word = {}) {
     return String(word.word || '').trim().length > 0;
 }
@@ -295,7 +302,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'fill-in-blank', title: 'Fill in Blank', description: 'Complete the sentence.',
         icon: 'text-cursor-input', settingKey: 'fillInBlank',
-        exportName: 'FillInBlankActivity', load: () => import('../activities/fillInBlank.js')
+        exportName: 'FillInBlankActivity', load: () => import('../activities/fillInBlank.js'),
+        isPlayable: hasWordAndExample,
+        prepare: preparePrioritizedActivity,
+        create: createWordListActivity
     }
 ]);
 

@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Eight activities migrated: full suite at Matching checkpoint; 135 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Matching, Flashcards, Quiz, Synonym & Antonym, Hangman, Scramble, Wordle, and Speed Match own lifecycle hooks. The other 4 activities retain existing launch branches until migrated separately. |
+| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Nine activities migrated: full suite at Matching checkpoint; 135 activity, 72 progress, registry, security, routing, teacher-flow, build-efficiency tests; production builds | Nine ordinary activity lifecycles now belong to their descriptors. Illustration, Word Search, and Crossword retain special launch branches until migrated separately. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -204,6 +204,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Recorded separate persistence debt: local high scores use only the selected word count, which can collide across units, and generic reset uses the full vocabulary count, which can miss limited or filtered selections. The existing tie copy can also announce a new high score without a strictly higher score. These product-level reliability fixes are not mixed into the descriptor migration.
 - Verification: registry browser smoke, 135 student activity tests, 72 progress tests, 14 routing tests, 8 build-efficiency tests, and the production build passed. Speed Match remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.64 kB raw, 66.37 kB gzip.
 
+### Task 4i, migrate Fill in Blank
+
+- Added Fill in Blank's nonblank word-and-example eligibility, prioritized limiting, and standard construction to its descriptor. Removed only its launcher and progress-flow switch cases.
+- Removed the launcher's redundant example filter. The shared playable-word input has already applied the same complete descriptor predicate before prioritization, so selected words and coverage remain unchanged.
+- Preserved the `fillInBlank` teacher limit, least-practiced selection, constructor state, internal shuffle, clue rotation, retry behavior, score evidence, server verification, and post-construction coverage.
+- Recorded separate latent reliability debt for focused tests: restored shuffled words and counters are weakly validated, regex metacharacters in a word are not escaped when building the blank, and local persistence uses inconsistent trailing-space keys. The checked catalog currently has valid examples containing their words and no regex-metacharacter terms, so this migration does not change product behavior.
+- Verification: registry browser smoke, 135 student activity tests, 72 progress tests, 14 security tests, 8 build-efficiency tests, and the production build passed. Fill in Blank remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.41 kB raw, 66.32 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Eight activities are complete. Word Search is intentionally deferred until the optional instance-based coverage selector is introduced; simpler word-list activities continue first.
+Task 4 continues one descriptor at a time. Nine activities are complete. The three remaining activities have special host behavior and will be migrated only after their narrow descriptor seams are proven.
