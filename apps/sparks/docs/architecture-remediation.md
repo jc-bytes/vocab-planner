@@ -48,7 +48,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
-| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls | Complete suite, UI-family contracts, computed-style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons and controls are centralized; cards, dialogs, navigation, feedback, containers, and typography remain. |
+| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls; cards | Complete suite, UI-family contracts, computed-style and pixel comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons, controls, and card shells are centralized; dialogs, navigation, feedback, containers, and typography remain. |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
@@ -454,3 +454,15 @@ Task 9 remains in progress. Task 9b will investigate and migrate shared input/fo
 - Production deployment remains 13.6 MB. Shared foundation CSS is 5.33/1.38 kB raw/gzip; duplicated teacher entry CSS decreased by another 2.27 kB raw and student entry CSS by 1.73 kB raw. Lazy feature CSS remains separate.
 
 Task 9 remains in progress. Task 9c will investigate the shared card family and keep activity/game-specific surfaces local.
+
+### Task 9c, migrate the shared card family
+
+- Added `css/cards.css` as the single structural owner for the generic `.card` surface and the reusable `.option-card` subtype used by landing choices and student vocabulary choices. All three app entries load it after theme foundations and before page-owned refinements.
+- Removed the duplicated card, option-card, content geometry, hover, and focus rules from landing, student, and teacher entry styles. The shared owner consumes semantic surface, raised-surface, border, text, and focus tokens; no new compatibility alias or `!important` was introduced.
+- Kept activity, menu, game, vocabulary, Spark, matching, Flashcards, Quiz Maker, responsive, and Celestial card behavior with the feature or page that owns it. Lazy student and Quiz Maker styles remain separate build assets.
+- Added `test:cards` to the complete suite and updated the landing ownership check. The contracts guard entry order, one shared owner, semantic-token use, student refinements, and feature-owned Quiz cards.
+- Verification: the complete `npm test` suite passed after the final semantic-token change. Focused card, landing, theme, and student design-system checks; 9-width/6-view student regression; source and built three-page smoke; production builds; and independent review passed.
+- Independent headless-Chromium comparison against `68a1a91a` found zero settled computed-style differences and pixel-identical screenshots at desktop and mobile widths for landing cards, student login/vocabulary/current-game cards, teacher login/group cards, tabindex focus/hover states, and lazy Quiz Maker question cards.
+- Production deployment remains 13.6 MB. Teacher entry CSS is 141.81/22.75 kB raw/gzip and student entry CSS is 221.69/33.78 kB; the 49.98/9.91 kB student feature CSS and 12.48/3.10 kB Quiz Maker CSS remain lazy.
+
+Task 9 remains in progress. Task 9d will investigate shared dialogs and modals without merging activity-internal overlays or the Quiz Maker document surface.

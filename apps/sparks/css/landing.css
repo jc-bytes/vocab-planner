@@ -91,56 +91,9 @@
 }.brand-mark svg {
     width: 1.7rem;
     height: 1.7rem;
-}/* Cards */.card {
-    position: relative;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 14px 30px -22px rgba(15, 23, 42, 0.7);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.option-card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: var(--text-main);
-    width: 100%;
-    min-height: 142px;
-    text-align: left;
-    cursor: pointer;
-    overflow: hidden;
-    padding: 1.35rem 1.45rem;
-}.option-card:hover {
-    transform: translateY(-6px) scale(1.01);
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.75);
-}/* Activity Card Badges *//* Completion Screen *//* Overall Coverage Indicator */.option-card h2 {
-    grid-column: 2;
-    margin: 0 0 0.35rem;
-    font-size: 1.45rem;
-    line-height: 1.1;
-    overflow-wrap: anywhere;
-}.option-card p,
-.landing-footer {
+}/* Cards */
+/* Activity Card Badges *//* Completion Screen *//* Overall Coverage Indicator */.landing-footer {
     color: #d7e3f8;
-}.option-card p {
-    grid-column: 2;
-    margin: 0;
-    font-size: 0.98rem;
-    line-height: 1.35;
-}.option-card .option-icon {
-    grid-row: 1 / span 2;
-    align-self: start;
-    width: 3.15rem;
-    height: 3.15rem;
-    margin: 0;
-    border-radius: 0.75rem;
-}.option-card .option-icon svg {
-    width: 1.75rem;
-    height: 1.75rem;
 }.landing-options {
     display: grid;
     grid-template-columns: repeat(2, minmax(260px, 1fr));
@@ -164,10 +117,7 @@
 }.landing-footer a:hover {
     color: #bae6fd;
     text-decoration: underline;
-}/* Buttons *//* Forms */.option-card:focus-visible {
-    outline: 3px solid rgba(14, 165, 233, 0.8);
-    outline-offset: 3px;
-}/* Grid Layouts *//* Teacher Dashboard Specifics */#vocab-selection-view #back-to-main-menu-btn[hidden] {
+}/* Buttons *//* Forms *//* Grid Layouts *//* Teacher Dashboard Specifics */#vocab-selection-view #back-to-main-menu-btn[hidden] {
     display: none !important;
 }.spark-library-body {
     display: grid;

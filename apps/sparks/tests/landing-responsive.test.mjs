@@ -2,13 +2,17 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 
-const landingCss = await readFile(new URL('../css/landing.css', import.meta.url), 'utf8');
+const [landingCss, cardsCss] = await Promise.all([
+    readFile(new URL('../css/landing.css', import.meta.url), 'utf8'),
+    readFile(new URL('../css/cards.css', import.meta.url), 'utf8')
+]);
 
-test('landing mode links keep their card surfaces in the split stylesheet', () => {
+test('landing mode links keep their card surfaces in the shared card stylesheet', () => {
     assert.match(
-        landingCss,
-        /\.card\s*\{[^}]*background:\s*var\(--card-bg\)[^}]*border:\s*1px solid var\(--border-color\)/s
+        cardsCss,
+        /\.card\s*\{[^}]*background:\s*var\(--color-surface\)[^}]*border:\s*1px solid var\(--color-border\)/s
     );
+    assert.doesNotMatch(landingCss, /\.card\s*\{[^}]*background:/s);
 });
 
 test('tablet landing layout does not shrink its grid tracks to content width', () => {

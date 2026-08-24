@@ -1,0 +1,78 @@
+/* Shared card surfaces. Page and feature styles own layout-specific variants. */
+.card {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 14px 30px -22px rgba(15, 23, 42, 0.7);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+:where(.student-site) .card {
+    background: var(--color-surface-raised);
+}
+
+:where(.student-site, .teacher-site) .card {
+    padding: var(--spacing-lg);
+}
+
+:where(.student-site, .teacher-site) .app-container > main .card {
+    background: rgba(15, 23, 42, 0.48);
+}
+
+.option-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    min-height: 142px;
+    padding: 1.35rem 1.45rem;
+    overflow: hidden;
+    color: var(--color-text);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.option-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 20px 45px -20px rgba(15, 23, 42, 0.75);
+}
+
+.option-card h2 {
+    grid-column: 2;
+    margin: 0 0 0.35rem;
+    font-size: 1.45rem;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.option-card p {
+    grid-column: 2;
+    margin: 0;
+    color: #d7e3f8;
+    font-size: 0.98rem;
+    line-height: 1.35;
+}
+
+.option-card .option-icon {
+    grid-row: 1 / span 2;
+    align-self: start;
+    width: 3.15rem;
+    height: 3.15rem;
+    margin: 0;
+    border-radius: 0.75rem;
+}
+
+.option-card .option-icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.card[tabindex]:focus-visible,
+.option-card:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+}
