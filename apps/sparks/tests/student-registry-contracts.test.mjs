@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
     STUDENT_ACTIVITY_REGISTRY,
@@ -147,6 +147,26 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
     })]), /coverage is disabled/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: 20 })]), /server-authoritative/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: undefined })]), /server-authoritative/);
+});
+
+test('activity policy consumers use descriptor metadata instead of ID lists', async () => {
+    const sources = await Promise.all([
+        'js/student/studentActivityAutoSave.js',
+        'js/student/studentActivityMenuMethods.js',
+        'js/student/studentActivityCoverageMethods.js',
+        'js/student/studentActivityLauncherMethods.js'
+    ].map(file => readFile(new URL(`../${file}`, import.meta.url), 'utf8')));
+    const [autoSave, menu, coverage, launcher] = sources;
+
+    assert.match(autoSave, /getStudentActivity\(activityType\)\?\.nonReplayable/);
+    assert.match(menu, /descriptor\?\.nonReplayable/);
+    assert.match(menu, /getStudentActivity\(type\)\?\.tracksCoverage/);
+    assert.match(coverage, /STUDENT_ACTIVITY_REGISTRY[\s\S]*activity\.tracksCoverage/);
+    assert.match(launcher, /getStudentActivity\(type\)\?\.title/);
+
+    for (const source of [autoSave, menu, coverage]) {
+        assert.doesNotMatch(source, /\[['"]flashcards['"],\s*['"]illustration['"]\]/);
+    }
 });
 
 test('matching descriptor owns eligibility, word preparation, and construction', () => {

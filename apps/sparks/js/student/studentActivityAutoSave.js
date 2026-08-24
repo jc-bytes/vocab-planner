@@ -1,7 +1,6 @@
 import { $ } from '../main.js';
 import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
-
-const NON_REPLAYABLE_ACTIVITIES = new Set(['flashcards', 'illustration']);
+import { getStudentActivity } from './studentActivityRegistry.js';
 
 export class StudentActivityAutoSave {
     constructor(persistence) {
@@ -31,7 +30,7 @@ export class StudentActivityAutoSave {
         const settings = this.sm.currentVocab.activitySettings || {};
         const { progressReward, completionBonus } = this.getActivityCoinRewards(activityType, settings);
         const wasComplete = Boolean(this.sm.unitScores[activityType]?.isComplete);
-        const persistedScoreData = NON_REPLAYABLE_ACTIVITIES.has(activityType)
+        const persistedScoreData = getStudentActivity(activityType)?.nonReplayable
             ? this.updateNonReplayableScore(activityType, scoreData, progressReward, completionBonus)
             : this.updateReplayableScore(activityType, scoreData, progressReward, completionBonus);
 

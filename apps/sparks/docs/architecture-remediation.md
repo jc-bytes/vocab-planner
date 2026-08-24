@@ -44,7 +44,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
-| 5. Consolidate duplicated configuration | TODO | | | |
+| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy consumers | Registry, 139 activity, 72 progress, and 8 build-efficiency tests | Replay, coverage, and header metadata now come from activity descriptors. Flow, gamification, and other verified duplicates remain. |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
@@ -250,3 +250,12 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 ## Remaining work
 
 Task 4 is complete. Task 5 will verify and consolidate only duplicated configuration that still has more than one genuine authority.
+
+### Task 5a, consume activity descriptor policies
+
+- Removed hardcoded Flashcards/Illustration replay and coverage lists from autosave and the activity menu.
+- Coverage aggregation now derives participating activity IDs from descriptors, and activity headers use descriptor titles instead of a second 12-item label map.
+- Added an ownership contract preventing the known policy lists and title map from returning outside the catalog.
+- Verification: 19 registry/parity contracts plus all 12 browser loaders, 139 student activity tests, 72 student progress tests, and 8 build-efficiency tests passed.
+
+Task 5 remains in progress. The next verified duplicate is the activity-flow policy copied across student, teacher, and catalog tooling.

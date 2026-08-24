@@ -392,22 +392,7 @@ export class StudentActivityLauncher {
         const title = $('#activity-header-title');
         if (!title) return;
 
-        const labels = {
-            illustration: 'Word Hunt',
-            matching: 'Matching',
-            flashcards: 'Flashcards',
-            quiz: 'Quiz',
-            'synonym-antonym': 'Synonym & Antonym',
-            'word-search': 'Word Search',
-            crossword: 'Crossword',
-            hangman: 'Hangman',
-            scramble: 'Scramble',
-            wordle: 'Wordle',
-            'speed-match': 'Speed Match',
-            'fill-in-blank': 'Fill in Blank'
-        };
-
-        title.textContent = labels[type] || '';
+        title.textContent = getStudentActivity(type)?.title || '';
         title.classList.toggle('hidden', !title.textContent);
     }
 }

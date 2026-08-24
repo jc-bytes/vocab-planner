@@ -1,6 +1,6 @@
 import { $, $$, createElement } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
-import { STUDENT_ACTIVITY_REGISTRY } from './studentActivityRegistry.js';
+import { STUDENT_ACTIVITY_REGISTRY, getStudentActivity } from './studentActivityRegistry.js';
 import { setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityMenu {
@@ -161,8 +161,8 @@ export class StudentActivityMenu {
 
             if (scoreData) {
                 const badge = createElement('div', 'progress-badge');
-                const nonReplayable = ['flashcards', 'illustration'];
-                badge.textContent = nonReplayable.includes(type) ? `${progress}%` : `Best ${progress}%`;
+                const descriptor = getStudentActivity(type);
+                badge.textContent = descriptor?.nonReplayable ? `${progress}%` : `Best ${progress}%`;
                 if (isComplete) badge.classList.add('complete');
                 card.appendChild(badge);
                 card.dataset.activityProgressSummary = isComplete
@@ -178,7 +178,7 @@ export class StudentActivityMenu {
             }
 
             // Show word coverage for activities that track it
-            if (coverageStats && coverageStats[type] && !['flashcards', 'illustration'].includes(type)) {
+            if (coverageStats && coverageStats[type] && getStudentActivity(type)?.tracksCoverage) {
                 const coverage = coverageStats[type];
                 if (coverage.practiced > 0) {
                     const allSeen = coverage.practiced >= coverage.total;

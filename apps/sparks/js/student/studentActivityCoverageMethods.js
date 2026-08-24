@@ -1,4 +1,5 @@
 import { $ } from '../main.js';
+import { STUDENT_ACTIVITY_REGISTRY } from './studentActivityRegistry.js';
 
 export class StudentActivityCoverage {
     constructor(activities) {
@@ -52,8 +53,9 @@ export class StudentActivityCoverage {
         if (!this.sm.currentVocab) return null;
         
         const totalWords = this.sm.currentVocab.words.length;
-        const activities = ['matching', 'quiz', 'synonym-antonym', 'word-search', 'crossword',
-                          'hangman', 'scramble', 'wordle', 'speed-match', 'fill-in-blank'];
+        const activities = STUDENT_ACTIVITY_REGISTRY
+            .filter(activity => activity.tracksCoverage)
+            .map(activity => activity.id);
         
         const stats = {};
         
