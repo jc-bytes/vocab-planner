@@ -16,7 +16,94 @@ const HANGMAN_ICON = `
     </svg>
 `;
 
-export const STUDENT_ACTIVITY_REGISTRY = Object.freeze([
+function requireNonEmptyString(activity, field, index) {
+    if (typeof activity[field] !== 'string' || !activity[field].trim()) {
+        throw new TypeError(`Activity descriptor at index ${index} must provide a non-empty ${field}`);
+    }
+}
+
+export function defineStudentActivityRegistry(activities) {
+    if (!Array.isArray(activities) || activities.length === 0) {
+        throw new TypeError('Activity registry must be a non-empty array');
+    }
+
+    const ids = new Set();
+    const settingKeys = new Set();
+    const hasOwn = (value, field) => Object.prototype.hasOwnProperty.call(value, field);
+    const descriptors = activities.map((activity, index) => {
+        if (!activity || typeof activity !== 'object' || Array.isArray(activity)) {
+            throw new TypeError(`Activity descriptor at index ${index} must be an object`);
+        }
+
+        ['id', 'title', 'description', 'settingKey', 'exportName'].forEach(field => {
+            requireNonEmptyString(activity, field, index);
+        });
+        for (const field of ['id', 'settingKey', 'exportName']) {
+            if (activity[field] !== activity[field].trim()) {
+                throw new TypeError(`Activity descriptor at index ${index} ${field} cannot have surrounding whitespace`);
+            }
+        }
+
+        if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(activity.id)) {
+            throw new TypeError(`Activity ${activity.id} must use a lowercase kebab-case ID`);
+        }
+        if (ids.has(activity.id)) {
+            throw new TypeError(`Duplicate activity ID: ${activity.id}`);
+        }
+        ids.add(activity.id);
+
+        if (settingKeys.has(activity.settingKey)) {
+            throw new TypeError(`Duplicate activity setting key: ${activity.settingKey}`);
+        }
+        settingKeys.add(activity.settingKey);
+
+        const hasIcon = hasOwn(activity, 'icon');
+        const hasIconMarkup = hasOwn(activity, 'iconMarkup');
+        if (hasIcon && (typeof activity.icon !== 'string' || !activity.icon.trim())) {
+            throw new TypeError(`Activity ${activity.id} icon must be a non-empty string`);
+        }
+        if (hasIconMarkup && (typeof activity.iconMarkup !== 'string' || !activity.iconMarkup.trim())) {
+            throw new TypeError(`Activity ${activity.id} iconMarkup must be a non-empty string`);
+        }
+        if (hasIcon === hasIconMarkup) {
+            throw new TypeError(`Activity ${activity.id} must provide exactly one icon or iconMarkup`);
+        }
+        if (typeof activity.load !== 'function') {
+            throw new TypeError(`Activity ${activity.id} must provide a lazy loader`);
+        }
+        if (!/Activity$/.test(activity.exportName)) {
+            throw new TypeError(`Activity ${activity.id} exportName must end with Activity`);
+        }
+        if (hasOwn(activity, 'xp')) {
+            throw new TypeError(`Activity ${activity.id} cannot define client XP; rewards are server-authoritative`);
+        }
+
+        for (const field of ['routeable', 'tracksCoverage', 'nonReplayable']) {
+            if (hasOwn(activity, field) && typeof activity[field] !== 'boolean') {
+                throw new TypeError(`Activity ${activity.id} ${field} must be a boolean`);
+            }
+        }
+        if (activity.routeable === false) {
+            throw new TypeError(`Activity ${activity.id} cannot disable routing in the student activity registry`);
+        }
+        for (const field of ['isPlayable', 'prepare', 'create']) {
+            if (hasOwn(activity, field) && typeof activity[field] !== 'function') {
+                throw new TypeError(`Activity ${activity.id} ${field} must be a function`);
+            }
+        }
+
+        return Object.freeze({
+            routeable: true,
+            tracksCoverage: true,
+            nonReplayable: false,
+            ...activity
+        });
+    });
+
+    return Object.freeze(descriptors);
+}
+
+export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'illustration', title: 'Word Hunt', description: 'Find a definition, image, and two examples.',
         icon: 'compass', settingKey: 'illustration',
@@ -79,7 +166,7 @@ export const STUDENT_ACTIVITY_REGISTRY = Object.freeze([
         icon: 'text-cursor-input', settingKey: 'fillInBlank',
         exportName: 'FillInBlankActivity', load: () => import('../activities/fillInBlank.js')
     }
-].map(activity => Object.freeze({ routeable: true, tracksCoverage: true, ...activity })));
+]);
 
 const ACTIVITY_BY_ID = new Map(STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity]));
 

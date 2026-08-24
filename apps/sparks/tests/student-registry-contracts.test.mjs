@@ -3,6 +3,7 @@ import { access } from 'node:fs/promises';
 import test from 'node:test';
 import {
     STUDENT_ACTIVITY_REGISTRY,
+    defineStudentActivityRegistry,
     getStudentActivity,
     getStudentActivityIds
 } from '../js/student/studentActivityRegistry.js';
@@ -22,6 +23,104 @@ function assertUniqueIds(entries, label) {
     assert.equal(new Set(ids).size, ids.length, `${label} IDs must be unique`);
     assert.ok(ids.every(Boolean), `${label} IDs must be non-empty`);
 }
+
+function validActivity(overrides = {}) {
+    return {
+        id: 'sample',
+        title: 'Sample',
+        description: 'Sample activity.',
+        settingKey: 'sample',
+        icon: 'circle',
+        exportName: 'SampleActivity',
+        load: async () => ({ SampleActivity: class SampleActivity {} }),
+        ...overrides
+    };
+}
+
+const PERSISTED_ACTIVITY_SETTING_KEYS = Object.freeze({
+    illustration: 'illustration',
+    matching: 'matching',
+    flashcards: 'flashcards',
+    quiz: 'quiz',
+    'synonym-antonym': 'synonymAntonym',
+    'word-search': 'wordSearch',
+    crossword: 'crossword',
+    hangman: 'hangman',
+    scramble: 'scramble',
+    wordle: 'wordle',
+    'speed-match': 'speedMatch',
+    'fill-in-blank': 'fillInBlank'
+});
+
+test('activity registry definition validates and freezes descriptors', () => {
+    const source = validActivity();
+    const registry = defineStudentActivityRegistry([source]);
+
+    assert.equal(Object.isFrozen(registry), true);
+    assert.equal(Object.isFrozen(registry[0]), true);
+    assert.equal(registry[0].routeable, true);
+    assert.equal(registry[0].tracksCoverage, true);
+    assert.equal(registry[0].nonReplayable, false);
+    assert.equal(Object.hasOwn(source, 'routeable'), false, 'definition must not add defaults to the input');
+    assert.equal(Object.hasOwn(source, 'tracksCoverage'), false, 'definition must not add defaults to the input');
+    assert.equal(Object.hasOwn(source, 'nonReplayable'), false, 'definition must not add defaults to the input');
+
+    const create = () => {};
+    const configured = validActivity({
+        tracksCoverage: false,
+        nonReplayable: true,
+        create
+    });
+    const configuredRegistry = defineStudentActivityRegistry([configured]);
+    assert.equal(configuredRegistry[0].routeable, true);
+    assert.equal(configuredRegistry[0].tracksCoverage, false);
+    assert.equal(configuredRegistry[0].nonReplayable, true);
+    assert.equal(configuredRegistry[0].create, create);
+});
+
+test('activity registry definition rejects malformed descriptors clearly', () => {
+    assert.throws(() => defineStudentActivityRegistry([]), /non-empty array/);
+    assert.throws(() => defineStudentActivityRegistry([null]), /must be an object/);
+    for (const field of ['id', 'title', 'description', 'settingKey', 'exportName']) {
+        assert.throws(
+            () => defineStudentActivityRegistry([validActivity({ [field]: '' })]),
+            new RegExp(`non-empty ${field}`)
+        );
+    }
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ id: 'Not Valid' })]), /kebab-case ID/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ settingKey: ' sample ' })]), /surrounding whitespace/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ exportName: ' SampleActivity' })]), /surrounding whitespace/);
+    assert.throws(() => defineStudentActivityRegistry([
+        validActivity(),
+        validActivity({ settingKey: 'second' })
+    ]), /Duplicate activity ID/);
+    assert.throws(() => defineStudentActivityRegistry([
+        validActivity(),
+        validActivity({ id: 'second' })
+    ]), /Duplicate activity setting key/);
+    const withoutIcon = validActivity();
+    delete withoutIcon.icon;
+    assert.throws(() => defineStudentActivityRegistry([withoutIcon]), /exactly one icon/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ icon: '' })]), /icon must be a non-empty string/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ iconMarkup: '<svg></svg>' })]), /exactly one icon/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ icon: 42, iconMarkup: '<svg></svg>' })]), /icon must be a non-empty string/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ load: null })]), /lazy loader/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ exportName: 'Sample' })]), /end with Activity/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ tracksCoverage: 'yes' })]), /must be a boolean/);
+    for (const field of ['routeable', 'tracksCoverage', 'nonReplayable']) {
+        assert.throws(
+            () => defineStudentActivityRegistry([validActivity({ [field]: undefined })]),
+            new RegExp(`${field} must be a boolean`)
+        );
+    }
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ routeable: false })]), /cannot disable routing/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ isPlayable: 1 })]), /isPlayable must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare: null })]), /prepare must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ create: true })]), /create must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ create: undefined })]), /create must be a function/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: 20 })]), /server-authoritative/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: undefined })]), /server-authoritative/);
+});
 
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
@@ -46,6 +145,7 @@ test('activity registry is the complete route and module source', () => {
     assert.deepEqual(VOCAB_ACTIVITY_SETTING_KEYS, Object.fromEntries(
         STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity.settingKey])
     ));
+    assert.deepEqual(VOCAB_ACTIVITY_SETTING_KEYS, PERSISTED_ACTIVITY_SETTING_KEYS);
 });
 
 test('game registry owns display, launch, frame, and leaderboard configuration', async () => {
