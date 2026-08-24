@@ -5,13 +5,24 @@ import { readFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = path => readFile(new URL(path, root), 'utf8');
 
-const [teacherHtml, teacherCss, teacherQuizCss, dashboardRecentActivity, teacherDataViewer, studentProgressRenderer] = await Promise.all([
+const [
+    teacherHtml,
+    teacherCss,
+    teacherQuizCss,
+    dashboardRecentActivity,
+    teacherDataViewer,
+    studentProgressRenderer,
+    vocabularyStorage,
+    vocabularyWordEditor
+] = await Promise.all([
     read('teacher.html'),
     read('css/teacher.css'),
     read('css/teacherQuiz.css'),
     read('js/teacherDataDashboardRecentActivityMethods.js'),
     read('js/teacherDataViewer.js'),
-    read('js/teacherStudentProgressRenderMethods.js')
+    read('js/teacherStudentProgressRenderMethods.js'),
+    read('js/teacherVocabularyStorage.js'),
+    read('js/teacherVocabularyWordEditorMethods.js')
 ]);
 
 function quizTemplate() {
@@ -219,6 +230,37 @@ test('Teacher loading and login views delegate static presentation to auth class
         /\.teacher-session-loading__message\s*\{[^}]*margin-top:\s*1rem;[^}]*color:\s*var\(--color-text-muted\);/s,
         /\.teacher-login-submit\s*\{[^}]*width:\s*100%;/s,
         /\.teacher-login-error\s*\{[^}]*margin-top:\s*1rem;[^}]*padding:\s*1rem;[^}]*border-radius:\s*8px;[^}]*background:\s*rgba\(239, 68, 68, 0\.15\);[^}]*color:\s*var\(--color-danger\);/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+});
+
+test('Teacher vocabulary views keep only data-driven color values inline', () => {
+    const templateStart = teacherHtml.indexOf('<!-- View: Editor -->');
+    const templateEnd = teacherHtml.indexOf('<!-- View: Quiz Maker -->', templateStart);
+    assert.ok(templateStart >= 0 && templateEnd > templateStart, 'Missing bounded vocabulary editor template');
+    assert.doesNotMatch(teacherHtml.slice(templateStart, templateEnd), /\sstyle=/,
+        'Vocabulary editor template must delegate static presentation to its feature CSS');
+
+    const cardStart = vocabularyStorage.indexOf('    createLibraryCard(');
+    const cardEnd = vocabularyStorage.indexOf('    loadLocalVocabulary(', cardStart);
+    assert.ok(cardStart >= 0 && cardEnd > cardStart, 'Missing bounded vocabulary card renderer');
+    const cardRenderer = vocabularyStorage.slice(cardStart, cardEnd);
+    assert.doesNotMatch(cardRenderer, /style="(?:background|color|display|margin)/,
+        'Vocabulary card renderer must use classes for fixed presentation');
+    assert.match(cardRenderer, /style="--subject-color:\$\{escapeHtml\(subject\.color\)\};"/,
+        'User-configured subject color remains a data-driven CSS custom property');
+    assert.doesNotMatch(vocabularyWordEditor, /<span style=/,
+        'Vocabulary image errors must use the feature-owned error class');
+
+    for (const declaration of [
+        /\.vocab-editor-title\s*\{[^}]*margin:\s*0\.35rem 0 0;/s,
+        /\.teacher-vocab-source-badge--remote\s*\{[^}]*background:\s*var\(--color-brand\);/s,
+        /\.teacher-vocab-source-badge--local\s*\{[^}]*background:\s*var\(--accent-color\);/s,
+        /\.teacher-vocab-source-badge--cloud\s*\{[^}]*background:\s*var\(--color-brand-hover\);/s,
+        /\.teacher-vocab-id,[\s\S]*?\.teacher-vocab-placement\s*\{[^}]*color:\s*var\(--color-text-muted\);/s,
+        /\.teacher-vocab-placement\s*\{[^}]*display:\s*block;[^}]*margin-top:\s*0\.35rem;/s,
+        /\.vocab-image-error\s*\{[^}]*color:\s*var\(--color-danger\);/s
     ]) {
         assert.match(teacherCss, declaration);
     }

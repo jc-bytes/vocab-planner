@@ -255,7 +255,7 @@ class TeacherVocabularyWordEditorMethods {
         const img = document.createElement('img');
         img.src = path;
         img.onerror = () => {
-            previewBox.innerHTML = `<span style="color:var(--danger-color)">Image not found at path</span>`;
+            previewBox.innerHTML = '<span class="vocab-image-error">Image not found at path</span>';
         };
         img.onload = () => {
             previewBox.innerHTML = '';

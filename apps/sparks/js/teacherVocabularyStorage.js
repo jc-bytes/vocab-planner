@@ -68,9 +68,9 @@ class TeacherVocabularyStorageMethods {
         card.setAttribute('aria-label', `Open ${vocab.name || vocab.id || 'vocabulary'}`);
 
         const badgeStyles = {
-            remote: { color: 'var(--primary-color)', text: 'Repo' },
-            local: { color: 'var(--accent-color)', text: 'Draft' },
-            cloud: { color: 'var(--primary-hover)', text: 'Cloud' }
+            remote: { className: 'teacher-vocab-source-badge--remote', text: 'Repo' },
+            local: { className: 'teacher-vocab-source-badge--local', text: 'Draft' },
+            cloud: { className: 'teacher-vocab-source-badge--cloud', text: 'Cloud' }
         };
 
         const badge = badgeStyles[type] || badgeStyles.remote;
@@ -83,11 +83,11 @@ class TeacherVocabularyStorageMethods {
         }
 
         card.innerHTML = `
-            <div class="badge" style="background:${badge.color};">${badge.text}</div>
+            <div class="badge teacher-vocab-source-badge ${badge.className}">${badge.text}</div>
             <div class="subject-badge" style="--subject-color:${escapeHtml(subject.color)};">${escapeHtml(subject.name)}</div>
             <h3 class="card-title">${escapeHtml(vocab.name || 'Untitled')}</h3>
-            <small class="card-caption" style="color:var(--text-muted)">${escapeHtml(vocab.id)}</small>
-            ${this.formatVocabPlacementLabel(vocab) ? `<small class="card-caption" style="color:var(--text-muted); display:block; margin-top:0.35rem;">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
+            <small class="card-caption teacher-vocab-id">${escapeHtml(vocab.id)}</small>
+            ${this.formatVocabPlacementLabel(vocab) ? `<small class="card-caption teacher-vocab-placement">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
             ${deleteBtnHtml}
         `;
 

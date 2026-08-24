@@ -1327,6 +1327,10 @@ body {
     margin-bottom: 0.7rem;
 }
 
+.vocab-editor-title {
+    margin: 0.35rem 0 0;
+}
+
 .vocab-editor-heading .teacher-toolbar {
     padding-top: 1.55rem;
     gap: 0.5rem;
@@ -2347,6 +2351,32 @@ body {
 
 .teacher-source-badge {
     background: rgba(99, 102, 241, 0.85);
+}
+
+.teacher-vocab-source-badge--remote {
+    background: var(--color-brand);
+}
+
+.teacher-vocab-source-badge--local {
+    background: var(--accent-color);
+}
+
+.teacher-vocab-source-badge--cloud {
+    background: var(--color-brand-hover);
+}
+
+.teacher-vocab-id,
+.teacher-vocab-placement {
+    color: var(--color-text-muted);
+}
+
+.teacher-vocab-placement {
+    display: block;
+    margin-top: 0.35rem;
+}
+
+.vocab-image-error {
+    color: var(--color-danger);
 }
 
 .subject-badge {
