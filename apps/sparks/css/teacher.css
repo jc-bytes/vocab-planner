@@ -732,25 +732,6 @@ body {
     text-decoration: underline;
 }
 
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.6rem 1.25rem;
-    min-height: var(--touch-target);
-    min-width: var(--touch-target);
-    border-radius: 999px;
-    font-weight: var(--type-button-weight);
-    cursor: pointer;
-    border: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    font-size: var(--type-button-size);
-    line-height: var(--type-button-line-height);
-    touch-action: manipulation;
-}
-
 .status-dot {
     display: inline-flex;
     align-items: center;
@@ -776,46 +757,6 @@ body {
 .status-dot[data-state="error"] {
     background: var(--danger-color);
     box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.16);
-}
-
-.btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.55;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn:disabled:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-.primary-btn {
-    background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-    color: #fff;
-    box-shadow: 0 10px 25px -10px rgba(99, 102, 241, 0.8);
-}
-
-.primary-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px -12px rgba(99, 102, 241, 0.9);
-}
-
-.secondary-btn {
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    color: var(--text-main);
-}
-
-.secondary-btn:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.65);
-}
-
-.accent-btn {
-    background: linear-gradient(120deg, var(--accent-color), #fb923c);
-    color: white;
-    box-shadow: 0 10px 25px -10px rgba(249, 115, 22, 0.8);
 }
 
 .student-export-menu {
@@ -888,27 +829,6 @@ body {
     height: 1rem;
     flex: 0 0 auto;
     color: #fed7aa;
-}
-
-.danger-btn {
-    background: rgba(239, 68, 68, 0.16);
-    border: 1px solid rgba(248, 113, 113, 0.55);
-    color: #fecaca;
-}
-
-.text-btn {
-    background: none;
-    color: var(--text-muted);
-    padding: 0.35rem 0.5rem;
-}
-
-.text-btn:hover {
-    color: var(--primary-color);
-}
-
-.icon-btn {
-    width: var(--touch-target);
-    padding: 0;
 }
 
 /* Forms */
@@ -1037,7 +957,6 @@ input[readonly] {
     pointer-events: none;
 }
 
-.btn:focus-visible,
 .card[tabindex]:focus-visible,
 .option-card:focus-visible,
 .activity-card:focus-visible,
@@ -1818,7 +1737,6 @@ input[readonly] {
 
 .teacher-tab svg,
 .teacher-mobile-menu-toggle svg,
-.btn svg,
 .data-tab-btn svg,
 .teacher-action-card svg,
 .teacher-vocab-pick-card svg {

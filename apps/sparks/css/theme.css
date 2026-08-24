@@ -11,6 +11,7 @@
     --color-brand: #6366f1;
     --color-brand-hover: #4f46e5;
     --color-on-brand: #ffffff;
+    --color-on-accent: #ffffff;
     --color-info: #0ea5e9;
     --color-accent: #f97316;
     --color-background: #0f172a;
@@ -22,7 +23,7 @@
     --color-success: #34d399;
     --color-warning: #fbbf24;
     --color-danger: #f87171;
-    --color-focus: #a5b4fc;
+    --color-focus: rgba(14, 165, 233, 0.8);
     --color-interactive: var(--color-brand);
     --color-on-interactive: var(--color-on-brand);
     --color-interactive-hover: var(--color-brand-hover);
@@ -47,6 +48,7 @@
     --color-brand: #adc6ff;
     --color-brand-hover: #d8e2ff;
     --color-on-brand: #002e6a;
+    --color-on-accent: #502400;
     --color-info: #0ea5e9;
     --color-secondary: #ddb7ff;
     --color-accent: #ffb786;
@@ -59,7 +61,7 @@
     --color-success: #10b981;
     --color-warning: #ffc800;
     --color-danger: #ff4b4b;
-    --color-focus: #adc6ff;
+    --color-focus: rgba(14, 165, 233, 0.8);
     --color-interactive: var(--color-brand);
     --color-on-interactive: var(--color-on-brand);
     --color-interactive-hover: var(--color-brand-hover);

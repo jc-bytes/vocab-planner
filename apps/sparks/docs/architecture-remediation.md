@@ -48,7 +48,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
-| 9. Migrate shared UI families | TODO | | | |
+| 9. Migrate shared UI families | IN PROGRESS | Buttons | Complete suite, button/theme/design contracts, computed-style comparison, 9-width regression, source/built UI smoke, production build, independent review | Shared button core is centralized; inputs, cards, dialogs, navigation, feedback, containers, and typography remain. |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
@@ -428,3 +428,16 @@ Task 7 is complete. Task 8 will introduce a semantic token layer without changin
 - Production build passed with 2,323 modules and a 13.6 MB deployment. Student feature CSS and teacher Quiz CSS remain separate lazy assets; the generated student service worker precaches the themed student entry CSS. No native `color-scheme` behavior was introduced.
 
 Task 8 is complete. Task 9 will migrate shared UI families one at a time, beginning with buttons, while preserving the compatibility aliases until their consumers are retired.
+
+### Task 9a, migrate the shared button family
+
+- Added `css/buttons.css` as the single structural owner for `.btn`, disabled behavior, primary/secondary/accent/danger/text variants, icon sizing, focus rings, and button SVG geometry. Student and teacher load it after the theme and before page-owned refinements; landing does not load unused button CSS.
+- Removed the exact duplicated core from `student.css` and `teacher.css`. Preserved the later Celestial student overrides, typography/design-system sizing, responsive rules, teacher/Quiz Maker layout refinements, async `disabled`/`aria-busy` behavior, and every existing class name.
+- Migrated shared button colors and the student primary/accent refinements to semantic tokens. The focus token now resolves to the exact pre-migration ring color, and the new accent foreground token preserves both shared white and student dark text.
+- Kept non-button `.btn` consumers (`label` and `summary`) working. Did not absorb landing cards, password/close controls, activity-internal layout, `.btn-icon-only`, Quiz document controls, or embedded game buttons into the primitive.
+- Added `test:buttons` to the complete suite. It guards stylesheet order, one structural authority, every live variant, semantic-token consumption, student overrides, and the absence of `!important` in the shared core.
+- Verification: the complete `npm test` suite passed. The theme and student design-system audits, 9-width/6-view student regression, source and built three-page UI smoke, production build, and independent review passed.
+- Independent headless-Chromium comparison found identical computed styles before and after for teacher and student variants, disabled primary, hover, focus, icon/SVG, `label`/`summary` consumers, and lazy Quiz Maker context.
+- Production build remains 13.6 MB. The 1.47/0.63 kB raw/gzip shared button asset replaces duplicated entry CSS; teacher entry CSS decreased by 1.33 kB raw and student entry CSS by 1.32 kB raw. Lazy feature CSS remains separate.
+
+Task 9 remains in progress. Task 9b will investigate and migrate shared input/form-control styling without changing feature-owned field layouts.

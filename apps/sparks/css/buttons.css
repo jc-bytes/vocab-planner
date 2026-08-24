@@ -1,0 +1,91 @@
+/* Shared application button core. Page and feature styles may refine layout. */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+    border: none;
+    border-radius: 999px;
+    font-size: var(--type-button-size);
+    font-weight: var(--type-button-weight);
+    line-height: var(--type-button-line-height);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.primary-btn {
+    background: linear-gradient(120deg, var(--color-brand), var(--color-info));
+    color: var(--color-on-brand);
+    box-shadow: 0 10px 25px -10px rgba(99, 102, 241, 0.8);
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px -12px rgba(99, 102, 241, 0.9);
+}
+
+.secondary-btn {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background-color: transparent;
+    color: var(--color-text);
+}
+
+.secondary-btn:hover {
+    border-color: rgba(255, 255, 255, 0.65);
+    transform: translateY(-2px);
+}
+
+.accent-btn {
+    background: linear-gradient(120deg, var(--color-accent), #fb923c);
+    color: var(--color-on-accent);
+    box-shadow: 0 10px 25px -10px rgba(249, 115, 22, 0.8);
+}
+
+.danger-btn {
+    border: 1px solid rgba(248, 113, 113, 0.55);
+    background: rgba(239, 68, 68, 0.16);
+    color: #fecaca;
+}
+
+.text-btn {
+    padding: 0.35rem 0.5rem;
+    background: none;
+    color: var(--color-text-muted);
+}
+
+.text-btn:hover {
+    color: var(--color-brand);
+}
+
+.icon-btn {
+    width: var(--touch-target);
+    padding: 0;
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+}
+
+.btn svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+}

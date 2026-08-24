@@ -19,6 +19,7 @@ const requiredSemanticTokens = [
     'brand',
     'brand-hover',
     'on-brand',
+    'on-accent',
     'info',
     'background',
     'surface',
