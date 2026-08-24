@@ -469,8 +469,7 @@
         box-shadow: none;
         margin: 0;
         padding: 0;
-        transform: none !important;
-        zoom: 1 !important;
+        zoom: 1;
     }
 }
 

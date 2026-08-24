@@ -50,7 +50,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
 | 9. Migrate shared UI families | DONE | Buttons; inputs/form controls; cards; dialogs; navigation; feedback; containers; typography ownership | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Repeated shared UI foundations are centralized while page-responsive and feature-owned behavior remains local. Existing typography authority now exclusively owns font delivery. |
 | 10. Reduce literal brand colors | DONE | Theme status roles; migrated shared styles; app-shell identity effects; known UI fallbacks; contract test | Complete suite, focused theme/UI contracts, 9-width regression, source/built smoke, production build, independent computed/pixel review | Canonical identity/status hues in migrated areas now derive from semantic tokens. Contextual game and feature palettes remain owned locally. |
-| 11. Reduce unnecessary `!important` | TODO | | | |
+| 11. Reduce unnecessary `!important` | IN PROGRESS | Quiz print reset; specificity guard | Focused specificity/build checks; production build; built smoke | Shared foundations require none. Quiz print reset now uses normal cascade; inline-dependent and responsive-shell declarations remain under review. |
 | 12. Clean up owned inline styles | TODO | | | |
 | 13. Create lightweight shared UI modules | TODO | | | |
 | 14. Standardize application feedback | TODO | | | |
@@ -575,3 +575,13 @@ Task 10 is complete. Next is the focused completion-animation ownership correcti
 - Verification: the feedback contract, 9-width/6-view student shell regression, source and built three-page smoke, and production build passed. Deployment remains 13.6 MB with lazy student and Quiz Maker CSS separate.
 
 The architecture-review correction is complete. Task 11 will now inspect `!important` declarations one component/viewport family at a time and remove only those proven unnecessary.
+
+### Task 11a, remove redundant Quiz print specificity
+
+- Inventoried 1,035 application `!important` declarations: 961 are concentrated in the layered student responsive shell, while the remaining declarations are split across teacher, lazy activity, Quiz, landing, and Arcade styles. This concentration makes a global removal unsafe.
+- Removed the duplicate Quiz print `transform: none` declaration because the same selector already owns that value. Removed `!important` from the later same-specificity print `zoom: 1` reset; no runtime code assigns transform/zoom to live `.document-page` elements.
+- Retained the four Quiz layout declarations that currently override inline gap, sidebar width, canvas padding, and canvas background in `teacher.html`. Task 12 can remove those after moving the owned inline layout styles.
+- Added `test:specificity` to the complete suite. It keeps all shared UI foundations free of `!important`, proves the Quiz print reset uses normal cascade, and bounds the four known inline-dependent Quiz exceptions.
+- Verification: focused specificity and build-efficiency checks, production build, and built three-page smoke passed. The lazy Quiz CSS decreased from 12.48/3.10 to 12.44/3.09 kB raw/gzip; deployment remains 13.6 MB and the Quiz bundle stays lazy.
+
+Task 11 remains in progress while the smaller teacher-entry candidates are verified independently. The student shell's layered responsive overrides will not be changed without exact viewport evidence.
