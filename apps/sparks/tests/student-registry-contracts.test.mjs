@@ -309,6 +309,43 @@ test('word scramble descriptor uses the shared nonblank prioritized lifecycle', 
     assert.equal(scramble.isPlayable({ word: '' }), false);
 });
 
+test('Wordle descriptor owns alphabetic eligibility and restorable preparation', () => {
+    const descriptor = getStudentActivity('wordle');
+    assert.equal(descriptor.isPlayable({ word: 'Cat' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Technology' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Data Base' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'Wi-Fi' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'AI' }), false);
+    assert.equal(descriptor.isPlayable({ word: 'Programming' }), false);
+    assert.equal(descriptor.isPlayable({ word: 'Web3' }), false);
+    assert.equal(descriptor.isPlayable({ word: 'Café' }), false);
+    assert.equal(descriptor.isPlayable({}), false);
+
+    const savedState = { wordKeys: ['Wi-Fi'] };
+    const fallbackWords = [{ word: 'Router' }];
+    const restoredWords = [{ word: 'Wi-Fi' }];
+    const calls = [];
+    const prepared = descriptor.prepare({
+        savedState,
+        wordLimit: 5,
+        prioritize(limit, filter) {
+            calls.push(['prioritize', limit, filter({ word: 'Router' }), filter({ word: 'Web3' })]);
+            return fallbackWords;
+        },
+        restore(state, fallback, filter) {
+            calls.push(['restore', state, fallback, filter({ word: 'Wi-Fi' }), filter({ word: 'AI' })]);
+            return restoredWords;
+        }
+    });
+
+    assert.deepEqual(prepared, { words: restoredWords });
+    assert.deepEqual(calls, [
+        ['prioritize', 5, true, false],
+        ['restore', savedState, fallbackWords, true, false]
+    ]);
+    assert.equal(descriptor.create, getStudentActivity('matching').create);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

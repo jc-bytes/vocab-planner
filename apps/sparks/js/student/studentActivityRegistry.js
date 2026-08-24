@@ -42,6 +42,12 @@ function isSynonymAntonymWordPlayable(word = {}) {
     return String(word.word || '').trim().length > 0 && hasSynonymOrAntonym(word);
 }
 
+function isWordleWordPlayable(word = {}) {
+    const label = String(word.word || '');
+    const letters = label.replace(/[^a-zA-Z]/g, '');
+    return /^[a-zA-Z\s-]+$/.test(label) && letters.length >= 3 && letters.length <= 10;
+}
+
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
     return {
         words: restore(
@@ -74,6 +80,16 @@ function prepareSynonymAntonymActivity({ savedState, wordLimit, prioritize, rest
             savedState,
             prioritize(wordLimit, isSynonymAntonymWordPlayable),
             isSynonymAntonymWordPlayable
+        )
+    };
+}
+
+function prepareWordleActivity({ savedState, wordLimit, prioritize, restore }) {
+    return {
+        words: restore(
+            savedState,
+            prioritize(wordLimit, isWordleWordPlayable),
+            isWordleWordPlayable
         )
     };
 }
@@ -260,7 +276,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'wordle', title: 'Vocabulary Wordle', description: 'Guess words from clues.',
         icon: 'layout-grid', settingKey: 'wordle',
-        exportName: 'WordleActivity', load: () => import('../activities/wordle.js')
+        exportName: 'WordleActivity', load: () => import('../activities/wordle.js'),
+        isPlayable: isWordleWordPlayable,
+        prepare: prepareWordleActivity,
+        create: createWordListActivity
     },
     {
         id: 'speed-match', title: 'Speed Match', description: 'Race against time.',

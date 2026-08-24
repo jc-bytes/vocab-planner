@@ -149,12 +149,6 @@ export class StudentActivityProgressFlow {
                     /^[a-zA-Z]+$/.test(String(word.word || ''))
                     && String(word.definition || '').trim().length > 0
                 );
-            case 'wordle':
-                {
-                    const label = String(word.word || '');
-                    const cleanWord = label.replace(/[^a-zA-Z]/g, '');
-                    return /^[a-zA-Z\s-]+$/.test(label) && cleanWord.length >= 3 && cleanWord.length <= 10;
-                }
             case 'fill-in-blank':
                 return (
                     String(word.word || '').trim().length > 0

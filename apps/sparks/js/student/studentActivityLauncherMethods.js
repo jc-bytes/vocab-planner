@@ -271,22 +271,6 @@ export class StudentActivityLauncher {
                 activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, activityInstance.placedWords);
                 break;
-            case 'wordle':
-                const wordleLimit = getActivityWordLimit('wordle');
-                const wordleWords = this.activities.restoreWordsFromState(
-                    savedState,
-                    getPrioritized(wordleLimit, w => {
-                        const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
-                        return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
-                    }),
-                    w => {
-                        const cleanWord = w.word.replace(/[^a-zA-Z]/g, '');
-                        return /^[a-zA-Z\s-]+$/.test(w.word) && cleanWord.length >= 3 && cleanWord.length <= 10;
-                    }
-                );
-                activityInstance = new ActivityClass(container, wordleWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, wordleWords);
-                break;
             case 'speed-match':
                 const speedMatchWords = getPrioritized(getActivityWordLimit('speedMatch'));
                 activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, savedState);
