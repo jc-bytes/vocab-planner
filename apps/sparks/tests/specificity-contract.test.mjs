@@ -71,3 +71,21 @@ test('lazy Flashcards and game-stage foundations do not escalate specificity', (
     assert.match(studentFeatureCss, /\.flashcard-controls\s*\{[^}]*width:\s*100%;[^}]*max-height:\s*none;/s);
     assert.match(studentFeatureCss, /#game-stage:not\(\.hidden\)\s*\{[^}]*min-width:\s*0;/s);
 });
+
+test('teacher detail height remains an explicit responsive exception', () => {
+    const detailRules = [...teacherCss.matchAll(/#student-detail-modal \.modal-content\s*\{([^}]*)\}/g)]
+        .filter(rule => /max-height:/.test(rule[1]));
+    assert.equal(detailRules.length, 2);
+    assert.match(detailRules[0][1], /max-height:\s*88vh !important;/);
+    assert.match(detailRules[1][1], /max-height:\s*100vh !important;/);
+    for (const rule of detailRules) {
+        assert.match(rule[1].match(/max-height:[^;]+;/)?.[0] ?? '', /!important/);
+    }
+});
+
+test('teacher mobile login height relies on normal same-specificity cascade', () => {
+    const loginRules = [...teacherCss.matchAll(/\.login-container\s*\{([^}]*)\}/g)];
+    assert.ok(loginRules.length >= 2);
+    assert.match(loginRules.at(-1)[1], /min-height:\s*auto;/);
+    assert.doesNotMatch(loginRules.at(-1)[1].match(/min-height:[^;]+;/)?.[0] ?? '', /!important/);
+});

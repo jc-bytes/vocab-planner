@@ -6328,7 +6328,7 @@ button.activity-card {
     }
 
     .login-container {
-        min-height: auto !important;
+        min-height: auto;
     }
 
     #student-register-panel form>div[style*="grid-template-columns"],
