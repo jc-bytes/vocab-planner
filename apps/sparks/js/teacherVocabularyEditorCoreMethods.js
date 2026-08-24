@@ -33,9 +33,6 @@ class TeacherVocabularyEditorCoreMethods {
         this.updatePlacementControlState();
 
         this.renderActivityFlowSettings();
-
-        const settings = this.vocabSet.activitySettings || {};
-        $('#setting-exchange-rate').value = settings.exchangeRate !== undefined ? settings.exchangeRate : 10;
         this.renderWords();
         this.updateVocabularyEditorSummary();
     }

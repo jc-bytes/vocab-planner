@@ -1,4 +1,5 @@
 import { $ } from '../main.js';
+import { resolveActivityCoinRewards } from '../gamificationConfig.js';
 import { refreshLocalFormativeWindow } from './studentArcadeTimeStorage.js';
 import { getStudentActivity } from './studentActivityRegistry.js';
 
@@ -10,15 +11,7 @@ export class StudentActivityAutoSave {
     }
 
     getActivityCoinRewards(activityType, settings = {}) {
-        const activityRewards = settings.activityRewards?.[activityType] || {};
-        return {
-            progressReward: activityRewards.progressReward !== undefined
-                ? activityRewards.progressReward
-                : (settings.progressReward !== undefined ? settings.progressReward : 1),
-            completionBonus: activityRewards.completionBonus !== undefined
-                ? activityRewards.completionBonus
-                : (settings.completionBonus !== undefined ? settings.completionBonus : 50)
-        };
+        return resolveActivityCoinRewards(settings, activityType);
     }
 
     handleAutoSave(scoreData) {

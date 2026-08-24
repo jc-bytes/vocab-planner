@@ -1,31 +1,23 @@
 import { $, notifications } from './main.js';
+import {
+    DEV_GAMIFICATION_SETTINGS_KEY,
+    GAMIFICATION_SETTINGS_KEY,
+    normalizeExchangeRate,
+    resolveArcadeEconomySettings
+} from './gamificationConfig.js';
 import { settingsRepository } from './services/settingsRepository.js';
 
-const DEV_GAMIFICATION_SETTINGS_KEY = 'dev_gamification_settings';
 const DEV_TEACHER_USER = { email: 'teacher@local.dev' };
 
 function readGamificationInputs() {
-    return {
-        exchangeRate: parseInt($('#global-exchange-rate')?.value) || 10,
-        completionBonus: parseInt($('#global-completion-bonus')?.value) || 50,
-        progressReward: parseInt($('#global-progress-reward')?.value) || 1
-    };
+    return resolveArcadeEconomySettings({
+        exchangeRate: $('#global-exchange-rate')?.value
+    });
 }
 
 function applyGamificationSettings(settings = {}) {
     const exchangeRateInput = $('#global-exchange-rate');
-    const completionBonusInput = $('#global-completion-bonus');
-    const progressRewardInput = $('#global-progress-reward');
-
-    if (exchangeRateInput && settings.exchangeRate !== undefined) {
-        exchangeRateInput.value = settings.exchangeRate;
-    }
-    if (completionBonusInput && settings.completionBonus !== undefined) {
-        completionBonusInput.value = settings.completionBonus;
-    }
-    if (progressRewardInput && settings.progressReward !== undefined) {
-        progressRewardInput.value = settings.progressReward;
-    }
+    if (exchangeRateInput) exchangeRateInput.value = normalizeExchangeRate(settings.exchangeRate);
 }
 
 function showTransientGamificationStatus(statusEl, text, colorVar) {
@@ -56,7 +48,7 @@ export const teacherGamificationSettingsMethods = {
         }
 
         try {
-            const settings = await settingsRepository.get('gamification');
+            const settings = await settingsRepository.get(GAMIFICATION_SETTINGS_KEY);
             if (settings) applyGamificationSettings(settings);
             this.gamificationSettingsLoaded = true;
         } catch (error) {
@@ -67,7 +59,7 @@ export const teacherGamificationSettingsMethods = {
     },
 
     async saveGamificationSettings() {
-        const { exchangeRate, completionBonus, progressReward } = readGamificationInputs();
+        const { exchangeRate } = readGamificationInputs();
 
         const statusEl = $('#gamification-save-status');
         const saveBtn = $('#save-gamification-btn');
@@ -83,8 +75,6 @@ export const teacherGamificationSettingsMethods = {
             if (this.authDisabled) {
                 localStorage.setItem(DEV_GAMIFICATION_SETTINGS_KEY, JSON.stringify({
                     exchangeRate,
-                    completionBonus,
-                    progressReward,
                     updatedAt: new Date().toISOString(),
                     updatedBy: DEV_TEACHER_USER.email
                 }));
@@ -96,10 +86,8 @@ export const teacherGamificationSettingsMethods = {
                 return;
             }
 
-            await settingsRepository.save('gamification', {
+            await settingsRepository.save(GAMIFICATION_SETTINGS_KEY, {
                 exchangeRate,
-                completionBonus,
-                progressReward,
                 updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
             });

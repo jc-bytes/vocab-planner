@@ -78,3 +78,24 @@ test('teacher activity time limits are stored per activity and can be removed', 
     assert.equal(manager.vocabSet.activitySettings.activityTimeLimits, undefined);
     assert.equal(saves, 2);
 });
+
+test('teacher activity rewards use the shared defaults and activity override precedence', () => {
+    const manager = new TeacherFlowHarness();
+    manager.vocabSet = {
+        activitySettings: {
+            completionBonus: 60,
+            progressReward: 2,
+            activityRewards: {
+                matching: { completionBonus: 80 }
+            }
+        }
+    };
+    manager.triggerAutoSave = () => {};
+
+    assert.deepEqual(manager.getActivityRewardSettings('matching'), {
+        completionBonus: 80,
+        progressReward: 2
+    });
+    manager.setActivityRewardSetting('matching', 'progressReward', 'invalid');
+    assert.equal(manager.vocabSet.activitySettings.activityRewards.matching.progressReward, 1);
+});

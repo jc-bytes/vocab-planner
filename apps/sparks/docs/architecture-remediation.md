@@ -44,7 +44,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
-| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy consumers, shared activity-flow policy, catalog tooling | Catalog, teacher flow, registry/parity, 139 activity, build-efficiency tests; production build | Replay, coverage, titles, default flow, IDs, and eligibility now have one client authority. Gamification and other verified duplicates remain. |
+| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy, flow policy, catalog tooling, gamification config and UI | Focused student/teacher/config tests, UI smoke, production build | Activity policies and client economy defaults now have one authority. Remaining verified duplicates are being handled separately. |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
@@ -269,3 +269,13 @@ Task 5 remains in progress. The next verified duplicate is the activity-flow pol
 - Verification: all 146 vocabulary units and catalog SQL generation, 3 teacher flow tests, 20 registry/server parity contracts plus all 12 browser loaders, 139 student activity tests, 8 build-efficiency tests, and the production build passed. Activity modules remain lazy chunks; deployment is 15.1 MB and the student entry is 255.78 kB raw, 65.78 kB gzip.
 
 Task 5 remains in progress. Next is the verified arcade/gamification configuration split, including removal of controls that currently save values no runtime uses.
+
+### Task 5c, separate Arcade economy from activity rewards
+
+- Added a focused gamification configuration module owning client setting keys, the Arcade exchange-rate default/range, and activity reward fallbacks.
+- Student and teacher Arcade settings now normalize the displayed price to the server's `1..10000` range. SQL remains independently authoritative, with a parity contract for its fallback and clamp.
+- Removed the global completion/progress controls because their saved values were never used by activity rewards. Per-vocabulary and per-activity reward controls remain unchanged and now share one resolver with autosave.
+- Removed the vocabulary editor's second exchange-rate control because it wrote `activitySettings.exchangeRate`, which no runtime consumed.
+- Verification: 15 student game tests, 73 student progress/security tests, 139 student activity tests, 11 teacher data tests, 4 teacher activity-flow tests, three-page UI smoke, 8 build-efficiency tests, and the production build passed. Deployment remains 15.1 MB and the student entry is 255.52 kB raw, 65.74 kB gzip.
+
+Task 5 remains in progress. Next are smaller verified shared-data and environment authorities; installer destination remains deferred because the repository does not prove the release URL.

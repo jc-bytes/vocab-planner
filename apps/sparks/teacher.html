@@ -827,17 +827,6 @@
                                 </div>
                             </section>
 
-                            <section class="vocab-editor-panel vocab-config-rewards-panel">
-                                <div class="vocab-editor-panel-header">
-                                    <div>
-                                        <h3>Coin Economy</h3>
-                                        <p>Global game-time exchange rate.</p>
-                                    </div>
-                                </div>
-                                <div class="vocab-count-grid vocab-reward-grid">
-                                    <label>Exchange Rate<input type="number" id="setting-exchange-rate" min="1" value="10"></label>
-                                </div>
-                            </section>
                         </div>
                     </section>
 
@@ -1075,7 +1064,7 @@
                         <div class="teacher-panel-header">
                             <div>
                                 <h3>Coin Settings</h3>
-                                <p>Configure coin rewards and game costs for all students.</p>
+                                <p>Configure the Arcade game cost for all students.</p>
                             </div>
                             <button id="save-gamification-btn" class="btn primary-btn">
                                 <i data-lucide="save"></i>
@@ -1085,18 +1074,8 @@
                         <div class="teacher-settings-grid">
                             <div class="form-group">
                                 <label for="global-exchange-rate">Game Cost (Coins/Min)</label>
-                                <input type="number" id="global-exchange-rate" min="1" value="10">
+                                <input type="number" id="global-exchange-rate" min="1" max="10000" value="10">
                                 <small>Cost to play games per minute.</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="global-completion-bonus">Completion Bonus (Coins)</label>
-                                <input type="number" id="global-completion-bonus" min="0" value="50">
-                                <small>Bonus for completing all activities.</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="global-progress-reward">Progress Reward (Coins/10%)</label>
-                                <input type="number" id="global-progress-reward" min="0" value="1">
-                                <small>Coins earned per 10% progress.</small>
                             </div>
                         </div>
                         <div id="gamification-save-status" class="teacher-inline-status"></div>

@@ -33,6 +33,9 @@ const groupMethods = await readFile(new URL('../js/teacherGroups.js', import.met
 const subjectSettingsMethods = await readFile(new URL('../js/teacherSubjectSettingsMethods.js', import.meta.url), 'utf8');
 const calendarSettingsMethods = await readFile(new URL('../js/teacherSchoolCalendarSettingsMethods.js', import.meta.url), 'utf8');
 const gamificationSettingsMethods = await readFile(new URL('../js/teacherGamificationSettingsMethods.js', import.meta.url), 'utf8');
+const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
+const vocabularyEditorCoreMethods = await readFile(new URL('../js/teacherVocabularyEditorCoreMethods.js', import.meta.url), 'utf8');
+const vocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 const calendarSettingsMethodsSource = calendarSettingsMethods;
 const subjectsRepositorySource = await readFile(new URL('../js/services/subjectsRepository.js', import.meta.url), 'utf8');
 const vocabularyRepositorySource = await readFile(new URL('../js/services/vocabularyRepository.js', import.meta.url), 'utf8');
@@ -86,6 +89,20 @@ test('teacher settings avoid duplicate database reads when their values are alre
     assert.match(subjectSettingsMethods, /subjectSettingsLoaded/);
     assert.match(calendarSettingsMethods, /schoolCalendarSettingsLoaded/);
     assert.match(gamificationSettingsMethods, /gamificationSettingsLoaded/);
+});
+
+test('teacher Arcade settings expose only effective global configuration', () => {
+    for (const obsoleteId of [
+        'setting-exchange-rate',
+        'global-completion-bonus',
+        'global-progress-reward'
+    ]) {
+        assert.doesNotMatch(teacherHtml, new RegExp(obsoleteId));
+        assert.doesNotMatch(gamificationSettingsMethods, new RegExp(obsoleteId));
+    }
+    assert.doesNotMatch(vocabularyEditorCoreMethods, /setting-exchange-rate/);
+    assert.doesNotMatch(vocabularyEditorListeners, /setting-exchange-rate/);
+    assert.match(teacherHtml, /id="global-exchange-rate"[^>]*min="1"[^>]*max="10000"/);
 });
 
 test('teacher settings save large collections with bounded database requests', () => {

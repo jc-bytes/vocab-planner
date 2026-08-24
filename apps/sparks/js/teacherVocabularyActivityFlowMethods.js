@@ -1,5 +1,9 @@
 import { $, createElement, notifications } from './main.js';
 import {
+    normalizeActivityRewardSetting,
+    resolveActivityCoinRewards
+} from './gamificationConfig.js';
+import {
     VOCAB_ACTIVITY_IDS,
     VOCAB_ACTIVITY_OPTIONS,
     VOCAB_ACTIVITY_SETTING_KEYS
@@ -133,17 +137,7 @@ class TeacherVocabularyActivityFlowMethods {
 
     getActivityRewardSettings(activityId) {
         const settings = this.vocabSet?.activitySettings || {};
-        const activityRewards = settings.activityRewards || {};
-        const rewardSettings = activityRewards[activityId] || {};
-
-        return {
-            completionBonus: rewardSettings.completionBonus !== undefined
-                ? rewardSettings.completionBonus
-                : (settings.completionBonus !== undefined ? settings.completionBonus : 50),
-            progressReward: rewardSettings.progressReward !== undefined
-                ? rewardSettings.progressReward
-                : (settings.progressReward !== undefined ? settings.progressReward : 1)
-        };
+        return resolveActivityCoinRewards(settings, activityId);
     }
 
     setActivityRewardSetting(activityId, field, value) {
@@ -157,10 +151,8 @@ class TeacherVocabularyActivityFlowMethods {
             this.vocabSet.activitySettings.activityRewards[activityId] = {};
         }
 
-        const fallback = field === 'completionBonus' ? 50 : 1;
-        const parsedValue = Number.parseInt(value, 10);
         this.vocabSet.activitySettings.activityRewards[activityId][field] =
-            Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : fallback;
+            normalizeActivityRewardSetting(field, value);
 
         this.triggerAutoSave();
     }

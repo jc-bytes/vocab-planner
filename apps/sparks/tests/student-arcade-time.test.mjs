@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import {
+    ARCADE_ECONOMY,
+    normalizeExchangeRate,
+    resolveArcadeEconomySettings
+} from '../js/gamificationConfig.js';
 
 const migrationUrl = new URL(
     '../supabase/migrations/20260816152559_add_arcade_time_allowance.sql',
@@ -39,12 +44,27 @@ test('Arcade reward bookkeeping cannot reject a valid activity completion', () =
 });
 
 test('each Arcade minute atomically requires earned time and the server coin price', () => {
-    assert.match(sql, /private\.jsonb_number\(settings\.value, 'exchangeRate', 10\)/i);
+    assert.match(sql, new RegExp(
+        `private\\.jsonb_number\\(settings\\.value, 'exchangeRate', ${ARCADE_ECONOMY.defaultExchangeRate}\\)`,
+        'i'
+    ));
+    assert.match(sql, new RegExp(
+        `least\\(${ARCADE_ECONOMY.maximumExchangeRate}, greatest\\(${ARCADE_ECONOMY.minimumExchangeRate},`,
+        'i'
+    ));
     assert.match(sql, /wallet\.available_seconds < 60/i);
     assert.match(sql, /coin_balance < coin_cost/i);
     assert.match(sql, /available_seconds = next_seconds/i);
     assert.match(sql, /coins = coin_balance, coin_data = next_coin_data/i);
     assert.match(sql, /private\.store_student_progress_event_receipt/i);
+});
+
+test('client Arcade exchange rates normalize to the server policy', () => {
+    assert.equal(normalizeExchangeRate(undefined), 10);
+    assert.equal(normalizeExchangeRate('25'), 25);
+    assert.equal(normalizeExchangeRate('-5'), 1);
+    assert.equal(normalizeExchangeRate('50000'), 10000);
+    assert.deepEqual(resolveArcadeEconomySettings({ exchangeRate: '40' }), { exchangeRate: 40 });
 });
 
 test('only the narrow Arcade RPC surface is executable by students', () => {

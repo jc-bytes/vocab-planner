@@ -1,4 +1,10 @@
 import { $ } from '../main.js';
+import {
+    DEV_GAMIFICATION_SETTINGS_KEY,
+    GAMIFICATION_SETTINGS_KEY,
+    normalizeExchangeRate,
+    resolveArcadeEconomySettings
+} from '../gamificationConfig.js';
 import { settingsRepository } from '../services/settingsRepository.js';
 
 export class StudentGameSettings {
@@ -24,51 +30,29 @@ export class StudentGameSettings {
 
         if (this.sm.authDisabled) {
             try {
-                const localSettings = JSON.parse(localStorage.getItem('dev_gamification_settings') || '{}');
-                this.globalSettings = {
-                    exchangeRate: localSettings.exchangeRate || 10,
-                    completionBonus: localSettings.completionBonus || 50,
-                    progressReward: localSettings.progressReward || 1
-                };
+                const localSettings = JSON.parse(localStorage.getItem(DEV_GAMIFICATION_SETTINGS_KEY) || '{}');
+                this.globalSettings = resolveArcadeEconomySettings(localSettings);
             } catch (error) {
                 console.error('Error loading local gamification settings:', error);
-                this.globalSettings = {
-                    exchangeRate: 10,
-                    completionBonus: 50,
-                    progressReward: 1
-                };
+                this.globalSettings = resolveArcadeEconomySettings();
             }
             return this.globalSettings;
         }
 
         try {
-            const settings = await settingsRepository.get('gamification');
-            if (settings) {
-                this.globalSettings = settings;
-            } else {
-                // Default settings if none exist
-                this.globalSettings = {
-                    exchangeRate: 10,
-                    completionBonus: 50,
-                    progressReward: 1
-                };
-            }
+            const settings = await settingsRepository.get(GAMIFICATION_SETTINGS_KEY);
+            this.globalSettings = resolveArcadeEconomySettings(settings);
         } catch (error) {
             console.error('Error loading global gamification settings:', error);
             // Fallback to defaults
-            this.globalSettings = {
-                exchangeRate: 10,
-                completionBonus: 50,
-                progressReward: 1
-            };
+            this.globalSettings = resolveArcadeEconomySettings();
         }
 
         return this.globalSettings;
     }
 
     getExchangeRate() {
-        // Return cached value or default
-        return this.globalSettings?.exchangeRate || 10;
+        return normalizeExchangeRate(this.globalSettings?.exchangeRate);
     }
 
     async updateArcadeUI(options = {}) {

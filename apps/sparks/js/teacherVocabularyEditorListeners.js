@@ -1,11 +1,6 @@
 import { $, $$, closeModal as closeDialog } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
 
-function ensureActivitySettings(manager) {
-    if (!manager.vocabSet.activitySettings) manager.vocabSet.activitySettings = {};
-    return manager.vocabSet.activitySettings;
-}
-
 function bindVocabularyMetaListeners(manager) {
     $('#vocab-name').addEventListener('input', (e) => {
         manager.vocabSet.name = e.target.value;
@@ -125,10 +120,6 @@ function bindActivitySettingInputs(manager) {
         manager.renderWords();
     });
 
-    $('#setting-exchange-rate').addEventListener('input', (e) => {
-        ensureActivitySettings(manager).exchangeRate = parseInt(e.target.value) || 10;
-        manager.triggerAutoSave();
-    });
 }
 
 function bindVocabularyModalListeners(manager) {
