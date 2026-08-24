@@ -48,7 +48,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
-| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls; cards; dialogs | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons, controls, cards, and dialog shells are centralized; navigation, feedback, containers, and typography remain. |
+| 9. Migrate shared UI families | DONE | Buttons; inputs/form controls; cards; dialogs; navigation; feedback; containers; typography ownership | Complete suite, UI-family contracts, style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Repeated shared UI foundations are centralized while page-responsive and feature-owned behavior remains local. Existing typography authority now exclusively owns font delivery. |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
@@ -535,3 +535,15 @@ Task 9 remains in progress. Next is the shared container family, followed by the
 - Production deployment remains 13.6 MB with 2,330 transformed modules. Shared foundation CSS is 5.91/1.71 kB raw/gzip, teacher entry CSS is 135.99/21.81 kB, student entry CSS is 215.89/32.87 kB, and lazy student/Quiz CSS remains separate at 49.84/9.88 and 12.48/3.10 kB.
 
 Task 9 remains in progress. The typography audit found the current shared authority sufficient; only duplicate font ownership will be removed next.
+
+### Task 9i, consolidate typography ownership
+
+- Kept the existing `css/typography.css` as the single shared typography authority instead of introducing another type system or mechanically moving 1,261 feature-specific declarations. Its semantic text roles and four Inter font faces remain the application contract.
+- Removed the duplicate four-face Inter delivery from `landing.css` and the redundant base `body` font-family declarations from landing, student, and teacher styles. All three entries already load `typography.css` after their page stylesheet, so resolved typography remains unchanged.
+- Preserved `student-design-system.css` as an intentional scoped Celestial refinement. The new contract distinguishes that page-owned override from shared font delivery and requires every entry to load the shared authority last.
+- Strengthened the build-efficiency font check and added `test:typography` to the complete suite. The contracts require exactly one font owner, all four delivered weights, semantic typography roles, entry cascade order, and removal of duplicate landing font faces.
+- Verification: the complete `npm test` suite passed, including 9 responsive widths, three-page source smoke, and 13 sandboxed games. Focused typography, build-efficiency, landing-responsive, and design-system checks, built three-page smoke, production build, scoped diff checks, and independent review passed.
+- Independent Chromium comparison against `6141063f` found identical computed body/tab typography and byte-identical full-page screenshots for landing at 1440x900 and 390x844. The scoped student override remained effective.
+- Production deployment remains 13.6 MB with 2,330 transformed modules. Landing CSS is 23.82/4.07 kB raw/gzip, teacher entry CSS is 135.96/21.78 kB, student entry CSS is 215.86/32.84 kB, lazy student CSS is 49.84/9.88 kB, and Quiz Maker CSS remains lazy at 12.48/3.10 kB. The build emits each Inter WOFF2 asset once; the service worker precaches 20 files totaling 1,029,760 bytes.
+
+Task 9 is complete. Task 10 will replace only duplicated visual-identity literals in migrated/shared areas with semantic tokens and add a narrow regression guard.

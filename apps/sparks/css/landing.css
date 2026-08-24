@@ -21,7 +21,6 @@
     margin: 0;
     padding: 0;
 }body {
-    font-family: 'Inter', sans-serif;
     background:
         radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.45), transparent 50%),
         radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.35), transparent 55%),
@@ -143,38 +142,6 @@
         transform: none;
     }
 }@media (max-width: 1024px) {
-/* Inter Latin subset for the landing page. */
-@font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 400;
-    src: url('../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 500;
-    src: url('../node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 600;
-    src: url('../node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-display: swap;
-    font-weight: 700;
-    src: url('../node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2') format('woff2');
-}
 
 :root {
         --cw-cell-size: 44px;

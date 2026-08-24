@@ -148,8 +148,8 @@ test('the local Lucide registry covers icons present in the teacher shell', () =
     }
 });
 
-test('font CSS is bundled with each page stylesheet instead of blocking as an icon dependency', () => {
+test('font CSS stays independent from the icon registry and page-owned styles', () => {
     assert.doesNotMatch(icons, /inter-latin\.css/);
     assert.match(typographyCss, /@font-face[\s\S]*font-family:\s*['"]Inter['"]/);
-    assert.match(landingCss, /@font-face[\s\S]*font-family:\s*['"]Inter['"]/);
+    assert.doesNotMatch(landingCss, /@font-face[\s\S]*font-family:\s*['"]Inter['"]/);
 });
