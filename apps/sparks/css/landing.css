@@ -194,14 +194,6 @@
     overflow-wrap: anywhere;
 }/* Modal */.modal.hidden {
     display: none;
-}@media print {
-    body *:not(.quiz-print-area):not(.quiz-print-area *) {
-        visibility: hidden;
-    }
-
-    .quiz-print-area * {
-        visibility: visible;
-    }
 }/* Stats *//* Utilities */.hidden {
     display: none !important;
 }/* Bulk Action Toolbar *//* Selected row highlighting *//* Checkbox styling *//* Activity Styles *//* Flashcards *//* Word Hunt */.word-hunt-upload-area.hidden {
@@ -227,19 +219,7 @@
     .option-card {
         width: 100%;
     }
-}/* Crossword Styles *//* Hangman Styles *//* Scramble Styles *//* Wordle Styles *//* Speed Match Styles *//* Fill in the Blank Styles *//* Quiz Maker Styles */.option-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}.option-input {
-    flex: 1;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    background: #fff;
-    color: #111;
-}/* Document Editor Styles (WYSIWYG) *//* Override question card styles for document view *//* Rubric Grid Styles *//* Remove bottom border for the last row items if they are the last ones *//* But we have a total row at the bottom spanning full width *//* Reference Header Styles *//* View Mode Question Cards *//* Edit Mode Question Cards *//* Ensure view mode questions look clean *//* Tablet and small Chromebook responsive pass */.option-card p {
+}/* Crossword Styles *//* Hangman Styles *//* Scramble Styles *//* Wordle Styles *//* Speed Match Styles *//* Fill in the Blank Styles *//* Tablet and small Chromebook responsive pass */.option-card p {
     overflow-wrap: anywhere;
 }.modal-body {
     max-height: calc(88vh - 9rem);

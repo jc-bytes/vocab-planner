@@ -23,7 +23,6 @@ class TeacherManager {
             activitySettings: {},
             words: []
         };
-        this.currentQuiz = null;
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.editingWordIndex = -1;
@@ -34,7 +33,6 @@ class TeacherManager {
         this.cloudSaveTimeout = null;
         this.VOCAB_COLLECTION = 'vocabularies';
         this.activeStudentId = null;
-        this.currentQuiz = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
         this.selectedGroupClass = '';

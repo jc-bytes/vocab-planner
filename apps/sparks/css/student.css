@@ -2519,10 +2519,6 @@ select:focus {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }.student-detail-activity-row:first-child {
     border-top: 0;
-}@media print {
-    body *:not(.quiz-print-area):not(.quiz-print-area *) {
-        visibility: hidden;
-    }
 }/* Stats */.mini-stat {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);

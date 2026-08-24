@@ -137,12 +137,6 @@ function bindVocabularyModalListeners(manager) {
             closeDialog(event.currentTarget.closest('.modal') || '#word-modal');
         });
     });
-    $('#close-quiz-modal').addEventListener('click', () => {
-        closeDialog('#quiz-modal');
-    });
-    $('#refresh-quiz-btn').addEventListener('click', () => manager.handleGenerateQuiz(true));
-    $('#print-quiz-btn').addEventListener('click', () => manager.printQuiz());
-
     $('#save-word-btn').addEventListener('click', () => {
         if (!manager.ensureAuthenticated()) return;
         manager.saveWord();
@@ -198,16 +192,6 @@ function bindVocabularyImportExport(manager) {
     });
 }
 
-function bindLegacyQuizModalListeners() {
-    $('#close-quiz-modal').addEventListener('click', () => {
-        closeDialog('#quiz-modal');
-    });
-    $('#refresh-quiz-btn').addEventListener('click', () => {
-    });
-    $('#print-quiz-btn').addEventListener('click', () => {
-    });
-}
-
 function bindVocabularyWorkflowTabs(manager) {
     $$('.activity-workflow-tab[data-vocabulary-tab]').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -257,5 +241,4 @@ export function initTeacherVocabularyEditorListeners(manager) {
     bindActivitySettingInputs(manager);
     bindVocabularyModalListeners(manager);
     bindVocabularyImportExport(manager);
-    bindLegacyQuizModalListeners();
 }

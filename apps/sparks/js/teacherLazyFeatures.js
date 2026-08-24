@@ -137,8 +137,6 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
         ['showWordHuntReviewView', 'wordHuntReview'],
         ['loadWordHuntReview', 'wordHuntReview'],
         ['showQuizzesView', 'quizzes'],
-        ['openQuizMaker', 'quizzes'],
-        ['handleGenerateQuiz', 'quizzes'],
-        ['printQuiz', 'quizzes']
+        ['openQuizMaker', 'quizzes']
     ].forEach(([methodName, featureName]) => installLazyMethod(TeacherManager, methodName, featureName));
 }

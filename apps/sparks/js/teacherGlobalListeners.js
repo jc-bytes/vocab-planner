@@ -108,7 +108,6 @@ export function initTeacherGlobalListeners(manager) {
             manager.editingWordIndex = -1;
         }
     });
-    setupModal('#quiz-modal', { dismissible: true });
     setupModal('#spark-modal', {
         dismissible: true,
         onClose: () => {

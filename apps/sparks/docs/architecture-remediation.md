@@ -46,7 +46,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
-| 7. Investigate legacy quiz implementation | IN PROGRESS | Teacher vocabulary import ownership | 7 vocabulary-library tests, package refactor, UI smoke, production build | Runtime and source traces prove the old preview is unreachable; removing it separately from the active Quiz Maker. |
+| 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
 | 10. Reduce literal brand colors | TODO | | | |
@@ -404,3 +404,15 @@ Task 6 is complete. Task 7 will trace legacy quiz reachability separately before
 - Verification: 7 teacher vocabulary-library tests, package refactor checks, three-page UI smoke, and the production build passed. Deployment remains 13.6 MB; teacher entry is 163.06/44.66 kB raw/gzip.
 
 Task 7 remains in progress. Next, the unreachable modal, methods, listeners, proxies, state, and exclusively owned styles will be removed together while retaining the modern Quiz Maker and student Quiz contracts.
+
+### Task 7b, retire the unreachable teacher quiz preview
+
+- Source, build, and browser traces proved the old `#quiz-modal` started hidden and had no opener. Overview navigation and Create Quiz reached the routed, lazy `#quiz-maker-view`; the legacy opener existed only as a comment.
+- Deleted the 468-line legacy method installer, hidden modal, duplicate/no-op listeners, modal setup, `currentQuiz` state, and `handleGenerateQuiz`/manager `printQuiz` lazy proxies.
+- Removed only styles and print exclusions owned by the retired preview, including stale landing/student copies. Preserved `teacherQuizCoreMethods`, `teacherQuizBrowserMethods`, all `quizMaker*` modules, `teacherQuiz.css`, quiz routes/templates, and the student Quiz descriptor/activity/server contracts.
+- Added a retirement contract that checks the active quiz owners and prevents the removed module, modal, state, proxies, and selectors from returning beside them. Independent post-diff review broadened this guard to scan the active quiz core, browser, and stylesheet owners.
+- Verification: the complete `npm test` suite passed, including 146 catalog units, 139 activity tests, 21 registry/parity tests, 9 viewport widths, three-page UI smoke, and 13 sandboxed games. Focused teacher accessibility, source UI smoke, built UI smoke, package, and architecture suites passed; PostCSS parsing and independent review found no regression.
+- Production build passed with 2,322 modules and the same 13.6 MB deployment. The active lazy teacher Quiz chunk decreased from 31.36/8.56 kB to 16.75/4.49 kB raw/gzip; teacher HTML decreased from 111.27/15.62 kB to 109.91/15.38 kB. The student Quiz remains a separate lazy 8.27/3.10 kB chunk.
+- The local cross-browser harness remains unavailable because `supabase start` exits 1 without the baseline Docker service. Direct unauthenticated browser inspection reached the expected login boundary; no authenticated post-change session was available, so that specific path is recorded as unknown rather than passed.
+
+Task 7 is complete. Task 8 will introduce a semantic token layer without changing the established visual identity.

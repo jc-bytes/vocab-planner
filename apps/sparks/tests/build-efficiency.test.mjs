@@ -8,8 +8,15 @@ const desktopAssetCopier = await readFile(new URL('../scripts/copy-desktop-asset
 const teacherEntry = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 const teacherLazyFeatures = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
 const teacherQuizEntry = await readFile(new URL('../js/teacherQuiz.js', import.meta.url), 'utf8');
+const teacherQuizCore = await readFile(new URL('../js/teacherQuizCoreMethods.js', import.meta.url), 'utf8');
+const teacherQuizBrowser = await readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8');
+const teacherGlobalListeners = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
+const teacherVocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 const teacherCss = await readFile(new URL('../css/teacher.css', import.meta.url), 'utf8');
 const teacherQuizCss = await readFile(new URL('../css/teacherQuiz.css', import.meta.url), 'utf8');
+const studentCss = await readFile(new URL('../css/student.css', import.meta.url), 'utf8');
+const studentFeatureCss = await readFile(new URL('../css/student-features.css', import.meta.url), 'utf8');
+const studentDesignSystemCss = await readFile(new URL('../css/student-design-system.css', import.meta.url), 'utf8');
 const teacherHtml = await readFile(new URL('../teacher.html', import.meta.url), 'utf8');
 const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8');
 const typographyCss = await readFile(new URL('../css/typography.css', import.meta.url), 'utf8');
@@ -99,6 +106,40 @@ test('quiz maker styles load with the lazy quiz feature', () => {
     assert.match(teacherQuizCss, /\.document-page/);
     assert.doesNotMatch(teacherCss, /\/\* Quiz Maker Styles \*\//);
     assert.doesNotMatch(teacherQuizCss, /Tablet and small Chromebook responsive pass/);
+});
+
+test('retired quiz preview cannot return beside the current Quiz Maker', async () => {
+    await assert.rejects(access(new URL('../js/teacherQuizLegacyMethods.js', import.meta.url)));
+
+    assert.match(teacherQuizEntry, /installTeacherQuizCoreMethods/);
+    assert.match(teacherQuizEntry, /installTeacherQuizBrowserMethods/);
+    assert.doesNotMatch(teacherQuizEntry, /Legacy/);
+    assert.match(teacherLazyFeatures, /\['showQuizzesView', 'quizzes'\]/);
+    assert.match(teacherLazyFeatures, /\['openQuizMaker', 'quizzes'\]/);
+
+    for (const source of [
+        teacherEntry,
+        teacherLazyFeatures,
+        teacherQuizCore,
+        teacherQuizBrowser,
+        teacherGlobalListeners,
+        teacherVocabularyEditorListeners,
+        teacherHtml,
+        teacherCss,
+        teacherQuizCss,
+        studentCss,
+        studentFeatureCss,
+        studentDesignSystemCss,
+        typographyCss,
+        landingCss
+    ]) {
+        assert.doesNotMatch(source, /quiz-modal|quiz-preview|quiz-print-area|handleGenerateQuiz|currentQuiz/);
+    }
+
+    assert.match(teacherHtml, /id="teacher-quizzes-view-template"/);
+    assert.match(teacherHtml, /id="quiz-maker-view"/);
+    assert.match(teacherQuizCss, /\.quiz-maker-container/);
+    assert.match(teacherQuizCss, /\.question-card/);
 });
 
 test('the local Lucide registry covers icons present in the teacher shell', () => {

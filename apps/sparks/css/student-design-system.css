@@ -323,21 +323,21 @@
     padding: var(--student-space-3) var(--student-space-4);
 }
 
-.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-body) {
+.student-site :where(.modal:not(#leaderboard-modal) .modal-body) {
     font-size: var(--student-type-body-size);
     line-height: var(--student-leading-body);
 }
 
-.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-header) {
+.student-site :where(.modal:not(#leaderboard-modal) .modal-header) {
     gap: var(--student-space-4);
     padding: var(--student-space-4) var(--student-space-6);
 }
 
-.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-body) {
+.student-site :where(.modal:not(#leaderboard-modal) .modal-body) {
     padding: var(--student-space-6);
 }
 
-.student-site :where(.modal:not(#leaderboard-modal):not(#quiz-modal) .modal-footer) {
+.student-site :where(.modal:not(#leaderboard-modal) .modal-footer) {
     gap: var(--student-space-3);
     padding: var(--student-space-4) var(--student-space-6);
 }
