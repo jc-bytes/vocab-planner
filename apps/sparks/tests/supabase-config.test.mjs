@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
@@ -69,4 +70,10 @@ test('build validation shares runtime validity and protects production from deve
             VITE_SUPABASE_PUBLISHABLE_KEY: validConfig.publishableKey
         }
     }), /Refusing to use the production Supabase project/);
+});
+
+test('the example environment does not pre-authorize production in development', async () => {
+    const example = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
+    assert.doesNotMatch(example, /^ALLOW_PRODUCTION_SUPABASE_IN_DEV=1$/m);
+    assert.match(example, /^# ALLOW_PRODUCTION_SUPABASE_IN_DEV=1$/m);
 });
