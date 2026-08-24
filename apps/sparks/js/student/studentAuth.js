@@ -68,10 +68,6 @@ export class StudentAuth {
         return this.ui.handleForcedPasswordChange(event);
     }
 
-    showElectronAuthMessage(loginBtn) {
-        return this.ui.showElectronAuthMessage(loginBtn);
-    }
-
     async initBackendAuth() {
         if (this.sm.authDisabled) {
             setActiveStudentStorageOwner('local-dev');

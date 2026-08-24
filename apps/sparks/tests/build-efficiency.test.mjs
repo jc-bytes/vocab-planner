@@ -11,6 +11,9 @@ const teacherQuizEntry = await readFile(new URL('../js/teacherQuiz.js', import.m
 const teacherQuizCore = await readFile(new URL('../js/teacherQuizCoreMethods.js', import.meta.url), 'utf8');
 const teacherQuizBrowser = await readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8');
 const teacherGlobalListeners = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
+const teacherAuth = await readFile(new URL('../js/teacherAuth.js', import.meta.url), 'utf8');
+const studentAuth = await readFile(new URL('../js/student/studentAuth.js', import.meta.url), 'utf8');
+const studentAuthUi = await readFile(new URL('../js/studentAuthUiMethods.js', import.meta.url), 'utf8');
 const teacherVocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 const teacherCss = await readFile(new URL('../css/teacher.css', import.meta.url), 'utf8');
 const teacherQuizCss = await readFile(new URL('../css/teacherQuiz.css', import.meta.url), 'utf8');
@@ -27,6 +30,12 @@ const { collectStudentPrecacheFiles } = await import('../scripts/student-precach
 test('obsolete client save stubs do not return as a second persistence system', async () => {
     assert.doesNotMatch(mainModule, /export const store\s*=/);
     await assert.rejects(access(new URL('../js/saveSystem.js', import.meta.url)));
+});
+
+test('unreachable platform-auth message code does not return as a duplicate UI system', () => {
+    for (const source of [teacherAuth, studentAuth, studentAuthUi]) {
+        assert.doesNotMatch(source, /showElectronAuthMessage|electron-auth-message|copy-url-btn/);
+    }
 });
 
 test('student continuation art keeps only the optimized delivery asset', async () => {
