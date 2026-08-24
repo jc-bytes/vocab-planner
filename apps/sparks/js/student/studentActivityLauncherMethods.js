@@ -290,11 +290,6 @@ export class StudentActivityLauncher {
                     }
                 );
                 break;
-            case 'crossword':
-                const crosswordWords = getPrioritized(getActivityWordLimit('crossword'));
-                activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, activityInstance.placedWords);
-                break;
             default:
                 container.innerHTML = `<p>Activity ${type} not implemented yet.</p>`;
             }

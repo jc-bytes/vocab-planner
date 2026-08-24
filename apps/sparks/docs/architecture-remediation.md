@@ -43,7 +43,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
-| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Ten activities migrated with focused and production-build verification | Ten activity lifecycles now belong to their descriptors. Illustration and Crossword retain special launch branches until migrated separately. |
+| 4. Migrate activities one at a time | IN PROGRESS | Activity registry, progress flow, launcher, focused tests | Eleven activities migrated with focused and production-build verification | Every activity except Illustration now owns its lifecycle through the registry. |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
@@ -228,6 +228,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Unified fallback selection and saved-state restoration on the descriptor's trimmed four-character eligibility predicate, preventing stale whitespace-padded terms from bypassing the availability rule.
 - Verification: registry browser smoke, 6 Word Search ownership/behavior tests, 138 student activity tests, 72 progress tests, 14 routing tests, 8 build-efficiency tests, and the production build passed. Word Search remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.80 kB raw, 66.43 kB gzip.
 
+### Task 4k, migrate Crossword
+
+- Added Crossword's ASCII-letter word-and-definition eligibility, prioritized limiting, standard construction, and placed-word coverage to its descriptor. Removed only its launcher and progress-flow switch cases.
+- Preserved the `crossword` teacher limit, least-practiced selection, internal grid placement, constructor-owned state restoration, hint and score evidence, cleanup, and coverage of only the subset placed in the grid.
+- Reused the standard constructor factory and prioritized preparation because Crossword's only special host behavior is its post-construction coverage source. The proven optional selector owns that difference without a Crossword-specific launcher branch.
+- Recorded separate persistence debt: Crossword's local key uses only the selected word count while generic reset uses the full vocabulary count, so limited or filtered units can retain fallback state and equal-sized units can collide. This migration keeps the existing cloud/local behavior unchanged.
+- Verification: registry browser smoke, 138 student activity tests including 11 Crossword behavior tests, 72 progress tests, 8 build-efficiency tests, and the production build passed. Crossword remains a dynamic chunk, deployment remains 15.1 MB, and the student entry is 257.55 kB raw, 66.33 kB gzip.
+
 ## Remaining work
 
-Task 4 continues one descriptor at a time. Ten activities are complete. Crossword can now use the proven coverage selector; Illustration remains intentionally special and will receive only a narrow feature context.
+Task 4 continues one descriptor at a time. Eleven activities are complete. Illustration remains intentionally special and will receive only a narrow feature context.

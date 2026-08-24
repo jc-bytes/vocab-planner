@@ -462,6 +462,19 @@ test('Word Search descriptor owns restoration, host construction, and placed cov
     assert.deepEqual(descriptor.selectCoverageWords({ instance, prepared }), instance.words);
 });
 
+test('Crossword descriptor owns eligibility, prioritization, and placed coverage', () => {
+    const descriptor = getStudentActivity('crossword');
+    assert.equal(descriptor.isPlayable({ word: 'Router', definition: 'Connects networks' }), true);
+    assert.equal(descriptor.isPlayable({ word: 'A', definition: 'A letter' }), false);
+    assert.equal(descriptor.isPlayable({ word: 'Data Set', definition: 'Related data' }), false);
+    assert.equal(descriptor.isPlayable({ word: 'Router', definition: '   ' }), false);
+    assert.equal(descriptor.prepare, getStudentActivity('hangman').prepare);
+    assert.equal(descriptor.create, getStudentActivity('matching').create);
+
+    const placedWords = [{ word: 'Router', number: 1 }];
+    assert.deepEqual(descriptor.selectCoverageWords({ instance: { placedWords } }), placedWords);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

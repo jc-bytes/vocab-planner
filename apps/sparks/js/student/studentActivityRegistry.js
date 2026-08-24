@@ -59,6 +59,13 @@ function isWordSearchWordPlayable(word = {}) {
     return String(word.word || '').trim().length >= 4;
 }
 
+function isCrosswordWordPlayable(word = {}) {
+    const label = String(word.word || '');
+    return label.length > 1
+        && /^[a-zA-Z]+$/.test(label)
+        && String(word.definition || '').trim().length > 0;
+}
+
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
     return {
         words: restore(
@@ -310,7 +317,11 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'crossword', title: 'Crossword', description: 'Solve definitions.',
         iconMarkup: CROSSWORD_ICON, settingKey: 'crossword',
-        exportName: 'CrosswordActivity', load: () => import('../activities/crossword.js')
+        exportName: 'CrosswordActivity', load: () => import('../activities/crossword.js'),
+        isPlayable: isCrosswordWordPlayable,
+        prepare: preparePrioritizedActivity,
+        create: createWordListActivity,
+        selectCoverageWords: ({ instance }) => instance.placedWords
     },
     {
         id: 'hangman', title: 'Hangman', description: 'Guess the word.',

@@ -141,12 +141,6 @@ export class StudentActivityProgressFlow {
         }
 
         switch (activityType) {
-            case 'crossword':
-                return (
-                    String(word.word || '').length > 1 &&
-                    /^[a-zA-Z]+$/.test(String(word.word || ''))
-                    && String(word.definition || '').trim().length > 0
-                );
             case 'illustration':
                 return String(word.word || '').trim().length > 0;
             default:
