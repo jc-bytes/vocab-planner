@@ -31,9 +31,12 @@ function hasWordAndDefinition(word = {}) {
 }
 
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
-    const filter = word => word.word.length >= 2;
     return {
-        words: restore(savedState, prioritize(wordLimit, filter), filter)
+        words: restore(
+            savedState,
+            prioritize(wordLimit, isMatchingWordPlayable),
+            isMatchingWordPlayable
+        )
     };
 }
 
@@ -43,9 +46,13 @@ function prepareFlashcardsActivity({ playableWords, wordLimit }) {
     };
 }
 
-function preparePrioritizedRestorableActivity({ savedState, wordLimit, prioritize, restore }) {
+function prepareQuizActivity({ savedState, wordLimit, prioritize, restore }) {
     return {
-        words: restore(savedState, prioritize(wordLimit))
+        words: restore(
+            savedState,
+            prioritize(wordLimit),
+            hasWordAndDefinition
+        )
     };
 }
 
@@ -185,7 +192,7 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
         icon: 'circle-help', settingKey: 'quiz',
         exportName: 'QuizActivity', load: () => import('../activities/quiz.js'),
         isPlayable: hasWordAndDefinition,
-        prepare: preparePrioritizedRestorableActivity,
+        prepare: prepareQuizActivity,
         create: createWordListActivity
     },
     {

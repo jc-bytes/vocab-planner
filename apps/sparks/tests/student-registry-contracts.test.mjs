@@ -139,11 +139,22 @@ test('matching descriptor owns eligibility, word preparation, and construction',
         savedState: { wordKeys: ['Router'] },
         wordLimit: 6,
         prioritize(limit, filter) {
-            calls.push(['prioritize', limit, filter({ word: 'AI' }), filter({ word: 'A' })]);
+            calls.push([
+                'prioritize',
+                limit,
+                filter({ word: 'AI', definition: 'Artificial intelligence' }),
+                filter({ word: 'AI', definition: '' })
+            ]);
             return [{ word: 'Fallback', definition: 'Backup' }];
         },
         restore(state, fallback, filter) {
-            calls.push(['restore', state, fallback, filter({ word: 'IT' }), filter({ word: 'I' })]);
+            calls.push([
+                'restore',
+                state,
+                fallback,
+                filter({ word: 'IT', definition: 'Technology' }),
+                filter({ word: 'IT', definition: '' })
+            ]);
             return restoredWords;
         }
     });
@@ -209,8 +220,14 @@ test('quiz descriptor owns eligibility and restorable prioritized preparation', 
             calls.push(['prioritize', limit]);
             return fallbackWords;
         },
-        restore(state, fallback) {
-            calls.push(['restore', state, fallback]);
+        restore(state, fallback, filter) {
+            calls.push([
+                'restore',
+                state,
+                fallback,
+                filter({ word: 'Cell', definition: 'Spreadsheet location' }),
+                filter({ word: 'Cell', definition: '' })
+            ]);
             return restoredWords;
         }
     });
@@ -218,7 +235,7 @@ test('quiz descriptor owns eligibility and restorable prioritized preparation', 
     assert.deepEqual(prepared, { words: restoredWords });
     assert.deepEqual(calls, [
         ['prioritize', 5],
-        ['restore', savedState, fallbackWords]
+        ['restore', savedState, fallbackWords, true, false]
     ]);
     assert.equal(quiz.create, getStudentActivity('matching').create);
 });

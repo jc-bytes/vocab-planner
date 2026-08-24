@@ -19,6 +19,9 @@ export class StudentActivityLauncher {
             prioritize: context.prioritize,
             restore: context.restore
         });
+        if (!prepared || !Array.isArray(prepared.words)) {
+            throw new TypeError(`Activity ${descriptor.id || 'descriptor'} prepare() must return a words array`);
+        }
         const instance = descriptor.create({
             ActivityClass,
             container: context.container,

@@ -411,6 +411,28 @@ test('registered activity startup prepares, constructs, then records coverage', 
     ]);
 });
 
+test('registered activity startup rejects malformed preparation clearly', () => {
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    assert.throws(() => launcher.createRegisteredActivity({
+        id: 'broken',
+        tracksCoverage: true,
+        prepare: () => ({}),
+        create() {
+            throw new Error('construction must not run after invalid preparation');
+        }
+    }, class ActivityDouble {}, {
+        container: {},
+        savedState: null,
+        wordLimit: 1,
+        playableWords: [],
+        prioritize() {},
+        restore() {},
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed() {}
+    }), /Activity broken prepare\(\) must return a words array/);
+});
+
 test('migrated launch dispatch stays on the registered lifecycle path', () => {
     const source = StudentActivityLauncher.prototype.startActivity.toString();
 
