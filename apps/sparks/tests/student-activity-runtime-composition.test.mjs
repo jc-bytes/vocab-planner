@@ -433,6 +433,71 @@ test('registered activity startup rejects malformed preparation clearly', () => 
     }), /Activity broken prepare\(\) must return a words array/);
 });
 
+test('descriptor contract failures do not reset valid saved activity state', () => {
+    const resetTypes = [];
+    const launcher = new StudentActivityLauncher({
+        sm: {},
+        resetActivityState(type) {
+            resetTypes.push(type);
+        }
+    });
+    const savedState = { wordKeys: ['Router'] };
+    assert.throws(() => launcher.startActivityWithStateRecovery(
+        'matching',
+        savedState,
+        state => launcher.createRegisteredActivity({
+            id: 'matching',
+            tracksCoverage: true,
+            prepare: () => ({}),
+            create: () => ({})
+        }, class ActivityDouble {}, {
+            container: {},
+            savedState: state,
+            wordLimit: 1,
+            playableWords: [],
+            prioritize() {},
+            restore() {},
+            onProgress() {},
+            onSaveState() {},
+            markWordsPracticed() {}
+        })
+    ), error => {
+        assert.equal(error.code, 'ACTIVITY_DESCRIPTOR_CONTRACT');
+        return true;
+    });
+
+    assert.deepEqual(resetTypes, []);
+});
+
+test('registered activity startup rejects a missing factory instance before coverage', () => {
+    const calls = [];
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    assert.throws(() => launcher.createRegisteredActivity({
+        id: 'missing-instance',
+        tracksCoverage: true,
+        prepare: () => ({ words: [{ word: 'Data' }] }),
+        create: () => null
+    }, class ActivityDouble {}, {
+        container: {},
+        savedState: null,
+        wordLimit: 1,
+        playableWords: [],
+        prioritize() {},
+        restore() {},
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed() {
+            calls.push('coverage');
+        }
+    }), error => {
+        assert.equal(error.code, 'ACTIVITY_DESCRIPTOR_CONTRACT');
+        assert.match(error.message, /create\(\) must return an activity instance/);
+        return true;
+    });
+
+    assert.deepEqual(calls, []);
+});
+
 test('migrated launch dispatch stays on the registered lifecycle path', () => {
     const source = StudentActivityLauncher.prototype.startActivity.toString();
 

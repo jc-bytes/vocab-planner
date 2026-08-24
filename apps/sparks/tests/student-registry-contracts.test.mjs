@@ -70,6 +70,7 @@ test('activity registry definition validates and freezes descriptors', () => {
     const configured = validActivity({
         tracksCoverage: false,
         nonReplayable: true,
+        isPlayable: () => true,
         prepare,
         create
     });
@@ -123,6 +124,7 @@ test('activity registry definition rejects malformed descriptors clearly', () =>
     assert.throws(() => defineStudentActivityRegistry([validActivity({ create: undefined })]), /create must be a function/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {} })]), /prepare and create together/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ create() {} })]), /prepare and create together/);
+    assert.throws(() => defineStudentActivityRegistry([validActivity({ prepare() {}, create() {} })]), /provide isPlayable/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: 20 })]), /server-authoritative/);
     assert.throws(() => defineStudentActivityRegistry([validActivity({ xp: undefined })]), /server-authoritative/);
 });

@@ -195,6 +195,9 @@ export function defineStudentActivityRegistry(activities) {
         if (hasOwn(activity, 'prepare') !== hasOwn(activity, 'create')) {
             throw new TypeError(`Activity ${activity.id} must provide prepare and create together`);
         }
+        if (hasOwn(activity, 'prepare') && !hasOwn(activity, 'isPlayable')) {
+            throw new TypeError(`Activity ${activity.id} must provide isPlayable with prepare and create`);
+        }
 
         return Object.freeze({
             routeable: true,

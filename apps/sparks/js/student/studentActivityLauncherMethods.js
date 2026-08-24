@@ -5,6 +5,14 @@ import { requestWithTimeout } from '../services/requestReliability.js';
 import { getStudentActivity } from './studentActivityRegistry.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
 
+const ACTIVITY_DESCRIPTOR_CONTRACT_ERROR = 'ACTIVITY_DESCRIPTOR_CONTRACT';
+
+function activityDescriptorContractError(message) {
+    const error = new TypeError(message);
+    error.code = ACTIVITY_DESCRIPTOR_CONTRACT_ERROR;
+    return error;
+}
+
 export class StudentActivityLauncher {
     constructor(activities) {
         this.activities = activities;
@@ -20,7 +28,9 @@ export class StudentActivityLauncher {
             restore: context.restore
         });
         if (!prepared || !Array.isArray(prepared.words)) {
-            throw new TypeError(`Activity ${descriptor.id || 'descriptor'} prepare() must return a words array`);
+            throw activityDescriptorContractError(
+                `Activity ${descriptor.id || 'descriptor'} prepare() must return a words array`
+            );
         }
         const instance = descriptor.create({
             ActivityClass,
@@ -30,6 +40,11 @@ export class StudentActivityLauncher {
             onSaveState: context.onSaveState,
             savedState: context.savedState
         });
+        if (!instance || !['object', 'function'].includes(typeof instance)) {
+            throw activityDescriptorContractError(
+                `Activity ${descriptor.id || 'descriptor'} create() must return an activity instance`
+            );
+        }
 
         if (descriptor.tracksCoverage) {
             context.markWordsPracticed(prepared.words);
@@ -312,7 +327,9 @@ export class StudentActivityLauncher {
         try {
             return createActivity(initialState);
         } catch (error) {
-            if (type === 'illustration') throw error;
+            if (type === 'illustration' || error?.code === ACTIVITY_DESCRIPTOR_CONTRACT_ERROR) {
+                throw error;
+            }
 
             console.warn(`Resetting stale ${type} activity state after a startup error:`, error);
             this.activities.resetActivityState(type);
