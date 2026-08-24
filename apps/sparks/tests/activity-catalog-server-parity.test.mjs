@@ -130,7 +130,7 @@ test('SQL allowlist extraction rejects ambiguous or computed arrays', () => {
     );
 });
 
-test('client activity IDs match the effective server access and flow allowlists', async () => {
+test('client activity IDs match every effective server vocabulary activity allowlist', async () => {
     const accessFunction = await findLatestFunctionDefinition(
         'private.assert_student_activity_access',
         /^p_user_id uuid, p_unit_key text, p_vocabulary_id text, p_activity_type text$/i,
@@ -140,6 +140,11 @@ test('client activity IDs match the effective server access and flow allowlists'
         'private.normalize_vocabulary_activity_flow',
         /^$/,
         /^$/
+    );
+    const requiredFunction = await findLatestFunctionDefinition(
+        'private.required_vocabulary_activities',
+        /^vocabulary_row public\.vocabularies$/i,
+        /^public\.vocabularies$/i
     );
 
     const accessIds = extractSqlStringArray(
@@ -154,6 +159,12 @@ test('client activity IDs match the effective server access and flow allowlists'
         'vocabulary activity flow',
         flowFunction.filename
     );
+    const requiredIds = extractSqlStringArray(
+        requiredFunction.definition,
+        /where\s+value\s*=\s*any\s*\(\s*array\s*\[([\s\S]*?)\]\s*\)/i,
+        'required vocabulary activity filtering',
+        requiredFunction.filename
+    );
     const clientIds = getStudentActivityIds();
     const sortedClientIds = [...clientIds].sort();
 
@@ -166,5 +177,10 @@ test('client activity IDs match the effective server access and flow allowlists'
         [...flowIds].sort(),
         sortedClientIds,
         `Client registry differs from server flow authority in ${flowFunction.filename}`
+    );
+    assert.deepEqual(
+        [...requiredIds].sort(),
+        sortedClientIds,
+        `Client registry differs from server required-activity filter in ${requiredFunction.filename}`
     );
 });

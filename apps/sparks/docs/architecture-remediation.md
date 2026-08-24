@@ -42,7 +42,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 0. Establish baseline | DONE | `docs/architecture-remediation.md` | Full suite, design audit, production build, built-page smoke, dependency audit, independent review | Source and built application are green. Local Supabase checks remain unknown because Docker is unavailable. |
 | 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
-| 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match both effective server access and vocabulary-flow allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
+| 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | TODO | | | |
 | 5. Consolidate duplicated configuration | TODO | | | |
 | 6. Remove confirmed dead code | TODO | | | |
@@ -99,12 +99,12 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Kept launch factories, activity flow defaults, routes, persistence, and SQL unchanged.
 - Did not move the unused client XP map into the registry. Supabase calculates rewards and the client displays the returned total delta, so copying the map would create a false reward authority.
 - Preserved lazy loading. The production manifest still keeps teacher feature imports separate and the build stays at 15.1 MB.
-- Independent review found zero cycles across 288 first-party JavaScript files and 523 resolved imports. The teacher entry kept its five existing lazy features and gained no activity imports.
+- Independent review found zero cycles across 288 first-party JavaScript files and 523 resolved imports. The teacher entry kept its five existing lazy features and gained no eager activity implementation imports.
 
 ### Task 2, activity catalog validation
 
 - Added a pure registry definition function that clones, defaults, validates, and freezes activity descriptors.
-- Rejects duplicate IDs and setting keys, missing copy or icons, invalid loaders and export names, unsupported routing, malformed policy values, and non-function migration hooks.
+- Rejects duplicate IDs and setting keys, missing copy or icons, invalid loaders and export names, unsupported routing, malformed policy values, and non-function activity lifecycle hooks.
 - Rejects client `xp` fields, including `xp: undefined`, because rewards belong to the server.
 - Added an explicit persisted ID-to-setting-key compatibility fixture. A derived projection alone would not detect an accidental stored-key rename.
 - Added a Chromium smoke test that imports every lazy activity module and verifies its declared constructor. A Node-only test was rejected because real activity imports initialize browser-owned notification code.
@@ -112,12 +112,13 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 
 ### Task 3, client/server activity parity
 
-- Added a migration-order parity test for the two server-owned vocabulary activity allowlists.
-- Targets the effective `private.assert_student_activity_access(uuid, text, text, text)` and `private.normalize_vocabulary_activity_flow()` definitions by signature.
-- Requires the server access list, server flow list, and client registry to contain the same 12 IDs.
+- Added a migration-order parity test for all three server-owned vocabulary activity allowlists.
+- Targets the effective `private.assert_student_activity_access(uuid, text, text, text)`, `private.normalize_vocabulary_activity_flow()`, and `private.required_vocabulary_activities(public.vocabularies)` definitions by signature.
+- Requires the server access list, server flow list, required-activity filter, and client registry to contain the same 12 IDs.
 - Rejects ambiguous arrays, computed SQL expressions, duplicate IDs, overload mismatch, and a later drop of the selected function.
 - Keeps classroom activity types and the weekly Spark reading flow out of this contract because they belong to separate systems.
 - Does not compare XP. Reward amounts remain a separate server-only policy and the client registry rejects XP fields.
+- An architecture review found the initially omitted required-activity filter before Task 4 was committed. Extending the contract prevents a newly registered activity from being silently removed when a teacher configures it as required.
 
 ## Remaining work
 
