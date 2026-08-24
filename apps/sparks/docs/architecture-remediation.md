@@ -373,3 +373,10 @@ Task 6 remains in progress. Remaining decisions are the tested-but-runtime-unuse
 - Verification: 5 vocabulary API contracts, package refactor checks, 75 student progress tests, 139 student activity tests, 10 build-efficiency tests, and the production build passed. Deployment and entry sizes remain unchanged.
 
 Task 6 remains in progress. Only CSS selectors with exact DOM/reference evidence remain before the full Task 6 checkpoint.
+
+### Task 6g, remove obsolete Flashcards meter styles
+
+- Removed four Flashcards study-meter selector families that no current or dynamically constructed activity DOM emits. Kept all live Flashcards panel/control styles and the matching, Crossword, and Scramble arms of grouped progress rules.
+- Verification: exact JS/HTML selector tracing, 10 Flashcards behavior tests, package refactor checks, three-page UI smoke, and the production build passed. Shared feature CSS decreased by 0.41 kB raw and student CSS by 0.05 kB raw; deployment remains 13.6 MB.
+
+Task 6 remains in progress. The final deletion group is three isolated teacher component selectors with no HTML, JavaScript, template, or runtime-ID owner.

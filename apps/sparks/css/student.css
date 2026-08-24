@@ -2819,7 +2819,6 @@ select:focus,
     color: #86efac;
 }
 
-.flashcard-study-track,
 .matching-progress-track,
 .cw-progress-track,
 .scramble-progress {
@@ -2828,7 +2827,6 @@ select:focus,
         rgba(255, 255, 255, 0.11);
 }
 
-.flashcard-study-fill,
 .matching-progress-fill,
 .cw-progress-fill,
 .scramble-progress-fill {
