@@ -348,6 +348,26 @@ test('Wordle descriptor owns alphabetic eligibility and restorable preparation',
     assert.equal(descriptor.create, getStudentActivity('matching').create);
 });
 
+test('Speed Match descriptor uses the shared defined-word prioritized lifecycle', () => {
+    const matching = getStudentActivity('matching');
+    const speedMatch = getStudentActivity('speed-match');
+
+    assert.equal(speedMatch.isPlayable({ word: 'Packet', definition: 'A unit of data' }), true);
+    assert.equal(speedMatch.isPlayable({ word: 'Packet', definition: '' }), false);
+    assert.equal(speedMatch.isPlayable({ word: '', definition: 'A unit of data' }), false);
+    assert.equal(speedMatch.prepare, getStudentActivity('hangman').prepare);
+    assert.equal(speedMatch.create, matching.create);
+
+    const words = [{ word: 'Packet', definition: 'A unit of data' }];
+    assert.deepEqual(speedMatch.prepare({
+        wordLimit: 4,
+        prioritize(limit) {
+            assert.equal(limit, 4);
+            return words;
+        }
+    }), { words });
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

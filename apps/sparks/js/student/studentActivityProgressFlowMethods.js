@@ -154,11 +154,6 @@ export class StudentActivityProgressFlow {
                     String(word.word || '').trim().length > 0
                     && String(word.example || '').trim().length > 0
                 );
-            case 'speed-match':
-                return (
-                    String(word.word || '').trim().length > 0
-                    && String(word.definition || '').trim().length > 0
-                );
             case 'illustration':
                 return String(word.word || '').trim().length > 0;
             default:

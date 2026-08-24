@@ -287,7 +287,10 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
     {
         id: 'speed-match', title: 'Speed Match', description: 'Race against time.',
         icon: 'timer', settingKey: 'speedMatch',
-        exportName: 'SpeedMatchActivity', load: () => import('../activities/speedMatch.js?v=20260706a')
+        exportName: 'SpeedMatchActivity', load: () => import('../activities/speedMatch.js?v=20260706a'),
+        isPlayable: hasWordAndDefinition,
+        prepare: preparePrioritizedActivity,
+        create: createWordListActivity
     },
     {
         id: 'fill-in-blank', title: 'Fill in Blank', description: 'Complete the sentence.',

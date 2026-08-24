@@ -286,11 +286,6 @@ export class StudentActivityLauncher {
                 activityInstance = new ActivityClass(container, crosswordWords, onProgress, onSaveState, savedState);
                 this.activities.markWordsPracticed(type, activityInstance.placedWords);
                 break;
-            case 'speed-match':
-                const speedMatchWords = getPrioritized(getActivityWordLimit('speedMatch'));
-                activityInstance = new ActivityClass(container, speedMatchWords, onProgress, onSaveState, savedState);
-                this.activities.markWordsPracticed(type, speedMatchWords);
-                break;
             case 'fill-in-blank':
                 const fibWords = getPrioritized(getActivityWordLimit('fillInBlank'), w => w.example);
                 activityInstance = new ActivityClass(container, fibWords, onProgress, onSaveState, savedState);
