@@ -45,7 +45,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
-| 6. Remove confirmed dead code | TODO | | | |
+| 6. Remove confirmed dead code | IN PROGRESS | Client XP mirror | Package refactor, 75 progress, 139 activity, and 8 build-efficiency tests | Removing only code with complete caller/import evidence. |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
@@ -320,3 +320,11 @@ The installer URL is intentionally deferred because changing a product download 
 - The complete test suite passed, including the 9-width student shell regression, three-page UI smoke, and all 13 sandboxed HTML games.
 - Independent review found two misses before closure: remaining Arcade minute literals and an active production-development override in `.env.example`. Both were removed, ownership/config tests were added, and the focused game, progress, registry, and auth/config suites passed again.
 - Task 5 is complete. Contextual report labels remain intentionally separate, SQL security/reward authorities remain independent, and no giant global constants module was introduced.
+
+### Task 6a, remove the dead client XP reward mirror
+
+- Removed `ACTIVITY_XP` and `getActivityXp`. Runtime completion displays the server-returned XP delta, the activity registry forbids client XP, and the only caller was a package test written solely for the unused map.
+- Kept level thresholds and offline total-XP fallback behavior in `studentExperience`; those remain live through student progress rendering.
+- Verification: package refactor checks, 75 student progress tests, 139 student activity tests, and 8 build-efficiency tests passed.
+
+Task 6 remains in progress while independent traces check the audit's no-op store, save-system, utility, CSS, and asset candidates for actual reachability.
