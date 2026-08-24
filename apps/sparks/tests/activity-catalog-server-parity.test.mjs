@@ -2,6 +2,10 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
 
+import {
+    DEFAULT_PRACTICE_REQUIRED_ROTATION,
+    DEFAULT_REQUIRED_BY_PURPOSE
+} from '../js/activityFlowPolicy.js';
 import { getStudentActivityIds } from '../js/student/studentActivityRegistry.js';
 
 const migrationsUrl = new URL('../supabase/migrations/', import.meta.url);
@@ -183,4 +187,32 @@ test('client activity IDs match every effective server vocabulary activity allow
         sortedClientIds,
         `Client registry differs from server required-activity filter in ${requiredFunction.filename}`
     );
+});
+
+test('client default activity flow matches the independent server fallback policy', async () => {
+    const requiredFunction = await findLatestFunctionDefinition(
+        'private.required_vocabulary_activities',
+        /^vocabulary_row public\.vocabularies$/i,
+        /^public\.vocabularies$/i
+    );
+    const summative = extractSqlStringArray(
+        requiredFunction.definition,
+        /like\s+'%summative%'[\s\S]*?return\s+array\s*\[([\s\S]*?)\]\s*;/i,
+        'summative activity fallback',
+        requiredFunction.filename
+    );
+    const caseMatch = /second_activity\s*:=\s*case[\s\S]*?end\s*;/i.exec(requiredFunction.definition);
+    assert.ok(caseMatch, `${requiredFunction.filename} must expose a readable default activity rotation`);
+
+    const indexedActivities = [...caseMatch[0].matchAll(/when\s+(\d+)\s+then\s+'([^']+)'/gi)]
+        .map(match => [Number(match[1]), match[2]]);
+    const elseMatch = /else\s+'([^']+)'/i.exec(caseMatch[0]);
+    assert.ok(elseMatch, `${requiredFunction.filename} default activity rotation must include an else case`);
+    const serverRotation = indexedActivities
+        .sort(([left], [right]) => left - right)
+        .map(([, activityId]) => ['flashcards', activityId]);
+    serverRotation.push(['flashcards', elseMatch[1]]);
+
+    assert.deepEqual(summative, DEFAULT_REQUIRED_BY_PURPOSE.summative);
+    assert.deepEqual(serverRotation, DEFAULT_PRACTICE_REQUIRED_ROTATION);
 });

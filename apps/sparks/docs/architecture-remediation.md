@@ -44,7 +44,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 2. Activity catalog validation | DONE | Activity registry, registry contract tests, browser loader smoke, package script | Registry, loader smoke, teacher-flow, 128 activity, routing, build-efficiency tests; production build | Descriptors fail clearly when malformed. Chromium proves all 12 lazy loaders resolve their declared exports. |
 | 3. Client/server activity parity | DONE | Migration parity test, registry package script | Registry, browser-loader, 128 activity, and security tests | Client IDs must match effective server access, flow-normalization, and required-activity filtering allowlists. Parsing fails on ambiguity, expressions, overload mismatch, or a later function drop. |
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
-| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy consumers | Registry, 139 activity, 72 progress, and 8 build-efficiency tests | Replay, coverage, and header metadata now come from activity descriptors. Flow, gamification, and other verified duplicates remain. |
+| 5. Consolidate duplicated configuration | IN PROGRESS | Activity policy consumers, shared activity-flow policy, catalog tooling | Catalog, teacher flow, registry/parity, 139 activity, build-efficiency tests; production build | Replay, coverage, titles, default flow, IDs, and eligibility now have one client authority. Gamification and other verified duplicates remain. |
 | 6. Remove confirmed dead code | TODO | | | |
 | 7. Investigate legacy quiz implementation | TODO | | | |
 | 8. Introduce semantic design tokens | TODO | | | |
@@ -259,3 +259,13 @@ Task 4 is complete. Task 5 will verify and consolidate only duplicated configura
 - Verification: 19 registry/parity contracts plus all 12 browser loaders, 139 student activity tests, 72 student progress tests, and 8 build-efficiency tests passed.
 
 Task 5 remains in progress. The next verified duplicate is the activity-flow policy copied across student, teacher, and catalog tooling.
+
+### Task 5b, centralize activity-flow and catalog policy
+
+- Added a narrow shared activity-flow policy for purpose defaults, the ten-step practice rotation, replacement order, and stable rotation indexing.
+- Student and teacher flow owners retain their existing public methods but delegate policy calculation to the shared pure functions; the duplicated arrays and algorithms were removed.
+- Catalog tooling now derives IDs and word eligibility from the authoritative activity registry instead of maintaining a second 12-item list and eligibility switch.
+- Server access remains independently authoritative. A parity contract now also compares the active SQL summative fallback and practice rotation with the shared client policy.
+- Verification: all 146 vocabulary units and catalog SQL generation, 3 teacher flow tests, 20 registry/server parity contracts plus all 12 browser loaders, 139 student activity tests, 8 build-efficiency tests, and the production build passed. Activity modules remain lazy chunks; deployment is 15.1 MB and the student entry is 255.78 kB raw, 65.78 kB gzip.
+
+Task 5 remains in progress. Next is the verified arcade/gamification configuration split, including removal of controls that currently save values no runtime uses.

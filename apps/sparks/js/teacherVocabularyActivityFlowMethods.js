@@ -1,42 +1,21 @@
 import { $, createElement, notifications } from './main.js';
 import {
-    DEFAULT_PRACTICE_REQUIRED_ROTATION,
-    DEFAULT_REQUIRED_BY_PURPOSE,
     VOCAB_ACTIVITY_IDS,
     VOCAB_ACTIVITY_OPTIONS,
     VOCAB_ACTIVITY_SETTING_KEYS
 } from './teacherVocabularyEditorConstants.js';
+import {
+    getDefaultRequiredActivities as resolveDefaultRequiredActivities,
+    getPracticeRequiredRotationIndex as resolvePracticeRequiredRotationIndex
+} from './activityFlowPolicy.js';
 
 class TeacherVocabularyActivityFlowMethods {
     getDefaultRequiredActivities(vocab = this.vocabSet) {
-        const purpose = String(vocab?.purpose || '').trim().toLowerCase();
-        if (purpose === 'practice') {
-            const rotationIndex = this.getPracticeRequiredRotationIndex(vocab);
-            return DEFAULT_PRACTICE_REQUIRED_ROTATION[rotationIndex] || DEFAULT_REQUIRED_BY_PURPOSE.practice;
-        }
-        return DEFAULT_REQUIRED_BY_PURPOSE[purpose] || DEFAULT_REQUIRED_BY_PURPOSE.default;
+        return resolveDefaultRequiredActivities(vocab);
     }
 
     getPracticeRequiredRotationIndex(vocab = this.vocabSet) {
-        const rotationLength = DEFAULT_PRACTICE_REQUIRED_ROTATION.length;
-        if (rotationLength === 0) return 0;
-
-        const week = Number(vocab?.week);
-        if (Number.isFinite(week) && week > 0) {
-            return (Math.floor(week) - 1) % rotationLength;
-        }
-
-        const unitKey = String(vocab?.id || vocab?.name || '');
-        const weekMatch = unitKey.match(/week[_-]?(\d+)/i);
-        if (weekMatch) {
-            return (Number(weekMatch[1]) - 1) % rotationLength;
-        }
-
-        let hash = 0;
-        for (let index = 0; index < unitKey.length; index += 1) {
-            hash = ((hash << 5) - hash + unitKey.charCodeAt(index)) | 0;
-        }
-        return Math.abs(hash) % rotationLength;
+        return resolvePracticeRequiredRotationIndex(vocab);
     }
 
     getActivityFlowConfig(vocab = this.vocabSet) {

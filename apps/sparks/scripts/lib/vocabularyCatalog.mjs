@@ -1,33 +1,20 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import {
+    DEFAULT_PRACTICE_REQUIRED_ROTATION,
+    DEFAULT_REQUIRED_BY_PURPOSE,
+    REQUIRED_ACTIVITY_REPLACEMENT_ORDER
+} from '../../js/activityFlowPolicy.js';
+import {
+    getStudentActivity,
+    getStudentActivityIds
+} from '../../js/student/studentActivityRegistry.js';
 
-export const ACTIVITY_IDS = Object.freeze([
-    'illustration', 'matching', 'flashcards', 'quiz', 'synonym-antonym',
-    'word-search', 'crossword', 'hangman', 'scramble', 'wordle',
-    'speed-match', 'fill-in-blank'
-]);
+export const ACTIVITY_IDS = getStudentActivityIds();
 
 const MONTHS = Object.freeze([
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
-]);
-
-const PRACTICE_ROTATION = Object.freeze([
-    ['flashcards', 'matching'],
-    ['flashcards', 'fill-in-blank'],
-    ['flashcards', 'word-search'],
-    ['flashcards', 'quiz'],
-    ['flashcards', 'speed-match'],
-    ['flashcards', 'wordle'],
-    ['flashcards', 'crossword'],
-    ['flashcards', 'hangman'],
-    ['flashcards', 'scramble'],
-    ['flashcards', 'word-search']
-]);
-
-const REQUIRED_REPLACEMENTS = Object.freeze([
-    'word-search', 'matching', 'scramble', 'hangman', 'quiz',
-    'speed-match', 'synonym-antonym', 'fill-in-blank', 'flashcards'
 ]);
 
 function unique(values = []) {
@@ -50,34 +37,7 @@ export function inferCatalogPlacement(vocabulary = {}) {
 }
 
 export function isActivityWordPlayable(activityType, word = {}) {
-    const label = String(word.word || '').trim();
-    const definition = String(word.definition || '').trim();
-    switch (activityType) {
-        case 'matching':
-            return label.length >= 2 && definition.length > 0;
-        case 'synonym-antonym':
-            return label.length > 0 && (word.synonyms?.length > 0 || word.antonyms?.length > 0);
-        case 'word-search':
-            return label.length >= 4;
-        case 'crossword':
-            return label.length > 1 && /^[a-zA-Z]+$/.test(label) && definition.length > 0;
-        case 'wordle': {
-            const cleanWord = label.replace(/[^a-zA-Z]/g, '');
-            return /^[a-zA-Z\s-]+$/.test(label) && cleanWord.length >= 3 && cleanWord.length <= 10;
-        }
-        case 'fill-in-blank':
-            return label.length > 0 && String(word.example || '').trim().length > 0;
-        case 'flashcards':
-        case 'quiz':
-        case 'speed-match':
-            return label.length > 0 && definition.length > 0;
-        case 'illustration':
-        case 'hangman':
-        case 'scramble':
-            return label.length > 0;
-        default:
-            return false;
-    }
+    return getStudentActivity(activityType)?.isPlayable(word) || false;
 }
 
 export function isRequiredActivitySuitable(activityType, vocabulary = {}) {
@@ -89,9 +49,11 @@ export function isRequiredActivitySuitable(activityType, vocabulary = {}) {
 
 export function getDefaultRequiredActivities(vocabulary = {}) {
     const purpose = String(vocabulary.purpose || '').trim().toLowerCase();
-    if (purpose === 'summative') return ['flashcards', 'illustration'];
+    if (purpose === 'summative') return DEFAULT_REQUIRED_BY_PURPOSE.summative;
     const { week } = inferCatalogPlacement(vocabulary);
-    return PRACTICE_ROTATION[(Math.max(week, 1) - 1) % PRACTICE_ROTATION.length];
+    return DEFAULT_PRACTICE_REQUIRED_ROTATION[
+        (Math.max(week, 1) - 1) % DEFAULT_PRACTICE_REQUIRED_ROTATION.length
+    ];
 }
 
 function replaceUnsuitableRequiredActivities(required, vocabulary) {
@@ -101,7 +63,7 @@ function replaceUnsuitableRequiredActivities(required, vocabulary) {
             selected.push(activityType);
             continue;
         }
-        const replacement = REQUIRED_REPLACEMENTS.find(candidate => (
+        const replacement = REQUIRED_ACTIVITY_REPLACEMENT_ORDER.find(candidate => (
             !selected.includes(candidate)
             && !required.includes(candidate)
             && isRequiredActivitySuitable(candidate, vocabulary)

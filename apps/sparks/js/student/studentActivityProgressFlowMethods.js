@@ -1,10 +1,11 @@
 import { StudentActivityGateDisplay } from './studentActivityGateDisplay.js';
 import { getCurrentSchoolYear, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import {
-    DEFAULT_PRACTICE_REQUIRED_ROTATION,
-    DEFAULT_REQUIRED_BY_PURPOSE,
-    VOCAB_ACTIVITY_IDS
-} from './studentActivityConstants.js';
+    getDefaultRequiredActivities as resolveDefaultRequiredActivities,
+    getPracticeRequiredRotationIndex as resolvePracticeRequiredRotationIndex,
+    REQUIRED_ACTIVITY_REPLACEMENT_ORDER
+} from '../activityFlowPolicy.js';
+import { VOCAB_ACTIVITY_IDS } from './studentActivityConstants.js';
 import { getStudentActivity } from './studentActivityRegistry.js';
 
 export class StudentActivityProgressFlow {
@@ -76,34 +77,11 @@ export class StudentActivityProgressFlow {
     }
 
     getDefaultRequiredActivities(vocab = this.sm.currentVocab) {
-        const purpose = String(vocab?.purpose || '').trim().toLowerCase();
-        if (purpose === 'practice') {
-            const rotationIndex = this.getPracticeRequiredRotationIndex(vocab);
-            return DEFAULT_PRACTICE_REQUIRED_ROTATION[rotationIndex] || DEFAULT_REQUIRED_BY_PURPOSE.practice;
-        }
-        return DEFAULT_REQUIRED_BY_PURPOSE[purpose] || DEFAULT_REQUIRED_BY_PURPOSE.default;
+        return resolveDefaultRequiredActivities(vocab);
     }
 
     getPracticeRequiredRotationIndex(vocab = this.sm.currentVocab) {
-        const rotationLength = DEFAULT_PRACTICE_REQUIRED_ROTATION.length;
-        if (rotationLength === 0) return 0;
-
-        const week = Number(vocab?.week);
-        if (Number.isFinite(week) && week > 0) {
-            return (Math.floor(week) - 1) % rotationLength;
-        }
-
-        const unitKey = String(vocab?.id || vocab?.name || '');
-        const weekMatch = unitKey.match(/week[_-]?(\d+)/i);
-        if (weekMatch) {
-            return (Number(weekMatch[1]) - 1) % rotationLength;
-        }
-
-        let hash = 0;
-        for (let index = 0; index < unitKey.length; index += 1) {
-            hash = ((hash << 5) - hash + unitKey.charCodeAt(index)) | 0;
-        }
-        return Math.abs(hash) % rotationLength;
+        return resolvePracticeRequiredRotationIndex(vocab);
     }
 
     getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
@@ -132,17 +110,8 @@ export class StudentActivityProgressFlow {
     }
 
     replaceUnsuitableRequiredActivities(requiredActivities, vocab = this.sm.currentVocab, validIds = new Set(VOCAB_ACTIVITY_IDS)) {
-        const replacementOrder = [
-            'word-search',
-            'matching',
-            'scramble',
-            'hangman',
-            'quiz',
-            'speed-match',
-            'synonym-antonym',
-            'fill-in-blank',
-            'flashcards'
-        ].filter(activityType => validIds.has(activityType));
+        const replacementOrder = REQUIRED_ACTIVITY_REPLACEMENT_ORDER
+            .filter(activityType => validIds.has(activityType));
         const selected = [];
 
         requiredActivities.forEach(activityType => {
