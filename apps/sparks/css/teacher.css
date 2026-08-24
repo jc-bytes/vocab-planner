@@ -4657,6 +4657,29 @@ body {
     margin-left: 0.5rem;
 }
 
+.add-student-dialog {
+    width: 92%;
+    max-width: 620px;
+}
+
+.add-student-field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.add-student-field-grid--grade {
+    grid-template-columns: 1fr 1fr;
+}
+
+.add-student-section-input {
+    text-transform: uppercase;
+}
+
+.add-student-status {
+    color: var(--color-text-muted);
+}
+
 .student-progress-cards,
 .student-mobile-select-row {
     display: none;

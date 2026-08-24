@@ -131,3 +131,37 @@ test('Student Progress roster delegates static presentation to its owned stylesh
     assert.doesNotMatch(teacherCss, /#teacher-progress-view \.card>div\[style\*="overflow-x"\]/,
         'Roster overflow must not depend on an inline-style substring selector');
 });
+
+test('Add Student modal delegates static presentation to its feature classes', () => {
+    const start = teacherHtml.indexOf('<!-- Modal: Add Student -->');
+    const end = teacherHtml.indexOf('<!-- Modal: Student Details -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Add Student modal');
+    const addStudentTemplate = teacherHtml.slice(start, end);
+
+    assert.doesNotMatch(addStudentTemplate, /\sstyle=/,
+        'Add Student markup must not recreate static styles inline');
+    for (const className of [
+        'add-student-dialog',
+        'add-student-field-grid',
+        'add-student-field-grid--grade',
+        'add-student-section-input',
+        'add-student-status'
+    ]) {
+        assert.match(addStudentTemplate, new RegExp(`class="[^"]*${className}`));
+    }
+
+    for (const declaration of [
+        /\.add-student-dialog\s*\{[^}]*width:\s*92%;[^}]*max-width:\s*620px;/s,
+        /\.add-student-field-grid\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(180px, 1fr\)\);[^}]*gap:\s*1rem;/s,
+        /\.add-student-field-grid--grade\s*\{[^}]*grid-template-columns:\s*1fr 1fr;/s,
+        /\.add-student-section-input\s*\{[^}]*text-transform:\s*uppercase;/s,
+        /\.add-student-status\s*\{[^}]*color:\s*var\(--color-text-muted\);/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+
+    const addStudentCssStart = teacherCss.indexOf('.add-student-dialog');
+    const addStudentCssEnd = teacherCss.indexOf('.student-progress-cards', addStudentCssStart);
+    assert.ok(addStudentCssStart >= 0 && addStudentCssEnd > addStudentCssStart);
+    assert.doesNotMatch(teacherCss.slice(addStudentCssStart, addStudentCssEnd), /!important/);
+});

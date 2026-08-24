@@ -528,14 +528,14 @@
 
             <!-- Modal: Add Student -->
             <div id="add-student-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="add-student-modal-title">
-                <div class="modal-content" style="max-width: 620px; width: 92%;">
+                <div class="modal-content add-student-dialog">
                     <div class="modal-header">
                         <h2 id="add-student-modal-title">Add Student</h2>
                         <button id="close-add-student-modal" class="btn text-btn btn-icon-only" aria-label="Close add student"><i data-lucide="circle-x" aria-hidden="true"></i></button>
                     </div>
                     <form id="add-student-form">
                         <div class="modal-body">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                            <div class="add-student-field-grid">
                                 <div class="form-group">
                                     <label for="add-student-first-name">First Name</label>
                                     <input type="text" id="add-student-first-name" autocomplete="off" required>
@@ -549,7 +549,7 @@
                                 <label for="add-student-email">School Email</label>
                                 <input type="email" id="add-student-email" autocomplete="off" required>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="add-student-field-grid add-student-field-grid--grade">
                                 <div class="form-group">
                                     <label for="add-student-grade">Grade</label>
                                     <select id="add-student-grade" required>
@@ -562,10 +562,10 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="add-student-section">Section</label>
-                                    <input type="text" id="add-student-section" maxlength="1" pattern="[A-Za-z]" style="text-transform: uppercase;" required>
+                                    <input type="text" id="add-student-section" class="add-student-section-input" maxlength="1" pattern="[A-Za-z]" required>
                                 </div>
                             </div>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                            <div class="add-student-field-grid">
                                 <div class="form-group">
                                     <label for="add-student-password">Password</label>
                                     <div class="password-field">
@@ -587,7 +587,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="add-student-status" class="form-feedback" role="status" aria-live="polite" style="color:var(--text-muted);"></div>
+                            <div id="add-student-status" class="form-feedback add-student-status" role="status" aria-live="polite"></div>
                         </div>
                         <div class="modal-footer">
                             <button id="cancel-add-student-btn" type="button" class="btn secondary-btn">Cancel</button>
