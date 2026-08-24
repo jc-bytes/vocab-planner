@@ -19,7 +19,7 @@
     "test:browser-storage": "node --test tests/browser-storage.test.mjs",
     "test:reports": "node --test tests/report-generator.test.mjs",
     "test:student-api": "node --test tests/student-api-contract.test.mjs",
-    "test:student-auth": "node --test tests/student-auth-composition.test.mjs",
+    "test:student-auth": "node --test tests/student-auth-composition.test.mjs tests/supabase-config.test.mjs",
     "test:student-games": "node --test tests/student-game-composition.test.mjs",
     "test:student-progress": "node --test tests/student-progress-composition.test.mjs tests/student-progress-write-reduction.test.mjs tests/student-progress-v2-schema.test.mjs tests/student-progress-v2-migration.test.mjs tests/student-progress-v2-broadcast.test.mjs tests/student-progress-v2-client.test.mjs tests/student-progress-v2-operations.test.mjs tests/student-progress-direct-normalized.test.mjs tests/student-progress-legacy-retirement.test.mjs tests/student-arcade-time.test.mjs tests/student-activity-attempt-results.test.mjs tests/student-activity-work-timer.test.mjs tests/spark-response-persistence.test.mjs",
     "test:student-activities": "node --test tests/student-activity-runtime-composition.test.mjs tests/activity-mastery-security.test.mjs tests/crossword-activity.test.mjs tests/flashcards-activity.test.mjs tests/matching-activity.test.mjs tests/spark-reading-activity.test.mjs tests/word-hunt-paste-security.test.mjs",

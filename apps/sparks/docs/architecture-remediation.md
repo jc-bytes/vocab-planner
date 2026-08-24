@@ -287,3 +287,13 @@ Task 5 remains in progress. Next are smaller verified shared-data and environmen
 - Verification: 12 repository tests, 73 student progress tests, 7 student authentication tests, and 8 build-efficiency tests passed.
 
 Task 5 remains in progress. Next is Supabase build/runtime configuration authority, followed by remaining proven UI metadata and Arcade-duration copies.
+
+### Task 5e, share Supabase build/runtime validation
+
+- Extracted a pure Supabase configuration validator and reused it in runtime checks and Vite's build gate. The production project URL now has one client/build authority.
+- Added contract coverage for missing values, placeholders, publishable and legacy anonymous keys, browser overrides, and refusal to use production from development without the explicit override.
+- Replaced live-looking values in `.env.example` with onboarding placeholders. CI secrets and ignored local environment files remain deployment authorities.
+- Kept service-role secrets, local Supabase CLI identity, and server security enforcement separate as required boundaries.
+- Verification: 10 student authentication/config tests, 14 security-hardening tests, and the production build passed. Deployment remains 15.1 MB and the student entry is 255.46 kB raw, 65.73 kB gzip.
+
+Task 5 remains in progress. Next is the student Arcade-duration policy and stale static game metadata.

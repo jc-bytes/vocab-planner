@@ -5,8 +5,7 @@ export const SUPABASE_CONFIG = {
 
 export const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co';
 
-export const isSupabaseConfigured = () => {
-    const config = globalThis.window?.SUPABASE_CONFIG || SUPABASE_CONFIG;
+export function isValidSupabaseConfig(config = {}) {
     const url = String(config.url || '');
     const publishableKey = String(config.publishableKey || '');
     return Boolean(
@@ -16,4 +15,9 @@ export const isSupabaseConfigured = () => {
         !publishableKey.includes('YOUR_SUPABASE') &&
         !publishableKey.includes('your_key_here')
     );
+}
+
+export const isSupabaseConfigured = () => {
+    const config = globalThis.window?.SUPABASE_CONFIG || SUPABASE_CONFIG;
+    return isValidSupabaseConfig(config);
 };

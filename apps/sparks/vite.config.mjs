@@ -1,18 +1,17 @@
 import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'node:path';
+import {
+  PRODUCTION_SUPABASE_URL,
+  isValidSupabaseConfig
+} from './config/supabase-config.js';
 
-const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co';
-
-function validateSupabaseBuildConfig({ command, mode, env }) {
+export function validateSupabaseBuildConfig({ command, mode, env }) {
   const url = env.VITE_SUPABASE_URL || '';
   const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || '';
   const allowMissing = env.ALLOW_MISSING_SUPABASE_CONFIG === '1';
   const allowProductionInDev = env.ALLOW_PRODUCTION_SUPABASE_IN_DEV === '1';
-  const hasPlaceholder = url.includes('YOUR_PROJECT_REF')
-    || publishableKey.includes('YOUR_SUPABASE')
-    || publishableKey.includes('your_key_here');
 
-  if (command === 'build' && !allowMissing && (!url || !publishableKey || hasPlaceholder)) {
+  if (command === 'build' && !allowMissing && !isValidSupabaseConfig({ url, publishableKey })) {
     throw new Error('Missing Supabase build config. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');
   }
 
