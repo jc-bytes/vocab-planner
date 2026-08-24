@@ -345,20 +345,19 @@
                     <div class="student-filter-grid">
                         <div class="form-group">
                             <label for="filter-grade">Grade</label>
-                            <select id="filter-grade" style="width: 100%; padding: 0.5rem;">
+                            <select id="filter-grade" class="student-progress-filter-control">
                                 <option value="">All Grades</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="filter-group">Section</label>
-                            <select id="filter-group" style="width: 100%; padding: 0.5rem;">
+                            <select id="filter-group" class="student-progress-filter-control">
                                 <option value="">All Sections</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="filter-search">Search Name</label>
-                            <input type="text" id="filter-search" placeholder="Search student..."
-                                style="width: 100%; padding: 0.5rem;">
+                            <input type="text" id="filter-search" class="student-progress-filter-control" placeholder="Search student...">
                         </div>
                     </div>
                 </div>
@@ -371,19 +370,19 @@
                         </label>
                     </div>
                     <div class="student-progress-table-wrap table-scroll-wrapper">
-                        <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: left;">
-                            <thead style="position: sticky; top: 0; background: var(--card-bg, rgba(15, 23, 42, 0.55)); z-index: 10;">
-                                <tr style="border-bottom: 2px solid var(--border-color);">
-                                    <th class="data-table__header-cell" style="padding: 1rem; width: 50px;">
+                        <table class="data-table student-progress-table">
+                            <thead class="student-progress-table-head">
+                                <tr class="student-progress-table-heading-row">
+                                    <th class="data-table__header-cell student-progress-select-column">
                                         <input type="checkbox" id="select-all-students" title="Select All">
                                     </th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Name</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Email</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Grade</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Section</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Coins</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Last Active</th>
-                                    <th class="data-table__header-cell" style="padding: 1rem;">Actions</th>
+                                    <th class="data-table__header-cell">Name</th>
+                                    <th class="data-table__header-cell">Email</th>
+                                    <th class="data-table__header-cell">Grade</th>
+                                    <th class="data-table__header-cell">Section</th>
+                                    <th class="data-table__header-cell">Coins</th>
+                                    <th class="data-table__header-cell">Last Active</th>
+                                    <th class="data-table__header-cell">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="student-progress-list">
@@ -402,8 +401,7 @@
                     <div class="bulk-toolbar-content">
                         <span id="bulk-selected-count" class="bulk-count">0 students selected</span>
                         <div class="bulk-actions">
-                            <input type="number" id="bulk-coin-input" value="10" min="1" placeholder="Coins"
-                                style="width: 90px; padding: 0.5rem;">
+                            <input type="number" id="bulk-coin-input" value="10" min="1" placeholder="Coins">
                             <button id="bulk-add-coins-btn" class="btn primary-btn">Add Coins to Selected</button>
                             <button id="bulk-clear-selection-btn" class="btn text-btn">Clear Selection</button>
                         </div>

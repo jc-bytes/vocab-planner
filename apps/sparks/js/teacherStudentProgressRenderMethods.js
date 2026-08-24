@@ -13,7 +13,7 @@ class TeacherStudentProgressRenderMethods {
             if (tbody) {
                 tbody.innerHTML = `
                     <tr>
-                        <td class="data-table__cell data-table__empty" colspan="8" style="padding: 1rem; color: var(--text-muted);">No students match the current filters.</td>
+                        <td class="data-table__cell data-table__empty" colspan="8">No students match the current filters.</td>
                     </tr>
                 `;
             }
@@ -37,18 +37,18 @@ class TeacherStudentProgressRenderMethods {
             }
 
             tr.innerHTML = `
-                <td class="data-table__cell" style="padding: 1rem;">
+                <td class="data-table__cell">
                     <input type="checkbox" class="student-checkbox student-select-control" data-id="${escapeHtml(student.id)}" aria-label="Select ${details.name}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
                 </td>
-                <td class="data-table__cell" style="padding: 1rem;">${details.name}</td>
-                <td class="data-table__cell data-table__secondary" style="padding: 1rem; color: var(--text-muted);">${details.email}</td>
-                <td class="data-table__cell" style="padding: 1rem;">${details.grade}</td>
-                <td class="data-table__cell" style="padding: 1rem;">${details.group}</td>
-                <td class="data-table__cell data-table__metric" style="padding: 1rem;">${details.coins}</td>
-                <td class="data-table__cell data-table__secondary" style="padding: 1rem;">${details.lastActive}</td>
-                <td class="data-table__cell data-table__action" style="padding: 1rem;">
+                <td class="data-table__cell">${details.name}</td>
+                <td class="data-table__cell data-table__secondary student-progress-table-email">${details.email}</td>
+                <td class="data-table__cell">${details.grade}</td>
+                <td class="data-table__cell">${details.group}</td>
+                <td class="data-table__cell data-table__metric">${details.coins}</td>
+                <td class="data-table__cell data-table__secondary">${details.lastActive}</td>
+                <td class="data-table__cell data-table__action">
                     <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
-                    <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}" style="margin-left:0.5rem;">Add Coins</button>
+                    <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}">Add Coins</button>
                 </td>
             `;
             tbody?.appendChild(tr);

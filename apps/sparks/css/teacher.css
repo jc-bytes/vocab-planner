@@ -4608,6 +4608,11 @@ body {
     margin-bottom: 0;
 }
 
+.student-progress-filter-control {
+    width: 100%;
+    padding: 0.5rem;
+}
+
 .student-progress-card {
     display: grid;
     gap: 1rem;
@@ -4615,6 +4620,41 @@ body {
 
 .student-progress-table-wrap {
     max-height: 60vh;
+}
+
+.student-progress-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.student-progress-table-head {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--card-bg, rgba(15, 23, 42, 0.55));
+}
+
+.student-progress-table-heading-row {
+    border-bottom: 2px solid var(--color-border);
+}
+
+.student-progress-table :is(.data-table__header-cell, .data-table__cell) {
+    padding: 1rem;
+}
+
+.student-progress-select-column {
+    width: 50px;
+}
+
+.student-progress-table .student-progress-table-email,
+.student-progress-table .data-table__empty {
+    color: var(--color-text-muted);
+}
+
+.student-progress-table .add-coins-btn {
+    margin-left: 0.5rem;
 }
 
 .student-progress-cards,
@@ -5100,6 +5140,8 @@ body {
 }
 
 .bulk-actions input[type="number"] {
+    width: 90px;
+    padding: 0.5rem;
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #0f172a;
@@ -5110,7 +5152,7 @@ body {
 }
 
 /* Selected row highlighting */
-tr.selected {
+.student-progress-table tr.selected {
     background: rgba(99, 102, 241, 0.15);
     border-left: 3px solid var(--primary-color);
 }
@@ -5239,10 +5281,6 @@ button.activity-card {
     max-width: 100% !important;
 }
 
-#teacher-progress-view table {
-    min-width: 760px;
-}
-
 #teacher-progress-view .card,
 #teacher-dashboard-view .card,
 #teacher-editor-view .card,
@@ -5250,7 +5288,6 @@ button.activity-card {
     min-width: 0;
 }
 
-#teacher-progress-view .card>div[style*="overflow-x"],
 #preview-tables,
 #viewer-tables-content {
     overflow-x: auto;

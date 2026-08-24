@@ -5,12 +5,13 @@ import { readFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = path => readFile(new URL(path, root), 'utf8');
 
-const [teacherHtml, teacherCss, teacherQuizCss, dashboardRecentActivity, teacherDataViewer] = await Promise.all([
+const [teacherHtml, teacherCss, teacherQuizCss, dashboardRecentActivity, teacherDataViewer, studentProgressRenderer] = await Promise.all([
     read('teacher.html'),
     read('css/teacher.css'),
     read('css/teacherQuiz.css'),
     read('js/teacherDataDashboardRecentActivityMethods.js'),
-    read('js/teacherDataViewer.js')
+    read('js/teacherDataViewer.js'),
+    read('js/teacherStudentProgressRenderMethods.js')
 ]);
 
 function quizTemplate() {
@@ -92,4 +93,41 @@ test('Analytics Dashboard delegates static presentation to its owned stylesheet'
     assert.doesNotMatch(teacherCss.slice(dashboardCssStart, dashboardCssEnd), /!important/);
     assert.match(teacherDataViewer, /content\.style\.display\s*=\s*isActive\s*\?\s*'block'\s*:\s*'none'/,
         'Tab visibility remains runtime state instead of static presentation');
+});
+
+test('Student Progress roster delegates static presentation to its owned stylesheet', () => {
+    const start = teacherHtml.indexOf('<!-- View: Student Progress -->');
+    const end = teacherHtml.indexOf('<!-- View: Group Generator -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Student Progress roster view');
+    const rosterTemplate = teacherHtml.slice(start, end);
+    const renderStart = studentProgressRenderer.indexOf('renderProgressTable()');
+    const renderEnd = studentProgressRenderer.indexOf('getStudentProgressDetails(', renderStart);
+    assert.ok(renderStart >= 0 && renderEnd > renderStart, 'Missing bounded roster renderer');
+    const rosterRenderer = studentProgressRenderer.slice(renderStart, renderEnd);
+
+    assert.doesNotMatch(rosterTemplate, /\sstyle=/,
+        'Student Progress roster markup must not recreate static styles inline');
+    assert.doesNotMatch(rosterRenderer, /style=/,
+        'Desktop roster rows must use Student Progress classes');
+
+    for (const declaration of [
+        /\.student-progress-filter-control\s*\{[^}]*width:\s*100%;[^}]*padding:\s*0\.5rem;/s,
+        /\.student-progress-table\s*\{[^}]*width:\s*100%;[^}]*min-width:\s*760px;[^}]*border-collapse:\s*collapse;[^}]*text-align:\s*left;/s,
+        /\.student-progress-table-head\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*z-index:\s*10;[^}]*background:\s*var\(--card-bg,/s,
+        /\.student-progress-table-heading-row\s*\{[^}]*border-bottom:\s*2px solid var\(--color-border\);/s,
+        /\.student-progress-table :is\(\.data-table__header-cell, \.data-table__cell\)\s*\{[^}]*padding:\s*1rem;/s,
+        /\.student-progress-select-column\s*\{[^}]*width:\s*50px;/s,
+        /\.student-progress-table \.add-coins-btn\s*\{[^}]*margin-left:\s*0\.5rem;/s,
+        /\.bulk-actions input\[type="number"\]\s*\{[^}]*width:\s*90px;[^}]*padding:\s*0\.5rem;/s,
+        /\.student-progress-table tr\.selected\s*\{/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+
+    const rosterCssStart = teacherCss.indexOf('.student-filter-card');
+    const rosterCssEnd = teacherCss.indexOf('.activity-student-preview-modal', rosterCssStart);
+    assert.ok(rosterCssStart >= 0 && rosterCssEnd > rosterCssStart);
+    assert.doesNotMatch(teacherCss.slice(rosterCssStart, rosterCssEnd), /!important/);
+    assert.doesNotMatch(teacherCss, /#teacher-progress-view \.card>div\[style\*="overflow-x"\]/,
+        'Roster overflow must not depend on an inline-style substring selector');
 });
