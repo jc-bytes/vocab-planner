@@ -1,17 +1,10 @@
-export const VOCAB_ACTIVITY_OPTIONS = [
-    { id: 'illustration', label: 'Word Hunt', settingKey: 'illustration' },
-    { id: 'matching', label: 'Matching', settingKey: 'matching' },
-    { id: 'flashcards', label: 'Flashcards', settingKey: 'flashcards' },
-    { id: 'quiz', label: 'Quiz', settingKey: 'quiz' },
-    { id: 'synonym-antonym', label: 'Synonym & Antonym', settingKey: 'synonymAntonym' },
-    { id: 'word-search', label: 'Word Search', settingKey: 'wordSearch' },
-    { id: 'crossword', label: 'Crossword', settingKey: 'crossword' },
-    { id: 'hangman', label: 'Hangman', settingKey: 'hangman' },
-    { id: 'scramble', label: 'Word Scramble', settingKey: 'scramble' },
-    { id: 'wordle', label: 'Vocabulary Wordle', settingKey: 'wordle' },
-    { id: 'speed-match', label: 'Speed Match', settingKey: 'speedMatch' },
-    { id: 'fill-in-blank', label: 'Fill in Blank', settingKey: 'fillInBlank' }
-];
+import { STUDENT_ACTIVITY_REGISTRY } from './student/studentActivityRegistry.js';
+
+export const VOCAB_ACTIVITY_OPTIONS = STUDENT_ACTIVITY_REGISTRY.map(activity => ({
+    id: activity.id,
+    label: activity.title,
+    settingKey: activity.settingKey
+}));
 
 export const VOCAB_ACTIVITY_IDS = VOCAB_ACTIVITY_OPTIONS.map(activity => activity.id);
 

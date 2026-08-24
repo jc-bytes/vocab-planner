@@ -40,7 +40,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | Task | Status | Files changed | Verification | Decision or result |
 | --- | --- | --- | --- | --- |
 | 0. Establish baseline | DONE | `docs/architecture-remediation.md` | Full suite, design audit, production build, built-page smoke, dependency audit, independent review | Source and built application are green. Local Supabase checks remain unknown because Docker is unavailable. |
-| 1. Activity catalog foundation | TODO | | | |
+| 1. Activity catalog foundation | DONE | `js/student/studentActivityRegistry.js`, `js/teacherVocabularyEditorConstants.js`, registry tests | Registry, teacher-flow, 128 activity, build-efficiency tests; UI smoke; production build | Existing registry now owns teacher setting keys, labels, IDs, and order. Rewards stay server-authoritative. |
 | 2. Activity catalog validation | TODO | | | |
 | 3. Client/server activity parity | TODO | | | |
 | 4. Migrate activities one at a time | TODO | | | |
@@ -91,6 +91,15 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Local Supabase acceptance, lint, and advisor checks remain unknown because Docker is not running. Authenticated production checks also remain outside this credential-free baseline. Existing source-level database, security, and repository tests passed.
 - Chose the existing `studentActivityRegistry.js` as the activity-catalog seam. Creating a second catalog would introduce the duplicate authority this remediation is meant to remove.
 - Confirmed that all 12 activity modules are dynamic Vite entries. Catalog work must preserve that build property.
+
+### Task 1, activity catalog foundation
+
+- Added each teacher activity setting key to the existing activity registry.
+- Derived teacher activity options, IDs, labels, order, and setting-key lookup from that registry. The duplicate 12-entry teacher list is gone.
+- Kept launch factories, activity flow defaults, routes, persistence, and SQL unchanged.
+- Did not move the unused client XP map into the registry. Supabase calculates rewards and the client displays the returned total delta, so copying the map would create a false reward authority.
+- Preserved lazy loading. The production manifest still keeps teacher feature imports separate and the build stays at 15.1 MB.
+- Independent review found zero cycles across 288 first-party JavaScript files and 523 resolved imports. The teacher entry kept its five existing lazy features and gained no activity imports.
 
 ## Remaining work
 

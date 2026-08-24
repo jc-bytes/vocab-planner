@@ -11,6 +11,11 @@ import {
     getLeaderboardGameIds,
     getStudentGame
 } from '../js/student/studentGameRegistry.js';
+import {
+    VOCAB_ACTIVITY_IDS,
+    VOCAB_ACTIVITY_OPTIONS,
+    VOCAB_ACTIVITY_SETTING_KEYS
+} from '../js/teacherVocabularyEditorConstants.js';
 
 function assertUniqueIds(entries, label) {
     const ids = entries.map(entry => entry.id);
@@ -29,7 +34,18 @@ test('activity registry is the complete route and module source', () => {
         assert.match(activity.exportName, /Activity$/, `${activity.id} must name its module export`);
         assert.ok(activity.title && activity.description, `${activity.id} must provide card copy`);
         assert.ok(activity.icon || activity.iconMarkup, `${activity.id} must provide a card icon`);
+        assert.ok(activity.settingKey, `${activity.id} must provide its teacher setting key`);
     }
+
+    assert.deepEqual(VOCAB_ACTIVITY_OPTIONS, STUDENT_ACTIVITY_REGISTRY.map(activity => ({
+        id: activity.id,
+        label: activity.title,
+        settingKey: activity.settingKey
+    })));
+    assert.deepEqual(VOCAB_ACTIVITY_IDS, getStudentActivityIds());
+    assert.deepEqual(VOCAB_ACTIVITY_SETTING_KEYS, Object.fromEntries(
+        STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity.settingKey])
+    ));
 });
 
 test('game registry owns display, launch, frame, and leaderboard configuration', async () => {

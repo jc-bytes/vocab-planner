@@ -19,53 +19,65 @@ const HANGMAN_ICON = `
 export const STUDENT_ACTIVITY_REGISTRY = Object.freeze([
     {
         id: 'illustration', title: 'Word Hunt', description: 'Find a definition, image, and two examples.',
-        icon: 'compass', exportName: 'IllustrationActivity', load: () => import('../activities/illustration.js'),
+        icon: 'compass', settingKey: 'illustration',
+        exportName: 'IllustrationActivity', load: () => import('../activities/illustration.js'),
         nonReplayable: true, tracksCoverage: false
     },
     {
         id: 'matching', title: 'Matching', description: 'Match words to definitions.',
-        icon: 'puzzle', exportName: 'MatchingActivity', load: () => import('../activities/matching.js')
+        icon: 'puzzle', settingKey: 'matching',
+        exportName: 'MatchingActivity', load: () => import('../activities/matching.js')
     },
     {
         id: 'flashcards', title: 'Flashcards', description: 'Study words and images.',
-        icon: 'layers-3', exportName: 'FlashcardsActivity', load: () => import('../activities/flashcards.js'),
+        icon: 'layers-3', settingKey: 'flashcards',
+        exportName: 'FlashcardsActivity', load: () => import('../activities/flashcards.js'),
         nonReplayable: true, tracksCoverage: false
     },
     {
         id: 'quiz', title: 'Quiz', description: 'Test your knowledge.',
-        icon: 'circle-help', exportName: 'QuizActivity', load: () => import('../activities/quiz.js')
+        icon: 'circle-help', settingKey: 'quiz',
+        exportName: 'QuizActivity', load: () => import('../activities/quiz.js')
     },
     {
         id: 'synonym-antonym', title: 'Synonym & Antonym', description: 'Challenge your word knowledge.',
-        icon: 'repeat-2', exportName: 'SynonymAntonymActivity', load: () => import('../activities/synonymAntonym.js')
+        icon: 'repeat-2', settingKey: 'synonymAntonym',
+        exportName: 'SynonymAntonymActivity', load: () => import('../activities/synonymAntonym.js')
     },
     {
         id: 'word-search', title: 'Word Search', description: 'Find hidden vocabulary words.',
-        icon: 'search', exportName: 'WordSearchActivity', load: () => import('../activities/wordSearch.js')
+        icon: 'search', settingKey: 'wordSearch',
+        exportName: 'WordSearchActivity', load: () => import('../activities/wordSearch.js')
     },
     {
         id: 'crossword', title: 'Crossword', description: 'Solve definitions.',
-        iconMarkup: CROSSWORD_ICON, exportName: 'CrosswordActivity', load: () => import('../activities/crossword.js')
+        iconMarkup: CROSSWORD_ICON, settingKey: 'crossword',
+        exportName: 'CrosswordActivity', load: () => import('../activities/crossword.js')
     },
     {
         id: 'hangman', title: 'Hangman', description: 'Guess the word.',
-        iconMarkup: HANGMAN_ICON, exportName: 'HangmanActivity', load: () => import('../activities/hangman.js')
+        iconMarkup: HANGMAN_ICON, settingKey: 'hangman',
+        exportName: 'HangmanActivity', load: () => import('../activities/hangman.js')
     },
     {
         id: 'scramble', title: 'Word Scramble', description: 'Unscramble the letters.',
-        icon: 'shuffle', exportName: 'ScrambleActivity', load: () => import('../activities/scramble.js')
+        icon: 'shuffle', settingKey: 'scramble',
+        exportName: 'ScrambleActivity', load: () => import('../activities/scramble.js')
     },
     {
         id: 'wordle', title: 'Vocabulary Wordle', description: 'Guess words from clues.',
-        icon: 'layout-grid', exportName: 'WordleActivity', load: () => import('../activities/wordle.js')
+        icon: 'layout-grid', settingKey: 'wordle',
+        exportName: 'WordleActivity', load: () => import('../activities/wordle.js')
     },
     {
         id: 'speed-match', title: 'Speed Match', description: 'Race against time.',
-        icon: 'timer', exportName: 'SpeedMatchActivity', load: () => import('../activities/speedMatch.js?v=20260706a')
+        icon: 'timer', settingKey: 'speedMatch',
+        exportName: 'SpeedMatchActivity', load: () => import('../activities/speedMatch.js?v=20260706a')
     },
     {
         id: 'fill-in-blank', title: 'Fill in Blank', description: 'Complete the sentence.',
-        icon: 'text-cursor-input', exportName: 'FillInBlankActivity', load: () => import('../activities/fillInBlank.js')
+        icon: 'text-cursor-input', settingKey: 'fillInBlank',
+        exportName: 'FillInBlankActivity', load: () => import('../activities/fillInBlank.js')
     }
 ].map(activity => Object.freeze({ routeable: true, tracksCoverage: true, ...activity })));
 
