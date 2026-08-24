@@ -1247,119 +1247,110 @@
 
                 <!-- Export Tab -->
                 <div id="data-export-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-export" style="display: none;">
-                    <div style="margin-bottom: 2rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600;">Data Export & Visualization</h3>
-                        <p style="color: var(--text-muted, #6b7280); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                    <div class="data-export-header">
+                        <h3>Data Export & Visualization</h3>
+                        <p>
                             Before resetting data, you must export it. Select the data types and students you want to export, then preview and download.
                         </p>
                     </div>
 
                     <!-- Data Type Selection -->
-                    <div class="form-group" style="margin-bottom: 2rem;">
-                        <label style="font-weight: 600; margin-bottom: 1rem; display: block; font-size: 1rem; color: var(--text-main, #f8fafc);">Select data to export:</label>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 1.25rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
-                                <input type="checkbox" id="export-progress" checked style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">Student Progress</div>
-                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Vocabulary progress (scores, activity data), coins, images, student profile</div>
+                    <div class="form-group data-export-group">
+                        <label class="data-export-group-label">Select data to export:</label>
+                        <div class="data-export-type-grid">
+                            <label class="data-export-type-option">
+                                <input type="checkbox" id="export-progress" checked>
+                                <div class="data-export-option-copy">
+                                    <div class="data-export-option-title">Student Progress</div>
+                                    <div class="data-export-option-description">Vocabulary progress (scores, activity data), coins, images, student profile</div>
                                 </div>
                             </label>
-                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: background 0.2s; border: 1px solid transparent;">
-                                <input type="checkbox" id="export-scores" checked style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">Leaderboard Scores</div>
-                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Game high scores</div>
+                            <label class="data-export-type-option">
+                                <input type="checkbox" id="export-scores" checked>
+                                <div class="data-export-option-copy">
+                                    <div class="data-export-option-title">Leaderboard Scores</div>
+                                    <div class="data-export-option-description">Game high scores</div>
                                 </div>
                             </label>
-                            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; padding: 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
-                                <input type="checkbox" id="export-roles" style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; margin-bottom: 0.35rem; color: var(--text-main, #f8fafc);">User Roles</div>
-                                    <div style="font-size: 0.9rem; color: var(--text-muted, #cbd5f5); line-height: 1.4;">Advanced option</div>
+                            <label class="data-export-type-option data-export-type-option--all-transition">
+                                <input type="checkbox" id="export-roles">
+                                <div class="data-export-option-copy">
+                                    <div class="data-export-option-title">User Roles</div>
+                                    <div class="data-export-option-description">Advanced option</div>
                                 </div>
                             </label>
                         </div>
                     </div>
                     <!-- Student Selection -->
-                    <div class="form-group" style="margin-bottom: 2rem;">
-                        <label style="font-weight: 600; margin-bottom: 1rem; display: block; font-size: 1rem; color: var(--text-main, #f8fafc);">Select students:</label>
-                        <div style="padding: 1.25rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
-                                    <input type="radio" name="student-selection" value="all" id="select-all" checked style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                    <span style="font-weight: 500; color: var(--text-main, #f8fafc);">All students</span>
+                    <div class="form-group data-export-group">
+                        <label class="data-export-group-label">Select students:</label>
+                        <div class="data-export-student-panel">
+                            <div class="data-export-student-list">
+                                <label class="data-export-student-option">
+                                    <input type="radio" name="student-selection" value="all" id="select-all" checked>
+                                    <span>All students</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent; flex-wrap: wrap;">
-                                    <input type="radio" name="student-selection" value="grade" id="select-grade" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                    <span style="font-weight: 500; min-width: 100px; color: var(--text-main, #f8fafc);">By grade:</span>
-                                    <select id="export-grade-select" class="form-control" style="flex: 1; max-width: 250px; padding: 0.5rem; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 6px; color: var(--text-main, #f8fafc);" disabled>
+                                <label class="data-export-student-option data-export-student-option--grade">
+                                    <input type="radio" name="student-selection" value="grade" id="select-grade">
+                                    <span>By grade:</span>
+                                    <select id="export-grade-select" class="form-control data-export-grade-select" disabled>
                                         <option value="">Select grade...</option>
                                     </select>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.875rem 1rem; border-radius: 6px; transition: all 0.2s; border: 1px solid transparent;">
-                                    <input type="radio" name="student-selection" value="specific" id="select-specific" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--color-brand);">
-                                    <span style="font-weight: 500; color: var(--text-main, #f8fafc);">Specific students (use filters above)</span>
+                                <label class="data-export-student-option">
+                                    <input type="radio" name="student-selection" value="specific" id="select-specific">
+                                    <span>Specific students (use filters above)</span>
                                 </label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center;">
-                        <button id="preview-data-btn" class="btn secondary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                    <div class="data-export-actions">
+                        <button id="preview-data-btn" class="btn secondary-btn data-export-action">
                             <i data-lucide="eye"></i>
                             Preview Data
                         </button>
-                        <button id="export-json-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                        <button id="export-json-btn" class="btn primary-btn data-export-action">
                             <i data-lucide="download"></i>
                             Export JSON
                         </button>
-                        <button id="export-csv-btn" class="btn primary-btn" style="padding: 0.75rem 1.5rem; font-size: 1rem;">
+                        <button id="export-csv-btn" class="btn primary-btn data-export-action">
                             <i data-lucide="table"></i>
                             Export CSV
                         </button>
                     </div>
 
                     <!-- Export Loading Indicator -->
-                    <div id="export-loading" style="display: none; padding: 1.5rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div class="export-spinner" style="width: 24px; height: 24px; border: 3px solid color-mix(in srgb, var(--color-brand) 30%, transparent); border-top-color: var(--color-brand); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                            <div style="flex: 1;">
-                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Exporting Data...</div>
-                                <div id="export-loading-text" class="runtime-status__description" style="color: var(--text-muted, #cbd5f5);">Preparing your data for download</div>
+                    <div id="export-loading" class="data-export-loading" style="display: none;">
+                        <div class="data-export-loading__row">
+                            <div class="export-spinner data-export-loading__spinner"></div>
+                            <div class="data-export-loading__copy">
+                                <div class="runtime-status__title data-export-status-title">Exporting Data...</div>
+                                <div id="export-loading-text" class="runtime-status__description data-export-status-description">Preparing your data for download</div>
                             </div>
                         </div>
-                        <div style="margin-top: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 6px; overflow: hidden;">
-                            <div id="export-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--color-brand), #8b5cf6); transition: width 0.3s ease; animation: progress-pulse 1.5s ease-in-out infinite;"></div>
+                        <div class="data-export-loading__progress-track">
+                            <div id="export-progress-bar" class="data-export-loading__progress-bar" style="width: 0%;"></div>
                         </div>
                     </div>
-                    <style>
-                        @keyframes spin {
-                            to { transform: rotate(360deg); }
-                        }
-                        @keyframes progress-pulse {
-                            0%, 100% { opacity: 1; }
-                            50% { opacity: 0.7; }
-                        }
-                    </style>
 
                     <!-- Export Status -->
-                    <div id="export-status" style="display: none; padding: 1rem 1.25rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
+                    <div id="export-status" class="data-export-success" style="display: none;">
+                        <div class="data-export-success__row">
                             <i data-lucide="circle-check"></i>
                             <div>
-                                <div class="runtime-status__title" style="margin-bottom: 0.25rem; color: var(--text-main, #f8fafc);">Export Completed</div>
-                                <div id="export-status-text" class="runtime-status__description" style="color: #34d399;">Ready to proceed with reset</div>
+                                <div class="runtime-status__title data-export-status-title">Export Completed</div>
+                                <div id="export-status-text" class="runtime-status__description data-export-success__description">Ready to proceed with reset</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Preview Section -->
-                    <div id="data-preview-section" class="runtime-section-shell" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--border-color, rgba(255, 255, 255, 0.125));">
-                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Data Preview</h4>
-                        <div id="preview-summary" style="margin-bottom: 1.5rem;"></div>
-                        <div id="preview-tables" class="table-scroll-wrapper data-table-region" style="max-height: 500px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                    <div id="data-preview-section" class="runtime-section-shell data-export-preview" style="display: none;">
+                        <h4 class="section-header__title data-export-preview__title">Data Preview</h4>
+                        <div id="preview-summary" class="data-export-preview__summary"></div>
+                        <div id="preview-tables" class="table-scroll-wrapper data-table-region data-export-preview__tables"></div>
                     </div>
                 </div>
 

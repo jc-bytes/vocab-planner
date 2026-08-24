@@ -118,7 +118,7 @@ const teacherDataExportMethods = {
         } catch (error) {
             console.error('Error previewing data:', error);
             notifications.error('Failed to load preview. Please try again.');
-            previewSummary.innerHTML = '<p class="runtime-status" style="color: var(--danger-color);">Error loading preview.</p>';
+            previewSummary.innerHTML = '<p class="runtime-status data-export-preview-error">Error loading preview.</p>';
         }
     },
 
@@ -227,7 +227,7 @@ const teacherDataExportMethods = {
             resetSection.style.opacity = '1';
             resetSection.style.pointerEvents = 'auto';
             resetBtn.disabled = false;
-            resetStatus.innerHTML = '<span class="runtime-status" style="color: var(--success-color);">Export completed. Reset is now enabled.</span>';
+            resetStatus.innerHTML = '<span class="runtime-status data-export-reset-enabled">Export completed. Reset is now enabled.</span>';
         }
     },
 };

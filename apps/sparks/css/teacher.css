@@ -4039,6 +4039,330 @@ body {
     min-width: 640px;
 }
 
+.data-export-header,
+.data-export-group,
+.data-export-actions {
+    margin-bottom: 2rem;
+}
+
+.data-export-header h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.data-export-header p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.data-export-group > .data-export-group-label {
+    display: block;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.data-export-type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.data-export-type-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.data-export-type-option--all-transition {
+    transition: all 0.2s;
+}
+
+.data-export-type-option input,
+.data-export-student-option input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-brand);
+}
+
+.data-export-type-option input {
+    margin-top: 0.25rem;
+}
+
+.data-export-option-copy {
+    flex: 1;
+}
+
+.data-export-option-title {
+    margin-bottom: 0.35rem;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.data-export-option-description {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.data-export-student-panel {
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.data-export-student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.data-export-student-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.data-export-student-option--grade {
+    flex-wrap: wrap;
+}
+
+.data-export-student-option span {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.data-export-student-option--grade span {
+    min-width: 100px;
+}
+
+.data-export-grade-select {
+    flex: 1;
+    max-width: 250px;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.6);
+    color: var(--color-text);
+}
+
+.data-export-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.data-export-action {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.data-export-loading {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.data-export-loading__row,
+.data-export-success__row {
+    display: flex;
+    align-items: center;
+}
+
+.data-export-loading__row {
+    gap: 1rem;
+}
+
+.data-export-loading__spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid color-mix(in srgb, var(--color-brand) 30%, transparent);
+    border-top-color: var(--color-brand);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.data-export-loading__copy {
+    flex: 1;
+}
+
+.data-export-status-title {
+    margin-bottom: 0.25rem;
+    color: var(--color-text);
+}
+
+.data-export-status-description {
+    color: var(--color-text-muted);
+}
+
+.data-export-loading__progress-track {
+    height: 6px;
+    margin-top: 1rem;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.data-export-loading__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-brand), #8b5cf6);
+    transition: width 0.3s ease;
+    animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+.data-export-success {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.data-export-success__row {
+    gap: 0.75rem;
+    color: var(--color-status-success-glow);
+}
+
+.data-export-success__description {
+    color: #34d399;
+}
+
+.data-export-preview {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--color-border);
+}
+
+.data-export-preview__title {
+    margin: 0 0 1.5rem;
+    color: var(--color-text);
+}
+
+.data-export-preview__summary {
+    margin-bottom: 1.5rem;
+}
+
+.data-export-preview__tables {
+    max-height: 500px;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.data-export-runtime-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.data-export-runtime-summary .runtime-summary__label {
+    color: var(--color-text-muted);
+}
+
+.data-export-runtime-summary .runtime-summary__value {
+    color: var(--color-text);
+}
+
+.data-export-table-caption {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.data-export-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-export-table--spaced {
+    margin-bottom: 1.5rem;
+}
+
+.data-export-table__header-row {
+    border-bottom: 2px solid var(--color-border);
+}
+
+.data-export-table__row {
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-export-table :is(.data-table__header-cell, .data-table__cell) {
+    padding: 0.75rem;
+}
+
+.data-export-table .data-table__header-cell {
+    text-align: left;
+}
+
+.data-export-table .data-table__metric {
+    text-align: right;
+}
+
+.data-export-table .data-export-table__numeric {
+    text-align: right;
+}
+
+.data-export-table .data-table__status {
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+.data-export-table-empty {
+    color: var(--color-text-muted);
+}
+
+.data-export-preview-error {
+    color: var(--color-danger);
+}
+
+.data-export-reset-enabled {
+    color: var(--color-success);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes progress-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
 .data-dashboard-empty {
     padding: 2rem;
     color: var(--color-text-muted);

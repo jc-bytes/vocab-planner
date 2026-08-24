@@ -16,36 +16,36 @@ export function renderPreview(preview, summaryEl, tablesEl) {
     }
 
     summaryEl.innerHTML = `
-            <div class="runtime-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125));">
+            <div class="runtime-summary data-export-runtime-summary">
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Students</div>
-                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalStudents}</div>
+                    <div class="runtime-summary__label">Total Students</div>
+                    <div class="runtime-summary__value">${preview.summary.totalStudents}</div>
                 </div>
                 ${preview.summary.totalProgressRecords > 0 ? `
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Progress Records</div>
-                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalProgressRecords}</div>
+                    <div class="runtime-summary__label">Progress Records</div>
+                    <div class="runtime-summary__value">${preview.summary.totalProgressRecords}</div>
                 </div>
                 ${totalVocabUnits > 0 ? `
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Vocabulary Units</div>
-                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${totalVocabUnits}</div>
+                    <div class="runtime-summary__label">Vocabulary Units</div>
+                    <div class="runtime-summary__value">${totalVocabUnits}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Total Coins</div>
-                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalCoins.toLocaleString()}</div>
+                    <div class="runtime-summary__label">Total Coins</div>
+                    <div class="runtime-summary__value">${preview.summary.totalCoins.toLocaleString()}</div>
                 </div>
                 ` : ''}
                 ${preview.summary.totalScores > 0 ? `
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Game Scores</div>
-                    <div class="runtime-summary__value" style="color: var(--text-main, #f8fafc);">${preview.summary.totalScores}</div>
+                    <div class="runtime-summary__label">Game Scores</div>
+                    <div class="runtime-summary__value">${preview.summary.totalScores}</div>
                 </div>
                 ` : ''}
                 <div>
-                    <div class="runtime-summary__label" style="color: var(--text-muted, #cbd5f5);">Date Range</div>
-                    <div class="runtime-summary__value runtime-summary__value--compact" style="color: var(--text-main, #f8fafc);">${dateStr}</div>
+                    <div class="runtime-summary__label">Date Range</div>
+                    <div class="runtime-summary__value runtime-summary__value--compact">${dateStr}</div>
                 </div>
             </div>
         `;
@@ -54,15 +54,15 @@ export function renderPreview(preview, summaryEl, tablesEl) {
 
     if (preview.studentProgress.length > 0) {
         tablesHTML += `
-                <h5 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Student Progress (${preview.studentProgress.length} records)</h5>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+                <h5 class="data-export-table-caption">Student Progress (${preview.studentProgress.length} records)</h5>
+                <table class="data-table data-export-table data-export-table--spaced">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--border-color);">
-                            <th style="padding: 0.75rem; text-align: left;">Student ID</th>
-                            <th style="padding: 0.75rem; text-align: left;">Name</th>
-                            <th style="padding: 0.75rem; text-align: left;">Grade</th>
-                            <th style="padding: 0.75rem; text-align: right;">Coins</th>
-                            <th style="padding: 0.75rem; text-align: left;">Last Active</th>
+                        <tr class="data-export-table__header-row">
+                            <th class="data-table__header-cell">Student ID</th>
+                            <th class="data-table__header-cell">Name</th>
+                            <th class="data-table__header-cell">Grade</th>
+                            <th class="data-table__header-cell data-export-table__numeric">Coins</th>
+                            <th class="data-table__header-cell">Last Active</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -76,18 +76,18 @@ export function renderPreview(preview, summaryEl, tablesEl) {
                                 ? (item.updatedAt.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt.seconds * 1000)).toLocaleDateString()
                                 : '-';
                             return `
-                                <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td style="padding: 0.75rem;">${escapeHtml(item.studentId)}</td>
-                                    <td style="padding: 0.75rem;">${escapeHtml(name)}</td>
-                                    <td style="padding: 0.75rem;">${escapeHtml(profile.grade || '-')}</td>
-                                    <td style="padding: 0.75rem; text-align: right;">${coins}</td>
-                                    <td style="padding: 0.75rem;">${lastActive}</td>
+                                <tr class="data-export-table__row">
+                                    <td class="data-table__cell">${escapeHtml(item.studentId)}</td>
+                                    <td class="data-table__cell">${escapeHtml(name)}</td>
+                                    <td class="data-table__cell">${escapeHtml(profile.grade || '-')}</td>
+                                    <td class="data-table__cell data-table__metric">${coins}</td>
+                                    <td class="data-table__cell">${lastActive}</td>
                                 </tr>
                             `;
                         }).join('')}
                         ${preview.studentProgress.length > 10 ? `
                             <tr>
-                                <td colspan="5" style="padding: 0.75rem; text-align: center; color: var(--text-muted);">
+                                <td colspan="5" class="data-table__cell data-table__status">
                                     ... and ${preview.studentProgress.length - 10} more records
                                 </td>
                             </tr>
@@ -99,14 +99,14 @@ export function renderPreview(preview, summaryEl, tablesEl) {
 
     if (preview.scores.length > 0) {
         tablesHTML += `
-                <h5 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Leaderboard Scores (${preview.scores.length} records)</h5>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+                <h5 class="data-export-table-caption">Leaderboard Scores (${preview.scores.length} records)</h5>
+                <table class="data-table data-export-table data-export-table--spaced">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--border-color);">
-                            <th style="padding: 0.75rem; text-align: left;">Student</th>
-                            <th style="padding: 0.75rem; text-align: left;">Game</th>
-                            <th style="padding: 0.75rem; text-align: right;">Score</th>
-                            <th style="padding: 0.75rem; text-align: left;">Date</th>
+                        <tr class="data-export-table__header-row">
+                            <th class="data-table__header-cell">Student</th>
+                            <th class="data-table__header-cell">Game</th>
+                            <th class="data-table__header-cell data-export-table__numeric">Score</th>
+                            <th class="data-table__header-cell">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,17 +115,17 @@ export function renderPreview(preview, summaryEl, tablesEl) {
                                 ? (item.timestamp.toDate ? item.timestamp.toDate() : new Date(item.timestamp.seconds * 1000)).toLocaleDateString()
                                 : '-';
                             return `
-                                <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td style="padding: 0.75rem;">${escapeHtml(item.name || item.userId)}</td>
-                                    <td style="padding: 0.75rem;">${escapeHtml(item.gameId || '-')}</td>
-                                    <td style="padding: 0.75rem; text-align: right;">${(item.score || 0).toLocaleString()}</td>
-                                    <td style="padding: 0.75rem;">${date}</td>
+                                <tr class="data-export-table__row">
+                                    <td class="data-table__cell">${escapeHtml(item.name || item.userId)}</td>
+                                    <td class="data-table__cell">${escapeHtml(item.gameId || '-')}</td>
+                                    <td class="data-table__cell data-table__metric">${(item.score || 0).toLocaleString()}</td>
+                                    <td class="data-table__cell">${date}</td>
                                 </tr>
                             `;
                         }).join('')}
                         ${preview.scores.length > 10 ? `
                             <tr>
-                                <td colspan="4" style="padding: 0.75rem; text-align: center; color: var(--text-muted);">
+                                <td colspan="4" class="data-table__cell data-table__status">
                                     ... and ${preview.scores.length - 10} more records
                                 </td>
                             </tr>
@@ -135,5 +135,5 @@ export function renderPreview(preview, summaryEl, tablesEl) {
             `;
     }
 
-    tablesEl.innerHTML = tablesHTML || '<p style="color: var(--text-muted);">No data to display.</p>';
+    tablesEl.innerHTML = tablesHTML || '<p class="data-export-table-empty">No data to display.</p>';
 }

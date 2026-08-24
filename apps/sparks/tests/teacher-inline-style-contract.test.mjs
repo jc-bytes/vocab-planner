@@ -13,7 +13,9 @@ const [
     teacherDataViewer,
     studentProgressRenderer,
     vocabularyStorage,
-    vocabularyWordEditor
+    vocabularyWordEditor,
+    dataExport,
+    dataExportPreviewRenderer
 ] = await Promise.all([
     read('teacher.html'),
     read('css/teacher.css'),
@@ -22,7 +24,9 @@ const [
     read('js/teacherDataViewer.js'),
     read('js/teacherStudentProgressRenderMethods.js'),
     read('js/teacherVocabularyStorage.js'),
-    read('js/teacherVocabularyWordEditorMethods.js')
+    read('js/teacherVocabularyWordEditorMethods.js'),
+    read('js/teacherDataExport.js'),
+    read('js/teacherDataExportPreviewRenderer.js')
 ]);
 
 function quizTemplate() {
@@ -280,4 +284,51 @@ test('Teacher settings keeps layout presentation separate from tab state', () =>
     assert.match(settingsTemplate, /id="data-calendar-section"[^>]*style="display: none;"/,
         'Initial settings tab visibility remains runtime state for Task 14');
     assert.match(teacherCss, /\.teacher-settings-grid--actions\s*\{[^}]*align-items:\s*end;/s);
+});
+
+test('Data Export delegates fixed presentation while retaining calculated runtime state', () => {
+    const start = teacherHtml.indexOf('<!-- Export Tab -->');
+    const end = teacherHtml.indexOf('<!-- View Data Tab -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Data Export template');
+    const exportTemplate = teacherHtml.slice(start, end);
+    const inlineStyles = [...exportTemplate.matchAll(/style="([^"]*)"/g)].map(match => match[1]);
+
+    assert.deepEqual(inlineStyles, [
+        'display: none;',
+        'display: none;',
+        'width: 0%;',
+        'display: none;',
+        'display: none;'
+    ], 'Data Export template must keep only initial visibility and calculated progress inline');
+    assert.doesNotMatch(exportTemplate, /<style>|@keyframes/,
+        'Data Export animations must be owned by teacher CSS');
+    assert.doesNotMatch(dataExportPreviewRenderer, /style=/,
+        'Generated Data Export preview markup must use owned classes');
+    assert.doesNotMatch(dataExport, /style="/,
+        'Generated Data Export feedback must use owned classes');
+
+    for (const runtimeAssignment of [
+        /previewSection\.style\.display\s*=\s*'block'/,
+        /loadingEl\.style\.display\s*=\s*'block'/,
+        /progressBar\.style\.width\s*=\s*`\$\{percent\}%`/,
+        /resetSection\.style\.opacity\s*=\s*'1'/,
+        /resetSection\.style\.pointerEvents\s*=\s*'auto'/
+    ]) {
+        assert.match(dataExport, runtimeAssignment);
+    }
+
+    for (const declaration of [
+        /\.data-export-type-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(280px, 1fr\)\);/s,
+        /\.data-export-student-option\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center;/s,
+        /\.data-export-loading__progress-bar\s*\{[^}]*height:\s*100%;[^}]*animation:\s*progress-pulse 1\.5s ease-in-out infinite;/s,
+        /\.data-export-preview__tables\s*\{[^}]*max-height:\s*500px;/s,
+        /\.data-export-runtime-summary\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(150px, 1fr\)\);/s,
+        /\.data-export-table\s*\{[^}]*width:\s*100%;[^}]*border-collapse:\s*collapse;/s,
+        /\.data-export-preview-error\s*\{[^}]*color:\s*var\(--color-danger\);/s,
+        /\.data-export-reset-enabled\s*\{[^}]*color:\s*var\(--color-success\);/s,
+        /@keyframes spin\s*\{/,
+        /@keyframes progress-pulse\s*\{/
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
 });
