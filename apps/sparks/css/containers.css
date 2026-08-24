@@ -1,0 +1,88 @@
+/* Shared page shells and reusable content collections. Responsive layout stays page-owned. */
+.landing-container {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    align-items: center;
+    justify-items: center;
+    gap: 1.2rem;
+    min-height: 100vh;
+    padding: clamp(1.25rem, 4vw, 3rem) var(--spacing-lg);
+    text-align: center;
+    max-width: 900px;
+    width: min(100%, 900px);
+    margin: 0 auto;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.app-container > main {
+    padding: var(--spacing-lg);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-lg);
+    background: rgba(15, 23, 42, 0.24);
+    box-shadow: none;
+}
+
+.app-container > main,
+.landing-container {
+    position: relative;
+}
+
+.app-container::before,
+.landing-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+    filter: blur(35px);
+    opacity: 0.18;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.words-grid,
+.vocab-grid,
+.activities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.vocab-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-sm);
+}
+
+.teacher-library-groups {
+    margin-top: var(--spacing-lg);
+}
+
+.teacher-library-browser {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.teacher-library-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: var(--spacing-md);
+}

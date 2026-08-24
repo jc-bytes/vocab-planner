@@ -38,24 +38,7 @@
     line-height: 1.5;
     min-height: 100vh;
     overflow-x: hidden;
-}/* Layout */.landing-container {
-    display: grid;
-    grid-template-rows: auto auto auto;
-    align-content: center;
-    align-items: center;
-    justify-items: center;
-    gap: 1.2rem;
-    min-height: 100vh;
-    padding: clamp(1.25rem, 4vw, 3rem) var(--spacing-lg);
-    text-align: center;
-    max-width: 900px;
-    width: min(100%, 900px);
-    margin: 0 auto;
-}.app-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-lg);
-}.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) {
+}/* Layout */.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) {
     max-width: none;
     min-height: calc(100svh - 1rem);
     min-height: calc(100dvh - 1rem);
@@ -82,12 +65,6 @@
     font-size: 0.86rem;
 }.app-container:has(#arcade-view:not(.hidden) #game-stage:not(.hidden)) .student-app-header #user-info {
     gap: 0.6rem !important;
-}.app-container>main {
-    background: rgba(15, 23, 42, 0.24);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    padding: var(--spacing-lg);
-    box-shadow: none;
 }.app-container>main:has(#arcade-view:not(.hidden)) {
     padding: 0.75rem;
 }.app-container>main:has(#arcade-view:not(.hidden) #game-selection:not(.hidden)) {
@@ -101,19 +78,6 @@
     border: 0;
     border-radius: 0;
     background: transparent;
-}.app-container>main,
-.landing-container {
-    position: relative;
-}.app-container::before,
-.landing-container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.05);
-    pointer-events: none;
-    filter: blur(35px);
-    opacity: 0.18;
 }.app-container:has(#login-view:not(.hidden))>main {
     min-height: calc(100vh - (2 * var(--spacing-lg)));
     min-height: calc(100dvh - (2 * var(--spacing-lg)));
@@ -156,13 +120,6 @@
 }.brand-mark svg {
     width: 1.7rem;
     height: 1.7rem;
-}.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }.header-left h1 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -607,30 +564,7 @@
 .teacher-library-choice-card:focus-visible {
     outline: 3px solid rgba(14, 165, 233, 0.8);
     outline-offset: 3px;
-}/* Grid Layouts */.words-grid,
-.vocab-grid,
-.activities-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-md);
-}.vocab-groups {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    margin-top: var(--spacing-sm);
-}.teacher-library-groups {
-    margin-top: var(--spacing-lg);
-}.teacher-library-browser {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-md);
-}.teacher-library-choice-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    gap: var(--spacing-md);
-}.teacher-library-choice-card {
+}/* Grid Layouts */.teacher-library-choice-card {
     display: flex;
     align-items: center;
     justify-content: space-between;

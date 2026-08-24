@@ -523,3 +523,15 @@ No corrective task was added. Task 9 continues with the status/feedback family.
 - Production deployment remains 13.6 MB with 2,329 transformed modules. Shared foundation CSS is 9.94/2.25 kB raw/gzip; teacher entry CSS decreased to 137.49/22.04 kB, student entry CSS to 217.39/33.10 kB, and lazy student feature CSS to 49.84/9.88 kB. Quiz Maker remains a separate lazy 12.48/3.10 kB CSS asset.
 
 Task 9 remains in progress. Next is the shared container family, followed by the existing typography authority review.
+
+### Task 9h, migrate shared container styles
+
+- Added `css/containers.css` as the bounded owner for the landing/app shell bases, main surface, decorative shell layer, app header base, and shared vocabulary/activity collection grids. All three entries load it before their page stylesheet.
+- Removed only declaration-identical bases from landing, student, and teacher CSS. Preserved login layouts, page panels, activity/game layouts, lazy feature grids, the student 1120/1121 rail, teacher sidebar geometry, all media queries, and feature-specific headers.
+- Kept contextual translucent shell colors local to the container family instead of falsely mapping them to stronger surface/border tokens. Existing spacing and radius variables continue to resolve through each entry's intended scale.
+- Added `test:containers` to the complete suite. It guards one shared owner and load order, excludes responsive/sidebar/auth concerns from that owner, verifies page refinements remain, and traces live collection producers across student, teacher vocabulary, lazy Quiz, and Word Hunt views.
+- Verification: the complete `npm test` suite passed, including 9 responsive widths, three-page source smoke, and 13 sandboxed games. Focused container, landing, student-shell, and build-efficiency suites, built three-page smoke, production build, scoped diff checks, and independent source/cascade review passed.
+- The independent before/after browser comparison was invalid because its baseline archive was empty after a path-prefix error; those results were discarded. Current Chromium rendered all three entries at mobile, 1120px, and 1121px, but exact visual parity is recorded as unproven rather than passed.
+- Production deployment remains 13.6 MB with 2,330 transformed modules. Shared foundation CSS is 5.91/1.71 kB raw/gzip, teacher entry CSS is 135.99/21.81 kB, student entry CSS is 215.89/32.87 kB, and lazy student/Quiz CSS remains separate at 49.84/9.88 and 12.48/3.10 kB.
+
+Task 9 remains in progress. The typography audit found the current shared authority sufficient; only duplicate font ownership will be removed next.
