@@ -48,7 +48,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
 | 7. Investigate legacy quiz implementation | DONE | Import ownership; legacy module/modal/listeners/proxies/state/styles | Complete suite, focused quiz/vocabulary/architecture/accessibility tests, source and built UI smoke, production build, independent review | Retired unreachable preview; preserved routed/lazy Quiz Maker and independently registered student Quiz. |
 | 8. Introduce semantic design tokens | DONE | Central theme authority, scoped student variant, compatibility aliases, entry loading contract | Complete suite, token/design-system contracts, 9-width student regression, three-page UI smoke, production build, independent review | Existing values remain visually equivalent; app theme authority is centralized without coupling isolated games or lazy feature styles. |
-| 9. Migrate shared UI families | IN PROGRESS | Buttons | Complete suite, button/theme/design contracts, computed-style comparison, 9-width regression, source/built UI smoke, production build, independent review | Shared button core is centralized; inputs, cards, dialogs, navigation, feedback, containers, and typography remain. |
+| 9. Migrate shared UI families | IN PROGRESS | Buttons; inputs/form controls | Complete suite, UI-family contracts, computed-style comparisons, 9-width regression, source/built UI smoke, production builds, independent review | Shared buttons and controls are centralized; cards, dialogs, navigation, feedback, containers, and typography remain. |
 | 10. Reduce literal brand colors | TODO | | | |
 | 11. Reduce unnecessary `!important` | TODO | | | |
 | 12. Clean up owned inline styles | TODO | | | |
@@ -441,3 +441,16 @@ Task 8 is complete. Task 9 will migrate shared UI families one at a time, beginn
 - Production build remains 13.6 MB. The 1.47/0.63 kB raw/gzip shared button asset replaces duplicated entry CSS; teacher entry CSS decreased by 1.33 kB raw and student entry CSS by 1.32 kB raw. Lazy feature CSS remains separate.
 
 Task 9 remains in progress. Task 9b will investigate and migrate shared input/form-control styling without changing feature-owned field layouts.
+
+### Task 9b, migrate the shared form-control family
+
+- Added `css/forms.css` as the structural owner for student and teacher form rows, broad controls, labels, placeholders, focus/readonly states, teacher select presentation, and the shared password field/toggle.
+- Preserved student and teacher surfaces through low-specificity page scopes. The later Celestial refinements, typography/design-system sizing, responsive subject selector, Quiz Maker document controls, activity inputs, calendar/roster selection controls, and all validation/listener behavior remain with their current owners.
+- Kept the existing broad native `input` behavior unchanged. Checkbox/radio/file/color separation is a demonstrated pre-existing risk, but changing native appearance requires a separate visual/behavior task and was not mixed into this architectural extraction.
+- Migrated shared text, muted text, and password focus colors to semantic tokens where they resolve exactly. No `!important`, new validation state, DOM abstraction, or compatibility adapter was introduced.
+- Added `test:forms` to the complete suite. It guards entry order, one family owner, page refinements, lazy feature exceptions, semantic color use, and all six password toggles' accessible runtime wiring.
+- Verification: the complete `npm test` suite passed. Focused form/button/theme/design-system, auth, and accessibility tests; 9-width/6-view student regression; source and built three-page UI smoke; production build; and independent review passed.
+- Independent headless-Chromium comparison against a clean `HEAD` archive found zero computed-style differences across student and teacher text controls, placeholders, focus, readonly, textarea, disabled select, password controls, checkbox/radio/file/color inputs, lazy activities, and lazy Quiz Maker document controls.
+- Production deployment remains 13.6 MB. Shared foundation CSS is 5.33/1.38 kB raw/gzip; duplicated teacher entry CSS decreased by another 2.27 kB raw and student entry CSS by 1.73 kB raw. Lazy feature CSS remains separate.
+
+Task 9 remains in progress. Task 9c will investigate the shared card family and keep activity/game-specific surfaces local.

@@ -1,0 +1,179 @@
+/* Shared application form-control family. Feature layouts remain page-owned. */
+
+.form-row {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+:where(.teacher-site) .form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+:where(.teacher-site) label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--type-form-label-size);
+    font-weight: var(--type-form-label-weight);
+    line-height: var(--type-form-label-line-height);
+    letter-spacing: var(--letter-spacing-label);
+}
+
+:where(.teacher-site) input,
+:where(.teacher-site) textarea,
+:where(.teacher-site) select {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-height: var(--touch-target);
+    padding: 0.6rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    background: rgba(15, 23, 42, 0.45);
+    color: var(--color-text);
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-control-size);
+    font-weight: var(--type-form-control-weight);
+    line-height: var(--type-form-control-line-height);
+    letter-spacing: var(--type-form-control-letter-spacing);
+}
+
+:where(.teacher-site) select {
+    padding-right: 2.6rem;
+    background-color: rgba(15, 23, 42, 0.45);
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--color-text-muted) 50%),
+        linear-gradient(135deg, var(--color-text-muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 1.05rem) 50%,
+        calc(100% - 0.75rem) 50%;
+    background-repeat: no-repeat;
+    background-size: 0.32rem 0.32rem, 0.32rem 0.32rem;
+}
+
+:where(.teacher-site) select:disabled {
+    opacity: 0.6;
+}
+
+:where(.teacher-site) input::placeholder,
+:where(.teacher-site) textarea::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-placeholder-size);
+    font-weight: var(--type-form-placeholder-weight);
+    line-height: var(--type-form-placeholder-line-height);
+    letter-spacing: var(--type-form-placeholder-letter-spacing);
+}
+
+:where(.teacher-site) input:focus,
+:where(.teacher-site) textarea:focus,
+:where(.teacher-site) select:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+:where(.teacher-site) input[readonly] {
+    background: rgba(15, 23, 42, 0.28);
+    color: var(--color-text-muted);
+    cursor: default;
+}
+
+:where(.student-site) .form-group label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--color-text-muted);
+    font-weight: var(--type-form-label-weight);
+}
+
+:where(.student-site) input,
+:where(.student-site) textarea,
+:where(.student-site) select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: var(--touch-target);
+    padding: 0.75rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-md);
+    outline: none;
+    background: rgba(15, 23, 42, 0.72);
+    color: var(--color-text);
+    font: inherit;
+    font-size: var(--type-form-control-size);
+    font-weight: var(--type-form-control-weight);
+    line-height: var(--type-form-control-line-height);
+    letter-spacing: var(--type-form-control-letter-spacing);
+}
+
+:where(.student-site) textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+:where(.student-site) input::placeholder,
+:where(.student-site) textarea::placeholder {
+    color: rgba(203, 213, 245, 0.62);
+    font-family: var(--font-family-sans);
+    font-size: var(--type-form-placeholder-size);
+    font-weight: var(--type-form-placeholder-weight);
+    line-height: var(--type-form-placeholder-line-height);
+    letter-spacing: var(--type-form-placeholder-letter-spacing);
+}
+
+:where(.student-site) input:focus,
+:where(.student-site) textarea:focus,
+:where(.student-site) select:focus {
+    border-color: rgba(14, 165, 233, 0.72);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+:where(.student-site) input[readonly] {
+    cursor: default;
+    opacity: 0.82;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 3rem;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.45rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.password-toggle:hover,
+.password-toggle[aria-pressed="true"] {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+}
+
+.password-toggle:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+}
+
+.password-toggle svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    pointer-events: none;
+}
