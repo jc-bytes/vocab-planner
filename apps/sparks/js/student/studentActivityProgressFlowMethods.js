@@ -165,7 +165,6 @@ export class StudentActivityProgressFlow {
                     String(word.word || '').trim().length > 0
                     && String(word.example || '').trim().length > 0
                 );
-            case 'flashcards':
             case 'quiz':
             case 'speed-match':
                 return (

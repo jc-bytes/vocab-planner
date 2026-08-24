@@ -173,6 +173,26 @@ test('matching descriptor owns eligibility, word preparation, and construction',
     assert.deepEqual(instance.args, [container, restoredWords, onProgress, onSaveState, savedState]);
 });
 
+test('flashcards descriptor owns eligibility and limited sequential preparation', () => {
+    const flashcards = getStudentActivity('flashcards');
+    assert.equal(flashcards.isPlayable({ word: 'Chart', definition: 'A visual display' }), true);
+    assert.equal(flashcards.isPlayable({ word: 'Chart', definition: '   ' }), false);
+    assert.equal(flashcards.isPlayable({ word: '   ', definition: 'A visual display' }), false);
+
+    const playableWords = [
+        { word: 'Chart', definition: 'A visual display' },
+        { word: 'Formula', definition: 'A calculation' },
+        { word: 'Cell', definition: 'A spreadsheet location' }
+    ];
+    assert.deepEqual(flashcards.prepare({ playableWords, wordLimit: 2 }), {
+        words: playableWords.slice(0, 2)
+    });
+
+    assert.equal(flashcards.nonReplayable, true);
+    assert.equal(flashcards.tracksCoverage, false);
+    assert.equal(flashcards.create, getStudentActivity('matching').create);
+});
+
 test('activity registry is the complete route and module source', () => {
     assertUniqueIds(STUDENT_ACTIVITY_REGISTRY, 'Activity');
     assert.deepEqual(getStudentActivityIds(), STUDENT_ACTIVITY_REGISTRY.map(activity => activity.id));

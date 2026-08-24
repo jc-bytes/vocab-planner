@@ -15,6 +15,7 @@ export class StudentActivityLauncher {
         const prepared = descriptor.prepare({
             savedState: context.savedState,
             wordLimit: context.wordLimit,
+            playableWords: context.playableWords,
             prioritize: context.prioritize,
             restore: context.restore
         });
@@ -185,6 +186,7 @@ export class StudentActivityLauncher {
                         container,
                         savedState,
                         wordLimit: getActivityWordLimit(activityDescriptor.settingKey),
+                        playableWords,
                         prioritize: getPrioritized,
                         restore: (state, fallbackWords, filter) => (
                             this.activities.restoreWordsFromState(state, fallbackWords, filter)
@@ -196,12 +198,6 @@ export class StudentActivityLauncher {
                 }
 
                 switch (type) {
-            case 'flashcards':
-                // Flashcards: use all words (non-replayable, study mode)
-                const flashcardsLimit = getActivityWordLimit('flashcards');
-                const flashcardsWords = playableWords.slice(0, flashcardsLimit);
-                activityInstance = new ActivityClass(container, flashcardsWords, onProgress, onSaveState, savedState);
-                break;
             case 'quiz':
                 const quizLimit = getActivityWordLimit('quiz');
                 const quizWords = this.activities.restoreWordsFromState(savedState, getPrioritized(quizLimit));

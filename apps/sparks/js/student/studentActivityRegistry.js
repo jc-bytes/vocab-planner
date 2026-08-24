@@ -23,6 +23,13 @@ function isMatchingWordPlayable(word = {}) {
     );
 }
 
+function hasWordAndDefinition(word = {}) {
+    return (
+        String(word.word || '').trim().length > 0
+        && String(word.definition || '').trim().length > 0
+    );
+}
+
 function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore }) {
     const filter = word => word.word.length >= 2;
     return {
@@ -30,7 +37,13 @@ function prepareMatchingActivity({ savedState, wordLimit, prioritize, restore })
     };
 }
 
-function createMatchingActivity({
+function prepareFlashcardsActivity({ playableWords, wordLimit }) {
+    return {
+        words: playableWords.slice(0, wordLimit)
+    };
+}
+
+function createWordListActivity({
     ActivityClass,
     container,
     prepared,
@@ -150,13 +163,16 @@ export const STUDENT_ACTIVITY_REGISTRY = defineStudentActivityRegistry([
         exportName: 'MatchingActivity', load: () => import('../activities/matching.js'),
         isPlayable: isMatchingWordPlayable,
         prepare: prepareMatchingActivity,
-        create: createMatchingActivity
+        create: createWordListActivity
     },
     {
         id: 'flashcards', title: 'Flashcards', description: 'Study words and images.',
         icon: 'layers-3', settingKey: 'flashcards',
         exportName: 'FlashcardsActivity', load: () => import('../activities/flashcards.js'),
-        nonReplayable: true, tracksCoverage: false
+        nonReplayable: true, tracksCoverage: false,
+        isPlayable: hasWordAndDefinition,
+        prepare: prepareFlashcardsActivity,
+        create: createWordListActivity
     },
     {
         id: 'quiz', title: 'Quiz', description: 'Test your knowledge.',

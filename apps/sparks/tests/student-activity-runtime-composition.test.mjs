@@ -411,7 +411,7 @@ test('registered activity startup prepares, constructs, then records coverage', 
     ]);
 });
 
-test('Matching launch dispatch stays on the registered lifecycle path', () => {
+test('migrated launch dispatch stays on the registered lifecycle path', () => {
     const source = StudentActivityLauncher.prototype.startActivity.toString();
 
     assert.match(source, /activityDescriptor\?\.prepare\s*&&\s*activityDescriptor\?\.create/);
@@ -419,6 +419,43 @@ test('Matching launch dispatch stays on the registered lifecycle path', () => {
     assert.match(source, /wordLimit:\s*getActivityWordLimit\(activityDescriptor\.settingKey\)/);
     assert.match(source, /activityInstance\s*=\s*this\.startActivityWithStateRecovery/);
     assert.doesNotMatch(source, /case ['"]matching['"]/);
+    assert.doesNotMatch(source, /case ['"]flashcards['"]/);
+});
+
+test('registered Flashcards startup does not record practice coverage', () => {
+    const launcher = new StudentActivityLauncher({ sm: {} });
+    const descriptor = getStudentActivity('flashcards');
+    const playableWords = [
+        { word: 'Chart', definition: 'A visual display' },
+        { word: 'Formula', definition: 'A calculation' }
+    ];
+    class FlashcardsActivityDouble {
+        constructor(container, words, onProgress, onSaveState, savedState) {
+            this.words = words;
+            this.savedState = savedState;
+        }
+    }
+
+    const activity = launcher.createRegisteredActivity(descriptor, FlashcardsActivityDouble, {
+        container: {},
+        savedState: { currentIndex: 1 },
+        wordLimit: 1,
+        playableWords,
+        prioritize() {
+            throw new Error('Flashcards must retain vocabulary order');
+        },
+        restore() {
+            throw new Error('Flashcards preparation must not restore words through the host');
+        },
+        onProgress() {},
+        onSaveState() {},
+        markWordsPracticed() {
+            throw new Error('Flashcards must not record practice coverage');
+        }
+    });
+
+    assert.deepEqual(activity.words, playableWords.slice(0, 1));
+    assert.deepEqual(activity.savedState, { currentIndex: 1 });
 });
 
 test('matching descriptor startup retries stale state before recording coverage', () => {
