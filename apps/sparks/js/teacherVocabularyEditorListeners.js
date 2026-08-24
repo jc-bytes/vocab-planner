@@ -168,7 +168,7 @@ function bindVocabularyImportExport(manager) {
         downloadAnchorNode.remove();
     });
 
-    $('#import-file').addEventListener('change', async (e) => {
+    $('#import-file').addEventListener('change', (e) => {
         if (!manager.ensureAuthenticated()) {
             e.target.value = '';
             return;
@@ -177,7 +177,7 @@ function bindVocabularyImportExport(manager) {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async (e) => {
+            reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
@@ -188,8 +188,6 @@ function bindVocabularyImportExport(manager) {
                 manager.renderWords();
                 manager.triggerAutoSave();
                 manager.showEditor();
-
-                await manager.downloadForRepository(data);
             } catch (err) {
                 alert('Error parsing JSON file');
                 console.error(err);

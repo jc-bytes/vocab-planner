@@ -46,7 +46,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 4. Migrate activities one at a time | DONE | Activity registry, progress flow, launcher, focused tests | All focused suites, the complete test suite, registry browser smoke, production build, and independent review pass | All 12 activities own eligibility, preparation, and construction through the registry. The legacy launch and eligibility switches are gone. Illustration keeps a narrow feature context and protected draft-reset policy. |
 | 5. Consolidate duplicated configuration | DONE | Activity/flow policy, catalog tooling, economy and duration config, shared progress/config values | Complete suite, focused config suites, UI/regression smoke, production builds, independent review | Genuine client authorities are centralized; server security remains independent with parity contracts. Unproven product destinations and later-phase navigation/auth policy are documented rather than guessed. |
 | 6. Remove confirmed dead code | DONE | XP mirror; save stubs; orphan assets; unused utilities/barrel exports; dead student/teacher CSS | Complete suite, focused ownership suites, UI/regression smoke, production builds, independent review | Removed only code with complete caller/import evidence; preserved uncertain data-driven and source assets. |
-| 7. Investigate legacy quiz implementation | TODO | | | |
+| 7. Investigate legacy quiz implementation | IN PROGRESS | Teacher vocabulary import ownership | 7 vocabulary-library tests, package refactor, UI smoke, production build | Runtime and source traces prove the old preview is unreachable; removing it separately from the active Quiz Maker. |
 | 8. Introduce semantic design tokens | TODO | | | |
 | 9. Migrate shared UI families | TODO | | | |
 | 10. Reduce literal brand colors | TODO | | | |
@@ -394,3 +394,13 @@ Task 6 remains in progress. The final deletion group is three isolated teacher c
 - Database-driven vocabulary images, intentional game source/reference artwork, and intertwined responsive selectors were explicitly retained because repository evidence does not prove they are obsolete.
 
 Task 6 is complete. Task 7 will trace legacy quiz reachability separately before any removal.
+
+### Task 7a, remove the vocabulary import dependency on legacy quiz code
+
+- Three independent traces and a real browser run confirmed two separate systems: the active routed/lazy Quiz Maker and a permanently hidden legacy preview modal. The student Quiz activity is a third independent system and remains out of scope.
+- A valid vocabulary JSON import updated editor state and then called `manager.downloadForRepository`, a method trapped inside the lazy legacy feature context with no manager proxy. The call always threw and falsely displayed `Error parsing JSON file`.
+- Removed only the orphan post-import call and its unnecessary async wrappers. Explicit JSON export and cloud publishing remain the owned vocabulary workflows; importing no longer triggers an unrelated repository-download prompt.
+- Added an ownership contract preventing eager JSON import from depending on the lazy quiz feature.
+- Verification: 7 teacher vocabulary-library tests, package refactor checks, three-page UI smoke, and the production build passed. Deployment remains 13.6 MB; teacher entry is 163.06/44.66 kB raw/gzip.
+
+Task 7 remains in progress. Next, the unreachable modal, methods, listeners, proxies, state, and exclusively owned styles will be removed together while retaining the modern Quiz Maker and student Quiz contracts.

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
@@ -25,6 +26,7 @@ const { teacherVocabularyBrowserViewMethods } = await import('../js/teacherVocab
 const { teacherVocabularyDataMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
 const { teacherVocabularyRowViewMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyRowViewMethods.js');
 const { teacherVocabularyWorkflowMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
+const vocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {
     getVocabGrades(vocab) { return vocab.grades || [vocab.grade || '6']; }
@@ -40,6 +42,10 @@ test('teacher vocabulary installer preserves the complete library workflow surfa
         'getTeacherLibrary', 'dedupeTeacherVocabularyItems', 'buildLibraryGroups',
         'renderLibraryBrowser', 'createTeacherVocabularyRow', 'renderSubjectPicker'
     ].forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
+});
+
+test('JSON import does not depend on the lazy quiz feature', () => {
+    assert.doesNotMatch(vocabularyEditorListeners, /manager\.downloadForRepository/);
 });
 
 test('teacher vocabulary responsibilities have one complete owner each', () => {
