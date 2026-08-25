@@ -56,7 +56,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 14. Standardize application feedback | DONE | Shared notification lifecycle; centered reward timer/presentation; loading and inline-status primitives; six teacher status producers | Complete suite, focused feedback/shell/teacher/lazy/security checks, browser computed-style checks, production build, source/built smoke, independent reviews | Shared application feedback now has small behavior contracts while activity/game visuals and rich feature notices remain owned locally. |
 | 15. Map teacher feature dependencies | DONE | `docs/teacher-feature-dependencies.md`, tracker | Source tracing, focused lazy/context and feature suites, full regression, production build, built-page smoke, independent review | Documented loader/proxy, manager, DOM, data, notification, route, and lifecycle dependencies. Groups is the Task 16 pilot because it is bounded and exposes a confirmed listener/context defect. |
 | 16. Convert one teacher feature | DONE | Groups factory, lazy adapter, feature-owned state/listeners, runtime/ownership tests, dependency map, package test script | Focused Groups/data/lazy suites, browser factory and real lazy-adapter workflow, full regression, production build, built-page smoke, independent diff review | Groups exposes only `show`/`destroy`; manager retains only `showGroupsView`. The confirmed undefined-manager listener path is removed without changing routes, repositories, storage keys, or lazy loading. |
-| 17. Validate the teacher feature pattern | TODO | | | |
+| 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | TODO | | | |
 | 19. Create a small page registry | TODO | | | |
 | 20. Migrate teacher pages | TODO | | | |
@@ -100,6 +100,16 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Added the previously orphaned Groups tests to `npm test` and added a browser workflow covering direct factory behavior plus the real lazy adapter. The latter reproduces the formerly broken manager path and confirms the manager does not expose internal handlers.
 - Updated the data-efficiency and build-ownership contracts to follow the new explicit seam. Groups remains a separate 15.61 kB raw, 4.91 kB gzip lazy chunk; the eager teacher entry is 158.31 kB raw, 43.60 kB gzip.
 - The first complete suite run found one stale source assertion expecting the roster capability inside `teacherGroups.js`; the assertion now correctly follows the explicit loader dependency. Focused reruns and the subsequent complete suite passed.
+
+### Task 17, validate the explicit teacher feature pattern
+
+- Independent review found no behavior, security, repository, route, lazy-loading, or cleanup regression after the Groups conversion.
+- Before conversion, Groups relied on five manager state fields, proxy fallback to manager capabilities, and seven eager listeners that called unavailable manager methods. After conversion, state and listeners are feature-owned, the manager exposes only `showGroupsView`, and the feature facade exposes only `show` and `destroy`.
+- Repeat `show()` binds one listener per control. `destroy()` removes all seven exact handlers, and a later `show()` rebinds successfully. The real lazy installer-to-public-method adapter is browser-tested, not only source-matched.
+- The feature still receives the existing identity-only roster use case and private restriction repository. It does not receive a manager, raw Supabase client, router, or broad context object.
+- Lazy loading is preserved: Groups remains a distinct 15.61 kB raw, 4.91 kB gzip chunk. The eager teacher entry decreased from Task 15's 158.95 kB raw, 43.68 kB gzip to 158.31 kB raw, 43.60 kB gzip.
+- Accepted pattern: a feature factory owns cohesive state and listeners, receives explicit capabilities, and returns only application use cases. Do not add a common feature base class, generic event framework, or mandatory `destroy()` where no resource needs cleanup.
+- Remaining lazy features must be migrated independently. Their contracts may differ: Word Hunt needs resource/listener cleanup; Sparks has a modal and repository cache; Quiz first needs a narrower vocabulary capability; Data Management should not be preserved as one oversized factory.
 
 ### Phase 0, baseline
 
