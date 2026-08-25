@@ -106,7 +106,10 @@ test('teacher feature bundles are loaded only when their views are opened', () =
         assert.match(teacherLazyFeatures, new RegExp(`import\\(['\"]\\./${eagerModule}`));
     }
     assert.doesNotMatch(teacherLazyFeatures, /manager\.constructor/);
-    assert.doesNotMatch(teacherLazyFeatures, /feature\.methods|captureFeatureMethods|createFeatureContext/);
+    assert.doesNotMatch(
+        teacherLazyFeatures,
+        /feature\.methods|captureFeatureMethods|createFeatureContext|initializedFeatures|feature\.initialize/
+    );
     assert.match(teacherLazyFeatures, /publicMethods:\s*\{ showGroupsView: 'show' \}/);
     assert.match(teacherLazyFeatures, /createTeacherGroupsFeature/);
     assert.match(teacherLazyFeatures, /publicMethods:\s*\{ showDataManagementView: 'show' \}/);

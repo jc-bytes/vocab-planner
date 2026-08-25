@@ -3,7 +3,6 @@ import { supabaseService } from './supabaseService.js';
 import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrowserAdapter.js';
 
 const featurePromises = new Map();
-const initializedFeatures = new WeakMap();
 const featureContexts = new WeakMap();
 
 const featureTemplateIds = {
@@ -211,15 +210,6 @@ async function ensureTeacherFeature(manager, featureName) {
     }
     const feature = await featurePromises.get(featureName);
     const context = getFeatureContext(manager, featureName, feature);
-    let initialized = initializedFeatures.get(manager);
-    if (!initialized) {
-        initialized = new Set();
-        initializedFeatures.set(manager, initialized);
-    }
-    if (!initialized.has(featureName)) {
-        feature.initialize?.(context);
-        initialized.add(featureName);
-    }
     return { feature, context };
 }
 
@@ -250,7 +240,6 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
 function disposeLoadedTeacherFeatures(manager) {
     const managerContexts = featureContexts.get(manager);
     if (!managerContexts) return;
-    const initialized = initializedFeatures.get(manager);
 
     for (const [featureName, context] of managerContexts) {
         if (typeof context.destroy !== 'function') continue;
@@ -260,10 +249,8 @@ function disposeLoadedTeacherFeatures(manager) {
             console.error(`Could not dispose teacher feature ${featureName}:`, error);
         }
         managerContexts.delete(featureName);
-        initialized?.delete(featureName);
     }
     if (managerContexts.size === 0) featureContexts.delete(manager);
-    if (initialized?.size === 0) initializedFeatures.delete(manager);
 }
 
 export function installTeacherLazyFeatureMethods(TeacherManager) {

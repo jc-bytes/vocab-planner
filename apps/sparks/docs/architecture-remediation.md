@@ -210,6 +210,13 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 
 Task 18 is complete. The next change is the small top-level page registry in Tasks 19-21. It should centralize existing page metadata without introducing a routing framework.
 
+### Architecture review after Tasks 18g-18j
+
+- Independent review found no behavior, security, lazy-loading, or new-coupling blocker in the Quiz and Data Management conversions.
+- Removed the now-dead optional feature initialization cache and hook. All five explicit factories initialize their own private contexts, and repository tracing found no remaining feature definition with a separate `initialize` callback.
+- Kept the 28-method Quiz vocabulary-browser adapter for Tasks 22-23. It is broad but explicit, frozen, and tested; replacing it is justified only if cohesive vocabulary-browser use cases reduce the interface.
+- Kept Data route/tab consolidation for Tasks 19-21 and capability-contract cleanup for Task 29. Neither requires a compatibility layer or blocks the current feature interfaces.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.
