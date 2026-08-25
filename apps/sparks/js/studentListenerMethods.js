@@ -241,8 +241,7 @@ export class StudentListeners {
 
         this.addListener('#exit-game-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            games.stopCurrentGame();
-            games.showGameSelection();
+            games.exitToGameSelection();
         });
 
         // Leaderboard Modal

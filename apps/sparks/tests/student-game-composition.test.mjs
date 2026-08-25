@@ -157,6 +157,7 @@ test('StudentGames declares its stable public interface directly', () => {
         'hideLeaderboardModal',
         'loadLeaderboard',
         'loadHTMLGame',
+        'exitToGameSelection',
         'selectAdjacentGame',
         'requestAdditionalTime',
         'startGame',
@@ -171,6 +172,17 @@ test('StudentGames declares its stable public interface directly', () => {
             `${method} must be declared by StudentGames`
         );
     }
+});
+
+test('exiting an Arcade game owns cleanup before restoring selection', () => {
+    const games = new StudentGames({});
+    const calls = [];
+    games.lifecycle.stopCurrentGame = () => calls.push('stop');
+    games.lifecycle.showGameSelection = () => calls.push('selection');
+
+    games.exitToGameSelection();
+
+    assert.deepEqual(calls, ['stop', 'selection']);
 });
 
 test('additional Arcade time owns concurrency, cap, access, refresh, and failure feedback', async () => {

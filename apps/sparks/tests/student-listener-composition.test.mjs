@@ -126,6 +126,15 @@ test('the add-time listener delegates its complete asynchronous lifecycle', () =
     );
 });
 
+test('the exit listener delegates the complete game-to-selection transition', () => {
+    const exitSource = studentListenerSource.slice(
+        studentListenerSource.indexOf("this.addListener('#exit-game-btn'"),
+        studentListenerSource.indexOf('// Leaderboard Modal')
+    );
+    assert.match(exitSource, /games\.exitToGameSelection\(\)/);
+    assert.doesNotMatch(exitSource, /stopCurrentGame|showGameSelection/);
+});
+
 test('tracked listeners are removed during teardown', () => {
     const listeners = new StudentListeners({});
     const target = new EventTarget();

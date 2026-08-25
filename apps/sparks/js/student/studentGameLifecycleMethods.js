@@ -23,6 +23,11 @@ export class StudentGameLifecycle {
         this.games.updateLeaderboardGame();
     }
 
+    exitToGameSelection() {
+        this.stopCurrentGame();
+        this.showGameSelection();
+    }
+
     selectAdjacentGame(offset) {
         const gameCount = this.games.gamesList.length;
         if (gameCount === 0) return false;
@@ -163,22 +168,17 @@ export class StudentGameLifecycle {
                 if (playAgain) {
                     this.restartCurrentGame(type);
                 } else {
-                    // Exit game
-                    this.stopCurrentGame();
-                    this.showGameSelection();
+                    this.exitToGameSelection();
                 }
             } else {
-                // No time left, just exit
-                this.stopCurrentGame();
-                this.showGameSelection();
+                this.exitToGameSelection();
             }
         };
 
         const game = getStudentGame(type);
         if (!game) {
             notifications.warning('This game is not available yet. Please refresh and try again.');
-            this.stopCurrentGame();
-            this.showGameSelection();
+            this.exitToGameSelection();
             return;
         }
 
@@ -207,8 +207,7 @@ export class StudentGameLifecycle {
         }).catch(error => {
             console.error(`Could not launch ${game.id}:`, error);
             notifications.warning('This game could not be loaded. Please refresh and try again.');
-            this.stopCurrentGame();
-            this.showGameSelection();
+            this.exitToGameSelection();
         });
         return true;
     }
