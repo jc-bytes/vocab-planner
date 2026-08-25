@@ -4,6 +4,7 @@ import test from 'node:test';
 
 const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.url), 'utf8');
 const studentCssSource = readFileSync(new URL('../css/student.css', import.meta.url), 'utf8');
+const feedbackCssSource = readFileSync(new URL('../css/feedback.css', import.meta.url), 'utf8');
 const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
 const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
@@ -77,6 +78,7 @@ test('StudentShell owns isolated lifecycle state', () => {
     assert.equal(first.scrollRestoreGeneration, 0);
     assert.equal(first.scrollRestoreFrame, null);
     assert.equal(first.scrollRestoreTimer, null);
+    assert.equal(first.toastHideTimer, null);
 
     first.scrollSaveTimer = 12;
     first.dashboardMutationObserver = {};
@@ -87,6 +89,85 @@ test('StudentShell owns isolated lifecycle state', () => {
     assert.equal(second.dashboardMutationObserver, null);
     assert.deepEqual(second.sectionScrollPositions, {});
     assert.equal(second.wideShellMediaQuery, null);
+});
+
+test('student reward toast owns one timer and keeps fixed presentation in shared feedback CSS', () => {
+    const shell = new StudentShell({});
+    const previousGetElementById = document.getElementById;
+    const previousCreateElement = document.createElement;
+    const previousBody = document.body;
+    const previousSetTimeout = window.setTimeout;
+    const previousClearTimeout = window.clearTimeout;
+    const timers = new Map();
+    const cleared = [];
+    let nextTimerId = 1;
+    let toast = null;
+
+    document.getElementById = id => id === 'student-toast' ? toast : null;
+    document.createElement = () => ({
+        id: '',
+        className: '',
+        textContent: '',
+        style: {},
+        attributes: new Map(),
+        setAttribute(name, value) {
+            this.attributes.set(name, String(value));
+        },
+        removeAttribute(name) {
+            this.attributes.delete(name);
+        },
+        getAttribute(name) {
+            return this.attributes.get(name) ?? null;
+        }
+    });
+    document.body = {
+        appendChild(element) {
+            toast = element;
+        }
+    };
+    window.setTimeout = (callback, delay) => {
+        const id = nextTimerId++;
+        timers.set(id, { callback, delay });
+        return id;
+    };
+    window.clearTimeout = id => {
+        cleared.push(id);
+        timers.delete(id);
+    };
+
+    try {
+        shell.showToast('First reward', 1000);
+        const firstTimerId = shell.toastHideTimer;
+        shell.showToast('Second reward', 2500);
+        const secondTimerId = shell.toastHideTimer;
+
+        assert.deepEqual(cleared, [firstTimerId]);
+        assert.notEqual(secondTimerId, firstTimerId);
+        assert.equal(toast.className, 'toast toast-emphasis student-reward-toast');
+        assert.equal(toast.textContent, 'Second reward');
+        assert.equal(toast.getAttribute('role'), 'status');
+        assert.equal(toast.getAttribute('aria-live'), 'polite');
+        assert.equal(toast.getAttribute('aria-atomic'), 'true');
+        assert.equal(toast.getAttribute('aria-hidden'), null);
+        assert.equal(toast.style.opacity, '1');
+        assert.equal(timers.has(firstTimerId), false);
+        assert.equal(timers.get(secondTimerId).delay, 2500);
+
+        timers.get(secondTimerId).callback();
+        assert.equal(shell.toastHideTimer, null);
+        assert.equal(toast.style.opacity, '0');
+        assert.equal(toast.style.transform, 'translateX(-50%) translateY(-20px)');
+        assert.equal(toast.getAttribute('aria-hidden'), 'true');
+    } finally {
+        document.getElementById = previousGetElementById;
+        document.createElement = previousCreateElement;
+        document.body = previousBody;
+        window.setTimeout = previousSetTimeout;
+        window.clearTimeout = previousClearTimeout;
+    }
+
+    assert.match(feedbackCssSource, /\.student-reward-toast\s*\{[^}]*position:\s*fixed[^}]*transition:\s*opacity 0\.3s, transform 0\.3s/s);
+    assert.doesNotMatch(studentCssSource, /#student-toast|\.student-reward-toast/);
 });
 
 test('scroll restoration owns one cancellable generation', () => {

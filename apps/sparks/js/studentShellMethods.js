@@ -17,6 +17,7 @@ export class StudentShell {
         this.scrollRestoreGeneration = 0;
         this.scrollRestoreFrame = null;
         this.scrollRestoreTimer = null;
+        this.toastHideTimer = null;
     }
 
     setWideShellMediaQuery(mediaQuery) {
@@ -443,32 +444,26 @@ export class StudentShell {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'student-toast';
-            toast.className = 'toast toast-emphasis';
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(16, 185, 129, 0.95);
-                color: white;
-                padding: 12px 24px;
-                border-radius: 50px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                z-index: 10000;
-                opacity: 0;
-                transition: opacity 0.3s, transform 0.3s;
-                pointer-events: none;
-            `;
+            toast.className = 'toast toast-emphasis student-reward-toast';
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            toast.setAttribute('aria-atomic', 'true');
             document.body.appendChild(toast);
         }
 
-        toast.textContent = message;
+        if (this.toastHideTimer !== null) {
+            window.clearTimeout(this.toastHideTimer);
+        }
+        toast.removeAttribute('aria-hidden');
+        toast.textContent = String(message ?? '');
         toast.style.opacity = '1';
         toast.style.transform = 'translateX(-50%) translateY(0)';
 
-        setTimeout(() => {
+        this.toastHideTimer = window.setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-50%) translateY(-20px)';
+            toast.setAttribute('aria-hidden', 'true');
+            this.toastHideTimer = null;
         }, duration);
     }
 }

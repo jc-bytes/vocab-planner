@@ -66,3 +66,19 @@
     background: var(--color-danger);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-status-danger-glow) 16%, transparent);
 }
+
+.student-reward-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    z-index: 10000;
+    padding: 12px 24px;
+    border-radius: 50px;
+    color: white;
+    background: color-mix(in srgb, var(--color-status-success-glow) 95%, transparent);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: opacity 0.3s, transform 0.3s;
+}

@@ -787,3 +787,15 @@ Task 13 is complete. Task 14 will harden the existing notification authority fir
 - Verification: 11 feedback/primitive tests, security hardening, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, production build, and built three-page smoke passed. Deployment remains 13.6 MB with 2,330 transformed modules; the shared application chunk is 8.41/2.82 kB raw/gzip and service-worker precache is 20 files totaling 1,026,992 bytes.
 
 Task 14 remains in progress. Next is the distinct centered student reward toast, whose timer ownership bug can be fixed without changing it into the top-right notification presentation.
+
+### Task 14b, stabilize the centered student reward toast
+
+- Preserved the centered, green, replace-in-place reward presentation used for starting coins and coin updates instead of redirecting it to the stacked top-right notification system. The two systems serve materially different interaction patterns.
+- Gave `StudentShell` explicit ownership of one hide timer. Showing a newer reward cancels the older timer, so an earlier message can no longer hide a later one; the active callback clears its own ownership after hiding.
+- Moved the fixed position, spacing, pill surface, success color, shadow, opacity, transform, transition, and pointer behavior from generated inline CSS into `.student-reward-toast` in the shared feedback stylesheet. JavaScript retains only live visibility transforms. The success surface derives from the centralized semantic status token and resolves to the previous 95% `#10b981` value.
+- Added polite atomic status semantics. The persistent node removes `aria-hidden` before each announcement and restores it when visually hidden, preventing stale reward/error copy from remaining exposed after the fade.
+- Extended the StudentShell runtime contract to prove isolated timer state, prior-timer cancellation, latest-message ownership, safe text, accessibility visibility, hide-state cleanup, and CSS ownership. Independent review caught the initially missing hidden accessibility state before completion; the correction and test were applied.
+- Headless Chromium at 390px confirmed the extracted CSS resolves to the previous fixed position, white text, 95% success green, padding, pill radius, shadow, opacity, pointer behavior, and transform. The complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, production build, and built three-page smoke passed after the final accessibility correction.
+- Deployment remains 13.6 MB with 2,330 transformed modules. Student entry JavaScript is 238.59/61.00 kB raw/gzip and service-worker precache is 20 files totaling 1,027,131 bytes.
+
+Task 14 remains in progress. Next is the repeated teacher inline-status behavior; only exact state-setting duplication with a stable CSS contract should be consolidated.
