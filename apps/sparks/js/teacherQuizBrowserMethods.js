@@ -4,6 +4,7 @@ import {
     getVocabSubjectSlug,
     loadVocabularyFile
 } from './services/vocabularyApi.js';
+import { filterTeacherVocabularyItems } from './teacherVocabularyLibrary/teacherVocabularyModel.js';
 
 function installMethods(TeacherManager, MethodsClass) {
     for (const name of Object.getOwnPropertyNames(MethodsClass.prototype)) {
@@ -17,7 +18,7 @@ function installMethods(TeacherManager, MethodsClass) {
 }
 
 class TeacherQuizBrowserMethods {
-    getQuizVocabularyViewDepth(drilldown = this.libraryDrilldown || {}) {
+    getQuizVocabularyViewDepth(drilldown = this.quizDrilldown || {}) {
         return this.getTeacherVocabularyViewDepth(drilldown);
     }
 
@@ -33,7 +34,7 @@ class TeacherQuizBrowserMethods {
         }
     }
 
-    getQuizVocabularyViewMode(drilldown = this.libraryDrilldown || {}) {
+    getQuizVocabularyViewMode(drilldown = this.quizDrilldown || {}) {
         if (!this.quizVocabularyViewModes) {
             this.quizVocabularyViewModes = this.getStoredQuizVocabularyViewModes();
         }
@@ -81,13 +82,13 @@ class TeacherQuizBrowserMethods {
         container.innerHTML = '';
 
         const subjectGroups = this.buildLibraryGroups(this.quizLibraryItems);
-        const selectedSubject = this.libraryDrilldown.subject;
-        const selectedGrade = this.libraryDrilldown.grade;
-        const selectedTrimester = this.libraryDrilldown.trimester;
-        const selectedMonth = this.libraryDrilldown.month;
+        const selectedSubject = this.quizDrilldown.subject;
+        const selectedGrade = this.quizDrilldown.grade;
+        const selectedTrimester = this.quizDrilldown.trimester;
+        const selectedMonth = this.quizDrilldown.month;
 
         if (!selectedSubject || !subjectGroups.has(selectedSubject)) {
-            this.resetLibraryDrilldown();
+            this.resetQuizDrilldown();
             if (this.getQuizVocabularyViewMode({}) === 'rows') {
                 this.renderQuizBreadcrumb(container);
                 this.renderQuizVocabularyRows(container, this.quizLibraryItems || []);
@@ -100,9 +101,9 @@ class TeacherQuizBrowserMethods {
         const gradeGroups = subjectGroups.get(selectedSubject);
 
         if (!selectedGrade || !gradeGroups.has(selectedGrade)) {
-            this.libraryDrilldown.grade = null;
-            this.libraryDrilldown.trimester = null;
-            this.libraryDrilldown.month = null;
+            this.quizDrilldown.grade = null;
+            this.quizDrilldown.trimester = null;
+            this.quizDrilldown.month = null;
             if (this.getQuizVocabularyViewMode({ subject: selectedSubject }) === 'rows') {
                 this.renderQuizBreadcrumb(container, selectedSubject);
                 this.renderQuizVocabularyRows(container, this.getQuizVocabularyItemsForDrilldown({ subject: selectedSubject }));
@@ -115,8 +116,8 @@ class TeacherQuizBrowserMethods {
         const trimesterGroups = gradeGroups.get(selectedGrade);
 
         if (!selectedTrimester || !trimesterGroups.has(selectedTrimester)) {
-            this.libraryDrilldown.trimester = null;
-            this.libraryDrilldown.month = null;
+            this.quizDrilldown.trimester = null;
+            this.quizDrilldown.month = null;
             if (this.getQuizVocabularyViewMode({ subject: selectedSubject, grade: selectedGrade }) === 'rows') {
                 this.renderQuizBreadcrumb(container, selectedSubject, selectedGrade);
                 this.renderQuizVocabularyRows(container, this.getQuizVocabularyItemsForDrilldown({
@@ -132,7 +133,7 @@ class TeacherQuizBrowserMethods {
         const monthGroups = this.buildMonthGroups(trimesterGroups.get(selectedTrimester));
 
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
-            this.libraryDrilldown.month = null;
+            this.quizDrilldown.month = null;
             if (this.getQuizVocabularyViewMode({
                 subject: selectedSubject,
                 grade: selectedGrade,
@@ -150,11 +151,11 @@ class TeacherQuizBrowserMethods {
     }
 
     getQuizVocabularyItemsForDrilldown(drilldown = {}) {
-        const previousItems = this.libraryItems;
-        this.libraryItems = this.quizLibraryItems || [];
-        const items = this.getTeacherVocabularyItemsForDrilldown(drilldown);
-        this.libraryItems = previousItems;
-        return items;
+        return filterTeacherVocabularyItems(this.quizLibraryItems, drilldown, {
+            getGrades: vocab => this.getVocabGrades(vocab),
+            getTrimesterKey: vocab => this.getTeacherTrimesterKey(vocab),
+            getMonthKey: vocab => this.getTeacherMonthKey(vocab)
+        });
     }
 
     renderQuizBreadcrumb(container, selectedSubject = null, selectedGrade = null, selectedTrimester = null, selectedMonth = null) {
@@ -166,8 +167,8 @@ class TeacherQuizBrowserMethods {
                         : 'root';
 
         const subjectsButton = this.createLibraryBreadcrumbButton('Subjects', () => {
-            this.resetLibraryDrilldown();
-            this.updateVocabularyRoute();
+            this.resetQuizDrilldown();
+            this.updateQuizRoute();
             this.renderQuizVocabularyBrowser();
         });
         subjectsButton.dataset.crumb = 'root';
@@ -180,8 +181,8 @@ class TeacherQuizBrowserMethods {
             const subject = getSubjectBySlug(this.getSubjects(), selectedSubject);
             const subjectButton = selectedGrade || selectedTrimester || selectedMonth
                 ? this.createLibraryBreadcrumbButton(subject.name, () => {
-                    this.libraryDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: selectedSubject, grade: null, trimester: null, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', subject.name);
@@ -196,8 +197,8 @@ class TeacherQuizBrowserMethods {
             const gradeLabel = this.formatGradeLabel(selectedGrade);
             const gradeButton = selectedTrimester || selectedMonth
                 ? this.createLibraryBreadcrumbButton(gradeLabel, () => {
-                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: null, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', gradeLabel);
@@ -212,8 +213,8 @@ class TeacherQuizBrowserMethods {
             const trimesterLabel = this.getTeacherTrimesterLabel(selectedTrimester);
             const trimesterNode = selectedMonth
                 ? this.createLibraryBreadcrumbButton(trimesterLabel, () => {
-                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: selectedTrimester, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                 })
                 : createElement('span', 'teacher-library-breadcrumb-current', trimesterLabel);
@@ -260,8 +261,8 @@ class TeacherQuizBrowserMethods {
                     color: subject.color
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: subjectSlug, grade: null, trimester: null, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                     this.refreshIcons();
                 });
@@ -291,8 +292,8 @@ class TeacherQuizBrowserMethods {
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = { subject: selectedSubject, grade, trimester: null, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: selectedSubject, grade, trimester: null, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                     this.refreshIcons();
                 });
@@ -317,8 +318,8 @@ class TeacherQuizBrowserMethods {
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: trimesterKey, month: null };
-                    this.updateVocabularyRoute();
+                    this.quizDrilldown = { subject: selectedSubject, grade: selectedGrade, trimester: trimesterKey, month: null };
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                     this.refreshIcons();
                 });
@@ -342,13 +343,13 @@ class TeacherQuizBrowserMethods {
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
-                    this.libraryDrilldown = {
+                    this.quizDrilldown = {
                         subject: selectedSubject,
                         grade: selectedGrade,
                         trimester: selectedTrimester,
                         month: monthKey
                     };
-                    this.updateVocabularyRoute();
+                    this.updateQuizRoute();
                     this.renderQuizVocabularyBrowser();
                     this.refreshIcons();
                 });

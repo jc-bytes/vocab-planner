@@ -63,4 +63,28 @@ test('teacher routes keep their public URL contract through the shared parser', 
         teacher.buildRoute({ view: 'vocabulary', grade: '7', mode: 'review' }),
         '#/teacher/vocabulary?grade=7&mode=review'
     );
+    assert.deepEqual(teacher.parseRoute('#/teacher/vocabulary?subject=technology&grade=6&trimester=1&month=March&mode=quizzes'), {
+        view: 'vocabulary',
+        subject: 'technology',
+        grade: '6',
+        trimester: '1',
+        month: 'March',
+        mode: 'quizzes'
+    });
+    assert.deepEqual(teacher.parseRoute('#/teacher/quizzes'), { view: 'quizzes' });
+    assert.deepEqual(teacher.parseRoute('#/teacher/quizzes/editor'), { view: 'quiz-editor' });
+    assert.equal(teacher.buildRoute({ view: 'quizzes' }), '#/teacher/vocabulary?mode=quizzes');
+    assert.equal(teacher.buildRoute({ view: 'quiz-editor' }), '#/teacher/quizzes/editor');
+
+    teacher.vocabularyMode = 'quizzes';
+    teacher.libraryDrilldown = { subject: 'science', grade: '9', trimester: '3', month: 'October' };
+    teacher.quizDrilldown = { subject: 'technology', grade: '6', trimester: '1', month: 'March' };
+    assert.deepEqual(teacher.currentTeacherRouteForView('teacher-dashboard-view'), {
+        view: 'vocabulary',
+        subject: 'technology',
+        grade: '6',
+        trimester: '1',
+        month: 'March',
+        mode: 'quizzes'
+    });
 });

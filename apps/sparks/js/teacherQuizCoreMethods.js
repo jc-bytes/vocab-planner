@@ -105,6 +105,14 @@ class TeacherQuizCoreMethods {
 
     async showQuizzesView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
+        if (options.drilldown) {
+            this.quizDrilldown = {
+                subject: options.drilldown.subject || null,
+                grade: options.drilldown.grade || null,
+                trimester: options.drilldown.trimester || null,
+                month: options.drilldown.month || null
+            };
+        }
         this.quizEditorOpen = false;
         this.vocabularyMode = 'quizzes';
         this.switchView('teacher-dashboard-view');
@@ -113,10 +121,10 @@ class TeacherQuizCoreMethods {
             loadQuizzes: false
         });
         this.updateQuizHubSummary();
-        await this.loadQuizPicker();
-        if (options.replaceRoute) {
-            this.setRoute({ view: 'vocabulary', mode: 'quizzes' }, { replace: true });
+        if (options.updateRoute !== false || options.replaceRoute) {
+            this.updateQuizRoute({ replace: options.replaceRoute === true });
         }
+        await this.loadQuizPicker();
     }
 
     updateQuizHubSummary() {
@@ -142,7 +150,6 @@ class TeacherQuizCoreMethods {
             }
 
             this.quizLibraryItems = items;
-            this.libraryItems = items;
             this.renderQuizVocabularyBrowser(container);
             this.refreshIcons();
         } catch (error) {
@@ -158,6 +165,17 @@ class TeacherQuizCoreMethods {
             trimester: null,
             month: null
         };
+    }
+
+    updateQuizRoute(options = {}) {
+        this.setRoute({
+            view: 'vocabulary',
+            subject: this.quizDrilldown.subject,
+            grade: this.quizDrilldown.grade,
+            trimester: this.quizDrilldown.trimester,
+            month: this.quizDrilldown.month,
+            mode: 'quizzes'
+        }, options);
     }
 }
 

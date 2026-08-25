@@ -78,12 +78,15 @@ export function installTeacherRoutingMethods(TeacherManager) {
 
         currentTeacherRouteForView(viewId) {
             if (viewId === 'teacher-dashboard-view') {
+                const drilldown = this.vocabularyMode === 'quizzes'
+                    ? this.quizDrilldown
+                    : this.libraryDrilldown;
                 return {
                     view: 'vocabulary',
-                    subject: this.libraryDrilldown.subject,
-                    grade: this.libraryDrilldown.grade,
-                    trimester: this.libraryDrilldown.trimester,
-                    month: this.libraryDrilldown.month,
+                    subject: drilldown.subject,
+                    grade: drilldown.grade,
+                    trimester: drilldown.trimester,
+                    month: drilldown.month,
                     mode: this.vocabularyMode
                 };
             }
@@ -169,7 +172,8 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 updateRoute: false,
                                 replace: true,
                                 loadReview: this.vocabularyMode === 'review',
-                                loadQuizzes: this.vocabularyMode === 'quizzes'
+                                loadQuizzes: this.vocabularyMode === 'quizzes',
+                                drilldown: this.libraryDrilldown
                             });
                             if (this.vocabularyMode === 'assign') {
                                 await this.loadLibrary();
@@ -199,7 +203,10 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             await this.showSparksView();
                             break;
                         case 'quizzes':
-                            await this.showQuizzesView({ replaceRoute: true });
+                            await this.showQuizzesView({
+                                replaceRoute: true,
+                                drilldown: { subject: null, grade: null, trimester: null, month: null }
+                            });
                             break;
                         case 'quiz-editor':
                             await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });

@@ -1,6 +1,7 @@
 import { $ } from '../main.js';
 import { getVocabSubjectSlug, loadManifest } from '../services/vocabularyApi.js';
 import { showLoadingState } from '../ui/loadingState.js';
+import { filterTeacherVocabularyItems } from './teacherVocabularyModel.js';
 
 export const teacherVocabularyDataMethods = {
 async getTeacherLibrary({ forceRefresh = false } = {}) {
@@ -201,17 +202,10 @@ buildLibraryGroups(items = this.libraryItems) {
     },
 
 getTeacherVocabularyItemsForDrilldown(drilldown = {}) {
-        const subject = drilldown.subject || null;
-        const grade = drilldown.grade || null;
-        const trimester = drilldown.trimester || null;
-        const month = drilldown.month || null;
-
-        return (this.libraryItems || []).filter(({ vocab }) => {
-            if (subject && getVocabSubjectSlug(vocab) !== subject) return false;
-            if (grade && !this.getVocabGrades(vocab).includes(grade)) return false;
-            if (trimester && this.getTeacherTrimesterKey(vocab) !== trimester) return false;
-            if (month && this.getTeacherMonthKey(vocab) !== month) return false;
-            return true;
+        return filterTeacherVocabularyItems(this.libraryItems, drilldown, {
+            getGrades: vocab => this.getVocabGrades(vocab),
+            getTrimesterKey: vocab => this.getTeacherTrimesterKey(vocab),
+            getMonthKey: vocab => this.getTeacherMonthKey(vocab)
         });
     },
 

@@ -73,10 +73,14 @@ setVocabularyWorkflowTab(mode = 'assign', options = {}) {
         }
 
         if (nextMode === 'quizzes' && options.loadQuizzes !== false) {
-            this.showQuizzesView({ updateRoute: false });
+            this.showQuizzesView({
+                updateRoute: options.updateRoute !== false,
+                replaceRoute: options.replace === true,
+                drilldown: options.drilldown
+            });
         }
 
-        if (options.updateRoute !== false) {
+        if (nextMode !== 'quizzes' && options.updateRoute !== false) {
             this.updateVocabularyRoute({ replace: options.replace === true });
         }
         this.refreshIcons();
@@ -117,4 +121,3 @@ invalidateStudentProgressCache() {
         this.filteredStudentData = [];
     }
 };
-
