@@ -1,5 +1,3 @@
-import { closeModal as closeDialog, notifications } from '../main.js';
-import { sparksRepository } from '../services/sparksRepository.js';
 import { isDuplicateScheduledDateError } from './sparkSchedule.js';
 
 export const teacherSparkPersistenceMethods = {
@@ -11,27 +9,30 @@ async saveSparkFromForm(statusOverride = null) {
             spark = this.readSparkForm(statusOverride);
         } catch (error) {
             this.setSparkModalStatus(error.message, 'error');
-            notifications.warning(error.message);
+            this.feedback.warning(error.message);
             return;
         }
 
+        const lifecycleGeneration = this.weeklySparkLifecycleGeneration;
         this.setSparkModalStatus('Saving Spark...', 'info');
         try {
-            await sparksRepository.save(spark.id, {
+            await this.repository.save(spark.id, {
                 ...spark,
                 updatedAt: new Date().toISOString()
             });
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
             this.invalidateWeeklySparkCache();
-            closeDialog('#spark-modal');
-            notifications.success(spark.status === 'scheduled' ? 'Spark scheduled.' : 'Spark saved.');
+            this.closeDialog('#spark-modal');
+            this.feedback.success(spark.status === 'scheduled' ? 'Spark scheduled.' : 'Spark saved.');
             await this.loadWeeklySparks({ forceRefresh: true });
         } catch (error) {
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
             console.error('Failed to save Spark:', error);
             const message = isDuplicateScheduledDateError(error)
                 ? 'A Spark with that exact schedule already exists. Check the date and try again.'
                 : 'Could not save this Spark. Check the fields and try again.';
             this.setSparkModalStatus(message, 'error');
-            notifications.error(message);
+            this.feedback.error(message);
         }
     },
 
@@ -40,19 +41,21 @@ async archiveSpark(id) {
         const spark = this.findSparkById(id);
         if (!spark) return;
 
+        const lifecycleGeneration = this.weeklySparkLifecycleGeneration;
         try {
-            await sparksRepository.save(id, {
+            await this.repository.save(id, {
                 ...spark,
                 status: 'archived',
                 updatedAt: new Date().toISOString()
             });
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
             this.invalidateWeeklySparkCache();
-            notifications.success('Spark archived.');
+            this.feedback.success('Spark archived.');
             await this.loadWeeklySparks({ forceRefresh: true });
         } catch (error) {
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
             console.error('Failed to archive Spark:', error);
-            notifications.error('Could not archive this Spark.');
+            this.feedback.error('Could not archive this Spark.');
         }
     },
 };
-

@@ -59,15 +59,6 @@ class TeacherManager {
         this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
-        this.weeklySparkItems = [];
-        this.weeklySparkCache = null;
-        this.weeklySparkPromise = null;
-        this.weeklySparkRefreshing = false;
-        this.weeklySparkActiveView = 'week';
-        this.weeklySparkTypeFilter = 'all';
-        this.weeklySparkMonth = null;
-        this.editingSparkId = null;
-        this.sparkModalMode = 'create';
         this.vocabularyMode = 'assign';
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;

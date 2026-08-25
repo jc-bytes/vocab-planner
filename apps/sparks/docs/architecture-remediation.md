@@ -125,6 +125,16 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Kept the five method groups private implementation details; tests assemble their own internal harness rather than widening the production API.
 - Verification: the complete suite, 13-game sandbox smoke, production build, and built-page smoke passed. Word Hunt remains lazy at 30.80 kB raw / 7.41 kB gzip; the teacher entry is 159.50 kB raw / 43.92 kB gzip, and deployment remains 13.6 MB.
 
+### Task 18b, migrate Teacher Sparks
+
+- Replaced the 52-method Spark proxy composition with `createTeacherSparksFeature`. The frozen public surface is only `show` and `destroy`, while the existing data, library, editor, and persistence method groups remain private implementation collaborators.
+- Moved all Spark library cache, view filters, editor identity, and request generations off `TeacherManager`. Removed the ineffective eager modal setup; the factory now owns modal setup after its template is lazily mounted.
+- Replaced implicit manager/global dependencies with explicit authentication, view activation, current-user, icon, feedback, modal, DOM, and narrow repository capabilities. The repository implementation stays imported inside the dynamic Spark chunk, not the eager lazy-loader module.
+- Converted the ten feature control/delegation listeners to exact removable handlers. Auth disposal closes the modal, removes listeners, clears rendered and cached data, invalidates late async work, and allows one clean rebind on a later session.
+- Added latest-wins library generations and identity-checked promise cleanup. Older forced loads and stale failures cannot overwrite a newer view. A separate lifecycle generation suppresses post-disposal save/archive effects without incorrectly hiding a successful write when an ordinary refresh overlaps it.
+- Browser verification exercises the real lazy adapter, proves the modal is inert before first use, creates and saves a Spark, disposes/recreates the feature, saves again exactly once, and confirms no Spark internals leak onto the manager.
+- Verification: 10 focused composition/race/lifecycle tests, the Spark browser smoke, lazy/build contracts, and production build passed. Sparks remains lazy at 34.57 kB raw / 9.15 kB gzip; the eager teacher entry decreased from 159.50 kB raw / 43.92 kB gzip to 159.21 kB raw / 43.76 kB gzip. Deployment remains 13.6 MB.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.

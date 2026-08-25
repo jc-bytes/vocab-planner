@@ -1,4 +1,4 @@
-import { notifications, setupModal } from './main.js';
+import { closeModal, notifications, openModal, setupModal } from './main.js';
 import { initTeacherSettingsListeners } from './teacherSettingsListeners.js';
 import { createFeatureContext } from './services/featureContext.js';
 
@@ -50,17 +50,19 @@ const featureDefinitions = {
     sparks: async () => {
         const module = await import('./teacherSparks.js');
         return {
-            methods: captureFeatureMethods(module.installTeacherSparkMethods),
-            initialize(manager) {
-                setupModal('#spark-modal', {
-                    dismissible: true,
-                    onClose: () => {
-                        manager.editingSparkId = null;
-                        manager.sparkModalMode = 'create';
-                        manager.setSparkModalStatus?.('');
-                    }
+            publicMethods: { showSparksView: 'show' },
+            create(manager) {
+                return module.createTeacherSparksFeature({
+                    ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
+                    showView: () => manager.switchView('teacher-sparks-view'),
+                    isAuthenticationDisabled: () => manager.authDisabled,
+                    getCurrentUser: () => manager.currentUser,
+                    refreshIcons: root => manager.refreshIcons(root),
+                    feedback: notifications,
+                    setupDialog: setupModal,
+                    openDialog: openModal,
+                    closeDialog: closeModal
                 });
-                module.initTeacherSparksListeners(manager);
             }
         };
     },

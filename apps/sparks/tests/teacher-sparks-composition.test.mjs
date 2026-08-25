@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 globalThis.document = {
@@ -27,9 +28,7 @@ globalThis.window = {
     removeEventListener() {}
 };
 
-const { installTeacherSparkMethods } = await import('../js/teacherSparks.js');
-const { initTeacherSparksListeners } = await import('../js/teacherSparks/teacherSparkListeners.js');
-const { setupModal } = await import('../js/main.js');
+const { createTeacherSparksFeature } = await import('../js/teacherSparks.js');
 const { getPanamaDateValue } = await import('../js/services/dateUtils.js');
 const { teacherSparkDataMethods } = await import('../js/teacherSparks/teacherSparkDataMethods.js');
 const { teacherSparkEditorMethods } = await import('../js/teacherSparks/teacherSparkEditorMethods.js');
@@ -38,7 +37,16 @@ const { teacherSparkLibraryViewMethods } = await import('../js/teacherSparks/tea
 const { teacherSparkPersistenceMethods } = await import('../js/teacherSparks/teacherSparkPersistenceMethods.js');
 
 class TeacherSparkHarness {}
-installTeacherSparkMethods(TeacherSparkHarness);
+const methodGroups = [
+    teacherSparkDataMethods,
+    teacherSparkLibraryModelMethods,
+    teacherSparkLibraryViewMethods,
+    teacherSparkEditorMethods,
+    teacherSparkPersistenceMethods
+];
+methodGroups.forEach(methods => {
+    Object.defineProperties(TeacherSparkHarness.prototype, Object.getOwnPropertyDescriptors(methods));
+});
 
 function addDays(dateValue, days) {
     const date = new Date(`${dateValue}T12:00:00Z`);
@@ -51,95 +59,61 @@ function createManager() {
     manager.weeklySparkItems = [];
     manager.weeklySparkCache = null;
     manager.weeklySparkPromise = null;
+    manager.weeklySparkLoadGeneration = 0;
+    manager.weeklySparkLifecycleGeneration = 0;
     manager.weeklySparkActiveView = 'week';
     manager.weeklySparkTypeFilter = 'all';
     manager.weeklySparkMonth = null;
+    manager.isAuthenticationDisabled = () => false;
+    manager.ensureAuthenticated = () => true;
+    manager.repository = { list: async () => [], save: async () => {} };
+    manager.feedback = { warning() {}, success() {}, error() {} };
+    manager.query = () => null;
+    manager.queryAll = () => [];
+    manager.refreshIcons = () => {};
     manager.refreshSparkLibrarySurface = () => {};
     return manager;
 }
 
-test('Teacher Sparks installs the complete stable feature surface', () => {
-    const expectedMethods = [
-        'showSparksView',
-        'loadWeeklySparks',
-        'getSparkLibraryData',
-        'renderSparkLibrary',
-        'openSparkModal',
-        'readSparkForm',
-        'saveSparkFromForm',
-        'archiveSpark'
-    ];
+test('Teacher Sparks exposes only its explicit use cases', () => {
+    const feature = createTeacherSparksFeature({
+        ensureAuthenticated: () => true,
+        showView: () => {},
+        isAuthenticationDisabled: () => true,
+        getCurrentUser: () => null,
+        refreshIcons: () => {},
+        repository: { list: async () => [], save: async () => {} },
+        feedback: { warning() {}, success() {}, error() {} },
+        setupDialog: () => {},
+        openDialog: () => {},
+        closeDialog: () => {}
+    });
 
-    expectedMethods.forEach(name => assert.equal(typeof TeacherSparkHarness.prototype[name], 'function'));
+    assert.deepEqual(Object.keys(feature).sort(), ['destroy', 'show']);
+    assert.equal(Object.isFrozen(feature), true);
+    assert.equal(feature.loadWeeklySparks, undefined);
 });
 
-test('lazy Spark close controls use the shared dialog lifecycle', () => {
-    const originalQuerySelector = document.querySelector;
-    const originalQuerySelectorAll = document.querySelectorAll;
-    const listeners = [];
-    const attributes = new Map();
-    const classes = new Set();
-    const content = {
-        hasAttribute: name => attributes.has(`content:${name}`),
-        setAttribute(name, value) { attributes.set(`content:${name}`, value); }
-    };
-    const modal = {
-        dataset: {},
-        hasAttribute: name => attributes.has(name),
-        getAttribute: name => attributes.get(name) ?? null,
-        setAttribute(name, value) { attributes.set(name, value); },
-        removeAttribute(name) { attributes.delete(name); },
-        querySelector(selector) { return selector === '.modal-content' ? content : null; },
-        querySelectorAll() { return []; },
-        addEventListener() {},
-        classList: {
-            contains: value => classes.has(value),
-            add: value => classes.add(value)
-        }
-    };
-    const closeButtons = Array.from({ length: 2 }, () => ({
-        addEventListener(type, handler) { listeners.push({ type, handler }); }
-    }));
-    const manager = {
-        editingSparkId: 'spark-1',
-        sparkModalMode: 'edit',
-        setSparkModalStatus(value) { this.sparkModalStatus = value; }
-    };
+test('Teacher Sparks uses the explicit lazy factory and manager owns no Spark state', async () => {
+    const [featureSource, lazySource, managerSource, listenerSource] = await Promise.all([
+        readFile(new URL('../js/teacherSparks.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacher.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherSparks/teacherSparkListeners.js', import.meta.url), 'utf8')
+    ]);
 
-    try {
-        document.querySelector = selector => selector === '#spark-modal' ? modal : null;
-        document.querySelectorAll = selector => selector === '#spark-modal .close-modal' ? closeButtons : [];
-        setupModal(modal, {
-            onClose: () => {
-                manager.editingSparkId = null;
-                manager.sparkModalMode = 'create';
-                manager.setSparkModalStatus('');
-            }
-        });
-        initTeacherSparksListeners(manager);
-
-        assert.equal(listeners.length, 2);
-        assert.ok(listeners.every(listener => listener.type === 'click'));
-        listeners[0].handler();
-        assert.ok(classes.has('hidden'));
-        assert.equal(manager.editingSparkId, null);
-        assert.equal(manager.sparkModalMode, 'create');
-        assert.equal(manager.sparkModalStatus, '');
-    } finally {
-        document.querySelector = originalQuerySelector;
-        document.querySelectorAll = originalQuerySelectorAll;
-    }
+    assert.doesNotMatch(featureSource, /installTeacherSparkMethods/);
+    assert.match(featureSource, /export function createTeacherSparksFeature/);
+    assert.match(featureSource, /services\/sparksRepository\.js/);
+    assert.match(lazySource, /showSparksView:\s*'show'/);
+    assert.match(lazySource, /module\.createTeacherSparksFeature/);
+    assert.doesNotMatch(lazySource, /import .*sparksRepository/);
+    assert.doesNotMatch(managerSource, /this\.(weeklySpark|editingSparkId|sparkModalMode)/);
+    assert.match(listenerSource, /removeEventListener/);
 });
 
 test('Teacher Sparks responsibilities are complete and owned by one component each', () => {
-    const groups = [
-        teacherSparkDataMethods,
-        teacherSparkLibraryModelMethods,
-        teacherSparkLibraryViewMethods,
-        teacherSparkEditorMethods,
-        teacherSparkPersistenceMethods
-    ];
-    const methodNames = groups.flatMap(group => Object.keys(group));
+    const methodNames = methodGroups.flatMap(group => Object.keys(group));
 
     assert.equal(methodNames.length, 52);
     assert.equal(new Set(methodNames).size, methodNames.length);
@@ -166,6 +140,133 @@ test('weekly Spark requests share one in-flight repository load', async () => {
     assert.deepEqual(secondResult, firstResult);
     assert.deepEqual(manager.weeklySparkCache, [{ id: 'spark-1' }]);
     assert.equal(manager.weeklySparkPromise, null);
+});
+
+test('forced Spark refresh is latest-wins and suppresses stale failures', async () => {
+    const manager = createManager();
+    const pending = [];
+    const warnings = [];
+    let renderCount = 0;
+    const list = {
+        innerHTML: '',
+        setAttribute() {},
+        removeAttribute() {}
+    };
+    manager.query = selector => selector === '#spark-library-list' ? list : null;
+    manager.feedback.warning = message => warnings.push(message);
+    manager.renderSparkLibrary = () => { renderCount += 1; };
+    manager.fetchWeeklySparks = () => new Promise((resolve, reject) => pending.push({ resolve, reject }));
+
+    const older = manager.loadWeeklySparks({ forceRefresh: true });
+    const newer = manager.loadWeeklySparks({ forceRefresh: true });
+    pending[1].resolve([{ id: 'newer' }]);
+    await newer;
+    pending[0].reject(new Error('stale failure'));
+    await older;
+
+    assert.deepEqual(manager.weeklySparkCache, [{ id: 'newer' }]);
+    assert.deepEqual(manager.weeklySparkItems, [{ id: 'newer' }]);
+    assert.equal(renderCount, 1);
+    assert.deepEqual(warnings, []);
+    assert.equal(manager.weeklySparkPromise, null);
+});
+
+test('an overlapping library refresh does not suppress a successful Spark save', async () => {
+    const manager = createManager();
+    let resolveSave;
+    let listCalls = 0;
+    let closeCalls = 0;
+    const successes = [];
+    const list = { innerHTML: '', setAttribute() {}, removeAttribute() {} };
+    manager.query = selector => selector === '#spark-library-list' ? list : null;
+    manager.readSparkForm = () => ({ id: 'spark-1', status: 'draft' });
+    manager.setSparkModalStatus = () => {};
+    manager.repository = {
+        list: async () => { listCalls += 1; return []; },
+        save: () => new Promise(resolve => { resolveSave = resolve; })
+    };
+    manager.closeDialog = () => { closeCalls += 1; };
+    manager.feedback.success = message => successes.push(message);
+    manager.renderSparkLibrary = () => {};
+
+    const save = manager.saveSparkFromForm('draft');
+    await Promise.resolve();
+    await manager.loadWeeklySparks({ forceRefresh: true });
+    resolveSave();
+    await save;
+
+    assert.equal(closeCalls, 1);
+    assert.deepEqual(successes, ['Spark saved.']);
+    assert.equal(listCalls, 2);
+});
+
+class ListenerTarget {
+    constructor() {
+        this.listeners = new Map();
+    }
+
+    addEventListener(type, handler) {
+        if (!this.listeners.has(type)) this.listeners.set(type, new Set());
+        this.listeners.get(type).add(handler);
+    }
+
+    removeEventListener(type, handler) {
+        this.listeners.get(type)?.delete(handler);
+    }
+
+    count() {
+        return Array.from(this.listeners.values()).reduce((total, handlers) => total + handlers.size, 0);
+    }
+}
+
+test('Spark feature destroy removes owned listeners and suppresses late loads', async () => {
+    const controls = new Map([
+        ['#add-spark-btn', new ListenerTarget()],
+        ['#save-spark-draft-btn', new ListenerTarget()],
+        ['#schedule-spark-btn', new ListenerTarget()],
+        ['#add-spark-question-btn', new ListenerTarget()],
+        ['#spark-check-mode-input', new ListenerTarget()],
+        ['#spark-question-builder', new ListenerTarget()],
+        ['#spark-form', new ListenerTarget()],
+        ['#spark-library-list', Object.assign(new ListenerTarget(), {
+            innerHTML: '',
+            setAttribute() {},
+            removeAttribute() {}
+        })]
+    ]);
+    let resolveList;
+    let refreshCount = 0;
+    const warnings = [];
+    const feature = createTeacherSparksFeature({
+        ensureAuthenticated: () => true,
+        showView: () => {},
+        isAuthenticationDisabled: () => false,
+        getCurrentUser: () => ({ uid: 'teacher-1' }),
+        refreshIcons: () => { refreshCount += 1; },
+        repository: {
+            list: () => new Promise(resolve => { resolveList = resolve; }),
+            save: async () => {}
+        },
+        feedback: { warning: message => warnings.push(message), success() {}, error() {} },
+        setupDialog: () => {},
+        openDialog: () => {},
+        closeDialog: () => {},
+        query: selector => controls.get(selector) || null,
+        queryAll: () => []
+    });
+
+    assert.equal(Array.from(controls.values()).reduce((sum, target) => sum + target.count(), 0), 10);
+    const pendingShow = feature.show();
+    feature.destroy();
+    feature.destroy();
+    assert.equal(Array.from(controls.values()).reduce((sum, target) => sum + target.count(), 0), 0);
+    assert.equal(controls.get('#spark-library-list').innerHTML, '');
+
+    resolveList([{ id: 'stale', title: 'Old session' }]);
+    await pendingShow;
+    assert.equal(controls.get('#spark-library-list').innerHTML, '');
+    assert.equal(refreshCount, 0);
+    assert.deepEqual(warnings, []);
 });
 
 test('Spark library modeling separates current, upcoming, draft, and archived records', () => {

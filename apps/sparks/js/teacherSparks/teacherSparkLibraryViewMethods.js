@@ -1,4 +1,4 @@
-import { $, createElement, escapeHtml } from '../main.js';
+import { createElement, escapeHtml } from '../main.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions, SPARK_CHECK_MODES } from '../sparkCheckModel.js';
 import { normalizeSparkGradeQuestions, normalizeSparkTargetGrades, SPARK_GRADE_LEVELS } from '../sparkModel.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
@@ -7,7 +7,7 @@ import { formatMonthLabel, formatShortDate, getMonthValue } from './sparkSchedul
 
 export const teacherSparkLibraryViewMethods = {
 renderSparkLibrary() {
-        const list = $('#spark-library-list');
+        const list = this.query('#spark-library-list');
         if (!list) return;
         list.innerHTML = '';
 
@@ -419,4 +419,3 @@ refreshSparkLibrarySurface() {
         this.refreshIcons();
     },
 };
-

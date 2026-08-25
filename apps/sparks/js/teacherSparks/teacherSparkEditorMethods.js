@@ -1,4 +1,4 @@
-import { $, escapeHtml, openModal } from '../main.js';
+import { escapeHtml } from '../main.js';
 import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 import {
     normalizeSparkCheckMode,
@@ -22,7 +22,7 @@ createSparkQuestionDraft(type = SPARK_QUESTION_TYPES.SHORT_TEXT) {
     },
 
 readSparkQuestionDraftsFromForm() {
-        return Array.from(document.querySelectorAll('#spark-question-builder .spark-question-editor')).map((editor, index) => {
+        return this.queryAll('#spark-question-builder .spark-question-editor').map((editor, index) => {
             const type = editor.querySelector('[data-spark-question-type]')?.value === SPARK_QUESTION_TYPES.MULTIPLE_CHOICE
                 ? SPARK_QUESTION_TYPES.MULTIPLE_CHOICE
                 : SPARK_QUESTION_TYPES.SHORT_TEXT;
@@ -40,10 +40,9 @@ readSparkQuestionDraftsFromForm() {
     },
 
 renderSparkQuestionEditors(questions = []) {
-        const builder = $('#spark-question-builder');
+        const builder = this.query('#spark-question-builder');
         if (!builder) return;
         const drafts = Array.isArray(questions) ? questions.slice(0, SPARK_QUESTION_LIMIT) : [];
-        this.sparkModalQuestions = drafts;
         if (drafts.length === 0) {
             builder.innerHTML = '<p class="spark-question-builder-empty">No questions yet. Add one or choose Reading only.</p>';
         } else {
@@ -89,14 +88,14 @@ renderSparkQuestionEditors(questions = []) {
                 `;
             }).join('');
         }
-        const addButton = $('#add-spark-question-btn');
+        const addButton = this.query('#add-spark-question-btn');
         if (addButton) addButton.disabled = drafts.length >= SPARK_QUESTION_LIMIT;
         this.refreshIcons(builder);
     },
 
 updateSparkCheckModeUi() {
-        const mode = normalizeSparkCheckMode($('#spark-check-mode-input')?.value);
-        const group = $('#spark-question-builder-group');
+        const mode = normalizeSparkCheckMode(this.query('#spark-check-mode-input')?.value);
+        const group = this.query('#spark-question-builder-group');
         if (group) group.hidden = mode === SPARK_CHECK_MODES.READING_ONLY;
     },
 
@@ -132,7 +131,7 @@ openSparkModal(spark = null, options = {}) {
         this.sparkModalMode = source.id && !duplicate ? 'edit' : 'create';
         this.editingSparkId = this.sparkModalMode === 'edit' ? source.id : null;
 
-        const title = $('#spark-modal-title');
+        const title = this.query('#spark-modal-title');
         if (title) title.textContent = this.sparkModalMode === 'edit' ? 'Edit Spark' : 'Add Spark';
 
         const values = {
@@ -154,12 +153,12 @@ openSparkModal(spark = null, options = {}) {
         };
 
         Object.entries(values).forEach(([selector, value]) => {
-            const field = $(selector);
+            const field = this.query(selector);
             if (field) field.value = value || '';
         });
 
         SPARK_GRADE_LEVELS.forEach(grade => {
-            const field = $(`#spark-target-grade-${grade}-input`);
+            const field = this.query(`#spark-target-grade-${grade}-input`);
             if (field) field.checked = source.targetGrades.includes(grade);
         });
 
@@ -167,16 +166,16 @@ openSparkModal(spark = null, options = {}) {
         this.updateSparkCheckModeUi();
 
         this.setSparkModalStatus('');
-        openModal('#spark-modal', { initialFocus: '#spark-title-input' });
+        this.openDialog('#spark-modal', { initialFocus: '#spark-title-input' });
     },
 
 readSparkTargetGradesFromForm() {
-        return SPARK_GRADE_LEVELS.filter(grade => $(`#spark-target-grade-${grade}-input`)?.checked);
+        return SPARK_GRADE_LEVELS.filter(grade => this.query(`#spark-target-grade-${grade}-input`)?.checked);
     },
 
 readSparkGradeQuestionsFromForm() {
         return SPARK_GRADE_LEVELS.reduce((questions, grade) => {
-            const field = $(`#spark-grade-question-${grade}-input`);
+            const field = this.query(`#spark-grade-question-${grade}-input`);
             const text = String(field?.value || '').trim();
             if (text) questions[grade] = text;
             return questions;
@@ -199,29 +198,29 @@ readSparkQuestionsFromForm() {
     },
 
 readSparkForm(statusOverride = null) {
-        const status = statusOverride || $('#spark-status-input')?.value || 'draft';
+        const status = statusOverride || this.query('#spark-status-input')?.value || 'draft';
         const spark = this.normalizeSpark({
-            id: $('#spark-id')?.value || this.editingSparkId || this.createSparkId(),
-            sparkType: $('#spark-type')?.value || 'cool_fact',
-            title: $('#spark-title-input')?.value || '',
-            sparkText: $('#spark-text-input')?.value || '',
-            whyItMatters: $('#spark-why-input')?.value || '',
-            question: $('#spark-question-input')?.value || '',
+            id: this.query('#spark-id')?.value || this.editingSparkId || this.createSparkId(),
+            sparkType: this.query('#spark-type')?.value || 'cool_fact',
+            title: this.query('#spark-title-input')?.value || '',
+            sparkText: this.query('#spark-text-input')?.value || '',
+            whyItMatters: this.query('#spark-why-input')?.value || '',
+            question: this.query('#spark-question-input')?.value || '',
             gradeQuestions: this.readSparkGradeQuestionsFromForm(),
-            checkMode: $('#spark-check-mode-input')?.value || SPARK_CHECK_MODES.OPTIONAL,
+            checkMode: this.query('#spark-check-mode-input')?.value || SPARK_CHECK_MODES.OPTIONAL,
             questions: this.readSparkQuestionsFromForm(),
             targetGrades: this.readSparkTargetGradesFromForm(),
-            sourceTitle: $('#spark-source-title-input')?.value || '',
-            sourceUrl: $('#spark-source-url-input')?.value || '',
+            sourceTitle: this.query('#spark-source-title-input')?.value || '',
+            sourceUrl: this.query('#spark-source-url-input')?.value || '',
             subjectSlug: DEFAULT_SUBJECT_SLUG,
-            scheduledDate: $('#spark-scheduled-date-input')?.value || '',
+            scheduledDate: this.query('#spark-scheduled-date-input')?.value || '',
             status,
-            ownerId: this.currentUser?.uid || null
+            ownerId: this.getCurrentUser()?.uid || null
         });
 
         if (!spark.title) throw new Error('Add a title for this Spark.');
         if (!spark.sparkText) throw new Error('Add the Spark text students will read.');
-        const editorCount = document.querySelectorAll('#spark-question-builder .spark-question-editor').length;
+        const editorCount = this.queryAll('#spark-question-builder .spark-question-editor').length;
         if (spark.checkMode !== SPARK_CHECK_MODES.READING_ONLY && editorCount > spark.questions.length) {
             throw new Error('Finish every Check Your Understanding question.');
         }
@@ -250,7 +249,7 @@ readSparkForm(statusOverride = null) {
     },
 
 setSparkModalStatus(text, state = 'muted') {
-        const el = $('#spark-modal-status');
+        const el = this.query('#spark-modal-status');
         if (!el) return;
         setInlineStatus(el, text, state);
     },

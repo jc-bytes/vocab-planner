@@ -1,47 +1,52 @@
-import { $, $$, closeModal as closeDialog } from '../main.js';
+export function bindTeacherSparksListeners(context) {
+    const disposers = [];
+    const listen = (element, type, handler) => {
+        if (!element) return;
+        element.addEventListener(type, handler);
+        disposers.push(() => element.removeEventListener(type, handler));
+    };
 
-export function initTeacherSparksListeners(manager) {
-    $$('#spark-modal .close-modal').forEach(button => {
-        button.addEventListener('click', () => closeDialog('#spark-modal'));
+    context.queryAll('#spark-modal .close-modal').forEach(button => {
+        listen(button, 'click', () => context.closeDialog('#spark-modal'));
     });
-    $('#add-spark-btn')?.addEventListener('click', () => manager.openSparkModal());
-    $('#save-spark-draft-btn')?.addEventListener('click', () => manager.saveSparkFromForm('draft'));
-    $('#schedule-spark-btn')?.addEventListener('click', () => manager.saveSparkFromForm('scheduled'));
-    $('#add-spark-question-btn')?.addEventListener('click', () => manager.addSparkQuestion());
-    $('#spark-check-mode-input')?.addEventListener('change', () => manager.updateSparkCheckModeUi());
-    $('#spark-question-builder')?.addEventListener('click', (event) => {
+    listen(context.query('#add-spark-btn'), 'click', () => context.openSparkModal());
+    listen(context.query('#save-spark-draft-btn'), 'click', () => context.saveSparkFromForm('draft'));
+    listen(context.query('#schedule-spark-btn'), 'click', () => context.saveSparkFromForm('scheduled'));
+    listen(context.query('#add-spark-question-btn'), 'click', () => context.addSparkQuestion());
+    listen(context.query('#spark-check-mode-input'), 'change', () => context.updateSparkCheckModeUi());
+    listen(context.query('#spark-question-builder'), 'click', (event) => {
         const button = event.target.closest('[data-remove-spark-question]');
         if (!button) return;
-        manager.removeSparkQuestion(Number(button.dataset.removeSparkQuestion));
+        context.removeSparkQuestion(Number(button.dataset.removeSparkQuestion));
     });
-    $('#spark-question-builder')?.addEventListener('change', (event) => {
+    listen(context.query('#spark-question-builder'), 'change', (event) => {
         const select = event.target.closest('[data-spark-question-type]');
         if (!select) return;
         const editor = select.closest('.spark-question-editor');
-        const editors = Array.from(document.querySelectorAll('#spark-question-builder .spark-question-editor'));
-        manager.changeSparkQuestionType(editors.indexOf(editor), select.value);
+        const editors = context.queryAll('#spark-question-builder .spark-question-editor');
+        context.changeSparkQuestionType(editors.indexOf(editor), select.value);
     });
-    $('#spark-form')?.addEventListener('submit', (event) => {
+    listen(context.query('#spark-form'), 'submit', (event) => {
         event.preventDefault();
-        manager.saveSparkFromForm($('#spark-status-input')?.value || 'draft');
+        context.saveSparkFromForm(context.query('#spark-status-input')?.value || 'draft');
     });
 
-    $('#spark-library-list')?.addEventListener('click', (event) => {
+    listen(context.query('#spark-library-list'), 'click', (event) => {
         const viewButton = event.target.closest('[data-spark-view]');
         if (viewButton) {
-            manager.selectSparkView(viewButton.dataset.sparkView);
+            context.selectSparkView(viewButton.dataset.sparkView);
             return;
         }
 
         const typeButton = event.target.closest('[data-spark-type-filter]');
         if (typeButton) {
-            manager.selectSparkTypeFilter(typeButton.dataset.sparkTypeFilter);
+            context.selectSparkTypeFilter(typeButton.dataset.sparkTypeFilter);
             return;
         }
 
         const monthButton = event.target.closest('[data-spark-month-shift]');
         if (monthButton) {
-            manager.shiftSparkMonth(Number(monthButton.dataset.sparkMonthShift) || 0);
+            context.shiftSparkMonth(Number(monthButton.dataset.sparkMonthShift) || 0);
             return;
         }
 
@@ -49,21 +54,23 @@ export function initTeacherSparksListeners(manager) {
         if (!button) return;
         const id = button.dataset.sparkId;
         const action = button.dataset.sparkAction;
-        const spark = manager.findSparkById(id);
+        const spark = context.findSparkById(id);
         if (!spark) return;
 
         if (action === 'edit') {
-            manager.openSparkModal(spark);
+            context.openSparkModal(spark);
         } else if (action === 'duplicate') {
-            manager.openSparkModal(spark, { duplicate: true });
+            context.openSparkModal(spark, { duplicate: true });
         } else if (action === 'archive') {
-            manager.archiveSpark(id);
+            context.archiveSpark(id);
         }
     });
 
-    $('#spark-library-list')?.addEventListener('change', (event) => {
+    listen(context.query('#spark-library-list'), 'change', (event) => {
         const select = event.target.closest('[data-spark-month-select]');
         if (!select) return;
-        manager.selectSparkMonth(select.value);
+        context.selectSparkMonth(select.value);
     });
+
+    return () => disposers.splice(0).forEach(dispose => dispose());
 }

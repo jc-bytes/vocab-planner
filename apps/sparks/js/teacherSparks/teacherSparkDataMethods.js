@@ -1,5 +1,3 @@
-import { $, notifications } from '../main.js';
-import { sparksRepository } from '../services/sparksRepository.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
 import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 import { SPARK_CHECK_MODES } from '../sparkCheckModel.js';
@@ -26,47 +24,55 @@ createSparkId() {
         return `spark_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     },
 
-invalidateWeeklySparkCache() {
+    invalidateWeeklySparkCache() {
+        this.weeklySparkLoadGeneration += 1;
         this.weeklySparkCache = null;
         this.weeklySparkPromise = null;
     },
 
-async fetchWeeklySparks() {
-        if (this.authDisabled) return [];
+    async fetchWeeklySparks() {
+        if (this.isAuthenticationDisabled()) return [];
         if (!this.ensureAuthenticated(false)) return [];
 
-        return (await sparksRepository.list())
+        return (await this.repository.list())
             .map(spark => this.normalizeSpark(spark))
             .sort(compareSparkSchedule);
     },
 
-async getWeeklySparks({ forceRefresh = false } = {}) {
+    async getWeeklySparks({ forceRefresh = false, generation = null } = {}) {
         if (!forceRefresh && this.weeklySparkCache) return this.weeklySparkCache;
         if (!forceRefresh && this.weeklySparkPromise) return this.weeklySparkPromise;
 
-        this.weeklySparkPromise = this.fetchWeeklySparks()
+        const requestGeneration = generation ?? ++this.weeklySparkLoadGeneration;
+        const request = this.fetchWeeklySparks()
             .then(sparks => {
-                this.weeklySparkCache = sparks;
+                if (requestGeneration === this.weeklySparkLoadGeneration) {
+                    this.weeklySparkCache = sparks;
+                }
                 return sparks;
             })
             .finally(() => {
-                this.weeklySparkPromise = null;
+                if (this.weeklySparkPromise === request) this.weeklySparkPromise = null;
             });
+        this.weeklySparkPromise = request;
 
-        return this.weeklySparkPromise;
+        return request;
     },
 
 async showSparksView() {
         if (!this.ensureAuthenticated(false)) return;
-        this.switchView('teacher-sparks-view');
+        this.showView();
         await this.loadWeeklySparks();
     },
 
-async loadWeeklySparks({ forceRefresh = false } = {}) {
-        const list = $('#spark-library-list');
+    async loadWeeklySparks({ forceRefresh = false } = {}) {
+        const list = this.query('#spark-library-list');
         if (!list) return;
 
-        this.weeklySparkRefreshing = true;
+        let generation = this.weeklySparkLoadGeneration;
+        if (forceRefresh || (!this.weeklySparkCache && !this.weeklySparkPromise)) {
+            generation = ++this.weeklySparkLoadGeneration;
+        }
         if (!this.weeklySparkItems.length) {
             list.innerHTML = '<div class="loading-spinner">Loading Sparks...</div>';
         } else {
@@ -74,18 +80,20 @@ async loadWeeklySparks({ forceRefresh = false } = {}) {
         }
 
         try {
-            const sparks = await this.getWeeklySparks({ forceRefresh });
+            const sparks = await this.getWeeklySparks({ forceRefresh, generation });
+            if (generation !== this.weeklySparkLoadGeneration) return;
             this.weeklySparkItems = sparks;
             this.renderSparkLibrary();
         } catch (error) {
+            if (generation !== this.weeklySparkLoadGeneration) return;
             console.error('Failed to load Sparks:', error);
             list.innerHTML = '<p class="teacher-empty-state">Could not load Sparks.</p>';
-            notifications.warning('Could not load Sparks.');
+            this.feedback.warning('Could not load Sparks.');
         } finally {
-            this.weeklySparkRefreshing = false;
-            list.removeAttribute('aria-busy');
-            this.refreshIcons();
+            if (generation === this.weeklySparkLoadGeneration) {
+                list.removeAttribute('aria-busy');
+                this.refreshIcons();
+            }
         }
     },
 };
-

@@ -109,15 +109,6 @@ export function initTeacherGlobalListeners(manager) {
             manager.editingWordIndex = -1;
         }
     });
-    setupModal('#spark-modal', {
-        dismissible: true,
-        onClose: () => {
-            manager.editingSparkId = null;
-            manager.sparkModalMode = 'create';
-            manager.setSparkModalStatus?.('');
-        }
-    });
-
     bindTeacherAuthListeners(manager);
     bindTeacherMobileMenu(manager);
     bindTeacherTabs(manager);
