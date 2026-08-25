@@ -15,8 +15,6 @@ async showProgressView() {
             await this.loadStudentRosterFilters();
             this.populateFilters();
             await this.fetchStudentProgressPage();
-            this.initExportListeners();
-            this.initDataViewer();
         } catch {
             // The loader renders a retryable error without replacing good data.
         } finally {

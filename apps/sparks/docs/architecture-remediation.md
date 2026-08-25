@@ -186,6 +186,12 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Made that caller explicit with `{ area: 'data', tab: 'dashboard' }`. No route format, sidebar behavior, repository, template, or other Data Management code changed.
 - Added a source contract and ran the 12 teacher-data checks plus all 14 routing checks. Both suites passed. The broader Data Management factory conversion remains the next Task 18 change.
 
+### Task 18i, remove pre-mount Data Management initialization
+
+- Removed two unreachable Student Progress calls to `initExportListeners()` and `initDataViewer()`. Those methods exist only inside the lazy Data Management context, so the calls threw after progress loaded and were swallowed by the broad retry-state catch; they also could not bind controls before the lazy template mounted.
+- Removed eager settings-listener initialization from the application listener bootstrap. The Settings controls also live inside the lazy template, so the eager pass always found no elements; the lazy Data Management initialization remains their sole live owner.
+- Added a source ownership contract. Focused Student Progress, Data Management, lazy/build, and routing verification must remain green before the factory loader switch.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.

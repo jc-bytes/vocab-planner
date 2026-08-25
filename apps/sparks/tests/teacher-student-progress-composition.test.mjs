@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
@@ -33,6 +34,11 @@ const {
 } = await import('../js/teacherStudentProgress/teacherStudentCsvImportMethods.js');
 const { teacherStudentProvisioningMethods } = await import('../js/teacherStudentProgress/teacherStudentProvisioningMethods.js');
 const { supabaseService } = await import('../js/supabaseService.js');
+const progressDataSource = await readFile(
+    new URL('../js/teacherStudentProgress/teacherProgressDataMethods.js', import.meta.url),
+    'utf8'
+);
+const teacherListenersSource = await readFile(new URL('../js/teacherListeners.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {}
 installTeacherStudentProgressDataMethods(TestTeacherManager);
@@ -49,6 +55,11 @@ test('teacher progress installer exposes progress, provisioning, and CSV workflo
         'parseStudentCsvText'
     ];
     methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
+});
+
+test('Student Progress does not reach into the unmounted Data Management feature', () => {
+    assert.doesNotMatch(progressDataSource, /initExportListeners|initDataViewer/);
+    assert.doesNotMatch(teacherListenersSource, /initTeacherSettingsListeners/);
 });
 
 test('teacher progress responsibilities have one complete owner each', () => {
