@@ -145,8 +145,13 @@ async function createPeerStudent(admin) {
 }
 
 async function cleanupAcceptanceData({ admin, peer, student }) {
+    const activityUnitKey = `technology:${IDS.vocabulary}`;
     await admin.from('export_logs').delete().eq('filename', IDS.exportFilename);
     await admin.from('weekly_sparks').delete().eq('id', IDS.spark);
+    await admin.from('student_arcade_time_ledger').delete()
+        .eq('user_id', student.id).like('event_key', `formative:${activityUnitKey}:%`);
+    await admin.from('student_activity_progress').delete()
+        .eq('user_id', student.id).eq('unit_key', activityUnitKey);
     await admin.from('vocabularies').delete().eq('id', IDS.vocabulary);
     await admin.from('app_settings').delete().eq('key', IDS.settings);
     await admin.from('subjects').delete().eq('slug', IDS.subject);
@@ -462,6 +467,17 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             }));
             assert.equal(initial.userId, student.id);
 
+            await withServiceClient(studentClient, () => supabaseService.getOwnArcadeTime());
+            const { error: resetArcadeError } = await admin.from('student_arcade_time')
+                .update({ available_seconds: 0 })
+                .eq('user_id', student.id);
+            if (resetArcadeError) throw resetArcadeError;
+            const { error: resetLedgerError } = await admin.from('student_arcade_time_ledger')
+                .delete()
+                .eq('user_id', student.id)
+                .like('event_key', `formative:${activityUnitKey}:%`);
+            if (resetLedgerError) throw resetLedgerError;
+
             const welcome = await withServiceClient(studentClient, () => supabaseService.claimStudentWelcomeBonus({
                 clientId: `${RUN_ID}-welcome`
             }));
@@ -514,6 +530,76 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 supabaseService.submitStudentActivityProgress(activityPayload)
             ));
             assert.deepEqual(activityRetry, activity);
+
+            const afterFlashcards = await withServiceClient(studentClient, () => (
+                supabaseService.getOwnArcadeTime()
+            ));
+            assert.equal(afterFlashcards.availableSeconds, 0,
+                'Flashcards study must not grant formative Arcade time.');
+
+            const matchingAttempt = await withServiceClient(studentClient, () => (
+                supabaseService.startStudentActivityAttempt({
+                    unitKey: activityUnitKey,
+                    vocabularyId: IDS.vocabulary,
+                    activityType: 'matching'
+                })
+            ));
+            await new Promise(resolve => setTimeout(resolve, (matchingAttempt.minimumSeconds * 1000) + 100));
+            const matchingPayload = {
+                unitKey: activityUnitKey,
+                activityType: 'matching',
+                score: 100,
+                isComplete: true,
+                details: {
+                    evidence: {
+                        correctCount: 20,
+                        totalCount: 20,
+                        attemptedCount: 20,
+                        completedRounds: 4,
+                        targetRounds: 4
+                    }
+                },
+                metrics: { correctActions: 20, attemptedActions: 20 },
+                clientId: `${RUN_ID}-matching`,
+                attemptId: matchingAttempt.attemptId
+            };
+            const matching = await withServiceClient(studentClient, () => (
+                supabaseService.submitStudentActivityProgress(matchingPayload)
+            ));
+            assert.equal(matching.activity.isComplete, true);
+            assert.equal(matching.activity.verified, true);
+
+            const afterMatching = await withServiceClient(studentClient, () => (
+                supabaseService.getOwnArcadeTime()
+            ));
+            assert.equal(afterMatching.availableSeconds, 600,
+                'A first verified formative completion must refresh Arcade time to ten minutes.');
+
+            const matchingEventKey = `formative:${activityUnitKey}:matching`;
+            const { data: matchingLedger, error: matchingLedgerError } = await admin
+                .from('student_arcade_time_ledger')
+                .select('event_key,seconds_delta,balance_after')
+                .eq('user_id', student.id)
+                .eq('event_key', matchingEventKey);
+            if (matchingLedgerError) throw matchingLedgerError;
+            assert.deepEqual(matchingLedger, [{
+                event_key: matchingEventKey,
+                seconds_delta: 600,
+                balance_after: 600
+            }]);
+
+            const matchingRetry = await withServiceClient(studentClient, () => (
+                supabaseService.submitStudentActivityProgress(matchingPayload)
+            ));
+            assert.deepEqual(matchingRetry, matching);
+            const { count: matchingLedgerCount, error: matchingLedgerCountError } = await admin
+                .from('student_arcade_time_ledger')
+                .select('id', { count: 'exact', head: true })
+                .eq('user_id', student.id)
+                .eq('event_key', matchingEventKey);
+            if (matchingLedgerCountError) throw matchingLedgerCountError;
+            assert.equal(matchingLedgerCount, 1,
+                'Retrying the same completion must not duplicate Arcade time.');
 
             const synced = await withServiceClient(studentClient, () => supabaseService.syncStudentUnitWork({
                 unitKey: activityUnitKey,
