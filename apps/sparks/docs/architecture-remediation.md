@@ -1496,11 +1496,11 @@ The remediation backlog is complete. Future work should use the extension paths 
 
 ### Post-remediation reliability follow-up, isolate student and teacher authentication
 
-- **Status:** IN PROGRESS
+- **Status:** DONE
 - Reproduced the reported dashboard-to-login transition at the auth-event boundary. Any empty auth event previously cleared an active student, even when the event was not `SIGNED_OUT`.
 - Found that teacher and student pages also used Supabase's same default persisted-session key. Opening both roles in one browser profile allowed either page to replace or sign out the other.
 - Changed the client to use project- and page-specific student/teacher auth keys. A real `SIGNED_OUT` still performs full cleanup, while a stale empty initialization event cannot remove an active student.
 - Changed the authenticated browser smoke to open teacher and student pages in the same browser context, making cross-role session replacement a release-blocking regression.
 - Files changed: `js/services/supabaseClient.js`, `js/student/studentAuth.js`, `scripts/ui-auth-smoke.mjs`, `tests/student-auth-composition.test.mjs`, and `tests/supabase-config.test.mjs`.
-- Verification so far: focused auth/API tests, the same-profile authenticated smoke, complete source suite on an isolated port, local Supabase acceptance, dependency audit, production build and delivery budgets, built-site smoke, and seven-width responsive audit passed. Database lint reported only its two pre-existing extra warnings; database advisors reported no issues. The local Firefox binary could not launch because macOS denied its headless plugin container, so the clean CI cross-browser run remains required before deployment.
+- Verification: focused auth/API tests, the same-profile authenticated smoke, complete source suite on an isolated port, local Supabase acceptance, dependency audit, production build and delivery budgets, built-site smoke, and seven-width responsive audit passed locally. Database lint reported only its two pre-existing extra warnings; database advisors reported no issues. GitHub Pages workflow [32877332386](https://github.com/jc-bytes/vocab-planner/actions/runs/32877332386) then passed the complete validation gate, including authenticated student/teacher smoke in one browser context, Firefox and WebKit focused smoke, responsive audit, authorization acceptance, production build, built-site smoke, and deployment.
 - Deployment note: changing the storage keys requires one fresh login on each student or teacher page after release. The old shared key is intentionally not copied because copying it would preserve the cross-role coupling being removed.
