@@ -117,7 +117,7 @@ class TeacherVocabularyStorageMethods {
                     const label = type === 'cloud' ? 'cloud' : 'draft';
                     if (confirm(`Delete ${label} vocabulary "${vocab.name}"? This cannot be undone.`)) {
                         if (type === 'local') {
-                            this.deleteLocalVocab(vocab.id);
+                            this.removeLocalVocab(vocab.id);
                             this.loadLibrary();
                         } else {
                             const deleted = await this.deleteCloudVocab(vocab.id);
@@ -128,10 +128,6 @@ class TeacherVocabularyStorageMethods {
             }
         }
         container.appendChild(card);
-    }
-
-    deleteLocalVocab(id) {
-        this.removeLocalVocab(id);
     }
 
     async deleteCloudVocab(id) {

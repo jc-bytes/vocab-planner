@@ -20,7 +20,6 @@ class TeacherManager {
         this.authDisabled = DEV_AUTH_DISABLED;
         this.isAuthenticated = this.authDisabled;
         this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
-        this.VOCAB_COLLECTION = 'vocabularies';
         this.activeStudentId = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();

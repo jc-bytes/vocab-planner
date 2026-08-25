@@ -63,7 +63,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
-| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities`, `StudentGames`, and `StudentManager` obsolete bridges; ownership contracts | Focused activity/game/auth/routing/security/build checks; complete regressions; production builds; independent reviews | Removed 25 revalidated forwarding members while preserving live owner APIs and session/security boundaries. Teacher candidates remain one final evidence gate. |
+| 24. Remove obsolete facade methods | IN PROGRESS | Student and teacher obsolete bridges/aliases; ownership contracts | Focused activity/game/auth/routing/security/teacher/build checks; complete regressions; production builds; independent reviews | Removed 28 revalidated forwarding members/properties while preserving live owner APIs and data/security boundaries. The obsolete full-progress read chain remains one final atomic gate. |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
@@ -460,6 +460,16 @@ Task 24 remains in progress. The small secondary StudentManager and teacher cand
 - Verification passed for 11 Student Auth, 15 routing, nine shell-composition, and 14 security tests; the complete regression suite, 9-width student shell, three-page/game browser smoke, production build, scoped diff validation, and independent audit. Deployment remains 13.5 MB; student entry JavaScript decreased from 236.53/60.56 kB to 236.21/60.49 kB raw/gzip.
 
 Task 24 remains in progress. The teacher audit identified one small alias/constants cleanup and a larger obsolete whole-progress read chain; they will be handled as separate atomic changes so the live paginated and identity-roster boundaries can be verified independently.
+
+### Task 24d, remove obsolete teacher composition members
+
+- Removed the unused `VOCAB_COLLECTION` manager property; `vocabularyRepository` remains the sole owner of the `vocabularies` table name and all persistence/RLS interaction.
+- Removed the uncalled Vocabulary-owned `invalidateStudentProgressCache()` method. Live account cleanup remains with `clearStudentProgressSessionState()`, which invalidates generations, requests, roster/detail/page state, selection, and rendered account data rather than performing the deleted method's incomplete reset.
+- Replaced the sole `deleteLocalVocab()` alias call with its existing `removeLocalVocab()` owner and removed the alias. The same validated local-storage filter/write and library-cache invalidation run, the click handler still refreshes the library, and cloud deletion remains separate and authenticated.
+- Updated the Vocabulary ownership count and added a negative contract for all three obsolete names. Independent review confirmed exact persistence equivalence and no dynamic/global caller.
+- Verification passed for 23 Teacher Vocabulary, 26 Quiz plus lazy smoke, 33 Teacher Progress, 23 Data plus lazy smoke, and 11 build/lazy tests; the complete regression suite, browser smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB; teacher entry JavaScript decreased from 182.35/49.03 kB to 182.12/48.97 kB raw/gzip.
+
+Task 24 remains in progress. The final subtask will remove the independently proven dead full-progress request chain atomically from manager state through the service method, while preserving the bounded Students page, identity roster, details, analytics, export, Groups, and Word Hunt data paths.
 
 ### Phase 0, baseline
 

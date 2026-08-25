@@ -132,12 +132,5 @@ ensureAuthenticated(showAlert = true) {
 invalidateTeacherLibraryCache() {
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
-    },
-
-invalidateStudentProgressCache() {
-        this.studentProgressCache = null;
-        this.studentProgressPromise = null;
-        this.allStudentData = [];
-        this.filteredStudentData = [];
     }
 };

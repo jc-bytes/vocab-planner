@@ -30,6 +30,7 @@ const { teacherVocabularyRowViewMethods } = await import('../js/teacherVocabular
 const { teacherVocabularyWorkflowMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
 const vocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 const vocabularyStorageSource = await readFile(new URL('../js/teacherVocabularyStorage.js', import.meta.url), 'utf8');
+const teacherSource = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {
     getVocabGrades(vocab) { return vocab.grades || [vocab.grade || '6']; }
@@ -60,7 +61,7 @@ test('teacher vocabulary responsibilities have one complete owner each', () => {
     ];
     const methodNames = groups.flatMap(group => Object.keys(group));
 
-    assert.equal(methodNames.length, 40);
+    assert.equal(methodNames.length, 39);
     assert.equal(new Set(methodNames).size, methodNames.length);
     methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
     assert.deepEqual(
@@ -73,6 +74,16 @@ test('teacher vocabulary responsibilities have one complete owner each', () => {
             'openTeacherVocabularyItem', 'resetLibraryDrilldown'
         ]
     );
+});
+
+test('teacher composition omits obsolete vocabulary and progress aliases', () => {
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(teacherVocabularyWorkflowMethods, 'invalidateStudentProgressCache'),
+        false
+    );
+    assert.doesNotMatch(vocabularyStorageSource, /\bdeleteLocalVocab\b/);
+    assert.match(vocabularyStorageSource, /this\.removeLocalVocab\(vocab\.id\)/);
+    assert.doesNotMatch(teacherSource, /\bVOCAB_COLLECTION\b/);
 });
 
 test('Vocabulary workflow navigation reserves the route before lazy activation', () => {
