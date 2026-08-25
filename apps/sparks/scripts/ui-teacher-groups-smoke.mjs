@@ -79,7 +79,7 @@ try {
             },
             clipboard: { writeText: async text => { calls.copied = text; } }
         });
-        window.groupsSmoke = { feature, calls };
+        window.groupsSmoke = { feature, calls, stored };
         await feature.show();
         await feature.show();
         return {
@@ -101,6 +101,10 @@ try {
     await page.locator('#group-roster-summary').getByText('3 present · 1 absent').waitFor();
     await page.locator('#clear-group-absences-btn').click();
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
+    const absenceStorageKeys = await page.evaluate(() => [...window.groupsSmoke.stored.keys()]);
+    if (!absenceStorageKeys.some(key => key.startsWith('teacher_group_absences:teacher-one:'))) {
+        throw new Error(`Group absences were not scoped to the teacher: ${JSON.stringify(absenceStorageKeys)}`);
+    }
 
     await page.locator('#randomize-groups-btn').click();
     if (await page.locator('.random-group-card').count() !== 2) {
@@ -116,19 +120,35 @@ try {
     await page.locator('button[data-restriction-id="saved-pair"]').click();
     await page.waitForFunction(() => window.groupsSmoke.calls.remove === 1);
 
-    await page.evaluate(() => {
+    const destroyedState = await page.evaluate(async () => {
         window.groupsSmoke.feature.destroy();
-        document.querySelector('#group-results').innerHTML = '';
         document.querySelector('#randomize-groups-btn').click();
+        await window.groupsSmoke.feature.show();
+        return {
+            classOptions: document.querySelector('#group-class-select').options.length,
+            rosterText: document.querySelector('#group-student-list').textContent,
+            restrictionText: document.querySelector('#group-restriction-list').textContent,
+            resultsText: document.querySelector('#group-results').textContent,
+            summary: document.querySelector('#group-roster-summary').textContent,
+            restrictionCount: document.querySelector('#group-restriction-count').textContent,
+            copyHidden: document.querySelector('#copy-groups-btn').classList.contains('hidden'),
+            randomizeDisabled: document.querySelector('#randomize-groups-btn').disabled,
+            saveDisabled: document.querySelector('#save-group-restriction-btn').disabled
+        };
     });
     if (await page.locator('.random-group-card').count()) {
         throw new Error('Destroyed Groups feature retained its listeners.');
     }
-
-    await page.evaluate(() => window.groupsSmoke.feature.show());
-    await page.locator('#randomize-groups-btn').click();
-    if (await page.locator('.random-group-card').count() !== 2) {
-        throw new Error('Groups feature did not rebind after destroy.');
+    if (destroyedState.classOptions !== 1
+        || destroyedState.rosterText.includes('Ana')
+        || destroyedState.restrictionText.includes('Ana')
+        || destroyedState.resultsText.includes('Ana')
+        || destroyedState.summary !== '0 students'
+        || destroyedState.restrictionCount !== '0 saved'
+        || !destroyedState.copyHidden
+        || !destroyedState.randomizeDisabled
+        || destroyedState.saveDisabled) {
+        throw new Error(`Destroyed Groups feature retained account state: ${JSON.stringify(destroyedState)}`);
     }
 
     const lazyAdapter = await page.evaluate(async () => {
@@ -172,6 +192,196 @@ try {
     await page.locator('#group-student-list input[data-student-id]').first().check();
     await page.locator('#clear-group-absences-btn').click();
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
+
+    const asyncLifecycle = await page.evaluate(async () => {
+        window.groupsSmoke.lazyManager.disposeLoadedTeacherFeatures();
+        const module = await import(`/js/teacherGroups.js?groups-lifecycle=${Date.now()}`);
+        const rosterPending = [];
+        const restrictionPending = [];
+        const lifecycleFeature = module.createTeacherGroupsFeature({
+            ensureAuthenticated: () => true,
+            showView: () => {},
+            loadRoster: () => new Promise(resolve => rosterPending.push(resolve)),
+            getSession: () => ({ authDisabled: false, currentUser: { uid: 'teacher-lifecycle' } }),
+            refreshIcons: () => {},
+            repository: { list: () => new Promise(resolve => restrictionPending.push(resolve)) },
+            feedback: { success: () => {}, error: () => {} },
+            storage: { getItem: () => null, setItem: () => {} }
+        });
+
+        const oldShow = lifecycleFeature.show();
+        const newShow = lifecycleFeature.show();
+        rosterPending[1]([{
+            id: 'new-student',
+            studentProfile: { firstName: 'New', lastName: 'Teacher', grade: '9', group: 'B' }
+        }]);
+        restrictionPending[1]([]);
+        await newShow;
+        rosterPending[0]([{
+            id: 'old-student',
+            studentProfile: { firstName: 'Old', lastName: 'Teacher', grade: '6', group: 'A' }
+        }]);
+        restrictionPending[0]([]);
+        await oldShow;
+        const latestText = document.querySelector('#group-student-list').textContent;
+
+        const disposedShow = lifecycleFeature.show();
+        lifecycleFeature.destroy();
+        rosterPending[2]([{
+            id: 'disposed-student',
+            studentProfile: { firstName: 'Disposed', lastName: 'Teacher', grade: '7', group: 'A' }
+        }]);
+        restrictionPending[2]([]);
+        await disposedShow;
+        return {
+            latestText,
+            disposedText: document.querySelector('#group-student-list').textContent,
+            status: document.querySelector('#group-generator-status').textContent
+        };
+    });
+    if (!asyncLifecycle.latestText.includes('New Teacher') || asyncLifecycle.latestText.includes('Old Teacher')) {
+        throw new Error(`Groups latest-show contract failed: ${JSON.stringify(asyncLifecycle)}`);
+    }
+    if (asyncLifecycle.disposedText.includes('Disposed Teacher') || asyncLifecycle.status) {
+        throw new Error(`Disposed Groups async work reached the DOM: ${JSON.stringify(asyncLifecycle)}`);
+    }
+
+    const accountSwitch = await page.evaluate(async () => {
+        const { installTeacherLazyFeatureMethods } = await import(
+            `/js/teacherLazyFeatures.js?groups-account-lazy=${Date.now()}`
+        );
+        const { installTeacherStudentProgressDataMethods } = await import(
+            `/js/teacherStudentProgressDataMethods.js?groups-account-progress=${Date.now()}`
+        );
+        const { supabaseService } = await import('/js/supabaseService.js');
+        const { teacherGroupRestrictionsRepository } = await import('/js/services/teacherGroupRestrictionsRepository.js');
+        const originalRoster = supabaseService.listStudentIdentityRoster;
+        const originalRestrictions = teacherGroupRestrictionsRepository.list;
+        const rosterPending = [];
+        supabaseService.listStudentIdentityRoster = () => new Promise(resolve => rosterPending.push(resolve));
+        teacherGroupRestrictionsRepository.list = async () => [];
+
+        class Manager {
+            constructor() {
+                this.authDisabled = false;
+                this.currentUser = { id: 'teacher-a' };
+                this.selectedStudents = new Set();
+                this.allStudentData = [];
+                this.filteredStudentData = [];
+            }
+
+            ensureAuthenticated() { return true; }
+            switchView() {}
+            refreshIcons() {}
+        }
+        installTeacherStudentProgressDataMethods(Manager);
+        installTeacherLazyFeatureMethods(Manager);
+        const manager = new Manager();
+
+        try {
+            const oldShow = manager.showGroupsView();
+            while (rosterPending.length < 1) await new Promise(resolve => setTimeout(resolve, 0));
+            manager.disposeLoadedTeacherFeatures();
+            manager.clearStudentProgressSessionState();
+            manager.currentUser = { id: 'teacher-b' };
+            const newShow = manager.showGroupsView();
+            while (rosterPending.length < 2) await new Promise(resolve => setTimeout(resolve, 0));
+
+            rosterPending[1]([{
+                id: 'new-b',
+                studentProfile: { firstName: 'NEW_B', lastName: 'Student', grade: '9', group: 'B' }
+            }]);
+            await newShow;
+            const beforeOld = {
+                rosterText: document.querySelector('#group-student-list').textContent,
+                classText: document.querySelector('#group-class-select').textContent,
+                cachedIds: manager.allStudentData.map(student => student.id)
+            };
+
+            rosterPending[0]([{
+                id: 'old-a',
+                studentProfile: { firstName: 'OLD_A', lastName: 'Student', grade: '6', group: 'A' }
+            }]);
+            await oldShow;
+            await Promise.resolve();
+            const afterOld = {
+                rosterText: document.querySelector('#group-student-list').textContent,
+                classText: document.querySelector('#group-class-select').textContent,
+                cachedIds: manager.allStudentData.map(student => student.id),
+                rosterRequests: rosterPending.length
+            };
+
+            await manager.showGroupsView();
+            afterOld.requestsAfterRepeatShow = rosterPending.length;
+            return { beforeOld, afterOld };
+        } finally {
+            manager.disposeLoadedTeacherFeatures();
+            supabaseService.listStudentIdentityRoster = originalRoster;
+            teacherGroupRestrictionsRepository.list = originalRestrictions;
+        }
+    });
+    if (!accountSwitch.beforeOld.rosterText.includes('NEW_B Student')
+        || accountSwitch.beforeOld.rosterText.includes('OLD_A')
+        || JSON.stringify(accountSwitch.beforeOld) !== JSON.stringify({
+            rosterText: accountSwitch.afterOld.rosterText,
+            classText: accountSwitch.afterOld.classText,
+            cachedIds: accountSwitch.afterOld.cachedIds
+        })
+        || accountSwitch.afterOld.rosterRequests !== 2
+        || accountSwitch.afterOld.requestsAfterRepeatShow !== 2) {
+        throw new Error(`Groups account-switch isolation failed: ${JSON.stringify(accountSwitch)}`);
+    }
+
+    const staleRestrictionSave = await page.evaluate(async () => {
+        const module = await import(`/js/teacherGroups.js?groups-save-lifecycle=${Date.now()}`);
+        let resolveCreate;
+        let createCalls = 0;
+        const feedback = [];
+        const feature = module.createTeacherGroupsFeature({
+            ensureAuthenticated: () => true,
+            showView: () => {},
+            loadRoster: async () => [
+                { id: 'one', studentProfile: { firstName: 'One', lastName: 'Student', grade: '6', group: 'A' } },
+                { id: 'two', studentProfile: { firstName: 'Two', lastName: 'Student', grade: '6', group: 'A' } }
+            ],
+            getSession: () => ({ authDisabled: false, currentUser: { id: 'teacher-save' } }),
+            refreshIcons: () => {},
+            repository: {
+                list: async () => [],
+                create() {
+                    createCalls += 1;
+                    return new Promise(resolve => { resolveCreate = resolve; });
+                }
+            },
+            feedback: {
+                success: message => feedback.push(message),
+                error: message => feedback.push(message)
+            },
+            storage: { getItem: () => null, setItem: () => {} }
+        });
+        await feature.show();
+        document.querySelector('#group-restriction-student-a').value = 'one';
+        document.querySelector('#group-restriction-student-b').value = 'two';
+        document.querySelector('#save-group-restriction-btn').click();
+        while (!resolveCreate) await new Promise(resolve => setTimeout(resolve, 0));
+        feature.destroy();
+        resolveCreate({ id: 'old-save', studentAId: 'one', studentBId: 'two' });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        return {
+            createCalls,
+            restrictionText: document.querySelector('#group-restriction-list').textContent,
+            status: document.querySelector('#group-restriction-status').textContent,
+            saveDisabled: document.querySelector('#save-group-restriction-btn').disabled,
+            feedback
+        };
+    });
+    if (staleRestrictionSave.createCalls !== 1
+        || staleRestrictionSave.restrictionText.includes('One Student')
+        || staleRestrictionSave.status
+        || staleRestrictionSave.saveDisabled
+        || staleRestrictionSave.feedback.length) {
+        throw new Error(`Disposed Groups save reached shared UI: ${JSON.stringify(staleRestrictionSave)}`);
+    }
 
     if (problems.length) throw new Error(problems.join('\n'));
     console.log('Teacher Groups factory smoke passed.');

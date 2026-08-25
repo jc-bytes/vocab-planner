@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke; Students account isolation | Per-page registry, routing, navigation, browser history, feature, account-switch, and UI checks | Four primary pages are migrated. Student Progress account-scoped state is hardened; Groups and Data feature-local account cleanup are the next reliability checks before their page migrations. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke; Students/Groups account isolation | Per-page registry, routing, navigation, browser history, feature, account-switch, and UI checks | Four primary pages are migrated. Student Progress and Groups account-scoped state are hardened; Data feature-local account cleanup is the next reliability check before page migration continues. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -95,8 +95,8 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Replaced the Groups temporary-prototype/proxy implementation with `createTeacherGroupsFeature`, while retaining the existing lazy `TeacherManager.showGroupsView()` shell and routing adapter.
 - The feature now owns its roster, selected class, absences, generated groups, pair restrictions, local fallback state, and all seven Groups control listeners.
 - Removed the five Groups-only fields from `TeacherManager` and removed eager Groups listeners from `teacherGlobalListeners.js`; internal handlers are no longer manager capabilities.
-- Exposed only frozen `show()` and `destroy()` use cases. Listener binding is idempotent; `destroy()` removes every owned listener and a later `show()` can rebind cleanly. The page-lifetime manager does not currently destroy features on route changes.
-- Preserved the identity-only roster loader, restriction repository/RLS boundary, local fallback behavior and keys, clipboard notifications, static markup, grouping algorithm, direct route, and navigation entry.
+- Exposed only frozen `show()` and `destroy()` use cases. Listener binding is idempotent and `destroy()` removes every owned listener. Later account cleanup made destroyed facades terminal; the lazy owner recreates a fresh context when needed.
+- Preserved the identity-only roster loader, restriction repository/RLS boundary, local fallback behavior, clipboard notifications, static markup, grouping algorithm, direct route, and navigation entry. Daily absence keys are now teacher-scoped instead of shared across accounts.
 - Added the previously orphaned Groups tests to `npm test` and added a browser workflow covering direct factory behavior plus the real lazy adapter. The latter reproduces the formerly broken manager path and confirms the manager does not expose internal handlers.
 - Updated the data-efficiency and build-ownership contracts to follow the new explicit seam. Groups remains a separate 15.61 kB raw, 4.91 kB gzip lazy chunk; the eager teacher entry is 158.31 kB raw, 43.60 kB gzip.
 - The first complete suite run found one stale source assertion expecting the roster capability inside `teacherGroups.js`; the assertion now correctly follows the explicit loader dependency. Focused reruns and the subsequent complete suite passed.
@@ -105,7 +105,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 
 - Independent review found no behavior, security, repository, route, lazy-loading, or cleanup regression after the Groups conversion.
 - Before conversion, Groups relied on five manager state fields, proxy fallback to manager capabilities, and seven eager listeners that called unavailable manager methods. After conversion, state and listeners are feature-owned, the manager exposes only `showGroupsView`, and the feature facade exposes only `show` and `destroy`.
-- Repeat `show()` binds one listener per control. `destroy()` removes all seven exact handlers, and a later `show()` rebinds successfully. The real lazy installer-to-public-method adapter is browser-tested, not only source-matched.
+- Repeat `show()` binds one listener per control. `destroy()` removes all seven exact handlers and the real lazy owner recreates a new context after account disposal. The installer-to-public-method adapter is browser-tested, not only source-matched.
 - The feature still receives the existing identity-only roster use case and private restriction repository. It does not receive a manager, raw Supabase client, router, or broad context object.
 - Lazy loading is preserved: Groups remains a distinct 15.61 kB raw, 4.91 kB gzip chunk. The eager teacher entry decreased from Task 15's 158.95 kB raw, 43.68 kB gzip to 158.31 kB raw, 43.60 kB gzip.
 - Accepted pattern: a feature factory owns cohesive state and listeners, receives explicit capabilities, and returns only application use cases. Do not add a common feature base class, generic event framework, or mandatory `destroy()` where no resource needs cleanup.
@@ -275,7 +275,16 @@ Task 20 remains in progress.
 - Added focused reset/race contracts covering cache reuse, shared requests, late page success/failure, late filters, queued debounce, chained page loading, rendered/modal scrubbing, late account creation, same-ID detail ordering, same-student password ordering, coin/late-work callbacks, CSV cancellation, and bulk cancellation.
 - All 33 focused Student Progress checks, the complete regression suite, production build, and scoped diff validation pass. The build remains 2,329 modules and 13.5 MB; three independent reviews approved the corrected account-isolation contract.
 
-The next reliability checks cover feature-local Groups and Data roster state discovered during the same account-boundary review. Their fixes, if confirmed, will remain separate commits.
+The next reliability check covers feature-local Data Management roster state discovered during the same account-boundary review; it remains a separate commit.
+
+### DONE — Immediate reliability fix, isolate Groups across teacher accounts
+
+- Made a disposed Groups facade terminal and added separate lifecycle/show generations. Concurrent roster/restriction loads are latest-wins, and success or failure from a disposed context cannot repopulate shared DOM.
+- Cleared Groups-owned roster, class, absence, restriction, generated-group, status, and control state during disposal. The lazy owner still recreates a fresh context for the next account; the public `{ show, destroy }` interface and lazy chunk remain unchanged.
+- Guarded deferred restriction creates/removals and clipboard feedback so completed old-account operations cannot mutate the new context. Already-dispatched repository writes remain governed by the existing server authorization boundary.
+- Scoped daily absence storage by teacher identity and normalized both `uid` and `id` for local ownership. Old unscoped absence keys are intentionally not read across accounts.
+- Extended the browser workflow to prove terminal disposal, complete DOM scrubbing, teacher-scoped storage, latest-show ordering, stale restriction-save suppression, and a real lazy-adapter/shared-roster account switch in which late account-A data cannot replace account B.
+- `npm run test:teacher-groups`, related Student Progress/page/build-efficiency checks, the complete regression suite, production build, and scoped diff validation pass. Three independent reviews approved the contract. The Groups lazy chunk remains separate at 18.50 kB raw / 5.33 kB gzip; total delivery remains 13.5 MB.
 
 ### Phase 0, baseline
 

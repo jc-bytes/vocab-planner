@@ -51,10 +51,16 @@ class TeacherGroupsFeature {
         this.usesLocalRestrictionFallback = false;
         this.listenersBound = false;
         this.listenerDisposers = [];
+        this.lifecycleGeneration = 0;
+        this.showGeneration = 0;
+        this.destroyed = false;
     }
 
     async show() {
+        if (this.destroyed) return;
         if (!this.ensureAuthenticated(false)) return;
+        const lifecycleGeneration = this.lifecycleGeneration;
+        const showGeneration = ++this.showGeneration;
         this.bindListeners();
         this.showView();
         this.setGroupGeneratorStatus('Loading your class roster…');
@@ -62,16 +68,24 @@ class TeacherGroupsFeature {
         try {
             const [roster] = await Promise.all([
                 this.loadRoster(),
-                this.loadGroupPairRestrictions()
+                this.loadGroupPairRestrictions({ lifecycleGeneration, showGeneration })
             ]);
+            if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return;
             this.roster = Array.isArray(roster) ? roster : [];
             this.populateGroupClassSelect();
             this.renderGroupStudentList();
             this.setGroupGeneratorStatus('');
         } catch (error) {
+            if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return;
             console.error('Could not load group generator roster:', error);
             this.setGroupGeneratorStatus('The class roster could not be loaded. Please try again.', 'error');
         }
+    }
+
+    isCurrent({ lifecycleGeneration, showGeneration = this.showGeneration }) {
+        return !this.destroyed
+            && lifecycleGeneration === this.lifecycleGeneration
+            && showGeneration === this.showGeneration;
     }
 
     bindListeners() {
@@ -103,8 +117,65 @@ class TeacherGroupsFeature {
     }
 
     destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        this.lifecycleGeneration += 1;
+        this.showGeneration += 1;
         this.listenerDisposers.splice(0).forEach(dispose => dispose());
         this.listenersBound = false;
+        this.selectedClass = '';
+        this.roster = [];
+        this.absentStudents.clear();
+        this.randomGroups = [];
+        this.pairRestrictions = [];
+        this.usesLocalRestrictionFallback = false;
+        this.resetView();
+    }
+
+    resetView() {
+        const classSelect = this.query('#group-class-select');
+        if (classSelect) {
+            classSelect.innerHTML = '<option value="">Select a class</option>';
+            classSelect.value = '';
+        }
+        const groupSize = this.query('#group-size-select');
+        if (groupSize) groupSize.value = '2';
+        const summary = this.query('#group-roster-summary');
+        if (summary) summary.textContent = '0 students';
+        const studentList = this.query('#group-student-list');
+        if (studentList) {
+            studentList.innerHTML = '<p class="teacher-empty-state">Select a class to see its students.</p>';
+        }
+        ['#group-restriction-student-a', '#group-restriction-student-b'].forEach(selector => {
+            const select = this.query(selector);
+            if (!select) return;
+            select.innerHTML = '<option value="">Choose a student</option>';
+            select.value = '';
+        });
+        const restrictionCount = this.query('#group-restriction-count');
+        if (restrictionCount) restrictionCount.textContent = '0 saved';
+        const restrictionList = this.query('#group-restriction-list');
+        if (restrictionList) {
+            restrictionList.innerHTML = '<p class="teacher-empty-state">Select a class to manage its pairing restrictions.</p>';
+        }
+        const randomizeButton = this.query('#randomize-groups-btn');
+        if (randomizeButton) randomizeButton.disabled = true;
+        const saveButton = this.query('#save-group-restriction-btn');
+        if (saveButton) saveButton.disabled = false;
+        this.query('#copy-groups-btn')?.classList.add('hidden');
+        const results = this.query('#group-results');
+        if (results) {
+            results.innerHTML = `
+                <div class="group-results-empty">
+                    <i data-lucide="users-round"></i>
+                    <h4>Ready when you are</h4>
+                    <p>Your randomized groups will appear here.</p>
+                </div>
+            `;
+            this.refreshIcons(results);
+        }
+        this.setGroupRestrictionStatus('');
+        this.setGroupGeneratorStatus('');
     }
 
     populateGroupClassSelect() {
@@ -136,7 +207,7 @@ class TeacherGroupsFeature {
     }
 
     groupAbsenceStorageKey() {
-        return `teacher_group_absences:${localDateKey()}:${this.selectedClass || 'none'}`;
+        return `teacher_group_absences:${this.getSessionOwnerId()}:${localDateKey()}:${this.selectedClass || 'none'}`;
     }
 
     loadTodayGroupAbsences() {
@@ -231,10 +302,18 @@ class TeacherGroupsFeature {
     }
 
     groupRestrictionsStorageKey() {
-        return `teacher_group_pair_restrictions:${this.getSession().currentUser?.id || 'development-teacher'}`;
+        return `teacher_group_pair_restrictions:${this.getSessionOwnerId()}`;
     }
 
-    async loadGroupPairRestrictions() {
+    getSessionOwnerId() {
+        const { currentUser } = this.getSession();
+        return currentUser?.uid || currentUser?.id || 'development-teacher';
+    }
+
+    async loadGroupPairRestrictions({
+        lifecycleGeneration = this.lifecycleGeneration,
+        showGeneration = this.showGeneration
+    } = {}) {
         const { authDisabled } = this.getSession();
         if (authDisabled || this.usesLocalRestrictionFallback) {
             try {
@@ -247,8 +326,11 @@ class TeacherGroupsFeature {
         }
 
         try {
-            this.pairRestrictions = await this.repository.list();
+            const restrictions = await this.repository.list();
+            if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return [];
+            this.pairRestrictions = restrictions;
         } catch (error) {
+            if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return [];
             console.error('Could not load teacher group restrictions:', error);
             this.usesLocalRestrictionFallback = true;
             try {
@@ -347,6 +429,7 @@ class TeacherGroupsFeature {
     }
 
     async saveGroupPairRestriction() {
+        const lifecycleGeneration = this.lifecycleGeneration;
         const studentAId = this.query('#group-restriction-student-a')?.value || '';
         const studentBId = this.query('#group-restriction-student-b')?.value || '';
         if (!studentAId || !studentBId) {
@@ -377,15 +460,18 @@ class TeacherGroupsFeature {
                 restriction = {
                     id: this.createRestrictionId(),
                     ...pair,
-                    teacherId: currentUser?.id || 'development-teacher',
+                    teacherId: currentUser?.uid || currentUser?.id || 'development-teacher',
                     createdAt: new Date().toISOString()
                 };
                 this.pairRestrictions.push(restriction);
                 this.saveDevelopmentGroupRestrictions();
             } else {
                 restriction = await this.repository.create(studentAId, studentBId);
+                if (lifecycleGeneration !== this.lifecycleGeneration) return;
                 this.pairRestrictions.push(restriction);
             }
+
+            if (lifecycleGeneration !== this.lifecycleGeneration) return;
 
             this.query('#group-restriction-student-a').value = '';
             this.query('#group-restriction-student-b').value = '';
@@ -394,17 +480,21 @@ class TeacherGroupsFeature {
             this.renderGroupRestrictionSettings();
             this.setGroupRestrictionStatus('Private pairing restriction saved.', 'success');
         } catch (error) {
+            if (lifecycleGeneration !== this.lifecycleGeneration) return;
             console.error('Could not save teacher group restriction:', error);
             const message = error?.code === '23505'
                 ? 'That pairing restriction is already saved.'
                 : 'The pairing restriction could not be saved.';
             this.setGroupRestrictionStatus(message, 'error');
         } finally {
-            if (saveButton) saveButton.disabled = false;
+            if (lifecycleGeneration === this.lifecycleGeneration && saveButton) {
+                saveButton.disabled = false;
+            }
         }
     }
 
     async removeGroupPairRestriction(restrictionId) {
+        const lifecycleGeneration = this.lifecycleGeneration;
         const restriction = this.pairRestrictions.find(item => item.id === restrictionId);
         if (!restriction) return;
 
@@ -412,6 +502,7 @@ class TeacherGroupsFeature {
             const { authDisabled } = this.getSession();
             if (!authDisabled && !this.usesLocalRestrictionFallback) {
                 await this.repository.remove(restrictionId);
+                if (lifecycleGeneration !== this.lifecycleGeneration) return;
             }
             this.pairRestrictions = this.pairRestrictions.filter(item => item.id !== restrictionId);
             if (authDisabled || this.usesLocalRestrictionFallback) {
@@ -422,6 +513,7 @@ class TeacherGroupsFeature {
             this.renderGroupRestrictionSettings();
             this.setGroupRestrictionStatus('Pairing restriction removed.', 'success');
         } catch (error) {
+            if (lifecycleGeneration !== this.lifecycleGeneration) return;
             console.error('Could not remove teacher group restriction:', error);
             this.setGroupRestrictionStatus('The pairing restriction could not be removed.', 'error');
         }
@@ -501,6 +593,7 @@ class TeacherGroupsFeature {
     }
 
     async copyRandomGroups() {
+        const lifecycleGeneration = this.lifecycleGeneration;
         const groups = this.randomGroups;
         if (!groups.length) return;
 
@@ -510,8 +603,10 @@ class TeacherGroupsFeature {
 
         try {
             await this.clipboard.writeText(text);
+            if (lifecycleGeneration !== this.lifecycleGeneration) return;
             this.feedback.success('Groups copied to the clipboard.');
         } catch {
+            if (lifecycleGeneration !== this.lifecycleGeneration) return;
             this.feedback.error('Could not copy the groups.');
         }
     }
