@@ -6,6 +6,7 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 const GROUPS_PAGE = teacherPageRegistry.get('groups');
+const DATA_PAGE = teacherPageRegistry.get('data');
 
 const featurePromises = new Map();
 const featureContexts = new WeakMap();
@@ -89,7 +90,7 @@ const featureDefinitions = {
                 return module.createTeacherDataManagementFeature({
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
                     activateDataManagement(area) {
-                        manager.switchView('teacher-data-management-view', { updateRoute: false });
+                        manager.switchView(DATA_PAGE.viewId, { updateRoute: false });
                         manager.setActiveTeacherTab(area);
                     },
                     writeDataRoute(area, tab, options = {}) {
@@ -98,7 +99,7 @@ const featureDefinitions = {
                     isRouteApplying: () => manager.isApplyingRoute,
                     isDataRouteCurrent(area, tab) {
                         const route = manager.parseRoute();
-                        const routeTab = route?.tab || (area === 'data' ? 'dashboard' : 'subjects');
+                        const routeTab = route?.tab || (area === DATA_PAGE.id ? 'dashboard' : 'subjects');
                         return route?.view === area && routeTab === tab;
                     },
                     loadSubjectSettings: (...args) => manager.loadSubjectSettings(...args),

@@ -1,4 +1,7 @@
 import { $, $$, closeModal as closeDialog } from './main.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const DATA_PAGE = teacherPageRegistry.get('data');
 
 export function initTeacherProgressListeners(manager) {
     $('#view-progress-btn')?.addEventListener('click', () => {
@@ -27,7 +30,7 @@ export function initTeacherProgressListeners(manager) {
     });
 
     $('#open-data-management-btn')?.addEventListener('click', () => {
-        manager.showTeacherSection('data', { tab: 'dashboard' });
+        manager.showTeacherSection(DATA_PAGE.id, { tab: 'dashboard' });
     });
     $('#open-add-student-modal-btn')?.addEventListener('click', () => {
         manager.showAddStudentModal();

@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, Students, and Groups shell/route migrations; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, and UI checks | Five primary pages are migrated. Data and Settings share one feature/view and will be migrated independently through their area contracts. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, Students, Groups, and Data shell/route migrations; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, and UI checks | Six primary pages are migrated. Data preserves route-based disambiguation on its shared view; Settings is the final primary page. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -313,6 +313,17 @@ Task 20 remains in progress. Groups is the next primary page migration.
 - Focused page, Groups, routing, lazy/build, scoped diff checks, the complete regression suite, and production build pass. Two independent reviews found no blocker. The build remains 13.5 MB with 2,330 modules; Groups remains lazy at 18.50 kB raw / 5.33 kB gzip.
 
 Task 20 remains in progress. Data is next; it shares a view and lazy feature with Settings, so only its primary area identity should migrate in that commit.
+
+### Task 20f, migrate Data
+
+- Replaced duplicated Data primary page IDs and the shared view activation ID in the shell, router, lazy adapter, Overview Export shortcut, and Students Analytics shortcut with the `data` registry descriptor.
+- Preserved the shared Data/Settings view contract. Shell and routing still inspect the current route before selecting an active primary tab, retain Settings as the non-Data fallback, and keep the legacy `data-settings` alias with tab-based area selection.
+- Preserved route reservation before cold lazy loading: normal entry writes the requested Data route first and calls the feature with `updateRoute: false`, so its existing stale-route guard can reject an import that finishes after navigation changed.
+- Kept feature-internal `area`, tab, section, and DOM strings local to Data Management. Those values describe the feature's two-area workflow and are not a second primary-page registry.
+- Extended public route assertions for Data build and legacy alias behavior. Extended the primary-page browser workflow for normal Dashboard entry, explicit Export deep link, shared-view labels/tab state, one feature call per entry, and Back restoration. The dedicated Data browser workflow remains the real lazy/template/lifecycle proof.
+- Focused page, Data, Progress, routing, lazy/build, scoped diff checks, the complete regression suite, and production build pass. The build remains 13.5 MB with 2,330 modules; Data Management remains lazy at 45.31 kB raw / 10.99 kB gzip.
+
+Task 20 remains in progress. Settings is the final primary page migration.
 
 ### Phase 0, baseline
 

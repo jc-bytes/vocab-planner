@@ -6,6 +6,7 @@ const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
 const GROUPS_PAGE = teacherPageRegistry.get('groups');
+const DATA_PAGE = teacherPageRegistry.get('data');
 
 export function installTeacherRoutingMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -23,11 +24,11 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (parts[1] === 'activities') return { view: OVERVIEW_PAGE.id };
             if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
             if (parts[1] === 'quizzes') return { view: 'quizzes' };
-            if (parts[1] === 'data') return { view: 'data', tab: params.get('tab') || undefined };
+            if (parts[1] === DATA_PAGE.id) return { view: DATA_PAGE.id, tab: params.get('tab') || undefined };
             if (parts[1] === 'settings') return { view: 'settings', tab: params.get('tab') || undefined };
             if (parts[1] === 'data-settings') {
                 const tab = params.get('tab') || undefined;
-                const view = ['dashboard', 'export', 'view', 'reset'].includes(tab) ? 'data' : 'settings';
+                const view = ['dashboard', 'export', 'view', 'reset'].includes(tab) ? DATA_PAGE.id : 'settings';
                 return { view, tab };
             }
             if (parts[1] === VOCABULARY_PAGE.id && parts[2] === 'editor') {
@@ -64,7 +65,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     ? `#/teacher/${VOCABULARY_PAGE.id}/editor/${encodeURIComponent(route.vocabularyId)}`
                     : `#/teacher/${VOCABULARY_PAGE.id}/editor`;
             }
-            if (route.view === 'data' || route.view === 'settings') {
+            if (route.view === DATA_PAGE.id || route.view === 'settings') {
                 const params = new URLSearchParams();
                 if (route.tab) params.set('tab', route.tab);
                 const query = params.toString();
@@ -111,9 +112,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (viewId === STUDENTS_PAGE.viewId) return { view: STUDENTS_PAGE.id };
             if (viewId === GROUPS_PAGE.viewId) return { view: GROUPS_PAGE.id };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
-            if (viewId === 'teacher-data-management-view') {
+            if (viewId === DATA_PAGE.viewId) {
                 const currentRoute = this.parseRoute();
-                if (currentRoute?.view === 'data' || currentRoute?.view === 'settings') return currentRoute;
+                if (currentRoute?.view === DATA_PAGE.id || currentRoute?.view === 'settings') return currentRoute;
                 return { view: 'settings', tab: 'subjects' };
             }
             return { view: OVERVIEW_PAGE.id };
@@ -224,7 +225,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                         case 'quiz-editor':
                             await this.openQuizMaker({ returnTo: 'quizzes', restoreDraft: true });
                             break;
-                        case 'data':
+                        case DATA_PAGE.id:
                         case 'settings':
                             await this.showDataManagementView({ area: routeToApply.view, tab: routeToApply.tab });
                             break;

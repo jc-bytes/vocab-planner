@@ -7,6 +7,7 @@ const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
 const GROUPS_PAGE = teacherPageRegistry.get('groups');
+const DATA_PAGE = teacherPageRegistry.get('data');
 
 function debounceTeacherResize(callback) {
     let timer = null;
@@ -94,7 +95,7 @@ function bindOverviewListeners(manager) {
     $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection(SPARKS_PAGE.id));
     $('#overview-settings-btn')?.addEventListener('click', () => manager.showTeacherSection('settings'));
     $('#overview-export-btn')?.addEventListener('click', () => {
-        manager.showTeacherSection('data', { tab: 'export' });
+        manager.showTeacherSection(DATA_PAGE.id, { tab: 'export' });
     });
 }
 

@@ -215,7 +215,7 @@ test('Data Management ownership does not leak back onto TeacherManager', async (
     assert.match(lazySource, /createTeacherDataManagementFeature\(\{/);
     assert.doesNotMatch(shellSource, /this\.dataManagementArea|this\.activeDataTab/);
     assert.doesNotMatch(routingSource, /this\.dataManagementArea|this\.activeDataTab/);
-    assert.match(shellSource, /setRoute\(\{ view: 'data', tab: options\.tab \|\| 'dashboard' \}\)[\s\S]*showDataManagementView/);
+    assert.match(shellSource, /setRoute\(\{ view: DATA_PAGE\.id, tab: options\.tab \|\| 'dashboard' \}\)[\s\S]*showDataManagementView/);
     assert.doesNotMatch(calendarSource, /calendarBound/);
     assert.match(calendarSource, /bindSchoolCalendarInputs\(listen[\s\S]*listen\(input, 'input'/);
     assert.match(dashboardSource, /await this\.renderDashboardCharts\(\);\s*if \(this\.destroyed[\s\S]*this\.renderRecentActivity\(\)/);

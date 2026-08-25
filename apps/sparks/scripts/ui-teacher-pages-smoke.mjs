@@ -24,6 +24,7 @@ try {
         const { teacherPageRegistry } = await import('/js/teacherPageRegistry.js');
         const sparksPage = teacherPageRegistry.get('sparks');
         const groupsPage = teacherPageRegistry.get('groups');
+        const dataPage = teacherPageRegistry.get('data');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
@@ -59,13 +60,18 @@ try {
                 this.sparkLoads = 0;
                 this.progressLoads = 0;
                 this.groupLoads = 0;
+                this.dataCalls = [];
             }
             ensureAuthenticated() { return true; }
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
             showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
-            showDataManagementView({ area }) { this.switchView('teacher-data-management-view', { updateRoute: false }); this.setActiveTeacherTab(area); }
+            showDataManagementView({ area, tab }) {
+                this.dataCalls.push({ area, tab });
+                this.switchView(dataPage.viewId, { updateRoute: false });
+                this.setActiveTeacherTab(area);
+            }
             setVocabularyWorkflowTab(mode, options) { this.workflowCalls.push({ mode, options }); }
             loadLibrary() { this.libraryLoads += 1; return Promise.resolve(); }
             getTeacherLibrary() { return Promise.resolve({ items: [] }); }
@@ -327,7 +333,59 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'groups'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, Students, and Groups navigation, direct routing, and history.');
+    const data = await page.evaluate(() => {
+        const manager = window.teacherPageSmokeManager;
+        const callsBefore = manager.dataCalls.length;
+        manager.showTeacherSection('data');
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            calls: manager.dataCalls.slice(callsBefore)
+        };
+    });
+    if (data.hash !== '#/teacher/data?tab=dashboard'
+        || data.activeView !== 'teacher-data-management-view'
+        || data.activeSection !== 'data'
+        || data.mobileLabel !== 'Data'
+        || data.topLabel !== 'Data'
+        || data.calls.length !== 1
+        || data.calls[0].area !== 'data'
+        || data.calls[0].tab !== undefined) {
+        throw new Error(`Data navigation changed: ${JSON.stringify(data)}`);
+    }
+
+    const dataDirect = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const callsBefore = manager.dataCalls.length;
+        history.replaceState(null, '', '#/teacher/data?tab=export');
+        await manager.handleRouteChange();
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            calls: manager.dataCalls.slice(callsBefore)
+        };
+    });
+    if (dataDirect.activeView !== 'teacher-data-management-view'
+        || dataDirect.activeSection !== 'data'
+        || dataDirect.calls.length !== 1
+        || dataDirect.calls[0].area !== 'data'
+        || dataDirect.calls[0].tab !== 'export') {
+        throw new Error(`Data direct route changed: ${JSON.stringify(dataDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('overview'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/data?tab=export'
+        && document.querySelector('.view.active')?.id === 'teacher-data-management-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'data'
+    ));
+
+    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, Students, Groups, and Data navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();
