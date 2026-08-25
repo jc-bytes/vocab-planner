@@ -228,10 +228,14 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 drilldown: routeDrilldown
                             });
                             if (this.vocabularyMode === 'assign') {
-                                await this.loadLibrary();
+                                await this.loadLibrary({
+                                    isCurrent: () => this.isTeacherNavigationCurrent(navigationToApply)
+                                });
                             } else if (this.vocabularyMode !== 'quizzes' && !this.libraryItems?.length) {
-                                this.getTeacherLibrary().then(({ items }) => {
-                                    this.libraryItems = items;
+                                this.getTeacherLibrary().then(({ items, stale }) => {
+                                    if (!stale && this.isTeacherNavigationCurrent(navigationToApply)) {
+                                        this.libraryItems = items;
+                                    }
                                 }).catch(error => console.warn('Could not warm vocabulary library cache:', error));
                             }
                             break;

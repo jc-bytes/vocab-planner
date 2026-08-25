@@ -1,7 +1,4 @@
-import {
-    DEFAULT_SUBJECT_SLUG,
-    getDefaultSchoolCalendar
-} from './services/vocabularyApi.js';
+import { getDefaultSchoolCalendar } from './services/vocabularyApi.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
 import { installTeacherOverviewMethods } from './teacherOverview.js';
 import { installTeacherLazyFeatureMethods } from './teacherLazyFeatures.js';
@@ -10,19 +7,12 @@ import { installTeacherSettingsMethods } from './teacherSettings.js';
 import { installTeacherShellMethods } from './teacherShell.js';
 import { installTeacherStudentProgressMethods } from './teacherStudentProgress.js';
 import { installTeacherVocabularyMethods } from './teacherVocabulary.js';
+import { createEmptyTeacherVocabulary } from './teacherVocabularySession.js';
 import { initTeacherListeners } from './teacherListeners.js';
 
 class TeacherManager {
     constructor() {
-        this.vocabSet = {
-            id: '',
-            name: '',
-            description: '',
-            grade: '',
-            subjectSlug: DEFAULT_SUBJECT_SLUG,
-            activitySettings: {},
-            words: []
-        };
+        this.vocabSet = createEmptyTeacherVocabulary();
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.editingWordIndex = -1;
@@ -30,7 +20,6 @@ class TeacherManager {
         this.authDisabled = DEV_AUTH_DISABLED;
         this.isAuthenticated = this.authDisabled;
         this.currentUser = this.authDisabled ? DEV_TEACHER_USER : null;
-        this.cloudSaveTimeout = null;
         this.VOCAB_COLLECTION = 'vocabularies';
         this.activeStudentId = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
@@ -50,6 +39,13 @@ class TeacherManager {
         this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
+        this.teacherVocabularySessionGeneration = 0;
+        this.teacherVocabularyDocumentGeneration = 0;
+        this.teacherVocabularySaveSequence = 0;
+        this.teacherVocabularySaveQueue = null;
+        this.teacherVocabularySaveDebounces = new Map();
+        this.teacherVocabularyLatestSaveByDocument = new Map();
+        this.teacherVocabularyStatusTimer = null;
         this.vocabularyMode = 'assign';
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;

@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
+const teacherLazyFeaturesSource = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
+
 globalThis.document = {
     readyState: 'loading',
     addEventListener() {},
@@ -118,6 +120,13 @@ test('Quiz feature exposes only its frozen application use cases', async () => {
         drilldown: { subject: 'technology', grade: '6', trimester: '1', month: 'March' },
         options: { replace: true }
     }]);
+});
+
+test('Quiz vocabulary commits start a distinct Vocabulary document lifecycle', () => {
+    assert.match(
+        teacherLazyFeaturesSource,
+        /commitActiveVocabulary\(vocabulary\)\s*\{\s*manager\.beginTeacherVocabularyDocument\(\);\s*manager\.vocabSet = vocabulary;/
+    );
 });
 
 test('showing the Quiz hub invalidates a delayed nested builder import', async () => {

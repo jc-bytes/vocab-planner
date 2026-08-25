@@ -64,10 +64,13 @@ export function installTeacherOverviewMethods(TeacherManager) {
         async loadOverviewVocabCount() {
             const countEl = $('#overview-vocab-count');
             if (!countEl) return;
+            const isCurrent = this.createTeacherVocabularyOperationGuard();
             try {
-                const { cloudVocabs, remoteVocabs, localVocabs } = await this.getTeacherLibrary();
+                const { cloudVocabs, remoteVocabs, localVocabs, stale } = await this.getTeacherLibrary();
+                if (!isCurrent() || stale) return;
                 countEl.textContent = `${cloudVocabs.length + remoteVocabs.length + localVocabs.length}`;
             } catch (error) {
+                if (!isCurrent()) return;
                 console.error('Failed to load overview vocabulary count:', error);
                 countEl.textContent = '--';
             }

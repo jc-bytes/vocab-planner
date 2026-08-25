@@ -49,11 +49,11 @@ class TeacherVocabularyActivityFlowMethods {
         };
     }
 
-    normalizeActivityFlowSettings() {
-        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
-        const flow = this.getActivityFlowConfig(this.vocabSet);
-        this.vocabSet.activitySettings.requiredActivities = flow.required;
-        this.vocabSet.activitySettings.additionalActivities = flow.additional;
+    normalizeActivityFlowSettings(vocab = this.vocabSet) {
+        if (!vocab.activitySettings) vocab.activitySettings = {};
+        const flow = this.getActivityFlowConfig(vocab);
+        vocab.activitySettings.requiredActivities = flow.required;
+        vocab.activitySettings.additionalActivities = flow.additional;
         return flow;
     }
 

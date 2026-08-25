@@ -109,7 +109,10 @@ showVocabularyLibrary() {
         this.resetLibraryDrilldown();
         this.switchView(VOCABULARY_PAGE.viewId);
         this.setVocabularyWorkflowTab('assign', { updateRoute: false });
-        this.loadLibrary();
+        const navigation = this.captureTeacherNavigation();
+        this.loadLibrary({
+            isCurrent: () => this.isTeacherNavigationCurrent(navigation)
+        });
     },
 
 ensureAuthenticated(showAlert = true) {

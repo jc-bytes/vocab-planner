@@ -47,6 +47,7 @@ class TeacherAuthMethods {
                         this.disposeLoadedTeacherFeatures?.();
                         this.clearStudentProgressSessionState?.();
                         this.clearTeacherSettingsSessionState?.();
+                        this.clearTeacherVocabularySessionState?.();
                     }
                     if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
@@ -59,6 +60,7 @@ class TeacherAuthMethods {
                     this.disposeLoadedTeacherFeatures?.();
                     this.clearStudentProgressSessionState?.();
                     this.clearTeacherSettingsSessionState?.();
+                    this.clearTeacherVocabularySessionState?.();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);

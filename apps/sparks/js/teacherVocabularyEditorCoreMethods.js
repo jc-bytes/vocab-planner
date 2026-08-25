@@ -8,6 +8,7 @@ class TeacherVocabularyEditorCoreMethods {
     startNewVocab() {
         if (!this.ensureAuthenticated()) return;
         this.beginTeacherNavigation();
+        this.beginTeacherVocabularyDocument();
         this.autoGenerateVocabId = true;
         this.vocabSet = { id: '', name: 'New Vocabulary', description: '', subjectSlug: DEFAULT_SUBJECT_SLUG, grades: [], words: [] };
         this.updateGeneratedVocabId();
@@ -198,9 +199,16 @@ class TeacherVocabularyEditorCoreMethods {
 
     async publishVocabulary({ asNew = false } = {}) {
         if (!this.ensureAuthenticated()) return;
+        const currentDocument = this.teacherVocabularyDocumentGeneration || 0;
+        const pendingTimeout = this.teacherVocabularySaveDebounces?.get(currentDocument);
+        clearTimeout(pendingTimeout);
+        clearTimeout(this.teacherVocabularyStatusTimer);
+        this.teacherVocabularyStatusTimer = null;
+        this.teacherVocabularySaveDebounces?.delete(currentDocument);
         this.applyAssignedDatePlacement(this.vocabSet);
 
         if (asNew) {
+            this.beginTeacherVocabularyDocument();
             const currentId = this.vocabSet.id;
             const generatedId = this.createVocabIdSuggestion();
             this.vocabSet.id = generatedId === currentId
@@ -214,14 +222,22 @@ class TeacherVocabularyEditorCoreMethods {
 
         this.prepareWordHuntWordsForSave(this.vocabSet);
         this.normalizeActivityFlowSettings();
-        const saved = await this.saveToCloud();
+        const ticket = this.createTeacherVocabularySaveTicket(this.vocabSet);
+        if (this.authDisabled) {
+            this.saveToLocal(ticket.snapshot);
+            return;
+        }
+        const result = await this.enqueueTeacherVocabularySave(ticket);
+        if (!ticket.sessionIsCurrent()) return;
 
-        if (saved) {
+        const activeDocument = ticket.documentGeneration === (this.teacherVocabularyDocumentGeneration || 0);
+        if (result.status === 'saved' && activeDocument) {
             this.autoGenerateVocabId = false;
+        }
+
+        if (result.status === 'saved' && this.isTeacherVocabularySaveUiCurrent(ticket)) {
             notifications.success(asNew ? 'Saved as a new vocabulary.' : 'Vocabulary update saved.');
-            this.loadLibrary();
-        } else {
-            this.saveToLocal(this.vocabSet);
+            this.loadLibrary({ isCurrent: ticket.sessionIsCurrent });
         }
     }
 
@@ -261,6 +277,7 @@ class TeacherVocabularyEditorCoreMethods {
             try {
                 const data = JSON.parse(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
+                this.beginTeacherVocabularyDocument();
                 this.vocabSet = data;
                 this.autoGenerateVocabId = false;
 

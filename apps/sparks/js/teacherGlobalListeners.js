@@ -50,16 +50,17 @@ function bindTeacherAuthListeners(manager) {
     const signOutBtn = $('#teacher-sign-out-btn');
     if (signOutBtn) {
         signOutBtn.addEventListener('click', async () => {
-            await supabaseService.signOut();
             manager.getAuthCoordinator?.().invalidate();
             manager.disposeLoadedTeacherFeatures();
             manager.clearStudentProgressSessionState?.();
             manager.clearTeacherSettingsSessionState?.();
+            manager.clearTeacherVocabularySessionState?.();
             localStorage.removeItem('was_logged_in');
             manager.isAuthenticated = false;
             manager.currentUser = null;
             manager.updateAuthUI(null);
             manager.showLoginView();
+            await supabaseService.signOut();
         });
     }
 }

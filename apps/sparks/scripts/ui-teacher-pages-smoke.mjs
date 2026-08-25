@@ -447,6 +447,7 @@ try {
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { installTeacherVocabularyStorageMethods } = await import('/js/teacherVocabularyStorage.js');
+        const { installTeacherVocabularySessionMethods } = await import('/js/teacherVocabularySession.js');
         document.body.innerHTML = `
             <div id="teacher-tab-shell"></div>
             <div id="teacher-tabs"></div>
@@ -486,6 +487,7 @@ try {
             setVocabularyWorkflowTab() {}
             loadLibrary() { return Promise.resolve(); }
         }
+        installTeacherVocabularySessionMethods(Manager);
         installTeacherVocabularyStorageMethods(Manager);
         installTeacherRoutingMethods(Manager);
         installTeacherShellMethods(Manager);
@@ -528,7 +530,27 @@ try {
             historyDelta: history.length - historyBeforeMissing,
             fallbacks: missingManager.libraryFallbacks
         };
-        return { beforeResolve, afterResolve, missingResult };
+
+        missingManager.vocabSet = { id: 'shared-unit', name: 'ACCOUNT A SECRET', words: [] };
+        missingManager.clearTeacherVocabularySessionState();
+        missingManager.currentUser = { id: 'teacher-b' };
+        let accountBLoads = 0;
+        missingManager.getTeacherLibrary = async () => {
+            accountBLoads += 1;
+            return {
+                items: [{ type: 'local', vocab: { id: 'shared-unit', name: 'Account B unit', words: [] } }]
+            };
+        };
+        history.replaceState(null, '', '#/teacher/vocabulary/editor/shared-unit');
+        await missingManager.handleRouteChange();
+        const accountSwitchResult = {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            vocabId: missingManager.vocabSet.id,
+            vocabName: missingManager.vocabSet.name,
+            loads: accountBLoads
+        };
+        return { beforeResolve, afterResolve, missingResult, accountSwitchResult };
     });
     if (JSON.stringify(editorNavigation.beforeResolve) !== JSON.stringify({
         hash: '#/teacher/overview',
@@ -550,6 +572,12 @@ try {
         activeView: 'teacher-dashboard-view',
         historyDelta: 0,
         fallbacks: 1
+    }) || JSON.stringify(editorNavigation.accountSwitchResult) !== JSON.stringify({
+        hash: '#/teacher/vocabulary/editor/shared-unit',
+        activeView: 'teacher-editor-view',
+        vocabId: 'shared-unit',
+        vocabName: 'Account B unit',
+        loads: 1
     })) {
         throw new Error(`Editor navigation lifecycle changed: ${JSON.stringify(editorNavigation)}`);
     }

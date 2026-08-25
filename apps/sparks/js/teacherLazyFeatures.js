@@ -186,6 +186,7 @@ const featureDefinitions = {
                     getTeacherLibrary: (...args) => manager.getTeacherLibrary(...args),
                     getActiveVocabulary: () => manager.vocabSet,
                     commitActiveVocabulary(vocabulary) {
+                        manager.beginTeacherVocabularyDocument();
                         manager.vocabSet = vocabulary;
                         manager.updateFormUI();
                         manager.renderWords();

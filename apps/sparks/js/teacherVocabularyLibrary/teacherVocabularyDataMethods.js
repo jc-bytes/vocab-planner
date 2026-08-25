@@ -13,10 +13,14 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
             return this.teacherLibraryPromise;
         }
 
-        this.teacherLibraryPromise = Promise.all([
-            this.fetchCloudVocabs(),
+        const isCurrent = this.createTeacherVocabularyOperationGuard();
+        const request = Promise.all([
+            this.fetchCloudVocabs({ isCurrent }),
             loadManifest()
         ]).then(([cloudVocabs, manifestData]) => {
+            if (!isCurrent() || this.teacherLibraryPromise !== request) {
+                return { cloudVocabs: [], remoteVocabs: [], localVocabs: [], items: [], stale: true };
+            }
             const remoteVocabs = Array.isArray(manifestData?.vocabularies)
                 ? manifestData.vocabularies.map(vocab => ({ ...vocab, subjectSlug: getVocabSubjectSlug(vocab) }))
                 : [];
@@ -28,19 +32,20 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
                 ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
             ]);
 
-            this.teacherLibraryCache = {
+            const result = {
                 cloudVocabs,
                 remoteVocabs,
                 localVocabs,
                 items,
                 loadedAt: Date.now()
             };
-            return this.teacherLibraryCache;
+            this.teacherLibraryCache = result;
+            return result;
         }).finally(() => {
-            this.teacherLibraryPromise = null;
+            if (this.teacherLibraryPromise === request) this.teacherLibraryPromise = null;
         });
-
-        return this.teacherLibraryPromise;
+        this.teacherLibraryPromise = request;
+        return request;
     },
 
 getTeacherVocabularyItemPriority(type = '') {
@@ -132,9 +137,10 @@ dedupeTeacherVocabularyItems(items = []) {
         return deduped;
     },
 
-async loadLibrary() {
+async loadLibrary(options = {}) {
+        const isCurrent = this.createTeacherVocabularyOperationGuard(options);
         const list = $('#library-list');
-        if (!list) return;
+        if (!list || !isCurrent()) return;
 
         if (!this.authDisabled && !this.isAuthenticated) {
             list.innerHTML = '<p>Please sign in to view the library.</p>';
@@ -144,7 +150,8 @@ async loadLibrary() {
         showLoadingState(list, 'Loading library...');
 
         try {
-            const { cloudVocabs, remoteVocabs, localVocabs, items } = await this.getTeacherLibrary();
+            const { cloudVocabs, remoteVocabs, localVocabs, items, stale } = await this.getTeacherLibrary();
+            if (!isCurrent() || stale) return;
 
             list.innerHTML = '';
 
@@ -157,6 +164,7 @@ async loadLibrary() {
             this.renderLibraryBrowser(list);
             this.refreshIcons();
         } catch (error) {
+            if (!isCurrent()) return;
             console.error('Failed to load vocabularies:', error);
             list.innerHTML = '<p>Failed to load vocabulary list.</p>';
         }

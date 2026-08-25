@@ -104,7 +104,7 @@ test('Student Progress does not reach into the unmounted Data Management feature
 test('explicit sign-out clears account-scoped progress state', () => {
     assert.match(
         teacherGlobalListenersSource,
-        /signOut\(\)[\s\S]*disposeLoadedTeacherFeatures\(\);\s*manager\.clearStudentProgressSessionState\?\.\(\)/
+        /disposeLoadedTeacherFeatures\(\);\s*manager\.clearStudentProgressSessionState\?\.\(\)[\s\S]*signOut\(\)/
     );
 });
 

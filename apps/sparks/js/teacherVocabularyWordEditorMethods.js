@@ -252,12 +252,16 @@ class TeacherVocabularyWordEditorMethods {
 
         // In a real repo, this would point to the relative path
         // We can try to load it. If it fails, show error.
+        const documentGeneration = this.teacherVocabularyDocumentGeneration || 0;
+        const isCurrent = this.createTeacherVocabularyOperationGuard();
         const img = document.createElement('img');
         img.src = path;
         img.onerror = () => {
+            if (!isCurrent() || documentGeneration !== (this.teacherVocabularyDocumentGeneration || 0)) return;
             previewBox.innerHTML = '<span class="vocab-image-error">Image not found at path</span>';
         };
         img.onload = () => {
+            if (!isCurrent() || documentGeneration !== (this.teacherVocabularyDocumentGeneration || 0)) return;
             previewBox.innerHTML = '';
             previewBox.appendChild(img);
         };

@@ -13,7 +13,7 @@
     "test:repositories": "node --test tests/repository-contracts.test.mjs",
     "test:teacher-data": "node --test tests/teacher-data-efficiency.test.mjs tests/teacher-data-management-composition.test.mjs tests/teacher-settings-session-isolation.test.mjs && node scripts/ui-teacher-data-management-smoke.mjs",
     "test:teacher-progress-composition": "node --test tests/teacher-student-progress-composition.test.mjs",
-    "test:teacher-vocabulary-library": "node --test tests/teacher-vocabulary-library-composition.test.mjs",
+    "test:teacher-vocabulary-library": "node --test tests/teacher-vocabulary-library-composition.test.mjs tests/teacher-vocabulary-session-isolation.test.mjs",
     "test:teacher-groups": "node --test tests/teacher-groups.test.mjs && node scripts/ui-teacher-groups-smoke.mjs",
     "test:build-efficiency": "node --test tests/build-efficiency.test.mjs",
     "test:theme": "node --test tests/theme-contract.test.mjs",

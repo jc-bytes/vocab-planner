@@ -118,10 +118,11 @@ class TeacherVocabularyStorageMethods {
                     if (confirm(`Delete ${label} vocabulary "${vocab.name}"? This cannot be undone.`)) {
                         if (type === 'local') {
                             this.deleteLocalVocab(vocab.id);
+                            this.loadLibrary();
                         } else {
-                            await this.deleteCloudVocab(vocab.id);
+                            const deleted = await this.deleteCloudVocab(vocab.id);
+                            if (deleted) this.loadLibrary();
                         }
-                        this.loadLibrary(); // Refresh
                     }
                 });
             }
@@ -135,12 +136,17 @@ class TeacherVocabularyStorageMethods {
 
     async deleteCloudVocab(id) {
         if (!this.ensureAuthenticated()) return;
+        const isCurrent = this.createTeacherVocabularyOperationGuard();
         try {
             await vocabularyRepository.remove(id);
+            if (!isCurrent()) return false;
             this.invalidateTeacherLibraryCache();
+            return true;
         } catch (err) {
+            if (!isCurrent()) return false;
             console.error('Failed to delete cloud vocab', err);
             alert('Could not delete cloud vocabulary.');
+            return false;
         }
     }
 
@@ -235,6 +241,7 @@ class TeacherVocabularyStorageMethods {
         if (options.source) clone.source = options.source;
         if (options.path) clone.path = options.path;
         clone.subjectSlug = getVocabSubjectSlug(clone);
+        this.beginTeacherVocabularyDocument();
         this.vocabSet = clone;
         this.autoGenerateVocabId = false;
         this.updateFormUI();
@@ -269,41 +276,99 @@ class TeacherVocabularyStorageMethods {
             return;
         }
         if (!this.isAuthenticated || !this.vocabSet.id) return;
-        clearTimeout(this.cloudSaveTimeout);
+        const ticket = this.createTeacherVocabularySaveTicket(this.vocabSet);
+        const documentGeneration = ticket.documentGeneration;
+        const debounces = this.teacherVocabularySaveDebounces ||= new Map();
+        clearTimeout(debounces.get(documentGeneration));
+        clearTimeout(this.teacherVocabularyStatusTimer);
+        this.teacherVocabularyStatusTimer = null;
         this.setCloudStatus('Saving...', 'info');
-        this.cloudSaveTimeout = setTimeout(() => {
-            this.saveToCloud();
+        const timeoutId = setTimeout(() => {
+            if (debounces.get(documentGeneration) !== timeoutId) return;
+            debounces.delete(documentGeneration);
+            void this.enqueueTeacherVocabularySave(ticket);
         }, 800);
+        debounces.set(documentGeneration, timeoutId);
     }
 
-    async saveToCloud() {
-        if (this.authDisabled) return;
-        if (!this.ensureAuthenticated(false)) return;
-        if (!this.vocabSet.id) return;
-        this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
-        this.normalizeActivityFlowSettings();
+    createTeacherVocabularySaveTicket(vocab = this.vocabSet) {
+        const snapshot = JSON.parse(JSON.stringify(vocab || {}));
+        snapshot.subjectSlug = getVocabSubjectSlug(snapshot);
+        this.normalizeActivityFlowSettings(snapshot);
+        const documentGeneration = this.teacherVocabularyDocumentGeneration || 0;
+        const sequence = (this.teacherVocabularySaveSequence || 0) + 1;
+        this.teacherVocabularySaveSequence = sequence;
+        this.teacherVocabularyLatestSaveByDocument ||= new Map();
+        this.teacherVocabularyLatestSaveByDocument.set(documentGeneration, sequence);
+        const sessionIsCurrent = this.createTeacherVocabularyOperationGuard();
+        const navigation = this.captureTeacherNavigation?.() || null;
+        return Object.freeze({ snapshot, documentGeneration, sequence, sessionIsCurrent, navigation });
+    }
+
+    isTeacherVocabularySaveLatest(ticket) {
+        return ticket.sessionIsCurrent()
+            && this.teacherVocabularyLatestSaveByDocument?.get(ticket.documentGeneration) === ticket.sequence;
+    }
+
+    isTeacherVocabularySaveUiCurrent(ticket) {
+        return this.isTeacherVocabularySaveLatest(ticket)
+            && ticket.documentGeneration === (this.teacherVocabularyDocumentGeneration || 0)
+            && (!ticket.navigation || this.isTeacherNavigationCurrent?.(ticket.navigation));
+    }
+
+    enqueueTeacherVocabularySave(ticket) {
+        const previous = this.teacherVocabularySaveQueue || Promise.resolve();
+        const operation = previous.catch(() => {}).then(() => this.performTeacherVocabularySave(ticket));
+        this.teacherVocabularySaveQueue = operation;
+        return operation.finally(() => {
+            if (this.teacherVocabularySaveQueue === operation) this.teacherVocabularySaveQueue = null;
+        });
+    }
+
+    async performTeacherVocabularySave(ticket) {
+        if (this.authDisabled || !ticket?.snapshot?.id || !ticket.sessionIsCurrent()) {
+            return { status: 'stale', ticket };
+        }
+        if (!this.ensureAuthenticated(false)) return { status: 'stale', ticket };
 
         try {
-            const { __source, source, ...rest } = this.vocabSet;
+            const { __source, source, ...rest } = ticket.snapshot;
             const payload = {
                 ...rest,
-                ownerId: this.currentUser ? this.currentUser.uid : null,
+                ownerId: this.currentUser?.uid || this.currentUser?.id || null,
                 updatedAt: new Date().toISOString()
             };
-            await vocabularyRepository.save(this.vocabSet.id, payload);
-            this.vocabSet.source = 'cloud';
-            this.removeLocalVocab(this.vocabSet.id);
-            this.invalidateTeacherLibraryCache();
-            this.setCloudStatus('Saved to cloud', 'success');
-            setTimeout(() => this.setCloudStatus('Ready', 'info'), 1500);
-            return true;
+            await vocabularyRepository.save(ticket.snapshot.id, payload);
+            if (!ticket.sessionIsCurrent()) return { status: 'stale', ticket };
+            if (this.isTeacherVocabularySaveLatest(ticket)) {
+                this.removeLocalVocab(ticket.snapshot.id);
+                this.invalidateTeacherLibraryCache();
+            }
+            if (this.isTeacherVocabularySaveUiCurrent(ticket)) {
+                if (this.vocabSet?.id === ticket.snapshot.id) this.vocabSet.source = 'cloud';
+                this.setCloudStatus('Saved to cloud', 'success');
+                clearTimeout(this.teacherVocabularyStatusTimer);
+                this.teacherVocabularyStatusTimer = setTimeout(() => {
+                    if (!this.isTeacherVocabularySaveUiCurrent(ticket)) return;
+                    this.teacherVocabularyStatusTimer = null;
+                    this.setCloudStatus('Ready', 'info');
+                }, 1500);
+            }
+            return { status: 'saved', ticket };
         } catch (error) {
+            if (!ticket.sessionIsCurrent()) return { status: 'stale', ticket };
             console.error('Failed to save vocabulary to backend:', error);
-            this.setCloudStatus('Save failed', 'error');
-            notifications.error('Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');
-            return false;
+            if (this.isTeacherVocabularySaveLatest(ticket)) {
+                this.saveToLocal(ticket.snapshot);
+            }
+            if (this.isTeacherVocabularySaveUiCurrent(ticket)) {
+                this.setCloudStatus('Save failed', 'error');
+                notifications.error('Cloud save failed. Check backend rules to ensure authenticated users can write to the vocabularies collection.');
+            }
+            return { status: 'failed', ticket };
         }
     }
+
 }
 
 export function installTeacherVocabularyStorageMethods(TeacherManager) {
