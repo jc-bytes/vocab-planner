@@ -4,7 +4,7 @@ This map began as the Task 22 caller and ownership analysis and now records the 
 
 ## Summary
 
-| Surface | Forwarded names | Actual role | Decision |
+| Surface | Current shape | Actual role | Decision |
 | --- | ---: | --- | --- |
 | `StudentManager` | Application composition root | Routing, shell, listeners, auth, subjects, progress, and activities | Preserve live cross-component bridges; owner-only registration and join bridges were removed. |
 | `StudentActivities` | Stable activity boundary over 13 owned collaborators | Runtime, presentation, schedule, vocabulary, progress, and Word Hunt collaboration | Preserve high-level contracts; 16 uncalled low-level wrappers were removed. |

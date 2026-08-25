@@ -2,6 +2,8 @@
 
 This is the practical map for extending Sparks. It describes current ownership and the shortest safe path for common changes. Detailed decisions and completed migrations are recorded in `docs/architecture-remediation.md`.
 
+The repository and classroom system are called Sparks. The currently shipped HTML titles, npm package, Tauri product, and desktop bundle retain the historical product name Vocabulary Master; changing those together is a separate product-release decision.
+
 ## Application shape
 
 Sparks is a vanilla JavaScript multi-page Vite application with three entries:
