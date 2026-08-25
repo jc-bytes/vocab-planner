@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'node:path';
 import {
   PRODUCTION_SUPABASE_URL,
+  isPrivilegedSupabaseKey,
   isValidSupabaseConfig
 } from './config/supabase-config.js';
 
@@ -10,6 +11,10 @@ export function validateSupabaseBuildConfig({ command, mode, env }) {
   const publishableKey = env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || '';
   const allowMissing = env.ALLOW_MISSING_SUPABASE_CONFIG === '1';
   const allowProductionInDev = env.ALLOW_PRODUCTION_SUPABASE_IN_DEV === '1';
+
+  if (isPrivilegedSupabaseKey(publishableKey)) {
+    throw new Error('Refusing to expose a Supabase secret or service_role key in the browser build.');
+  }
 
   if (command === 'build' && !allowMissing && !isValidSupabaseConfig({ url, publishableKey })) {
     throw new Error('Missing Supabase build config. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY.');

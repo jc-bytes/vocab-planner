@@ -5,12 +5,32 @@ export const SUPABASE_CONFIG = {
 
 export const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co';
 
+function readLegacyKeyRole(key) {
+    const payload = key.split('.')[1];
+    if (!payload || typeof globalThis.atob !== 'function') return '';
+    try {
+        const normalized = payload.replaceAll('-', '+').replaceAll('_', '/');
+        const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=');
+        return JSON.parse(globalThis.atob(padded))?.role || '';
+    } catch {
+        return '';
+    }
+}
+
+export function isPrivilegedSupabaseKey(value) {
+    const key = String(value || '').trim();
+    return /^sb_secret_/i.test(key)
+        || /service[_-]?role/i.test(key)
+        || readLegacyKeyRole(key) === 'service_role';
+}
+
 export function isValidSupabaseConfig(config = {}) {
-    const url = String(config.url || '');
-    const publishableKey = String(config.publishableKey || '');
+    const url = String(config.url || '').trim();
+    const publishableKey = String(config.publishableKey || '').trim();
     return Boolean(
         url &&
         publishableKey &&
+        !isPrivilegedSupabaseKey(publishableKey) &&
         !url.includes('YOUR_PROJECT_REF') &&
         !publishableKey.includes('YOUR_SUPABASE') &&
         !publishableKey.includes('your_key_here')

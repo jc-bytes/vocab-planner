@@ -69,7 +69,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
 | 29. Add interfaces only where justified | DONE | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle; game/server score parity | Focused/full regression; production builds; registry/database contracts; independent reviews | Added only two justified seams: authoritative signed-in rewards and injectable teacher auth. Client leaderboard capability now exactly matches independent SQL authorization and score order. |
-| 30. Consolidate environment authority | TODO | | | |
+| 30. Consolidate environment authority | IN PROGRESS | Shared browser-key validation | Focused config/auth/security tests; production build | Runtime and every Vite command reject current secret keys and legacy service-role keys before client exposure. Production project authority consolidation remains. |
 | 31. Correct stale documentation | TODO | | | |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
 | 33. Organize changed features gradually | TODO | | | |
@@ -583,6 +583,16 @@ Task 29 remains in progress. The next subtask will add a static parity contract 
 - Verification passed through 22 registry/parity tests and registry smoke, 61 focused game/repository/security tests, the complete regression suite, nine-width student regression, three-page smoke, 13-game sandbox smoke, production build, scoped diff validation, and independent migration review. Local migration application remains unverified because the local Supabase database cannot connect; static effective-migration checks pass. Deployment remains 13.5 MB with 2,332 modules.
 
 Task 29 is complete. No generic repository wrapper, service container, or read/write reshuffle was added because the existing repository and student capability boundaries already protect meaningful ownership and security seams.
+
+### Task 30a, reject privileged browser keys
+
+- Extended the existing shared Supabase configuration validator instead of adding a second build-only policy. Runtime overrides and Vite validation now use the same privileged-key decision.
+- Rejects current `sb_secret_...` keys, explicit service-role values, and legacy JWT keys whose payload role is `service_role`. Current `sb_publishable_...` and legacy anonymous JWT keys remain valid browser credentials.
+- Build validation rejects privileged keys for every command and even when missing configuration is intentionally allowed. A secret cannot reach a development browser through the looser missing-config escape hatch.
+- Preserved publishable/legacy-anon compatibility, browser test overrides, placeholder handling, production-in-development protection, and all backend-only service-role environment paths.
+- Verification passed for 23 focused configuration/auth/security tests, production build, and scoped diff validation. The implementation follows current Supabase guidance that publishable/anon keys are browser-safe while secret/service-role keys bypass RLS and belong only in backend components.
+
+Task 30 remains in progress. The next subtask will remove the duplicated production project reference/URL authority used by the planner while preserving CLI project metadata and environment overrides.
 
 ### Phase 0, baseline
 

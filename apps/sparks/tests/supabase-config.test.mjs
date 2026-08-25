@@ -5,6 +5,7 @@ import test from 'node:test';
 import {
     PRODUCTION_SUPABASE_URL,
     isSupabaseConfigured,
+    isPrivilegedSupabaseKey,
     isValidSupabaseConfig
 } from '../config/supabase-config.js';
 import { validateSupabaseBuildConfig } from '../vite.config.mjs';
@@ -13,6 +14,11 @@ const validConfig = {
     url: 'https://example-project.supabase.co',
     publishableKey: 'sb_publishable_example'
 };
+
+function legacyJwt(role) {
+    const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
+    return `${encode({ alg: 'HS256', typ: 'JWT' })}.${encode({ role })}.signature`;
+}
 
 test('Supabase configuration validation rejects missing and placeholder values', () => {
     assert.equal(isValidSupabaseConfig({}), false);
@@ -32,6 +38,18 @@ test('Supabase configuration validation rejects missing and placeholder values',
     }), true);
 });
 
+test('browser configuration rejects current and legacy privileged key formats', () => {
+    const legacyServiceRole = legacyJwt('service_role');
+    assert.equal(isPrivilegedSupabaseKey('sb_secret_example'), true);
+    assert.equal(isPrivilegedSupabaseKey('SUPABASE_SERVICE_ROLE_KEY'), true);
+    assert.equal(isPrivilegedSupabaseKey(legacyServiceRole), true);
+    assert.equal(isPrivilegedSupabaseKey(legacyJwt('anon')), false);
+    assert.equal(isPrivilegedSupabaseKey(validConfig.publishableKey), false);
+    assert.equal(isValidSupabaseConfig({ ...validConfig, publishableKey: 'sb_secret_example' }), false);
+    assert.equal(isValidSupabaseConfig({ ...validConfig, publishableKey: legacyServiceRole }), false);
+    assert.equal(isValidSupabaseConfig({ ...validConfig, publishableKey: legacyJwt('anon') }), true);
+});
+
 test('runtime Supabase validation honors an explicit browser override', () => {
     const previousWindow = globalThis.window;
     globalThis.window = { SUPABASE_CONFIG: validConfig };
@@ -40,6 +58,11 @@ test('runtime Supabase validation honors an explicit browser override', () => {
         globalThis.window.SUPABASE_CONFIG = {
             url: 'https://YOUR_PROJECT_REF.supabase.co',
             publishableKey: 'your_key_here'
+        };
+        assert.equal(isSupabaseConfigured(), false);
+        globalThis.window.SUPABASE_CONFIG = {
+            url: validConfig.url,
+            publishableKey: 'sb_secret_browser_override'
         };
         assert.equal(isSupabaseConfigured(), false);
     } finally {
@@ -70,6 +93,15 @@ test('build validation shares runtime validity and protects production from deve
             VITE_SUPABASE_PUBLISHABLE_KEY: validConfig.publishableKey
         }
     }), /Refusing to use the production Supabase project/);
+    assert.throws(() => validateSupabaseBuildConfig({
+        command: 'serve',
+        mode: 'development',
+        env: {
+            VITE_SUPABASE_URL: validConfig.url,
+            VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_secret_build_key',
+            ALLOW_MISSING_SUPABASE_CONFIG: '1'
+        }
+    }), /Refusing to expose a Supabase secret or service_role key/);
 });
 
 test('the example environment does not pre-authorize production in development', async () => {
