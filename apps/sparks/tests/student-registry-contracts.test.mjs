@@ -619,9 +619,19 @@ test('game registry owns display, launch, frame, and leaderboard configuration',
     assertUniqueIds(STUDENT_GAME_REGISTRY, 'Game');
     const leaderboardIds = new Set(getLeaderboardGameIds());
 
+    assert.equal(Object.isFrozen(STUDENT_GAME_REGISTRY), true);
+
     for (const game of STUDENT_GAME_REGISTRY) {
         assert.equal(getStudentGame(game.id), game);
-        assert.ok(game.name && game.desc && game.art, `${game.id} must provide arcade card metadata`);
+        assert.match(game.id, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, `${game.id} must use a kebab-case ID`);
+        for (const field of ['name', 'icon', 'desc', 'art']) {
+            assert.equal(typeof game[field], 'string', `${game.id} must provide string ${field} metadata`);
+            assert.ok(game[field].trim(), `${game.id} must provide non-empty ${field} metadata`);
+        }
+        await access(new URL(`../${game.art}`, import.meta.url));
+        assert.equal(Object.isFrozen(game), true, `${game.id} descriptor must be frozen`);
+        assert.equal(Object.isFrozen(game.launch), true, `${game.id} launch contract must be frozen`);
+        assert.equal(typeof game.leaderboard, 'boolean', `${game.id} leaderboard capability must be boolean`);
         assert.equal(leaderboardIds.has(game.id), game.leaderboard, `${game.id} leaderboard metadata must agree`);
         assert.ok(['asc', 'desc'].includes(game.scoreOrder), `${game.id} must provide a valid score order`);
 
@@ -629,15 +639,41 @@ test('game registry owns display, launch, frame, and leaderboard configuration',
             assert.equal(typeof game.launch.load, 'function', `${game.id} must provide a lazy loader`);
             assert.equal(typeof game.launch.create, 'function', `${game.id} must provide a factory`);
             assert.ok(game.launch.exportName, `${game.id} must name its module export`);
+            const loadResult = game.launch.load();
+            assert.equal(typeof loadResult?.then, 'function', `${game.id} loader must return a Promise`);
+            const gameModule = await loadResult;
+            assert.equal(
+                typeof gameModule[game.launch.exportName],
+                'function',
+                `${game.id} must load its configured ${game.launch.exportName} export`
+            );
+            assert.equal(typeof gameModule[game.launch.exportName].prototype.start, 'function', `${game.id} must start`);
+            assert.equal(typeof gameModule[game.launch.exportName].prototype.stop, 'function', `${game.id} must clean up`);
             continue;
         }
 
         assert.equal(game.launch.mode, 'html', `${game.id} must have a supported launch mode`);
-        assert.ok(game.launch.path, `${game.id} must provide an HTML path`);
+        assert.match(game.launch.path, /^js\/games\/.+\.html$/, `${game.id} must provide an owned HTML path`);
+        assert.doesNotMatch(game.launch.path, /(?:^|\/)\.\.(?:\/|$)/, `${game.id} path must not escape its game directory`);
         await access(new URL(`../${game.launch.path}`, import.meta.url));
-        assert.ok(game.launch.frame.height > 0, `${game.id} must provide a frame height`);
+        assert.equal(Object.isFrozen(game.launch.frame), true, `${game.id} frame contract must be frozen`);
+        if (Object.hasOwn(game.launch.frame, 'responsive')) {
+            assert.equal(typeof game.launch.frame.responsive, 'boolean', `${game.id} responsive flag must be boolean`);
+        }
+        assert.ok(Number.isFinite(game.launch.frame.height) && game.launch.frame.height > 0, `${game.id} must provide a frame height`);
+        assert.ok(
+            game.launch.scoreMessageType === null
+                || (typeof game.launch.scoreMessageType === 'string' && game.launch.scoreMessageType.trim()),
+            `${game.id} score message type must be null or a non-empty string`
+        );
+        if (game.leaderboard) {
+            assert.ok(game.launch.scoreMessageType, `${game.id} leaderboard games must provide a score message type`);
+        }
         if (!game.launch.frame.responsive) {
-            assert.ok(game.launch.frame.width > 0, `${game.id} fixed frames must provide a width`);
+            assert.ok(
+                Number.isFinite(game.launch.frame.width) && game.launch.frame.width > 0,
+                `${game.id} fixed frames must provide a width`
+            );
         }
     }
 

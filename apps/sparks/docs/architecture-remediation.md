@@ -66,7 +66,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 24. Remove obsolete facade methods | DONE | Student/teacher obsolete bridges, aliases, broad read chain, and ownership/least-data contracts | Focused domain/security/build checks; complete regressions; production builds; browser smoke; independent audits | Removed 30 obsolete facade methods plus associated dead state/service code. Live owner APIs, bounded data paths, lazy loading, persistence, and security boundaries remain intact. |
 | 25. Move legacy game adapters into descriptors | DONE | Dead host monitor removal; descriptor-owned score order; registry contract | Focused game/registry/security/build checks; complete regressions; production builds; 13-game smoke; independent runtime reviews | Live bridge stays game-owned inside the sandbox. Registry owns message types, frame/capability metadata, and score direction. A formatter interface is intentionally deferred. |
 | 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
-| 27. Add game registry contract tests | TODO | | | |
+| 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | TODO | | | |
 | 29. Add interfaces only where justified | TODO | | | |
 | 30. Consolidate environment authority | TODO | | | |
@@ -519,6 +519,18 @@ Task 25 is complete. The registry owns the game-specific scalar policy that the 
 - Verification passed for 20 Student Games tests, 21 registry/parity tests plus smoke, 14 security tests, package/build contracts, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and two independent reviews. Deployment remains 13.5 MB with 2,331 modules; the lazy Student Games chunk is 31.17/9.49 kB raw/gzip.
 
 Task 26 is complete. Task 27 will strengthen registry/build contracts only where the existing tests do not already prove uniqueness, reachability, configuration validity, lazy loading, and copied-asset compatibility.
+
+### Task 27, enforce source and production game contracts
+
+- Extended the existing registry contract instead of creating a second registry or generic framework. Every descriptor must now have a kebab-case ID, non-empty card metadata, reachable cover art, a frozen launch contract, valid leaderboard/score-order policy, and mode-appropriate configuration.
+- Each of the seven canvas loaders is executed only inside the test, where it must return a Promise, resolve its configured class export, and expose the `start` and `stop` lifecycle used by the host. Production code remains lazy; registry definition does not import a game.
+- HTML descriptors must remain inside `js/games`, cannot traverse parent directories, must use an HTML entry, and must provide finite frame dimensions with a real boolean responsive flag. Leaderboard-enabled HTML games must provide a score message type. Existing sandbox smoke continues to navigate and isolate all 13 entries.
+- Added a registry-driven post-build validator. It verifies all 20 copied cover files, all 13 copied HTML entry files, the Student Games dynamic entry, exactly seven game-owned dynamic imports, and every emitted lazy canvas chunk. All desktop web builds now fail immediately if registration and packaged output drift.
+- Did not add a `defineStudentGameRegistry()` layer. The two private descriptor factories already own construction defaults, while the source and post-build contracts catch the demonstrated authoring failures without adding a second runtime path.
+- Independent tracing confirmed a separate pre-existing offline limitation: the generated service worker does not precache cold game launches, and My Digital Garden uses remote media. Task 27 does not redefine offline product behavior; Task 35 will evaluate this evidence while preserving intentional lazy delivery.
+- Verification passed for 21 registry/parity tests plus activity smoke, 20 Student Games, 14 security, 11 build/lazy checks, the complete regression suite, 13-game sandbox smoke, production build, scoped diff validation, and three independent source/runtime/build maps. The production validator reports 20 registered games and seven lazy canvas bundles; deployment remains 13.5 MB with 2,331 modules.
+
+Task 27 is complete. Task 28 will review the existing Supabase boundaries without replacing the repository layer or adding interfaces before a concrete seam is demonstrated.
 
 ### Phase 0, baseline
 
