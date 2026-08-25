@@ -23,6 +23,7 @@ try {
     const initial = await page.evaluate(async () => {
         const { teacherPageRegistry } = await import('/js/teacherPageRegistry.js');
         const sparksPage = teacherPageRegistry.get('sparks');
+        const groupsPage = teacherPageRegistry.get('groups');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
@@ -57,12 +58,13 @@ try {
                 this.workflowCalls = [];
                 this.sparkLoads = 0;
                 this.progressLoads = 0;
+                this.groupLoads = 0;
             }
             ensureAuthenticated() { return true; }
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
-            showGroupsView() { this.switchView('teacher-groups-view'); }
+            showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
             showDataManagementView({ area }) { this.switchView('teacher-data-management-view', { updateRoute: false }); this.setActiveTeacherTab(area); }
             setVocabularyWorkflowTab(mode, options) { this.workflowCalls.push({ mode, options }); }
             loadLibrary() { this.libraryLoads += 1; return Promise.resolve(); }
@@ -277,7 +279,55 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, and Students navigation, direct routing, and history.');
+    const groups = await page.evaluate(() => {
+        const manager = window.teacherPageSmokeManager;
+        const loadsBefore = manager.groupLoads;
+        manager.showTeacherSection('groups');
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            loadDelta: manager.groupLoads - loadsBefore
+        };
+    });
+    if (groups.hash !== '#/teacher/groups'
+        || groups.activeView !== 'teacher-groups-view'
+        || groups.activeSection !== 'groups'
+        || groups.mobileLabel !== 'Groups'
+        || groups.topLabel !== 'Groups'
+        || groups.loadDelta !== 1) {
+        throw new Error(`Groups navigation changed: ${JSON.stringify(groups)}`);
+    }
+
+    const groupsDirect = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const loadsBefore = manager.groupLoads;
+        history.replaceState(null, '', '#/teacher/groups');
+        await manager.handleRouteChange();
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            loadDelta: manager.groupLoads - loadsBefore
+        };
+    });
+    if (groupsDirect.activeView !== 'teacher-groups-view'
+        || groupsDirect.activeSection !== 'groups'
+        || groupsDirect.loadDelta !== 1) {
+        throw new Error(`Groups direct route changed: ${JSON.stringify(groupsDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('overview'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/groups'
+        && document.querySelector('.view.active')?.id === 'teacher-groups-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'groups'
+    ));
+
+    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, Students, and Groups navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

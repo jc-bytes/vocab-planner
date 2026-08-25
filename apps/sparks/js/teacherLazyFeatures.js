@@ -5,6 +5,7 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
+const GROUPS_PAGE = teacherPageRegistry.get('groups');
 
 const featurePromises = new Map();
 const featureContexts = new WeakMap();
@@ -68,7 +69,7 @@ const featureDefinitions = {
             create(manager) {
                 return module.createTeacherGroupsFeature({
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
-                    showView: () => manager.switchView('teacher-groups-view'),
+                    showView: () => manager.switchView(GROUPS_PAGE.viewId),
                     loadRoster: () => manager.getStudentRosterData(),
                     getSession: () => ({
                         authDisabled: manager.authDisabled,

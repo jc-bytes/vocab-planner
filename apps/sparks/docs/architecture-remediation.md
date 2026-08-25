@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke; Students/Groups/Settings account isolation; Data roster-control cleanup | Per-page registry, routing, navigation, browser history, feature, account-switch, and UI checks | Four primary pages are migrated. Student Progress, Groups, Data controls, and delegated Settings operations are isolated across teacher accounts. Groups page migration is next. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, Students, and Groups shell/route migrations; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, and UI checks | Five primary pages are migrated. Data and Settings share one feature/view and will be migrated independently through their area contracts. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -303,6 +303,16 @@ The next reliability check covers feature-local Data Management roster state dis
 - Added focused contracts covering all three delayed account-A loaders versus account B, canonical control cleanup, the Coins timer race, Calendar follow-on suppression, and all auth exit-path wiring. All 23 focused checks, the real lazy-feature browser smoke, the complete regression suite, production build, and scoped diff validation pass; independent review approved the corrected timer and account-isolation contracts. The build remains 13.5 MB with 2,330 modules, and Data Management remains lazy at 45.31 kB raw / 11.00 kB gzip.
 
 Task 20 remains in progress. Groups is the next primary page migration.
+
+### Task 20e, migrate Groups
+
+- Replaced duplicated Groups primary page IDs and view IDs in the shell, router, lazy feature adapter, and both Overview shortcuts with the `groups` registry descriptor.
+- Preserved the frozen `{ show, destroy }` feature interface, lazy import, roster capability, teacher-scoped absence/restriction state, direct URL, navigation label, and account-isolation lifecycle.
+- Extended the primary-page browser workflow for normal Groups entry, canonical URL, visible view, active navigation labels, direct routing, one feature load per entry, and Back restoration. The dedicated Groups browser workflow continues to exercise the real lazy adapter and feature factory.
+- Added exact route parse/build/current-view assertions and updated shortcut ownership contracts to follow the registry authority.
+- Focused page, Groups, routing, lazy/build, scoped diff checks, the complete regression suite, and production build pass. Two independent reviews found no blocker. The build remains 13.5 MB with 2,330 modules; Groups remains lazy at 18.50 kB raw / 5.33 kB gzip.
+
+Task 20 remains in progress. Data is next; it shares a view and lazy feature with Settings, so only its primary area identity should migrate in that commit.
 
 ### Phase 0, baseline
 

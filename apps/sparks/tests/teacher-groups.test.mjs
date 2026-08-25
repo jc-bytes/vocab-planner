@@ -91,8 +91,8 @@ test('teacher overview exposes direct group-generator shortcuts', async () => {
 
     assert.match(html, /id="overview-groups-btn"[\s\S]*?Randomize Groups/);
     assert.match(html, /id="overview-groups-action-btn"[\s\S]*?Randomize groups/);
-    assert.match(listeners, /overview-groups-btn[\s\S]*?showTeacherSection\('groups'\)/);
-    assert.match(listeners, /overview-groups-action-btn[\s\S]*?showTeacherSection\('groups'\)/);
+    assert.match(listeners, /overview-groups-btn[\s\S]*?showTeacherSection\(GROUPS_PAGE\.id\)/);
+    assert.match(listeners, /overview-groups-action-btn[\s\S]*?showTeacherSection\(GROUPS_PAGE\.id\)/);
 });
 
 test('pairing restrictions have a private device fallback when cloud storage is unavailable', async () => {
