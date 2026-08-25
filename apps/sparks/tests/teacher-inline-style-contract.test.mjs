@@ -169,8 +169,7 @@ test('Add Student modal delegates static presentation to its feature classes', (
         /\.add-student-dialog\s*\{[^}]*width:\s*92%;[^}]*max-width:\s*620px;/s,
         /\.add-student-field-grid\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(180px, 1fr\)\);[^}]*gap:\s*1rem;/s,
         /\.add-student-field-grid--grade\s*\{[^}]*grid-template-columns:\s*1fr 1fr;/s,
-        /\.add-student-section-input\s*\{[^}]*text-transform:\s*uppercase;/s,
-        /\.add-student-status\s*\{[^}]*color:\s*var\(--color-text-muted\);/s
+        /\.add-student-section-input\s*\{[^}]*text-transform:\s*uppercase;/s
     ]) {
         assert.match(teacherCss, declaration);
     }

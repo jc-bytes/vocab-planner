@@ -1,6 +1,7 @@
 import Papa from 'papaparse';
 import { $, notifications } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
+import { setInlineStatus } from '../ui/inlineStatus.js';
 
 export async function importStudentRecordsWithConcurrency(
     records,
@@ -58,14 +59,7 @@ updateStudentImportStatus(message, state = 'muted') {
         const status = $('#student-roster-import-status');
         if (!status) return;
 
-        const colors = {
-            error: 'var(--danger-color)',
-            muted: 'var(--text-muted)',
-            success: 'var(--accent-color)'
-        };
-
-        status.style.color = colors[state] || colors.muted;
-        status.textContent = message;
+        setInlineStatus(status, message, state);
     },
 
 async handleStudentCsvImportFiles(fileList) {

@@ -1131,26 +1131,10 @@ body {
     margin-top: 0.5rem;
 }
 
-#group-restriction-status[data-state="error"] {
-    color: var(--danger-color);
-}
-
-#group-restriction-status[data-state="success"] {
-    color: var(--success-color);
-}
-
 .group-generator-status {
     min-height: 1.5rem;
     margin-top: 0.55rem;
     text-align: center;
-}
-
-.group-generator-status[data-state="error"] {
-    color: var(--danger-color);
-}
-
-.group-generator-status[data-state="success"] {
-    color: var(--success-color);
 }
 
 .group-results {
@@ -5296,10 +5280,6 @@ body {
 
 .add-student-section-input {
     text-transform: uppercase;
-}
-
-.add-student-status {
-    color: var(--color-text-muted);
 }
 
 .student-progress-cards,

@@ -1,4 +1,5 @@
 import { $, createElement, notifications } from './main.js';
+import { setInlineStatus } from './ui/inlineStatus.js';
 import {
     canonicalStudentPair,
     teacherGroupRestrictionsRepository
@@ -271,8 +272,7 @@ class TeacherGroupsMethods {
     setGroupRestrictionStatus(message, state = 'muted') {
         const status = $('#group-restriction-status');
         if (!status) return;
-        status.textContent = message;
-        status.dataset.state = state;
+        setInlineStatus(status, message, state);
     }
 
     async saveGroupPairRestriction() {
@@ -424,8 +424,7 @@ class TeacherGroupsMethods {
     setGroupGeneratorStatus(message, state = 'muted') {
         const status = $('#group-generator-status');
         if (!status) return;
-        status.textContent = message;
-        status.dataset.state = state;
+        setInlineStatus(status, message, state);
     }
 
     async copyRandomGroups() {

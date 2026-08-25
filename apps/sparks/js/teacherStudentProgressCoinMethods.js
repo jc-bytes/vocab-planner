@@ -1,17 +1,12 @@
 import { $ } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { setInlineStatus } from './ui/inlineStatus.js';
 
 class TeacherStudentProgressCoinMethods {
     updateCoinStatus(message, state = 'muted') {
         const el = $('#coin-adjust-status');
         if (!el) return;
-        const colors = {
-            success: 'var(--accent-color)',
-            muted: 'var(--text-muted)',
-            error: 'var(--danger-color)'
-        };
-        el.style.color = colors[state] || colors.muted;
-        el.textContent = message;
+        setInlineStatus(el, message, state);
     }
 
     async handleCoinAdjust() {

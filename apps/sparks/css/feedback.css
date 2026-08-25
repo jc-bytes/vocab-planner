@@ -82,3 +82,23 @@
     transform: translateX(-50%);
     transition: opacity 0.3s, transform 0.3s;
 }
+
+.inline-status[data-state="muted"] {
+    color: var(--color-text-muted);
+}
+
+.inline-status[data-state="info"] {
+    color: var(--color-info);
+}
+
+.inline-status[data-state="success"] {
+    color: var(--color-success);
+}
+
+.inline-status[data-state="error"] {
+    color: var(--color-danger);
+}
+
+.inline-status--accent-success[data-state="success"] {
+    color: var(--color-accent);
+}

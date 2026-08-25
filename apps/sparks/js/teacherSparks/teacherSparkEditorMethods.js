@@ -8,6 +8,7 @@ import {
     SPARK_QUESTION_TYPES
 } from '../sparkCheckModel.js';
 import { SPARK_GRADE_LEVELS } from '../sparkModel.js';
+import { setInlineStatus } from '../ui/inlineStatus.js';
 
 export const teacherSparkEditorMethods = {
 createSparkQuestionDraft(type = SPARK_QUESTION_TYPES.SHORT_TEXT) {
@@ -251,14 +252,6 @@ readSparkForm(statusOverride = null) {
 setSparkModalStatus(text, state = 'muted') {
         const el = $('#spark-modal-status');
         if (!el) return;
-        el.textContent = text || '';
-        const colors = {
-            success: 'var(--success-color)',
-            error: 'var(--danger-color)',
-            info: 'var(--secondary-color)',
-            muted: 'var(--text-muted)'
-        };
-        el.style.color = colors[state] || colors.muted;
+        setInlineStatus(el, text, state);
     },
 };
-

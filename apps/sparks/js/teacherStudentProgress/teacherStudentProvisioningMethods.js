@@ -1,5 +1,6 @@
 import { $, closeModal, notifications, openModal } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
+import { setInlineStatus } from '../ui/inlineStatus.js';
 
 const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
 
@@ -20,14 +21,7 @@ updateAddStudentStatus(message, state = 'muted') {
         const status = $('#add-student-status');
         if (!status) return;
 
-        const colors = {
-            error: 'var(--danger-color)',
-            muted: 'var(--text-muted)',
-            success: 'var(--accent-color)'
-        };
-
-        status.style.color = colors[state] || colors.muted;
-        status.textContent = message;
+        setInlineStatus(status, message, state);
     },
 
 validateAddStudentForm() {
