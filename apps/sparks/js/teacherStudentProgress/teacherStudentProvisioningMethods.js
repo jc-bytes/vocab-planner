@@ -93,7 +93,6 @@ async handleAddStudentSubmit(event) {
             await supabaseService.createStudentAccount(payload.profile, payload.password);
             if (generation !== (this.studentProgressSessionGeneration || 0)) return;
 
-            this.studentProgressCache = null;
             await this.loadStudentRosterFilters({ forceRefresh: true });
             if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             this.populateFilters();

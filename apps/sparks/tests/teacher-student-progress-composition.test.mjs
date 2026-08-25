@@ -84,7 +84,6 @@ async function flushAsync() {
 
 test('teacher progress installer exposes progress, provisioning, and CSV workflows', () => {
     const methodNames = [
-        'fetchAllStudentProgress',
         'getStudentRosterData',
         'ensureStudentProgressDetails',
         'applyFilters',
@@ -117,7 +116,7 @@ test('teacher progress responsibilities have one complete owner each', () => {
     ];
     const methodNames = groups.flatMap(group => Object.keys(group));
 
-    assert.equal(methodNames.length, 35);
+    assert.equal(methodNames.length, 33);
     assert.equal(new Set(methodNames).size, methodNames.length);
     methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
     assert.deepEqual(
@@ -953,31 +952,6 @@ test('canceling a later password prompt does not supersede the active request', 
         supabaseService.resetStudentPassword = originalReset;
         globalThis.confirm = originalConfirm;
         document.querySelector = originalQuerySelector;
-    }
-});
-
-test('a shared progress request cannot overwrite the next account data', async () => {
-    const manager = new TestTeacherManager();
-    manager.authDisabled = false;
-    manager.allStudentData = [];
-    manager.filteredStudentData = [];
-    manager.selectedStudents = new Set();
-    let resolveProgress;
-    const originalGetStudentsWithProgress = supabaseService.getStudentsWithProgress;
-    supabaseService.getStudentsWithProgress = () => new Promise(resolve => { resolveProgress = resolve; });
-
-    try {
-        const owner = manager.getStudentProgressData();
-        const waiter = manager.getStudentProgressData();
-        manager.clearStudentProgressSessionState();
-        manager.allStudentData = [{ id: 'new-account' }];
-        manager.filteredStudentData = [...manager.allStudentData];
-        resolveProgress([{ id: 'old-account' }]);
-        assert.deepEqual(await owner, []);
-        assert.deepEqual(await waiter, []);
-        assert.deepEqual(manager.allStudentData, [{ id: 'new-account' }]);
-    } finally {
-        supabaseService.getStudentsWithProgress = originalGetStudentsWithProgress;
     }
 });
 

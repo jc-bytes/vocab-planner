@@ -57,7 +57,7 @@ test('teacher roster uses a bounded paginated summary without full activity snap
     assert.match(progressPageMethods, /grade: query\.grade/);
     assert.match(progressPageMethods, /section: query\.section/);
     assert.match(progressPageMethods, /search: query\.search/);
-    assert.match(authProfileMethods, /while \(offset < total\)/, 'explicit bulk workflows retain full retrieval');
+    assert.doesNotMatch(authProfileMethods, /getStudentsWithProgress|while \(offset < total\)/);
     assert.match(authProfileMethods, /list_student_progress_summaries_v1/);
 });
 

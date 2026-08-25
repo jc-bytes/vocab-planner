@@ -118,7 +118,6 @@ async handleStudentCsvImportFiles(fileList) {
             failed = result.failed;
 
             if (created > 0) {
-                this.studentProgressCache = null;
                 await this.loadStudentRosterFilters({ forceRefresh: true });
                 if (!isCurrentSession()) return;
                 this.populateFilters();

@@ -47,8 +47,6 @@ class TeacherManager {
         this.teacherVocabularyStatusTimer = null;
         this.vocabularyMode = 'assign';
         this.schoolCalendar = getDefaultSchoolCalendar();
-        this.studentProgressCache = null;
-        this.studentProgressPromise = null;
         this.studentProgressSessionGeneration = 0;
         this.studentIdentityRosterGeneration = 0;
         this.studentProgressDetailGeneration = 0;

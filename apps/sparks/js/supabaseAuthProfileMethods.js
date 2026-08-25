@@ -255,23 +255,6 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         };
     },
 
-    async getStudentsWithProgress() {
-        const students = [];
-        const limit = 100;
-        let offset = 0;
-        let total = Infinity;
-
-        while (offset < total) {
-            const page = await this.listStudentProgressSummaries({ limit, offset });
-            students.push(...page.items);
-            total = page.total;
-            if (page.items.length === 0) break;
-            offset += page.items.length;
-        }
-
-        return students;
-    },
-
     async getWordHuntReviewData() {
         await this.init();
         const { data, error } = await this.client.rpc('list_word_hunt_reviews_v1');

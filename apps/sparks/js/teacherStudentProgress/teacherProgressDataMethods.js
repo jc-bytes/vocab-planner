@@ -1,4 +1,4 @@
-import { $, closeModal, createElement, notifications } from '../main.js';
+import { $, closeModal, createElement } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
 import { teacherPageRegistry } from '../teacherPageRegistry.js';
 
@@ -119,79 +119,9 @@ async showProgressView() {
         }
     },
 
-async fetchAllStudentProgress(options = {}) {
-        try {
-            return await this.getStudentProgressData(options);
-        } catch (error) {
-            this.setStudentProgressLoadState(this.allStudentData.length ? 'stale' : 'error');
-            throw error;
-        }
-    },
-
 applyStudentProgressData(data) {
         this.allStudentData = Array.isArray(data) ? data : [];
         this.filteredStudentData = [...this.allStudentData];
-    },
-
-async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
-        const generation = this.studentProgressSessionGeneration || 0;
-        if (this.authDisabled) {
-            this.applyStudentProgressData([]);
-            this.studentProgressCache = {
-                data: [],
-                loadedAt: Date.now()
-            };
-            return [];
-        }
-
-        if (!forceRefresh && this.studentProgressCache) {
-            this.applyStudentProgressData(this.studentProgressCache.data);
-            return this.studentProgressCache.data;
-        }
-
-        if (!forceRefresh && this.studentProgressPromise) {
-            try {
-                const data = await this.studentProgressPromise;
-                if (generation !== (this.studentProgressSessionGeneration || 0)) {
-                    return [];
-                }
-                this.applyStudentProgressData(data);
-                return data;
-            } catch (error) {
-                if (generation !== (this.studentProgressSessionGeneration || 0)) {
-                    return [];
-                }
-                if (showError) {
-                    notifications.error('Failed to load student data.');
-                }
-                throw error;
-            }
-        }
-
-        const request = supabaseService.getStudentsWithProgress()
-            .then(data => {
-                if (generation !== (this.studentProgressSessionGeneration || 0)) return [];
-                this.studentProgressCache = {
-                    data,
-                    loadedAt: Date.now()
-                };
-                this.applyStudentProgressData(data);
-                return data;
-            })
-            .catch(error => {
-                if (generation !== (this.studentProgressSessionGeneration || 0)) return [];
-                console.error('Error fetching student progress:', error);
-                if (showError) {
-                    notifications.error('Failed to load student data.');
-                }
-                throw error;
-            })
-            .finally(() => {
-                if (this.studentProgressPromise === request) this.studentProgressPromise = null;
-            });
-        this.studentProgressPromise = request;
-
-        return request;
     },
 
 async getStudentRosterData({ forceRefresh = false } = {}) {
@@ -231,8 +161,6 @@ clearStudentProgressSessionState() {
         this.studentProgressPageGeneration = (this.studentProgressPageGeneration || 0) + 1;
         this.studentRosterFiltersGeneration = (this.studentRosterFiltersGeneration || 0) + 1;
         this.studentPasswordResetGeneration = (this.studentPasswordResetGeneration || 0) + 1;
-        this.studentProgressCache = null;
-        this.studentProgressPromise = null;
         this.studentIdentityRosterCache = null;
         this.studentIdentityRosterPromise = null;
         this.studentProgressPageCache = null;

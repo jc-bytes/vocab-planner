@@ -241,10 +241,6 @@ test('Word Hunt loading uses its narrow data request and caches repeat visits', 
     manager.initWordHuntReview = () => {};
     manager.query = () => null;
     manager.feedback = { error() {} };
-    manager.getStudentProgressData = () => {
-        throw new Error('Word Hunt review must not load complete student progress.');
-    };
-
     let requests = 0;
     manager.repository = {
         async loadReviewData() {
