@@ -64,7 +64,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
 | 24. Remove obsolete facade methods | DONE | Student/teacher obsolete bridges, aliases, broad read chain, and ownership/least-data contracts | Focused domain/security/build checks; complete regressions; production builds; browser smoke; independent audits | Removed 30 obsolete facade methods plus associated dead state/service code. Live owner APIs, bounded data paths, lazy loading, persistence, and security boundaries remain intact. |
-| 25. Move legacy game adapters into descriptors | IN PROGRESS | Dead host score-monitor duplicate; game integration audit | 19 game, 21 registry, security, package, build/lazy, 13-game smoke; complete regression; production build; independent map | Removed the unreachable host poller while preserving the live sandbox bridge. Score direction is the remaining justified scalar descriptor change; a formatter interface is deferred. |
+| 25. Move legacy game adapters into descriptors | DONE | Dead host monitor removal; descriptor-owned score order; registry contract | Focused game/registry/security/build checks; complete regressions; production builds; 13-game smoke; independent runtime reviews | Live bridge stays game-owned inside the sandbox. Registry owns message types, frame/capability metadata, and score direction. A formatter interface is intentionally deferred. |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
 | 28. Review Supabase seams | TODO | | | |
@@ -498,6 +498,16 @@ Task 24 is complete. The remaining manager and feature interfaces all have confi
 - Verification passed for 19 Student Games, 21 registry/parity tests plus activity-loader smoke, 14 security tests, package contracts, 11 build/lazy checks, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and an independent game integration map. The build drops from 2,331 to 2,330 modules; the lazy Student Games chunk decreases from 39.47/10.52 kB to 30.67/9.24 kB raw/gzip.
 
 Task 25 remains in progress. SpacePi's lower-is-better direction is a genuine scalar game capability currently repeated in three host conditions; it will move to the descriptor next while database ordering enforcement remains independent.
+
+### Task 25b, move leaderboard score direction into descriptors
+
+- Added a validated `scoreOrder` descriptor field with the established descending default and SpacePi's ascending override. Replaced three `gameId === 'spacepi'` conditions in score admission, best-score comparison, and leaderboard query ordering with registry lookup.
+- Preserved every game's previous client behavior: SpacePi still submits zero/negative values and keeps smaller observed scores; all other and unknown games reject nonpositive scores and use descending order. The existing server RPC independently hardcodes SpacePi ordering, accepts zero, and rejects negative persistence; no database authority moved client-side.
+- Added a registry contract requiring `asc` or `desc`, asserting SpacePi's override and every other game's default. Independent runtime review exercised actual submissions and confirmed SpacePi zero/negative attempts plus Snake rejection.
+- Kept Trapdoor metadata sanitization, progress text, and leaderboard row formatting as explicit host conditions. One structured outlier does not justify a broad callback interface. Kept legacy-global readers inside the sandbox bridge rather than leaking third-party implementation details into the host descriptor.
+- Verification passed for 19 Student Games, 21 registry/parity tests plus smoke, repository/package/security/build checks, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and independent semantic review. Deployment remains 13.5 MB with 2,330 modules; the lazy Student Games chunk is 30.81/9.29 kB raw/gzip.
+
+Task 25 is complete. The registry owns the game-specific scalar policy that the host legitimately needs, while live legacy extraction remains beside the sandboxed games that understand those globals. Task 26 will define and test the existing host/game message protocol without forcing internal game UI standardization.
 
 ### Phase 0, baseline
 

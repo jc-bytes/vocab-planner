@@ -2,7 +2,7 @@ import { $, closeModal, escapeHtml, openModal } from '../main.js';
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { leaderboardRepository } from '../services/leaderboardRepository.js';
-import { getLeaderboardGameIds } from './studentGameRegistry.js';
+import { getLeaderboardGameIds, getStudentGame } from './studentGameRegistry.js';
 import { getStudentPageSkeleton } from './studentLoadingSkeletons.js';
 
 const LEADERBOARD_ENABLED_GAMES = getLeaderboardGameIds();
@@ -51,12 +51,12 @@ export class StudentGameLeaderboard {
 
         // Ensure score is a number
         const numericScore = typeof score === 'number' ? score : Number(score) || 0;
-        if (numericScore <= 0 && gameId !== 'spacepi') {
-            // Don't save zero or negative scores (except for SpacePi where lower can be better)
+        const lowerIsBetter = getStudentGame(gameId)?.scoreOrder === 'asc';
+        if (numericScore <= 0 && !lowerIsBetter) {
+            // Lower-is-better games can use zero as their best possible score.
             return Promise.resolve(null);
         }
 
-        const lowerIsBetter = gameId === 'spacepi';
         let state = this.scoreSyncStates.get(gameId);
         if (!state) {
             state = {
@@ -198,8 +198,7 @@ export class StudentGameLeaderboard {
             // Query: Same grade, same game, order by score (desc for higher=better, asc for lower=better)
             // Note: This requires a composite index in Supabase.
             // If it fails, check console for index creation link.
-            // SpacePi uses "lower is better" scoring
-            const isLowerBetter = gameId === 'spacepi';
+            const isLowerBetter = getStudentGame(gameId)?.scoreOrder === 'asc';
             const scores = await leaderboardRepository.listTop({
                 grade: this.sm.studentProfile.grade,
                 gameId,

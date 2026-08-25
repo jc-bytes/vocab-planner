@@ -1,13 +1,13 @@
-function canvasGame({ id, name, icon, art, desc, load, exportName, leaderboard = true, create }) {
+function canvasGame({ id, name, icon, art, desc, load, exportName, leaderboard = true, scoreOrder = 'desc', create }) {
     return {
-        id, name, icon, art, desc, leaderboard,
+        id, name, icon, art, desc, leaderboard, scoreOrder,
         launch: Object.freeze({ mode: 'canvas', load, exportName, create })
     };
 }
 
-function htmlGame({ id, name, icon, art, desc, path, scoreMessageType = null, leaderboard = Boolean(scoreMessageType), frame = {} }) {
+function htmlGame({ id, name, icon, art, desc, path, scoreMessageType = null, leaderboard = Boolean(scoreMessageType), scoreOrder = 'desc', frame = {} }) {
     return {
-        id, name, icon, art, desc, leaderboard,
+        id, name, icon, art, desc, leaderboard, scoreOrder,
         launch: Object.freeze({ mode: 'html', path, scoreMessageType, frame: Object.freeze(frame) })
     };
 }
@@ -47,7 +47,7 @@ export const STUDENT_GAME_REGISTRY = Object.freeze([
     htmlGame({ id: 'tower-platformer', name: 'Tower Climb', icon: 'layers-3', art: 'images/game-art/tower-climb-cover-neon-cyberpunk-v1.webp', desc: 'Circle the tower, climb ladders, and collect coins!', path: 'js/games/tower-platformer/index.html', scoreMessageType: 'tower-platformer-score', frame: { responsive: true, height: 600 } }),
     htmlGame({ id: 'radius-raid', name: 'Radius Raid', icon: 'send', art: 'images/game-art/radius-raid-cover-neon-cyberpunk-v1.webp', desc: 'Blast enemies in space!', path: 'js/games/radius-raid-master/index.html', scoreMessageType: 'radius-raid-score', frame: { width: 820, height: 620, overflow: 'auto' } }),
     htmlGame({ id: 'packabunchas', name: 'Packabunchas', icon: 'puzzle', art: 'images/game-art/packabunchas-cover-neon-cyberpunk-v1.webp', desc: 'Solve tiling puzzles!', path: 'js/games/packabunchas-main/index.html', scoreMessageType: 'packabunchas-score', frame: { width: 800, height: 600 } }),
-    htmlGame({ id: 'spacepi', name: 'SpacePi', icon: 'badge-check', art: 'images/game-art/spacepi-cover-neon-cyberpunk-v1.webp', desc: 'Defend your base!', path: 'js/games/spacepi-master/index.html', scoreMessageType: 'spacepi-score', frame: { width: 960, height: 600, overflow: 'auto' } }),
+    htmlGame({ id: 'spacepi', name: 'SpacePi', icon: 'badge-check', art: 'images/game-art/spacepi-cover-neon-cyberpunk-v1.webp', desc: 'Defend your base!', path: 'js/games/spacepi-master/index.html', scoreMessageType: 'spacepi-score', scoreOrder: 'asc', frame: { width: 960, height: 600, overflow: 'auto' } }),
     htmlGame({ id: 'black-hole-square', name: 'Black Hole Square', icon: 'circle-x', art: 'images/game-art/black-hole-square-cover-neon-cyberpunk-v1.webp', desc: 'Clean up the squares!', path: 'js/games/black-hole-square-master/public/index.html', frame: { responsive: true, height: 600 } }),
     htmlGame({ id: 'glitch-buster', name: 'Glitch Buster', icon: 'triangle-alert', art: 'images/game-art/glitch-buster-cover-neon-cyberpunk-v1.webp', desc: 'Bust the glitches!', path: 'js/games/glitch-buster-master/glitch buster.html', frame: { responsive: true, height: 600 } }),
     htmlGame({ id: 'callisto', name: 'Callisto', icon: 'sparkles', art: 'images/game-art/callisto-cover-neon-cyberpunk-v1.webp', desc: 'Run, jump, and collect stars in space!', path: 'js/games/js13k-callisto-main/index.html', frame: { responsive: true, height: 600 } }),

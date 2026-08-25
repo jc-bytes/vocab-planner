@@ -623,6 +623,7 @@ test('game registry owns display, launch, frame, and leaderboard configuration',
         assert.equal(getStudentGame(game.id), game);
         assert.ok(game.name && game.desc && game.art, `${game.id} must provide arcade card metadata`);
         assert.equal(leaderboardIds.has(game.id), game.leaderboard, `${game.id} leaderboard metadata must agree`);
+        assert.ok(['asc', 'desc'].includes(game.scoreOrder), `${game.id} must provide a valid score order`);
 
         if (game.launch.mode === 'canvas') {
             assert.equal(typeof game.launch.load, 'function', `${game.id} must provide a lazy loader`);
@@ -639,6 +640,11 @@ test('game registry owns display, launch, frame, and leaderboard configuration',
             assert.ok(game.launch.frame.width > 0, `${game.id} fixed frames must provide a width`);
         }
     }
+
+    assert.equal(getStudentGame('spacepi').scoreOrder, 'asc');
+    assert.ok(
+        STUDENT_GAME_REGISTRY.filter(game => game.id !== 'spacepi').every(game => game.scoreOrder === 'desc')
+    );
 });
 
 test('student shell does not duplicate game registry metadata', async () => {
