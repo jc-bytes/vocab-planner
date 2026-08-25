@@ -6,15 +6,19 @@ import {
 } from './services/vocabularyApi.js';
 
 class TeacherVocabularyStorageMethods {
-    async fetchCloudVocabs() {
+    async fetchCloudVocabs(options = {}) {
+        const isCurrent = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
+        if (!isCurrent()) return [];
         if (this.authDisabled) return [];
         if (!this.ensureAuthenticated(false)) return [];
 
         try {
             const vocabularies = await vocabularyRepository.listMetadata();
+            if (!isCurrent()) return [];
             this.setCloudStatus('Ready', 'info');
             return vocabularies.map(vocabulary => ({ ...vocabulary, source: 'cloud' }));
         } catch (error) {
+            if (!isCurrent()) return [];
             console.error('Failed to fetch cloud vocabularies:', error);
             this.setCloudStatus('Cloud load failed', 'error');
             return [];

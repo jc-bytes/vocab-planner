@@ -12,6 +12,7 @@ import {
     getDefaultSchoolCalendar,
     normalizeSchoolCalendar
 } from './services/vocabularyApi.js';
+import { createTeacherSettingsOperationGuard } from './teacherSettingsSession.js';
 
 const SCHOOL_CALENDAR_TRIMESTERS = [
     { key: 'IT', slug: 'it' },
@@ -21,39 +22,49 @@ const SCHOOL_CALENDAR_TRIMESTERS = [
 
 export const teacherSchoolCalendarSettingsMethods = {
     async loadSchoolCalendarSettings(options = {}) {
+        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        if (!isCurrent()) return false;
         if (this.schoolCalendarSettingsLoaded && options.forceRefresh !== true) {
+            if (!isCurrent()) return false;
             this.updateSchoolCalendarUI();
-            return;
+            return true;
         }
 
         if (this.authDisabled) {
             try {
                 const settings = JSON.parse(localStorage.getItem(SCHOOL_CALENDAR_LOCAL_KEY) || 'null');
+                if (!isCurrent()) return false;
                 this.schoolCalendar = normalizeSchoolCalendar(settings);
                 this.schoolCalendarSettingsLoaded = true;
             } catch (error) {
+                if (!isCurrent()) return false;
                 console.error('Error loading local school calendar:', error);
                 this.schoolCalendarSettingsLoaded = false;
                 this.schoolCalendar = getDefaultSchoolCalendar();
                 this.updateSchoolCalendarUI();
                 if (options.surfaceErrors) throw error;
-                return;
+                return false;
             }
+            if (!isCurrent()) return false;
             this.updateSchoolCalendarUI();
-            return;
+            return true;
         }
 
         try {
             const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY);
+            if (!isCurrent()) return false;
             this.schoolCalendar = normalizeSchoolCalendar(settings);
             this.schoolCalendarSettingsLoaded = true;
             this.updateSchoolCalendarUI();
+            return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error loading school calendar:', error);
             this.schoolCalendarSettingsLoaded = false;
             this.schoolCalendar = getDefaultSchoolCalendar();
             this.updateSchoolCalendarUI();
             if (options.surfaceErrors) throw error;
+            return false;
         }
     },
 
@@ -272,7 +283,9 @@ export const teacherSchoolCalendarSettingsMethods = {
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     },
 
-    async saveSchoolCalendarSettings() {
+    async saveSchoolCalendarSettings(options = {}) {
+        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        if (!isCurrent()) return false;
         const scheduleError = this.validateClassScheduleRows();
         const calendar = this.readSchoolCalendarFromUI();
         const errors = this.validateSchoolCalendar(calendar);
@@ -283,7 +296,7 @@ export const teacherSchoolCalendarSettingsMethods = {
             const message = scheduleError || errors[0];
             if (statusEl) statusEl.textContent = message;
             notifications.error(message);
-            return;
+            return false;
         }
 
         try {
@@ -298,6 +311,7 @@ export const teacherSchoolCalendarSettingsMethods = {
 
             if (this.authDisabled) {
                 localStorage.setItem(SCHOOL_CALENDAR_LOCAL_KEY, JSON.stringify(calendar));
+                if (!isCurrent()) return false;
                 this.schoolCalendarSettingsLoaded = true;
                 const localResult = this.recalculateLocalVocabularyPlacements(calendar);
                 this.invalidateTeacherLibraryCache();
@@ -305,7 +319,7 @@ export const teacherSchoolCalendarSettingsMethods = {
                 const message = `Calendar saved locally. Updated ${localResult.updated} draft vocabularies; ${localResult.skipped} skipped.`;
                 if (statusEl) statusEl.textContent = message;
                 notifications.success(message);
-                return;
+                return true;
             }
 
             await settingsRepository.save(SCHOOL_CALENDAR_SETTINGS_KEY, {
@@ -313,20 +327,25 @@ export const teacherSchoolCalendarSettingsMethods = {
                 updatedAt: new Date().toISOString(),
                 updatedBy: this.currentUser?.email || 'unknown'
             });
+            if (!isCurrent()) return false;
             this.schoolCalendarSettingsLoaded = true;
 
-            const result = await this.recalculateCloudVocabularyPlacements(calendar);
+            const result = await this.recalculateCloudVocabularyPlacements(calendar, { isCurrent });
+            if (!isCurrent() || !result) return false;
             this.invalidateTeacherLibraryCache();
             this.updateFormUI();
             const message = `Calendar saved. Updated ${result.updated} cloud vocabularies; ${result.skipped} skipped.`;
             if (statusEl) statusEl.textContent = message;
             notifications.success(message);
+            return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error saving school calendar:', error);
             if (statusEl) statusEl.textContent = 'Failed to save calendar.';
             notifications.error('Failed to save school calendar.');
+            return false;
         } finally {
-            if (saveBtn) {
+            if (isCurrent() && saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i data-lucide="calendar-check"></i> Save Calendar';
                 this.refreshIcons();
@@ -383,8 +402,11 @@ export const teacherSchoolCalendarSettingsMethods = {
         return { updated, skipped };
     },
 
-    async recalculateCloudVocabularyPlacements(calendar) {
-        const cloudVocabs = await this.fetchCloudVocabs();
+    async recalculateCloudVocabularyPlacements(calendar, options = {}) {
+        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        if (!isCurrent()) return null;
+        const cloudVocabs = await this.fetchCloudVocabs({ isCurrent });
+        if (!isCurrent()) return null;
         let skipped = 0;
         const updates = cloudVocabs.flatMap(vocab => {
             if (!vocab.assignedDate) {
@@ -400,6 +422,7 @@ export const teacherSchoolCalendarSettingsMethods = {
         });
 
         const result = await vocabularyRepository.updateVocabularyPlacements(updates);
+        if (!isCurrent()) return null;
         skipped += Math.max(result.requested - result.updated, 0);
 
         if (this.vocabSet?.assignedDate) {

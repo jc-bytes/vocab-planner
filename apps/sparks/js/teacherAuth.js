@@ -46,6 +46,7 @@ class TeacherAuthMethods {
                     if (this.currentUser?.uid && this.currentUser.uid !== user.uid) {
                         this.disposeLoadedTeacherFeatures?.();
                         this.clearStudentProgressSessionState?.();
+                        this.clearTeacherSettingsSessionState?.();
                     }
                     if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
@@ -57,6 +58,7 @@ class TeacherAuthMethods {
                     this.getAuthCoordinator().invalidate();
                     this.disposeLoadedTeacherFeatures?.();
                     this.clearStudentProgressSessionState?.();
+                    this.clearTeacherSettingsSessionState?.();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);
@@ -125,8 +127,8 @@ class TeacherAuthMethods {
             localStorage.setItem('was_logged_in', 'true');
             this.updateAuthUI(user);
             await Promise.all([
-                this.loadSubjectSettings(),
-                this.loadSchoolCalendarSettings()
+                this.loadSubjectSettings({ isCurrent: context.isCurrent }),
+                this.loadSchoolCalendarSettings({ isCurrent: context.isCurrent })
             ]);
             if (!context.isCurrent()) return false;
             await this.restoreRouteOrDefault();

@@ -9,13 +9,14 @@ export function initTeacherSettingsListeners(manager) {
             target.addEventListener(type, handler);
         }
     };
+    const operationOptions = () => ({ isCurrent: () => !manager.destroyed });
     const saveGamificationBtn = $('#save-gamification-btn');
-    listen(saveGamificationBtn, 'click', () => manager.saveGamificationSettings());
+    listen(saveGamificationBtn, 'click', () => manager.saveGamificationSettings(operationOptions()));
 
     const saveSchoolCalendarBtn = $('#save-school-calendar-btn');
-    listen(saveSchoolCalendarBtn, 'click', () => manager.saveSchoolCalendarSettings());
+    listen(saveSchoolCalendarBtn, 'click', () => manager.saveSchoolCalendarSettings(operationOptions()));
     manager.bindSchoolCalendarInputs?.(listen);
 
     listen($('#add-subject-btn'), 'click', () => manager.addSubjectFromForm());
-    listen($('#save-subjects-btn'), 'click', () => manager.saveSubjectSettings());
+    listen($('#save-subjects-btn'), 'click', () => manager.saveSubjectSettings(operationOptions()));
 }

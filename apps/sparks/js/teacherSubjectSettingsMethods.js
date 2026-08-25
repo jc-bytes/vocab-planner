@@ -9,34 +9,48 @@ import {
     loadSubjects,
     normalizeSubject
 } from './services/vocabularyApi.js';
+import { createTeacherSettingsOperationGuard } from './teacherSettingsSession.js';
 
 export const teacherSubjectSettingsMethods = {
     async loadSubjectSettings(options = {}) {
+        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        if (!isCurrent()) return false;
         if (this.subjectSettingsLoaded && options.forceRefresh !== true) {
+            if (!isCurrent()) return false;
             this.renderSubjectManager();
             this.updateSubjectSelect();
-            return;
+            return true;
         }
 
         let loadError = null;
         try {
+            let subjects;
             if (this.authDisabled) {
                 const stored = JSON.parse(localStorage.getItem(SUBJECTS_LOCAL_KEY) || '[]');
-                this.subjects = stored.length ? stored.map((subject, index) => normalizeSubject(subject, index)) : await loadSubjects();
+                subjects = stored.length
+                    ? stored.map((subject, index) => normalizeSubject(subject, index))
+                    : await loadSubjects();
             } else {
-                this.subjects = await loadSubjects(supabaseService);
+                subjects = await loadSubjects(supabaseService);
             }
+            if (!isCurrent()) return false;
+            this.subjects = subjects;
             this.subjectSettingsLoaded = true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error loading subjects:', error);
             loadError = error;
+            const subjects = await loadSubjects();
+            if (!isCurrent()) return false;
             this.subjectSettingsLoaded = false;
-            this.subjects = await loadSubjects();
+            this.subjects = subjects;
         }
 
+        if (!isCurrent()) return false;
         this.renderSubjectManager();
         this.updateSubjectSelect();
         if (loadError && options.surfaceErrors) throw loadError;
+        return true;
     },
 
     getSubjects() {
@@ -135,7 +149,9 @@ export const teacherSubjectSettingsMethods = {
         this.updateSubjectSelect();
     },
 
-    async saveSubjectSettings() {
+    async saveSubjectSettings(options = {}) {
+        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        if (!isCurrent()) return false;
         const statusEl = $('#subjects-save-status');
         const saveBtn = $('#save-subjects-btn');
         const subjects = this.getSubjects()
@@ -160,22 +176,26 @@ export const teacherSubjectSettingsMethods = {
                     ...subject,
                     updatedAt: new Date().toISOString()
                 })));
+                if (!isCurrent()) return false;
             }
 
+            if (!isCurrent()) return false;
             this.subjectSettingsLoaded = true;
 
             this.invalidateTeacherLibraryCache();
             this.renderSubjectManager();
             this.updateSubjectSelect();
-            this.loadLibrary();
             if (statusEl) statusEl.textContent = 'Subjects saved.';
             notifications.success('Subjects saved.');
+            return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error saving subjects:', error);
             if (statusEl) statusEl.textContent = 'Failed to save subjects.';
             notifications.error('Failed to save subjects.');
+            return false;
         } finally {
-            if (saveBtn) {
+            if (isCurrent() && saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i data-lucide="save"></i> Save Subjects';
                 this.refreshIcons();

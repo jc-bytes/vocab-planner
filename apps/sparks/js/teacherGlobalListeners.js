@@ -51,6 +51,7 @@ function bindTeacherAuthListeners(manager) {
             manager.getAuthCoordinator?.().invalidate();
             manager.disposeLoadedTeacherFeatures();
             manager.clearStudentProgressSessionState?.();
+            manager.clearTeacherSettingsSessionState?.();
             localStorage.removeItem('was_logged_in');
             manager.isAuthenticated = false;
             manager.currentUser = null;

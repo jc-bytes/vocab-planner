@@ -118,9 +118,9 @@ test('teacher settings save large collections with bounded database requests', (
 
 test('data-management settings load together and expose section-level failures', () => {
     assert.match(dashboardMethods, /Promise\.allSettled\(\[/);
-    assert.match(dashboardMethods, /loadSubjectSettings\(\{ surfaceErrors: true \}\)/);
-    assert.match(dashboardMethods, /loadGamificationSettings\(\{ surfaceErrors: true \}\)/);
-    assert.match(dashboardMethods, /loadSchoolCalendarSettings\(\{ surfaceErrors: true \}\)/);
+    assert.match(dashboardMethods, /loadSubjectSettings\(\{ surfaceErrors: true, isCurrent \}\)/);
+    assert.match(dashboardMethods, /loadGamificationSettings\(\{ surfaceErrors: true, isCurrent \}\)/);
+    assert.match(dashboardMethods, /loadSchoolCalendarSettings\(\{ surfaceErrors: true, isCurrent \}\)/);
     assert.match(dashboardMethods, /subjects-save-status/);
     assert.match(dashboardMethods, /gamification-save-status/);
     assert.match(dashboardMethods, /school-calendar-save-status/);

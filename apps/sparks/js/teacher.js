@@ -57,6 +57,8 @@ class TeacherManager {
         this.studentProgressSessionGeneration = 0;
         this.studentIdentityRosterGeneration = 0;
         this.studentProgressDetailGeneration = 0;
+        this.teacherSettingsSessionGeneration = 0;
+        this.gamificationStatusTimer = null;
         this.overviewStudentLoadScheduled = false;
         this.isApplyingRoute = false;
         this.pendingTeacherRoute = null;

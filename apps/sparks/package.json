@@ -11,7 +11,7 @@
     "test:catalog": "npm run catalog:validate && node --test tests/vocabulary-catalog-contract.test.mjs",
     "test:vocabulary-api": "node --test tests/vocabulary-api-composition.test.mjs",
     "test:repositories": "node --test tests/repository-contracts.test.mjs",
-    "test:teacher-data": "node --test tests/teacher-data-efficiency.test.mjs tests/teacher-data-management-composition.test.mjs && node scripts/ui-teacher-data-management-smoke.mjs",
+    "test:teacher-data": "node --test tests/teacher-data-efficiency.test.mjs tests/teacher-data-management-composition.test.mjs tests/teacher-settings-session-isolation.test.mjs && node scripts/ui-teacher-data-management-smoke.mjs",
     "test:teacher-progress-composition": "node --test tests/teacher-student-progress-composition.test.mjs",
     "test:teacher-vocabulary-library": "node --test tests/teacher-vocabulary-library-composition.test.mjs",
     "test:teacher-groups": "node --test tests/teacher-groups.test.mjs && node scripts/ui-teacher-groups-smoke.mjs",

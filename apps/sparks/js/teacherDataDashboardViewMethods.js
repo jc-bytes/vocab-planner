@@ -30,10 +30,11 @@ const teacherDataDashboardViewMethods = {
         if (area === 'data') return true;
 
         const lifecycleGeneration = this.lifecycleGeneration;
+        const isCurrent = () => !this.destroyed && lifecycleGeneration === this.lifecycleGeneration;
         const settingsLoad = Promise.allSettled([
-            this.loadSubjectSettings({ surfaceErrors: true }),
-            this.loadGamificationSettings({ surfaceErrors: true }),
-            this.loadSchoolCalendarSettings({ surfaceErrors: true })
+            this.loadSubjectSettings({ surfaceErrors: true, isCurrent }),
+            this.loadGamificationSettings({ surfaceErrors: true, isCurrent }),
+            this.loadSchoolCalendarSettings({ surfaceErrors: true, isCurrent })
         ]);
         const results = await settingsLoad;
         if (this.destroyed || lifecycleGeneration !== this.lifecycleGeneration) return false;

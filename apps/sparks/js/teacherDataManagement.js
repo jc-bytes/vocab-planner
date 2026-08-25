@@ -2,6 +2,7 @@ import { installTeacherDataDashboardMethods } from './teacherDataDashboard.js';
 import { installTeacherDataExportMethods } from './teacherDataExport.js';
 import { installTeacherDataViewerMethods } from './teacherDataViewer.js';
 import { initTeacherSettingsListeners } from './teacherSettingsListeners.js';
+import { resetTeacherSettingsView } from './teacherSettingsSession.js';
 
 class TeacherDataManagementContext {}
 installTeacherDataExportMethods(TeacherDataManagementContext);
@@ -52,6 +53,7 @@ function destroyDataManagement(context) {
     context.activeDataTab = 'subjects';
     context.dataViewerInitialized = false;
     context.exportListenersInitialized = false;
+    resetTeacherSettingsView(root => context.refreshIcons(root));
     [
         '#preview-summary', '#preview-tables', '#viewer-summary-stats',
         '#viewer-tables-content', '#recent-activity-table', '#subjects-manager-list'
