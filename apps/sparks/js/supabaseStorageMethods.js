@@ -74,17 +74,5 @@ export function installSupabaseStorageMethods(supabaseService) {
 
         return data;
     },
-
-    async deleteWordHuntImage(path) {
-        await this.init();
-        if (!path) return;
-
-        const { error } = await this.client
-            .storage
-            .from(WORD_HUNT_IMAGE_BUCKET)
-            .remove([path]);
-
-        if (error) throw error;
-    },
     });
 }

@@ -1413,3 +1413,13 @@ Task 35 is complete. Task 36 will remove only code or CSS that current caller/im
 - Verification passed: 140 student-activity tests, 15 student-routing tests, 21 build-efficiency/lazy tests, the complete `npm test` suite, three-page source smoke, 9-width student regression, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student initial delivery is 182.4 KiB gzip.
 
 Task 36 remains in progress. The next cleanup will remove only independently traced zero-caller repository methods, separate from the dormant-auth investigation.
+
+### Task 36b, narrow repository and storage surfaces
+
+- Removed four unused single-record/legacy export methods from `teacherExportRepository`; current exports use only bounded batch progress, profile, and score reads plus audit logging. Its obsolete leaderboard and Spark-response imports disappeared with those wrappers.
+- Removed the unused single-score `leaderboardRepository.get` and teacher-only `sparkResponsesRepository.listForStudent` methods. Preserved `listForUser`, which remains an authorization acceptance-test use case, and the active student-owned Spark read/submit paths.
+- Removed the unused Word Hunt image-delete client method. The live product supports deterministic image upsert and download, not user-facing deletion; the database Storage delete policy remains intact as an independent authorization rule.
+- Added an exact live repository-surface contract so these low-value convenience methods cannot silently return.
+- Verification passed: 13 repository tests, 23 teacher-data tests and smoke, 13 Word Hunt review tests and smoke, 140 student-activity tests, 21 build/lazy checks, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student initial delivery is 182.0 KiB gzip and the precache is 19 files/1,024,562 bytes.
+
+Task 36 remains in progress. Authentication compatibility code and dead CSS will be handled as separate changes after direct UI and caller verification.

@@ -1,23 +1,7 @@
 import { supabaseService } from '../supabaseService.js';
 import { mapProfileRow, mapScoreRow, timestampToIso } from './supabaseValues.js';
-import { leaderboardRepository } from './leaderboardRepository.js';
-import { sparkResponsesRepository } from './sparkResponsesRepository.js';
 
 export const teacherExportRepository = {
-    async getStudentProgress(userId) {
-        await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().rpc('get_student_progress_v3', {
-            p_user_id: userId
-        });
-        if (error) throw error;
-        return Array.isArray(data) ? data[0] : data;
-    },
-    async getProfile(userId) {
-        await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('profiles').select('*').eq('user_id', userId).maybeSingle();
-        if (error) throw error;
-        return mapProfileRow(data);
-    },
     async getStudentProgressBatch(userIds = []) {
         const ids = Array.from(new Set(userIds.filter(Boolean)));
         const results = [];
@@ -62,12 +46,6 @@ export const teacherExportRepository = {
             }
         }
         return scores;
-    },
-    listScores(userId) {
-        return leaderboardRepository.listForUser(userId);
-    },
-    listSparkResponses(userId) {
-        return sparkResponsesRepository.listForStudent(userId);
     },
     async logExport(record = {}) {
         await supabaseService.init();

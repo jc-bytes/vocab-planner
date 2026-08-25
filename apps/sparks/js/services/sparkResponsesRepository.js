@@ -38,17 +38,6 @@ export const sparkResponsesRepository = {
         return (data || []).map(mapSparkResponseRow);
     },
 
-    async listForStudent(userId) {
-        await supabaseService.init();
-        const { data, error } = await supabaseService.getClient()
-            .from('student_spark_responses')
-            .select('*')
-            .eq('user_id', userId)
-            .order('updated_at', { ascending: false });
-        if (error) throw error;
-        return (data || []).map(mapSparkResponseRow);
-    },
-
     async submit(state = {}, options = {}) {
         const row = await studentApi.submitStudentSparkResponse({
             sparkId: String(state.sparkId || ''),

@@ -10,12 +10,24 @@ import { mapSparkResponseRow, sparkResponsesRepository } from '../js/services/sp
 import { leaderboardRepository } from '../js/services/leaderboardRepository.js';
 import { studentProgressRepository } from '../js/services/studentProgressRepository.js';
 import { supabaseService } from '../js/supabaseService.js';
+import { teacherExportRepository } from '../js/services/teacherExportRepository.js';
 import {
     mapProfileRow,
     mapScoreRow,
     mapStudentProgressRow,
     profilePayload
 } from '../js/services/supabaseValues.js';
+
+test('domain repositories expose only their live use cases', () => {
+    assert.deepEqual(Object.keys(leaderboardRepository).sort(), ['listForUser', 'listTop']);
+    assert.deepEqual(Object.keys(sparkResponsesRepository).sort(), ['listOwn', 'submit']);
+    assert.deepEqual(Object.keys(teacherExportRepository).sort(), [
+        'getProfiles',
+        'getStudentProgressBatch',
+        'listScoresForUsers',
+        'logExport'
+    ]);
+});
 
 test('settings rows preserve the previous flattened client shape', () => {
     const settings = mapSettingsRow({
