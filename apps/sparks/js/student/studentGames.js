@@ -106,6 +106,10 @@ export class StudentGames {
         return this.lifecycle.showGameSelection();
     }
 
+    selectAdjacentGame(offset) {
+        return this.lifecycle.selectAdjacentGame(offset);
+    }
+
     startGame(type) {
         return this.lifecycle.startGame(type);
     }

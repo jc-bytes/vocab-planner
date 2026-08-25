@@ -23,6 +23,19 @@ export class StudentGameLifecycle {
         this.games.updateLeaderboardGame();
     }
 
+    selectAdjacentGame(offset) {
+        const gameCount = this.games.gamesList.length;
+        if (gameCount === 0) return false;
+
+        const step = Number.isFinite(offset) ? Math.trunc(offset) : 0;
+        this.games.currentGameIndex = (
+            this.games.currentGameIndex + step + gameCount
+        ) % gameCount;
+        this.games.updateGameSelectionUI();
+        this.games.updateLeaderboardGame();
+        return true;
+    }
+
     async startGame(type) {
         await this.sm.activities?.refreshCurrentSparkGate?.({ updateDisplay: false });
         const access = this.sm.activities?.getPendingRequiredWork?.();

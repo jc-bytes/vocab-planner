@@ -156,6 +156,7 @@ test('StudentGames declares its stable public interface directly', () => {
         'hideLeaderboardModal',
         'loadLeaderboard',
         'loadHTMLGame',
+        'selectAdjacentGame',
         'startGame',
         'stopCurrentGame',
         'pauseGame',
@@ -168,6 +169,29 @@ test('StudentGames declares its stable public interface directly', () => {
             `${method} must be declared by StudentGames`
         );
     }
+});
+
+test('game selection navigation owns index wrapping and coordinated refresh', () => {
+    const calls = [];
+    const games = new StudentGames({});
+    games.gamesList = [{ id: 'one' }, { id: 'two' }, { id: 'three' }];
+    games.currentGameIndex = 0;
+    games.updateGameSelectionUI = () => calls.push('selection');
+    games.updateLeaderboardGame = () => calls.push('leaderboard');
+
+    assert.equal(games.selectAdjacentGame(-1), true);
+    assert.equal(games.currentGameIndex, 2);
+    assert.deepEqual(calls, ['selection', 'leaderboard']);
+
+    calls.length = 0;
+    assert.equal(games.selectAdjacentGame(1), true);
+    assert.equal(games.currentGameIndex, 0);
+    assert.deepEqual(calls, ['selection', 'leaderboard']);
+
+    games.gamesList = [];
+    calls.length = 0;
+    assert.equal(games.selectAdjacentGame(1), false);
+    assert.deepEqual(calls, []);
 });
 
 test('StudentGames delegates to the owning component', async () => {

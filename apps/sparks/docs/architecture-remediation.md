@@ -62,7 +62,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 20. Migrate teacher pages | DONE | All seven primary teacher pages; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, complete regression suite, and production build | Every primary page now uses its registry descriptor. Data and Settings preserve route-based disambiguation on their intentional shared view. |
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
-| 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
+| 23. Reduce forwarding where a cohesive use case exists | IN PROGRESS | Arcade selection lifecycle intent and listener contract | Student Games, listener, routing, and build/lazy checks | Previous/Next controls delegate one complete selection intent; add-time and exit intents remain separate bounded candidates. |
 | 24. Remove obsolete facade methods | TODO | | | |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
@@ -390,6 +390,16 @@ Task 21 is complete. Top-level page identity, browser-history dispatch, route in
 - Three independent read-only maps agreed that broad facade removal is unjustified and that Arcade intent ownership plus dead forwards are the smallest evidence-backed next changes. Full details and the verification matrix are in `docs/manager-facade-analysis.md`.
 
 Task 22 is complete. Task 23 starts with the smallest Arcade listener intent and will not redesign the already-strong game registry or lazy loader.
+
+### Task 23a, deepen Arcade selection navigation
+
+- Added `selectAdjacentGame(offset)` to the existing `StudentGameLifecycle` and exposed that single use case through the lazy `StudentGames` boundary.
+- Moved index wrapping plus the selection and leaderboard refresh sequence out of both Previous/Next global listeners. Listeners now request an intent and no longer know `currentGameIndex`, `gamesList`, or the two required render operations.
+- Preserved the registry order, circular Previous/Next behavior, lazy `getGames()` boundary, selection UI, leaderboard selection, routes, persistence, and server access. An empty registry now returns without producing an invalid index.
+- Added a direct lifecycle contract for backward/forward wrapping, refresh order, and the empty case. Added a listener ownership contract preventing low-level game state and render coordination from returning to those handlers.
+- Verification passed for 16 Student Games tests, 6 Student Listener tests, 15 routing tests, and 11 build/lazy-loading checks. Scoped diff validation passed.
+
+Task 23 remains in progress. The add-time path is next because it currently duplicates a complete asynchronous Arcade lifecycle inside the global listener; it will be migrated separately with failure and in-flight tests.
 
 ### Phase 0, baseline
 

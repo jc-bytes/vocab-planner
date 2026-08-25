@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 globalThis.localStorage = {
@@ -38,6 +39,7 @@ globalThis.window = {
 
 const { StudentManager } = await import('../js/student.js');
 const { StudentListeners } = await import('../js/studentListenerMethods.js');
+const studentListenerSource = await readFile(new URL('../js/studentListenerMethods.js', import.meta.url), 'utf8');
 
 test('StudentListeners owns isolated lifecycle and export state', () => {
     const manager = {};
@@ -100,6 +102,16 @@ test('StudentManager retains the listener bridge used by game settings', () => {
         true,
         'addListener must be declared by StudentManager'
     );
+});
+
+test('Arcade selection listeners delegate one complete navigation intent', () => {
+    assert.match(studentListenerSource, /#prev-game-select-btn[\s\S]*games\.selectAdjacentGame\(-1\)/);
+    assert.match(studentListenerSource, /#next-game-select-btn[\s\S]*games\.selectAdjacentGame\(1\)/);
+    const selectionListenerSource = studentListenerSource.slice(
+        studentListenerSource.indexOf('// Game Selection Navigation'),
+        studentListenerSource.indexOf('// Note: #play-current-game-btn')
+    );
+    assert.doesNotMatch(selectionListenerSource, /currentGameIndex|updateGameSelectionUI|updateLeaderboardGame/);
 });
 
 test('tracked listeners are removed during teardown', () => {

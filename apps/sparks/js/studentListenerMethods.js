@@ -228,16 +228,12 @@ export class StudentListeners {
         // Game Selection Navigation
         this.addListener('#prev-game-select-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            games.currentGameIndex = (games.currentGameIndex - 1 + games.gamesList.length) % games.gamesList.length;
-            games.updateGameSelectionUI();
-            games.updateLeaderboardGame();
+            games.selectAdjacentGame(-1);
         });
 
         this.addListener('#next-game-select-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            games.currentGameIndex = (games.currentGameIndex + 1) % games.gamesList.length;
-            games.updateGameSelectionUI();
-            games.updateLeaderboardGame();
+            games.selectAdjacentGame(1);
         });
 
         // Note: #play-current-game-btn listener is attached dynamically in updateGameSelectionUI()
