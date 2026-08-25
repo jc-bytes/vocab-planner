@@ -1,12 +1,102 @@
-import { $, createElement, notifications } from '../main.js';
+import { $, closeModal, createElement, notifications } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
 import { teacherPageRegistry } from '../teacherPageRegistry.js';
 
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
+function resetStudentProgressView() {
+    ['#student-progress-list', '#student-progress-cards', '#student-progress-pagination', '#student-progress-status', '#student-roster-import-status']
+        .forEach(selector => {
+            const element = $(selector);
+            if (!element) return;
+            element.innerHTML = '';
+            element.textContent = '';
+        });
+    ['#progress-loading', '#student-progress-pagination', '#student-progress-status']
+        .forEach(selector => $(selector)?.classList.add('hidden'));
+
+    const grade = $('#filter-grade');
+    if (grade) {
+        grade.innerHTML = '<option value="">All Grades</option>';
+        grade.value = '';
+    }
+    const section = $('#filter-group');
+    if (section) {
+        section.innerHTML = '<option value="">All Sections</option>';
+        section.value = '';
+    }
+    const search = $('#filter-search');
+    if (search) search.value = '';
+
+    const detailDefaults = {
+        '#detail-student-name': 'Student Name',
+        '#detail-student-grade': '-',
+        '#detail-student-group': '-',
+        '#detail-student-coins': '0',
+        '#detail-last-active': '-',
+        '#detail-avg-score': '-',
+        '#detail-total-activities': '-',
+        '#detail-password-flag': 'No'
+    };
+    Object.entries(detailDefaults).forEach(([selector, value]) => {
+        const element = $(selector);
+        if (element) element.textContent = value;
+    });
+    ['#detail-activity-list', '#coin-adjust-status', '#reset-password-status', '#temporary-password-output']
+        .forEach(selector => {
+            const element = $(selector);
+            if (!element) return;
+            element.innerHTML = '';
+            element.textContent = '';
+        });
+    const coinInput = $('#coin-adjust-input');
+    if (coinInput) coinInput.value = '10';
+    const temporaryPassword = $('#temporary-password-output');
+    if (temporaryPassword) temporaryPassword.style.display = 'none';
+    const resetPasswordButton = $('#reset-student-password-btn');
+    if (resetPasswordButton) resetPasswordButton.disabled = false;
+    ['#select-all-students', '#select-visible-students-mobile'].forEach(selector => {
+        const checkbox = $(selector);
+        if (!checkbox) return;
+        checkbox.checked = false;
+        checkbox.indeterminate = false;
+    });
+    $('#bulk-action-toolbar')?.classList.add('hidden');
+    const selectedCount = $('#bulk-selected-count');
+    if (selectedCount) selectedCount.textContent = '0 students selected';
+    const bulkCoinInput = $('#bulk-coin-input');
+    if (bulkCoinInput) bulkCoinInput.value = '10';
+
+    closeModal('#student-detail-modal', { restoreFocus: false });
+    const addStudentForm = $('#add-student-form');
+    addStudentForm?.reset();
+    ['add-student-password', 'add-student-confirm-password'].forEach(inputId => {
+        const input = $(`#${inputId}`);
+        if (input) input.type = 'password';
+        const toggle = $(`.password-toggle[aria-controls="${inputId}"]`);
+        if (!toggle) return;
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.setAttribute('aria-label', 'Show password');
+        toggle.title = 'Show password';
+    });
+    const addStudentStatus = $('#add-student-status');
+    if (addStudentStatus) {
+        addStudentStatus.innerHTML = '';
+        addStudentStatus.textContent = '';
+    }
+    const addStudentButton = $('#create-student-account-btn');
+    if (addStudentButton) addStudentButton.disabled = false;
+    closeModal('#add-student-modal', { restoreFocus: false });
+    const csvInput = $('#student-csv-input');
+    if (csvInput) csvInput.value = '';
+    const csvButton = $('#import-student-csv-btn');
+    if (csvButton) csvButton.disabled = false;
+}
+
 export const teacherProgressDataMethods = {
 async showProgressView() {
         if (!this.ensureAuthenticated(false)) return;
+        const generation = this.studentProgressSessionGeneration || 0;
         this.switchView(STUDENTS_PAGE.viewId);
 
         const loadingEl = $('#progress-loading');
@@ -16,12 +106,16 @@ async showProgressView() {
 
         try {
             await this.loadStudentRosterFilters();
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             this.populateFilters();
             await this.fetchStudentProgressPage();
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
         } catch {
             // The loader renders a retryable error without replacing good data.
         } finally {
-            if (loadingEl) loadingEl.classList.add('hidden');
+            if (generation === (this.studentProgressSessionGeneration || 0) && loadingEl) {
+                loadingEl.classList.add('hidden');
+            }
         }
     },
 
@@ -40,6 +134,7 @@ applyStudentProgressData(data) {
     },
 
 async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
+        const generation = this.studentProgressSessionGeneration || 0;
         if (this.authDisabled) {
             this.applyStudentProgressData([]);
             this.studentProgressCache = {
@@ -57,9 +152,15 @@ async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
         if (!forceRefresh && this.studentProgressPromise) {
             try {
                 const data = await this.studentProgressPromise;
+                if (generation !== (this.studentProgressSessionGeneration || 0)) {
+                    return [];
+                }
                 this.applyStudentProgressData(data);
                 return data;
             } catch (error) {
+                if (generation !== (this.studentProgressSessionGeneration || 0)) {
+                    return [];
+                }
                 if (showError) {
                     notifications.error('Failed to load student data.');
                 }
@@ -67,7 +168,6 @@ async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
             }
         }
 
-        const generation = this.studentProgressSessionGeneration || 0;
         const request = supabaseService.getStudentsWithProgress()
             .then(data => {
                 if (generation !== (this.studentProgressSessionGeneration || 0)) return [];
@@ -128,15 +228,26 @@ clearStudentProgressSessionState() {
         this.studentProgressSessionGeneration = (this.studentProgressSessionGeneration || 0) + 1;
         this.studentIdentityRosterGeneration = (this.studentIdentityRosterGeneration || 0) + 1;
         this.studentProgressDetailGeneration = (this.studentProgressDetailGeneration || 0) + 1;
+        this.studentProgressPageGeneration = (this.studentProgressPageGeneration || 0) + 1;
+        this.studentRosterFiltersGeneration = (this.studentRosterFiltersGeneration || 0) + 1;
+        this.studentPasswordResetGeneration = (this.studentPasswordResetGeneration || 0) + 1;
         this.studentProgressCache = null;
         this.studentProgressPromise = null;
         this.studentIdentityRosterCache = null;
         this.studentIdentityRosterPromise = null;
+        this.studentProgressPageCache = null;
+        this.studentProgressLastPage = null;
+        this.studentProgressPage = null;
+        this.studentProgressLoadState = 'idle';
+        this.studentRosterFilters = null;
+        globalThis.clearTimeout(this.studentProgressFilterTimer);
+        this.studentProgressFilterTimer = null;
         this.studentProgressDetailPromises?.clear();
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.selectedStudents.clear();
         this.activeStudentId = null;
+        resetStudentProgressView();
     },
 
 mergeStudentProgressDetail(detail) {

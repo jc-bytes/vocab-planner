@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, feature, and UI checks | Four primary pages are migrated. A separately verified Students account-reset defect will be fixed before Groups; Data and Settings follow independently. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke; Students account isolation | Per-page registry, routing, navigation, browser history, feature, account-switch, and UI checks | Four primary pages are migrated. Student Progress account-scoped state is hardened; Groups and Data feature-local account cleanup are the next reliability checks before their page migrations. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -265,7 +265,17 @@ Task 20 remains in progress.
 - Added exact teacher route parse/build/current-view assertions. All 43 focused checks, the primary-page browser workflow, production build, bundle/deployment guardrails, scoped diff validation, and independent review pass.
 - Review exposed a pre-existing account-isolation gap: session reset does not clear the newer paginated roster cache/filter state or invalidate its requests. It is not caused or worsened by this identity-only change and will be the next separate reliability fix so its behavior and tests remain independently reviewable.
 
-Task 20 remains in progress. The Students account-reset fix is next; Groups migration resumes afterward.
+Task 20 remains in progress.
+
+### DONE — Immediate reliability fix, isolate Student Progress across teacher accounts
+
+- Completed the session reset for paginated progress pages, filters, timers, full/identity/detail caches, selections, and load state. Page and filter generations now invalidate late successes and failures before they can cache or render prior-account data.
+- Session cleanup synchronously clears desktop/mobile roster output, pagination/status, filter controls, bulk selection UI, CSV status/input, Student Detail content (including temporary passwords), and Add Student form/password visibility. Both student modals close without restoring focus into old account context.
+- `showProgressView()`, Add Student, CSV import, password reset, coin actions, and late-work overrides now stop account-bound continuations after session invalidation. Student-specific modal callbacks also verify the active student, and multi-account CSV/bulk loops stop scheduling new RPCs.
+- Added focused reset/race contracts covering cache reuse, shared requests, late page success/failure, late filters, queued debounce, chained page loading, rendered/modal scrubbing, late account creation, same-ID detail ordering, same-student password ordering, coin/late-work callbacks, CSV cancellation, and bulk cancellation.
+- All 33 focused Student Progress checks, the complete regression suite, production build, and scoped diff validation pass. The build remains 2,329 modules and 13.5 MB; three independent reviews approved the corrected account-isolation contract.
+
+The next reliability checks cover feature-local Groups and Data roster state discovered during the same account-boundary review. Their fixes, if confirmed, will remain separate commits.
 
 ### Phase 0, baseline
 

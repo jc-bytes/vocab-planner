@@ -6,7 +6,7 @@ import { setInlineStatus } from '../ui/inlineStatus.js';
 export async function importStudentRecordsWithConcurrency(
     records,
     createAccount,
-    { concurrency = 3, onProgress = () => {} } = {}
+    { concurrency = 3, onProgress = () => {}, shouldContinue = () => true } = {}
 ) {
     const workerCount = Math.min(Math.max(1, Math.floor(concurrency)), records.length);
     const failuresByIndex = new Map();
@@ -15,7 +15,7 @@ export async function importStudentRecordsWithConcurrency(
     let created = 0;
 
     const worker = async () => {
-        while (nextIndex < records.length) {
+        while (nextIndex < records.length && shouldContinue()) {
             const index = nextIndex;
             nextIndex += 1;
             const record = records[index];
@@ -29,7 +29,7 @@ export async function importStudentRecordsWithConcurrency(
                 });
             } finally {
                 completed += 1;
-                onProgress({ completed, total: records.length, record });
+                if (shouldContinue()) onProgress({ completed, total: records.length, record });
             }
         }
     };
@@ -63,6 +63,8 @@ updateStudentImportStatus(message, state = 'muted') {
     },
 
 async handleStudentCsvImportFiles(fileList) {
+        const generation = this.studentProgressSessionGeneration || 0;
+        const isCurrentSession = () => generation === (this.studentProgressSessionGeneration || 0);
         const files = Array.from(fileList || []).filter(file => /\.csv$/i.test(file.name));
         if (files.length === 0) return;
 
@@ -70,8 +72,10 @@ async handleStudentCsvImportFiles(fileList) {
         try {
             this.updateStudentImportStatus(`Reading ${files.length} CSV file${files.length === 1 ? '' : 's'}...`);
             const recordGroups = await Promise.all(files.map(file => this.parseStudentCsvFile(file)));
+            if (!isCurrentSession()) return;
             records = recordGroups.flat();
         } catch (error) {
+            if (!isCurrentSession()) return;
             console.error('Failed to read student CSV files:', error);
             this.updateStudentImportStatus(error.message || 'Could not read the selected CSV files.', 'error');
             return;
@@ -101,6 +105,7 @@ async handleStudentCsvImportFiles(fileList) {
                 (profile, password) => supabaseService.createStudentAccount(profile, password),
                 {
                     concurrency: 3,
+                    shouldContinue: isCurrentSession,
                     onProgress: ({ completed, total, record }) => {
                         this.updateStudentImportStatus(
                             `Processed ${completed} of ${total}: ${record.profile.firstName} ${record.profile.lastName} (${record.profile.grade}${record.profile.group})...`
@@ -108,14 +113,17 @@ async handleStudentCsvImportFiles(fileList) {
                     }
                 }
             );
+            if (!isCurrentSession()) return;
             created = result.created;
             failed = result.failed;
 
             if (created > 0) {
                 this.studentProgressCache = null;
                 await this.loadStudentRosterFilters({ forceRefresh: true });
+                if (!isCurrentSession()) return;
                 this.populateFilters();
                 await this.fetchStudentProgressPage({ forceRefresh: true });
+                if (!isCurrentSession()) return;
                 this.populateFilters();
                 this.applyFilters();
             }
@@ -133,7 +141,7 @@ async handleStudentCsvImportFiles(fileList) {
                 notifications.success(summary);
             }
         } finally {
-            if (importButton) importButton.disabled = false;
+            if (isCurrentSession() && importButton) importButton.disabled = false;
         }
     },
 

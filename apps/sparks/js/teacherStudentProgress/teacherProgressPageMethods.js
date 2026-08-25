@@ -5,9 +5,17 @@ export const teacherProgressPageMethods = {
     async loadStudentRosterFilters({ forceRefresh = false } = {}) {
         if (this.authDisabled) return { grades: [], classes: [] };
         if (!forceRefresh && this.studentRosterFilters) return this.studentRosterFilters;
+        const generation = this.studentRosterFiltersGeneration || 0;
         try {
-            this.studentRosterFilters = await supabaseService.getStudentRosterFilters();
+            const filters = await supabaseService.getStudentRosterFilters();
+            if (generation !== (this.studentRosterFiltersGeneration || 0)) {
+                return this.studentRosterFilters || { grades: [], classes: [] };
+            }
+            this.studentRosterFilters = filters;
         } catch (error) {
+            if (generation !== (this.studentRosterFiltersGeneration || 0)) {
+                return this.studentRosterFilters || { grades: [], classes: [] };
+            }
             console.error('Error fetching roster filters:', error);
             this.studentRosterFilters ||= { grades: [], classes: [] };
         }
@@ -122,6 +130,11 @@ export const teacherProgressPageMethods = {
 
     scheduleStudentProgressFilter() {
         window.clearTimeout(this.studentProgressFilterTimer);
-        this.studentProgressFilterTimer = window.setTimeout(() => this.applyFilters(), 250);
+        const generation = this.studentProgressSessionGeneration || 0;
+        this.studentProgressFilterTimer = window.setTimeout(() => {
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
+            this.studentProgressFilterTimer = null;
+            this.applyFilters();
+        }, 250);
     }
 };

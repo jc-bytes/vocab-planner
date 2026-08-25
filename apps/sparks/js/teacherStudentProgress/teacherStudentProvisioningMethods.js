@@ -75,6 +75,7 @@ validateAddStudentForm() {
 
 async handleAddStudentSubmit(event) {
         event.preventDefault();
+        const generation = this.studentProgressSessionGeneration || 0;
 
         let payload;
         try {
@@ -90,20 +91,26 @@ async handleAddStudentSubmit(event) {
             this.updateAddStudentStatus('Creating student account...', 'muted');
 
             await supabaseService.createStudentAccount(payload.profile, payload.password);
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
 
             this.studentProgressCache = null;
             await this.loadStudentRosterFilters({ forceRefresh: true });
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             this.populateFilters();
             await this.fetchStudentProgressPage({ forceRefresh: true });
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             this.populateFilters();
             this.applyFilters();
             closeModal('#add-student-modal');
             notifications.success(`Added ${payload.profile.firstName} ${payload.profile.lastName}.`);
         } catch (error) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             console.error('Failed to create student account:', error);
             this.updateAddStudentStatus(error.message || 'Could not create student account.', 'error');
         } finally {
-            if (submitButton) submitButton.disabled = false;
+            if (generation === (this.studentProgressSessionGeneration || 0) && submitButton) {
+                submitButton.disabled = false;
+            }
         }
     }
 };

@@ -11,6 +11,8 @@ class TeacherStudentProgressCoinMethods {
 
     async handleCoinAdjust() {
         if (!this.activeStudentId) return;
+        const studentId = this.activeStudentId;
+        const generation = this.studentProgressSessionGeneration || 0;
         const input = $('#coin-adjust-input');
         const amount = parseInt(input.value, 10) || 0;
         if (amount <= 0) {
@@ -19,16 +21,21 @@ class TeacherStudentProgressCoinMethods {
         }
         this.updateCoinStatus('Saving...', 'muted');
         try {
-            await this.adjustStudentCoins(this.activeStudentId, amount);
+            await this.adjustStudentCoins(studentId, amount);
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return;
             this.updateCoinStatus(`Added ${amount} coins.`, 'success');
             $('#coin-adjust-input').value = '10';
         } catch (err) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return;
             console.error('Failed to adjust coins', err);
             this.updateCoinStatus('Failed to update coins.', 'error');
         }
     }
 
     async adjustStudentCoins(studentId, amount, message = '') {
+        const generation = this.studentProgressSessionGeneration || 0;
         const student = this.allStudentData.find(s => s.id === studentId);
         if (!student) throw new Error('Student not found');
 
@@ -37,6 +44,8 @@ class TeacherStudentProgressCoinMethods {
             amount,
             message: message || 'Gift from teacher'
         });
+        if (generation !== (this.studentProgressSessionGeneration || 0)
+            || this.activeStudentId !== studentId) return null;
 
         // Update local student data (for display)
         student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
@@ -120,9 +129,12 @@ class TeacherStudentProgressCoinMethods {
         );
 
         if (!confirmed) return;
+        const generation = this.studentProgressSessionGeneration || 0;
+        const selectedStudentIds = Array.from(this.selectedStudents);
 
         try {
-            for (const studentId of this.selectedStudents) {
+            for (const studentId of selectedStudentIds) {
+                if (generation !== (this.studentProgressSessionGeneration || 0)) return;
                 const student = this.allStudentData.find(s => s.id === studentId);
                 if (!student) continue;
 
@@ -131,6 +143,7 @@ class TeacherStudentProgressCoinMethods {
                     amount,
                     message: 'Bulk gift from teacher'
                 });
+                if (generation !== (this.studentProgressSessionGeneration || 0)) return;
 
                 // Update local data
                 student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
@@ -142,12 +155,13 @@ class TeacherStudentProgressCoinMethods {
                 }
             }
 
-            alert(`Successfully gifted ${amount} coins to ${this.selectedStudents.size} student${this.selectedStudents.size > 1 ? 's' : ''}! They will receive a notification when they log in.`);
+            alert(`Successfully gifted ${amount} coins to ${selectedStudentIds.length} student${selectedStudentIds.length > 1 ? 's' : ''}! They will receive a notification when they log in.`);
 
             // Clear selection and refresh UI
             this.clearSelection();
             this.renderProgressTable();
         } catch (error) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             console.error('Bulk coin adjustment failed:', error);
             alert('Failed to update coins. Please try again.');
         }

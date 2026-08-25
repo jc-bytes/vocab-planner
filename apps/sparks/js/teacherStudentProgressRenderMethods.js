@@ -156,6 +156,7 @@ class TeacherStudentProgressRenderMethods {
     }
 
     async showStudentDetails(student) {
+        const generation = this.studentProgressSessionGeneration || 0;
         this.activeStudentId = student.id;
         const needsDetail = !student.progressDetailLoaded;
         this.renderStudentDetails(student, { loading: needsDetail });
@@ -163,10 +164,13 @@ class TeacherStudentProgressRenderMethods {
         if (!needsDetail) return;
         try {
             const detailedStudent = await this.ensureStudentProgressDetail(student);
-            if (this.activeStudentId === student.id) {
+            if (generation === (this.studentProgressSessionGeneration || 0)
+                && this.activeStudentId === student.id
+                && detailedStudent) {
                 this.renderStudentDetails(detailedStudent);
             }
         } catch (error) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
             console.error('Failed to load student details:', error);
             if (this.activeStudentId === student.id) {
                 const list = $('#detail-activity-list');
@@ -288,6 +292,8 @@ class TeacherStudentProgressRenderMethods {
     }
 
     async handleActivityLateOverride(student, button) {
+        const generation = this.studentProgressSessionGeneration || 0;
+        const studentId = student?.id;
         const attemptId = String(button?.dataset?.attemptId || '');
         const currentlyExcused = button?.dataset?.excused === 'true';
         if (!attemptId) return;
@@ -311,6 +317,8 @@ class TeacherStudentProgressRenderMethods {
                 excused: !currentlyExcused,
                 reason
             });
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return;
             for (const unit of Object.values(student.units || {})) {
                 for (const score of Object.values(unit.scores || {})) {
                     if (score.latestAttempt?.attemptId === attemptId) score.latestAttempt = updatedAttempt;
@@ -320,6 +328,8 @@ class TeacherStudentProgressRenderMethods {
             notifications.success(currentlyExcused ? 'Late excuse removed.' : 'Late activity excused.');
             this.renderStudentDetails(student);
         } catch (error) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return;
             console.error('Could not update late-work status:', error);
             notifications.error(error.message || 'Could not update late-work status.');
             button.disabled = false;
@@ -333,10 +343,14 @@ class TeacherStudentProgressRenderMethods {
 
     async handlePasswordReset() {
         if (!this.activeStudentId) return;
-        const student = this.allStudentData.find(s => s.id === this.activeStudentId);
+        const studentId = this.activeStudentId;
+        const generation = this.studentProgressSessionGeneration || 0;
+        const student = this.allStudentData.find(s => s.id === studentId);
         const name = student?.studentProfile?.name || student?.email || 'this student';
         const confirmed = confirm(`Reset the password for ${name}?`);
         if (!confirmed) return;
+        const resetGeneration = (this.studentPasswordResetGeneration || 0) + 1;
+        this.studentPasswordResetGeneration = resetGeneration;
 
         const status = $('#reset-password-status');
         const tempOutput = $('#temporary-password-output');
@@ -350,7 +364,10 @@ class TeacherStudentProgressRenderMethods {
             }
             if (tempOutput) tempOutput.style.display = 'none';
 
-            const result = await supabaseService.resetStudentPassword(this.activeStudentId);
+            const result = await supabaseService.resetStudentPassword(studentId);
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId
+                || resetGeneration !== this.studentPasswordResetGeneration) return;
             if (status) {
                 status.style.color = result.warning ? '#b45309' : 'var(--success-color)';
                 status.textContent = result.warning || 'Temporary password created.';
@@ -368,13 +385,20 @@ class TeacherStudentProgressRenderMethods {
                     : 'Required';
             }
         } catch (error) {
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId
+                || resetGeneration !== this.studentPasswordResetGeneration) return;
             console.error('Password reset failed:', error);
             if (status) {
                 status.style.color = 'var(--danger-color)';
                 status.textContent = error.message || 'Could not reset password.';
             }
         } finally {
-            if (button) button.disabled = false;
+            if (generation === (this.studentProgressSessionGeneration || 0)
+                && resetGeneration === this.studentPasswordResetGeneration
+                && button) {
+                button.disabled = false;
+            }
         }
     }
 }
