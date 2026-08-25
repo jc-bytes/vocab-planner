@@ -1356,58 +1356,58 @@
 
                 <!-- View Data Tab -->
                 <div id="data-viewer-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-view" style="display: none;">
-                    <div class="runtime-section-shell" style="margin-bottom: 2rem;">
-                        <h3 class="section-header__title" style="margin: 0 0 0.5rem 0; color: var(--text-main, #f8fafc);">View Exported Data</h3>
-                        <p class="section-header__description" style="color: var(--text-muted, #cbd5f5); margin: 0;">
+                    <div class="runtime-section-shell data-viewer-header">
+                        <h3 class="section-header__title data-viewer-header__title">View Exported Data</h3>
+                        <p class="section-header__description data-viewer-header__description">
                             Load a previously exported JSON file to view all progress data, vocabulary scores, and student information.
                         </p>
                     </div>
 
                     <!-- File Loader -->
-                    <div id="file-loader" style="border: 2px dashed var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 2.5rem; text-align: center; background: rgba(15, 23, 42, 0.3); transition: all 0.2s;">
-                        <input type="file" id="load-json-file" accept=".json" style="display: none;">
+                    <div id="file-loader" class="data-viewer-file-loader">
+                        <input type="file" id="load-json-file" class="data-viewer-file-input" accept=".json">
                         <i data-lucide="folder-open" class="teacher-file-icon"></i>
-                        <button id="choose-file-btn" class="btn primary-btn" style="padding: 0.75rem 2rem; font-size: 1rem; margin-bottom: 0.75rem;">
+                        <button id="choose-file-btn" class="btn primary-btn data-viewer-file-button">
                             Choose JSON File
                         </button>
-                        <p class="runtime-status__description" style="margin: 0; color: var(--text-muted, #cbd5f5);">or drag and drop file here</p>
+                        <p class="runtime-status__description data-viewer-file-hint">or drag and drop file here</p>
                     </div>
 
                     <!-- File Info -->
-                    <div id="file-info" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #10b981;">
+                    <div id="file-info" class="data-viewer-message data-viewer-message--success" style="display: none;">
+                        <div class="data-viewer-message__row">
                             <i data-lucide="circle-check"></i>
-                            <div style="flex: 1;">
-                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">
+                            <div class="data-viewer-message__copy">
+                                <div class="runtime-status__title data-viewer-message__title">
                                     <span id="file-name"></span>
                                 </div>
-                                <div id="file-size" class="runtime-status__description" style="color: #34d399;"></div>
+                                <div id="file-size" class="runtime-status__description data-viewer-message__description"></div>
                             </div>
-                            <button id="clear-file-btn" class="btn text-btn" style="padding: 0.5rem 1rem;">Clear</button>
+                            <button id="clear-file-btn" class="btn text-btn data-viewer-clear-button">Clear</button>
                         </div>
                     </div>
 
                     <!-- Error Message -->
-                    <div id="file-error" style="display: none; margin-top: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #f87171;">
+                    <div id="file-error" class="data-viewer-message data-viewer-message--error" style="display: none;">
+                        <div class="data-viewer-message__row">
                             <i data-lucide="circle-x"></i>
                             <div>
-                                <div class="runtime-status__title" style="color: var(--text-main, #f8fafc); margin-bottom: 0.25rem;">Error Loading File</div>
-                                <div id="error-message" class="runtime-status__description" style="color: #fca5a5;"></div>
+                                <div class="runtime-status__title data-viewer-message__title">Error Loading File</div>
+                                <div id="error-message" class="runtime-status__description data-viewer-message__description"></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Data Summary (shown after successful load) -->
-                    <div id="viewer-summary" class="runtime-section-shell" style="display: none; margin-top: 2rem;">
-                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Data Summary</h4>
-                        <div id="viewer-summary-stats" style="margin-bottom: 1.5rem;"></div>
+                    <div id="viewer-summary" class="runtime-section-shell data-viewer-section" style="display: none;">
+                        <h4 class="section-header__title data-viewer-section__title">Data Summary</h4>
+                        <div id="viewer-summary-stats" class="data-viewer-section__summary"></div>
                     </div>
 
                     <!-- Data Tables (shown after successful load) -->
-                    <div id="viewer-tables" class="runtime-section-shell" style="display: none; margin-top: 2rem;">
-                        <h4 class="section-header__title" style="margin: 0 0 1.5rem 0; color: var(--text-main, #f8fafc);">Student Data</h4>
-                        <div id="viewer-tables-content" class="table-scroll-wrapper data-table-region" style="max-height: 600px; border: 1px solid var(--border-color, rgba(255, 255, 255, 0.125)); border-radius: 8px; padding: 1rem; background: rgba(15, 23, 42, 0.4);"></div>
+                    <div id="viewer-tables" class="runtime-section-shell data-viewer-section" style="display: none;">
+                        <h4 class="section-header__title data-viewer-section__title">Student Data</h4>
+                        <div id="viewer-tables-content" class="table-scroll-wrapper data-table-region data-viewer-tables-content"></div>
                     </div>
                 </div>
 

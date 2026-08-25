@@ -332,3 +332,54 @@ test('Data Export delegates fixed presentation while retaining calculated runtim
         assert.match(teacherCss, declaration);
     }
 });
+
+test('Data Viewer delegates fixed presentation while retaining file and drag state', () => {
+    const start = teacherHtml.indexOf('<!-- View Data Tab -->');
+    const end = teacherHtml.indexOf('<!-- Reset Tab -->', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Data Viewer template');
+    const viewerTemplate = teacherHtml.slice(start, end);
+    const inlineStyles = [...viewerTemplate.matchAll(/style="([^"]*)"/g)].map(match => match[1]);
+
+    assert.deepEqual(inlineStyles, [
+        'display: none;',
+        'display: none;',
+        'display: none;',
+        'display: none;',
+        'display: none;'
+    ], 'Data Viewer template must keep only initial runtime visibility inline');
+    assert.doesNotMatch(teacherDataViewer, /style="/,
+        'Generated Data Viewer markup must use Viewer-owned classes');
+
+    for (const runtimeAssignment of [
+        /fileLoader\.style\.borderColor\s*=\s*'var\(--color-brand\)'/,
+        /fileLoader\.style\.background\s*=\s*'rgba\(99, 102, 241, 0\.2\)'/,
+        /fileLoader\.style\.borderColor\s*=\s*'var\(--border-color, rgba\(255, 255, 255, 0\.125\)\)'/,
+        /fileLoader\.style\.background\s*=\s*'rgba\(15, 23, 42, 0\.3\)'/,
+        /content\.style\.display\s*=\s*isActive\s*\?\s*'block'\s*:\s*'none'/,
+        /if \(errorDiv\) errorDiv\.style\.display\s*=\s*'none'/,
+        /fileInfo\.style\.display\s*=\s*'block'/,
+        /errorDiv\.style\.display\s*=\s*'block'/,
+        /\$\('#file-info'\)\.style\.display\s*=\s*'none'/,
+        /\$\('#file-error'\)\.style\.display\s*=\s*'none'/,
+        /\$\('#viewer-summary'\)\.style\.display\s*=\s*'none'/,
+        /\$\('#viewer-tables'\)\.style\.display\s*=\s*'none'/,
+        /\$\('#viewer-summary'\)\.style\.display\s*=\s*'block'/,
+        /\$\('#viewer-tables'\)\.style\.display\s*=\s*'block'/
+    ]) {
+        assert.match(teacherDataViewer, runtimeAssignment);
+    }
+
+    for (const declaration of [
+        /\.data-viewer-file-loader\s*\{[^}]*padding:\s*2\.5rem;[^}]*border:\s*2px dashed var\(--color-border\);[^}]*background:\s*rgba\(15, 23, 42, 0\.3\);/s,
+        /\.data-viewer-message\s*\{[^}]*margin-top:\s*1\.5rem;[^}]*padding:\s*1rem;/s,
+        /\.data-viewer-message--success\s*\{[^}]*background:\s*rgba\(16, 185, 129, 0\.15\);/s,
+        /\.data-viewer-message--error\s*\{[^}]*background:\s*rgba\(239, 68, 68, 0\.15\);/s,
+        /\.data-viewer-tables-content\s*\{[^}]*max-height:\s*600px;/s,
+        /\.data-viewer-runtime-summary\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(150px, 1fr\)\);/s,
+        /\.data-viewer-table\s*\{[^}]*width:\s*100%;[^}]*border-collapse:\s*collapse;/s,
+        /\.data-viewer-table \.data-viewer-table__numeric\s*\{[^}]*text-align:\s*right;/s,
+        /\.data-viewer-table__empty\s*\{[^}]*color:\s*var\(--color-text-muted\);/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+});
