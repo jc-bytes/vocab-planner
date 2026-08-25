@@ -64,3 +64,9 @@ test('teacher page descriptors reject ambiguous registration', () => {
     ]);
     assert.equal(sharedDataView.pages.length, 2);
 });
+
+test('teacher history has one hash-route event authority', async () => {
+    const listenerSource = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
+    assert.equal((listenerSource.match(/addEventListener\('hashchange'/g) || []).length, 1);
+    assert.doesNotMatch(listenerSource, /addEventListener\('popstate'/);
+});

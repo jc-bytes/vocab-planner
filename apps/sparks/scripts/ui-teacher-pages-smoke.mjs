@@ -88,7 +88,6 @@ try {
         const manager = new Manager();
         window.teacherPageSmokeManager = manager;
         window.addEventListener('hashchange', () => manager.handleRouteChange());
-        window.addEventListener('popstate', () => manager.handleRouteChange());
 
         manager.showTeacherSection('overview');
         manager.showDashboard();
@@ -126,12 +125,18 @@ try {
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
     await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    const overviewLoadsBeforeBack = await page.evaluate(() => window.teacherPageSmokeManager.overviewLoads);
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/overview'
         && document.querySelector('.view.active')?.id === 'teacher-overview-view'
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'overview'
     ));
+    await page.waitForTimeout(25);
+    const overviewLoadsAfterBack = await page.evaluate(() => window.teacherPageSmokeManager.overviewLoads);
+    if (overviewLoadsAfterBack - overviewLoadsBeforeBack !== 1) {
+        throw new Error(`One Back action applied Overview ${overviewLoadsAfterBack - overviewLoadsBeforeBack} times.`);
+    }
 
     const vocabulary = await page.evaluate(() => {
         const manager = window.teacherPageSmokeManager;

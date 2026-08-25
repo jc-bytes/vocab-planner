@@ -109,16 +109,14 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     vocabularyId: this.vocabSet?.id || null
                 };
             }
-            if (viewId === SPARKS_PAGE.viewId) return { view: SPARKS_PAGE.id };
-            if (viewId === STUDENTS_PAGE.viewId) return { view: STUDENTS_PAGE.id };
-            if (viewId === GROUPS_PAGE.viewId) return { view: GROUPS_PAGE.id };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === DATA_PAGE.viewId) {
                 const currentRoute = this.parseRoute();
                 if (currentRoute?.view === DATA_PAGE.id || currentRoute?.view === SETTINGS_PAGE.id) return currentRoute;
                 return { view: SETTINGS_PAGE.id, tab: 'subjects' };
             }
-            return { view: OVERVIEW_PAGE.id };
+            const page = teacherPageRegistry.pages.find(candidate => candidate.viewId === viewId);
+            return { view: page?.id || OVERVIEW_PAGE.id };
         },
 
         setRoute(route, options = {}) {

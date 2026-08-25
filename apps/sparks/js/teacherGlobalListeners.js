@@ -102,7 +102,6 @@ function bindOverviewListeners(manager) {
 
 export function initTeacherGlobalListeners(manager) {
     window.addEventListener('hashchange', () => manager.handleRouteChange());
-    window.addEventListener('popstate', () => manager.handleRouteChange());
     window.addEventListener('resize', debounceTeacherResize(() => manager.setTeacherMobileMenu(false)));
 
     setupModal('#student-detail-modal', {

@@ -60,7 +60,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
 | 20. Migrate teacher pages | DONE | All seven primary teacher pages; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, complete regression suite, and production build | Every primary page now uses its registry descriptor. Data and Settings preserve route-based disambiguation on their intentional shared view. |
-| 21. Remove duplicated navigation wiring | TODO | | | |
+| 21. Remove duplicated navigation wiring | IN PROGRESS | Teacher history listener; registry-derived reverse view mapping; page/history contracts | Focused teacher feature suites, all-seven-page browser smoke, complete regression suite, production build, independent review | One Back traversal now has one route application. Unambiguous reverse mappings derive from the registry; feature-specific dispatch and shared-view rules remain explicit. Route-intent races are the remaining Task 21 reliability work. |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
 | 24. Remove obsolete facade methods | TODO | | | |
@@ -334,6 +334,16 @@ Task 20 remains in progress. Settings is the final primary page migration.
 - Focused page, Data Management, routing, and build-efficiency checks pass. The complete regression suite, 9-width student shell, three-page UI smoke, 13 sandboxed games, production build, and scoped diff validation pass. Two independent reviews found no blocker. The build remains 13.5 MB with 2,330 modules; Data Management remains lazy at 45.31 kB raw / 10.99 kB gzip.
 
 Task 20 is complete. All seven primary teacher pages now use the page registry. Task 21 will remove only duplicated navigation wiring proven obsolete; feature-owned routing details and the intentional shared-view distinction remain in place.
+
+### Task 21a, remove proven duplicate navigation wiring
+
+- Removed the teacher `popstate` route listener and retained `hashchange` as the single history authority. Sparks writes every teacher route as a hash entry, and Chromium proved that Back previously emitted both events and applied one route twice.
+- Replaced copied one-to-one view-to-page comparisons in the shell and current-route serializer with lookup through the frozen page descriptors. Vocabulary editor/Quiz Maker ownership and route-based Data/Settings disambiguation remain explicit before the generic lookup.
+- Kept direct page dispatch and route restoration separate. Their Vocabulary reset/restore and Data route-reservation semantics differ, so a shared handler map or loader-bearing registry would add coupling and change behavior.
+- Added a source contract preventing a second teacher route event listener and a browser assertion that one Back traversal loads Overview exactly once. Added reverse-mapping coverage for Overview and the unknown-view fallback; existing assertions cover all other primary and shared views.
+- Focused page, routing, Data, Groups, Sparks, Quiz, Word Hunt, and lazy/build checks pass. The complete regression suite, 9-width student shell, three-page UI smoke, 13 sandboxed games, production build, and scoped diff validation pass. Two independent reviews found no blocker. The build remains 13.5 MB with 2,330 modules.
+
+Task 21 remains in progress. A separate, already reproduced route-intent race can let a cold lazy feature activate after a newer direct navigation; it requires lifecycle invalidation rather than merging the intentionally different dispatch paths.
 
 ### Phase 0, baseline
 

@@ -114,18 +114,14 @@ class TeacherShellMethods {
     }
 
     getSectionForView(viewId) {
-        if (viewId === OVERVIEW_PAGE.viewId) return OVERVIEW_PAGE.id;
         if ([VOCABULARY_PAGE.viewId, 'teacher-editor-view', 'quiz-maker-view'].includes(viewId)) {
             return VOCABULARY_PAGE.id;
         }
-        if (viewId === SPARKS_PAGE.viewId) return SPARKS_PAGE.id;
-        if (viewId === STUDENTS_PAGE.viewId) return STUDENTS_PAGE.id;
-        if (viewId === GROUPS_PAGE.viewId) return GROUPS_PAGE.id;
         if (viewId === DATA_PAGE.viewId) {
             const route = this.parseRoute?.();
             return route?.view === DATA_PAGE.id ? DATA_PAGE.id : SETTINGS_PAGE.id;
         }
-        return '';
+        return teacherPageRegistry.pages.find(page => page.viewId === viewId)?.id || '';
     }
 
     setActiveTeacherTab(sectionId) {
