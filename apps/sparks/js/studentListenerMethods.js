@@ -1,11 +1,6 @@
 import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 import { STUDENT_WIDE_SHELL_MEDIA_QUERY } from './studentShellMethods.js';
-import {
-    ARCADE_MINUTE_SECONDS,
-    FORMATIVE_PASS_MINUTES,
-    MAX_QUEUED_ARCADE_SECONDS
-} from './student/studentArcadePolicy.js';
 
 const STUDENT_RESIZE_DEBOUNCE_MS = 120;
 
@@ -241,29 +236,7 @@ export class StudentListeners {
 
         this.addListener('#add-time-btn', 'click', async () => {
             const games = await this.sm.getGames();
-            if (games.isAddingGameTime) return;
-            if (games.gameTimeRemaining > MAX_QUEUED_ARCADE_SECONDS - ARCADE_MINUTE_SECONDS) {
-                notifications.warning(`You can queue a maximum of ${FORMATIVE_PASS_MINUTES} minutes.`);
-                games.updateGameTimer();
-                return;
-            }
-            const gameId = games.currentGame?.gameType || 'arcade';
-            games.isAddingGameTime = true;
-            games.updateGameTimer();
-            try {
-                const minute = await games.startArcadeMinute(gameId);
-                if (minute) {
-                    games.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
-                    await games.updateArcadeUI({ force: false });
-                } else {
-                    notifications.warning('Complete another formative activity before continuing your Arcade break.');
-                }
-            } catch (error) {
-                notifications.warning(error?.message || 'Could not add Arcade time.');
-            } finally {
-                games.isAddingGameTime = false;
-                games.updateGameTimer();
-            }
+            await games.requestAdditionalTime();
         });
 
         this.addListener('#exit-game-btn', 'click', async () => {

@@ -110,6 +110,10 @@ export class StudentGames {
         return this.lifecycle.selectAdjacentGame(offset);
     }
 
+    requestAdditionalTime() {
+        return this.lifecycle.requestAdditionalTime();
+    }
+
     startGame(type) {
         return this.lifecycle.startGame(type);
     }

@@ -62,7 +62,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 20. Migrate teacher pages | DONE | All seven primary teacher pages; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, complete regression suite, and production build | Every primary page now uses its registry descriptor. Data and Settings preserve route-based disambiguation on their intentional shared view. |
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
-| 23. Reduce forwarding where a cohesive use case exists | IN PROGRESS | Arcade selection lifecycle intent and listener contract | Student Games, listener, routing, and build/lazy checks | Previous/Next controls delegate one complete selection intent; add-time and exit intents remain separate bounded candidates. |
+| 23. Reduce forwarding where a cohesive use case exists | IN PROGRESS | Arcade selection and add-time lifecycle intents; listener contracts | Student Games, listener, routing, and build/lazy checks | Listeners delegate complete selection and asynchronous time-request intents; exit-to-selection remains the final bounded Arcade candidate. |
 | 24. Remove obsolete facade methods | TODO | | | |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
@@ -400,6 +400,17 @@ Task 22 is complete. Task 23 starts with the smallest Arcade listener intent and
 - Verification passed for 16 Student Games tests, 6 Student Listener tests, 15 routing tests, and 11 build/lazy-loading checks. Scoped diff validation passed.
 
 Task 23 remains in progress. The add-time path is next because it currently duplicates a complete asynchronous Arcade lifecycle inside the global listener; it will be migrated separately with failure and in-flight tests.
+
+### Task 23b, own the Arcade add-time lifecycle
+
+- Added `requestAdditionalTime()` to the existing game lifecycle and exposed that complete asynchronous intent through `StudentGames`.
+- Removed the add-time listener's knowledge of the in-flight lock, queued-time cap, active game ID, server minute request, timer mutation, Arcade UI refresh, and policy-specific warnings. The listener now awaits one lifecycle use case.
+- Preserved `StudentGameAccess.startMinute()` as the authenticated coin/formative-time authority. The lifecycle still requests exactly one server minute, uses the returned duration or established default, refreshes account/UI state only after success, and restores the button/timer state in `finally`.
+- Preserved the ten-minute queue cap, warning copy, no-formative-work warning, thrown-error message, and immediate in-flight rejection. Removed the now-unused Arcade policy import from the listener.
+- Added direct coverage for the cap, an actual overlapping request, game ID selection, returned duration, UI refresh order, null authorization result, thrown error, and lock cleanup. The listener contract prevents low-level add-time orchestration from returning.
+- Verification passed for 17 Student Games tests, 7 Student Listener tests, 15 routing tests, and 11 build/lazy checks. Scoped diff validation passed.
+
+Task 23 remains in progress. Exit-to-selection is the final demonstrated Arcade listener sequence; it will be migrated separately before deciding whether any other facade deepening has enough evidence.
 
 ### Phase 0, baseline
 

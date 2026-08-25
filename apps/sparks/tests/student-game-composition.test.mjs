@@ -64,6 +64,7 @@ const {
 const { StudentGameScoreMonitor } = await import('../js/student/studentGameScoreMonitor.js');
 const { StudentGameSettings } = await import('../js/student/studentGameSettingsMethods.js');
 const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
+const { notifications } = await import('../js/notifications.js');
 const { readLocalArcadeSession, writeLocalArcadeSession, writeLocalArcadeTime } = await import('../js/student/studentArcadeTimeStorage.js');
 const { refreshLocalFormativeWindow } = await import('../js/student/studentArcadeTimeStorage.js');
 const { supabaseService } = await import('../js/supabaseService.js');
@@ -157,6 +158,7 @@ test('StudentGames declares its stable public interface directly', () => {
         'loadLeaderboard',
         'loadHTMLGame',
         'selectAdjacentGame',
+        'requestAdditionalTime',
         'startGame',
         'stopCurrentGame',
         'pauseGame',
@@ -168,6 +170,69 @@ test('StudentGames declares its stable public interface directly', () => {
             true,
             `${method} must be declared by StudentGames`
         );
+    }
+});
+
+test('additional Arcade time owns concurrency, cap, access, refresh, and failure feedback', async () => {
+    const games = new StudentGames({});
+    const originalWarning = notifications.warning;
+    const warnings = [];
+    notifications.warning = message => warnings.push(message);
+
+    try {
+        games.gameTimeRemaining = MAX_QUEUED_ARCADE_SECONDS;
+        let timerUpdates = 0;
+        games.lifecycle.updateGameTimer = () => { timerUpdates += 1; };
+        assert.equal(await games.requestAdditionalTime(), false);
+        assert.equal(timerUpdates, 1);
+        assert.match(warnings.pop(), /maximum/);
+
+        let releaseRequest;
+        let requestCount = 0;
+        games.gameTimeRemaining = 0;
+        games.startArcadeMinute = () => {
+            requestCount += 1;
+            return new Promise(resolve => { releaseRequest = resolve; });
+        };
+        const pendingRequest = games.requestAdditionalTime();
+        await Promise.resolve();
+        assert.equal(games.isAddingGameTime, true);
+        assert.equal(await games.requestAdditionalTime(), false);
+        assert.equal(requestCount, 1);
+        releaseRequest(null);
+        assert.equal(await pendingRequest, false);
+        assert.match(warnings.pop(), /formative activity/);
+
+        const events = [];
+        games.gameTimeRemaining = 0;
+        games.currentGame = { gameType: 'snake' };
+        games.lifecycle.updateGameTimer = () => events.push(['timer', games.isAddingGameTime]);
+        games.startArcadeMinute = async gameId => {
+            events.push(['start', gameId]);
+            return { minuteSeconds: 75 };
+        };
+        games.lifecycle.addGameTime = seconds => events.push(['add', seconds]);
+        games.updateArcadeUI = async options => events.push(['ui', options]);
+        assert.equal(await games.requestAdditionalTime(), true);
+        assert.equal(games.isAddingGameTime, false);
+        assert.deepEqual(events, [
+            ['timer', true],
+            ['start', 'snake'],
+            ['add', 75],
+            ['ui', { force: false }],
+            ['timer', false]
+        ]);
+
+        games.startArcadeMinute = async () => null;
+        assert.equal(await games.requestAdditionalTime(), false);
+        assert.match(warnings.pop(), /formative activity/);
+
+        games.startArcadeMinute = async () => { throw new Error('Arcade unavailable'); };
+        assert.equal(await games.requestAdditionalTime(), false);
+        assert.equal(warnings.pop(), 'Arcade unavailable');
+        assert.equal(games.isAddingGameTime, false);
+    } finally {
+        notifications.warning = originalWarning;
     }
 });
 

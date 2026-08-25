@@ -36,6 +36,36 @@ export class StudentGameLifecycle {
         return true;
     }
 
+    async requestAdditionalTime() {
+        if (this.games.isAddingGameTime) return false;
+        if (this.games.gameTimeRemaining > MAX_QUEUED_ARCADE_SECONDS - ARCADE_MINUTE_SECONDS) {
+            notifications.warning(`You can queue a maximum of ${FORMATIVE_PASS_MINUTES} minutes.`);
+            this.updateGameTimer();
+            return false;
+        }
+
+        const gameId = this.games.currentGame?.gameType || 'arcade';
+        this.games.isAddingGameTime = true;
+        this.updateGameTimer();
+        try {
+            const minute = await this.games.startArcadeMinute(gameId);
+            if (!minute) {
+                notifications.warning('Complete another formative activity before continuing your Arcade break.');
+                return false;
+            }
+
+            this.addGameTime(minute.minuteSeconds || ARCADE_MINUTE_SECONDS);
+            await this.games.updateArcadeUI({ force: false });
+            return true;
+        } catch (error) {
+            notifications.warning(error?.message || 'Could not add Arcade time.');
+            return false;
+        } finally {
+            this.games.isAddingGameTime = false;
+            this.updateGameTimer();
+        }
+    }
+
     async startGame(type) {
         await this.sm.activities?.refreshCurrentSparkGate?.({ updateDisplay: false });
         const access = this.sm.activities?.getPendingRequiredWork?.();

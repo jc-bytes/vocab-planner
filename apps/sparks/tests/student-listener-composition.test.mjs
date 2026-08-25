@@ -114,6 +114,18 @@ test('Arcade selection listeners delegate one complete navigation intent', () =>
     assert.doesNotMatch(selectionListenerSource, /currentGameIndex|updateGameSelectionUI|updateLeaderboardGame/);
 });
 
+test('the add-time listener delegates its complete asynchronous lifecycle', () => {
+    const addTimeSource = studentListenerSource.slice(
+        studentListenerSource.indexOf("this.addListener('#add-time-btn'"),
+        studentListenerSource.indexOf("this.addListener('#exit-game-btn'")
+    );
+    assert.match(addTimeSource, /await games\.requestAdditionalTime\(\)/);
+    assert.doesNotMatch(
+        addTimeSource,
+        /isAddingGameTime|gameTimeRemaining|startArcadeMinute|addGameTime|updateArcadeUI|updateGameTimer/
+    );
+});
+
 test('tracked listeners are removed during teardown', () => {
     const listeners = new StudentListeners({});
     const target = new EventTarget();
