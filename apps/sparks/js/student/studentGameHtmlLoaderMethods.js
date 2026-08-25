@@ -1,4 +1,5 @@
 import { $ } from '../main.js';
+import { GAME_HOST_EVENT, parseGameHostMessage } from './studentGameProtocol.js';
 import { getStudentGame } from './studentGameRegistry.js';
 import { readStudentJson, writeStudentJson } from './persistence/studentStorage.js';
 
@@ -209,22 +210,11 @@ export class StudentGameHtmlLoader {
         if (scoreMessageType) {
             messageHandler = (event) => {
                 // Verify message is from our iframe (security check)
-                if (event.source === iframe.contentWindow && event.data && event.data.type === scoreMessageType) {
-                    // Ensure score is a number
-                    const score = Number(event.data.score) || 0;
-                    const isGameOver = event.data.gameOver || false;
-                    
-                    // Extract optional progress metadata from HTML games.
-                    const metadata = {
-                        level: event.data.level,
-                        deaths: event.data.deaths,
-                        totalDeaths: event.data.totalDeaths,
-                        completedLevels: event.data.completedLevels,
-                        totalLevels: event.data.totalLevels,
-                        completed: event.data.completed,
-                        time: event.data.time,
-                        originalScore: event.data.originalScore
-                    };
+                if (event.source === iframe.contentWindow) {
+                    const message = parseGameHostMessage(event.data, scoreMessageType);
+                    if (!message) return;
+                    const { score, metadata } = message;
+                    const isGameOver = message.event === GAME_HOST_EVENT.GAME_OVER;
                     
                     // Update score display dynamically
                     const scoreDisplay = $('#game-score');

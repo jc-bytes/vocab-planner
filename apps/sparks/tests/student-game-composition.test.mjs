@@ -56,6 +56,7 @@ const { StudentManager } = await import('../js/student.js');
 const { StudentGameHtmlLoader } = await import('../js/student/studentGameHtmlLoaderMethods.js');
 const { StudentGameLeaderboard } = await import('../js/student/studentGameLeaderboardMethods.js');
 const { StudentGameLifecycle } = await import('../js/student/studentGameLifecycleMethods.js');
+const { GAME_HOST_EVENT, parseGameHostMessage } = await import('../js/student/studentGameProtocol.js');
 const {
     ARCADE_MINUTE_SECONDS,
     FORMATIVE_PASS_SECONDS,
@@ -119,6 +120,50 @@ test('legacy game score discovery caches the first matching global', () => {
     assert.match(legacyScoreBridgeSource, /let cachedGame = null/);
     assert.match(legacyScoreBridgeSource, /if \(cachedGame\?\.levelStats\) return cachedGame/);
     assert.match(legacyScoreBridgeSource, /if \(!cachedGame \|\| cachedGame\.score === undefined\)/);
+});
+
+test('HTML game messages use one normalized score and game-over protocol', () => {
+    assert.deepEqual(
+        parseGameHostMessage({
+            type: 'trapdoor-score',
+            score: 250,
+            level: 4,
+            deaths: 2,
+            completed: true,
+            gameOver: true
+        }, 'trapdoor-score'),
+        {
+            event: GAME_HOST_EVENT.GAME_OVER,
+            score: 250,
+            metadata: {
+                level: 4,
+                deaths: 2,
+                completed: true
+            }
+        }
+    );
+    assert.deepEqual(
+        parseGameHostMessage({
+            type: 'platformer-score', score: 900, attempts: 3, time: 18, gameOver: false
+        }, 'platformer-score'),
+        {
+            event: GAME_HOST_EVENT.SCORE,
+            score: 900,
+            metadata: { time: 18, attempts: 3 }
+        }
+    );
+    assert.equal(parseGameHostMessage({ type: 'other', score: 10 }, 'expected'), null);
+    assert.equal(parseGameHostMessage(null, 'expected'), null);
+    for (const score of [NaN, Infinity, -1, 100_000_001, '10', null, true]) {
+        assert.equal(parseGameHostMessage({ type: 'expected', score, gameOver: false }, 'expected'), null);
+    }
+    assert.equal(parseGameHostMessage({ type: 'expected', score: 10, gameOver: 'true' }, 'expected'), null);
+    assert.deepEqual(
+        parseGameHostMessage({
+            type: 'expected', score: 10, level: '4', deaths: null, time: false, gameOver: false
+        }, 'expected'),
+        { event: GAME_HOST_EVENT.SCORE, score: 10, metadata: {} }
+    );
 });
 
 test('StudentGames runtime state is isolated per instance', () => {

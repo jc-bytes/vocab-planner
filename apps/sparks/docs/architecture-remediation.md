@@ -65,7 +65,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
 | 24. Remove obsolete facade methods | DONE | Student/teacher obsolete bridges, aliases, broad read chain, and ownership/least-data contracts | Focused domain/security/build checks; complete regressions; production builds; browser smoke; independent audits | Removed 30 obsolete facade methods plus associated dead state/service code. Live owner APIs, bounded data paths, lazy loading, persistence, and security boundaries remain intact. |
 | 25. Move legacy game adapters into descriptors | DONE | Dead host monitor removal; descriptor-owned score order; registry contract | Focused game/registry/security/build checks; complete regressions; production builds; 13-game smoke; independent runtime reviews | Live bridge stays game-owned inside the sandbox. Registry owns message types, frame/capability metadata, and score direction. A formatter interface is intentionally deferred. |
-| 26. Define a host/game protocol | TODO | | | |
+| 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
 | 27. Add game registry contract tests | TODO | | | |
 | 28. Review Supabase seams | TODO | | | |
 | 29. Add interfaces only where justified | TODO | | | |
@@ -508,6 +508,17 @@ Task 25 remains in progress. SpacePi's lower-is-better direction is a genuine sc
 - Verification passed for 19 Student Games, 21 registry/parity tests plus smoke, repository/package/security/build checks, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and independent semantic review. Deployment remains 13.5 MB with 2,330 modules; the lazy Student Games chunk is 30.81/9.29 kB raw/gzip.
 
 Task 25 is complete. The registry owns the game-specific scalar policy that the host legitimately needs, while live legacy extraction remains beside the sandboxed games that understand those globals. Task 26 will define and test the existing host/game message protocol without forcing internal game UI standardization.
+
+### Task 26, define the live host/game protocol
+
+- Added one small parser for the protocol all registered iframe games actually use: numeric score updates and terminal game-over updates. The host still validates the exact iframe source and each descriptor's exact message type before updating UI, saving a score, or invoking completion callbacks.
+- Tightened payload validation to the persistence contract: scores must be finite numbers from zero through 100,000,000 and `gameOver` must be a boolean. Optional numeric progress fields must be finite; optional completion must be boolean. Malformed messages are ignored rather than coerced into a zero score or truthy completion.
+- Preserved Basic Platformer's `attempts` metadata, Trapdoor's structured progress fields, every descriptor-specific message type, the separate capability-scoped vocabulary-storage channel, callback timing, listener cleanup, and lazy loading.
+- Did not add `ready`, `status`, or `error` abstractions because source and runtime tracing found no registered game sender or host consumer for them. The protocol documents current behavior rather than creating speculative game requirements.
+- Direct protocol tests cover representative progress and terminal payloads, incorrect message types, invalid scores, invalid completion flags, and optional-field sanitization. Existing host and sandbox tests continue to cover source checks, listener lifecycle, all registered HTML games, and their emitted message types.
+- Verification passed for 20 Student Games tests, 21 registry/parity tests plus smoke, 14 security tests, package/build contracts, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and two independent reviews. Deployment remains 13.5 MB with 2,331 modules; the lazy Student Games chunk is 31.17/9.49 kB raw/gzip.
+
+Task 26 is complete. Task 27 will strengthen registry/build contracts only where the existing tests do not already prove uniqueness, reachability, configuration validity, lazy loading, and copied-asset compatibility.
 
 ### Phase 0, baseline
 
