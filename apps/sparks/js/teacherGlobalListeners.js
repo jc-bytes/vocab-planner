@@ -122,19 +122,4 @@ export function initTeacherGlobalListeners(manager) {
     bindTeacherTabs(manager);
     bindOverviewListeners(manager);
 
-    $('#group-class-select')?.addEventListener('change', event => {
-        manager.handleGroupClassChange(event.currentTarget.value);
-    });
-    $('#group-student-list')?.addEventListener('change', event => {
-        const checkbox = event.target.closest('input[data-student-id]');
-        if (checkbox) manager.toggleGroupStudentAbsent(checkbox.dataset.studentId, checkbox.checked);
-    });
-    $('#clear-group-absences-btn')?.addEventListener('click', () => manager.clearGroupAbsences());
-    $('#save-group-restriction-btn')?.addEventListener('click', () => manager.saveGroupPairRestriction());
-    $('#group-restriction-list')?.addEventListener('click', event => {
-        const button = event.target.closest('button[data-restriction-id]');
-        if (button) manager.removeGroupPairRestriction(button.dataset.restrictionId);
-    });
-    $('#randomize-groups-btn')?.addEventListener('click', () => manager.generateRandomGroups());
-    $('#copy-groups-btn')?.addEventListener('click', () => manager.copyRandomGroups());
 }

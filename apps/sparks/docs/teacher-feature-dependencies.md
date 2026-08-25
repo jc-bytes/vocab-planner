@@ -34,22 +34,21 @@ Top-level navigation is independently wired in `teacherShell.js` and `teacherRou
 
 Groups is a bounded, representative conversion with one repository, one shared roster capability, five cohesive state values, a static view, and already-tested pure grouping logic. It has no student-facing write model. More importantly, conversion fixes the confirmed listener/context defect rather than creating an architecture-only abstraction.
 
-The smallest justified interface is:
+The smallest justified interface was implemented in Task 16 as:
 
 ```js
 createTeacherGroupsFeature({
     ensureAuthenticated,
     showView,
     loadRoster,
-    getRoster,
     getSession,
     refreshIcons,
     repository,
     notifications
-}) => ({ show })
+}) => ({ show, destroy })
 ```
 
-The factory should own the five Groups state values and bind its own controls after lazy loading. `TeacherManager.showGroupsView()` remains the one routing adapter and delegates to `feature.show()`. Internal click handlers should not become manager methods. Browser APIs can keep safe defaults; inject them only where a test or platform seam requires it. A `destroy()` method is not justified until the loader has an actual teardown/reinitialize lifecycle.
+The factory owns the Groups roster and five Groups state values and binds its own controls after lazy loading. `TeacherManager.showGroupsView()` remains the one routing adapter and delegates to `feature.show()`. Internal click handlers are not manager methods. Browser APIs keep safe defaults and can be injected for platform-level tests. `destroy()` removes all seven feature listeners and supports clean reinitialization; the current page-lifetime manager does not yet call it during route changes.
 
 An eager Overview factory was considered because its read-only workflow is smaller. It was rejected as the pilot because it would not exercise or repair the lazy feature boundary that this phase targets. Word Hunt Review is the next-smallest lazy candidate, but its document listener and object-URL lifecycle make it a poorer first proof.
 

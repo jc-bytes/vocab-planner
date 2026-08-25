@@ -98,7 +98,46 @@ test('teacher overview exposes direct group-generator shortcuts', async () => {
 test('pairing restrictions have a private device fallback when cloud storage is unavailable', async () => {
     const groupsSource = await readFile(new URL('../js/teacherGroups.js', import.meta.url), 'utf8');
 
-    assert.match(groupsSource, /groupRestrictionsLocalFallback = true/);
+    assert.match(groupsSource, /usesLocalRestrictionFallback = true/);
     assert.match(groupsSource, /Restrictions are private and saved on this device/);
-    assert.match(groupsSource, /localStorage\.setItem\(/);
+    assert.match(groupsSource, /this\.storage\.setItem\(/);
+});
+
+test('Groups owns one explicit lazy feature boundary instead of manager state and handlers', async () => {
+    const [managerSource, groupsSource, lazySource, globalListeners] = await Promise.all([
+        readFile(new URL('../js/teacher.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherGroups.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8')
+    ]);
+
+    assert.match(groupsSource, /export function createTeacherGroupsFeature/);
+    assert.doesNotMatch(groupsSource, /installTeacherGroupsMethods/);
+    assert.match(groupsSource, /Object\.freeze\(\{[\s\S]*show:[\s\S]*destroy:/);
+    assert.match(lazySource, /import\(['"]\.\/teacherGroups\.js['"]\)/);
+    assert.match(lazySource, /publicMethods:\s*\{ showGroupsView: 'show' \}/);
+    assert.match(lazySource, /module\.createTeacherGroupsFeature/);
+
+    for (const field of [
+        'selectedGroupClass',
+        'groupAbsentStudents',
+        'currentRandomGroups',
+        'groupPairRestrictions',
+        'groupRestrictionsLocalFallback'
+    ]) {
+        assert.doesNotMatch(managerSource, new RegExp(`this\\.${field}`));
+    }
+
+    for (const controlId of [
+        'group-class-select',
+        'group-student-list',
+        'clear-group-absences-btn',
+        'save-group-restriction-btn',
+        'group-restriction-list',
+        'randomize-groups-btn',
+        'copy-groups-btn'
+    ]) {
+        assert.doesNotMatch(globalListeners, new RegExp(controlId));
+        assert.match(groupsSource, new RegExp(controlId));
+    }
 });

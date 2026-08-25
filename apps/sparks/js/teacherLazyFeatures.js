@@ -31,7 +31,7 @@ function captureFeatureMethods(installMethods) {
     return Object.getOwnPropertyDescriptors(FeatureMethods.prototype);
 }
 
-function getFeatureContext(manager, featureName, methods) {
+function getFeatureContext(manager, featureName, feature) {
     let managerContexts = featureContexts.get(manager);
     if (!managerContexts) {
         managerContexts = new Map();
@@ -39,7 +39,9 @@ function getFeatureContext(manager, featureName, methods) {
     }
     if (managerContexts.has(featureName)) return managerContexts.get(featureName);
 
-    const context = createFeatureContext(manager, methods);
+    const context = feature.create
+        ? feature.create(manager)
+        : createFeatureContext(manager, feature.methods);
     managerContexts.set(featureName, context);
     return context;
 }
@@ -64,7 +66,22 @@ const featureDefinitions = {
     },
     groups: async () => {
         const module = await import('./teacherGroups.js');
-        return { methods: captureFeatureMethods(module.installTeacherGroupsMethods) };
+        return {
+            publicMethods: { showGroupsView: 'show' },
+            create(manager) {
+                return module.createTeacherGroupsFeature({
+                    ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
+                    showView: () => manager.switchView('teacher-groups-view'),
+                    loadRoster: () => manager.getStudentRosterData(),
+                    getSession: () => ({
+                        authDisabled: manager.authDisabled,
+                        currentUser: manager.currentUser
+                    }),
+                    refreshIcons: root => manager.refreshIcons(root),
+                    feedback: notifications
+                });
+            }
+        };
     },
     dataManagement: async () => {
         const module = await import('./teacherDataManagement.js');
@@ -93,7 +110,7 @@ async function ensureTeacherFeature(manager, featureName) {
         }));
     }
     const feature = await featurePromises.get(featureName);
-    const context = getFeatureContext(manager, featureName, feature.methods);
+    const context = getFeatureContext(manager, featureName, feature);
     let initialized = initializedFeatures.get(manager);
     if (!initialized) {
         initialized = new Set();
@@ -110,7 +127,10 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
     async function lazyFeatureMethod(...args) {
         try {
             const { feature, context } = await ensureTeacherFeature(this, featureName);
-            const installedMethod = feature.methods[methodName]?.value;
+            const publicMethodName = feature.publicMethods?.[methodName];
+            const installedMethod = publicMethodName
+                ? context[publicMethodName]
+                : feature.methods?.[methodName]?.value;
             if (typeof installedMethod !== 'function') {
                 throw new Error(`${featureName} did not install ${methodName}.`);
             }

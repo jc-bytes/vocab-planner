@@ -55,7 +55,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 13. Create lightweight shared UI modules | DONE | Shared loading-state helper; Quiz picker and Vocabulary library consumers; primitive contract test | Complete suite, focused UI/Vocabulary/lazy checks, production build, source/built smoke | Added one evidence-backed DOM primitive. Existing element, button/card CSS, modal lifecycle, student skeleton, toast, and completion owners remain the simpler contracts. |
 | 14. Standardize application feedback | DONE | Shared notification lifecycle; centered reward timer/presentation; loading and inline-status primitives; six teacher status producers | Complete suite, focused feedback/shell/teacher/lazy/security checks, browser computed-style checks, production build, source/built smoke, independent reviews | Shared application feedback now has small behavior contracts while activity/game visuals and rich feature notices remain owned locally. |
 | 15. Map teacher feature dependencies | DONE | `docs/teacher-feature-dependencies.md`, tracker | Source tracing, focused lazy/context and feature suites, full regression, production build, built-page smoke, independent review | Documented loader/proxy, manager, DOM, data, notification, route, and lifecycle dependencies. Groups is the Task 16 pilot because it is bounded and exposes a confirmed listener/context defect. |
-| 16. Convert one teacher feature | TODO | | | |
+| 16. Convert one teacher feature | DONE | Groups factory, lazy adapter, feature-owned state/listeners, runtime/ownership tests, dependency map, package test script | Focused Groups/data/lazy suites, browser factory and real lazy-adapter workflow, full regression, production build, built-page smoke, independent diff review | Groups exposes only `show`/`destroy`; manager retains only `showGroupsView`. The confirmed undefined-manager listener path is removed without changing routes, repositories, storage keys, or lazy loading. |
 | 17. Validate the teacher feature pattern | TODO | | | |
 | 18. Migrate remaining teacher features | TODO | | | |
 | 19. Create a small page registry | TODO | | | |
@@ -89,6 +89,17 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Chose Groups as the first conversion because it is bounded, its grouping algorithm is already isolated and tested, it has no student-facing writes, and conversion removes the defect without a compatibility facade.
 - Considered eager Overview as the smallest factory pilot and Word Hunt Review as another cohesive lazy candidate. Groups was preferred because it validates the actual lazy-feature boundary and fixes demonstrated coupling; Data Management, Quiz, and Sparks are higher-risk first conversions.
 - Task 15 changes documentation only. No runtime, route, persistence, DOM, or security behavior changed.
+
+### Task 16, convert Groups to an explicit feature
+
+- Replaced the Groups temporary-prototype/proxy implementation with `createTeacherGroupsFeature`, while retaining the existing lazy `TeacherManager.showGroupsView()` shell and routing adapter.
+- The feature now owns its roster, selected class, absences, generated groups, pair restrictions, local fallback state, and all seven Groups control listeners.
+- Removed the five Groups-only fields from `TeacherManager` and removed eager Groups listeners from `teacherGlobalListeners.js`; internal handlers are no longer manager capabilities.
+- Exposed only frozen `show()` and `destroy()` use cases. Listener binding is idempotent; `destroy()` removes every owned listener and a later `show()` can rebind cleanly. The page-lifetime manager does not currently destroy features on route changes.
+- Preserved the identity-only roster loader, restriction repository/RLS boundary, local fallback behavior and keys, clipboard notifications, static markup, grouping algorithm, direct route, and navigation entry.
+- Added the previously orphaned Groups tests to `npm test` and added a browser workflow covering direct factory behavior plus the real lazy adapter. The latter reproduces the formerly broken manager path and confirms the manager does not expose internal handlers.
+- Updated the data-efficiency and build-ownership contracts to follow the new explicit seam. Groups remains a separate 15.61 kB raw, 4.91 kB gzip lazy chunk; the eager teacher entry is 158.31 kB raw, 43.60 kB gzip.
+- The first complete suite run found one stale source assertion expecting the roster capability inside `teacherGroups.js`; the assertion now correctly follows the explicit loader dependency. Focused reruns and the subsequent complete suite passed.
 
 ### Phase 0, baseline
 

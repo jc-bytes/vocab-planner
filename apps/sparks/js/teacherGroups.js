@@ -17,17 +17,54 @@ function localDateKey(date = new Date()) {
     return `${year}-${month}-${day}`;
 }
 
-class TeacherGroupsMethods {
-    async showGroupsView() {
+class TeacherGroupsFeature {
+    constructor({
+        ensureAuthenticated,
+        showView,
+        loadRoster,
+        getSession,
+        refreshIcons,
+        repository = teacherGroupRestrictionsRepository,
+        feedback = notifications,
+        storage = globalThis.localStorage,
+        clipboard = globalThis.navigator?.clipboard,
+        createRestrictionId = () => globalThis.crypto?.randomUUID?.() || `restriction-${Date.now()}`,
+        query = $
+    }) {
+        this.ensureAuthenticated = ensureAuthenticated;
+        this.showView = showView;
+        this.loadRoster = loadRoster;
+        this.getSession = getSession;
+        this.refreshIcons = refreshIcons;
+        this.repository = repository;
+        this.feedback = feedback;
+        this.storage = storage;
+        this.clipboard = clipboard;
+        this.createRestrictionId = createRestrictionId;
+        this.query = query;
+
+        this.selectedClass = '';
+        this.roster = [];
+        this.absentStudents = new Set();
+        this.randomGroups = [];
+        this.pairRestrictions = [];
+        this.usesLocalRestrictionFallback = false;
+        this.listenersBound = false;
+        this.listenerDisposers = [];
+    }
+
+    async show() {
         if (!this.ensureAuthenticated(false)) return;
-        this.switchView('teacher-groups-view');
+        this.bindListeners();
+        this.showView();
         this.setGroupGeneratorStatus('Loading your class roster…');
 
         try {
-            await Promise.all([
-                this.getStudentRosterData(),
+            const [roster] = await Promise.all([
+                this.loadRoster(),
                 this.loadGroupPairRestrictions()
             ]);
+            this.roster = Array.isArray(roster) ? roster : [];
             this.populateGroupClassSelect();
             this.renderGroupStudentList();
             this.setGroupGeneratorStatus('');
@@ -37,12 +74,45 @@ class TeacherGroupsMethods {
         }
     }
 
+    bindListeners() {
+        if (this.listenersBound) return;
+        this.listenersBound = true;
+
+        this.addListener('#group-class-select', 'change', event => {
+            this.handleGroupClassChange(event.currentTarget.value);
+        });
+        this.addListener('#group-student-list', 'change', event => {
+            const checkbox = event.target.closest('input[data-student-id]');
+            if (checkbox) this.toggleGroupStudentAbsent(checkbox.dataset.studentId, checkbox.checked);
+        });
+        this.addListener('#clear-group-absences-btn', 'click', () => this.clearGroupAbsences());
+        this.addListener('#save-group-restriction-btn', 'click', () => this.saveGroupPairRestriction());
+        this.addListener('#group-restriction-list', 'click', event => {
+            const button = event.target.closest('button[data-restriction-id]');
+            if (button) this.removeGroupPairRestriction(button.dataset.restrictionId);
+        });
+        this.addListener('#randomize-groups-btn', 'click', () => this.generateRandomGroups());
+        this.addListener('#copy-groups-btn', 'click', () => this.copyRandomGroups());
+    }
+
+    addListener(selector, type, handler) {
+        const element = this.query(selector);
+        if (!element) return;
+        element.addEventListener(type, handler);
+        this.listenerDisposers.push(() => element.removeEventListener(type, handler));
+    }
+
+    destroy() {
+        this.listenerDisposers.splice(0).forEach(dispose => dispose());
+        this.listenersBound = false;
+    }
+
     populateGroupClassSelect() {
-        const select = $('#group-class-select');
+        const select = this.query('#group-class-select');
         if (!select) return;
 
-        const previous = select.value || this.selectedGroupClass || '';
-        const classKeys = [...new Set(this.allStudentData.map(getStudentClassKey).filter(Boolean))]
+        const previous = select.value || this.selectedClass || '';
+        const classKeys = [...new Set(this.roster.map(getStudentClassKey).filter(Boolean))]
             .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
         select.innerHTML = '<option value="">Select a class</option>';
@@ -55,82 +125,82 @@ class TeacherGroupsMethods {
 
         const nextClass = classKeys.includes(previous) ? previous : (classKeys[0] || '');
         select.value = nextClass;
-        this.selectedGroupClass = nextClass;
+        this.selectedClass = nextClass;
         this.loadTodayGroupAbsences();
     }
 
     getSelectedGroupStudents() {
-        return this.allStudentData
-            .filter(student => getStudentClassKey(student) === this.selectedGroupClass)
+        return this.roster
+            .filter(student => getStudentClassKey(student) === this.selectedClass)
             .sort((a, b) => getStudentDisplayName(a).localeCompare(getStudentDisplayName(b)));
     }
 
     groupAbsenceStorageKey() {
-        return `teacher_group_absences:${localDateKey()}:${this.selectedGroupClass || 'none'}`;
+        return `teacher_group_absences:${localDateKey()}:${this.selectedClass || 'none'}`;
     }
 
     loadTodayGroupAbsences() {
         try {
-            const saved = JSON.parse(localStorage.getItem(this.groupAbsenceStorageKey()) || '[]');
-            this.groupAbsentStudents = new Set(Array.isArray(saved) ? saved : []);
+            const saved = JSON.parse(this.storage.getItem(this.groupAbsenceStorageKey()) || '[]');
+            this.absentStudents = new Set(Array.isArray(saved) ? saved : []);
         } catch {
-            this.groupAbsentStudents = new Set();
+            this.absentStudents = new Set();
         }
     }
 
     saveTodayGroupAbsences() {
         try {
-            localStorage.setItem(this.groupAbsenceStorageKey(), JSON.stringify([...this.groupAbsentStudents]));
+            this.storage.setItem(this.groupAbsenceStorageKey(), JSON.stringify([...this.absentStudents]));
         } catch {
             // Grouping still works if private browsing blocks local storage.
         }
     }
 
     handleGroupClassChange(classKey) {
-        this.selectedGroupClass = classKey;
+        this.selectedClass = classKey;
         this.loadTodayGroupAbsences();
-        this.currentRandomGroups = [];
+        this.randomGroups = [];
         this.renderGroupStudentList();
         this.renderGroupRestrictionSettings();
         this.renderRandomGroups();
     }
 
     toggleGroupStudentAbsent(studentId, absent) {
-        if (absent) this.groupAbsentStudents.add(studentId);
-        else this.groupAbsentStudents.delete(studentId);
+        if (absent) this.absentStudents.add(studentId);
+        else this.absentStudents.delete(studentId);
         this.saveTodayGroupAbsences();
         this.renderGroupStudentList();
-        this.currentRandomGroups = [];
+        this.randomGroups = [];
         this.renderRandomGroups();
     }
 
     clearGroupAbsences() {
-        this.groupAbsentStudents.clear();
+        this.absentStudents.clear();
         this.saveTodayGroupAbsences();
         this.renderGroupStudentList();
-        this.currentRandomGroups = [];
+        this.randomGroups = [];
         this.renderRandomGroups();
     }
 
     renderGroupStudentList() {
-        const list = $('#group-student-list');
-        const summary = $('#group-roster-summary');
-        const randomizeButton = $('#randomize-groups-btn');
+        const list = this.query('#group-student-list');
+        const summary = this.query('#group-roster-summary');
+        const randomizeButton = this.query('#randomize-groups-btn');
         if (!list) return;
 
         const students = this.getSelectedGroupStudents();
-        const presentCount = students.filter(student => !this.groupAbsentStudents.has(student.id)).length;
+        const presentCount = students.filter(student => !this.absentStudents.has(student.id)).length;
         const absentCount = students.length - presentCount;
 
         if (summary) {
-            summary.textContent = this.selectedGroupClass
+            summary.textContent = this.selectedClass
                 ? `${presentCount} present · ${absentCount} absent`
-                : `${this.allStudentData.length} students`;
+                : `${this.roster.length} students`;
         }
         if (randomizeButton) randomizeButton.disabled = presentCount < 2;
 
         list.innerHTML = '';
-        if (!this.selectedGroupClass) {
+        if (!this.selectedClass) {
             list.innerHTML = '<p class="teacher-empty-state">Select a class to see its students.</p>';
             this.renderGroupRestrictionSettings();
             return;
@@ -142,7 +212,7 @@ class TeacherGroupsMethods {
         }
 
         students.forEach(student => {
-            const absent = this.groupAbsentStudents.has(student.id);
+            const absent = this.absentStudents.has(student.id);
             const label = createElement('label', `group-student-toggle${absent ? ' is-absent' : ''}`);
             const checkbox = createElement('input');
             checkbox.type = 'checkbox';
@@ -161,44 +231,45 @@ class TeacherGroupsMethods {
     }
 
     groupRestrictionsStorageKey() {
-        return `teacher_group_pair_restrictions:${this.currentUser?.id || 'development-teacher'}`;
+        return `teacher_group_pair_restrictions:${this.getSession().currentUser?.id || 'development-teacher'}`;
     }
 
     async loadGroupPairRestrictions() {
-        if (this.authDisabled || this.groupRestrictionsLocalFallback) {
+        const { authDisabled } = this.getSession();
+        if (authDisabled || this.usesLocalRestrictionFallback) {
             try {
-                const saved = JSON.parse(localStorage.getItem(this.groupRestrictionsStorageKey()) || '[]');
-                this.groupPairRestrictions = Array.isArray(saved) ? saved : [];
+                const saved = JSON.parse(this.storage.getItem(this.groupRestrictionsStorageKey()) || '[]');
+                this.pairRestrictions = Array.isArray(saved) ? saved : [];
             } catch {
-                this.groupPairRestrictions = [];
+                this.pairRestrictions = [];
             }
-            return this.groupPairRestrictions;
+            return this.pairRestrictions;
         }
 
         try {
-            this.groupPairRestrictions = await teacherGroupRestrictionsRepository.list();
+            this.pairRestrictions = await this.repository.list();
         } catch (error) {
             console.error('Could not load teacher group restrictions:', error);
-            this.groupRestrictionsLocalFallback = true;
+            this.usesLocalRestrictionFallback = true;
             try {
-                const saved = JSON.parse(localStorage.getItem(this.groupRestrictionsStorageKey()) || '[]');
-                this.groupPairRestrictions = Array.isArray(saved) ? saved : [];
+                const saved = JSON.parse(this.storage.getItem(this.groupRestrictionsStorageKey()) || '[]');
+                this.pairRestrictions = Array.isArray(saved) ? saved : [];
             } catch {
-                this.groupPairRestrictions = [];
+                this.pairRestrictions = [];
             }
             this.setGroupRestrictionStatus(
                 'Restrictions are private and saved on this device.',
                 'muted'
             );
         }
-        return this.groupPairRestrictions;
+        return this.pairRestrictions;
     }
 
     saveDevelopmentGroupRestrictions() {
         try {
-            localStorage.setItem(
+            this.storage.setItem(
                 this.groupRestrictionsStorageKey(),
-                JSON.stringify(this.groupPairRestrictions)
+                JSON.stringify(this.pairRestrictions)
             );
         } catch {
             // Development-only fallback; production restrictions use Supabase.
@@ -211,17 +282,17 @@ class TeacherGroupsMethods {
 
     getCurrentClassRestrictions() {
         const classStudentIds = this.getCurrentClassRestrictionStudents();
-        return this.groupPairRestrictions.filter(restriction => (
+        return this.pairRestrictions.filter(restriction => (
             classStudentIds.has(restriction.studentAId)
             && classStudentIds.has(restriction.studentBId)
         ));
     }
 
     renderGroupRestrictionSettings() {
-        const studentASelect = $('#group-restriction-student-a');
-        const studentBSelect = $('#group-restriction-student-b');
-        const list = $('#group-restriction-list');
-        const count = $('#group-restriction-count');
+        const studentASelect = this.query('#group-restriction-student-a');
+        const studentBSelect = this.query('#group-restriction-student-b');
+        const list = this.query('#group-restriction-list');
+        const count = this.query('#group-restriction-count');
         if (!studentASelect || !studentBSelect || !list) return;
 
         const students = this.getSelectedGroupStudents();
@@ -243,7 +314,7 @@ class TeacherGroupsMethods {
         if (count) count.textContent = `${restrictions.length} saved`;
         list.innerHTML = '';
 
-        if (!this.selectedGroupClass) {
+        if (!this.selectedClass) {
             list.innerHTML = '<p class="teacher-empty-state">Select a class to manage its pairing restrictions.</p>';
             return;
         }
@@ -270,14 +341,14 @@ class TeacherGroupsMethods {
     }
 
     setGroupRestrictionStatus(message, state = 'muted') {
-        const status = $('#group-restriction-status');
+        const status = this.query('#group-restriction-status');
         if (!status) return;
         setInlineStatus(status, message, state);
     }
 
     async saveGroupPairRestriction() {
-        const studentAId = $('#group-restriction-student-a')?.value || '';
-        const studentBId = $('#group-restriction-student-b')?.value || '';
+        const studentAId = this.query('#group-restriction-student-a')?.value || '';
+        const studentBId = this.query('#group-restriction-student-b')?.value || '';
         if (!studentAId || !studentBId) {
             this.setGroupRestrictionStatus('Choose both students.', 'error');
             return;
@@ -288,7 +359,7 @@ class TeacherGroupsMethods {
         }
 
         const pair = canonicalStudentPair(studentAId, studentBId);
-        const alreadySaved = this.groupPairRestrictions.some(restriction => (
+        const alreadySaved = this.pairRestrictions.some(restriction => (
             restriction.studentAId === pair.studentAId
             && restriction.studentBId === pair.studentBId
         ));
@@ -297,27 +368,28 @@ class TeacherGroupsMethods {
             return;
         }
 
-        const saveButton = $('#save-group-restriction-btn');
+        const saveButton = this.query('#save-group-restriction-btn');
         try {
             if (saveButton) saveButton.disabled = true;
             let restriction;
-            if (this.authDisabled || this.groupRestrictionsLocalFallback) {
+            const { authDisabled, currentUser } = this.getSession();
+            if (authDisabled || this.usesLocalRestrictionFallback) {
                 restriction = {
-                    id: globalThis.crypto?.randomUUID?.() || `restriction-${Date.now()}`,
+                    id: this.createRestrictionId(),
                     ...pair,
-                    teacherId: this.currentUser?.id || 'development-teacher',
+                    teacherId: currentUser?.id || 'development-teacher',
                     createdAt: new Date().toISOString()
                 };
-                this.groupPairRestrictions.push(restriction);
+                this.pairRestrictions.push(restriction);
                 this.saveDevelopmentGroupRestrictions();
             } else {
-                restriction = await teacherGroupRestrictionsRepository.create(studentAId, studentBId);
-                this.groupPairRestrictions.push(restriction);
+                restriction = await this.repository.create(studentAId, studentBId);
+                this.pairRestrictions.push(restriction);
             }
 
-            $('#group-restriction-student-a').value = '';
-            $('#group-restriction-student-b').value = '';
-            this.currentRandomGroups = [];
+            this.query('#group-restriction-student-a').value = '';
+            this.query('#group-restriction-student-b').value = '';
+            this.randomGroups = [];
             this.renderRandomGroups();
             this.renderGroupRestrictionSettings();
             this.setGroupRestrictionStatus('Private pairing restriction saved.', 'success');
@@ -333,18 +405,19 @@ class TeacherGroupsMethods {
     }
 
     async removeGroupPairRestriction(restrictionId) {
-        const restriction = this.groupPairRestrictions.find(item => item.id === restrictionId);
+        const restriction = this.pairRestrictions.find(item => item.id === restrictionId);
         if (!restriction) return;
 
         try {
-            if (!this.authDisabled && !this.groupRestrictionsLocalFallback) {
-                await teacherGroupRestrictionsRepository.remove(restrictionId);
+            const { authDisabled } = this.getSession();
+            if (!authDisabled && !this.usesLocalRestrictionFallback) {
+                await this.repository.remove(restrictionId);
             }
-            this.groupPairRestrictions = this.groupPairRestrictions.filter(item => item.id !== restrictionId);
-            if (this.authDisabled || this.groupRestrictionsLocalFallback) {
+            this.pairRestrictions = this.pairRestrictions.filter(item => item.id !== restrictionId);
+            if (authDisabled || this.usesLocalRestrictionFallback) {
                 this.saveDevelopmentGroupRestrictions();
             }
-            this.currentRandomGroups = [];
+            this.randomGroups = [];
             this.renderRandomGroups();
             this.renderGroupRestrictionSettings();
             this.setGroupRestrictionStatus('Pairing restriction removed.', 'success');
@@ -356,8 +429,8 @@ class TeacherGroupsMethods {
 
     generateRandomGroups() {
         const presentStudents = this.getSelectedGroupStudents()
-            .filter(student => !this.groupAbsentStudents.has(student.id));
-        const groupSize = Number.parseInt($('#group-size-select')?.value || '2', 10);
+            .filter(student => !this.absentStudents.has(student.id));
+        const groupSize = Number.parseInt(this.query('#group-size-select')?.value || '2', 10);
         const presentIds = new Set(presentStudents.map(student => student.id));
         const activeRestrictions = this.getCurrentClassRestrictions().filter(restriction => (
             presentIds.has(restriction.studentAId)
@@ -369,7 +442,7 @@ class TeacherGroupsMethods {
             activeRestrictions
         );
         if (generatedGroups === null) {
-            this.currentRandomGroups = [];
+            this.randomGroups = [];
             this.renderRandomGroups();
             this.setGroupGeneratorStatus(
                 'No valid arrangement is possible with these pairing restrictions. Change the group size or remove a restriction.',
@@ -377,22 +450,22 @@ class TeacherGroupsMethods {
             );
             return;
         }
-        this.currentRandomGroups = generatedGroups;
+        this.randomGroups = generatedGroups;
         this.renderRandomGroups();
 
-        const groupWord = this.currentRandomGroups.length === 1 ? 'group' : 'groups';
+        const groupWord = this.randomGroups.length === 1 ? 'group' : 'groups';
         this.setGroupGeneratorStatus(
-            `Created ${this.currentRandomGroups.length} ${groupWord} for ${presentStudents.length} present students.`,
+            `Created ${this.randomGroups.length} ${groupWord} for ${presentStudents.length} present students.`,
             'success'
         );
     }
 
     renderRandomGroups() {
-        const results = $('#group-results');
-        const copyButton = $('#copy-groups-btn');
+        const results = this.query('#group-results');
+        const copyButton = this.query('#copy-groups-btn');
         if (!results) return;
 
-        const groups = this.currentRandomGroups || [];
+        const groups = this.randomGroups;
         copyButton?.classList.toggle('hidden', groups.length === 0);
         results.innerHTML = '';
 
@@ -422,13 +495,13 @@ class TeacherGroupsMethods {
     }
 
     setGroupGeneratorStatus(message, state = 'muted') {
-        const status = $('#group-generator-status');
+        const status = this.query('#group-generator-status');
         if (!status) return;
         setInlineStatus(status, message, state);
     }
 
     async copyRandomGroups() {
-        const groups = this.currentRandomGroups || [];
+        const groups = this.randomGroups;
         if (!groups.length) return;
 
         const text = groups.map((group, index) => (
@@ -436,21 +509,18 @@ class TeacherGroupsMethods {
         )).join('\n');
 
         try {
-            await navigator.clipboard.writeText(text);
-            notifications.success('Groups copied to the clipboard.');
+            await this.clipboard.writeText(text);
+            this.feedback.success('Groups copied to the clipboard.');
         } catch {
-            notifications.error('Could not copy the groups.');
+            this.feedback.error('Could not copy the groups.');
         }
     }
 }
 
-export function installTeacherGroupsMethods(TeacherManager) {
-    for (const name of Object.getOwnPropertyNames(TeacherGroupsMethods.prototype)) {
-        if (name === 'constructor') continue;
-        Object.defineProperty(
-            TeacherManager.prototype,
-            name,
-            Object.getOwnPropertyDescriptor(TeacherGroupsMethods.prototype, name)
-        );
-    }
+export function createTeacherGroupsFeature(dependencies) {
+    const feature = new TeacherGroupsFeature(dependencies);
+    return Object.freeze({
+        show: feature.show.bind(feature),
+        destroy: feature.destroy.bind(feature)
+    });
 }

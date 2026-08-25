@@ -35,11 +35,6 @@ class TeacherManager {
         this.activeStudentId = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
-        this.selectedGroupClass = '';
-        this.groupAbsentStudents = new Set();
-        this.currentRandomGroups = [];
-        this.groupPairRestrictions = [];
-        this.groupRestrictionsLocalFallback = false;
         this.dataViewerInitialized = false;
         this.exportListenersInitialized = false;
         this.libraryItems = [];

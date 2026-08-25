@@ -30,6 +30,7 @@ const wordHuntMethods = await readFile(new URL(
     '../js/teacherWordHuntReview/teacherWordHuntReviewDataMethods.js', import.meta.url
 ), 'utf8');
 const groupMethods = await readFile(new URL('../js/teacherGroups.js', import.meta.url), 'utf8');
+const lazyFeatureMethods = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
 const subjectSettingsMethods = await readFile(new URL('../js/teacherSubjectSettingsMethods.js', import.meta.url), 'utf8');
 const calendarSettingsMethods = await readFile(new URL('../js/teacherSchoolCalendarSettingsMethods.js', import.meta.url), 'utf8');
 const gamificationSettingsMethods = await readFile(new URL('../js/teacherGamificationSettingsMethods.js', import.meta.url), 'utf8');
@@ -79,7 +80,7 @@ test('group generation and export selection use identity-only roster data', () =
     assert.match(identityRosterMigration, /from public\.profiles/i);
     assert.doesNotMatch(identityRosterMigration, /student_progress|student_activity|student_coin/i);
     assert.doesNotMatch(groupMethods, /getStudentProgressData/);
-    assert.match(groupMethods, /getStudentRosterData/);
+    assert.match(lazyFeatureMethods, /loadRoster:\s*\(\) => manager\.getStudentRosterData\(\)/);
     assert.doesNotMatch(dashboardMethods, /getStudentProgressData/);
     assert.match(dashboardMethods, /getStudentRosterData/);
     assert.match(groupMethods, /Promise\.all\(\[/);
