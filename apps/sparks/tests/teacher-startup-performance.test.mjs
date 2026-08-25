@@ -6,7 +6,7 @@ const teacherAuth = await readFile(new URL('../js/teacherAuth.js', import.meta.u
 const teacherOverview = await readFile(new URL('../js/teacherOverview.js', import.meta.url), 'utf8');
 
 test('teacher session loads independent settings in parallel', () => {
-    const parallelLoad = /Promise\.all\(\[\s*this\.loadSubjectSettings\(\),\s*this\.loadSchoolCalendarSettings\(\)\s*\]\)/;
+    const parallelLoad = /Promise\.all\(\[\s*this\.loadSubjectSettings\([^)]*\),\s*this\.loadSchoolCalendarSettings\([^)]*\)\s*\]\)/;
     assert.match(teacherAuth, parallelLoad);
     assert.equal((teacherAuth.match(new RegExp(parallelLoad.source, 'g')) || []).length, 2);
 });

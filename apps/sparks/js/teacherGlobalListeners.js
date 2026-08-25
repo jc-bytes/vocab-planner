@@ -1,5 +1,4 @@
 import { $, $$, setupModal } from './main.js';
-import { supabaseService } from './supabaseService.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
@@ -60,7 +59,7 @@ function bindTeacherAuthListeners(manager) {
             manager.currentUser = null;
             manager.updateAuthUI(null);
             manager.showLoginView();
-            await supabaseService.signOut();
+            await manager.teacherAuthApi.signOut();
         });
     }
 }

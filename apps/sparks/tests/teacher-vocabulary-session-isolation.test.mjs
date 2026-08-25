@@ -474,5 +474,5 @@ test('every auth exit invalidates Vocabulary state before another account can us
     const listenerSource = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
     assert.match(authSource, /currentUser\.uid !== user\.uid[\s\S]*clearTeacherVocabularySessionState\?\.\(\)/);
     assert.match(authSource, /else \{[\s\S]*clearTeacherVocabularySessionState\?\.\(\)[\s\S]*currentUser = null/);
-    assert.match(listenerSource, /clearTeacherVocabularySessionState\?\.\(\);[\s\S]*await supabaseService\.signOut\(\)/);
+    assert.match(listenerSource, /clearTeacherVocabularySessionState\?\.\(\);[\s\S]*await manager\.teacherAuthApi\.signOut\(\)/);
 });

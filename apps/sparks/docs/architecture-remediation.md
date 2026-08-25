@@ -68,7 +68,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
-| 29. Add interfaces only where justified | IN PROGRESS | Signed-in reward authority | Focused/full regression; production build; independent review | Server snapshots now exclusively award authenticated activity coins; explicit local mode retains immediate rewards. Auth and parity seams remain. |
+| 29. Add interfaces only where justified | IN PROGRESS | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle | Focused/full regression; production builds; independent reviews | Server snapshots exclusively award authenticated activity coins. Teacher authentication is injectable, rejects stale cached roles, clears rejected sessions, and permits same-account retries. Game/server parity remains. |
 | 30. Consolidate environment authority | TODO | | | |
 | 31. Correct stale documentation | TODO | | | |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
@@ -561,6 +561,17 @@ Task 28 is complete. Task 29 will add only the narrow test/security seams needed
 - Verification passed for 108 focused activity/progress tests, 76 Student Progress tests in independent review, the complete regression suite, 13-game sandbox smoke, production build, scoped diff validation, and independent semantic review. Deployment remains 13.5 MB with 2,331 modules.
 
 Task 29 remains in progress. The next subtask will introduce only the auth seam required to test and eliminate stale teacher-role fail-open behavior.
+
+### Task 29b, make teacher authentication explicit and fail closed
+
+- Added one frozen teacher-auth capability containing only the authentication/session methods the teacher workflow actually calls. The auth installer accepts this capability for deterministic tests; it does not expose the raw Supabase client or teacher/data operations.
+- Removed the teacher shell's cached-role fallback. A current profile request or allowlist repair must verify the teacher role before the shell opens; a verification failure now disposes lazy features, clears account-owned state, closes the shell, and shows the login view.
+- Routed explicit sign-out through the same injected capability. Teacher auth lifecycle code no longer imports the broad service directly.
+- Invalidated failed session initialization so a transient profile error is not cached as a completed same-account result. A retry for the same UID now performs a fresh verification and can recover.
+- Preserved development auth mode, password and email-link flows, current role repair, route restoration, parallel settings loads, auth-event de-duplication, and repository/RLS security boundaries. Dormant auth methods remain for Task 36 reachability tracing rather than being removed speculatively.
+- Verification passed through seven new auth-boundary tests, focused settings/Vocabulary/startup/build/security checks, the complete regression suite, nine-width student regression, three-page smoke, 13-game sandbox smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB with 2,332 modules.
+
+Task 29 remains in progress. The next subtask will add a static parity contract between the independent game registry and the effective server score policy; it will not make client metadata authoritative for database security.
 
 ### Phase 0, baseline
 

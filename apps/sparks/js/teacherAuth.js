@@ -1,6 +1,6 @@
 import { $ } from './main.js';
-import { supabaseService } from './supabaseService.js';
 import { SessionInitializationCoordinator } from './services/sessionInitialization.js';
+import { teacherAuthApi } from './services/teacherAuthApi.js';
 
 export const DEV_AUTH_DISABLED = false;
 export const DEV_TEACHER_USER = {
@@ -29,8 +29,8 @@ class TeacherAuthMethods {
 
     async initAuth() {
         try {
-            await supabaseService.init();
-            const restoredUser = supabaseService.getCurrentUser();
+            await this.teacherAuthApi.init();
+            const restoredUser = this.teacherAuthApi.getCurrentUser();
             let restoredUserHandled = false;
 
             if (restoredUser) {
@@ -41,7 +41,7 @@ class TeacherAuthMethods {
             }
 
             this.authUnsubscribe?.();
-            this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
+            this.authUnsubscribe = this.teacherAuthApi.onAuthStateChanged((user, event) => {
                 if (user) {
                     if (this.currentUser?.uid && this.currentUser.uid !== user.uid) {
                         this.disposeLoadedTeacherFeatures?.();
@@ -88,7 +88,7 @@ class TeacherAuthMethods {
     // Handle email link sign-in with confirmed email (cross-device)
     async completeEmailSignInWithEmail(email) {
         try {
-            const result = await supabaseService.completeEmailSignIn(email);
+            const result = await this.teacherAuthApi.completeEmailSignIn(email);
             console.log('Email link sign-in completed:', result.user.email);
             await this.handleAuthWithRole(result.user);
         } catch (error) {
@@ -117,7 +117,18 @@ class TeacherAuthMethods {
             if (!context.isCurrent()) return false;
             this.currentRole = role;
             if (role !== 'teacher') {
-                await supabaseService.signOut();
+                this.disposeLoadedTeacherFeatures?.();
+                this.clearStudentProgressSessionState?.();
+                this.clearTeacherSettingsSessionState?.();
+                this.clearTeacherVocabularySessionState?.();
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                this.updateAuthUI(null);
+                try {
+                    await this.teacherAuthApi.signOut();
+                } catch (signOutError) {
+                    console.warn('Could not clear the rejected teacher session:', signOutError);
+                }
                 this.showAuthError(role === 'unknown'
                     ? 'No teacher profile was found for this account. Check the teacher allowlist and database sync.'
                     : 'Access restricted to allowlisted teacher emails.');
@@ -138,6 +149,15 @@ class TeacherAuthMethods {
         } catch (err) {
             if (!context.isCurrent()) return false;
             console.error('Role check failed:', err);
+            this.getAuthCoordinator().invalidate();
+            this.disposeLoadedTeacherFeatures?.();
+            this.clearStudentProgressSessionState?.();
+            this.clearTeacherSettingsSessionState?.();
+            this.clearTeacherVocabularySessionState?.();
+            this.isAuthenticated = false;
+            this.currentUser = null;
+            this.currentRole = 'unknown';
+            this.updateAuthUI(null);
             this.showAuthError('Could not verify teacher role.');
             this.showLoginView();
             return false;
@@ -146,14 +166,12 @@ class TeacherAuthMethods {
 
     async fetchUserRole(user) {
         try {
-            const profile = await supabaseService.getProfile(user.uid);
+            const profile = await this.teacherAuthApi.getProfile(user.uid);
             if (!profile || profile.role !== 'teacher') {
-                if (typeof supabaseService.ensureAllowlistedTeacherProfile === 'function') {
+                if (typeof this.teacherAuthApi.ensureAllowlistedTeacherProfile === 'function') {
                     try {
-                        const repairedProfile = await supabaseService.ensureAllowlistedTeacherProfile();
-                        const repairedRole = repairedProfile?.role || 'unknown';
-                        localStorage.setItem(`userRole_${user.uid}`, repairedRole);
-                        return repairedRole;
+                        const repairedProfile = await this.teacherAuthApi.ensureAllowlistedTeacherProfile();
+                        return repairedProfile?.role || 'unknown';
                     } catch (repairError) {
                         console.warn('Could not repair allowlisted teacher profile:', repairError);
                     }
@@ -161,16 +179,11 @@ class TeacherAuthMethods {
             }
 
             if (!profile) {
-                localStorage.removeItem(`userRole_${user.uid}`);
                 return 'unknown';
             }
-            const role = profile.role || 'unknown';
-            localStorage.setItem(`userRole_${user.uid}`, role);
-            return role;
+            return profile.role || 'unknown';
         } catch (err) {
             console.error('Failed to fetch role', err);
-            const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
-            if (cachedRole) return cachedRole;
             throw err;
         }
     }
@@ -252,7 +265,7 @@ class TeacherAuthMethods {
 
         this.showAuthError('');
         try {
-            const result = await supabaseService.signInWithPassword(email, password);
+            const result = await this.teacherAuthApi.signInWithPassword(email, password);
             await this.handleAuthWithRole(result.user);
         } catch (error) {
             console.error('Teacher login failed:', error);
@@ -284,7 +297,7 @@ class TeacherAuthMethods {
 
         this.showAuthError('');
         try {
-            const result = await supabaseService.signUpTeacher(email, password);
+            const result = await this.teacherAuthApi.signUpTeacher(email, password);
             await this.handleAuthWithRole(result.user);
         } catch (error) {
             console.error('Teacher signup failed:', error);
@@ -324,7 +337,7 @@ class TeacherAuthMethods {
                 this.showAuthError('');
                 
                 try {
-                    await supabaseService.sendEmailSignInLink(email);
+                    await this.teacherAuthApi.sendEmailSignInLink(email);
                     
                     // Show success message
                     const form = $('#email-signin-form');
@@ -410,7 +423,12 @@ class TeacherAuthMethods {
     }
 }
 
-export function installTeacherAuthMethods(TeacherManager) {
+export function installTeacherAuthMethods(TeacherManager, { authApi = teacherAuthApi } = {}) {
+    Object.defineProperty(TeacherManager.prototype, 'teacherAuthApi', {
+        configurable: true,
+        writable: true,
+        value: authApi
+    });
     for (const name of Object.getOwnPropertyNames(TeacherAuthMethods.prototype)) {
         if (name === 'constructor') continue;
         Object.defineProperty(
