@@ -135,7 +135,6 @@ test('StudentActivities owns explicit runtime components', () => {
 
     assert.equal(activities.sm, manager);
     assert.equal(activities.manifest, null);
-    assert.deepEqual(activities.cloudVocabs, []);
     assert.deepEqual(activities.availableVocabs, []);
     assert.equal(activities.studentVocabularyViewMode, 'cards');
     assert.ok(activities.activityRouteTypes.length > 0);
@@ -160,7 +159,6 @@ test('StudentActivities owns explicit runtime components', () => {
     assert.equal(activities.launcher.activities, activities);
     for (const state of [
         'manifest',
-        'cloudVocabs',
         'availableVocabs',
         'studentVocabularyViewMode',
         'activityRouteTypes'
@@ -926,13 +924,11 @@ test('StudentActivities catalog and browser state is isolated per instance', () 
     const second = new StudentActivities({});
 
     first.manifest = { vocabularies: [{ id: 'unit-1' }] };
-    first.cloudVocabs.push({ id: 'cloud-1' });
     first.availableVocabs.push({ id: 'available-1' });
     first.studentVocabularyViewMode = 'rows';
     first.activityRouteTypes.push('custom-test-activity');
 
     assert.equal(second.manifest, null);
-    assert.deepEqual(second.cloudVocabs, []);
     assert.deepEqual(second.availableVocabs, []);
     assert.equal(second.studentVocabularyViewMode, 'cards');
     assert.equal(second.activityRouteTypes.includes('custom-test-activity'), false);

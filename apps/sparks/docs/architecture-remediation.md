@@ -1404,3 +1404,12 @@ Task 34 is complete. Task 35 will verify that every intended lazy boundary remai
 - Verification passed: 21 focused build/lazy/budget checks, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, and final production build. The manifest validator passes, the student precache remains 20 files/1,025,326 bytes, and Task 34 size metrics remain unchanged.
 
 Task 35 is complete. Task 36 will remove only code or CSS that current caller/import/DOM tracing proves obsolete after the completed migrations.
+
+### Task 36a, remove unused student vocabulary state
+
+- Removed the `StudentActivities.cloudVocabs` collection and its merge branch. Production source initialized and read this collection but never populated it; only an isolation test mutated it.
+- Preserved manifest and available-vocabulary precedence, routing, activity preparation, browser storage, and cloud repository behavior. No compatibility field remains because there is no production caller.
+- Updated the focused runtime-composition contract so it continues to prove per-instance ownership for every live activity state field.
+- Verification passed: 140 student-activity tests, 15 student-routing tests, 21 build-efficiency/lazy tests, the complete `npm test` suite, three-page source smoke, 9-width student regression, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student initial delivery is 182.4 KiB gzip.
+
+Task 36 remains in progress. The next cleanup will remove only independently traced zero-caller repository methods, separate from the dormant-auth investigation.

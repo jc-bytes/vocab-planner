@@ -22,7 +22,6 @@ export class StudentActivities {
     constructor(studentManager) {
         this.sm = studentManager; // Reference to StudentManager instance
         this.manifest = null;
-        this.cloudVocabs = [];
         this.availableVocabs = [];
         this.studentVocabularyViewMode = localStorage.getItem('student_vocabulary_view_mode') || 'cards';
         this.activityRouteTypes = getStudentActivityIds();

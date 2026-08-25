@@ -29,10 +29,6 @@ export class StudentActivityVocabularyData {
     getAllVocabularySources() {
         let vocabs = [];
 
-        if (this.activities.cloudVocabs.length > 0) {
-            vocabs = vocabs.concat(this.activities.cloudVocabs);
-        }
-
         if (Array.isArray(this.activities.manifest?.vocabularies)) {
             const manifestVocabs = this.activities.manifest.vocabularies.map(v => ({
                 ...v,
