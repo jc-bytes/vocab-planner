@@ -28,7 +28,7 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | Top-level teacher page IDs and view IDs | `js/teacherPageRegistry.js` |
 | Teacher route parsing and application | `js/teacherRouting.js` |
 | Semantic theme values | `css/theme.css` |
-| Shared UI styles | `css/buttons.css`, `forms.css`, `cards.css`, `dialogs.css`, `navigation.css`, `feedback.css`, `containers.css`, and `typography.css` |
+| Shared UI styles | `css/buttons.css`, `css/forms.css`, `css/cards.css`, `css/dialogs.css`, `css/navigation.css`, `css/feedback.css`, `css/containers.css`, and `css/typography.css` |
 | Small shared DOM behavior | `js/ui/` and `js/main.js` |
 | Domain data access | `js/services/*Repository.js` and narrow domain API modules |
 | Browser Supabase initialization | `js/services/supabaseClient.js` and `js/supabaseService.js` |
