@@ -116,6 +116,32 @@ test('StudentGames owns explicit game components', () => {
     }
 });
 
+test('Arcade selection displays the authoritative earned-time balance', async () => {
+    const games = new StudentGames({ currentUser: { uid: 'student-1' } });
+    const elements = new Map([
+        ['#galactic-breaker-cost', { textContent: '' }],
+        ['#add-time-btn', { textContent: '' }],
+        ['#arcade-time-balance', { textContent: '' }]
+    ]);
+    const originalQuerySelector = globalThis.document.querySelector;
+    globalThis.document.querySelector = selector => elements.get(selector) || null;
+    games.settings.loadGlobalSettings = async () => ({ exchangeRate: 10 });
+    games.loadArcadeTime = async () => {
+        games.access.arcadeTime = { availableSeconds: FORMATIVE_PASS_SECONDS };
+        return games.access.arcadeTime;
+    };
+
+    try {
+        await games.updateArcadeUI();
+        assert.equal(
+            elements.get('#arcade-time-balance').textContent,
+            '10m 0s of earned Arcade time available. Complete a formative activity after every 10 minutes of Arcade play.'
+        );
+    } finally {
+        globalThis.document.querySelector = originalQuerySelector;
+    }
+});
+
 test('legacy game score discovery caches the first matching global', () => {
     assert.match(legacyScoreBridgeSource, /let cachedGame = null/);
     assert.match(legacyScoreBridgeSource, /if \(cachedGame\?\.levelStats\) return cachedGame/);
