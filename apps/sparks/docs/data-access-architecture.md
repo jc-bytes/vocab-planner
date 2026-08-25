@@ -20,12 +20,12 @@ The migration preserved the existing camelCase application record shapes while m
 | `subjectsRepository` | `subjects` | `list`, `saveAll` |
 | `vocabularyRepository` | `vocabularies` | `list`, `get`, `save`, `update`, `remove` |
 | `sparksRepository` | `weekly_sparks` | `list`, `listScheduledForStudent`, `save`, `update` |
-| `studentProgressRepository` | `student_progress` reads and Realtime | `get`, `subscribe` |
-| `leaderboardRepository` | `scores` reads | `get`, `listTop`, `listForUser` |
-| `teacherExportRepository` | export reads from `student_progress`, `profiles`, and `scores`; writes to `export_logs` | `getStudentProgress`, `getProfile`, `listScores`, `logExport` |
-| Auth/profile service | Supabase Auth and `profiles` | sign-in, sign-up, profile reads/writes, student roster reads |
+| `studentProgressRepository` | `student_progress` reads and Realtime | `get`, `getSummary`, `subscribe` |
+| `leaderboardRepository` | `scores` reads | `listTop`, `listForUser` |
+| `teacherExportRepository` | export reads from `student_progress`, `profiles`, and `scores`; writes to `export_logs` | `getStudentProgressBatch`, `getProfiles`, `listScoresForUsers`, `logExport` |
+| Auth/profile service | Supabase Auth and `profiles` | password sign-in, session/profile reads, teacher-managed student provisioning and roster reads |
 | Student RPC client | validated progress and score writes | domain-specific RPC methods such as `submitStudentActivityProgress` and `submitStudentGameScore` |
-| Word Hunt Storage service | `word-hunt-images` bucket | path construction, upload, download, delete |
+| Word Hunt Storage service | `word-hunt-images` bucket | path construction, upload, download |
 
 `studentApi.js` and `teacherAuthApi.js` expose separate frozen capability allowlists for student operations and teacher authentication. They do not re-export data primitives or the broad internal Supabase service.
 
@@ -83,7 +83,7 @@ The August 2026 remediation review traced authentication/session, activity progr
 3. **Resolved — browser secret-key guard:** shared runtime/build validation rejects current secret keys, explicit service-role values, and legacy service-role JWTs before browser exposure.
 4. **Resolved — game policy drift:** the client leaderboard set and score directions must match the independently defined effective SQL policy. Four stale server-only capabilities were removed.
 5. **Medium — broad internal auth file:** `supabaseAuthProfileMethods.js` also contains teacher roster/progress RPC methods. This is internal module organization, not a leaked client interface. Split it only when one of those operations is materially changed; an import-only rearrangement is not justified.
-6. **Low — dead or uncertain surfaces:** unused export-repository methods, an unused Storage delete method, dormant auth flows, and the unpopulated `cloudVocabs` collection are candidates for Task 36. Each still requires exact caller and behavior confirmation before removal.
+6. **Resolved — dead surfaces:** Task 36 removed the source-proven unused export-repository methods, Storage delete method, dormant public signup flows, and unpopulated student `cloudVocabs` collection. Active batch export, password authentication, teacher-managed provisioning, and Word Hunt upload/download paths remain.
 
 ### Interface decision rule
 
