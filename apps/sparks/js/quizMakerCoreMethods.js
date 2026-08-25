@@ -58,7 +58,7 @@ class QuizMakerCoreMethods {
     }
 
     notifyStateChange() {
-        if (this.suppressStateSave || !this.onStateChange) return;
+        if (this.disposed || this.suppressStateSave || !this.onStateChange) return;
         this.syncSectionsFromInputs();
         this.onStateChange(this.serializeState());
     }
@@ -96,6 +96,7 @@ class QuizMakerCoreMethods {
     }
 
     generateQuizFromSections() {
+        if (this.disposed) return;
         this.syncSectionsFromInputs();
         this.questions = [];
         this.quizSections.forEach(section => {
@@ -108,8 +109,54 @@ class QuizMakerCoreMethods {
     }
 
     scheduleAutoGenerate() {
+        if (this.disposed) return;
         window.clearTimeout(this.autoGenerateTimer);
         this.autoGenerateTimer = window.setTimeout(() => this.generateQuizFromSections(), 350);
+    }
+
+    destroy() {
+        if (this.disposed) return;
+        this.disposed = true;
+        this.lifecycleGeneration = (this.lifecycleGeneration || 0) + 1;
+
+        window.clearTimeout(this.autoGenerateTimer);
+        this.autoGenerateTimer = null;
+
+        const handlerProperties = new Map([
+            ['quiz-maker-back-btn', ['onclick']],
+            ['quiz-maker-close-btn', ['onclick']],
+            ['quiz-maker-word-btn', ['onclick']],
+            ['add-quiz-section-btn', ['onclick']],
+            ['generate-questions-btn', ['onclick']],
+            ['quiz-title-input', ['oninput']],
+            ['quiz-instructions-input', ['oninput']],
+            ['quiz-school-input', ['oninput']],
+            ['quiz-teacher-input', ['oninput']],
+            ['quiz-grade-input', ['oninput']],
+            ['quiz-border-toggle', ['onchange']],
+            ['quiz-font-select', ['onchange']],
+            ['edit-rubric-btn', ['onclick']]
+        ]);
+        handlerProperties.forEach((properties, id) => {
+            const element = document.getElementById(id);
+            properties.forEach(property => {
+                if (element) element[property] = null;
+            });
+        });
+        document.querySelectorAll('.quiz-tool-tab').forEach(tab => { tab.onclick = null; });
+
+        this.rubricOverlays?.forEach(overlay => overlay.remove());
+        this.rubricOverlays?.clear();
+        this.downloadRevokeTimers?.forEach(timer => window.clearTimeout(timer));
+        this.downloadRevokeTimers?.clear();
+        this.downloadUrls?.forEach(url => URL.revokeObjectURL(url));
+        this.downloadUrls?.clear();
+
+        document.getElementById('quiz-section-list')?.replaceChildren();
+        document.getElementById('quiz-questions-list')?.replaceChildren();
+        this.dragSrcEl = null;
+        this.onStateChange = null;
+        this.onClose = null;
     }
 }
 

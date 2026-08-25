@@ -324,6 +324,8 @@ export async function buildQuizWordDocumentBlob(quizMaker, logoBuffer = null) {
 
 class QuizMakerWordExportMethods {
     async exportAsWord() {
+        if (this.disposed) return false;
+        const lifecycleGeneration = this.lifecycleGeneration;
         if (!this.questions.length) {
             this.generateQuizFromSections();
         }
@@ -331,11 +333,16 @@ class QuizMakerWordExportMethods {
         try {
             this.updateTotalPoints();
             const logoBuffer = await this.loadDocxLogo();
+            if (this.disposed || lifecycleGeneration !== this.lifecycleGeneration) return false;
             const blob = await this.buildWordDocumentBlob(logoBuffer);
+            if (this.disposed || lifecycleGeneration !== this.lifecycleGeneration) return false;
             this.downloadBlob(blob, `${this.safeFileName(this.meta.title || 'quiz')}.docx`);
+            return true;
         } catch (err) {
+            if (this.disposed || lifecycleGeneration !== this.lifecycleGeneration) return false;
             console.error('Export Word failed:', err);
             alert('Could not export Word document.');
+            return false;
         }
     }
 
@@ -364,13 +371,35 @@ class QuizMakerWordExportMethods {
 
     downloadBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
+        this.downloadUrls.add(url);
         const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const revokeUrl = () => {
+            if (!this.downloadUrls.delete(url)) return;
+            URL.revokeObjectURL(url);
+        };
+
+        try {
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            revokeUrl();
+            throw error;
+        } finally {
+            link.remove();
+        }
+
+        try {
+            const timer = window.setTimeout(() => {
+                this.downloadRevokeTimers.delete(url);
+                revokeUrl();
+            }, 1000);
+            this.downloadRevokeTimers.set(url, timer);
+        } catch (error) {
+            revokeUrl();
+            throw error;
+        }
     }
 }
 

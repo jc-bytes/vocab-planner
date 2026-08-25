@@ -11,6 +11,8 @@ export class QuizMaker {
         this.onClose = onClose;
         this.onStateChange = typeof options.onStateChange === 'function' ? options.onStateChange : null;
         this.suppressStateSave = true;
+        this.disposed = false;
+        this.lifecycleGeneration = 0;
         this.questions = [];
         this.meta = {
             title: cleanQuizTitle(vocabSet.name || 'Quiz'),
@@ -33,6 +35,9 @@ export class QuizMaker {
         this.dragSrcEl = null;
         this.sectionIdCounter = 0;
         this.autoGenerateTimer = null;
+        this.rubricOverlays = new Set();
+        this.downloadUrls = new Set();
+        this.downloadRevokeTimers = new Map();
         this.wordExportLogoRelId = null;
         this.sectionTypes = {
             mc: { title: 'Multiple Choice', countLabel: 'Questions', pointsLabel: 'Pts / question', defaults: { count: 5, points: 1 } },

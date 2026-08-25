@@ -194,6 +194,7 @@ class QuizMakerComposerMethods {
     }
 
     editRubric() {
+        if (this.disposed) return;
         const escapeHtml = (value = '') => String(value)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -240,9 +241,19 @@ class QuizMakerComposerMethods {
         const el = createElement('div');
         el.innerHTML = modalHtml;
         document.body.appendChild(el);
+        this.rubricOverlays.add(el);
 
-        el.querySelector('#close-rubric-btn').onclick = () => el.remove();
+        const removeOverlay = () => {
+            this.rubricOverlays.delete(el);
+            el.remove();
+        };
+
+        el.querySelector('#close-rubric-btn').onclick = removeOverlay;
         el.querySelector('#save-rubric-btn').onclick = () => {
+            if (this.disposed) {
+                removeOverlay();
+                return;
+            }
             const rows = el.querySelectorAll('.rubric-row-edit');
             const newRubric = [];
             rows.forEach(row => {
@@ -254,7 +265,7 @@ class QuizMakerComposerMethods {
                 }
             });
             this.meta.rubric = newRubric;
-            el.remove();
+            removeOverlay();
             this.renderEditor();
         };
     }

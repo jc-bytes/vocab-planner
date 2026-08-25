@@ -160,6 +160,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Added absence guards so both dead installers cannot return. Verification: focused Quiz, build/lazy, report, and live Word-generation tests; the complete suite; 9-width student regression; source UI smoke; 13-game sandbox smoke; production build; and built three-page smoke passed. The reviewer approved the corrected dependency boundary.
 - The Quiz Maker nested chunk decreased from 422.19/118.70 kB raw/gzip to 403.92/115.17 kB. The build dropped from 2,333 to 2,327 transformed modules and deployment from 13.6 to 13.5 MB. The lazy Quiz coordinator remains 17.94/4.92 kB, teacher entry remains 159.55/43.92 kB, and the service worker remains 20 files totaling 1,027,448 bytes.
 
+### Task 18f, give Quiz Maker an explicit lifecycle
+
+- Added idempotent `QuizMaker.destroy()`. It invalidates the maker lifecycle, clears the 350 ms generation debounce, detaches property handlers from the static builder controls and tool tabs, clears generated section/preview nodes, removes every tracked rubric overlay, releases drag and callback references, and clears tracked Word-download timers and object URLs.
+- Tracked rubric wrappers rather than searching their duplicated inner dialog ID. Normal Cancel/Save removes the exact owned wrapper; session teardown removes every still-open wrapper. Delayed generation and state callbacks are permanently silent after disposal.
+- Guarded both asynchronous Word-export boundaries. A maker disposed while its logo or DOCX blob is loading cannot download or report an irrelevant error. Temporary anchors are removed in `finally`; append, click, or timer-setup failures revoke/delete the URL immediately, while successful downloads retain the existing one-second revocation.
+- Added a direct lifecycle suite covering idempotent cleanup, static handlers, timers, overlays, URL ownership, delayed Word export, throwing downloads, generated-node clearing, callback silencing, and post-destroy scheduling. Independent review found and then approved the failure-safe download correction.
+- Verification: fifteen focused Quiz/lifecycle tests, the live DOCX ZIP/XML regression, build/lazy tests, the complete suite, 9-width student regression, source UI smoke, 13-game sandbox smoke, production build, and built three-page smoke passed. Deployment remains 13.5 MB with 2,327 transformed modules. The nested Quiz Maker chunk is 406.03/115.74 kB raw/gzip, lazy Quiz is 17.94/4.92 kB, teacher entry is 159.55/43.92 kB, and the service worker precaches 20 files totaling 1,027,448 bytes.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.
