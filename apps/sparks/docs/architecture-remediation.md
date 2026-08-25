@@ -54,7 +54,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 12. Clean up owned inline styles | DONE | Quiz Maker, Analytics Dashboard, Student Progress roster, Add Student, Student Detail, loading/login, Vocabulary, Settings, Data Export, Data Viewer, and Data Reset presentation; inline-style/specificity contracts | Complete suites, focused ownership/lazy checks, multi-state and multi-viewport computed/pixel comparisons, production builds, source/built smoke | Eleven bounded teacher surfaces delegate fixed presentation to owned CSS. Runtime visibility, drag state, calculated progress, reset gating, and user-selected colors remain with their behavior/data owners. The inert Reset control is documented for a separate product/security decision. |
 | 13. Create lightweight shared UI modules | DONE | Shared loading-state helper; Quiz picker and Vocabulary library consumers; primitive contract test | Complete suite, focused UI/Vocabulary/lazy checks, production build, source/built smoke | Added one evidence-backed DOM primitive. Existing element, button/card CSS, modal lifecycle, student skeleton, toast, and completion owners remain the simpler contracts. |
 | 14. Standardize application feedback | DONE | Shared notification lifecycle; centered reward timer/presentation; loading and inline-status primitives; six teacher status producers | Complete suite, focused feedback/shell/teacher/lazy/security checks, browser computed-style checks, production build, source/built smoke, independent reviews | Shared application feedback now has small behavior contracts while activity/game visuals and rich feature notices remain owned locally. |
-| 15. Map teacher feature dependencies | TODO | | | |
+| 15. Map teacher feature dependencies | DONE | `docs/teacher-feature-dependencies.md`, tracker | Source tracing, focused lazy/context and feature suites, full regression, production build, built-page smoke, independent review | Documented loader/proxy, manager, DOM, data, notification, route, and lifecycle dependencies. Groups is the Task 16 pilot because it is bounded and exposes a confirmed listener/context defect. |
 | 16. Convert one teacher feature | TODO | | | |
 | 17. Validate the teacher feature pattern | TODO | | | |
 | 18. Migrate remaining teacher features | TODO | | | |
@@ -79,6 +79,16 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 37. Final architecture verification | TODO | | | |
 
 ## Change log
+
+### Task 15, map teacher feature dependencies
+
+- Documented the current lazy loader, template mounting, temporary prototype capture, per-manager proxy context, initialization cache, routing boundary, and absence of feature teardown.
+- Mapped Groups, Sparks, Data Management, Word Hunt Review, and Quiz state, host capabilities, data access, DOM/listeners, notifications, resources, cleanup, and primary tests.
+- Confirmed that the loader intentionally keeps internal captured methods off `TeacherManager`; the proxy test enforces that contract.
+- Found a real Groups wiring defect: seven eager global listeners call internal Groups methods on the manager even though those methods exist only on the lazy proxy context.
+- Chose Groups as the first conversion because it is bounded, its grouping algorithm is already isolated and tested, it has no student-facing writes, and conversion removes the defect without a compatibility facade.
+- Considered eager Overview as the smallest factory pilot and Word Hunt Review as another cohesive lazy candidate. Groups was preferred because it validates the actual lazy-feature boundary and fixes demonstrated coupling; Data Management, Quiz, and Sparks are higher-risk first conversions.
+- Task 15 changes documentation only. No runtime, route, persistence, DOM, or security behavior changed.
 
 ### Phase 0, baseline
 
