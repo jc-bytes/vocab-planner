@@ -4,6 +4,7 @@ import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrows
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
+const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 
 const featurePromises = new Map();
 const featureContexts = new WeakMap();
@@ -48,7 +49,7 @@ const featureDefinitions = {
             create(manager) {
                 return module.createTeacherSparksFeature({
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
-                    showView: () => manager.switchView('teacher-sparks-view'),
+                    showView: () => manager.switchView(SPARKS_PAGE.viewId),
                     isAuthenticationDisabled: () => manager.authDisabled,
                     getCurrentUser: () => manager.currentUser,
                     refreshIcons: root => manager.refreshIcons(root),

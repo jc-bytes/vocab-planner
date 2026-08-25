@@ -4,6 +4,7 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const TEACHER_SIDEBAR_STORAGE_KEY = 'teacher_sidebar_collapsed';
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
+const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
     ...TEACHER_SHELL_VIEW_IDS,
@@ -113,12 +114,12 @@ class TeacherShellMethods {
         if ([VOCABULARY_PAGE.viewId, 'teacher-editor-view', 'quiz-maker-view'].includes(viewId)) {
             return VOCABULARY_PAGE.id;
         }
+        if (viewId === SPARKS_PAGE.viewId) return SPARKS_PAGE.id;
         if (viewId === 'teacher-data-management-view') {
             const route = this.parseRoute?.();
             return route?.view === 'data' ? 'data' : 'settings';
         }
         const map = {
-            'teacher-sparks-view': 'sparks',
             'teacher-progress-view': 'students',
             'teacher-groups-view': 'groups'
         };
@@ -184,7 +185,7 @@ class TeacherShellMethods {
                 }
                 this.showVocabularyLibrary();
                 break;
-            case 'sparks':
+            case SPARKS_PAGE.id:
                 this.showSparksView();
                 break;
             case 'students':

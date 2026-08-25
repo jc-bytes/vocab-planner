@@ -22,6 +22,7 @@ try {
 
     const initial = await page.evaluate(async () => {
         const { teacherPageRegistry } = await import('/js/teacherPageRegistry.js');
+        const sparksPage = teacherPageRegistry.get('sparks');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
@@ -53,11 +54,12 @@ try {
                 this.overviewLoads = 0;
                 this.libraryLoads = 0;
                 this.workflowCalls = [];
+                this.sparkLoads = 0;
             }
             ensureAuthenticated() { return true; }
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
-            showSparksView() { this.switchView('teacher-sparks-view'); }
+            showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
             showProgressView() { this.switchView('teacher-progress-view'); }
             showGroupsView() { this.switchView('teacher-groups-view'); }
             showDataManagementView({ area }) { this.switchView('teacher-data-management-view', { updateRoute: false }); this.setActiveTeacherTab(area); }
@@ -175,7 +177,53 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'vocabulary'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview and Vocabulary navigation, direct routing, and history.');
+    const sparks = await page.evaluate(() => {
+        const manager = window.teacherPageSmokeManager;
+        manager.showTeacherSection('sparks');
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            loads: manager.sparkLoads
+        };
+    });
+    if (sparks.hash !== '#/teacher/sparks'
+        || sparks.activeView !== 'teacher-sparks-view'
+        || sparks.activeSection !== 'sparks'
+        || sparks.mobileLabel !== 'Sparks'
+        || sparks.topLabel !== 'Sparks'
+        || sparks.loads !== 1) {
+        throw new Error(`Sparks navigation changed: ${JSON.stringify(sparks)}`);
+    }
+
+    const sparksDirect = await page.evaluate(async () => {
+        history.replaceState(null, '', '#/teacher/sparks');
+        await window.teacherPageSmokeManager.handleRouteChange();
+        const manager = window.teacherPageSmokeManager;
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            loads: manager.sparkLoads
+        };
+    });
+    if (sparksDirect.activeView !== 'teacher-sparks-view'
+        || sparksDirect.activeSection !== 'sparks'
+        || sparksDirect.loads !== 2) {
+        throw new Error(`Sparks direct route changed: ${JSON.stringify(sparksDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/sparks'
+        && document.querySelector('.view.active')?.id === 'teacher-sparks-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'sparks'
+    ));
+
+    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, and Sparks navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

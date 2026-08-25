@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview and Vocabulary shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, and UI checks | Overview and Vocabulary are migrated. Sparks is next; remaining primary pages will continue one at a time. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, and Sparks shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, lazy-feature, and UI checks | Overview, Vocabulary, and Sparks are migrated. Students is next; remaining primary pages will continue one at a time. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -246,7 +246,16 @@ Task 20 remains in progress. Vocabulary is next because its assign hub is eager 
 - Verification passed for 76 focused checks, the primary-page, Word Hunt, and Quiz browser workflows, a production build, bundle/deployment guardrails, and scoped diff validation. Added exact legacy Word Hunt parse/build assertions; independent reviews approved the final boundary.
 - Recorded pre-existing route lifecycle issues for Task 21, including duplicate `popstate`/`hashchange` Back dispatch, cold lazy subfeatures finishing after newer navigation, and route-driven Assign/Editor work suppressing a newer direct UI route write. The identity substitutions do not change those behaviors.
 
-Task 20 remains in progress. Sparks is the next primary page.
+Task 20 remains in progress.
+
+### Task 20c, migrate Sparks
+
+- Replaced duplicated teacher Sparks primary page IDs and view IDs in the shell, router, lazy feature adapter, and Overview shortcut with the `sparks` registry descriptor.
+- Preserved the lazy `showSparksView()` boundary, modal template mounting, repository/cache/editor behavior, feature key, and the separate student Sparks route.
+- Extended the page browser workflow for normal entry, canonical URL, visible view, active navigation labels, direct routing, and Back restoration. The dedicated Sparks lazy browser workflow continues to verify the real feature factory, loading, modal, persistence, disposal, and listener behavior.
+- Added exact teacher route parse/build/current-view assertions. All 41 focused checks, both page/Sparks browser workflows, the production build, bundle guardrails, scoped diff validation, and independent review pass. The Sparks feature remains a separate 34.57 kB raw / 9.15 kB gzip chunk.
+
+Task 20 remains in progress. Students is next.
 
 ### Phase 0, baseline
 
