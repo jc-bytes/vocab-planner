@@ -229,3 +229,50 @@ test('Supabase initialization shares one in-flight session request', async () =>
         else window.SUPABASE_CONFIG = originalConfig;
     }
 });
+
+test('a stale empty auth event cannot return an active student to login', async () => {
+    const originalInit = supabaseService.init;
+    const originalListener = supabaseService.onAuthStateChanged;
+    let listener;
+    const views = [];
+    const manager = {
+        authDisabled: false,
+        currentUser: { uid: 'student-1' },
+        progress: {
+            stopCoinSync() {},
+            cancelScheduledCloudSync() {},
+            resetSessionState() {}
+        },
+        activities: {
+            progressPersistence: { resetForSession() {} }
+        },
+        cleanupActivity() {},
+        resetSessionRouting() {},
+        logStudentDomUpdate() {},
+        switchView(view) {
+            views.push(view);
+        }
+    };
+
+    supabaseService.init = async () => supabaseService;
+    supabaseService.onAuthStateChanged = callback => {
+        listener = callback;
+        return () => {};
+    };
+
+    try {
+        const auth = new StudentAuth(manager);
+        await auth.initBackendAuth();
+
+        listener(null, 'INITIAL_SESSION');
+        assert.equal(manager.currentUser?.uid, 'student-1');
+        assert.equal(views.includes('login-view'), false);
+
+        listener(null, 'SIGNED_OUT');
+        assert.equal(manager.currentUser, null);
+        assert.equal(views.at(-1), 'login-view');
+    } finally {
+        supabaseService.init = originalInit;
+        supabaseService.onAuthStateChanged = originalListener;
+    }
+});

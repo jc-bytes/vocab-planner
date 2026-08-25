@@ -94,13 +94,13 @@ try {
     server = await resolveServer();
     browser = await chromium.launch();
 
-    const teacherContext = await browser.newContext();
-    const studentContext = await browser.newContext();
-    await addLocalSupabaseOverride(teacherContext, seeded.browserConfig);
-    await addLocalSupabaseOverride(studentContext, seeded.browserConfig);
+    const sharedContext = await browser.newContext();
+    await addLocalSupabaseOverride(sharedContext, seeded.browserConfig);
 
-    const teacherPage = await teacherContext.newPage();
-    const studentPage = await studentContext.newPage();
+    // Keep both roles in one browser profile. Their persisted Supabase sessions
+    // must remain independent when a teacher and student page are open together.
+    const teacherPage = await sharedContext.newPage();
+    const studentPage = await sharedContext.newPage();
     trackPageProblems(teacherPage, 'teacher', problems);
     trackPageProblems(studentPage, 'student', problems);
 

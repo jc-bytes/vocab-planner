@@ -75,7 +75,10 @@ export class StudentAuth {
                             console.error('Student session initialization failed:', error);
                             this.showLoginError(error?.message || 'Could not finish signing in.');
                         });
-                } else {
+                } else if (
+                    event === 'SIGNED_OUT'
+                    || (event === 'INITIAL_SESSION' && !this.sm.currentUser)
+                ) {
                     this.handleBackendSignOut();
                 }
             });

@@ -5,6 +5,21 @@ export { isSupabaseConfigured };
 
 export const resolveSupabaseConfig = () => globalThis.window?.SUPABASE_CONFIG || SUPABASE_CONFIG;
 
+function resolveAuthStorageKey(config) {
+    const pathname = globalThis.window?.location?.pathname || '';
+    const page = /(?:^|\/)teacher\.html$/i.test(pathname) ? 'teacher' : 'student';
+    let project = 'sparks';
+    try {
+        project = new URL(config.url).host
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || project;
+    } catch {
+        // Configuration validation will report an invalid URL.
+    }
+    return `sparks-${project}-${page}-auth-token`;
+}
+
 export function createSupabaseClient() {
     const config = resolveSupabaseConfig();
     if (!isSupabaseConfigured()) {
@@ -14,7 +29,8 @@ export function createSupabaseClient() {
         auth: {
             autoRefreshToken: true,
             detectSessionInUrl: true,
-            persistSession: true
+            persistSession: true,
+            storageKey: resolveAuthStorageKey(config)
         }
     });
 }

@@ -9,6 +9,7 @@ import {
     isPrivilegedSupabaseKey,
     isValidSupabaseConfig
 } from '../config/supabase-config.js';
+import { createSupabaseClient } from '../js/services/supabaseClient.js';
 import { validateSupabaseBuildConfig } from '../vite.config.mjs';
 
 const validConfig = {
@@ -67,6 +68,31 @@ test('runtime Supabase validation honors an explicit browser override', () => {
         };
         assert.equal(isSupabaseConfigured(), false);
     } finally {
+        if (previousWindow === undefined) delete globalThis.window;
+        else globalThis.window = previousWindow;
+    }
+});
+
+test('student and teacher pages keep independent persisted auth sessions', async () => {
+    const previousWindow = globalThis.window;
+    const clients = [];
+    globalThis.window = {
+        SUPABASE_CONFIG: validConfig,
+        location: { pathname: '/student.html' }
+    };
+
+    try {
+        const studentClient = createSupabaseClient();
+        clients.push(studentClient);
+        globalThis.window.location.pathname = '/teacher.html';
+        const teacherClient = createSupabaseClient();
+        clients.push(teacherClient);
+
+        assert.notEqual(studentClient.auth.storageKey, teacherClient.auth.storageKey);
+        assert.match(studentClient.auth.storageKey, /student/);
+        assert.match(teacherClient.auth.storageKey, /teacher/);
+    } finally {
+        await Promise.all(clients.map(client => client.auth.dispose()));
         if (previousWindow === undefined) delete globalThis.window;
         else globalThis.window = previousWindow;
     }
