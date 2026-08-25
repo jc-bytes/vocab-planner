@@ -45,6 +45,7 @@ class TeacherAuthMethods {
                 if (user) {
                     if (this.currentUser?.uid && this.currentUser.uid !== user.uid) {
                         this.disposeLoadedTeacherFeatures?.();
+                        this.clearStudentProgressSessionState?.();
                     }
                     if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
@@ -55,6 +56,7 @@ class TeacherAuthMethods {
                     restoredUserHandled = false;
                     this.getAuthCoordinator().invalidate();
                     this.disposeLoadedTeacherFeatures?.();
+                    this.clearStudentProgressSessionState?.();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);

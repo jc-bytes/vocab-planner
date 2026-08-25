@@ -358,10 +358,8 @@ test('Data Viewer delegates fixed presentation while retaining file and drag sta
         /if \(errorDiv\) errorDiv\.style\.display\s*=\s*'none'/,
         /fileInfo\.style\.display\s*=\s*'block'/,
         /errorDiv\.style\.display\s*=\s*'block'/,
-        /\$\('#file-info'\)\.style\.display\s*=\s*'none'/,
-        /\$\('#file-error'\)\.style\.display\s*=\s*'none'/,
-        /\$\('#viewer-summary'\)\.style\.display\s*=\s*'none'/,
-        /\$\('#viewer-tables'\)\.style\.display\s*=\s*'none'/,
+        /\['#file-info', '#file-error', '#viewer-summary', '#viewer-tables'\]\.forEach/,
+        /if \(element\) element\.style\.display\s*=\s*'none'/,
         /\$\('#viewer-summary'\)\.style\.display\s*=\s*'block'/,
         /\$\('#viewer-tables'\)\.style\.display\s*=\s*'block'/
     ]) {

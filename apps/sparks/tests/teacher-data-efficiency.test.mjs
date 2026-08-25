@@ -65,7 +65,7 @@ test('teacher analytics use a server aggregate instead of expanding every studen
     assert.match(analyticsMigration, /get_teacher_dashboard_analytics_v1/i);
     assert.match(analyticsMigration, /student_activity_progress/i);
     assert.match(analyticsMigration, /limit 30/i);
-    assert.match(dashboardMethods, /getTeacherDashboardAnalytics/);
+    assert.match(lazyFeatureMethods, /loadDashboardAnalytics:[\s\S]*getTeacherDashboardAnalytics/);
     assert.doesNotMatch(dashboardMethods, /ensureStudentProgressDetails/);
 });
 
@@ -82,9 +82,9 @@ test('group generation and export selection use identity-only roster data', () =
     assert.match(identityRosterMigration, /from public\.profiles/i);
     assert.doesNotMatch(identityRosterMigration, /student_progress|student_activity|student_coin/i);
     assert.doesNotMatch(groupMethods, /getStudentProgressData/);
-    assert.match(lazyFeatureMethods, /loadRoster:\s*\(\) => manager\.getStudentRosterData\(\)/);
+    assert.match(lazyFeatureMethods, /loadRoster:\s*\(\.\.\.args\) => manager\.getStudentRosterData\(\.\.\.args\)/);
     assert.doesNotMatch(dashboardMethods, /getStudentProgressData/);
-    assert.match(dashboardMethods, /getStudentRosterData/);
+    assert.match(dashboardMethods, /this\.loadRoster\(\)/);
     assert.match(groupMethods, /Promise\.all\(\[/);
 });
 
@@ -127,7 +127,7 @@ test('data-management settings load together and expose section-level failures',
 });
 
 test('the Students analytics action opens the Data dashboard explicitly', () => {
-    assert.match(progressListeners, /showDataManagementView\(\{ area: 'data', tab: 'dashboard' \}\)/);
+    assert.match(progressListeners, /showTeacherSection\('data', \{ tab: 'dashboard' \}\)/);
 });
 
 test('roster failures preserve the last successful page and expose a retry state', () => {

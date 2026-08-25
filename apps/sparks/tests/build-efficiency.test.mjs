@@ -106,9 +106,11 @@ test('teacher feature bundles are loaded only when their views are opened', () =
         assert.match(teacherLazyFeatures, new RegExp(`import\\(['\"]\\./${eagerModule}`));
     }
     assert.doesNotMatch(teacherLazyFeatures, /manager\.constructor/);
-    assert.match(teacherLazyFeatures, /feature\.methods\?\.\[methodName\]/);
+    assert.doesNotMatch(teacherLazyFeatures, /feature\.methods|captureFeatureMethods|createFeatureContext/);
     assert.match(teacherLazyFeatures, /publicMethods:\s*\{ showGroupsView: 'show' \}/);
     assert.match(teacherLazyFeatures, /createTeacherGroupsFeature/);
+    assert.match(teacherLazyFeatures, /publicMethods:\s*\{ showDataManagementView: 'show' \}/);
+    assert.match(teacherLazyFeatures, /createTeacherDataManagementFeature/);
 });
 
 test('quiz maker styles load with the lazy quiz feature', () => {

@@ -39,6 +39,7 @@ const progressDataSource = await readFile(
     'utf8'
 );
 const teacherListenersSource = await readFile(new URL('../js/teacherListeners.js', import.meta.url), 'utf8');
+const teacherGlobalListenersSource = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {}
 installTeacherStudentProgressDataMethods(TestTeacherManager);
@@ -62,6 +63,13 @@ test('Student Progress does not reach into the unmounted Data Management feature
     assert.doesNotMatch(teacherListenersSource, /initTeacherSettingsListeners/);
 });
 
+test('explicit sign-out clears account-scoped progress state', () => {
+    assert.match(
+        teacherGlobalListenersSource,
+        /signOut\(\)[\s\S]*disposeLoadedTeacherFeatures\(\);\s*manager\.clearStudentProgressSessionState\?\.\(\)/
+    );
+});
+
 test('teacher progress responsibilities have one complete owner each', () => {
     const groups = [
         teacherProgressDataMethods,
@@ -71,7 +79,7 @@ test('teacher progress responsibilities have one complete owner each', () => {
     ];
     const methodNames = groups.flatMap(group => Object.keys(group));
 
-    assert.equal(methodNames.length, 34);
+    assert.equal(methodNames.length, 35);
     assert.equal(new Set(methodNames).size, methodNames.length);
     methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
     assert.deepEqual(
@@ -206,5 +214,67 @@ test('identity roster requests are shared and cached across teacher tools', asyn
         assert.equal(requests, 2);
     } finally {
         supabaseService.listStudentIdentityRoster = originalListStudentIdentityRoster;
+    }
+});
+
+test('account changes clear roster selection and suppress late student data', async () => {
+    const manager = new TestTeacherManager();
+    manager.authDisabled = false;
+    manager.allStudentData = [{ id: 'old-student' }];
+    manager.filteredStudentData = [{ id: 'old-student' }];
+    manager.selectedStudents = new Set(['old-student']);
+    manager.studentProgressSessionGeneration = 0;
+    manager.studentIdentityRosterGeneration = 0;
+    let resolveRoster;
+    const originalListStudentIdentityRoster = supabaseService.listStudentIdentityRoster;
+    supabaseService.listStudentIdentityRoster = () => new Promise(resolve => { resolveRoster = resolve; });
+    try {
+        const loading = manager.getStudentRosterData();
+        manager.clearStudentProgressSessionState();
+        resolveRoster([{ id: 'late-student' }]);
+        assert.deepEqual(await loading, []);
+        assert.deepEqual(manager.allStudentData, []);
+        assert.deepEqual(manager.filteredStudentData, []);
+        assert.equal(manager.selectedStudents.size, 0);
+        assert.equal(manager.studentIdentityRosterCache, null);
+    } finally {
+        supabaseService.listStudentIdentityRoster = originalListStudentIdentityRoster;
+    }
+});
+
+test('account changes clear detail requests and suppress late detail merges', async () => {
+    const manager = new TestTeacherManager();
+    const oldStudent = { id: 'student-1', studentProfile: { firstName: 'Old' } };
+    manager.allStudentData = [oldStudent];
+    manager.filteredStudentData = [oldStudent];
+    manager.selectedStudents = new Set();
+    manager.studentProgressDetailGeneration = 0;
+    let resolveOldDetail;
+    let resolveNewDetail;
+    const originalGetStudentProgressForTeacher = supabaseService.getStudentProgressForTeacher;
+    let requestCount = 0;
+    supabaseService.getStudentProgressForTeacher = () => new Promise(resolve => {
+        requestCount += 1;
+        if (requestCount === 1) resolveOldDetail = resolve;
+        else resolveNewDetail = resolve;
+    });
+
+    try {
+        const oldRequest = manager.ensureStudentProgressDetail(oldStudent);
+        manager.clearStudentProgressSessionState();
+        const newStudent = { id: 'student-1', studentProfile: { firstName: 'New' } };
+        manager.allStudentData = [newStudent];
+        manager.filteredStudentData = [newStudent];
+        const newRequest = manager.ensureStudentProgressDetail(newStudent);
+
+        resolveOldDetail({ id: 'student-1', unitProgress: { old: true } });
+        assert.equal(await oldRequest, null);
+        assert.equal(newStudent.progressDetailLoaded, undefined);
+
+        resolveNewDetail({ id: 'student-1', unitProgress: { current: true } });
+        assert.equal((await newRequest).unitProgress.current, true);
+        assert.equal(requestCount, 2);
+    } finally {
+        supabaseService.getStudentProgressForTeacher = originalGetStudentProgressForTeacher;
     }
 });

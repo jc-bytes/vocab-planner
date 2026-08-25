@@ -64,8 +64,10 @@ async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
             }
         }
 
-        this.studentProgressPromise = supabaseService.getStudentsWithProgress()
+        const generation = this.studentProgressSessionGeneration || 0;
+        const request = supabaseService.getStudentsWithProgress()
             .then(data => {
+                if (generation !== (this.studentProgressSessionGeneration || 0)) return [];
                 this.studentProgressCache = {
                     data,
                     loadedAt: Date.now()
@@ -74,6 +76,7 @@ async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
                 return data;
             })
             .catch(error => {
+                if (generation !== (this.studentProgressSessionGeneration || 0)) return [];
                 console.error('Error fetching student progress:', error);
                 if (showError) {
                     notifications.error('Failed to load student data.');
@@ -81,10 +84,11 @@ async getStudentProgressData({ forceRefresh = false, showError = true } = {}) {
                 throw error;
             })
             .finally(() => {
-                this.studentProgressPromise = null;
+                if (this.studentProgressPromise === request) this.studentProgressPromise = null;
             });
+        this.studentProgressPromise = request;
 
-        return this.studentProgressPromise;
+        return request;
     },
 
 async getStudentRosterData({ forceRefresh = false } = {}) {
@@ -95,19 +99,41 @@ async getStudentRosterData({ forceRefresh = false } = {}) {
 
         if (forceRefresh) this.studentIdentityRosterCache = null;
         if (!this.studentIdentityRosterCache) {
-            this.studentIdentityRosterPromise ||= supabaseService.listStudentIdentityRoster()
-                .then(students => {
-                    this.studentIdentityRosterCache = students;
-                    return students;
-                })
-                .finally(() => {
-                    this.studentIdentityRosterPromise = null;
-                });
-            await this.studentIdentityRosterPromise;
+            const generation = this.studentIdentityRosterGeneration || 0;
+            let request = this.studentIdentityRosterPromise;
+            if (!request) {
+                request = supabaseService.listStudentIdentityRoster()
+                    .then(students => {
+                        if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
+                        this.studentIdentityRosterCache = students;
+                        return students;
+                    })
+                    .finally(() => {
+                        if (this.studentIdentityRosterPromise === request) this.studentIdentityRosterPromise = null;
+                    });
+                this.studentIdentityRosterPromise = request;
+            }
+            await request;
+            if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
         }
 
         this.applyStudentProgressData(this.studentIdentityRosterCache || []);
         return this.studentIdentityRosterCache || [];
+    },
+
+clearStudentProgressSessionState() {
+        this.studentProgressSessionGeneration = (this.studentProgressSessionGeneration || 0) + 1;
+        this.studentIdentityRosterGeneration = (this.studentIdentityRosterGeneration || 0) + 1;
+        this.studentProgressDetailGeneration = (this.studentProgressDetailGeneration || 0) + 1;
+        this.studentProgressCache = null;
+        this.studentProgressPromise = null;
+        this.studentIdentityRosterCache = null;
+        this.studentIdentityRosterPromise = null;
+        this.studentProgressDetailPromises?.clear();
+        this.allStudentData = [];
+        this.filteredStudentData = [];
+        this.selectedStudents.clear();
+        this.activeStudentId = null;
     },
 
 mergeStudentProgressDetail(detail) {
@@ -137,14 +163,23 @@ async ensureStudentProgressDetail(student, { forceRefresh = false } = {}) {
             return this.studentProgressDetailPromises.get(student.id);
         }
 
+        const generation = this.studentProgressDetailGeneration || 0;
         const request = supabaseService.getStudentProgressForTeacher(student.id)
-            .then(detail => this.mergeStudentProgressDetail(detail) || student)
-            .finally(() => this.studentProgressDetailPromises.delete(student.id));
+            .then(detail => {
+                if (generation !== (this.studentProgressDetailGeneration || 0)) return null;
+                return this.mergeStudentProgressDetail(detail) || student;
+            })
+            .finally(() => {
+                if (this.studentProgressDetailPromises.get(student.id) === request) {
+                    this.studentProgressDetailPromises.delete(student.id);
+                }
+            });
         this.studentProgressDetailPromises.set(student.id, request);
         return request;
     },
 
-async ensureStudentProgressDetails(studentIds = []) {
+    async ensureStudentProgressDetails(studentIds = []) {
+        const generation = this.studentProgressDetailGeneration || 0;
         const requestedIds = new Set(studentIds.filter(Boolean));
         const pendingIds = this.allStudentData
             .filter(student => requestedIds.has(student.id) && !student.progressDetailLoaded)
@@ -155,6 +190,7 @@ async ensureStudentProgressDetails(studentIds = []) {
             const details = await supabaseService.getStudentsProgressForTeacher(
                 pendingIds.slice(index, index + 100)
             );
+            if (generation !== (this.studentProgressDetailGeneration || 0)) return;
             details.forEach(detail => this.mergeStudentProgressDetail(detail));
         }
     },

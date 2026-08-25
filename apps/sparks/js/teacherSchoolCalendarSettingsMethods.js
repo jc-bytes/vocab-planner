@@ -187,34 +187,26 @@ export const teacherSchoolCalendarSettingsMethods = {
         return errors;
     },
 
-    bindSchoolCalendarInputs() {
+    bindSchoolCalendarInputs(listen = (target, type, handler) => target?.addEventListener(type, handler)) {
         SCHOOL_CALENDAR_TRIMESTERS.forEach(({ slug }) => {
             ['start', 'weeks', 'end'].forEach(field => {
                 const input = $(`#calendar-${slug}-${field}`);
-                if (!input || input.dataset.calendarBound === 'true') return;
-                input.dataset.calendarBound = 'true';
-                input.addEventListener('input', () => {
+                listen(input, 'input', () => {
                     this.handleSchoolCalendarInput(slug, field);
                 });
             });
         });
 
         const addButton = $('#add-class-schedule-btn');
-        if (addButton && addButton.dataset.calendarBound !== 'true') {
-            addButton.dataset.calendarBound = 'true';
-            addButton.addEventListener('click', () => this.addClassScheduleRow({ grade: '6', section: '', weekdays: [] }));
-        }
+        listen(addButton, 'click', () => this.addClassScheduleRow({ grade: '6', section: '', weekdays: [] }));
 
         const scheduleList = $('#class-schedule-list');
-        if (scheduleList && scheduleList.dataset.calendarBound !== 'true') {
-            scheduleList.dataset.calendarBound = 'true';
-            scheduleList.addEventListener('click', event => {
-                const removeButton = event.target.closest('[data-remove-class-schedule]');
-                if (!removeButton) return;
-                removeButton.closest('.class-schedule-row')?.remove();
-                scheduleList.classList.toggle('is-empty', scheduleList.children.length === 0);
-            });
-        }
+        listen(scheduleList, 'click', event => {
+            const removeButton = event.target.closest('[data-remove-class-schedule]');
+            if (!removeButton) return;
+            removeButton.closest('.class-schedule-row')?.remove();
+            scheduleList.classList.toggle('is-empty', scheduleList.children.length === 0);
+        });
     },
 
     handleSchoolCalendarInput(slug, field) {

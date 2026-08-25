@@ -1,6 +1,5 @@
 import { closeModal, notifications, openModal, setupModal } from './main.js';
-import { initTeacherSettingsListeners } from './teacherSettingsListeners.js';
-import { createFeatureContext } from './services/featureContext.js';
+import { supabaseService } from './supabaseService.js';
 import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrowserAdapter.js';
 
 const featurePromises = new Map();
@@ -26,12 +25,6 @@ function mountTeacherFeatureTemplates(featureName) {
     });
 }
 
-function captureFeatureMethods(installMethods) {
-    class FeatureMethods {}
-    installMethods(FeatureMethods);
-    return Object.getOwnPropertyDescriptors(FeatureMethods.prototype);
-}
-
 function getFeatureContext(manager, featureName, feature) {
     let managerContexts = featureContexts.get(manager);
     if (!managerContexts) {
@@ -40,9 +33,7 @@ function getFeatureContext(manager, featureName, feature) {
     }
     if (managerContexts.has(featureName)) return managerContexts.get(featureName);
 
-    const context = feature.create
-        ? feature.create(manager)
-        : createFeatureContext(manager, feature.methods);
+    const context = feature.create(manager);
     managerContexts.set(featureName, context);
     return context;
 }
@@ -89,8 +80,42 @@ const featureDefinitions = {
     dataManagement: async () => {
         const module = await import('./teacherDataManagement.js');
         return {
-            methods: captureFeatureMethods(module.installTeacherDataManagementMethods),
-            initialize: initTeacherSettingsListeners
+            publicMethods: { showDataManagementView: 'show' },
+            create(manager) {
+                return module.createTeacherDataManagementFeature({
+                    ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
+                    activateDataManagement(area) {
+                        manager.switchView('teacher-data-management-view', { updateRoute: false });
+                        manager.setActiveTeacherTab(area);
+                    },
+                    writeDataRoute(area, tab, options = {}) {
+                        manager.setRoute({ view: area, tab }, options);
+                    },
+                    isRouteApplying: () => manager.isApplyingRoute,
+                    isDataRouteCurrent(area, tab) {
+                        const route = manager.parseRoute();
+                        const routeTab = route?.tab || (area === 'data' ? 'dashboard' : 'subjects');
+                        return route?.view === area && routeTab === tab;
+                    },
+                    loadSubjectSettings: (...args) => manager.loadSubjectSettings(...args),
+                    loadGamificationSettings: (...args) => manager.loadGamificationSettings(...args),
+                    loadSchoolCalendarSettings: (...args) => manager.loadSchoolCalendarSettings(...args),
+                    saveGamificationSettings: (...args) => manager.saveGamificationSettings(...args),
+                    saveSchoolCalendarSettings: (...args) => manager.saveSchoolCalendarSettings(...args),
+                    bindSchoolCalendarInputs: listener => manager.bindSchoolCalendarInputs(listener),
+                    addSubjectFromForm: (...args) => manager.addSubjectFromForm(...args),
+                    saveSubjectSettings: (...args) => manager.saveSubjectSettings(...args),
+                    loadRoster: (...args) => manager.getStudentRosterData(...args),
+                    getRoster: () => manager.allStudentData,
+                    getExplicitSelectedStudentIds: () => Array.from(manager.selectedStudents),
+                    loadLibrary: (...args) => manager.getTeacherLibrary(...args),
+                    loadDashboardAnalytics: options => supabaseService.getTeacherDashboardAnalytics(options),
+                    getCurrentUser: () => manager.currentUser,
+                    feedback: notifications,
+                    storage: localStorage,
+                    refreshIcons: root => manager.refreshIcons(root)
+                });
+            }
         };
     },
     wordHuntReview: async () => {
@@ -203,9 +228,7 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
         try {
             const { feature, context } = await ensureTeacherFeature(this, featureName);
             const publicMethodName = feature.publicMethods?.[methodName];
-            const installedMethod = publicMethodName
-                ? context[publicMethodName]
-                : feature.methods?.[methodName]?.value;
+            const installedMethod = publicMethodName ? context[publicMethodName] : undefined;
             if (typeof installedMethod !== 'function') {
                 throw new Error(`${featureName} did not install ${methodName}.`);
             }

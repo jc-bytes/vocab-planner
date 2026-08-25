@@ -1,9 +1,8 @@
-import { $, notifications } from './main.js';
-import { supabaseService } from './supabaseService.js';
+import { $ } from './main.js';
 
 const teacherDataDashboardViewMethods = {
     async showDataManagementView(options = {}) {
-        if (!this.ensureAuthenticated(false)) return;
+        if (this.destroyed || !this.ensureAuthenticated(false)) return false;
         const settingsTabs = ['subjects', 'gamification', 'calendar'];
         const dataTabs = ['dashboard', 'export', 'view', 'reset'];
         const requestedTab = String(options.tab || '');
@@ -12,9 +11,14 @@ const teacherDataDashboardViewMethods = {
         const allowedTabs = area === 'data' ? dataTabs : settingsTabs;
         const activeTab = allowedTabs.includes(requestedTab) ? requestedTab : allowedTabs[0];
 
+        if (options.updateRoute === false && !this.isDataRouteCurrent(area, activeTab)) return false;
+
         this.dataManagementArea = area;
         this.activeDataTab = activeTab;
-        this.switchView('teacher-data-management-view');
+        if (options.updateRoute !== false && !this.isRouteApplying()) {
+            this.writeDataRoute(area, activeTab, { replace: options.replaceRoute === true });
+        }
+        this.activateDataManagement(area);
         this.configureDataManagementArea(area);
 
         if (!this.dataViewerInitialized) {
@@ -23,14 +27,16 @@ const teacherDataDashboardViewMethods = {
         this.initExportListeners();
         this.switchDataTab(activeTab, { updateRoute: false });
 
-        if (area === 'data') return;
+        if (area === 'data') return true;
 
+        const lifecycleGeneration = this.lifecycleGeneration;
         const settingsLoad = Promise.allSettled([
             this.loadSubjectSettings({ surfaceErrors: true }),
             this.loadGamificationSettings({ surfaceErrors: true }),
             this.loadSchoolCalendarSettings({ surfaceErrors: true })
         ]);
         const results = await settingsLoad;
+        if (this.destroyed || lifecycleGeneration !== this.lifecycleGeneration) return false;
         [
             { label: 'subjects', statusId: '#subjects-save-status' },
             { label: 'coin settings', statusId: '#gamification-save-status' },
@@ -45,6 +51,7 @@ const teacherDataDashboardViewMethods = {
                 status.textContent = `Could not load ${section.label}. Try reopening this view.`;
             }
         });
+        return true;
     },
 
     configureDataManagementArea(area) {
@@ -62,16 +69,25 @@ const teacherDataDashboardViewMethods = {
         tabList?.querySelectorAll('.data-tab-btn[data-area]').forEach(button => {
             button.hidden = button.dataset.area !== normalizedArea;
         });
-        this.setActiveTeacherTab(normalizedArea);
     },
 
     async loadExportRosterData() {
+        const generation = ++this.rosterLoadGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
         try {
-            await this.getStudentRosterData();
+            await this.loadRoster();
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.rosterLoadGeneration) return false;
             this.populateExportGradeSelect();
+            return true;
         } catch (error) {
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.rosterLoadGeneration) return false;
             console.error('Unable to load the export roster:', error);
-            notifications.error('The student list for exports is unavailable.');
+            this.feedback.error('The student list for exports is unavailable.');
+            return false;
         }
     },
 
@@ -79,35 +95,54 @@ const teacherDataDashboardViewMethods = {
         const grade = $('#dashboard-grade-filter')?.value || '';
         const generation = (this.dashboardLoadGeneration || 0) + 1;
         this.dashboardLoadGeneration = generation;
-        const analyticsPromise = supabaseService.getTeacherDashboardAnalytics({ grade });
-        const libraryPromise = this.getTeacherLibrary();
+        const lifecycleGeneration = this.lifecycleGeneration;
+        const analyticsPromise = this.loadDashboardAnalytics({ grade });
+        const libraryPromise = this.loadLibrary()
+            .then(value => ({ value, error: null }))
+            .catch(error => ({ value: null, error }));
 
         try {
             const analytics = await analyticsPromise;
-            if (generation !== this.dashboardLoadGeneration) return;
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.dashboardLoadGeneration) return false;
             this.dashboardAnalytics = analytics;
             this.populateDashboardGradeFilter();
             $('#dashboard-total-students').textContent = analytics.totalStudents;
             $('#dashboard-active-students').textContent = analytics.activeStudents;
             $('#dashboard-avg-coins').textContent = analytics.averageCoins.toLocaleString();
             await this.renderDashboardCharts();
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.dashboardLoadGeneration) return false;
             this.renderRecentActivity();
         } catch (error) {
-            if (generation !== this.dashboardLoadGeneration) return;
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.dashboardLoadGeneration) return false;
             console.error('Unable to load dashboard analytics:', error);
-            notifications.error('Dashboard analytics are unavailable right now.');
+            this.feedback.error('Dashboard analytics are unavailable right now.');
             ['dashboard-total-students', 'dashboard-active-students', 'dashboard-avg-coins']
                 .forEach(id => { const element = $(`#${id}`); if (element) element.textContent = '--'; });
         }
 
         try {
-            const { cloudVocabs, remoteVocabs, localVocabs } = await libraryPromise;
-            if (generation !== this.dashboardLoadGeneration) return;
+            const libraryResult = await libraryPromise;
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.dashboardLoadGeneration) return false;
+            if (libraryResult.error) throw libraryResult.error;
+            const { cloudVocabs, remoteVocabs, localVocabs } = libraryResult.value;
             $('#dashboard-vocab-count').textContent = cloudVocabs.length + remoteVocabs.length + localVocabs.length;
         } catch (err) {
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.dashboardLoadGeneration) return false;
             console.error('Error loading vocab count:', err);
-            $('#dashboard-vocab-count').textContent = '--';
+            const count = $('#dashboard-vocab-count');
+            if (count) count.textContent = '--';
         }
+        return true;
     },
 
     populateDashboardGradeFilter() {

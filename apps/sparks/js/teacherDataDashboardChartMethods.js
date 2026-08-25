@@ -12,6 +12,8 @@ const teacherDataDashboardChartMethods = {
     },
 
     async renderDashboardCharts() {
+        const lifecycleGeneration = this.lifecycleGeneration;
+        const dashboardGeneration = this.dashboardLoadGeneration;
         let Chart;
         try {
             Chart = await this.ensureChartLibrary();
@@ -19,6 +21,9 @@ const teacherDataDashboardChartMethods = {
             console.error('Unable to load dashboard charts:', error);
             return;
         }
+        if (this.destroyed
+            || lifecycleGeneration !== this.lifecycleGeneration
+            || dashboardGeneration !== this.dashboardLoadGeneration) return;
 
         // Activity Completion Chart
         const activityCtx = document.getElementById('activity-chart')?.getContext('2d');

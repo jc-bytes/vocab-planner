@@ -70,17 +70,17 @@ export async function exportUserRoles(studentIds) {
     return profiles.map(profile => ({ userId: profile.userId, ...profile }));
 }
 
-export async function markExportComplete(dataTypes, studentIds, exportFormat) {
+export async function markExportComplete(dataTypes, studentIds, exportFormat, teacherId = '') {
     const exportRecord = {
         timestamp: new Date().toISOString(),
-        teacherId: this.currentUser?.uid || '',
+        teacherId,
         dataTypes: dataTypes,
         studentCount: studentIds.length,
         format: exportFormat,
         filename: `export-${Date.now()}.${exportFormat}`
     };
 
-    localStorage.setItem('lastExport', JSON.stringify(exportRecord));
+    this.storage.setItem(`lastExport:${teacherId || 'development-teacher'}`, JSON.stringify(exportRecord));
 
     const exportStatus = $('#export-status');
     const exportStatusText = $('#export-status-text');

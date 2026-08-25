@@ -1,4 +1,4 @@
-import { $, createElement, notifications } from './main.js';
+import { $, createElement } from './main.js';
 import {
     exportScores,
     exportStudentProgress,
@@ -18,7 +18,7 @@ const teacherDataExportMethods = {
         if (!gradeSelect) return;
 
         const grades = new Set();
-        this.allStudentData.forEach(student => {
+        this.getRoster().forEach(student => {
             const profile = student.studentProfile || {};
             if (profile.grade) grades.add(profile.grade);
         });
@@ -37,7 +37,7 @@ const teacherDataExportMethods = {
         this.exportListenersInitialized = true;
         const studentSelectionRadios = document.querySelectorAll('input[name="student-selection"]');
         studentSelectionRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
+            this.addOwnedListener(radio, 'change', () => {
                 const gradeSelect = $('#export-grade-select');
                 if (radio.value === 'grade') {
                     if (gradeSelect) gradeSelect.disabled = false;
@@ -47,35 +47,24 @@ const teacherDataExportMethods = {
             });
         });
 
-        const previewBtn = $('#preview-data-btn');
-        if (previewBtn) {
-            previewBtn.addEventListener('click', () => this.previewData());
-        }
-
-        const exportJsonBtn = $('#export-json-btn');
-        if (exportJsonBtn) {
-            exportJsonBtn.addEventListener('click', () => this.exportData('json'));
-        }
-
-        const exportCsvBtn = $('#export-csv-btn');
-        if (exportCsvBtn) {
-            exportCsvBtn.addEventListener('click', () => this.exportData('csv'));
-        }
+        this.addOwnedListener($('#preview-data-btn'), 'click', () => this.previewData());
+        this.addOwnedListener($('#export-json-btn'), 'click', () => this.exportData('json'));
+        this.addOwnedListener($('#export-csv-btn'), 'click', () => this.exportData('csv'));
     },
 
     getSelectedStudentIds() {
         const selection = document.querySelector('input[name="student-selection"]:checked')?.value || 'all';
 
         if (selection === 'all') {
-            return this.allStudentData.map(s => s.id);
+            return this.getRoster().map(s => s.id);
         } else if (selection === 'grade') {
             const grade = $('#export-grade-select')?.value;
             if (!grade) return [];
-            return this.allStudentData
+            return this.getRoster()
                 .filter(s => (s.studentProfile || {}).grade === grade)
                 .map(s => s.id);
         } else if (selection === 'specific') {
-            return Array.from(this.selectedStudents);
+            return this.getExplicitSelectedStudentIds();
         }
         return [];
     },
@@ -89,16 +78,18 @@ const teacherDataExportMethods = {
     },
 
     async previewData() {
+        const generation = ++this.previewGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
         const studentIds = this.getSelectedStudentIds();
         const dataTypes = this.getSelectedDataTypes();
 
         if (studentIds.length === 0) {
-            notifications.warning('Please select at least one student.');
+            this.feedback.warning('Please select at least one student.');
             return;
         }
 
         if (dataTypes.length === 0) {
-            notifications.warning('Please select at least one data type to preview.');
+            this.feedback.warning('Please select at least one data type to preview.');
             return;
         }
 
@@ -114,11 +105,19 @@ const teacherDataExportMethods = {
 
         try {
             const preview = await this.fetchPreviewData(studentIds, dataTypes);
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.previewGeneration) return false;
             this.renderPreview(preview, previewSummary, previewTables);
+            return true;
         } catch (error) {
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.previewGeneration) return false;
             console.error('Error previewing data:', error);
-            notifications.error('Failed to load preview. Please try again.');
+            this.feedback.error('Failed to load preview. Please try again.');
             previewSummary.innerHTML = '<p class="runtime-status data-export-preview-error">Error loading preview.</p>';
+            return false;
         }
     },
 
@@ -126,16 +125,22 @@ const teacherDataExportMethods = {
     renderPreview,
 
     async exportData(format) {
+        const generation = ++this.exportGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
+        const teacherId = this.getCurrentUser()?.uid || this.getCurrentUser()?.id || '';
+        const isCurrent = () => !this.destroyed
+            && lifecycleGeneration === this.lifecycleGeneration
+            && generation === this.exportGeneration;
         const studentIds = this.getSelectedStudentIds();
         const dataTypes = this.getSelectedDataTypes();
 
         if (studentIds.length === 0) {
-            notifications.warning('Please select at least one student.');
+            this.feedback.warning('Please select at least one student.');
             return;
         }
 
         if (dataTypes.length === 0) {
-            notifications.warning('Please select at least one data type to export.');
+            this.feedback.warning('Please select at least one data type to export.');
             return;
         }
 
@@ -164,18 +169,21 @@ const teacherDataExportMethods = {
             if (dataTypes.includes('studentProgress')) {
                 updateProgress(10 + (currentStep / totalSteps) * 70, `Exporting student progress (${studentIds.length} students)...`);
                 exportData.studentProgress = await this.exportStudentProgress(studentIds);
+                if (!isCurrent()) return false;
                 currentStep++;
             }
 
             if (dataTypes.includes('scores')) {
                 updateProgress(10 + (currentStep / totalSteps) * 70, 'Exporting leaderboard scores...');
                 exportData.scores = await this.exportScores(studentIds);
+                if (!isCurrent()) return false;
                 currentStep++;
             }
 
             if (dataTypes.includes('userRoles')) {
                 updateProgress(10 + (currentStep / totalSteps) * 70, 'Exporting user roles...');
                 exportData.userRoles = await this.exportUserRoles(studentIds);
+                if (!isCurrent()) return false;
                 currentStep++;
             }
 
@@ -189,25 +197,31 @@ const teacherDataExportMethods = {
 
             updateProgress(95, 'Finalizing...');
 
-            await this.markExportComplete(dataTypes, studentIds, format);
+            await this.markExportComplete(dataTypes, studentIds, format, teacherId);
+            if (!isCurrent()) return false;
 
             updateProgress(100, 'Export complete!');
 
-            setTimeout(() => {
+            this.exportCompletionTimer = setTimeout(() => {
+                if (!isCurrent()) return;
                 if (loadingEl) loadingEl.style.display = 'none';
                 if (jsonBtn) jsonBtn.disabled = false;
                 if (csvBtn) csvBtn.disabled = false;
+                this.exportCompletionTimer = null;
             }, 500);
 
-            notifications.success('Data exported successfully!');
+            this.feedback.success('Data exported successfully!');
+            return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error exporting data:', error);
 
             if (loadingEl) loadingEl.style.display = 'none';
             if (jsonBtn) jsonBtn.disabled = false;
             if (csvBtn) csvBtn.disabled = false;
 
-            notifications.error('Failed to export data. Please try again.');
+            this.feedback.error('Failed to export data. Please try again.');
+            return false;
         }
     },
 

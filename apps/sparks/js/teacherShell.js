@@ -114,7 +114,8 @@ class TeacherShellMethods {
 
     getSectionForView(viewId) {
         if (viewId === 'teacher-data-management-view') {
-            return this.dataManagementArea === 'data' ? 'data' : 'settings';
+            const route = this.parseRoute?.();
+            return route?.view === 'data' ? 'data' : 'settings';
         }
         const map = {
             'teacher-overview-view': 'overview',
@@ -203,13 +204,18 @@ class TeacherShellMethods {
                 this.showQuizzesView({ resumeEditor: true });
                 break;
             case 'data':
-                this.showDataManagementView({ ...options, area: 'data' });
+                this.setRoute({ view: 'data', tab: options.tab || 'dashboard' });
+                this.showDataManagementView({ ...options, area: 'data', updateRoute: false });
                 break;
             case 'settings':
-                this.showDataManagementView({ ...options, area: 'settings' });
+                this.setRoute({ view: 'settings', tab: options.tab || 'subjects' });
+                this.showDataManagementView({ ...options, area: 'settings', updateRoute: false });
                 break;
             case 'data-settings':
-                this.showDataManagementView(options);
+                this.showTeacherSection(
+                    ['dashboard', 'export', 'view', 'reset'].includes(options.tab) ? 'data' : 'settings',
+                    options
+                );
                 break;
             default:
                 this.showTeacherSection('overview');

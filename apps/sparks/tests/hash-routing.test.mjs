@@ -90,4 +90,13 @@ test('teacher routes keep their public URL contract through the shared parser', 
     assert.deepEqual(teacher.libraryDrilldown, {
         subject: 'science', grade: '9', trimester: '3', month: 'October'
     });
+
+    window.location.hash = '#/teacher/data?tab=view';
+    assert.deepEqual(teacher.currentTeacherRouteForView('teacher-data-management-view'), {
+        view: 'data', tab: 'view'
+    });
+    window.location.hash = '#/teacher/settings?tab=calendar';
+    assert.deepEqual(teacher.currentTeacherRouteForView('teacher-data-management-view'), {
+        view: 'settings', tab: 'calendar'
+    });
 });

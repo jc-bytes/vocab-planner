@@ -27,7 +27,7 @@ export function initTeacherProgressListeners(manager) {
     });
 
     $('#open-data-management-btn')?.addEventListener('click', () => {
-        manager.showDataManagementView({ area: 'data', tab: 'dashboard' });
+        manager.showTeacherSection('data', { tab: 'dashboard' });
     });
     $('#open-add-student-modal-btn')?.addEventListener('click', () => {
         manager.showAddStudentModal();

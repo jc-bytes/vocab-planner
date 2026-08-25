@@ -105,10 +105,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (viewId === 'teacher-groups-view') return { view: 'groups' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === 'teacher-data-management-view') {
-                return {
-                    view: this.dataManagementArea === 'data' ? 'data' : 'settings',
-                    tab: this.activeDataTab || undefined
-                };
+                const currentRoute = this.parseRoute();
+                if (currentRoute?.view === 'data' || currentRoute?.view === 'settings') return currentRoute;
+                return { view: 'settings', tab: 'subjects' };
             }
             return { view: 'overview' };
         },

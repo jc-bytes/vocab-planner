@@ -1,24 +1,25 @@
-import { $, escapeHtml, notifications } from './main.js';
+import { $, escapeHtml } from './main.js';
+
+function finiteNumber(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+}
 
 const teacherDataViewerMethods = {
 
     initDataViewer() {
-        // Check if already initialized to prevent duplicate listeners
         if (this.dataViewerInitialized) return;
         const tabList = document.getElementById('data-settings-tab-list');
         if (!tabList) return;
         this.dataViewerInitialized = true;
 
-        // Tab switching
         const tabButtons = Array.from(tabList.querySelectorAll('.data-tab-btn[data-tab]'));
         tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                this.switchDataTab(tab);
-            });
-            btn.addEventListener('keydown', (event) => {
+            this.addOwnedListener(btn, 'click', () => this.switchDataTab(btn.dataset.tab));
+            this.addOwnedListener(btn, 'keydown', event => {
                 if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                 const visibleTabButtons = tabButtons.filter(button => !button.hidden);
+                if (!visibleTabButtons.length) return;
                 const currentIndex = visibleTabButtons.indexOf(btn);
                 let nextIndex = currentIndex;
                 if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % visibleTabButtons.length;
@@ -30,78 +31,53 @@ const teacherDataViewerMethods = {
                 this.switchDataTab(visibleTabButtons[nextIndex].dataset.tab);
             });
         });
-        
-        // Dashboard grade filter
-        const dashboardGradeFilter = $('#dashboard-grade-filter');
-        if (dashboardGradeFilter) {
-            dashboardGradeFilter.addEventListener('change', () => {
-                this.loadDashboardData();
-            });
-        }
 
-        // File input
+        const dashboardGradeFilter = $('#dashboard-grade-filter');
+        this.addOwnedListener(dashboardGradeFilter, 'change', () => this.loadDashboardData());
+
         const fileInput = $('#load-json-file');
         const chooseFileBtn = $('#choose-file-btn');
         const clearFileBtn = $('#clear-file-btn');
-        
-        if (chooseFileBtn && fileInput) {
-            chooseFileBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (fileInput) {
-                    fileInput.click();
-                }
-            });
-        }
 
         if (fileInput) {
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    this.loadJSONFile(file);
-                    // Reset input so same file can be selected again
-                    e.target.value = '';
-                }
+            this.addOwnedListener(chooseFileBtn, 'click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                fileInput.click();
+            });
+            this.addOwnedListener(fileInput, 'change', event => {
+                const file = event.target.files[0];
+                if (file) this.loadJSONFile(file);
+                event.target.value = '';
             });
         }
+        this.addOwnedListener(clearFileBtn, 'click', () => this.clearLoadedData());
 
-        if (clearFileBtn) {
-            clearFileBtn.addEventListener('click', () => {
-                this.clearLoadedData();
-            });
-        }
-
-        // Drag and drop
         const fileLoader = $('#file-loader');
-        if (fileLoader) {
-            fileLoader.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileLoader.style.borderColor = 'var(--color-brand)';
-                fileLoader.style.background = 'rgba(99, 102, 241, 0.2)';
-            });
-
-            fileLoader.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileLoader.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.125))';
-                fileLoader.style.background = 'rgba(15, 23, 42, 0.3)';
-            });
-
-            fileLoader.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileLoader.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.125))';
-                fileLoader.style.background = 'rgba(15, 23, 42, 0.3)';
-                
-                const file = e.dataTransfer.files[0];
-                if (file && (file.type === 'application/json' || file.name.endsWith('.json'))) {
-                    this.loadJSONFile(file);
-                } else {
-                    notifications.warning('Please drop a JSON file.');
-                }
-            });
-        }
+        this.addOwnedListener(fileLoader, 'dragover', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            fileLoader.style.borderColor = 'var(--color-brand)';
+            fileLoader.style.background = 'rgba(99, 102, 241, 0.2)';
+        });
+        this.addOwnedListener(fileLoader, 'dragleave', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            fileLoader.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.125))';
+            fileLoader.style.background = 'rgba(15, 23, 42, 0.3)';
+        });
+        this.addOwnedListener(fileLoader, 'drop', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            fileLoader.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.125))';
+            fileLoader.style.background = 'rgba(15, 23, 42, 0.3)';
+            const file = event.dataTransfer.files[0];
+            if (file && (file.type === 'application/json' || file.name.endsWith('.json'))) {
+                this.loadJSONFile(file);
+            } else {
+                this.feedback.warning('Please drop a JSON file.');
+            }
+        });
     },
 
     switchDataTab(tab, options = {}) {
@@ -140,8 +116,8 @@ const teacherDataViewerMethods = {
         });
 
         this.activeDataTab = activeTab;
-        if (options.updateRoute !== false && !this.isApplyingRoute) {
-            this.setRoute({ view: this.dataManagementArea, tab: activeTab });
+        if (options.updateRoute !== false && !this.isRouteApplying()) {
+            this.writeDataRoute(this.dataManagementArea, activeTab);
         }
 
         if (activeTab === 'dashboard') {
@@ -152,15 +128,20 @@ const teacherDataViewerMethods = {
     },
 
     async loadJSONFile(file) {
+        const generation = ++this.fileLoadGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
         // Hide previous errors
         const errorDiv = $('#file-error');
         if (errorDiv) errorDiv.style.display = 'none';
 
         // Show loading
-        notifications.info('Loading file...');
+        this.feedback.info('Loading file...');
 
         try {
             const text = await file.text();
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.fileLoadGeneration) return false;
             const data = JSON.parse(text);
 
             // Validate structure
@@ -176,11 +157,16 @@ const teacherDataViewerMethods = {
             this.renderViewerSummary();
             this.renderViewerTables();
 
-            notifications.success('File loaded successfully!');
+            this.feedback.success('File loaded successfully!');
+            return true;
         } catch (error) {
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || generation !== this.fileLoadGeneration) return false;
             console.error('Error loading JSON file:', error);
             this.showFileError(error.message || 'Failed to load file. Please check the file format.');
-            notifications.error('Failed to load file. Please check the file format.');
+            this.feedback.error('Failed to load file. Please check the file format.');
+            return false;
         }
     },
 
@@ -223,7 +209,7 @@ const teacherDataViewerMethods = {
                 totalVocabUnits += Object.keys(student.units).length;
             }
             if (student.coinData) {
-                totalCoins += student.coinData.balance || 0;
+                totalCoins += finiteNumber(student.coinData.balance);
             }
             if (student.updatedAt) {
                 const date = student.updatedAt.toDate ? student.updatedAt.toDate() : new Date(student.updatedAt.seconds * 1000);
@@ -269,14 +255,17 @@ const teacherDataViewerMethods = {
     },
 
     clearLoadedData() {
+        this.fileLoadGeneration += 1;
         this.loadedData = null;
         const fileInput = $('#load-json-file');
         if (fileInput) fileInput.value = '';
 
-        $('#file-info').style.display = 'none';
-        $('#file-error').style.display = 'none';
-        $('#viewer-summary').style.display = 'none';
-        $('#viewer-tables').style.display = 'none';
+        ['#file-info', '#file-error', '#viewer-summary', '#viewer-tables'].forEach(selector => {
+            const element = $(selector);
+            if (element) element.style.display = 'none';
+        });
+        $('#viewer-summary-stats')?.replaceChildren();
+        $('#viewer-tables-content')?.replaceChildren();
     },
 
     renderViewerSummary() {
@@ -358,7 +347,7 @@ const teacherDataViewerMethods = {
                             const name = profile.firstName && profile.lastName
                                 ? `${profile.firstName} ${profile.lastName}`
                                 : (profile.name || 'Unknown');
-                            const coins = (item.coinData || {}).balance || 0;
+                            const coins = finiteNumber((item.coinData || {}).balance);
                             const vocabUnits = item.units ? Object.keys(item.units).length : 0;
                             const lastActive = item.updatedAt
                                 ? (item.updatedAt.toDate ? item.updatedAt.toDate() : new Date(item.updatedAt.seconds * 1000)).toLocaleDateString()
@@ -401,7 +390,7 @@ const teacherDataViewerMethods = {
                                 <tr class="data-viewer-table__row">
                                     <td class="data-table__cell">${escapeHtml(item.name || item.userId)}</td>
                                     <td class="data-table__cell">${escapeHtml(item.gameId || '-')}</td>
-                                    <td class="data-table__cell data-table__metric data-viewer-table__numeric">${(item.score || 0).toLocaleString()}</td>
+                                    <td class="data-table__cell data-table__metric data-viewer-table__numeric">${finiteNumber(item.score).toLocaleString()}</td>
                                     <td class="data-table__cell data-table__secondary">${date}</td>
                                 </tr>
                             `;

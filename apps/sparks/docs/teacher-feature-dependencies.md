@@ -1,66 +1,84 @@
 # Teacher feature dependency map
 
-This map records the current teacher feature architecture before Task 16 changes it. It is a source-traced contract, not a proposal to convert every feature to the same shape.
+This map records the teacher feature architecture after Tasks 15-18. It describes the interfaces new work should preserve.
 
-## Current loading and collaboration model
+## Loading and ownership model
 
-`TeacherManager` installs seven stable lazy entry methods from `teacherLazyFeatures.js`. On first use, the loader mounts any declared HTML templates, imports the feature module once, captures methods from a temporary prototype, and creates a per-manager `Proxy` with `createFeatureContext`. Feature methods can call one another through that proxy and fall through to manager fields and methods. Assignments through the proxy are written to the manager.
+`TeacherManager` exposes seven stable lazy entry methods through `teacherLazyFeatures.js`. The first call mounts the feature template, imports the feature module, creates one private feature instance for that manager, and delegates to the feature's public use case. Every lazy feature now uses an explicit factory. The old prototype capture and manager-fallback Proxy have been removed.
 
-The proxy deliberately does **not** add captured feature methods to `TeacherManager`. This keeps the public manager surface small, but it also hides each feature's required manager capabilities and lets feature state accumulate in the manager constructor. The loader has no route-level teardown; features and listeners live for the teacher application lifetime.
+The manager remains the application shell. It owns authentication, top-level view activation, routing, shared vocabulary editing, and established repository capabilities. Each feature factory receives only the capabilities it uses. Feature implementation methods and state stay inside the feature instance instead of leaking onto `TeacherManager`.
 
-Top-level navigation is independently wired in `teacherShell.js` and `teacherRouting.js`. The router needs only each feature's stable show/open entry point, but it also duplicates view and route knowledge that belongs to Tasks 19–21.
+`disposeLoadedTeacherFeatures()` calls each loaded feature's `destroy()` method on sign-out or teacher-account replacement. A feature must remove its listeners, invalidate pending asynchronous work, and release browser resources there. Feature modules are cached by the JavaScript loader, but manager-specific instances and state are recreated.
 
-## Lazy feature dependencies
+Top-level route and navigation metadata are still duplicated between `teacherShell.js` and `teacherRouting.js`. Tasks 19-21 own that separate problem.
 
-| Feature | Stable lazy entries | State currently reached through `this` | Host and data dependencies | UI behavior and lifecycle | Main risk |
-| --- | --- | --- | --- | --- | --- |
-| Groups | `showGroupsView` | `selectedGroupClass`, `groupAbsentStudents`, `currentRandomGroups`, `groupPairRestrictions`, `groupRestrictionsLocalFallback`; shared `allStudentData`, `authDisabled`, `currentUser` | `ensureAuthenticated`, `switchView`, `getStudentRosterData`, `refreshIcons`; `teacherGroupRestrictionsRepository`; local storage, clipboard, crypto | Static `teacher.html` view. Fourteen fixed controls/status/results targets. Seven interaction handlers are bound eagerly in `teacherGlobalListeners.js`. No teardown. | **Confirmed wiring defect:** eager listeners call internal feature methods on `TeacherManager`, but those methods exist only on the proxy context, so first interaction can call `undefined`. Feature state and DOM ownership are also implicit. |
-| Sparks | `showSparksView` | Weekly Spark cache/promise/refresh state, active view/type/month, editor ID/mode, question editor state | Auth/session, `switchView`, `refreshIcons`; `sparksRepository`; Spark/check/date/subject models | Static library plus lazy modal template. Feature-owned delegated listeners receive the proxy context after mount; modal close resets editor state. No teardown, but binding is once per manager. | Broad 52-method collaboration surface and student-visible persisted authoring model make conversion higher risk. Listener ownership is already correct. An eager pre-mount modal setup is redundant. |
-| Data Management | `showDataManagementView` | Viewer/export initialization, selected students, loaded/preview data, active tab, dashboard generation/cache and Chart instances; shared roster/settings and route flags | Auth/session, view/tab/route methods, roster and settings loaders; `teacherExportRepository`; dashboard analytics through `supabaseService`; Papa Parse and Chart lazy resources | Lazy view template. Viewer, dashboard, export, file drag/drop, and reset/settings surfaces share one feature definition. `initTeacherSettingsListeners` is invoked during lazy initialization in addition to eager settings listener initialization. Chart instances are destroyed before replacement; no feature teardown. | It is several workflows behind one name, with broad manager state and duplicated listener initialization. A single factory would be another oversized facade. |
-| Word Hunt Review | `showWordHuntReviewView`, `loadWordHuntReview` | Rows/cache, filters, drilldown/view modes, active key, image URL map, initialized flag; shared vocabulary mode/subjects | Auth/session, vocabulary workflow switching, `getSubjects`, `refreshIcons`; review/image methods call `supabaseService`; local review notes | Static workflow view. Content delegation, filters, note/review controls, and a document keydown listener are initialized lazily. Object URLs have explicit revocation logic. | Anonymous app-lifetime document/content listeners make teardown difficult; direct Supabase access and roughly 40 internal methods remain hidden behind proxy fallback. |
-| Quizzes | `showQuizzesView`, `openQuizMaker` | Quiz library/drilldown/view modes, builder instance/key/open/return state; also shared vocabulary `libraryItems`, `libraryDrilldown`, `vocabSet`, `vocabularyMode` | Auth/session, routing/view methods, teacher-library and vocabulary browser/render helpers, `refreshIcons`; browser storage draft helper | Lazy view template and lazy `teacherQuiz.css`. Many rendered cards/rows own click listeners. Quiz Maker bridges to the eager vocabulary editor and restores drafts. No teardown. | It is tightly coupled to the existing vocabulary feature's state and internal rendering methods. Converting it first would require defining the vocabulary boundary at the same time. |
+## Lazy feature interfaces
 
-## Dependency details that must remain stable
+| Feature | Manager entries | Factory interface | Private ownership | Important dependencies |
+| --- | --- | --- | --- | --- |
+| Groups | `showGroupsView` | `{ show, destroy }` | Selected class, absences, generated groups, restrictions, seven control listeners | Authentication, view activation, roster loader, session reader, icons, notifications |
+| Sparks | `showSparksView` | `{ show, destroy }` | Spark cache and request generations, active library state, editor state, delegated listeners | Authentication, view activation, session reader, icons, notifications, modal controls |
+| Data Management | `showDataManagementView` | `{ show, destroy }` | Active area/tab, viewer file, export preview, asynchronous generations, owned listeners, four chart instances | Authentication, view and route adapters, teacher settings use cases, roster and library readers, analytics query, account identity, notifications, storage |
+| Word Hunt Review | `showWordHuntReviewView`, `loadWordHuntReview` | `{ show, load, destroy }` | Review rows and cache, filters, view state, image URLs, content and keyboard listeners | Authentication, workflow activation, subjects reader, icons, notifications |
+| Quizzes | `showQuizzesView`, `openQuizMaker` | `{ show, open, destroy }` | Quiz library, drilldown, preferences, account-scoped drafts, builder lifecycle, asynchronous generations | Authentication, Quiz route and view adapters, teacher library, current vocabulary, bounded vocabulary-browser adapter, session identity, icons, notifications, storage |
 
-- **Security:** repository and Supabase policies remain authoritative. A feature factory may receive a narrower repository capability, but must not bypass RLS or move authorization into UI metadata.
-- **Routing:** `#/teacher/groups`, `#/teacher/sparks`, data/settings tabs, Word Hunt review, Quiz hub, and Quiz Maker deep links must continue to load lazily and restore shell state.
-- **Groups persistence:** absence keys remain date-and-class scoped; restriction fallback remains teacher scoped; cloud restrictions continue through `teacherGroupRestrictionsRepository`.
-- **Sparks persistence:** cache coalescing/invalidation, schedule normalization, modal reset behavior, and student-visible Spark IDs remain unchanged.
-- **Word Hunt resources:** generated image object URLs must still be revoked; the keyboard handler must not be multiplied by repeat navigation.
-- **Quiz resources:** `teacherQuiz.css` and Quiz code must remain outside the eager teacher entry.
-- **Data resources:** chart and export libraries must remain lazy, and old Chart instances must be destroyed before replacement.
+## Data Management implementation map
 
-## Why Groups is the Task 16 pilot
-
-Groups is a bounded, representative conversion with one repository, one shared roster capability, five cohesive state values, a static view, and already-tested pure grouping logic. It has no student-facing write model. More importantly, conversion fixes the confirmed listener/context defect rather than creating an architecture-only abstraction.
-
-The smallest justified interface was implemented in Task 16 as:
+Data Management is one mounted screen with four closely related workflows. Its external interface is intentionally small:
 
 ```js
-createTeacherGroupsFeature({
+createTeacherDataManagementFeature({
     ensureAuthenticated,
-    showView,
+    activateDataManagement,
+    writeDataRoute,
+    isRouteApplying,
+    loadSubjectSettings,
+    loadGamificationSettings,
+    loadSchoolCalendarSettings,
+    saveGamificationSettings,
+    saveSchoolCalendarSettings,
+    bindSchoolCalendarInputs,
+    addSubjectFromForm,
+    saveSubjectSettings,
     loadRoster,
-    getSession,
+    getRoster,
+    getExplicitSelectedStudentIds,
+    loadLibrary,
+    loadDashboardAnalytics,
+    getCurrentUser,
     refreshIcons,
-    repository,
-    notifications
+    feedback,
+    storage
 }) => ({ show, destroy })
 ```
 
-The factory owns the Groups roster and five Groups state values and binds its own controls after lazy loading. `TeacherManager.showGroupsView()` remains the one routing adapter and delegates to `feature.show()`. Internal click handlers are not manager methods. Browser APIs keep safe defaults and can be injected for platform-level tests. `destroy()` removes all seven feature listeners and supports clean reinitialization; the current page-lifetime manager does not yet call it during route changes.
+The factory composes the existing dashboard, export, viewer, and settings implementations into a private context. Those internal seams remain separate files because each workflow has cohesive logic and focused tests. They are not exposed to `TeacherManager` or application routing.
 
-An eager Overview factory was considered because its read-only workflow is smaller. It was rejected as the pilot because it would not exercise or repair the lazy feature boundary that this phase targets. Word Hunt Review is the next-smallest lazy candidate, but its document listener and object-URL lifecycle make it a poorer first proof.
+`show({ area, tab, updateRoute, replace })` authenticates, activates the shared view, initializes owned listeners once, and updates the canonical route when appropriate. Data workflows activate on demand. The Settings area loads its three cached settings authorities together. `destroy()` removes owned listeners, destroys Chart instances, clears account-sensitive DOM and loaded files, cancels completion timers, and invalidates dashboard, roster, preview, export, and file-read generations.
 
-## Task 16 acceptance contract
+The JSON/CSV reset area remains visually gated after export but has no reset listener or repository operation. This remediation preserves that inert behavior. Implementing destructive data reset requires a separate product and security decision.
 
-- Preserve the Groups route, static markup, repository/RLS boundary, local-storage keys, notifications, grouping behavior, and lazy chunk.
-- Remove Groups feature state from the manager constructor.
-- Move Groups control listeners out of `teacherGlobalListeners.js` and bind them once to the feature instance.
-- Expose only the stable `showGroupsView` manager adapter; do not install internal Groups methods or retain a proxy compatibility shim.
-- Add an interface-level test that loads the feature and drives representative class, absence, randomize, restriction, and copy interactions.
-- Run focused Groups, lazy-loading, routing, repository/security, full regression, production build, and built-page smoke checks.
+## Contracts that must remain stable
 
-## Intentionally unchanged in Task 15
+- **Security:** repositories, Supabase functions, and RLS remain authoritative. Feature metadata and client factories do not authorize data access.
+- **Routing:** direct and history navigation must still restore Groups, Sparks, Data/Settings tabs, Word Hunt Review, Quiz hub, and Quiz Maker through their public use cases.
+- **Account isolation:** sign-out and UID replacement dispose loaded features and clear shared Student Progress roster, selection, and request caches. Late results from the previous account must not update the next session.
+- **Lazy loading:** feature implementations, Chart.js, Papa Parse, Quiz CSS, and Quiz Maker stay outside the eager teacher entry where they were already lazy.
+- **Groups persistence:** absence keys remain date-and-class scoped; restriction fallback remains teacher scoped; cloud restrictions continue through `teacherGroupRestrictionsRepository`.
+- **Sparks persistence:** cache coalescing, schedule normalization, modal reset behavior, and student-visible Spark IDs remain unchanged.
+- **Word Hunt resources:** generated image object URLs are revoked and document listeners are removed on disposal.
+- **Quiz resources:** drafts and preferences are teacher scoped; nested builder timers, overlays, object URLs, and callbacks are released on disposal.
+- **Data resources:** old Chart instances are destroyed before replacement; file, preview, roster, dashboard, and export work use latest-request and lifecycle guards.
 
-Task 15 changes documentation only. It does not alter feature loading, prototypes, routing, DOM, repositories, persistence, or user behavior. Tasks 16–18 will convert and validate one feature at a time; Tasks 19–21 own navigation duplication.
+## Rules for another teacher feature
+
+1. Add one lazy definition in `teacherLazyFeatures.js` and one explicit feature factory in the feature-owned module.
+2. Expose user-facing use cases only. Do not install internal implementation methods on `TeacherManager`.
+3. Pass the smallest existing host capabilities the feature actually needs. Do not pass the manager itself.
+4. Keep feature state in the feature instance. Shared shell state must have a documented reason to stay on the manager.
+5. Implement idempotent `destroy()` for listeners, timers, object URLs, charts, and pending asynchronous work.
+6. Test through the factory's public interface and through the real lazy adapter. Keep repository and security tests at their existing seams.
+
+## Task 15-18 result
+
+The pilot Groups conversion proved the factory pattern and fixed its broken eager listener wiring. Word Hunt Review, Sparks, Quiz, and Data Management then migrated one at a time. Each conversion removed its prototype installer and manager-fallback dependency only after focused tests, browser smoke coverage, the full suite, and the production build passed. The result is one lazy-loading mechanism and five explicit feature interfaces, without a compatibility Proxy or a second feature framework.

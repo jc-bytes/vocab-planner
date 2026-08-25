@@ -35,8 +35,6 @@ class TeacherManager {
         this.activeStudentId = null;
         this.currentRole = this.authDisabled ? 'teacher' : 'student';
         this.selectedStudents = new Set();
-        this.dataViewerInitialized = false;
-        this.exportListenersInitialized = false;
         this.libraryItems = [];
         this.libraryDrilldown = {
             subject: null,
@@ -56,6 +54,9 @@ class TeacherManager {
         this.schoolCalendar = getDefaultSchoolCalendar();
         this.studentProgressCache = null;
         this.studentProgressPromise = null;
+        this.studentProgressSessionGeneration = 0;
+        this.studentIdentityRosterGeneration = 0;
+        this.studentProgressDetailGeneration = 0;
         this.overviewStudentLoadScheduled = false;
         this.isApplyingRoute = false;
         this.pendingTeacherRoute = null;

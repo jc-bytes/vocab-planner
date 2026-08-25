@@ -46,6 +46,7 @@ function bindTeacherAuthListeners(manager) {
             await supabaseService.signOut();
             manager.getAuthCoordinator?.().invalidate();
             manager.disposeLoadedTeacherFeatures();
+            manager.clearStudentProgressSessionState?.();
             localStorage.removeItem('was_logged_in');
             manager.isAuthenticated = false;
             manager.currentUser = null;
