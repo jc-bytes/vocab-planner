@@ -1,6 +1,9 @@
 import { closeModal, notifications, openModal, setupModal } from './main.js';
 import { supabaseService } from './supabaseService.js';
 import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrowserAdapter.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 const featurePromises = new Map();
 const featureContexts = new WeakMap();
@@ -131,7 +134,7 @@ const featureDefinitions = {
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
                     activateReview: ({ updateRoute, replace }) => {
                         manager.vocabularyMode = 'review';
-                        manager.switchView('teacher-dashboard-view');
+                        manager.switchView(VOCABULARY_PAGE.viewId);
                         manager.setVocabularyWorkflowTab('review', {
                             loadReview: false,
                             updateRoute,
@@ -159,7 +162,7 @@ const featureDefinitions = {
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
                     activateQuizHub() {
                         manager.vocabularyMode = 'quizzes';
-                        manager.switchView('teacher-dashboard-view', { updateRoute: false });
+                        manager.switchView(VOCABULARY_PAGE.viewId, { updateRoute: false });
                         manager.setVocabularyWorkflowTab('quizzes', {
                             updateRoute: false,
                             loadQuizzes: false
@@ -169,7 +172,7 @@ const featureDefinitions = {
                     showVocabularyEditor: () => manager.showEditor(),
                     writeQuizRoute(drilldown, options = {}) {
                         manager.setRoute({
-                            view: 'vocabulary',
+                            view: VOCABULARY_PAGE.id,
                             subject: drilldown.subject,
                             grade: drilldown.grade,
                             trimester: drilldown.trimester,

@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview shell/route migration; primary-page browser smoke | Per-page registry, routing, navigation, browser history, and UI checks | Overview is migrated. Remaining primary pages will move one at a time. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview and Vocabulary shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, and UI checks | Overview and Vocabulary are migrated. Sparks is next; remaining primary pages will continue one at a time. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -237,6 +237,16 @@ Task 19 is complete. Task 20 will migrate primary pages one at a time; Task 21 w
 - Verification: registry and browser page smoke, all 14 routing checks, four navigation checks, production build, all 11 build-efficiency checks, scoped diff validation, and independent review passed.
 
 Task 20 remains in progress. Vocabulary is next because its assign hub is eager but has nested Review, Quiz, and Editor modes that must remain outside the primary-page descriptor.
+
+### Task 20b, migrate Vocabulary
+
+- Replaced duplicated primary Vocabulary page IDs and view IDs in the shell, router, Assign workflow, Overview shortcut, and lazy Review/Quiz parent-page adapters with the `vocabulary` registry descriptor.
+- Kept Assign, Review, and Quizzes as page-owned workflow modes. Vocabulary Editor, Quiz Maker, legacy Word Hunt/Quiz URLs, drilldown query fields, lazy imports, and feature contracts remain with their existing owners.
+- Extended the browser page workflow to verify normal Vocabulary entry, canonical URL, active view/navigation labels, Assign reset/load behavior, a direct full-drilldown Review URL, and Back restoration.
+- Verification passed for 76 focused checks, the primary-page, Word Hunt, and Quiz browser workflows, a production build, bundle/deployment guardrails, and scoped diff validation. Added exact legacy Word Hunt parse/build assertions; independent reviews approved the final boundary.
+- Recorded pre-existing route lifecycle issues for Task 21, including duplicate `popstate`/`hashchange` Back dispatch, cold lazy subfeatures finishing after newer navigation, and route-driven Assign/Editor work suppressing a newer direct UI route write. The identity substitutions do not change those behaviors.
+
+Task 20 remains in progress. Sparks is the next primary page.
 
 ### Phase 0, baseline
 

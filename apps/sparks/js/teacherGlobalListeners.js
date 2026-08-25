@@ -1,7 +1,9 @@
 import { $, $$, setupModal } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 function debounceTeacherResize(callback) {
     let timer = null;
@@ -83,7 +85,7 @@ function bindOverviewListeners(manager) {
     $('#overview-groups-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
     $('#overview-groups-action-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
     $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection('students'));
-    $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection('vocabulary'));
+    $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection(VOCABULARY_PAGE.id));
     $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
     $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection('sparks'));
     $('#overview-settings-btn')?.addEventListener('click', () => manager.showTeacherSection('settings'));

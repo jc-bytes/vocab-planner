@@ -1,4 +1,7 @@
 import { $ } from '../main.js';
+import { teacherPageRegistry } from '../teacherPageRegistry.js';
+
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 export const teacherVocabularyWorkflowMethods = {
 getTeacherVocabularyViewDepth(drilldown = this.libraryDrilldown || {}) {
@@ -90,7 +93,7 @@ showVocabularyLibrary() {
         if (!this.ensureAuthenticated(false)) return;
         this.vocabularyMode = 'assign';
         this.resetLibraryDrilldown();
-        this.switchView('teacher-dashboard-view');
+        this.switchView(VOCABULARY_PAGE.viewId);
         this.setVocabularyWorkflowTab('assign', { updateRoute: false });
         this.loadLibrary();
     },

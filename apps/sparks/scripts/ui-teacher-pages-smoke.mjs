@@ -24,6 +24,8 @@ try {
         const { teacherPageRegistry } = await import('/js/teacherPageRegistry.js');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
+        const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
+        const { teacherVocabularyDataMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
         const teacherSource = await fetch('/teacher.html').then(response => response.text());
         const parsedTeacher = new DOMParser().parseFromString(teacherSource, 'text/html');
         const navigation = parsedTeacher.querySelector('#teacher-tab-shell').outerHTML;
@@ -49,18 +51,22 @@ try {
                 this.vocabularyMode = 'assign';
                 this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
                 this.overviewLoads = 0;
+                this.libraryLoads = 0;
+                this.workflowCalls = [];
             }
             ensureAuthenticated() { return true; }
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
-            showVocabularyLibrary() { this.switchView('teacher-dashboard-view'); }
             showSparksView() { this.switchView('teacher-sparks-view'); }
             showProgressView() { this.switchView('teacher-progress-view'); }
             showGroupsView() { this.switchView('teacher-groups-view'); }
             showDataManagementView({ area }) { this.switchView('teacher-data-management-view', { updateRoute: false }); this.setActiveTeacherTab(area); }
-            setVocabularyWorkflowTab() {}
-            loadLibrary() { return Promise.resolve(); }
+            setVocabularyWorkflowTab(mode, options) { this.workflowCalls.push({ mode, options }); }
+            loadLibrary() { this.libraryLoads += 1; return Promise.resolve(); }
+            getTeacherLibrary() { return Promise.resolve({ items: [] }); }
         }
+        Manager.prototype.showVocabularyLibrary = teacherVocabularyWorkflowMethods.showVocabularyLibrary;
+        Manager.prototype.resetLibraryDrilldown = teacherVocabularyDataMethods.resetLibraryDrilldown;
         installTeacherRoutingMethods(Manager);
         installTeacherShellMethods(Manager);
         const manager = new Manager();
@@ -111,7 +117,65 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'overview'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview navigation, direct routing, and history.');
+    const vocabulary = await page.evaluate(() => {
+        const manager = window.teacherPageSmokeManager;
+        manager.showTeacherSection('vocabulary');
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            mode: manager.vocabularyMode,
+            drilldown: manager.libraryDrilldown,
+            libraryLoads: manager.libraryLoads
+        };
+    });
+    if (vocabulary.hash !== '#/teacher/vocabulary'
+        || vocabulary.activeView !== 'teacher-dashboard-view'
+        || vocabulary.activeSection !== 'vocabulary'
+        || vocabulary.mobileLabel !== 'Vocabulary'
+        || vocabulary.topLabel !== 'Vocabulary'
+        || vocabulary.mode !== 'assign'
+        || Object.values(vocabulary.drilldown).some(Boolean)
+        || vocabulary.libraryLoads !== 1) {
+        throw new Error(`Vocabulary navigation changed: ${JSON.stringify(vocabulary)}`);
+    }
+
+    const vocabularyDirect = await page.evaluate(async () => {
+        history.replaceState(null, '', '#/teacher/vocabulary?subject=technology&grade=7&trimester=2&month=May&mode=review');
+        await window.teacherPageSmokeManager.handleRouteChange();
+        const manager = window.teacherPageSmokeManager;
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mode: manager.vocabularyMode,
+            drilldown: manager.libraryDrilldown,
+            workflow: manager.workflowCalls.at(-1)
+        };
+    });
+    if (vocabularyDirect.activeView !== 'teacher-dashboard-view'
+        || vocabularyDirect.activeSection !== 'vocabulary'
+        || vocabularyDirect.mode !== 'review'
+        || vocabularyDirect.drilldown.subject !== 'technology'
+        || vocabularyDirect.drilldown.grade !== '7'
+        || vocabularyDirect.drilldown.trimester !== '2'
+        || vocabularyDirect.drilldown.month !== 'May'
+        || vocabularyDirect.workflow?.mode !== 'review'
+        || vocabularyDirect.workflow?.options?.loadReview !== true) {
+        throw new Error(`Vocabulary direct route changed: ${JSON.stringify(vocabularyDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/students');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/vocabulary?subject=technology&grade=7&trimester=2&month=May&mode=review'
+        && document.querySelector('.view.active')?.id === 'teacher-dashboard-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'vocabulary'
+    ));
+
+    console.log('Teacher primary-page smoke passed for Overview and Vocabulary navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

@@ -2,6 +2,7 @@ import { parseHashLocation, writeHashLocation } from './services/hashRouting.js'
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 export function installTeacherRoutingMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -14,7 +15,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (!parts[1] || parts[1] === OVERVIEW_PAGE.id) return { view: OVERVIEW_PAGE.id };
             if (parts[1] === 'students') return { view: 'students' };
             if (parts[1] === 'groups') return { view: 'groups' };
-            if (parts[1] === 'word-hunt') return { view: 'vocabulary', mode: 'review' };
+            if (parts[1] === 'word-hunt') return { view: VOCABULARY_PAGE.id, mode: 'review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
             if (parts[1] === 'activities') return { view: OVERVIEW_PAGE.id };
             if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
@@ -26,15 +27,15 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 const view = ['dashboard', 'export', 'view', 'reset'].includes(tab) ? 'data' : 'settings';
                 return { view, tab };
             }
-            if (parts[1] === 'vocabulary' && parts[2] === 'editor') {
+            if (parts[1] === VOCABULARY_PAGE.id && parts[2] === 'editor') {
                 return {
                     view: 'editor',
                     vocabularyId: parts[3] || params.get('id') || null
                 };
             }
-            if (parts[1] === 'vocabulary') {
+            if (parts[1] === VOCABULARY_PAGE.id) {
                 return {
-                    view: 'vocabulary',
+                    view: VOCABULARY_PAGE.id,
                     subject: params.get('subject') || null,
                     grade: params.get('grade') || null,
                     trimester: params.get('trimester') || null,
@@ -51,14 +52,14 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (route.view === OVERVIEW_PAGE.id) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (route.view === 'students') return '#/teacher/students';
             if (route.view === 'groups') return '#/teacher/groups';
-            if (route.view === 'word-hunt-review') return '#/teacher/vocabulary?mode=review';
+            if (route.view === 'word-hunt-review') return `#/teacher/${VOCABULARY_PAGE.id}?mode=review`;
             if (route.view === 'sparks') return '#/teacher/sparks';
-            if (route.view === 'quizzes') return '#/teacher/vocabulary?mode=quizzes';
+            if (route.view === 'quizzes') return `#/teacher/${VOCABULARY_PAGE.id}?mode=quizzes`;
             if (route.view === 'quiz-editor') return '#/teacher/quizzes/editor';
             if (route.view === 'editor') {
                 return route.vocabularyId
-                    ? `#/teacher/vocabulary/editor/${encodeURIComponent(route.vocabularyId)}`
-                    : '#/teacher/vocabulary/editor';
+                    ? `#/teacher/${VOCABULARY_PAGE.id}/editor/${encodeURIComponent(route.vocabularyId)}`
+                    : `#/teacher/${VOCABULARY_PAGE.id}/editor`;
             }
             if (route.view === 'data' || route.view === 'settings') {
                 const params = new URLSearchParams();
@@ -66,7 +67,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 const query = params.toString();
                 return `#/teacher/${route.view}${query ? `?${query}` : ''}`;
             }
-            if (route.view === 'vocabulary') {
+            if (route.view === VOCABULARY_PAGE.id) {
                 const params = new URLSearchParams();
                 if (route.subject) params.set('subject', route.subject);
                 if (route.grade) params.set('grade', route.grade);
@@ -74,22 +75,22 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (route.month) params.set('month', route.month);
                 if (route.mode === 'review' || route.mode === 'quizzes') params.set('mode', route.mode);
                 const query = params.toString();
-                return `#/teacher/vocabulary${query ? `?${query}` : ''}`;
+                return `#/teacher/${VOCABULARY_PAGE.id}${query ? `?${query}` : ''}`;
             }
             return `#/teacher/${OVERVIEW_PAGE.id}`;
         },
 
         currentTeacherRouteForView(viewId) {
-            if (viewId === 'teacher-dashboard-view') {
+            if (viewId === VOCABULARY_PAGE.viewId) {
                 if (this.vocabularyMode === 'quizzes') {
                     const currentRoute = this.parseRoute();
-                    if (currentRoute?.view === 'vocabulary' && currentRoute.mode === 'quizzes') {
+                    if (currentRoute?.view === VOCABULARY_PAGE.id && currentRoute.mode === 'quizzes') {
                         return currentRoute;
                     }
-                    return { view: 'vocabulary', mode: 'quizzes' };
+                    return { view: VOCABULARY_PAGE.id, mode: 'quizzes' };
                 }
                 return {
-                    view: 'vocabulary',
+                    view: VOCABULARY_PAGE.id,
                     subject: this.libraryDrilldown.subject,
                     grade: this.libraryDrilldown.grade,
                     trimester: this.libraryDrilldown.trimester,
@@ -127,7 +128,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         updateVocabularyRoute(options = {}) {
             if (this.isApplyingRoute || !this.isAuthenticated) return;
             this.lastVocabularyRoute = {
-                view: 'vocabulary',
+                view: VOCABULARY_PAGE.id,
                 subject: this.libraryDrilldown.subject,
                 grade: this.libraryDrilldown.grade,
                 trimester: this.libraryDrilldown.trimester,
@@ -164,7 +165,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 while (routeToApply) {
                     this.pendingTeacherRoute = null;
                     switch (routeToApply.view) {
-                        case 'vocabulary':
+                        case VOCABULARY_PAGE.id:
                             const routeDrilldown = {
                                 subject: routeToApply.subject || null,
                                 grade: routeToApply.grade || null,
@@ -176,7 +177,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 this.libraryDrilldown = routeDrilldown;
                             }
                             this.lastVocabularyRoute = { ...routeToApply };
-                            this.switchView('teacher-dashboard-view');
+                            this.switchView(VOCABULARY_PAGE.viewId);
                             this.setVocabularyWorkflowTab(this.vocabularyMode, {
                                 updateRoute: false,
                                 replace: true,
