@@ -2,6 +2,8 @@
  * Toast notification system for non-blocking user messages
  */
 
+const NOTIFICATION_TYPES = new Set(['info', 'success', 'error', 'warning']);
+
 class NotificationManager {
     constructor() {
         this.container = null;
@@ -30,8 +32,12 @@ class NotificationManager {
     }
 
     show(message, type = 'info', duration = 4000) {
+        const notificationType = NOTIFICATION_TYPES.has(type) ? type : 'info';
         const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
+        toast.className = `toast toast-${notificationType}`;
+        toast.setAttribute('role', notificationType === 'error' ? 'alert' : 'status');
+        toast.setAttribute('aria-live', notificationType === 'error' ? 'assertive' : 'polite');
+        toast.setAttribute('aria-atomic', 'true');
         
         const colors = {
             info: { bg: 'rgba(14, 165, 233, 0.9)', border: '#0ea5e9' },
@@ -47,7 +53,7 @@ class NotificationManager {
             warning: 'triangle-alert'
         };
 
-        const color = colors[type] || colors.info;
+        const color = colors[notificationType];
         
         toast.style.cssText = `
             background: ${color.bg};
@@ -71,7 +77,7 @@ class NotificationManager {
         icon.className = 'toast-icon';
         icon.setAttribute('aria-hidden', 'true');
         const iconGlyph = document.createElement('i');
-        iconGlyph.setAttribute('data-lucide', icons[type] || icons.info);
+        iconGlyph.setAttribute('data-lucide', icons[notificationType]);
         icon.appendChild(iconGlyph);
 
         const messageText = document.createElement('span');
@@ -138,7 +144,15 @@ class NotificationManager {
         }
 
         // Close button handler
+        let isClosing = false;
+        let autoRemoveTimer = null;
         const closeToast = () => {
+            if (isClosing) return;
+            isClosing = true;
+            if (autoRemoveTimer !== null) {
+                clearTimeout(autoRemoveTimer);
+                autoRemoveTimer = null;
+            }
             toast.style.animation = 'slideOutRight 0.3s ease-out';
             setTimeout(() => {
                 if (toast.parentNode) {
@@ -147,18 +161,17 @@ class NotificationManager {
             }, 300);
         };
 
-        closeBtn.addEventListener('click', closeToast);
-        toast.addEventListener('click', (e) => {
-            if (e.target !== closeBtn) {
-                closeToast();
-            }
+        closeBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeToast();
         });
+        toast.addEventListener('click', closeToast);
 
         this.container.appendChild(toast);
 
         // Auto-remove after duration
         if (duration > 0) {
-            setTimeout(closeToast, duration);
+            autoRemoveTimer = setTimeout(closeToast, duration);
         }
 
         return toast;
