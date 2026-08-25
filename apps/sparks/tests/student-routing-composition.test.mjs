@@ -123,8 +123,7 @@ test('StudentManager declares the stable routing interface directly', () => {
         'navigateTo',
         'restoreRouteOrDefault',
         'handleRouteChange',
-        'isKnownActivityType',
-        'resetRouteState'
+        'isKnownActivityType'
     ]) {
         assert.equal(
             Object.prototype.hasOwnProperty.call(StudentManager.prototype, method),
@@ -132,6 +131,12 @@ test('StudentManager declares the stable routing interface directly', () => {
             `${method} must be declared by StudentManager`
         );
     }
+
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentManager.prototype, 'resetRouteState'),
+        false,
+        'route reset belongs to StudentRouting; session cleanup uses resetSessionRouting'
+    );
 });
 
 test('route parsing and building preserve the public URL contract', () => {

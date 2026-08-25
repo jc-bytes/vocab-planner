@@ -24,10 +24,6 @@ export class StudentAuth {
         this.authUnsubscribe = null;
     }
 
-    getJoinGradeFromUrl() {
-        return this.ui.getJoinGradeFromUrl();
-    }
-
     prefillRegistrationFromJoinLink() {
         return this.ui.prefillRegistrationFromJoinLink();
     }
@@ -54,10 +50,6 @@ export class StudentAuth {
 
     handleStudentLogin(event) {
         return this.ui.handleStudentLogin(event);
-    }
-
-    handleStudentRegister(event) {
-        return this.ui.handleStudentRegister(event);
     }
 
     showForcedPasswordChange() {

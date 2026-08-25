@@ -80,7 +80,6 @@ test('StudentManager declares only the cross-component auth interface directly',
         'hasCompleteStudentProfile',
         'showAuthPanel',
         'handleStudentLogin',
-        'handleStudentRegister',
         'handleForcedPasswordChange',
         'setAuthStatus'
     ]) {
@@ -91,9 +90,19 @@ test('StudentManager declares only the cross-component auth interface directly',
         );
     }
 
-    const joinGrade = Object.getOwnPropertyDescriptor(StudentManager.prototype, 'joinGrade');
-    assert.equal(typeof joinGrade?.get, 'function');
-    assert.equal(typeof joinGrade?.set, 'function');
+    assert.equal(Object.getOwnPropertyDescriptor(StudentManager.prototype, 'joinGrade'), undefined);
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentManager.prototype, 'handleStudentRegister'),
+        false
+    );
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentAuth.prototype, 'handleStudentRegister'),
+        false
+    );
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentAuth.prototype, 'getJoinGradeFromUrl'),
+        false
+    );
 });
 
 test('profile normalization and merging preserve legacy aliases', () => {

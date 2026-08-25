@@ -141,10 +141,6 @@ export class StudentManager {
         return this.routing.isKnownActivityType(activityType);
     }
 
-    resetRouteState() {
-        this.routing.reset();
-    }
-
     resetSessionRouting() {
         this.routing.resetSession();
     }
@@ -277,14 +273,6 @@ export class StudentManager {
         return this.subjectSelection.rememberStudentVocabularyLocation(trimester, month);
     }
 
-    get joinGrade() {
-        return this.auth.ui.joinGrade;
-    }
-
-    set joinGrade(grade) {
-        this.auth.ui.joinGrade = grade;
-    }
-
     normalizeStudentProfile(profile) {
         return this.auth.normalizeStudentProfile(profile);
     }
@@ -303,10 +291,6 @@ export class StudentManager {
 
     handleStudentLogin(event) {
         return this.auth.handleStudentLogin(event);
-    }
-
-    handleStudentRegister(event) {
-        return this.auth.handleStudentRegister(event);
     }
 
     handleForcedPasswordChange(event) {

@@ -63,7 +63,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
-| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities` and `StudentGames` owner-only wrappers; ownership contracts | Focused activity/game/listener/routing/build checks; complete regressions; production builds; independent reviews | Removed 20 revalidated one-line pass-throughs while preserving their eager owner APIs. Secondary manager/teacher candidates remain a separate evidence gate. |
+| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities`, `StudentGames`, and `StudentManager` obsolete bridges; ownership contracts | Focused activity/game/auth/routing/security/build checks; complete regressions; production builds; independent reviews | Removed 25 revalidated forwarding members while preserving live owner APIs and session/security boundaries. Teacher candidates remain one final evidence gate. |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
@@ -450,6 +450,16 @@ Task 24 remains in progress. Student Games candidates will be re-traced and remo
 - Verification passed for 19 Student Games, eight Student Listener, 15 routing, and 11 build/lazy tests; the complete regression suite, 9-width student shell, three-page/game browser smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB; the lazy Student Games chunk decreased from 39.73/10.55 kB to 39.47/10.52 kB raw/gzip.
 
 Task 24 remains in progress. The small secondary StudentManager and teacher candidate list will receive one final source-and-runtime audit; uncertain or externally meaningful methods will be preserved and documented rather than removed.
+
+### Task 24c, remove obsolete Student Manager bridges
+
+- Removed the uncalled `joinGrade` manager property, registration handler, and route-reset bridge after exact, computed, HTML, listener, and global-surface tracing. Removed the two newly orphaned `StudentAuth` pass-throughs for join-grade parsing and registration submission.
+- Preserved the actual join-link state and prefill logic on `StudentAuthUi`, direct registration validation tests, and the dormant UI implementation. Retiring that broader product surface is a separate auth/security decision; this change only removes unreachable forwarding layers.
+- Preserved `resetSessionRouting()`, whose two live auth lifecycle callers own lazy Arcade cleanup plus route reset. `StudentRouting.reset()` remains directly tested as the lower-level route-state operation.
+- Added negative ownership contracts so the removed bridges cannot silently return. The absence of registration controls, inline handlers, dynamic dispatch, and repository callers was independently verified; server/config signup restrictions and authorization-field protections remain the real security boundary.
+- Verification passed for 11 Student Auth, 15 routing, nine shell-composition, and 14 security tests; the complete regression suite, 9-width student shell, three-page/game browser smoke, production build, scoped diff validation, and independent audit. Deployment remains 13.5 MB; student entry JavaScript decreased from 236.53/60.56 kB to 236.21/60.49 kB raw/gzip.
+
+Task 24 remains in progress. The teacher audit identified one small alias/constants cleanup and a larger obsolete whole-progress read chain; they will be handled as separate atomic changes so the live paginated and identity-roster boundaries can be verified independently.
 
 ### Phase 0, baseline
 
