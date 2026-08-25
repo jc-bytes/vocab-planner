@@ -86,6 +86,23 @@ test('authenticated activity autosave does not mint coins before the authoritati
     assert.equal(coinAwards.length, 0);
 });
 
+test('only a first non-Flashcards completion requests Arcade refresh feedback', () => {
+    const { persistence, sm } = createPersistence();
+    const submissions = [];
+    persistence.syncActivityProgressToCloud = (...args) => submissions.push(args);
+
+    persistence.handleAutoSave({ score: 100, details: 'Complete', isComplete: true });
+    persistence.handleAutoSave({ score: 100, details: 'Replay complete', isComplete: true });
+
+    sm.currentActivityType = 'flashcards';
+    sm.unitScores.flashcards = { score: 0, isComplete: false };
+    persistence.handleAutoSave({ score: 100, details: 'Studied', isComplete: true });
+
+    assert.equal(submissions[0][2].notifyArcadeRefresh, true);
+    assert.equal(submissions[1][2].notifyArcadeRefresh, false);
+    assert.equal(submissions[2][2].notifyArcadeRefresh, false);
+});
+
 test('auth-disabled activities retain immediate local coin rewards', () => {
     for (const activityType of ['matching', 'flashcards']) {
         const { persistence, sm, coinAwards } = createPersistence();
@@ -241,6 +258,40 @@ test('time-reporting failure does not block the authoritative completion request
         supabaseService.reportStudentActivityTime = originalReportTime;
         supabaseService.submitStudentActivityProgress = originalSubmitProgress;
         setActiveStudentStorageOwner(originalOwner);
+    }
+});
+
+test('verified formative completion reports the authoritative Arcade balance', async () => {
+    const originalOwner = getActiveStudentStorageOwner();
+    const originalSubmitProgress = supabaseService.submitStudentActivityProgress;
+    const originalGetArcadeTime = supabaseService.getOwnArcadeTime;
+    const { persistence, sm } = createPersistence();
+    const toasts = [];
+    setActiveStudentStorageOwner('student-1');
+    sm.showToast = message => toasts.push(message);
+    persistence.activities.getPendingRequiredWork = () => ({ isBlocked: true });
+    persistence.applyActivityProgressResult = () => {};
+    persistence.showActivityXpReward = () => {};
+    supabaseService.submitStudentActivityProgress = async () => ({
+        totalXp: 50,
+        activity: { activityType: 'matching', isComplete: true, verified: true }
+    });
+    supabaseService.getOwnArcadeTime = async () => ({ availableSeconds: 600 });
+
+    try {
+        await persistence.submitActivityProgressPayload({
+            unitKey: 'unit-1',
+            activityType: 'matching',
+            isComplete: true,
+            notifyArcadeRefresh: true
+        });
+        assert.deepEqual(toasts, [
+            'Arcade ready: 10 minutes available. Finish remaining required work to unlock Arcade.'
+        ]);
+    } finally {
+        setActiveStudentStorageOwner(originalOwner);
+        supabaseService.submitStudentActivityProgress = originalSubmitProgress;
+        supabaseService.getOwnArcadeTime = originalGetArcadeTime;
     }
 });
 

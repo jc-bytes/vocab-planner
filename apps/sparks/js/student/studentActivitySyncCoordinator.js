@@ -5,6 +5,7 @@ import {
     getActiveStudentStorageOwner,
     isActiveStudentStorageOwner
 } from './persistence/studentStorage.js';
+import { ARCADE_MINUTE_SECONDS } from './studentArcadePolicy.js';
 
 function getSyncErrorSummary(error) {
     const parts = [error?.code, error?.message, error?.details, error?.hint]
@@ -47,6 +48,7 @@ export class StudentActivitySyncCoordinator {
         if (this.sm.authDisabled || !this.sm.currentUser) return;
         const payload = this.persistence.buildActivityProgressPayload(activityType, scoreData, settings);
         if (!payload) return;
+        payload.notifyArcadeRefresh = Boolean(settings.notifyArcadeRefresh);
 
         const ownerUserId = getActiveStudentStorageOwner();
         const syncKey = `${ownerUserId}:${payload.unitKey}:${activityType}`;
@@ -90,7 +92,8 @@ export class StudentActivitySyncCoordinator {
             payload.attemptId || '',
             Number(payload.activeSeconds) || 0,
             Number(payload.timeLimitSeconds) || 0,
-            Boolean(payload.isRequired)
+            Boolean(payload.isRequired),
+            Boolean(payload.notifyArcadeRefresh)
         ]);
     }
 
@@ -195,6 +198,7 @@ export class StudentActivitySyncCoordinator {
             if (payload.isComplete) {
                 this.persistence.showActivityXpReward(xpAwarded, payload.activityType);
             }
+            await this.showArcadeRefreshFeedback(progress, payload, ownerUserId);
             if (payload.isFinished) {
                 this.activities.session.finishActivityTimer?.();
             }
@@ -217,6 +221,39 @@ export class StudentActivitySyncCoordinator {
                 this.sm.setAuthStatus('Activity result rejected');
                 this.sm.showToast?.('This activity result was not accepted. Refresh and try again.');
             }
+            return null;
+        }
+    }
+
+    async showArcadeRefreshFeedback(progress, payload, ownerUserId) {
+        if (!payload.notifyArcadeRefresh
+            || payload.activityType === 'flashcards'
+            || !progress?.activity?.isComplete
+            || !progress.activity.verified) return null;
+
+        try {
+            const wallet = await studentApi.getOwnArcadeTime();
+            if (!isActiveStudentStorageOwner(ownerUserId)
+                || this.sm.currentUser?.uid !== ownerUserId) return null;
+
+            const availableSeconds = Math.max(0, Number(wallet?.availableSeconds) || 0);
+            if (availableSeconds < ARCADE_MINUTE_SECONDS) {
+                this.sm.showToast?.('Activity saved, but Arcade time was not added.');
+                return wallet;
+            }
+
+            const availableMinutes = Math.floor(availableSeconds / ARCADE_MINUTE_SECONDS);
+            const minuteLabel = availableMinutes === 1 ? 'minute' : 'minutes';
+            const hasRemainingWork = this.activities.getPendingRequiredWork?.().isBlocked;
+            const remainingWorkMessage = hasRemainingWork
+                ? ' Finish remaining required work to unlock Arcade.'
+                : '';
+            this.sm.showToast?.(
+                `Arcade ready: ${availableMinutes} ${minuteLabel} available.${remainingWorkMessage}`
+            );
+            return wallet;
+        } catch (error) {
+            console.warn('Could not refresh Arcade time after activity completion:', error);
             return null;
         }
     }

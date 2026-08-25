@@ -75,8 +75,11 @@ export class StudentGameSettings {
 
         const timeBalance = $('#arcade-time-balance');
         if (timeBalance) {
-            const availableTime = this.formatTime(this.games.getAvailableArcadeSeconds());
-            timeBalance.textContent = `${availableTime} of earned Arcade time available. Complete a formative activity after every ${FORMATIVE_PASS_MINUTES} minutes of Arcade play.`;
+            const availableSeconds = this.games.getAvailableArcadeSeconds();
+            const balanceText = availableSeconds > 0
+                ? `${this.formatTime(availableSeconds)} of earned Arcade time available.`
+                : 'No earned Arcade time available.';
+            timeBalance.textContent = `${balanceText} Complete a formative activity after every ${FORMATIVE_PASS_MINUTES} minutes of Arcade play.`;
         }
     }
 

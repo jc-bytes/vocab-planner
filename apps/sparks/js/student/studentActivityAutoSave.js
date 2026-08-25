@@ -37,7 +37,10 @@ export class StudentActivityAutoSave {
         this.persistence.syncActivityProgressToCloud(activityType, scoreData, {
             ...settings,
             progressReward,
-            completionBonus
+            completionBonus,
+            notifyArcadeRefresh: activityType !== 'flashcards'
+                && !wasComplete
+                && Boolean(persistedScoreData.isComplete)
         });
         this.activities.scheduleActivityPreload();
         this.activities.updateArcadeGateDisplay();

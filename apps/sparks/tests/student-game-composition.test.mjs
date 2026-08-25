@@ -137,6 +137,16 @@ test('Arcade selection displays the authoritative earned-time balance', async ()
             elements.get('#arcade-time-balance').textContent,
             '10m 0s of earned Arcade time available. Complete a formative activity after every 10 minutes of Arcade play.'
         );
+
+        games.loadArcadeTime = async () => {
+            games.access.arcadeTime = { availableSeconds: 0 };
+            return games.access.arcadeTime;
+        };
+        await games.updateArcadeUI();
+        assert.equal(
+            elements.get('#arcade-time-balance').textContent,
+            'No earned Arcade time available. Complete a formative activity after every 10 minutes of Arcade play.'
+        );
     } finally {
         globalThis.document.querySelector = originalQuerySelector;
     }
