@@ -1,5 +1,6 @@
 import { $, notifications } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
+import { showLoadingState } from './ui/loadingState.js';
 
 const QUIZ_BUILDER_DRAFT_KEY = 'teacher_quiz_builder_active_draft';
 
@@ -131,7 +132,7 @@ class TeacherQuizCoreMethods {
     async loadQuizPicker() {
         const container = $('#quiz-vocab-picker');
         if (!container) return;
-        container.innerHTML = '<div class="loading-spinner">Loading vocabulary choices...</div>';
+        showLoadingState(container, 'Loading vocabulary choices...');
         try {
             const { items } = await this.getTeacherLibrary();
 

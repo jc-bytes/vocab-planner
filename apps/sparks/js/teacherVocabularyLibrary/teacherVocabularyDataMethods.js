@@ -1,5 +1,6 @@
 import { $ } from '../main.js';
 import { getVocabSubjectSlug, loadManifest } from '../services/vocabularyApi.js';
+import { showLoadingState } from '../ui/loadingState.js';
 
 export const teacherVocabularyDataMethods = {
 async getTeacherLibrary({ forceRefresh = false } = {}) {
@@ -139,7 +140,7 @@ async loadLibrary() {
             return;
         }
 
-        list.innerHTML = '<div class="loading-spinner">Loading library...</div>';
+        showLoadingState(list, 'Loading library...');
 
         try {
             const { cloudVocabs, remoteVocabs, localVocabs, items } = await this.getTeacherLibrary();
@@ -224,4 +225,3 @@ openTeacherVocabularyItem(vocab, type) {
         }
     }
 };
-

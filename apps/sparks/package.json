@@ -24,7 +24,7 @@
     "test:cards": "node --test tests/card-style-contract.test.mjs",
     "test:dialogs": "node --test tests/dialog-style-contract.test.mjs",
     "test:navigation": "node --test tests/navigation-style-contract.test.mjs",
-    "test:feedback": "node --test tests/feedback-style-contract.test.mjs",
+    "test:feedback": "node --test tests/feedback-style-contract.test.mjs tests/shared-ui-primitives.test.mjs",
     "test:containers": "node --test tests/container-style-contract.test.mjs",
     "test:typography": "node --test tests/typography-style-contract.test.mjs",
     "test:landing-responsive": "node --test tests/landing-responsive.test.mjs",
