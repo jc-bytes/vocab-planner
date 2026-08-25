@@ -755,3 +755,12 @@ Task 12 remains in progress. Data Reset is the final bounded data-management sur
 - Verification: focused inline-style, button, typography, brand-color, build/lazy, and security suites; then the complete `npm test` suite, nine-width student regression, 13-game sandbox smoke, production build, and built three-page smoke passed. Deployment remains 13.6 MB with 2,329 transformed modules. Teacher HTML is 101.50/13.83 kB raw/gzip, teacher CSS is 148.41/23.86 kB, teacher entry JavaScript is 158.82/43.53 kB, the lazy data-management chunk remains 38.19/9.26 kB, and service-worker precache remains 20 files totaling 1,026,797 bytes.
 
 Task 12 is complete. Fixed presentation in every audited teacher surface now has a clear CSS owner, while genuinely dynamic state remains with behavior. Task 13 should inspect repeated DOM construction and introduce only primitives supported by multiple current callers; it must not create a framework or abstract unique game visuals.
+
+### Architecture review after Tasks 8-12
+
+- Independent review found no blocking regression, new eager dependency, circular dependency, or unnecessary abstraction. The shared theme and component-family styles remain genuine authorities with page- and feature-specific refinements kept local.
+- Removed the confirmed-dead `--primary-hover` compatibility alias from both theme scopes. Repository-wide tracing found no `var(--primary-hover)` consumer; the theme contract was the only reason it remained.
+- Deferred moving namespaced Data Management styles out of eager `teacher.css` until the corresponding teacher features are converted in Tasks 16-18. Moving CSS alone now would be organization-only churn; migrating implementation and owned styles together will create a real lazy feature boundary.
+- Recorded two lower-risk follow-ups for the next material changes in those areas: reduce exact presentation-value duplication in `teacher-inline-style-contract.test.mjs`, and co-locate Student Detail responsive rules after generic modal rules so four currently necessary `!important` declarations can be removed safely.
+
+The review correction is complete. Task 13 begins from the existing `createElement` and modal lifecycle utilities and will add only a primitive supported by repeated live behavior.

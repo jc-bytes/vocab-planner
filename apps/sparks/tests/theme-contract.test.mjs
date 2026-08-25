@@ -77,7 +77,6 @@ test('every application entry loads the theme once before page-owned styles', ()
 test('entry styles no longer own the migrated palette aliases', () => {
     const migratedAliases = {
         'primary-color': 'color-brand',
-        'primary-hover': 'color-brand-hover',
         'accent-color': 'color-accent',
         'bg-color': 'color-background',
         'text-main': 'color-text',
@@ -106,4 +105,6 @@ test('entry styles no longer own the migrated palette aliases', () => {
             `--${alias} must remain a compatibility alias for --${semanticToken}`
         );
     }
+
+    assert.doesNotMatch(themeCss, /--primary-hover\s*:/, 'unused compatibility aliases must not become permanent theme API');
 });

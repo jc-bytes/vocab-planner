@@ -35,7 +35,6 @@
 
     /* Compatibility aliases for component families not migrated yet. */
     --primary-color: var(--color-brand);
-    --primary-hover: var(--color-brand-hover);
     --secondary-color: var(--color-info);
     --accent-color: var(--color-accent);
     --bg-color: var(--color-background);
@@ -98,7 +97,6 @@
 
     /* Resolve compatibility aliases in the student scope. */
     --primary-color: var(--color-brand);
-    --primary-hover: var(--color-brand-hover);
     --secondary-color: var(--color-secondary);
     --accent-color: var(--color-accent);
     --bg-color: var(--color-background);
