@@ -1,4 +1,7 @@
 import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 
 export function installTeacherRoutingMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -8,12 +11,12 @@ export function installTeacherRoutingMethods(TeacherManager) {
             const { parts, params } = location;
 
             if (parts[0] !== 'teacher') return null;
-            if (!parts[1] || parts[1] === 'overview') return { view: 'overview' };
+            if (!parts[1] || parts[1] === OVERVIEW_PAGE.id) return { view: OVERVIEW_PAGE.id };
             if (parts[1] === 'students') return { view: 'students' };
             if (parts[1] === 'groups') return { view: 'groups' };
             if (parts[1] === 'word-hunt') return { view: 'vocabulary', mode: 'review' };
             if (parts[1] === 'sparks') return { view: 'sparks' };
-            if (parts[1] === 'activities') return { view: 'overview' };
+            if (parts[1] === 'activities') return { view: OVERVIEW_PAGE.id };
             if (parts[1] === 'quizzes' && parts[2] === 'editor') return { view: 'quiz-editor' };
             if (parts[1] === 'quizzes') return { view: 'quizzes' };
             if (parts[1] === 'data') return { view: 'data', tab: params.get('tab') || undefined };
@@ -40,12 +43,12 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 };
             }
 
-            return { view: 'overview' };
+            return { view: OVERVIEW_PAGE.id };
         },
 
         buildRoute(route) {
-            if (!route || !route.view) return '#/teacher/overview';
-            if (route.view === 'overview') return '#/teacher/overview';
+            if (!route || !route.view) return `#/teacher/${OVERVIEW_PAGE.id}`;
+            if (route.view === OVERVIEW_PAGE.id) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (route.view === 'students') return '#/teacher/students';
             if (route.view === 'groups') return '#/teacher/groups';
             if (route.view === 'word-hunt-review') return '#/teacher/vocabulary?mode=review';
@@ -73,7 +76,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 const query = params.toString();
                 return `#/teacher/vocabulary${query ? `?${query}` : ''}`;
             }
-            return '#/teacher/overview';
+            return `#/teacher/${OVERVIEW_PAGE.id}`;
         },
 
         currentTeacherRouteForView(viewId) {
@@ -109,7 +112,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (currentRoute?.view === 'data' || currentRoute?.view === 'settings') return currentRoute;
                 return { view: 'settings', tab: 'subjects' };
             }
-            return { view: 'overview' };
+            return { view: OVERVIEW_PAGE.id };
         },
 
         setRoute(route, options = {}) {
@@ -134,7 +137,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
             this.setRoute(this.lastVocabularyRoute, options);
         },
 
-        async restoreRouteOrDefault(defaultRoute = { view: 'overview' }) {
+        async restoreRouteOrDefault(defaultRoute = { view: OVERVIEW_PAGE.id }) {
             this.routeReady = true;
             const route = this.parseRoute() || defaultRoute;
             if (!this.parseRoute()) {
@@ -145,7 +148,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
 
         async handleRouteChange() {
             if (!this.isAuthenticated) return;
-            const route = this.parseRoute() || { view: 'overview' };
+            const route = this.parseRoute() || { view: OVERVIEW_PAGE.id };
             await this.applyRoute(route);
         },
 
@@ -221,9 +224,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                         case 'settings':
                             await this.showDataManagementView({ area: routeToApply.view, tab: routeToApply.tab });
                             break;
-                        case 'overview':
+                        case OVERVIEW_PAGE.id:
                         default:
-                            this.switchView('teacher-overview-view');
+                            this.switchView(OVERVIEW_PAGE.viewId);
                             this.loadTeacherOverview();
                             break;
                     }

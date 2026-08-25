@@ -2,6 +2,7 @@ import { $, $$ } from './main.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const TEACHER_SIDEBAR_STORAGE_KEY = 'teacher_sidebar_collapsed';
+const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
     ...TEACHER_SHELL_VIEW_IDS,
@@ -64,7 +65,7 @@ class TeacherShellMethods {
 
     showDashboard() {
         if (!this.ensureAuthenticated(false)) return;
-        this.showTeacherSection('overview');
+        this.showTeacherSection(OVERVIEW_PAGE.id);
     }
     
 
@@ -107,12 +108,12 @@ class TeacherShellMethods {
     }
 
     getSectionForView(viewId) {
+        if (viewId === OVERVIEW_PAGE.viewId) return OVERVIEW_PAGE.id;
         if (viewId === 'teacher-data-management-view') {
             const route = this.parseRoute?.();
             return route?.view === 'data' ? 'data' : 'settings';
         }
         const map = {
-            'teacher-overview-view': 'overview',
             'teacher-dashboard-view': 'vocabulary',
             'teacher-editor-view': 'vocabulary',
             'teacher-sparks-view': 'sparks',
@@ -171,8 +172,8 @@ class TeacherShellMethods {
         if (!this.ensureAuthenticated(false)) return;
         this.closeTeacherMobileMenu();
         switch (sectionId) {
-            case 'overview':
-                this.switchView('teacher-overview-view');
+            case OVERVIEW_PAGE.id:
+                this.switchView(OVERVIEW_PAGE.viewId);
                 this.loadTeacherOverview();
                 break;
             case 'vocabulary':
@@ -212,7 +213,7 @@ class TeacherShellMethods {
                 );
                 break;
             default:
-                this.showTeacherSection('overview');
+                this.showTeacherSection(OVERVIEW_PAGE.id);
         }
     }
 }

@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | TODO | | | |
+| 20. Migrate teacher pages | IN PROGRESS | Overview shell/route migration; primary-page browser smoke | Per-page registry, routing, navigation, browser history, and UI checks | Overview is migrated. Remaining primary pages will move one at a time. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -228,6 +228,15 @@ Task 18 is complete. The next change is the small top-level page registry in Tas
 - Verification: two registry contracts, four navigation contracts, 14 routing contracts, 11 build/lazy contracts, source three-page smoke, and scoped diff validation passed. Independent reviews approved the corrected foundation after the registry gained a production consumer and an independently pinned public-page fixture.
 
 Task 19 is complete. Task 20 will migrate primary pages one at a time; Task 21 will remove the old switches only after every page uses the registry-backed navigation path.
+
+### Task 20a, migrate Overview
+
+- Replaced Overview's duplicated route/view literals in the shell and router with the `overview` registry descriptor. The `/teacher/overview` URL, `/activities` compatibility redirect, default route, view activation, and overview loader remain unchanged.
+- Added a browser workflow built from the real teacher navigation markup. It verifies the public section/dashboard navigation paths, direct route application, Back navigation, visible Overview view, active tab, mobile label, top-bar label, canonical hash, and Overview load call.
+- Kept route parsing, history serialization, page loading, labels, and static HTML in their existing owners. This page migration uses registry identity and view metadata only.
+- Verification: registry and browser page smoke, all 14 routing checks, four navigation checks, production build, all 11 build-efficiency checks, scoped diff validation, and independent review passed.
+
+Task 20 remains in progress. Vocabulary is next because its assign hub is eager but has nested Review, Quiz, and Editor modes that must remain outside the primary-page descriptor.
 
 ### Phase 0, baseline
 

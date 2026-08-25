@@ -44,7 +44,7 @@
     "test:teacher-quiz": "node --test tests/teacher-quiz-composition.test.mjs tests/quiz-maker-lifecycle.test.mjs && node scripts/ui-teacher-quiz-smoke.mjs",
     "test:teacher-word-hunt": "node --test tests/teacher-word-hunt-review-composition.test.mjs && node scripts/ui-teacher-word-hunt-smoke.mjs",
     "test:student-routing": "node --test tests/hash-routing.test.mjs tests/student-routing-composition.test.mjs",
-    "test:teacher-pages": "node --test tests/teacher-page-registry.test.mjs",
+    "test:teacher-pages": "node --test tests/teacher-page-registry.test.mjs && node scripts/ui-teacher-pages-smoke.mjs",
     "test:student-shell-composition": "node --test tests/student-shell-composition.test.mjs",
     "test:student-listeners": "node --test tests/student-listener-composition.test.mjs",
     "test:student-subjects": "node --test tests/student-subject-composition.test.mjs",

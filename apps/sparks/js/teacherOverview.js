@@ -1,5 +1,8 @@
 import { $, escapeHtml } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 
 export function installTeacherOverviewMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -34,7 +37,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
             const load = async () => {
                 try {
                     this.overviewAnalytics = await supabaseService.getTeacherDashboardAnalytics();
-                    if (this.getSectionForView('teacher-overview-view') === 'overview' && !$('#teacher-overview-view')?.classList.contains('hidden')) {
+                    if (this.getSectionForView(OVERVIEW_PAGE.viewId) === OVERVIEW_PAGE.id && !$(`#${OVERVIEW_PAGE.viewId}`)?.classList.contains('hidden')) {
                         this.renderOverviewStats();
                         this.renderOverviewRecentActivity();
                     }
