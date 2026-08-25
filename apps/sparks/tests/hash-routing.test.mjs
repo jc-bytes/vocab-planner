@@ -66,6 +66,13 @@ test('teacher routes keep their public URL contract through the shared parser', 
     assert.deepEqual(teacher.parseRoute('#/teacher/data-settings?tab=calendar'), {
         view: 'settings', tab: 'calendar'
     });
+    assert.deepEqual(teacher.parseRoute('#/teacher/settings?tab=gamification'), {
+        view: 'settings', tab: 'gamification'
+    });
+    assert.equal(
+        teacher.buildRoute({ view: 'settings', tab: 'gamification' }),
+        '#/teacher/settings?tab=gamification'
+    );
     assert.equal(
         teacher.buildRoute({ view: 'vocabulary', grade: '7', mode: 'review' }),
         '#/teacher/vocabulary?grade=7&mode=review'

@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, Students, Groups, and Data shell/route migrations; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, and UI checks | Six primary pages are migrated. Data preserves route-based disambiguation on its shared view; Settings is the final primary page. |
+| 20. Migrate teacher pages | DONE | All seven primary teacher pages; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, complete regression suite, and production build | Every primary page now uses its registry descriptor. Data and Settings preserve route-based disambiguation on their intentional shared view. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -324,6 +324,16 @@ Task 20 remains in progress. Data is next; it shares a view and lazy feature wit
 - Focused page, Data, Progress, routing, lazy/build, scoped diff checks, the complete regression suite, and production build pass. The build remains 13.5 MB with 2,330 modules; Data Management remains lazy at 45.31 kB raw / 10.99 kB gzip.
 
 Task 20 remains in progress. Settings is the final primary page migration.
+
+### Task 20g, migrate Settings
+
+- Replaced duplicated Settings primary page IDs in the shell, router, and Overview shortcut with the `settings` registry descriptor.
+- Preserved the intentional shared Data/Settings view. Shell and routing still use the current route to choose the active primary navigation item, Settings still defaults to Subjects, Data still defaults to Dashboard, and the legacy `data-settings` alias still selects its area from the tab.
+- Kept feature-owned Settings area, tab, section, copy, and DOM strings inside Data Management. They describe the shared feature workflow rather than duplicate top-level page metadata.
+- Extended public route assertions and the primary-page browser workflow for normal Subjects entry, a direct Gamification route, the shared view with Settings labels, one lazy feature activation per entry, and Back restoration.
+- Focused page, Data Management, routing, and build-efficiency checks pass. The complete regression suite, 9-width student shell, three-page UI smoke, 13 sandboxed games, production build, and scoped diff validation pass. Two independent reviews found no blocker. The build remains 13.5 MB with 2,330 modules; Data Management remains lazy at 45.31 kB raw / 10.99 kB gzip.
+
+Task 20 is complete. All seven primary teacher pages now use the page registry. Task 21 will remove only duplicated navigation wiring proven obsolete; feature-owned routing details and the intentional shared-view distinction remain in place.
 
 ### Phase 0, baseline
 

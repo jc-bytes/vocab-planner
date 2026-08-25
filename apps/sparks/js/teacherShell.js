@@ -8,6 +8,7 @@ const SPARKS_PAGE = teacherPageRegistry.get('sparks');
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
 const GROUPS_PAGE = teacherPageRegistry.get('groups');
 const DATA_PAGE = teacherPageRegistry.get('data');
+const SETTINGS_PAGE = teacherPageRegistry.get('settings');
 const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
     ...TEACHER_SHELL_VIEW_IDS,
@@ -122,7 +123,7 @@ class TeacherShellMethods {
         if (viewId === GROUPS_PAGE.viewId) return GROUPS_PAGE.id;
         if (viewId === DATA_PAGE.viewId) {
             const route = this.parseRoute?.();
-            return route?.view === DATA_PAGE.id ? DATA_PAGE.id : 'settings';
+            return route?.view === DATA_PAGE.id ? DATA_PAGE.id : SETTINGS_PAGE.id;
         }
         return '';
     }
@@ -205,13 +206,13 @@ class TeacherShellMethods {
                 this.setRoute({ view: DATA_PAGE.id, tab: options.tab || 'dashboard' });
                 this.showDataManagementView({ ...options, area: DATA_PAGE.id, updateRoute: false });
                 break;
-            case 'settings':
-                this.setRoute({ view: 'settings', tab: options.tab || 'subjects' });
-                this.showDataManagementView({ ...options, area: 'settings', updateRoute: false });
+            case SETTINGS_PAGE.id:
+                this.setRoute({ view: SETTINGS_PAGE.id, tab: options.tab || 'subjects' });
+                this.showDataManagementView({ ...options, area: SETTINGS_PAGE.id, updateRoute: false });
                 break;
             case 'data-settings':
                 this.showTeacherSection(
-                    ['dashboard', 'export', 'view', 'reset'].includes(options.tab) ? DATA_PAGE.id : 'settings',
+                    ['dashboard', 'export', 'view', 'reset'].includes(options.tab) ? DATA_PAGE.id : SETTINGS_PAGE.id,
                     options
                 );
                 break;

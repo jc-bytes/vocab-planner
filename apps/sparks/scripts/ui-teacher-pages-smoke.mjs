@@ -25,6 +25,7 @@ try {
         const sparksPage = teacherPageRegistry.get('sparks');
         const groupsPage = teacherPageRegistry.get('groups');
         const dataPage = teacherPageRegistry.get('data');
+        const settingsPage = teacherPageRegistry.get('settings');
         const { installTeacherShellMethods } = await import('/js/teacherShell.js');
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
@@ -69,7 +70,7 @@ try {
             showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
             showDataManagementView({ area, tab }) {
                 this.dataCalls.push({ area, tab });
-                this.switchView(dataPage.viewId, { updateRoute: false });
+                this.switchView(area === settingsPage.id ? settingsPage.viewId : dataPage.viewId, { updateRoute: false });
                 this.setActiveTeacherTab(area);
             }
             setVocabularyWorkflowTab(mode, options) { this.workflowCalls.push({ mode, options }); }
@@ -385,7 +386,59 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'data'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, Students, Groups, and Data navigation, direct routing, and history.');
+    const settings = await page.evaluate(() => {
+        const manager = window.teacherPageSmokeManager;
+        const callsBefore = manager.dataCalls.length;
+        manager.showTeacherSection('settings');
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            calls: manager.dataCalls.slice(callsBefore)
+        };
+    });
+    if (settings.hash !== '#/teacher/settings?tab=subjects'
+        || settings.activeView !== 'teacher-data-management-view'
+        || settings.activeSection !== 'settings'
+        || settings.mobileLabel !== 'Settings'
+        || settings.topLabel !== 'Settings'
+        || settings.calls.length !== 1
+        || settings.calls[0].area !== 'settings'
+        || settings.calls[0].tab !== undefined) {
+        throw new Error(`Settings navigation changed: ${JSON.stringify(settings)}`);
+    }
+
+    const settingsDirect = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const callsBefore = manager.dataCalls.length;
+        history.replaceState(null, '', '#/teacher/settings?tab=gamification');
+        await manager.handleRouteChange();
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            calls: manager.dataCalls.slice(callsBefore)
+        };
+    });
+    if (settingsDirect.activeView !== 'teacher-data-management-view'
+        || settingsDirect.activeSection !== 'settings'
+        || settingsDirect.calls.length !== 1
+        || settingsDirect.calls[0].area !== 'settings'
+        || settingsDirect.calls[0].tab !== 'gamification') {
+        throw new Error(`Settings direct route changed: ${JSON.stringify(settingsDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('overview'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/settings?tab=gamification'
+        && document.querySelector('.view.active')?.id === 'teacher-data-management-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'settings'
+    ));
+
+    console.log('Teacher primary-page smoke passed for all seven registered pages: navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();
