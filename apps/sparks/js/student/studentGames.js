@@ -98,10 +98,6 @@ export class StudentGames {
         );
     }
 
-    getScoreMonitoringScript(gameId, messageType) {
-        return this.htmlLoader.getScoreMonitoringScript(gameId, messageType);
-    }
-
     showGameSelection() {
         return this.lifecycle.showGameSelection();
     }
@@ -122,20 +118,8 @@ export class StudentGames {
         return this.lifecycle.startGame(type);
     }
 
-    restartCurrentGame(type) {
-        return this.lifecycle.restartCurrentGame(type);
-    }
-
     launchGame(type, options = {}) {
         return this.lifecycle.launchGame(type, options);
-    }
-
-    clearGameTimer() {
-        return this.lifecycle.clearGameTimer();
-    }
-
-    startGameTimer() {
-        return this.lifecycle.startGameTimer();
     }
 
     cleanupCurrentGame(options = {}) {

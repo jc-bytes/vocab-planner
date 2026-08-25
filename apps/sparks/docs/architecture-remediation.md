@@ -63,7 +63,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
-| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities` owner-only schedule/progress wrappers and ownership contract | 140 activity, 15 routing, 11 build/lazy checks; complete regression; production build; independent review | Removed the first 16 revalidated one-line pass-throughs while preserving their eager owner APIs. Student Games and secondary candidates remain separate evidence gates. |
+| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities` and `StudentGames` owner-only wrappers; ownership contracts | Focused activity/game/listener/routing/build checks; complete regressions; production builds; independent reviews | Removed 20 revalidated one-line pass-throughs while preserving their eager owner APIs. Secondary manager/teacher candidates remain a separate evidence gate. |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
@@ -441,6 +441,15 @@ Task 23 is complete. Task 24 will remove only pass-throughs whose receiver calls
 - Verification passed for 140 activity tests, 15 routing tests, 11 build/lazy checks, the complete regression suite, 9-width student shell and three-page/game browser smoke, production build, scoped diff validation, and independent review. The build remains 13.5 MB with 2,331 modules; student entry JavaScript is 236.53/60.56 kB raw/gzip.
 
 Task 24 remains in progress. Student Games candidates will be re-traced and removed as a separate change; broader StudentManager and teacher candidates remain unproven until their own caller and compatibility review.
+
+### Task 24b, remove owner-only Student Games pass-throughs
+
+- Removed four uncalled wrappers from `StudentGames`: score-monitor script construction, game restart, timer clear, and timer start. None was part of the tested stable public interface, and exact plus computed-property tracing found no repository caller through the facade.
+- Preserved replay, launch, pause, stop, and cleanup behavior on `StudentGameLifecycle`; its internal calls still own restart and timer coordination. Preserved score-monitor construction on `StudentGameHtmlLoader`/`StudentGameScoreMonitor` without changing the sandboxed `postMessage` path used by live HTML games.
+- Added an ownership contract preventing these four loader/lifecycle details from returning to `StudentGames`. Independent runtime verification confirmed all four remain callable on their eagerly constructed owners and found no lazy-loading or security boundary change.
+- Verification passed for 19 Student Games, eight Student Listener, 15 routing, and 11 build/lazy tests; the complete regression suite, 9-width student shell, three-page/game browser smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB; the lazy Student Games chunk decreased from 39.73/10.55 kB to 39.47/10.52 kB raw/gzip.
+
+Task 24 remains in progress. The small secondary StudentManager and teacher candidate list will receive one final source-and-runtime audit; uncertain or externally meaningful methods will be preserved and documented rather than removed.
 
 ### Phase 0, baseline
 

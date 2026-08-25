@@ -174,6 +174,21 @@ test('StudentGames declares its stable public interface directly', () => {
     }
 });
 
+test('StudentGames omits owner-only loader and lifecycle helpers', () => {
+    for (const method of [
+        'getScoreMonitoringScript',
+        'restartCurrentGame',
+        'clearGameTimer',
+        'startGameTimer'
+    ]) {
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(StudentGames.prototype, method),
+            false,
+            `${method} belongs to the HTML loader or lifecycle owner`
+        );
+    }
+});
+
 test('exiting an Arcade game owns cleanup before restoring selection', () => {
     const games = new StudentGames({});
     const calls = [];
