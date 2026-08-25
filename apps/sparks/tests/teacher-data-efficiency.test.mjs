@@ -29,6 +29,7 @@ const dashboardMethods = await readFile(new URL('../js/teacherDataDashboardViewM
 const wordHuntMethods = await readFile(new URL(
     '../js/teacherWordHuntReview/teacherWordHuntReviewDataMethods.js', import.meta.url
 ), 'utf8');
+const wordHuntFeature = await readFile(new URL('../js/teacherWordHuntReview.js', import.meta.url), 'utf8');
 const groupMethods = await readFile(new URL('../js/teacherGroups.js', import.meta.url), 'utf8');
 const lazyFeatureMethods = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
 const subjectSettingsMethods = await readFile(new URL('../js/teacherSubjectSettingsMethods.js', import.meta.url), 'utf8');
@@ -72,7 +73,7 @@ test('Word Hunt review fetches only Word Hunt work instead of every complete stu
     assert.match(wordHuntMigration, /work_data\s*->\s*'wordHunt'/i);
     assert.doesNotMatch(wordHuntMigration, /student_progress_snapshot_v2|student_coin_ledger|student_activity_state/i);
     assert.doesNotMatch(wordHuntMethods, /ensureStudentProgressDetails/);
-    assert.match(wordHuntMethods, /getWordHuntReviewData/);
+    assert.match(wordHuntFeature, /loadReviewData:\s*\(\) => supabaseService\.getWordHuntReviewData\(\)/);
 });
 
 test('group generation and export selection use identity-only roster data', () => {

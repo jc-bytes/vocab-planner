@@ -1,6 +1,4 @@
-import { $, notifications } from '../main.js';
 import { toDate } from '../services/dateUtils.js';
-import { supabaseService } from '../supabaseService.js';
 import { getWordHuntQuality } from '../services/wordHuntQuality.js';
 import {
     getWordHuntReviewStudentName as getStudentName,
@@ -11,10 +9,7 @@ import {
 export const teacherWordHuntReviewDataMethods = {
 async showWordHuntReviewView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
-        this.vocabularyMode = 'review';
-        this.switchView('teacher-dashboard-view');
-        this.setVocabularyWorkflowTab('review', {
-            loadReview: false,
+        this.activateReview({
             updateRoute: options.updateRoute !== false,
             replace: options.replace === true
         });
@@ -32,39 +27,59 @@ initWordHuntReview() {
         this.wordHuntReviewFilters = { status: '', search: '' };
         this.wordHuntReviewViewModes = this.getWordHuntReviewStoredViewModes();
 
-        $('#word-hunt-review-content')?.addEventListener('click', (event) => {
+        this.addPersistentListener(this.query('#word-hunt-review-content'), 'click', (event) => {
             const action = event.target.closest('[data-word-hunt-review-action]');
             if (!action) return;
             this.handleWordHuntReviewAction(action);
         });
 
-        document.addEventListener('keydown', (event) => this.handleWordHuntReviewKeyboardNavigation(event));
+        this.addPersistentListener(
+            this.documentTarget,
+            'keydown',
+            (event) => this.handleWordHuntReviewKeyboardNavigation(event)
+        );
     },
 
 async loadWordHuntReview(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.initWordHuntReview();
+        const generation = ++this.wordHuntReviewLoadGeneration;
 
-        const content = $('#word-hunt-review-content');
+        const content = this.query('#word-hunt-review-content');
         if (content) content.innerHTML = '<div class="loading-spinner">Loading Word Hunt work...</div>';
 
+        let request;
         try {
             const forceRefresh = options.forceRefresh === true;
-            if (forceRefresh) this.wordHuntReviewDataCache = null;
-            const students = this.wordHuntReviewDataCache || await supabaseService.getWordHuntReviewData();
+            if (forceRefresh) {
+                this.wordHuntReviewDataCache = null;
+                this.wordHuntReviewDataPromise = null;
+            }
+            let students = this.wordHuntReviewDataCache;
+            if (!students) {
+                this.wordHuntReviewDataPromise ||= Promise.resolve(this.repository.loadReviewData());
+                request = this.wordHuntReviewDataPromise;
+                students = await request;
+            }
+            if (generation !== this.wordHuntReviewLoadGeneration) return;
             this.wordHuntReviewDataCache = students;
             this.wordHuntReviewRows = this.buildWordHuntReviewRows(students);
             this.renderWordHuntReviewBrowser({ preserveSelection: true });
         } catch (error) {
+            if (generation !== this.wordHuntReviewLoadGeneration) return;
             console.error('Failed to load Word Hunt review:', error);
             if (content) content.innerHTML = '<p class="teacher-empty-state">Could not load Word Hunt responses.</p>';
-            notifications.error('Could not load Word Hunt review.');
+            this.feedback.error('Could not load Word Hunt review.');
+        } finally {
+            if (this.wordHuntReviewDataPromise === request) {
+                this.wordHuntReviewDataPromise = null;
+            }
         }
     },
 
 buildWordHuntReviewRows(students = []) {
         const reviewNotes = this.getWordHuntReviewNotes();
-        const subjects = this.getSubjects?.() || [];
+        const subjects = this.getSubjects();
         const rows = [];
 
         students.forEach(student => {

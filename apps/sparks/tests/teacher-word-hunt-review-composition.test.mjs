@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const storage = new Map();
@@ -32,16 +33,24 @@ globalThis.document = {
 globalThis.window = { addEventListener() {}, removeEventListener() {} };
 globalThis.CSS = { escape(value) { return String(value); } };
 
-const { installTeacherWordHuntReviewMethods } = await import('../js/teacherWordHuntReview.js');
+const { createTeacherWordHuntReviewFeature } = await import('../js/teacherWordHuntReview.js');
 const { teacherWordHuntReviewDataMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewDataMethods.js');
 const { teacherWordHuntReviewImageMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewImageMethods.js');
 const { teacherWordHuntReviewInteractionMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewInteractionMethods.js');
 const { teacherWordHuntReviewStateMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewStateMethods.js');
 const { teacherWordHuntReviewViewMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewViewMethods.js');
-const { supabaseService } = await import('../js/supabaseService.js');
 
 class TeacherWordHuntReviewHarness {}
-installTeacherWordHuntReviewMethods(TeacherWordHuntReviewHarness);
+const methodGroups = [
+    teacherWordHuntReviewDataMethods,
+    teacherWordHuntReviewStateMethods,
+    teacherWordHuntReviewViewMethods,
+    teacherWordHuntReviewInteractionMethods,
+    teacherWordHuntReviewImageMethods
+];
+methodGroups.forEach(methods => {
+    Object.defineProperties(TeacherWordHuntReviewHarness.prototype, Object.getOwnPropertyDescriptors(methods));
+});
 
 function createManager() {
     const manager = new TeacherWordHuntReviewHarness();
@@ -52,6 +61,15 @@ function createManager() {
     manager.wordHuntReviewDrilldown = { subject: '', grade: '', group: '', unitId: '' };
     manager.wordHuntReviewFilters = { status: '', search: '' };
     manager.wordHuntReviewViewModes = {};
+    manager.wordHuntReviewDataCache = null;
+    manager.wordHuntReviewDataPromise = null;
+    manager.wordHuntReviewLoadGeneration = 0;
+    manager.wordHuntReviewImageGeneration = 0;
+    manager.storage = globalThis.localStorage;
+    manager.objectUrls = {
+        create: value => URL.createObjectURL(value),
+        revoke: value => URL.revokeObjectURL(value)
+    };
     manager.getSubjects = () => [
         { slug: 'technology', name: 'Technology', color: '#334155', sortOrder: 1 },
         { slug: 'science', name: 'Science', color: '#166534', sortOrder: 2 }
@@ -60,27 +78,43 @@ function createManager() {
     return manager;
 }
 
-test('Teacher Word Hunt review installs its stable lazy-feature surface', () => {
-    for (const name of [
-        'showWordHuntReviewView',
-        'loadWordHuntReview',
-        'buildWordHuntReviewRows',
-        'renderWordHuntReviewBrowser',
-        'selectWordHuntReviewRow',
-        'loadWordHuntReviewImages'
-    ]) {
-        assert.equal(typeof TeacherWordHuntReviewHarness.prototype[name], 'function');
-    }
+test('Teacher Word Hunt review exposes only its explicit use cases', () => {
+    const root = { querySelector() { return null; }, querySelectorAll() { return []; } };
+    const feature = createTeacherWordHuntReviewFeature({
+        root,
+        ensureAuthenticated: () => true,
+        activateReview: () => {},
+        isReviewActive: () => true,
+        isAuthenticationDisabled: () => true,
+        getSubjects: () => [],
+        refreshIcons: () => {},
+        repository: { loadReviewData: async () => [], downloadImage: async () => null }
+    });
+
+    assert.deepEqual(Object.keys(feature).sort(), ['destroy', 'load', 'show']);
+    assert.equal(Object.isFrozen(feature), true);
+    assert.equal(feature.buildWordHuntReviewRows, undefined);
+});
+
+test('Word Hunt Review uses the explicit lazy factory and disposes on session changes', async () => {
+    const [entrySource, lazySource, authSource] = await Promise.all([
+        readFile(new URL('../js/teacherWordHuntReview.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherAuth.js', import.meta.url), 'utf8')
+    ]);
+
+    assert.doesNotMatch(entrySource, /installTeacherWordHuntReviewMethods/);
+    assert.match(entrySource, /export function createTeacherWordHuntReviewFeature/);
+    assert.match(lazySource, /showWordHuntReviewView:\s*'show'/);
+    assert.match(lazySource, /loadWordHuntReview:\s*'load'/);
+    assert.match(lazySource, /module\.createTeacherWordHuntReviewFeature/);
+    assert.match(lazySource, /disposeLoadedTeacherFeatures/);
+    assert.match(authSource, /currentUser\?\.uid && this\.currentUser\.uid !== user\.uid[\s\S]*disposeLoadedTeacherFeatures/);
+    assert.match(authSource, /else \{[\s\S]*getAuthCoordinator\(\)\.invalidate\(\);[\s\S]*disposeLoadedTeacherFeatures/);
 });
 
 test('Teacher Word Hunt review responsibilities have one complete owner each', () => {
-    const groups = [
-        teacherWordHuntReviewDataMethods,
-        teacherWordHuntReviewStateMethods,
-        teacherWordHuntReviewViewMethods,
-        teacherWordHuntReviewInteractionMethods,
-        teacherWordHuntReviewImageMethods
-    ];
+    const groups = methodGroups;
     const methodNames = groups.flatMap(group => Object.keys(group));
 
     assert.equal(methodNames.length, 40);
@@ -204,25 +238,182 @@ test('Word Hunt image cleanup revokes every retained object URL', () => {
 test('Word Hunt loading uses its narrow data request and caches repeat visits', async () => {
     const manager = createManager();
     manager.ensureAuthenticated = () => true;
+    manager.initWordHuntReview = () => {};
+    manager.query = () => null;
+    manager.feedback = { error() {} };
     manager.getStudentProgressData = () => {
         throw new Error('Word Hunt review must not load complete student progress.');
     };
 
-    const originalGetWordHuntReviewData = supabaseService.getWordHuntReviewData;
     let requests = 0;
-    supabaseService.getWordHuntReviewData = async () => {
-        requests += 1;
-        return [];
+    manager.repository = {
+        async loadReviewData() {
+            requests += 1;
+            return [];
+        }
+    };
+    manager.renderWordHuntReviewBrowser = () => {};
+
+    await manager.loadWordHuntReview();
+    await manager.loadWordHuntReview();
+    assert.equal(requests, 1);
+
+    await manager.loadWordHuntReview({ forceRefresh: true });
+    assert.equal(requests, 2);
+});
+
+function deferred() {
+    let resolve;
+    let reject;
+    const promise = new Promise((resolvePromise, rejectPromise) => {
+        resolve = resolvePromise;
+        reject = rejectPromise;
+    });
+    return { promise, resolve, reject };
+}
+
+class ListenerTarget {
+    constructor() {
+        this.listeners = new Map();
+        this.innerHTML = '';
+        this.classList = { contains: () => false };
+    }
+
+    addEventListener(type, handler) {
+        const handlers = this.listeners.get(type) || new Set();
+        handlers.add(handler);
+        this.listeners.set(type, handlers);
+    }
+
+    removeEventListener(type, handler) {
+        this.listeners.get(type)?.delete(handler);
+    }
+
+    count(type) {
+        return this.listeners.get(type)?.size || 0;
+    }
+}
+
+test('Word Hunt feature owns and releases its persistent listeners', async () => {
+    const content = new ListenerTarget();
+    const documentTarget = new ListenerTarget();
+    const root = {
+        classList: { contains: () => false },
+        querySelector(selector) { return selector === '#word-hunt-review-content' ? content : null; },
+        querySelectorAll() { return []; }
+    };
+    const feature = createTeacherWordHuntReviewFeature({
+        root,
+        documentTarget,
+        ensureAuthenticated: () => true,
+        activateReview: () => {},
+        isReviewActive: () => true,
+        isAuthenticationDisabled: () => true,
+        getSubjects: () => [],
+        refreshIcons: () => {},
+        repository: { loadReviewData: async () => [], downloadImage: async () => null }
+    });
+
+    await feature.load();
+    await feature.load();
+    assert.equal(content.count('click'), 1);
+    assert.equal(documentTarget.count('keydown'), 1);
+
+    feature.destroy();
+    feature.destroy();
+    assert.equal(content.count('click'), 0);
+    assert.equal(documentTarget.count('keydown'), 0);
+
+    await feature.load();
+    assert.equal(content.count('click'), 1);
+    assert.equal(documentTarget.count('keydown'), 1);
+    feature.destroy();
+});
+
+test('Word Hunt forced refresh is latest-wins and suppresses stale failures', async () => {
+    const manager = createManager();
+    const first = deferred();
+    const second = deferred();
+    const requests = [first, second];
+    const rendered = [];
+    let errors = 0;
+    manager.ensureAuthenticated = () => true;
+    manager.initWordHuntReview = () => {};
+    manager.query = () => null;
+    manager.repository = { loadReviewData: () => requests.shift().promise };
+    manager.buildWordHuntReviewRows = students => students;
+    manager.renderWordHuntReviewBrowser = () => rendered.push(manager.wordHuntReviewRows);
+    manager.feedback = { error: () => { errors += 1; } };
+
+    const olderLoad = manager.loadWordHuntReview();
+    const newerLoad = manager.loadWordHuntReview({ forceRefresh: true });
+    second.resolve(['newer']);
+    await newerLoad;
+    first.reject(new Error('stale request'));
+    await olderLoad;
+
+    assert.deepEqual(manager.wordHuntReviewDataCache, ['newer']);
+    assert.deepEqual(rendered, [['newer']]);
+    assert.equal(errors, 0);
+});
+
+test('Word Hunt concurrent ordinary loads share one request', async () => {
+    const manager = createManager();
+    const request = deferred();
+    let requests = 0;
+    manager.ensureAuthenticated = () => true;
+    manager.initWordHuntReview = () => {};
+    manager.query = () => null;
+    manager.repository = {
+        loadReviewData() {
+            requests += 1;
+            return request.promise;
+        }
+    };
+    manager.renderWordHuntReviewBrowser = () => {};
+    manager.feedback = { error() {} };
+
+    const firstLoad = manager.loadWordHuntReview();
+    const secondLoad = manager.loadWordHuntReview();
+    request.resolve([]);
+    await Promise.all([firstLoad, secondLoad]);
+    assert.equal(requests, 1);
+});
+
+test('Word Hunt image generations ignore late selection results and destroy revokes active URLs', async () => {
+    const manager = createManager();
+    const first = deferred();
+    const second = deferred();
+    const firstTarget = { innerHTML: '' };
+    const secondTarget = { innerHTML: '' };
+    const revoked = [];
+    manager.isAuthenticationDisabled = () => false;
+    manager.escapeSelector = value => value;
+    manager.query = selector => selector.includes('First') ? firstTarget : secondTarget;
+    manager.repository = {
+        downloadImage(path) {
+            return path === 'first' ? first.promise : second.promise;
+        }
+    };
+    manager.objectUrls = {
+        create: blob => `blob:${blob.name}`,
+        revoke: url => revoked.push(url)
     };
 
-    try {
-        await manager.loadWordHuntReview();
-        await manager.loadWordHuntReview();
-        assert.equal(requests, 1);
+    const firstLoad = manager.loadWordHuntReviewImages({
+        words: [{ word: 'First', entry: { imagePath: 'first' } }]
+    });
+    const secondLoad = manager.loadWordHuntReviewImages({
+        words: [{ word: 'Second', entry: { imagePath: 'second' } }]
+    });
+    second.resolve({ name: 'second' });
+    await secondLoad;
+    first.resolve({ name: 'first' });
+    await firstLoad;
 
-        await manager.loadWordHuntReview({ forceRefresh: true });
-        assert.equal(requests, 2);
-    } finally {
-        supabaseService.getWordHuntReviewData = originalGetWordHuntReviewData;
-    }
+    assert.equal(firstTarget.innerHTML, '');
+    assert.match(secondTarget.innerHTML, /blob:second/);
+    assert.deepEqual(manager.wordHuntReviewImageUrls, ['blob:second']);
+    manager.revokeWordHuntReviewImageUrls();
+    assert.deepEqual(revoked, ['blob:second']);
 });

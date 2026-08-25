@@ -1,9 +1,9 @@
-import { $, $$, escapeHtml } from '../main.js';
+import { escapeHtml } from '../main.js';
 import { getSubjectBySlug } from '../services/vocabularyApi.js';
 
 export const teacherWordHuntReviewViewMethods = {
 renderWordHuntReviewBrowser(options = {}) {
-        const content = $('#word-hunt-review-content');
+        const content = this.query('#word-hunt-review-content');
         if (!content) return;
 
         if (this.wordHuntReviewRows.length === 0) {
@@ -44,7 +44,7 @@ renderWordHuntReviewToolbar() {
             '<button type="button" data-word-hunt-review-action="home">Subjects</button>'
         ];
         if (drilldown.subject) {
-            const subject = getSubjectBySlug(this.getSubjects?.() || [], drilldown.subject);
+            const subject = getSubjectBySlug(this.getSubjects(), drilldown.subject);
             const subjectNode = drilldown.grade || drilldown.group || drilldown.unitId
                 ? `<button type="button" data-word-hunt-review-action="subject" data-subject="${escapeHtml(drilldown.subject)}">${escapeHtml(subject.name)}</button>`
                 : `<span>${escapeHtml(subject.name)}</span>`;
@@ -145,8 +145,8 @@ renderWordHuntFolderCard(item, level) {
 renderWordHuntFlatRows(rows = []) {
         const columns = this.getWordHuntReviewRowColumns();
         const sortedRows = rows.slice().sort((a, b) => {
-            const subjectA = getSubjectBySlug(this.getSubjects?.() || [], a.subjectSlug);
-            const subjectB = getSubjectBySlug(this.getSubjects?.() || [], b.subjectSlug);
+            const subjectA = getSubjectBySlug(this.getSubjects(), a.subjectSlug);
+            const subjectB = getSubjectBySlug(this.getSubjects(), b.subjectSlug);
             if (subjectA.sortOrder !== subjectB.sortOrder) return subjectA.sortOrder - subjectB.sortOrder;
             const subjectCompare = subjectA.name.localeCompare(subjectB.name);
             if (subjectCompare) return subjectCompare;
@@ -195,7 +195,7 @@ getWordHuntReviewRowDepthClass(drilldown = this.wordHuntReviewDrilldown || {}) {
 renderWordHuntFlatRow(row, columns = this.getWordHuntReviewRowColumns()) {
         const status = row.note.reviewed ? 'Reviewed' : 'Open';
         const statusClass = row.note.reviewed ? 'is-reviewed' : 'is-open';
-        const subject = getSubjectBySlug(this.getSubjects?.() || [], row.subjectSlug);
+        const subject = getSubjectBySlug(this.getSubjects(), row.subjectSlug);
         const values = {
             subject: `<span>${escapeHtml(subject.name)}</span>`,
             grade: `<span>${escapeHtml(row.grade ? `Grade ${row.grade}` : 'Other')}</span>`,
@@ -239,7 +239,7 @@ renderWordHuntVocabularyWorkspace() {
     },
 
 renderWordHuntReviewRoster() {
-        const roster = $('#word-hunt-review-roster');
+        const roster = this.query('#word-hunt-review-roster');
         if (!roster) return;
         if (this.filteredWordHuntReviewRows.length === 0) {
             roster.innerHTML = '<p class="teacher-empty-state">No students match these filters.</p>';
@@ -249,7 +249,7 @@ renderWordHuntReviewRoster() {
             .sort((a, b) => a.studentName.localeCompare(b.studentName))
             .map(row => this.renderWordHuntStudentNavRow(row))
             .join('');
-        $$('.word-hunt-student-row').forEach(row => {
+        this.queryAll('.word-hunt-student-row').forEach(row => {
             row.addEventListener('click', () => this.selectWordHuntReviewRow(row.dataset.wordHuntKey));
         });
     },
@@ -397,4 +397,3 @@ renderWordHuntEmptyDetail(message) {
         `;
     },
 };
-

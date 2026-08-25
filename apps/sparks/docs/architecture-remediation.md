@@ -57,7 +57,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 15. Map teacher feature dependencies | DONE | `docs/teacher-feature-dependencies.md`, tracker | Source tracing, focused lazy/context and feature suites, full regression, production build, built-page smoke, independent review | Documented loader/proxy, manager, DOM, data, notification, route, and lifecycle dependencies. Groups is the Task 16 pilot because it is bounded and exposes a confirmed listener/context defect. |
 | 16. Convert one teacher feature | DONE | Groups factory, lazy adapter, feature-owned state/listeners, runtime/ownership tests, dependency map, package test script | Focused Groups/data/lazy suites, browser factory and real lazy-adapter workflow, full regression, production build, built-page smoke, independent diff review | Groups exposes only `show`/`destroy`; manager retains only `showGroupsView`. The confirmed undefined-manager listener path is removed without changing routes, repositories, storage keys, or lazy loading. |
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
-| 18. Migrate remaining teacher features | TODO | | | |
+| 18. Migrate remaining teacher features | IN PROGRESS | Groups and Word Hunt Review explicit factories; shared loaded-feature disposal; tests and browser workflows | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, independent reviews | Groups and Word Hunt Review are migrated. Sparks, Quiz, and Data Management remain and will be handled independently. |
 | 19. Create a small page registry | TODO | | | |
 | 20. Migrate teacher pages | TODO | | | |
 | 21. Remove duplicated navigation wiring | TODO | | | |
@@ -110,6 +110,20 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Lazy loading is preserved: Groups remains a distinct 15.61 kB raw, 4.91 kB gzip chunk. The eager teacher entry decreased from Task 15's 158.95 kB raw, 43.68 kB gzip to 158.31 kB raw, 43.60 kB gzip.
 - Accepted pattern: a feature factory owns cohesive state and listeners, receives explicit capabilities, and returns only application use cases. Do not add a common feature base class, generic event framework, or mandatory `destroy()` where no resource needs cleanup.
 - Remaining lazy features must be migrated independently. Their contracts may differ: Word Hunt needs resource/listener cleanup; Sparks has a modal and repository cache; Quiz first needs a narrower vocabulary capability; Data Management should not be preserved as one oversized factory.
+
+### Task 18a, migrate Word Hunt Review
+
+- Replaced the Word Hunt Review prototype capture/proxy with `createTeacherWordHuntReviewFeature`, while preserving both stable manager adapters: `showWordHuntReviewView` maps to `show`, and `loadWordHuntReview` maps to `load`.
+- The feature owns its 40 collaborating internal methods, rows, filters, drilldown, selection, view modes, cache/promise, request generations, image URLs, and listener disposers. Its frozen public surface is only `show`, `load`, and `destroy`.
+- Replaced implicit manager/global access with explicit capabilities for authentication, review activation, active-state checks, subject metadata, icon refresh, the narrow review/image data source, feedback, storage, scoped DOM, selector escaping, and object URLs.
+- Scoped feature queries to `#vocabulary-review-panel`; preserved the static HTML, routes, vocabulary workflow behavior, local note/view-mode keys, review RPC/RLS path, image storage operation, and user-facing copy.
+- Persistent content delegation and document keyboard navigation now bind once and remove exact handlers during `destroy()`. Dynamic controls remain owned by the DOM nodes replaced during rendering.
+- Added one in-flight normal review request and generation guards. Concurrent loads share the request; a forced refresh is latest-wins; stale success or error work cannot replace a newer view.
+- Added an image generation guard. Late downloads from an old selection or disposed feature cannot mutate detached UI or retain blob URLs; active URLs are revoked during selection changes and disposal.
+- Added `disposeLoadedTeacherFeatures()` as a manager lifecycle use case. It disposes only explicit contexts that implement `destroy`, isolates failures per feature, and is called for sign-out, null-user auth transitions, and account UID changes. Word Hunt disposal clears sensitive cached rows before a later teacher can log in.
+- Browser verification uses the real lazy adapters, navigates the Subject → Grade → Group → Unit review path, loads a real blob URL, disposes the context, observes revocation, reloads, and confirms a fresh data request with no manager-internal state.
+- Kept the five method groups private implementation details; tests assemble their own internal harness rather than widening the production API.
+- Verification: the complete suite, 13-game sandbox smoke, production build, and built-page smoke passed. Word Hunt remains lazy at 30.80 kB raw / 7.41 kB gzip; the teacher entry is 159.50 kB raw / 43.92 kB gzip, and deployment remains 13.6 MB.
 
 ### Phase 0, baseline
 

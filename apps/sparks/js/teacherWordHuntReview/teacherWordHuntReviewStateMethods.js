@@ -7,7 +7,7 @@ import {
 export const teacherWordHuntReviewStateMethods = {
 getWordHuntReviewNotes() {
         try {
-            return JSON.parse(localStorage.getItem(WORD_HUNT_REVIEW_STORAGE_KEY) || '{}');
+            return JSON.parse(this.storage.getItem(WORD_HUNT_REVIEW_STORAGE_KEY) || '{}');
         } catch (error) {
             console.warn('Could not read Word Hunt review notes:', error);
             return {};
@@ -22,7 +22,7 @@ saveWordHuntReviewNote(key, patch = {}) {
             ...patch,
             updatedAt: new Date().toISOString()
         };
-        localStorage.setItem(WORD_HUNT_REVIEW_STORAGE_KEY, JSON.stringify(notes));
+        this.storage.setItem(WORD_HUNT_REVIEW_STORAGE_KEY, JSON.stringify(notes));
         this.wordHuntReviewRows = this.wordHuntReviewRows.map(row => (
             row.key === key ? { ...row, note: notes[key] } : row
         ));
@@ -31,10 +31,10 @@ saveWordHuntReviewNote(key, patch = {}) {
 
 getWordHuntReviewStoredViewModes() {
         try {
-            const saved = JSON.parse(localStorage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY) || '{}');
+            const saved = JSON.parse(this.storage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY) || '{}');
             if (saved && typeof saved === 'object' && !Array.isArray(saved)) return saved;
         } catch (error) {
-            const legacyMode = localStorage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY);
+            const legacyMode = this.storage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY);
             if (legacyMode === 'rows') return { subjects: 'rows' };
         }
         return {};
@@ -59,7 +59,7 @@ setWordHuntReviewViewMode(mode) {
             ...(this.wordHuntReviewViewModes || {}),
             [depth]: mode === 'rows' ? 'rows' : 'cards'
         };
-        localStorage.setItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY, JSON.stringify(this.wordHuntReviewViewModes));
+        this.storage.setItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY, JSON.stringify(this.wordHuntReviewViewModes));
     },
 
 getWordHuntRowsForDrilldown(drilldown = this.wordHuntReviewDrilldown || {}) {
@@ -88,7 +88,7 @@ getWordHuntSubjectSummaries() {
         this.wordHuntReviewRows.forEach(row => {
             const key = row.subjectSlug || DEFAULT_SUBJECT_SLUG;
             if (!map.has(key)) {
-                const subject = getSubjectBySlug(this.getSubjects?.() || [], key);
+                const subject = getSubjectBySlug(this.getSubjects(), key);
                 map.set(key, { key, label: subject.name, color: subject.color, rows: [] });
             }
             map.get(key).rows.push(row);
@@ -96,8 +96,8 @@ getWordHuntSubjectSummaries() {
         return Array.from(map.values())
             .map(item => ({ ...item, summary: this.summarizeWordHuntRows(item.rows) }))
             .sort((a, b) => {
-                const subjectA = getSubjectBySlug(this.getSubjects?.() || [], a.key);
-                const subjectB = getSubjectBySlug(this.getSubjects?.() || [], b.key);
+                const subjectA = getSubjectBySlug(this.getSubjects(), a.key);
+                const subjectB = getSubjectBySlug(this.getSubjects(), b.key);
                 if (subjectA.sortOrder !== subjectB.sortOrder) return subjectA.sortOrder - subjectB.sortOrder;
                 return subjectA.name.localeCompare(subjectB.name);
             });
@@ -152,4 +152,3 @@ getWordHuntUnitSummaries() {
             .sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
     },
 };
-

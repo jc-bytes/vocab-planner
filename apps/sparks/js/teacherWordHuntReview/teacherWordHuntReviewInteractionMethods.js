@@ -1,4 +1,3 @@
-import { $, $$, notifications } from '../main.js';
 import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 
 export const teacherWordHuntReviewInteractionMethods = {
@@ -56,12 +55,12 @@ handleWordHuntReviewAction(action) {
     },
 
 bindWordHuntReviewFilters() {
-        $('#word-hunt-status-filter')?.addEventListener('change', () => {
-            this.wordHuntReviewFilters.status = $('#word-hunt-status-filter')?.value || '';
+        this.query('#word-hunt-status-filter')?.addEventListener('change', () => {
+            this.wordHuntReviewFilters.status = this.query('#word-hunt-status-filter')?.value || '';
             this.applyWordHuntReviewWorkspaceFilters();
         });
-        $('#word-hunt-search-filter')?.addEventListener('input', () => {
-            this.wordHuntReviewFilters.search = $('#word-hunt-search-filter')?.value || '';
+        this.query('#word-hunt-search-filter')?.addEventListener('input', () => {
+            this.wordHuntReviewFilters.search = this.query('#word-hunt-search-filter')?.value || '';
             this.applyWordHuntReviewWorkspaceFilters();
         });
     },
@@ -97,9 +96,9 @@ getSortedWordHuntReviewRowsForNavigation() {
 handleWordHuntReviewKeyboardNavigation(event) {
         if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
         if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-        if (this.vocabularyMode !== 'review') return;
+        if (!this.isReviewActive()) return;
 
-        const reviewPanel = $('#vocabulary-review-panel');
+        const reviewPanel = this.root;
         if (!reviewPanel || reviewPanel.classList.contains('hidden')) return;
 
         const target = event.target;
@@ -121,21 +120,21 @@ handleWordHuntReviewKeyboardNavigation(event) {
 
 async selectWordHuntReviewRow(key) {
         const row = this.wordHuntReviewRows.find(item => item.key === key);
-        const detail = $('#word-hunt-review-detail');
+        const detail = this.query('#word-hunt-review-detail');
         if (!detail) return;
         if (!row) {
             this.activeWordHuntReviewKey = '';
             this.revokeWordHuntReviewImageUrls();
             detail.innerHTML = this.renderWordHuntEmptyDetail('No student Word Hunt work matches this view.');
-            $$('.word-hunt-student-row').forEach(button => button.classList.remove('is-selected'));
+            this.queryAll('.word-hunt-student-row').forEach(button => button.classList.remove('is-selected'));
             return;
         }
 
         this.activeWordHuntReviewKey = key;
-        $$('.word-hunt-student-row').forEach(button => {
+        this.queryAll('.word-hunt-student-row').forEach(button => {
             button.classList.toggle('is-selected', button.dataset.wordHuntKey === key);
         });
-        $(`.word-hunt-student-row[data-word-hunt-key="${CSS.escape(key)}"]`)?.scrollIntoView({
+        this.query(`.word-hunt-student-row[data-word-hunt-key="${this.escapeSelector(key)}"]`)?.scrollIntoView({
             block: 'nearest'
         });
 
@@ -147,20 +146,19 @@ async selectWordHuntReviewRow(key) {
     },
 
 bindWordHuntReviewDetail(row) {
-        $('#save-word-hunt-review-note-btn')?.addEventListener('click', () => {
+        this.query('#save-word-hunt-review-note-btn')?.addEventListener('click', () => {
             this.saveWordHuntReviewNote(row.key, {
-                feedback: $('#word-hunt-review-note')?.value || ''
+                feedback: this.query('#word-hunt-review-note')?.value || ''
             });
-            notifications.success('Word Hunt note saved on this device.');
+            this.feedback.success('Word Hunt note saved on this device.');
         });
 
-        $('#toggle-word-hunt-reviewed-btn')?.addEventListener('click', () => {
+        this.query('#toggle-word-hunt-reviewed-btn')?.addEventListener('click', () => {
             this.saveWordHuntReviewNote(row.key, {
                 reviewed: !row.note.reviewed,
                 reviewedAt: !row.note.reviewed ? new Date().toISOString() : ''
             });
-            notifications.success(!row.note.reviewed ? 'Marked reviewed.' : 'Marked unreviewed.');
+            this.feedback.success(!row.note.reviewed ? 'Marked reviewed.' : 'Marked unreviewed.');
         });
     },
 };
-

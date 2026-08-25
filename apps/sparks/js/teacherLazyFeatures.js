@@ -92,7 +92,33 @@ const featureDefinitions = {
     },
     wordHuntReview: async () => {
         const module = await import('./teacherWordHuntReview.js');
-        return { methods: captureFeatureMethods(module.installTeacherWordHuntReviewMethods) };
+        return {
+            publicMethods: {
+                showWordHuntReviewView: 'show',
+                loadWordHuntReview: 'load'
+            },
+            create(manager) {
+                const root = document.getElementById('vocabulary-review-panel');
+                return module.createTeacherWordHuntReviewFeature({
+                    root,
+                    ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
+                    activateReview: ({ updateRoute, replace }) => {
+                        manager.vocabularyMode = 'review';
+                        manager.switchView('teacher-dashboard-view');
+                        manager.setVocabularyWorkflowTab('review', {
+                            loadReview: false,
+                            updateRoute,
+                            replace
+                        });
+                    },
+                    isReviewActive: () => manager.vocabularyMode === 'review',
+                    isAuthenticationDisabled: () => manager.authDisabled,
+                    getSubjects: () => manager.getSubjects(),
+                    refreshIcons: () => manager.refreshIcons(),
+                    feedback: notifications
+                });
+            }
+        };
     },
     quizzes: async () => {
         const module = await import('./teacherQuiz.js');
@@ -149,6 +175,25 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
     });
 }
 
+function disposeLoadedTeacherFeatures(manager) {
+    const managerContexts = featureContexts.get(manager);
+    if (!managerContexts) return;
+    const initialized = initializedFeatures.get(manager);
+
+    for (const [featureName, context] of managerContexts) {
+        if (typeof context.destroy !== 'function') continue;
+        try {
+            context.destroy();
+        } catch (error) {
+            console.error(`Could not dispose teacher feature ${featureName}:`, error);
+        }
+        managerContexts.delete(featureName);
+        initialized?.delete(featureName);
+    }
+    if (managerContexts.size === 0) featureContexts.delete(manager);
+    if (initialized?.size === 0) initializedFeatures.delete(manager);
+}
+
 export function installTeacherLazyFeatureMethods(TeacherManager) {
     [
         ['showSparksView', 'sparks'],
@@ -159,4 +204,12 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
         ['showQuizzesView', 'quizzes'],
         ['openQuizMaker', 'quizzes']
     ].forEach(([methodName, featureName]) => installLazyMethod(TeacherManager, methodName, featureName));
+
+    Object.defineProperty(TeacherManager.prototype, 'disposeLoadedTeacherFeatures', {
+        configurable: true,
+        writable: true,
+        value() {
+            disposeLoadedTeacherFeatures(this);
+        }
+    });
 }

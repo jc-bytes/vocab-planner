@@ -43,6 +43,9 @@ class TeacherAuthMethods {
             this.authUnsubscribe?.();
             this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
                 if (user) {
+                    if (this.currentUser?.uid && this.currentUser.uid !== user.uid) {
+                        this.disposeLoadedTeacherFeatures?.();
+                    }
                     if (restoredUserHandled && this.isAuthenticated && this.currentUser?.uid === user.uid) {
                         restoredUserHandled = false;
                         return;
@@ -51,6 +54,7 @@ class TeacherAuthMethods {
                 } else {
                     restoredUserHandled = false;
                     this.getAuthCoordinator().invalidate();
+                    this.disposeLoadedTeacherFeatures?.();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);
