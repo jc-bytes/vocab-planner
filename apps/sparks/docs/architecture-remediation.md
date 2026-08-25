@@ -58,7 +58,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 16. Convert one teacher feature | DONE | Groups factory, lazy adapter, feature-owned state/listeners, runtime/ownership tests, dependency map, package test script | Focused Groups/data/lazy suites, browser factory and real lazy-adapter workflow, full regression, production build, built-page smoke, independent diff review | Groups exposes only `show`/`destroy`; manager retains only `showGroupsView`. The confirmed undefined-manager listener path is removed without changing routes, repositories, storage keys, or lazy loading. |
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
-| 19. Create a small page registry | TODO | | | |
+| 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
 | 20. Migrate teacher pages | TODO | | | |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
@@ -216,6 +216,18 @@ Task 18 is complete. The next change is the small top-level page registry in Tas
 - Removed the now-dead optional feature initialization cache and hook. All five explicit factories initialize their own private contexts, and repository tracing found no remaining feature definition with a separate `initialize` callback.
 - Kept the 28-method Quiz vocabulary-browser adapter for Tasks 22-23. It is broad but explicit, frozen, and tested; replacing it is justified only if cohesive vocabulary-browser use cases reduce the interface.
 - Kept Data route/tab consolidation for Tasks 19-21 and capability-contract cleanup for Task 29. Neither requires a compatibility layer or blocks the current feature interfaces.
+
+### Task 19, create the primary teacher page registry
+
+- Added a dependency-free registry for the seven primary teacher navigation pages in their persisted DOM order: Overview, Vocabulary, Sparks, Students, Groups, Data, and Settings.
+- Kept each descriptor to `{ id, viewId }`. The ID already serves as the primary navigation section and canonical simple route identity. Labels remain accessible HTML content, lazy imports remain in `teacherLazyFeatures.js`, and complex aliases, modes, tabs, and URL encoding remain in `teacherRouting.js` or their feature owner.
+- Explicitly permits only Data and Settings to share `teacher-data-management-view`. Duplicate IDs, other duplicate views, empty fields, unknown fields, null descriptors, and empty registries fail clearly.
+- `teacherShell.js` now derives its primary view discovery from the registry. Loading, Login, Vocabulary Editor, and Quiz Maker remain explicit shell or nested-workflow views. This makes the registry a runtime authority without forcing nested workflows into the primary-page model.
+- Added an independent seven-page fixture and robust HTML parity checks. The contract verifies page order, `data-section`, `aria-controls`, target existence, descriptor freezing, lookup, exact fields, and the intentional Data/Settings shared view.
+- Kept Quiz, Word Hunt Review, editor routes, Data tabs, and compatibility aliases out of the registry. They are Vocabulary modes, nested workflows, or feature-owned route details rather than primary navigation pages.
+- Verification: two registry contracts, four navigation contracts, 14 routing contracts, 11 build/lazy contracts, source three-page smoke, and scoped diff validation passed. Independent reviews approved the corrected foundation after the registry gained a production consumer and an independently pinned public-page fixture.
+
+Task 19 is complete. Task 20 will migrate primary pages one at a time; Task 21 will remove the old switches only after every page uses the registry-backed navigation path.
 
 ### Phase 0, baseline
 

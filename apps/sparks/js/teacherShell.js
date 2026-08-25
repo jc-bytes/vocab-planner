@@ -1,6 +1,12 @@
 import { $, $$ } from './main.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const TEACHER_SIDEBAR_STORAGE_KEY = 'teacher_sidebar_collapsed';
+const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
+const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
+    ...TEACHER_SHELL_VIEW_IDS,
+    ...teacherPageRegistry.pages.map(page => page.viewId)
+])));
 
 class TeacherShellMethods {
     setTeacherSidebarCollapsed(collapsed, { persist = true } = {}) {
@@ -37,19 +43,7 @@ class TeacherShellMethods {
 
     switchView(viewId, options = {}) {
         const targetView = document.getElementById(viewId);
-        const views = [
-            'teacher-loading-view',
-            'teacher-login-view',
-            'teacher-overview-view',
-            'teacher-dashboard-view',
-            'teacher-editor-view',
-            'teacher-sparks-view',
-            'teacher-progress-view',
-            'teacher-groups-view',
-            'quiz-maker-view',
-            'teacher-data-management-view'
-        ];
-        views.forEach(id => {
+        TEACHER_VIEW_IDS.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
             if (id === viewId) {
