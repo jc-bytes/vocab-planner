@@ -193,6 +193,128 @@ try {
     await page.locator('#clear-group-absences-btn').click();
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
 
+    const staleRoute = await page.evaluate(async () => {
+        document.body.insertAdjacentHTML('beforeend', `
+            <section id="teacher-overview-view" class="view hidden"></section>
+            <section id="teacher-groups-view" class="view hidden"></section>
+        `);
+        const { installTeacherLazyFeatureMethods } = await import(
+            `/js/teacherLazyFeatures.js?groups-route-lifecycle=${Date.now()}`
+        );
+        const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
+        const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        class RouteManager {
+            constructor() {
+                this.authDisabled = true;
+                this.isAuthenticated = true;
+                this.currentUser = { id: 'teacher-route' };
+                this.isApplyingRoute = false;
+                this.pendingTeacherRoute = null;
+                this.pendingTeacherNavigation = null;
+                this.teacherNavigationGeneration = 0;
+                this.routeReady = true;
+                this.vocabularyMode = 'assign';
+                this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
+                this.overviewLoads = 0;
+                this.rosterLoads = 0;
+            }
+
+            ensureAuthenticated() { return true; }
+            getStudentRosterData() {
+                this.rosterLoads += 1;
+                return new Promise(() => {});
+            }
+            loadTeacherOverview() { this.overviewLoads += 1; }
+            refreshIcons() {}
+        }
+        installTeacherLazyFeatureMethods(RouteManager);
+        installTeacherRoutingMethods(RouteManager);
+        installTeacherShellMethods(RouteManager);
+        const manager = new RouteManager();
+        history.replaceState(null, '', '#/teacher/groups');
+        const oldRoute = manager.applyRoute({ view: 'groups' });
+        manager.showTeacherSection('overview');
+        const settled = await Promise.race([
+            oldRoute.then(() => true),
+            new Promise(resolve => setTimeout(() => resolve(false), 100))
+        ]);
+        return {
+            settled,
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            applying: manager.isApplyingRoute,
+            pendingRoute: manager.pendingTeacherRoute,
+            overviewLoads: manager.overviewLoads,
+            rosterLoads: manager.rosterLoads
+        };
+    });
+    if (!staleRoute.settled
+        || staleRoute.hash !== '#/teacher/overview'
+        || staleRoute.activeView !== 'teacher-overview-view'
+        || staleRoute.applying
+        || staleRoute.pendingRoute
+        || staleRoute.overviewLoads !== 1
+        || staleRoute.rosterLoads !== 0) {
+        throw new Error(`A stale Groups route replaced newer navigation: ${JSON.stringify(staleRoute)}`);
+    }
+
+    const latestOwnerRoute = await page.evaluate(async () => {
+        const { installTeacherLazyFeatureMethods } = await import(
+            `/js/teacherLazyFeatures.js?groups-route-owner=${Date.now()}`
+        );
+        const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
+        const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        class RouteManager {
+            constructor() {
+                this.authDisabled = true;
+                this.isAuthenticated = true;
+                this.currentUser = { id: 'teacher-a' };
+                this.isApplyingRoute = false;
+                this.pendingTeacherRoute = null;
+                this.pendingTeacherNavigation = null;
+                this.teacherNavigationGeneration = 0;
+                this.routeReady = true;
+                this.vocabularyMode = 'assign';
+                this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
+                this.rosterOwners = [];
+            }
+
+            ensureAuthenticated() { return true; }
+            async getStudentRosterData() {
+                this.rosterOwners.push(this.currentUser?.id);
+                return [];
+            }
+            loadTeacherOverview() {}
+            refreshIcons() {}
+        }
+        installTeacherLazyFeatureMethods(RouteManager);
+        installTeacherRoutingMethods(RouteManager);
+        installTeacherShellMethods(RouteManager);
+        const manager = new RouteManager();
+        history.replaceState(null, '', '#/teacher/groups');
+        const oldRoute = manager.applyRoute({ view: 'groups' });
+        manager.showTeacherSection('overview');
+        manager.currentUser = { id: 'teacher-b' };
+        manager.disposeLoadedTeacherFeatures();
+        manager.showTeacherSection('groups');
+        await oldRoute;
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const result = {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            rosterOwners: manager.rosterOwners,
+            applying: manager.isApplyingRoute
+        };
+        manager.disposeLoadedTeacherFeatures();
+        return result;
+    });
+    if (latestOwnerRoute.hash !== '#/teacher/groups'
+        || latestOwnerRoute.activeView !== 'teacher-groups-view'
+        || JSON.stringify(latestOwnerRoute.rosterOwners) !== JSON.stringify(['teacher-b'])
+        || latestOwnerRoute.applying) {
+        throw new Error(`Stale owner or ABA navigation reached Groups: ${JSON.stringify(latestOwnerRoute)}`);
+    }
+
     const asyncLifecycle = await page.evaluate(async () => {
         window.groupsSmoke.lazyManager.disposeLoadedTeacherFeatures();
         const module = await import(`/js/teacherGroups.js?groups-lifecycle=${Date.now()}`);

@@ -55,6 +55,23 @@ renderTeacherVocabularyViewControls() {
 setVocabularyWorkflowTab(mode = 'assign', options = {}) {
         const nextMode = ['review', 'quizzes'].includes(mode) ? mode : 'assign';
         this.vocabularyMode = nextMode;
+        if (options.updateRoute !== false) {
+            this.beginTeacherNavigation();
+            if (nextMode === 'quizzes') {
+                const currentRoute = this.parseRoute?.();
+                const replaceQuizReservation = options.replace === true
+                    || (currentRoute?.view === VOCABULARY_PAGE.id && currentRoute.mode === 'quizzes');
+                this.setRoute(
+                    { view: VOCABULARY_PAGE.id, mode: 'quizzes' },
+                    { replace: replaceQuizReservation }
+                );
+            } else {
+                this.updateVocabularyRoute({
+                    replace: options.replace === true,
+                    navigationIntent: true
+                });
+            }
+        }
 
         [
             ['assign', '#vocabulary-tab-assign', '#vocabulary-assign-panel'],
@@ -78,14 +95,11 @@ setVocabularyWorkflowTab(mode = 'assign', options = {}) {
         if (nextMode === 'quizzes' && options.loadQuizzes !== false) {
             this.showQuizzesView({
                 updateRoute: options.updateRoute !== false,
-                replaceRoute: options.replace === true,
+                replaceRoute: options.updateRoute !== false || options.replace === true,
                 drilldown: options.drilldown
             });
         }
 
-        if (nextMode !== 'quizzes' && options.updateRoute !== false) {
-            this.updateVocabularyRoute({ replace: options.replace === true });
-        }
         this.refreshIcons();
     },
 

@@ -126,4 +126,48 @@ test('teacher routes keep their public URL contract through the shared parser', 
         view: 'settings', tab: 'calendar'
     });
     assert.deepEqual(teacher.currentTeacherRouteForView('unknown-view'), { view: 'overview' });
+
+    teacher.currentUser = { uid: 'teacher-a' };
+    const firstNavigation = teacher.beginTeacherNavigation();
+    assert.equal(teacher.isTeacherNavigationCurrent(firstNavigation), true);
+    teacher.beginTeacherNavigation();
+    assert.equal(teacher.isTeacherNavigationCurrent(firstNavigation), false);
+    const secondNavigation = teacher.captureTeacherNavigation();
+    teacher.currentUser = { uid: 'teacher-b' };
+    assert.equal(teacher.isTeacherNavigationCurrent(secondNavigation), false);
+});
+
+test('teacher route queue applies only the newest navigation generation', async () => {
+    class TeacherManager {
+        constructor() {
+            this.currentUser = { uid: 'teacher-route' };
+            this.isAuthenticated = true;
+            this.isApplyingRoute = false;
+            this.pendingTeacherRoute = null;
+            this.pendingTeacherNavigation = null;
+            this.teacherNavigationGeneration = 0;
+            this.calls = [];
+        }
+
+        showGroupsView() {
+            this.calls.push('groups');
+            return new Promise(resolve => { this.releaseGroups = resolve; });
+        }
+
+        async showSparksView() {
+            this.calls.push('sparks');
+        }
+    }
+    installTeacherRoutingMethods(TeacherManager);
+    const teacher = new TeacherManager();
+    const firstRoute = teacher.applyRoute({ view: 'groups' });
+    await Promise.resolve();
+    await teacher.applyRoute({ view: 'sparks' });
+    teacher.releaseGroups();
+    await firstRoute;
+
+    assert.deepEqual(teacher.calls, ['groups', 'sparks']);
+    assert.equal(teacher.isApplyingRoute, false);
+    assert.equal(teacher.pendingTeacherRoute, null);
+    assert.equal(teacher.pendingTeacherNavigation, null);
 });

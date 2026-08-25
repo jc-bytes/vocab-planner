@@ -123,13 +123,44 @@ export function installTeacherRoutingMethods(TeacherManager) {
             writeHashLocation(this.buildRoute(route), options);
         },
 
+        getTeacherNavigationOwnerId() {
+            return this.currentUser?.uid || this.currentUser?.id || null;
+        },
+
+        beginTeacherNavigation() {
+            this.teacherNavigationGeneration = (this.teacherNavigationGeneration || 0) + 1;
+            return Object.freeze({
+                generation: this.teacherNavigationGeneration,
+                ownerId: this.getTeacherNavigationOwnerId()
+            });
+        },
+
+        captureTeacherNavigation() {
+            return Object.freeze({
+                generation: this.teacherNavigationGeneration || 0,
+                ownerId: this.getTeacherNavigationOwnerId()
+            });
+        },
+
+        isTeacherNavigationCurrent(navigation) {
+            return Boolean(navigation)
+                && navigation.generation === (this.teacherNavigationGeneration || 0)
+                && navigation.ownerId === this.getTeacherNavigationOwnerId();
+        },
+
+        invalidateTeacherNavigation() {
+            this.teacherNavigationGeneration = (this.teacherNavigationGeneration || 0) + 1;
+            this.pendingTeacherRoute = null;
+            this.pendingTeacherNavigation = null;
+        },
+
         updateTeacherRouteForView(viewId, options = {}) {
             if (this.isApplyingRoute || !this.isAuthenticated || viewId === 'teacher-login-view') return;
             this.setRoute(this.currentTeacherRouteForView(viewId), options);
         },
 
         updateVocabularyRoute(options = {}) {
-            if (this.isApplyingRoute || !this.isAuthenticated) return;
+            if ((this.isApplyingRoute && options.navigationIntent !== true) || !this.isAuthenticated) return;
             this.lastVocabularyRoute = {
                 view: VOCABULARY_PAGE.id,
                 subject: this.libraryDrilldown.subject,
@@ -156,17 +187,25 @@ export function installTeacherRoutingMethods(TeacherManager) {
             await this.applyRoute(route);
         },
 
-        async applyRoute(route) {
+        async applyRoute(route, navigation = this.beginTeacherNavigation()) {
             if (!route) return;
             if (this.isApplyingRoute) {
                 this.pendingTeacherRoute = route;
+                this.pendingTeacherNavigation = navigation;
                 return;
             }
             this.isApplyingRoute = true;
             let routeToApply = route;
+            let navigationToApply = navigation;
             try {
                 while (routeToApply) {
                     this.pendingTeacherRoute = null;
+                    this.pendingTeacherNavigation = null;
+                    if (!this.isTeacherNavigationCurrent(navigationToApply)) {
+                        routeToApply = this.pendingTeacherRoute;
+                        navigationToApply = this.pendingTeacherNavigation;
+                        continue;
+                    }
                     switch (routeToApply.view) {
                         case VOCABULARY_PAGE.id:
                             const routeDrilldown = {
@@ -235,10 +274,12 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             break;
                     }
                     routeToApply = this.pendingTeacherRoute;
+                    navigationToApply = this.pendingTeacherNavigation;
                 }
             } finally {
                 this.isApplyingRoute = false;
                 this.pendingTeacherRoute = null;
+                this.pendingTeacherNavigation = null;
             }
         }
     });

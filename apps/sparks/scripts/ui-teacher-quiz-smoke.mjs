@@ -107,6 +107,118 @@ try {
     if (!result.clearedAfterDispose || result.requestsAfterReload !== 2 || result.leakedStateAfterReload.length) {
         throw new Error(`Quiz disposal/recreation changed: ${JSON.stringify(result)}`);
     }
+
+    const navigationRace = await page.evaluate(async () => {
+        document.body.innerHTML = `
+            <section id="teacher-dashboard-view" class="view active"></section>
+            <section id="vocabulary-quizzes-panel"></section>
+            <div data-teacher-feature-mount="quizzes-view"></div>
+            <template id="teacher-quizzes-view-template">
+                <section id="teacher-quizzes-view"><div id="quiz-vocab-picker"></div></section>
+            </template>
+        `;
+        const { installTeacherLazyFeatureMethods } = await import(
+            `/js/teacherLazyFeatures.js?quiz-navigation-race=${Date.now()}`
+        );
+        const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
+        const { teacherVocabularyWorkflowMethods } = await import(
+            '/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js'
+        );
+        const { QUIZ_VOCABULARY_BROWSER_CAPABILITIES } = await import('/js/teacherQuizVocabularyBrowserAdapter.js');
+        class Manager {
+            constructor() {
+                this.currentUser = { id: 'teacher-navigation' };
+                this.isAuthenticated = true;
+                this.isApplyingRoute = false;
+                this.pendingTeacherRoute = null;
+                this.pendingTeacherNavigation = null;
+                this.teacherNavigationGeneration = 0;
+                this.vocabularyMode = 'assign';
+                this.vocabSet = { id: 'unit', subjectSlug: 'technology', words: [{ word: 'term', definition: 'meaning' }] };
+                this.libraryItems = [];
+                this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
+                this.activations = 0;
+                this.libraryRequests = 0;
+            }
+
+            ensureAuthenticated() { return true; }
+            switchView() { this.activations += 1; }
+            async getTeacherLibrary() { this.libraryRequests += 1; return { items: [] }; }
+            getSubjects() { return []; }
+            refreshIcons() {}
+            updateFormUI() {}
+            renderWords() {}
+        }
+        QUIZ_VOCABULARY_BROWSER_CAPABILITIES.forEach(name => { Manager.prototype[name] = () => []; });
+        Manager.prototype.setVocabularyWorkflowTab = teacherVocabularyWorkflowMethods.setVocabularyWorkflowTab;
+        installTeacherLazyFeatureMethods(Manager);
+        installTeacherRoutingMethods(Manager);
+        const manager = new Manager();
+        history.replaceState(null, '', '#/teacher/vocabulary');
+        manager.setVocabularyWorkflowTab('quizzes');
+        manager.setVocabularyWorkflowTab('review', { loadReview: false });
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const staleResult = {
+            hash: window.location.hash,
+            mode: manager.vocabularyMode,
+            activations: manager.activations,
+            libraryRequests: manager.libraryRequests,
+            generation: manager.teacherNavigationGeneration
+        };
+        manager.libraryDrilldown = { subject: 'science', grade: '9', trimester: null, month: null };
+        history.replaceState(null, '', '#/teacher/vocabulary');
+        const historyBeforeQuiz = history.length;
+        manager.setVocabularyWorkflowTab('quizzes');
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const normalResult = {
+            hash: window.location.hash,
+            historyDelta: history.length - historyBeforeQuiz,
+            activations: manager.activations,
+            libraryRequests: manager.libraryRequests
+        };
+        history.replaceState(
+            null,
+            '',
+            '#/teacher/vocabulary?subject=technology&grade=8&trimester=2&month=August&mode=quizzes'
+        );
+        manager.libraryDrilldown = {
+            subject: 'technology',
+            grade: '8',
+            trimester: '2',
+            month: 'August'
+        };
+        const historyBeforeRepeatedQuiz = history.length;
+        manager.setVocabularyWorkflowTab('quizzes', {
+            drilldown: {
+                subject: 'technology',
+                grade: '8',
+                trimester: '2',
+                month: 'August'
+            }
+        });
+        await new Promise(resolve => setTimeout(resolve, 10));
+        return {
+            staleResult,
+            normalResult,
+            repeatedQuizResult: {
+                hash: window.location.hash,
+                historyDelta: history.length - historyBeforeRepeatedQuiz
+            }
+        };
+    });
+    if (navigationRace.staleResult.hash !== '#/teacher/vocabulary?mode=review'
+        || navigationRace.staleResult.mode !== 'review'
+        || navigationRace.staleResult.activations !== 0
+        || navigationRace.staleResult.libraryRequests !== 0
+        || navigationRace.staleResult.generation !== 2
+        || navigationRace.normalResult.hash !== '#/teacher/vocabulary?mode=quizzes'
+        || navigationRace.normalResult.historyDelta !== 1
+        || navigationRace.normalResult.activations !== 1
+        || navigationRace.normalResult.libraryRequests !== 1
+        || navigationRace.repeatedQuizResult.hash !== '#/teacher/vocabulary?subject=technology&grade=8&trimester=2&month=August&mode=quizzes'
+        || navigationRace.repeatedQuizResult.historyDelta !== 0) {
+        throw new Error(`A stale Quiz import replaced newer Vocabulary navigation: ${JSON.stringify(navigationRace)}`);
+    }
     if (problems.length) throw new Error(problems.join('\n'));
     console.log('Teacher Quiz lazy-feature smoke passed.');
 } finally {

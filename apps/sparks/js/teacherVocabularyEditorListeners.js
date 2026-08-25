@@ -129,6 +129,8 @@ function bindVocabularyModalListeners(manager) {
     });
     $('#generate-quiz-btn').addEventListener('click', () => {
         if (!manager.ensureAuthenticated()) return;
+        manager.beginTeacherNavigation();
+        manager.setRoute({ view: 'quiz-editor' });
         manager.openQuizMaker({ returnTo: 'editor' });
     });
 

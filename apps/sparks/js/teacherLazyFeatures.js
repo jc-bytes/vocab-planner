@@ -205,7 +205,7 @@ const featureDefinitions = {
     }
 };
 
-async function ensureTeacherFeature(manager, featureName) {
+async function loadTeacherFeature(featureName) {
     if (!featurePromises.has(featureName)) {
         const loader = featureDefinitions[featureName];
         mountTeacherFeatureTemplates(featureName);
@@ -214,15 +214,19 @@ async function ensureTeacherFeature(manager, featureName) {
             throw error;
         }));
     }
-    const feature = await featurePromises.get(featureName);
-    const context = getFeatureContext(manager, featureName, feature);
-    return { feature, context };
+    return featurePromises.get(featureName);
 }
 
 function installLazyMethod(TeacherManager, methodName, featureName) {
     async function lazyFeatureMethod(...args) {
+        let navigation = null;
         try {
-            const { feature, context } = await ensureTeacherFeature(this, featureName);
+            navigation = typeof this.captureTeacherNavigation === 'function'
+                ? this.captureTeacherNavigation()
+                : null;
+            const feature = await loadTeacherFeature(featureName);
+            if (navigation && !this.isTeacherNavigationCurrent(navigation)) return undefined;
+            const context = getFeatureContext(this, featureName, feature);
             const publicMethodName = feature.publicMethods?.[methodName];
             const installedMethod = publicMethodName ? context[publicMethodName] : undefined;
             if (typeof installedMethod !== 'function') {
@@ -230,6 +234,7 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
             }
             return installedMethod.apply(context, args);
         } catch (error) {
+            if (navigation && !this.isTeacherNavigationCurrent(navigation)) return undefined;
             console.error(`Could not load teacher feature ${featureName}:`, error);
             notifications.error('That teacher tool could not load. Please try again.');
             return undefined;
@@ -274,6 +279,7 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
         configurable: true,
         writable: true,
         value() {
+            this.invalidateTeacherNavigation?.();
             disposeLoadedTeacherFeatures(this);
         }
     });

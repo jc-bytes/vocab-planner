@@ -399,7 +399,7 @@ test('Quiz implementation no longer depends on mutable Vocabulary browser state'
 
     assert.doesNotMatch(`${coreSource}\n${browserSource}`, /this\.library(?:Items|Drilldown)/);
     assert.doesNotMatch(browserSource, /resetLibraryDrilldown|updateVocabularyRoute/);
-    assert.match(workflowSource, /nextMode !== 'quizzes' && options\.updateRoute !== false/);
+    assert.match(workflowSource, /nextMode === 'quizzes'[\s\S]*setRoute\([\s\S]*mode: 'quizzes'[\s\S]*replaceRoute: options\.updateRoute !== false \|\| options\.replace === true/);
     assert.match(routingSource, /const routeDrilldown = \{[\s\S]*loadQuizzes: this\.vocabularyMode === 'quizzes',[\s\S]*drilldown: routeDrilldown/);
     assert.doesNotMatch(routingSource, /this\.quizDrilldown/);
 });

@@ -62,6 +62,8 @@ class TeacherManager {
         this.overviewStudentLoadScheduled = false;
         this.isApplyingRoute = false;
         this.pendingTeacherRoute = null;
+        this.pendingTeacherNavigation = null;
+        this.teacherNavigationGeneration = 0;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
         this.init();

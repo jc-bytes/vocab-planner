@@ -72,6 +72,49 @@ test('teacher vocabulary responsibilities have one complete owner each', () => {
     );
 });
 
+test('Vocabulary workflow navigation reserves the route before lazy activation', () => {
+    const manager = new TestTeacherManager();
+    const events = [];
+    manager.beginTeacherNavigation = () => events.push('begin');
+    manager.updateVocabularyRoute = options => events.push(['route', options]);
+    manager.setRoute = (route, options) => events.push(['set-route', route, options]);
+    manager.showQuizzesView = options => events.push(['quizzes', options]);
+    manager.loadWordHuntReview = () => events.push('review');
+    manager.refreshIcons = () => {};
+
+    manager.setVocabularyWorkflowTab('quizzes');
+    assert.deepEqual(events, [
+        'begin',
+        ['set-route', { view: 'vocabulary', mode: 'quizzes' }, { replace: false }],
+        ['quizzes', {
+            updateRoute: true,
+            replaceRoute: true,
+            drilldown: undefined
+        }]
+    ]);
+
+    events.length = 0;
+    manager.parseRoute = () => ({
+        view: 'vocabulary',
+        mode: 'quizzes',
+        subject: 'technology'
+    });
+    manager.setVocabularyWorkflowTab('quizzes');
+    assert.deepEqual(events, [
+        'begin',
+        ['set-route', { view: 'vocabulary', mode: 'quizzes' }, { replace: true }],
+        ['quizzes', {
+            updateRoute: true,
+            replaceRoute: true,
+            drilldown: undefined
+        }]
+    ]);
+
+    events.length = 0;
+    manager.setVocabularyWorkflowTab('review', { updateRoute: false, loadReview: false });
+    assert.deepEqual(events, []);
+});
+
 test('teacher vocabulary deduplication keeps the strongest source and useful fallback metadata', () => {
     const manager = new TestTeacherManager();
     const items = manager.dedupeTeacherVocabularyItems([

@@ -171,6 +171,20 @@ class TeacherShellMethods {
     showTeacherSection(sectionId, options = {}) {
         if (!this.ensureAuthenticated(false)) return;
         this.closeTeacherMobileMenu();
+        this.beginTeacherNavigation();
+        const primaryPage = teacherPageRegistry.get(sectionId);
+        if (primaryPage) {
+            if (primaryPage.id === VOCABULARY_PAGE.id && options.editor) {
+                this.setRoute({ view: 'editor', vocabularyId: this.vocabSet?.id || null });
+            } else {
+                const defaultTab = primaryPage.id === DATA_PAGE.id
+                    ? 'dashboard'
+                    : primaryPage.id === SETTINGS_PAGE.id
+                        ? 'subjects'
+                        : undefined;
+                this.setRoute({ view: primaryPage.id, tab: options.tab || defaultTab });
+            }
+        }
         switch (sectionId) {
             case OVERVIEW_PAGE.id:
                 this.switchView(OVERVIEW_PAGE.viewId);
@@ -199,11 +213,9 @@ class TeacherShellMethods {
                 this.showQuizzesView({ resumeEditor: true });
                 break;
             case DATA_PAGE.id:
-                this.setRoute({ view: DATA_PAGE.id, tab: options.tab || 'dashboard' });
                 this.showDataManagementView({ ...options, area: DATA_PAGE.id, updateRoute: false });
                 break;
             case SETTINGS_PAGE.id:
-                this.setRoute({ view: SETTINGS_PAGE.id, tab: options.tab || 'subjects' });
                 this.showDataManagementView({ ...options, area: SETTINGS_PAGE.id, updateRoute: false });
                 break;
             case 'data-settings':
