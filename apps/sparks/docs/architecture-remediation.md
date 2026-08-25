@@ -76,7 +76,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 34. Add delivery-size budgets | DONE | Manifest-driven budget authority, build enforcement, focused tests, architecture map | 16 focused checks, full regression, production build, independent review | Build now limits total deployment, complete initial student/teacher JS+CSS graphs, and the three largest lazy chunks using deterministic gzip and stable manifest names. |
 | 35. Preserve lazy loading | DONE | Production lazy-graph validator, build integration, fixture contracts, architecture map | 21 focused build checks, full regression, production builds, student precache validation, independent runtime/manifest review | Nine feature edges and deferred student styles must remain lazy; optional games, activities, reports, teacher tools, Quiz Maker, charts, CSS, and assets cannot enter initial graphs/precache. |
 | 36. Remove code and CSS proven obsolete | DONE | Activity state; repository/auth surfaces; teacher, Quiz, and container styles; focused contracts | Focused ownership/style/auth checks, full regression, 9-width regression, source and built smoke, 13-game sandbox, production build, independent reviews | Removed only source-proven zero-caller code and orphan styles. Live security, lazy-feature, student, teacher, Quiz, and shared vocabulary behavior remains owned and tested. |
-| 37. Final architecture verification | TODO | | | |
+| 37. Final architecture verification | DONE | Final architecture/change-impact audit, corrected data map, verification record | Full regression, design audit, dependency/cycle audits, production build, source/built smoke, 9-width regression, 13-game sandbox, three independent audits | No High-priority architecture finding remains. Medium debt is either guarded or explicitly deferred below; local database acceptance remains unknown because another local Supabase project owns a required port. |
 
 ## Change log
 
@@ -1444,3 +1444,52 @@ Task 36 remains in progress. The remaining work is a source-traced CSS cleanup, 
 - Final verification passed: the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, production build, and built three-page smoke. The build remains 2,332 modules and 13.5 MB. Teacher CSS decreased from the baseline 149.89 kB raw / 24.40 kB gzip to 125.98 kB raw / 20.78 kB gzip; teacher initial delivery is 151.2 KiB gzip.
 
 Task 36 is complete. Task 37 will repeat the architecture audit and change-impact tests against the final repository state.
+
+### Task 37, final architecture verification
+
+- Three independent reviews covered change impact and developer experience, reliability/security/performance, and documentation/definition-of-done. They found no remaining High-priority architecture issue and no new compatibility layer, eager feature path, raw data-client leak, or circular dependency.
+- Corrected the detailed data-access inventory after Task 36 so it names only the live repository, authentication, and Storage operations. The concise `ARCHITECTURE.md` map remains accurate and every documented path exists.
+- A current static scan reports no cycles across 322 JavaScript files. The production dependency audit reports zero vulnerabilities at the requested high threshold. The student design-system audit passes.
+- The production build validates 20 registered games, seven lazy canvas bundles, nine required lazy edges, deferred feature CSS/assets, and all delivery budgets. Final delivery is 13.5 MB; student initial JS/CSS is 180.8 KiB gzip; teacher is 151.2 KiB; Report Generator is 132.4 KiB; Quiz Maker is 112.7 KiB; charts are 69.6 KiB; the student shell precaches 19 files / 1,019,286 bytes.
+- Final application verification passes the complete source suite, 9-width/six-view student shell regression including the 1120/1121 boundary, all-seven-page teacher smoke, three-entry source and built smoke, and 13 sandboxed HTML games.
+- Docker became available, but this project's local stack could not start because another Supabase project owns port 54324. That unrelated stack was not stopped. Local acceptance, database lint/advisors, hosted migration parity, and live production behavior are therefore explicitly unknown in this final local run; source and static security contracts are green, and CI owns the Docker-backed release gates.
+- `test:ui:smoke:dist` rebuilds before preview unless explicitly told to reuse output, so the local release command does not smoke-test a stale artifact. Its final repeated build is inefficient but safe and is not an architecture defect.
+
+#### Before versus after change impact
+
+| Change | Before remediation | After remediation |
+| --- | --- | --- |
+| Change the primary brand color | Repeated literals and page-owned aliases across shared styles | One semantic authority in `css/theme.css`; root and intentional student variant are in the same file, with two focused contracts. |
+| Add or change a theme | No complete semantic role layer; shared families depended on page values | Usually one production file; shared component families consume semantic roles. Feature/game palettes remain intentionally local. |
+| Add a game | Already registry-driven and lazy; separate asset/policy drift was possible | One descriptor plus owned implementation/assets and tests; build copying/reachability are derived. A scoring game also needs an independent SQL policy migration/parity update. |
+| Remove a game | Registry/assets plus manually verified delivery and score policy | Remove its descriptor and owned assets/tests; derived build validation catches leftovers or missing files. Historical SQL remains immutable, with a new policy migration when applicable. |
+| Add an activity | Metadata, teacher settings, eligibility, preparation, factory, launch switches, and server allowlists were separate authorities | One client descriptor owns the client lifecycle and presentation metadata. Implementation/tests plus an independent server migration/parity expectation remain necessary for security. |
+| Add a teacher navigation page | Identity and view wiring were repeated across shell, navigation, routing, and feature code | Registry owns page/view identity; HTML, routing, shell action, optional lazy feature, and two focused checks remain. Approximately 6-10 files/systems because the registry intentionally is not a generic router. |
+| Change shared feedback | Loading/status/notification lifecycles and presentation were repeated | Shared feedback CSS and small notification/loading/inline-status behaviors own common contracts; callers retain copy and feature-specific visuals. |
+| Replace a shared UI primitive | One-off markup/styles required consumer-by-consumer changes | A stable loading or inline-status interface can change in one implementation file plus its focused contract; structural styling has one family owner. |
+| Change a data implementation | Repository seams were already a strength, but browser capability and environment ownership had gaps | A domain query change stays in one repository plus its contract. A provider-wide replacement still spans repositories/config/security by design because no second provider exists. |
+| Add a new interactive category | Required new shell, routing, listener, UI, data, and build wiring with no generic framework | Still approximately 6-12 production/test systems. This intentional cost avoids a speculative plugin framework; add a category registry only after repeated categories prove a common lifecycle. |
+
+#### Final scores
+
+| Quality | Score |
+| --- | ---: |
+| Modularity | 9/10 |
+| Maintainability | 9/10 |
+| Simplicity | 9/10 |
+| Extensibility | 8/10 |
+| Reliability | 8/10 |
+| Performance | 8.5/10 |
+| Code organization | 8.5/10 |
+| Developer experience | 8.5/10 |
+
+#### Remaining intentional debt and current risks
+
+1. **Medium, deferred — privileged Edge Function acceptance.** Source guards and database authorization are strong, but the local suite does not invoke the complete `create-student-account` and `reset-student-password` Edge Function paths. Add end-to-end function invocation when the release environment can provide local function secrets and lifecycle safely; do not weaken or mock the authorization boundary merely to increase a test count.
+2. **Medium, monitored — delivery headroom.** Student, Report Generator, Quiz Maker, and charts use roughly 86-88% of their budgets. This is not a current bottleneck; the enforced manifest/gzip budgets require deliberate dependency review before meaningful growth.
+3. **Medium, deferred — static developer feedback.** Runtime, ownership, and browser contracts are extensive, but the project has no committed general cycle/lint/type-check gate. Introduce gradual `// @ts-check` or an equivalent only around registries, factories, and capability objects when those modules next change; a whole-project TypeScript conversion is not justified.
+4. **Low, deferred — legacy activity fallback keys.** Crossword and Speed Match retain word-count-based local backup/high-score keys. Manager-owned unit state is the normal authority, and changing persisted fallback semantics needs a compatibility decision. Add vocabulary identity to a versioned key when either activity's persistence is next changed.
+5. **Low, deferred — Word Hunt asynchronous startup.** Illustration initialization awaits IndexedDB/remote restoration after construction and catches remote failures, but its startup promise is not exposed to the launcher. Give activities an explicit asynchronous readiness contract only if a demonstrated startup race/error requires it; do not force all activities into an async base interface now.
+6. **Low, product decision — cold-offline HTML games.** HTML games and remote My Digital Garden media are intentionally excluded from initial precache. Asset licensing/provenance and offline expectations must be decided before localization or cache-on-first-use work.
+
+The remediation backlog is complete. Future work should use the extension paths and verification commands in `ARCHITECTURE.md` rather than restarting a broad architecture rewrite.
