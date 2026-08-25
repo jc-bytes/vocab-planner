@@ -35,6 +35,7 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | Database authority | `supabase/migrations/` plus RLS and RPC contracts |
 | Environment validation | `config/supabase-config.js`, `vite.config.mjs`, and `planner` |
 | Delivery-size budgets | `scripts/lib/deliverySizeBudgets.mjs`, enforced by `scripts/check-dist-size.mjs` after every production build |
+| Lazy production graph | `scripts/lib/lazyBuildContracts.mjs`, enforced by `scripts/validate-lazy-build.mjs` after every production build |
 
 Managers are application composition roots. They may coordinate shell-level use cases, but new feature internals should not be installed as broad manager methods or reach through a manager to another feature's private object.
 

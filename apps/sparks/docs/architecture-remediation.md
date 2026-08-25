@@ -74,7 +74,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 32. Create `ARCHITECTURE.md` | DONE | `ARCHITECTURE.md`, tracker | Documented-path check, full regression suite, 13-game sandbox smoke, production build, independent ownership trace | One concise extension map now answers where and how to add activities, games, teacher features/pages, theme/UI, and data boundaries without duplicating implementation internals. |
 | 33. Organize changed features gradually | DONE | Tracker only | Repository ownership/path trace, reference counts, prior full regression/build, independent organization audit | No additional move is justified now. Owned directories, consistent prefixes, registries, factories, and `ARCHITECTURE.md` make boundaries discoverable; import-only churn is rejected. |
 | 34. Add delivery-size budgets | DONE | Manifest-driven budget authority, build enforcement, focused tests, architecture map | 16 focused checks, full regression, production build, independent review | Build now limits total deployment, complete initial student/teacher JS+CSS graphs, and the three largest lazy chunks using deterministic gzip and stable manifest names. |
-| 35. Preserve lazy loading | TODO | | | |
+| 35. Preserve lazy loading | DONE | Production lazy-graph validator, build integration, fixture contracts, architecture map | 21 focused build checks, full regression, production builds, student precache validation, independent runtime/manifest review | Nine feature edges and deferred student styles must remain lazy; optional games, activities, reports, teacher tools, Quiz Maker, charts, CSS, and assets cannot enter initial graphs/precache. |
 | 36. Remove code and CSS proven obsolete | TODO | | | |
 | 37. Final architecture verification | TODO | | | |
 
@@ -1392,3 +1392,15 @@ Task 33 is complete with no source move. Task 34 will add delivery-size budgets 
 - The delivery guard measures actual initial JS/CSS graphs rather than entry chunks alone, so moving code into shared static imports cannot evade the budget. Lazy feature budgets remain separate and do not pull those features into an eager graph.
 
 Task 34 is complete. Task 35 will verify that every intended lazy boundary remains outside the initial student and teacher graphs and strengthen only missing production-manifest contracts.
+
+### Task 35, preserve lazy loading
+
+- Added one post-build production-manifest validator for nine required edges: Student to Games and Report Generator; Teacher to its five lazy feature entries; Data Management to Chart.js; and Teacher Quiz to Quiz Maker.
+- Every required child must be a dynamic entry, appear in its parent's `dynamicImports`, and remain absent from the parent's transitive static graph. Student and teacher initial graphs also reject any optional feature, game module, or activity module.
+- Added an explicit guard for the CSS-only `js/student/studentFeatureStyles.js` manifest entry because Vite emits it without a name or `isDynamicEntry`. Its 49.81/9.87 kB raw/gzip stylesheet must stay outside the student initial graph and precache.
+- The validator reuses the existing static-graph traversal and service-worker precache collector. `validate-game-build.mjs` remains responsible for registry assets and canvas bundle reachability; the new check owns entry-level delivery boundaries.
+- Added fixture tests for missing/duplicate entries, missing dynamic edges, simultaneous static/dynamic imports, eager optional features, games and activities, deferred feature CSS, broken graph entries, and precached lazy code/CSS/assets.
+- Independent runtime tracing confirmed My Digital Garden loads its remote media only after iframe launch and parent CSP does not block its current browser path. It and the other HTML games are not guaranteed cold-offline. Asset localization or cache-on-first-use is intentionally deferred because licensing/provenance and offline product behavior must be decided before changing delivery; precaching every game would defeat the initial-load boundary.
+- Verification passed: 21 focused build/lazy/budget checks, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, and final production build. The manifest validator passes, the student precache remains 20 files/1,025,326 bytes, and Task 34 size metrics remain unchanged.
+
+Task 35 is complete. Task 36 will remove only code or CSS that current caller/import/DOM tracing proves obsolete after the completed migrations.
