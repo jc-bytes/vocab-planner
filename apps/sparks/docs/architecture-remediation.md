@@ -180,6 +180,12 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Independent architecture and race-condition reviews initially found account scoping, Assign drilldown, capability-list, hydration, listener, failure-rollback, and authentication gaps. Both reviewers approved the corrected diff with no remaining blocker.
 - Verification: 25 focused Quiz/lifecycle tests, 12 build/lazy tests, 14 routing tests, Quiz browser smoke, the complete suite, 9-width student regression, source UI smoke, 13-game sandbox smoke, production build, and built three-page smoke passed. The build transforms 2,329 modules; Quiz remains a separate 22.14/5.77 kB raw/gzip chunk, nested QuizMaker remains 406.03/115.74 kB, teacher entry is 161.42/44.43 kB, deployment is 13.5 MB, and the student service worker remains 20 files totaling 1,027,448 bytes.
 
+### Task 18h, correct the Data Management Analytics entry
+
+- Data Management tracing found that the Students page's `Analytics` button called the lazy feature without an area or tab. The existing fallback therefore opened Settings → Subjects instead of Data → Dashboard.
+- Made that caller explicit with `{ area: 'data', tab: 'dashboard' }`. No route format, sidebar behavior, repository, template, or other Data Management code changed.
+- Added a source contract and ran the 12 teacher-data checks plus all 14 routing checks. Both suites passed. The broader Data Management factory conversion remains the next Task 18 change.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.

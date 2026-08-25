@@ -26,6 +26,7 @@ const progressPageMethods = await readFile(new URL(
     '../js/teacherStudentProgress/teacherProgressPageMethods.js', import.meta.url
 ), 'utf8');
 const dashboardMethods = await readFile(new URL('../js/teacherDataDashboardViewMethods.js', import.meta.url), 'utf8');
+const progressListeners = await readFile(new URL('../js/teacherProgressListeners.js', import.meta.url), 'utf8');
 const wordHuntMethods = await readFile(new URL(
     '../js/teacherWordHuntReview/teacherWordHuntReviewDataMethods.js', import.meta.url
 ), 'utf8');
@@ -123,6 +124,10 @@ test('data-management settings load together and expose section-level failures',
     assert.match(dashboardMethods, /subjects-save-status/);
     assert.match(dashboardMethods, /gamification-save-status/);
     assert.match(dashboardMethods, /school-calendar-save-status/);
+});
+
+test('the Students analytics action opens the Data dashboard explicitly', () => {
+    assert.match(progressListeners, /showDataManagementView\(\{ area: 'data', tab: 'dashboard' \}\)/);
 });
 
 test('roster failures preserve the last successful page and expose a retry state', () => {
