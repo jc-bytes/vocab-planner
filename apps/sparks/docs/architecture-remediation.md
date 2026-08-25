@@ -67,7 +67,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 25. Move legacy game adapters into descriptors | DONE | Dead host monitor removal; descriptor-owned score order; registry contract | Focused game/registry/security/build checks; complete regressions; production builds; 13-game smoke; independent runtime reviews | Live bridge stays game-owned inside the sandbox. Registry owns message types, frame/capability metadata, and score direction. A formatter interface is intentionally deferred. |
 | 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
-| 28. Review Supabase seams | TODO | | | |
+| 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
 | 29. Add interfaces only where justified | TODO | | | |
 | 30. Consolidate environment authority | TODO | | | |
 | 31. Correct stale documentation | TODO | | | |
@@ -539,6 +539,18 @@ Task 27 is complete. Task 28 will review the existing Supabase boundaries withou
 - The series removes the unused 185-line host monitor and three repeated SpacePi policy checks. It adds one cohesive pure parser and test/build contracts, with no compatibility shim, duplicate registry, eager game import, or broad interface.
 - The concrete registry and manifest checks intentionally make a new dynamic import or game path an explicit architecture decision. A future sender/type static parity check is useful optional hardening, not a current runtime defect.
 - Verification passed again through the full regression suite, all 13 sandboxed HTML games, 60 focused game/registry/build tests, and the production validator for 20 games and seven lazy canvas bundles.
+
+### Task 28, review Supabase boundaries
+
+- Traced authentication/session, activity progress, vocabulary, rewards, leaderboards, and Word Hunt assets from callers through repositories/adapters, browser storage, RPCs, RLS, Realtime, and Storage. Updated `docs/data-access-architecture.md` with the complete boundary and decision map.
+- Confirmed that raw Supabase operations remain confined to nine domain repositories and the three `supabase*` adapter modules. UI, activities, games, managers, and lazy teacher features do not construct table queries or receive the raw client.
+- Confirmed that the frozen `studentApi` forwarding surface is intentional: it prevents student modules from reaching `getClient`, teacher account provisioning, password reset, teacher rewards, or other broad service operations. It should not be removed merely because it delegates.
+- Confirmed that vocabulary mapping/persistence, progress reads/Realtime, owner-bound progress writes, reward writes, score reads/writes, and private Word Hunt storage each retain their existing server/RLS authority. No repository replacement or generic interface is justified.
+- Found two actionable boundary defects for Task 29: authenticated autosave can add calculated coins locally before the server accepts the result, and cached teacher-role recovery can open the shell after current server verification fails. The former can leave temporary inflated wallet state; the latter does not bypass RLS but can expose stale teacher UI/state.
+- Routed the missing privileged-key format guard to Task 30, static client/server game-score parity to Task 29, and high-confidence dead/uncertain data methods to Task 36 after exact caller verification.
+- Verification passed across repository, student API/auth, teacher progress/session, Word Hunt review, browser-storage, schema, RPC, and security contracts in two independent audits. No local or production Supabase was contacted; Docker-backed acceptance, lint, and advisors remain unavailable in this environment as previously recorded.
+
+Task 28 is complete. Task 29 will add only the narrow test/security seams needed to fix the two confirmed boundary defects and parity gap; it will not wrap every repository or reorganize data code for symmetry.
 
 ### Phase 0, baseline
 

@@ -53,6 +53,42 @@ Repositories use the signed-in browser client and do not use privileged keys or 
 
 `tests/repository-contracts.test.mjs` verifies mapping and result-shape compatibility with built-in `node:test`. Local authenticated smoke tests and Supabase lint/advisors verify integration behavior when the Docker-backed local stack is available. UI smoke and Student Shell tests remain behavior-level guardrails.
 
+## Task 28 boundary review
+
+The August 2026 remediation review traced authentication/session, activity progress, vocabulary, rewards, leaderboards, and Word Hunt assets from their UI callers through the browser API and database authority. No raw Supabase client, table query, RPC call, Realtime channel, or Storage bucket call was found in UI, activity, game, or teacher-feature implementation code. Raw access remains confined to `supabase*` adapter modules and domain repositories under `js/services/`.
+
+| Domain | Application boundary | Supabase owner | Independent authority or alternate path | Decision |
+| --- | --- | --- | --- | --- |
+| Student authentication/session | Frozen `studentApi` allowlist, consumed by `StudentAuth` and authentication UI | `supabaseAuthProfileMethods.js` and the single client factory | Supabase Auth session; owner-scoped browser cleanup and stale-initialization aborts | Keep `studentApi`. It prevents student modules from acquiring teacher and raw-client capabilities. |
+| Teacher authentication/session | Teacher auth workflow calls domain methods on `supabaseService` | `supabaseAuthProfileMethods.js` | Auth session, `profiles`, teacher allowlist RPC, RLS | Preserve server authorization. An injectable auth capability is justified for direct failure/revocation tests; do not create a generic service container. |
+| Activity progress | Activity coordinator, attempt service, offline owner-partitioned queue, and `studentApi` | `supabaseStudentWriteMethods.js`; reads and Realtime in `studentProgressRepository.js` | Owner-bound RPCs independently verify `auth.uid()` and return authoritative progress/reward state | Keep the offline queue and explicit student allowlist. Signed-in rewards must not be committed locally before the RPC accepts them. |
+| Vocabulary | `vocabularyRepository` plus local/bundled/cloud source selection | `vocabularyRepository.js` | Teacher-only mutations, authenticated reads, local and bundled sources | No new interface. The repository already owns database mapping while source aggregation remains a separate application concern. |
+| Rewards and Arcade wallet | Student coin/progress owners call the explicit student API | `supabaseStudentWriteMethods.js` | Transactional server RPCs and returned wallet state | Server remains authoritative. Moving methods merely to make read/write filenames symmetrical is not enough reason for another wrapper. |
+| Leaderboards | `leaderboardRepository` for reads; student API for score submission | Repository queries plus score RPC adapter | Score RPC derives identity/grade and enforces allowed games/order independently | Keep the security split. Add client/server game-policy parity coverage rather than sharing client configuration with SQL authorization. |
+| Word Hunt images | Student Word Hunt operations and the teacher review's injected two-method repository | `supabaseStorageMethods.js` | Private bucket, owner path RLS, MIME/size policy; teacher read/delete policy | Existing teacher injection is a useful test seam. Deepen student save into one owner-scoped use case only if it removes arbitrary path construction without broadening access. |
+
+### Confirmed strengths
+
+- The browser creates one Supabase client and uses only a publishable or legacy anonymous key. No privileged key exists in application source.
+- Student code cannot reach `getClient`, teacher account operations, or teacher reward operations through `studentApi`; its frozen allowlist has a dedicated contract test.
+- UI and manager modules do not build PostgREST queries. Teacher lazy features receive the exact repository or data capabilities they use.
+- Student offline replays verify the live authenticated owner in the client adapter and again in owner-bound database RPCs.
+- Progress writes, rewards, Arcade time, and scores remain server-authoritative. RLS and RPC grants are independent from client metadata.
+- Word Hunt Storage is private, owner-prefixed, WebP-only, and capped at 64 KB. Teacher review owns object-URL cleanup and stale-result suppression.
+
+### Actionable findings and routing
+
+1. **High — signed-in optimistic reward state:** `studentActivityAutoSave.js` adds calculated coins before server acceptance. A rejected RPC can leave the local wallet inflated until a later refresh. Task 29 must keep immediate local rewards only for intentionally offline/auth-disabled mode and use the accepted RPC result for authenticated sessions.
+2. **High — stale teacher role fallback:** `teacherAuth.js` can use a cached teacher role after profile/RPC verification fails and then mark the shell authenticated. Database authorization still prevents privilege escalation, but cached teacher UI/state can be exposed. Task 29 must add an explicit auth test seam and fail the teacher shell closed when current verification fails.
+3. **Medium — browser secret-key guard:** the shared configuration validator rejects placeholders but not known secret/service-role key formats. No leaked key was found. Task 30 will reject privileged formats in runtime and build validation.
+4. **Medium — game policy drift:** client descriptors and server score authorization currently agree but lack an automated parity contract. Task 29 will add a static parity test while keeping SQL independently authoritative.
+5. **Medium — broad internal auth file:** `supabaseAuthProfileMethods.js` also contains teacher roster/progress RPC methods. This is internal module organization, not a leaked client interface. Split it only when one of those operations is materially changed; an import-only rearrangement is not justified.
+6. **Low — dead or uncertain surfaces:** unused export-repository methods, an unused Storage delete method, dormant auth flows, and the unpopulated `cloudVocabs` collection are candidates for Task 36. Each still requires exact caller and behavior confirmation before removal.
+
+### Interface decision rule
+
+Do not wrap repository objects in another layer. A new or extracted interface is justified only when it enforces a capability/security boundary, supports a real alternate implementation, or enables a needed test double that the current module cannot provide safely. Passing a narrow function or repository into a feature factory is preferred over introducing a generic dependency container.
+
 ## Migration inventory
 
 | Domain | Previous operations | Risk and preserved behavior |
