@@ -1,4 +1,4 @@
-import { $, createElement, escapeHtml, notifications } from './main.js';
+import { $, createElement, escapeHtml } from './main.js';
 import {
     getSubjectBySlug,
     getVocabSubjectSlug
@@ -28,7 +28,7 @@ class TeacherQuizBrowserMethods {
 
     getStoredQuizVocabularyViewModes() {
         try {
-            return JSON.parse(localStorage.getItem('teacher_quiz_vocabulary_view_modes') || '{}') || {};
+            return JSON.parse(this.storage.getItem(this.getOwnedStorageKey('teacher_quiz_vocabulary_view_modes')) || '{}') || {};
         } catch {
             return {};
         }
@@ -46,12 +46,16 @@ class TeacherQuizBrowserMethods {
     }
 
     setQuizVocabularyViewMode(mode) {
+        if (this.destroyed) return;
         const depth = this.getQuizVocabularyViewDepth();
         this.quizVocabularyViewModes = {
             ...(this.quizVocabularyViewModes || {}),
             [depth]: mode === 'rows' ? 'rows' : 'cards'
         };
-        localStorage.setItem('teacher_quiz_vocabulary_view_modes', JSON.stringify(this.quizVocabularyViewModes));
+        this.storage.setItem(
+            this.getOwnedStorageKey('teacher_quiz_vocabulary_view_modes'),
+            JSON.stringify(this.quizVocabularyViewModes)
+        );
         this.renderQuizVocabularyBrowser();
         this.refreshIcons();
     }
@@ -380,7 +384,7 @@ class TeacherQuizBrowserMethods {
     createQuizVocabularyRowList(columns = []) {
         const list = createElement('div', 'student-vocab-row-list teacher-vocab-row-list quiz-vocab-row-list');
         const header = createElement('div', 'student-vocab-row student-vocab-row-header teacher-vocab-row quiz-vocab-row');
-        header.classList.add(this.getTeacherVocabularyRowDepthClass());
+        header.classList.add(this.getTeacherVocabularyRowDepthClass(this.quizDrilldown));
         header.setAttribute('aria-hidden', 'true');
         header.appendChild(createElement('strong', null, 'Name'));
         columns.forEach(column => header.appendChild(createElement('span', null, column.label)));
@@ -390,7 +394,7 @@ class TeacherQuizBrowserMethods {
         return list;
     }
 
-    createQuizVocabularyRow({ vocab, type }, columns = this.getTeacherVocabularyRowColumns()) {
+    createQuizVocabularyRow({ vocab, type }, columns = this.getTeacherVocabularyRowColumns(this.quizDrilldown)) {
         const grades = this.getVocabGrades(vocab).map(grade => this.formatGradeLabel(grade)).join(', ');
         const trimester = this.getTeacherTrimesterShortLabel(this.getTeacherTrimesterKey(vocab));
         const month = this.getTeacherMonthShortLabel(this.getTeacherMonthKey(vocab));
@@ -398,7 +402,7 @@ class TeacherQuizBrowserMethods {
         const purpose = this.getTeacherVocabularyPurpose(vocab, type);
         const wordCount = this.getTeacherVocabularyWordCount(vocab);
         const row = createElement('button', 'student-vocab-row teacher-vocab-row quiz-vocab-row');
-        row.classList.add(this.getTeacherVocabularyRowDepthClass());
+        row.classList.add(this.getTeacherVocabularyRowDepthClass(this.quizDrilldown));
         row.type = 'button';
         const values = {
             grade: `<span>${escapeHtml(grades || 'Other')}</span>`,
@@ -423,34 +427,54 @@ class TeacherQuizBrowserMethods {
             return;
         }
 
-        const columns = this.getTeacherVocabularyRowColumns();
+        const columns = this.getTeacherVocabularyRowColumns(this.quizDrilldown);
         const list = this.createQuizVocabularyRowList(columns);
         vocabItems
             .slice()
-            .sort((itemA, itemB) => this.compareTeacherVocabularyRowOrder(itemA, itemB))
+            .sort((itemA, itemB) => this.compareTeacherVocabularyRowOrder(itemA, itemB, this.quizDrilldown))
             .forEach(item => list.appendChild(this.createQuizVocabularyRow(item, columns)));
         container.appendChild(list);
-        this.hydrateTeacherVocabularyRowWordCounts(list);
+        this.hydrateQuizVocabularyRowWordCounts(list);
+    }
+
+    hydrateQuizVocabularyRowWordCounts(container) {
+        const countNodes = Array.from(container.querySelectorAll('[data-vocab-word-count-path]'));
+        const paths = Array.from(new Set(countNodes.map(node => node.dataset.vocabWordCountPath).filter(Boolean)));
+        const lifecycleGeneration = this.lifecycleGeneration;
+        paths.forEach(async path => {
+            const data = await this.loadVocabularyFile(path, { silent: true });
+            if (this.destroyed || lifecycleGeneration !== this.lifecycleGeneration) return;
+            const count = this.getTeacherVocabularyWordCount(data || {});
+            countNodes
+                .filter(node => node.dataset.vocabWordCountPath === path && container.contains(node))
+                .forEach(node => {
+                    node.textContent = String(count);
+                    delete node.dataset.vocabWordCountPath;
+                });
+        });
     }
 
     async openQuizVocabularyItem(vocab, type, resolveVocabulary = resolveQuizVocabularyItem) {
         const selectionGeneration = (this.quizVocabularySelectionGeneration || 0) + 1;
         this.quizVocabularySelectionGeneration = selectionGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
         try {
             const resolvedVocabulary = await resolveVocabulary({ vocab, type });
-            if (selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
 
-            this.vocabSet = resolvedVocabulary;
-            this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
-            this.updateFormUI();
-            this.renderWords();
+            resolvedVocabulary.subjectSlug = getVocabSubjectSlug(resolvedVocabulary);
+            this.commitActiveVocabulary(resolvedVocabulary);
             this.updateQuizHubSummary();
             this.openQuizMaker({ returnTo: 'quizzes' });
             return true;
         } catch (error) {
-            if (selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
+            if (this.destroyed
+                || lifecycleGeneration !== this.lifecycleGeneration
+                || selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
             console.error('Failed to load Quiz vocabulary:', error);
-            notifications.error('Could not load that vocabulary.');
+            this.feedback.error('Could not load that vocabulary.');
             return false;
         }
     }

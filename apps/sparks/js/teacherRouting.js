@@ -78,15 +78,19 @@ export function installTeacherRoutingMethods(TeacherManager) {
 
         currentTeacherRouteForView(viewId) {
             if (viewId === 'teacher-dashboard-view') {
-                const drilldown = this.vocabularyMode === 'quizzes'
-                    ? this.quizDrilldown
-                    : this.libraryDrilldown;
+                if (this.vocabularyMode === 'quizzes') {
+                    const currentRoute = this.parseRoute();
+                    if (currentRoute?.view === 'vocabulary' && currentRoute.mode === 'quizzes') {
+                        return currentRoute;
+                    }
+                    return { view: 'vocabulary', mode: 'quizzes' };
+                }
                 return {
                     view: 'vocabulary',
-                    subject: drilldown.subject,
-                    grade: drilldown.grade,
-                    trimester: drilldown.trimester,
-                    month: drilldown.month,
+                    subject: this.libraryDrilldown.subject,
+                    grade: this.libraryDrilldown.grade,
+                    trimester: this.libraryDrilldown.trimester,
+                    month: this.libraryDrilldown.month,
                     mode: this.vocabularyMode
                 };
             }
@@ -159,13 +163,16 @@ export function installTeacherRoutingMethods(TeacherManager) {
                     this.pendingTeacherRoute = null;
                     switch (routeToApply.view) {
                         case 'vocabulary':
-                            this.libraryDrilldown = {
+                            const routeDrilldown = {
                                 subject: routeToApply.subject || null,
                                 grade: routeToApply.grade || null,
                                 trimester: routeToApply.trimester || null,
                                 month: routeToApply.month || null
                             };
                             this.vocabularyMode = ['review', 'quizzes'].includes(routeToApply.mode) ? routeToApply.mode : 'assign';
+                            if (this.vocabularyMode !== 'quizzes') {
+                                this.libraryDrilldown = routeDrilldown;
+                            }
                             this.lastVocabularyRoute = { ...routeToApply };
                             this.switchView('teacher-dashboard-view');
                             this.setVocabularyWorkflowTab(this.vocabularyMode, {
@@ -173,7 +180,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 replace: true,
                                 loadReview: this.vocabularyMode === 'review',
                                 loadQuizzes: this.vocabularyMode === 'quizzes',
-                                drilldown: this.libraryDrilldown
+                                drilldown: routeDrilldown
                             });
                             if (this.vocabularyMode === 'assign') {
                                 await this.loadLibrary();

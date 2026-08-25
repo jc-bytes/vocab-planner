@@ -8,6 +8,7 @@ const desktopAssetCopier = await readFile(new URL('../scripts/copy-desktop-asset
 const teacherEntry = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 const teacherLazyFeatures = await readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8');
 const teacherQuizEntry = await readFile(new URL('../js/teacherQuiz.js', import.meta.url), 'utf8');
+const teacherQuizFeature = await readFile(new URL('../js/teacherQuizFeature.js', import.meta.url), 'utf8');
 const teacherQuizCore = await readFile(new URL('../js/teacherQuizCoreMethods.js', import.meta.url), 'utf8');
 const teacherQuizBrowser = await readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8');
 const teacherGlobalListeners = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
@@ -124,8 +125,13 @@ test('retired quiz preview cannot return beside the current Quiz Maker', async (
     await assert.rejects(access(new URL('../js/quizMakerPrintMethods.js', import.meta.url)));
     await assert.rejects(access(new URL('../js/quizMakerRasterExportMethods.js', import.meta.url)));
 
-    assert.match(teacherQuizEntry, /installTeacherQuizCoreMethods/);
-    assert.match(teacherQuizEntry, /installTeacherQuizBrowserMethods/);
+    assert.match(teacherQuizEntry, /export \{ createTeacherQuizFeature \}/);
+    assert.match(teacherQuizFeature, /installTeacherQuizCoreMethods\(TeacherQuizFeatureContext\)/);
+    assert.match(teacherQuizFeature, /installTeacherQuizBrowserMethods\(TeacherQuizFeatureContext\)/);
+    assert.match(teacherQuizFeature, /Object\.freeze\(\{[\s\S]*show\(options = \{\}\)[\s\S]*open\(options = \{\}\)[\s\S]*destroy\(\)/);
+    assert.match(teacherQuizFeature, /import\(['"]\.\/quizMaker\.js/);
+    assert.match(teacherLazyFeatures, /publicMethods:\s*\{[\s\S]*showQuizzesView: 'show',[\s\S]*openQuizMaker: 'open'/);
+    assert.match(teacherLazyFeatures, /createTeacherQuizFeature\(\{/);
     assert.doesNotMatch(teacherQuizEntry, /Legacy/);
     assert.match(teacherLazyFeatures, /\['showQuizzesView', 'quizzes'\]/);
     assert.match(teacherLazyFeatures, /\['openQuizMaker', 'quizzes'\]/);

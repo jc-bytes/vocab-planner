@@ -35,7 +35,7 @@ class TeacherShellMethods {
         this.setTeacherSidebarCollapsed(collapsed, { persist: false });
     }
 
-    switchView(viewId) {
+    switchView(viewId, options = {}) {
         const targetView = document.getElementById(viewId);
         const views = [
             'teacher-loading-view',
@@ -64,7 +64,7 @@ class TeacherShellMethods {
         $('#teacher-tab-shell')?.classList.toggle('hidden', !isTeacherView);
         this.setActiveTeacherTab(this.getSectionForView(viewId));
         this.closeTeacherMobileMenu();
-        this.updateTeacherRouteForView(viewId);
+        if (options.updateRoute !== false) this.updateTeacherRouteForView(viewId);
         this.refreshIcons(targetView);
     }
 
@@ -200,11 +200,7 @@ class TeacherShellMethods {
                 this.showWordHuntReviewView();
                 break;
             case 'quizzes':
-                if (this.quizEditorOpen && this.quizMaker) {
-                    this.openQuizMaker({ returnTo: this.quizReturnView || 'quizzes' });
-                } else {
-                    this.showQuizzesView();
-                }
+                this.showQuizzesView({ resumeEditor: true });
                 break;
             case 'data':
                 this.showDataManagementView({ ...options, area: 'data' });

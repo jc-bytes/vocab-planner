@@ -27,7 +27,9 @@ globalThis.window = { addEventListener() {}, removeEventListener() {} };
 
 const { installTeacherQuizCoreMethods } = await import('../js/teacherQuizCoreMethods.js');
 const { installTeacherQuizBrowserMethods } = await import('../js/teacherQuizBrowserMethods.js');
+const { createTeacherQuizFeature } = await import('../js/teacherQuizFeature.js');
 const { resolveQuizVocabularyItem } = await import('../js/teacherQuizVocabularyResolver.js');
+const { QUIZ_VOCABULARY_BROWSER_CAPABILITIES } = await import('../js/teacherQuizVocabularyBrowserAdapter.js');
 
 class TeacherQuizHarness {}
 installTeacherQuizCoreMethods(TeacherQuizHarness);
@@ -35,13 +37,248 @@ installTeacherQuizBrowserMethods(TeacherQuizHarness);
 
 function createHarness() {
     const manager = new TeacherQuizHarness();
+    manager.destroyed = false;
+    manager.lifecycleGeneration = 0;
+    manager.quizPickerLoadGeneration = 0;
+    manager.quizVocabularySelectionGeneration = 0;
+    manager.quizBuilderOpenGeneration = 0;
     manager.quizLibraryItems = [];
     manager.quizDrilldown = { subject: null, grade: null, trimester: null, month: null };
+    manager.vocabSet = { id: '', subjectSlug: 'technology', words: [] };
+    manager.getActiveVocabulary = () => manager.vocabSet;
+    manager.updateFormUI = () => {};
+    manager.renderWords = () => {};
+    manager.commitActiveVocabulary = vocabulary => {
+        manager.vocabSet = vocabulary;
+        manager.updateFormUI();
+        manager.renderWords();
+    };
+    manager.activateQuizHub = () => {};
+    manager.writeQuizRoute = (drilldown, options) => manager.setRoute?.({
+        view: 'vocabulary',
+        subject: drilldown.subject,
+        grade: drilldown.grade,
+        trimester: drilldown.trimester,
+        month: drilldown.month,
+        mode: 'quizzes'
+    }, options);
+    manager.feedback = { warning() {}, error() {} };
+    manager.storage = { getItem() { return null; }, setItem() {} };
     manager.getVocabGrades = vocab => vocab.grades || [];
     manager.getTeacherTrimesterKey = vocab => vocab.trimester || '';
     manager.getTeacherMonthKey = vocab => vocab.month || '';
     return manager;
 }
+
+function createFeatureDependencies(overrides = {}) {
+    let activeVocabulary = overrides.activeVocabulary || {
+        id: 'unit-one', name: 'Unit One', subjectSlug: 'technology',
+        words: [{ word: 'router', definition: 'Directs traffic' }]
+    };
+    return {
+        ensureAuthenticated: () => true,
+        activateQuizHub() {},
+        showQuizEditor() {},
+        showVocabularyEditor() {},
+        writeQuizRoute() {},
+        getTeacherLibrary: async () => ({ items: [] }),
+        getActiveVocabulary: () => activeVocabulary,
+        commitActiveVocabulary: vocabulary => { activeVocabulary = vocabulary; },
+        getSubjects: () => [],
+        refreshIcons() {},
+        feedback: { warning() {}, error() {} },
+        storage: { getItem() { return null; }, setItem() {} },
+        getOwnedStorageKey: key => `${key}:teacher-one`,
+        vocabularyBrowser: Object.fromEntries(
+            QUIZ_VOCABULARY_BROWSER_CAPABILITIES.map(name => [name, () => []])
+        ),
+        ...overrides
+    };
+}
+
+test('Quiz feature exposes only its frozen application use cases', async () => {
+    const activations = [];
+    const routes = [];
+    const feature = createTeacherQuizFeature(createFeatureDependencies({
+        activateQuizHub: () => activations.push('hub'),
+        writeQuizRoute: (drilldown, options) => routes.push({ drilldown, options })
+    }));
+
+    assert.equal(Object.isFrozen(feature), true);
+    assert.deepEqual(Object.keys(feature), ['show', 'open', 'destroy']);
+    await feature.show({
+        drilldown: { subject: 'technology', grade: '6', trimester: '1', month: 'March' },
+        replaceRoute: true
+    });
+    feature.destroy();
+    feature.destroy();
+
+    assert.deepEqual(activations, ['hub']);
+    assert.deepEqual(routes, [{
+        drilldown: { subject: 'technology', grade: '6', trimester: '1', month: 'March' },
+        options: { replace: true }
+    }]);
+});
+
+test('showing the Quiz hub invalidates a delayed nested builder import', async () => {
+    let resolveBuilder;
+    let constructions = 0;
+    const feature = createTeacherQuizFeature(createFeatureDependencies({
+        loadQuizMaker: () => new Promise(resolve => { resolveBuilder = resolve; })
+    }));
+
+    const opening = feature.open({ returnTo: 'quizzes' });
+    await feature.show({ updateRoute: false });
+    resolveBuilder({ QuizMaker: class { constructor() { constructions += 1; } } });
+
+    assert.equal(await opening, false);
+    assert.equal(constructions, 0);
+});
+
+test('Quiz feature destroys its maker and suppresses late draft callbacks', async () => {
+    let makerDestroyed = 0;
+    let lateStateChange;
+    let draftWrites = 0;
+    const feature = createTeacherQuizFeature(createFeatureDependencies({
+        storage: {
+            getItem() { return null; },
+            setItem() { draftWrites += 1; }
+        },
+        loadQuizMaker: async () => ({
+            QuizMaker: class {
+                constructor(vocabulary, onClose, options) {
+                    lateStateChange = options.onStateChange;
+                }
+                destroy() { makerDestroyed += 1; }
+            }
+        })
+    }));
+
+    assert.equal(await feature.open({ returnTo: 'quizzes' }), true);
+    feature.destroy();
+    lateStateChange({ questions: [] });
+
+    assert.equal(makerDestroyed, 1);
+    assert.equal(draftWrites, 0);
+});
+
+test('Quiz opener checks authentication before loading the nested builder', async () => {
+    let editorCalls = 0;
+    let loaderCalls = 0;
+    const feature = createTeacherQuizFeature(createFeatureDependencies({
+        ensureAuthenticated: () => false,
+        showQuizEditor: () => { editorCalls += 1; },
+        loadQuizMaker: async () => { loaderCalls += 1; return { QuizMaker: class {} }; }
+    }));
+
+    assert.equal(await feature.open(), false);
+    assert.equal(editorCalls, 0);
+    assert.equal(loaderCalls, 0);
+});
+
+test('failed nested Quiz Maker loading returns to the hub with feedback', async () => {
+    const activations = [];
+    const errors = [];
+    const originalConsoleError = console.error;
+    console.error = () => {};
+    try {
+        const feature = createTeacherQuizFeature(createFeatureDependencies({
+            activateQuizHub: () => activations.push('hub'),
+            feedback: { warning() {}, error: message => errors.push(message) },
+            loadQuizMaker: async () => { throw new Error('chunk unavailable'); }
+        }));
+
+        assert.equal(await feature.open(), false);
+        assert.deepEqual(activations, ['hub']);
+        assert.deepEqual(errors, ['Could not load the quiz builder. Please try again.']);
+    } finally {
+        console.error = originalConsoleError;
+    }
+});
+
+test('failed Quiz Maker construction returns to the hub with feedback', async () => {
+    const activations = [];
+    const errors = [];
+    const originalConsoleError = console.error;
+    console.error = () => {};
+    try {
+        const feature = createTeacherQuizFeature(createFeatureDependencies({
+            activateQuizHub: () => activations.push('hub'),
+            feedback: { warning() {}, error: message => errors.push(message) },
+            loadQuizMaker: async () => ({ QuizMaker: class { constructor() { throw new Error('invalid DOM'); } } })
+        }));
+
+        assert.equal(await feature.open(), false);
+        assert.deepEqual(activations, ['hub']);
+        assert.deepEqual(errors, ['Could not start the quiz builder. Please try again.']);
+    } finally {
+        console.error = originalConsoleError;
+    }
+});
+
+test('Quiz feature disposal removes every context-owned browser control', () => {
+    const picker = { replaceChildrenCalls: 0, replaceChildren() { this.replaceChildrenCalls += 1; } };
+    const toggle = { replaceChildrenCalls: 0, replaceChildren() { this.replaceChildrenCalls += 1; } };
+    const originalQuerySelector = document.querySelector;
+    document.querySelector = selector => ({
+        '#quiz-vocab-picker': picker,
+        '#quiz-vocab-view-toggle': toggle
+    })[selector] || null;
+    try {
+        const feature = createTeacherQuizFeature(createFeatureDependencies());
+        feature.destroy();
+        assert.equal(picker.replaceChildrenCalls, 1);
+        assert.equal(toggle.replaceChildrenCalls, 1);
+    } finally {
+        document.querySelector = originalQuerySelector;
+    }
+});
+
+test('Quiz drafts are scoped to the active teacher and ignore the legacy global key', async () => {
+    const values = new Map();
+    const storage = {
+        getItem: key => values.get(key) || null,
+        setItem: (key, value) => values.set(key, value)
+    };
+    values.set('teacher_quiz_builder_active_draft:teacher-one', JSON.stringify({
+        returnTo: 'quizzes',
+        vocabSet: { id: 'private', words: [{ word: 'private', definition: 'Not shared' }] }
+    }));
+    let committedVocabulary = null;
+    const second = createTeacherQuizFeature(createFeatureDependencies({
+        activeVocabulary: { id: '', subjectSlug: 'technology', words: [] },
+        storage,
+        getOwnedStorageKey: key => `${key}:teacher-two`,
+        commitActiveVocabulary: vocabulary => { committedVocabulary = vocabulary; }
+    }));
+
+    assert.equal(await second.open({ restoreDraft: true }), false);
+    assert.equal(committedVocabulary, null);
+    assert.equal(values.has('teacher_quiz_builder_active_draft'), false);
+});
+
+test('late Quiz word-count hydration cannot mutate rows after disposal', async () => {
+    const manager = createHarness();
+    const node = {
+        dataset: { vocabWordCountPath: '/vocabulary/private.json' },
+        textContent: '...'
+    };
+    const container = {
+        querySelectorAll: () => [node],
+        contains: () => true
+    };
+    let resolveLoad;
+    manager.loadVocabularyFile = () => new Promise(resolve => { resolveLoad = resolve; });
+
+    manager.hydrateQuizVocabularyRowWordCounts(container);
+    manager.destroyed = true;
+    manager.lifecycleGeneration += 1;
+    resolveLoad({ words: [{ word: 'one' }, { word: 'two' }] });
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(node.textContent, '...');
+    assert.equal(node.dataset.vocabWordCountPath, '/vocabulary/private.json');
+});
 
 test('Quiz filtering owns its items and never swaps the Vocabulary library array', () => {
     const manager = createHarness();
@@ -163,7 +400,31 @@ test('Quiz implementation no longer depends on mutable Vocabulary browser state'
     assert.doesNotMatch(`${coreSource}\n${browserSource}`, /this\.library(?:Items|Drilldown)/);
     assert.doesNotMatch(browserSource, /resetLibraryDrilldown|updateVocabularyRoute/);
     assert.match(workflowSource, /nextMode !== 'quizzes' && options\.updateRoute !== false/);
-    assert.match(routingSource, /loadQuizzes: this\.vocabularyMode === 'quizzes',[\s\S]*drilldown: this\.libraryDrilldown/);
+    assert.match(routingSource, /const routeDrilldown = \{[\s\S]*loadQuizzes: this\.vocabularyMode === 'quizzes',[\s\S]*drilldown: routeDrilldown/);
+    assert.doesNotMatch(routingSource, /this\.quizDrilldown/);
+});
+
+test('TeacherManager and shell do not own Quiz implementation state', async () => {
+    const [teacherSource, shellSource, lazySource, featureSource, browserSource] = await Promise.all([
+        readFile(new URL('../js/teacher.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherShell.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherQuizFeature.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8')
+    ]);
+
+    const privateQuizFields = /this\.quiz(?:LibraryItems|Drilldown|Maker|MakerVocabKey|EditorOpen|ReturnView)/;
+    assert.doesNotMatch(teacherSource, privateQuizFields);
+    assert.doesNotMatch(shellSource, privateQuizFields);
+    assert.match(shellSource, /showQuizzesView\(\{ resumeEditor: true \}\)/);
+    assert.match(lazySource, /publicMethods:\s*\{\s*showQuizzesView: 'show',\s*openQuizMaker: 'open'\s*\}/);
+    assert.match(lazySource, /createTeacherQuizFeature\(\{/);
+    assert.match(lazySource, /createQuizVocabularyBrowserAdapter\(manager\)/);
+    assert.match(featureSource, /context\.quizMaker = null/);
+    assert.match(browserSource, /getTeacherVocabularyRowColumns\(this\.quizDrilldown\)/);
+    assert.match(browserSource, /getTeacherVocabularyRowDepthClass\(this\.quizDrilldown\)/);
+    assert.match(browserSource, /compareTeacherVocabularyRowOrder\(itemA, itemB, this\.quizDrilldown\)/);
+    assert.doesNotMatch(browserSource, /hydrateTeacherVocabularyRowWordCounts/);
 });
 
 test('Quiz vocabulary resolver loads full data for remote and cloud metadata', async () => {

@@ -1,6 +1,7 @@
 import { closeModal, notifications, openModal, setupModal } from './main.js';
 import { initTeacherSettingsListeners } from './teacherSettingsListeners.js';
 import { createFeatureContext } from './services/featureContext.js';
+import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrowserAdapter.js';
 
 const featurePromises = new Map();
 const initializedFeatures = new WeakMap();
@@ -124,7 +125,53 @@ const featureDefinitions = {
     },
     quizzes: async () => {
         const module = await import('./teacherQuiz.js');
-        return { methods: captureFeatureMethods(module.installTeacherQuizMethods) };
+        return {
+            publicMethods: {
+                showQuizzesView: 'show',
+                openQuizMaker: 'open'
+            },
+            create(manager) {
+                return module.createTeacherQuizFeature({
+                    ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
+                    activateQuizHub() {
+                        manager.vocabularyMode = 'quizzes';
+                        manager.switchView('teacher-dashboard-view', { updateRoute: false });
+                        manager.setVocabularyWorkflowTab('quizzes', {
+                            updateRoute: false,
+                            loadQuizzes: false
+                        });
+                    },
+                    showQuizEditor: () => manager.switchView('quiz-maker-view'),
+                    showVocabularyEditor: () => manager.showEditor(),
+                    writeQuizRoute(drilldown, options = {}) {
+                        manager.setRoute({
+                            view: 'vocabulary',
+                            subject: drilldown.subject,
+                            grade: drilldown.grade,
+                            trimester: drilldown.trimester,
+                            month: drilldown.month,
+                            mode: 'quizzes'
+                        }, options);
+                    },
+                    getTeacherLibrary: (...args) => manager.getTeacherLibrary(...args),
+                    getActiveVocabulary: () => manager.vocabSet,
+                    commitActiveVocabulary(vocabulary) {
+                        manager.vocabSet = vocabulary;
+                        manager.updateFormUI();
+                        manager.renderWords();
+                    },
+                    getSubjects: () => manager.getSubjects(),
+                    refreshIcons: root => manager.refreshIcons(root),
+                    feedback: notifications,
+                    storage: localStorage,
+                    getOwnedStorageKey(key) {
+                        const ownerId = manager.currentUser?.uid || manager.currentUser?.id;
+                        return `${key}:${ownerId || 'development-teacher'}`;
+                    },
+                    vocabularyBrowser: createQuizVocabularyBrowserAdapter(manager)
+                });
+            }
+        };
     }
 };
 

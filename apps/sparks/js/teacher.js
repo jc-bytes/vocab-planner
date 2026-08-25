@@ -49,13 +49,6 @@ class TeacherManager {
         } catch {
             this.teacherVocabularyViewModes = {};
         }
-        this.quizLibraryItems = [];
-        this.quizDrilldown = {
-            subject: null,
-            grade: null,
-            trimester: null,
-            month: null
-        };
         this.subjects = [];
         this.teacherLibraryCache = null;
         this.teacherLibraryPromise = null;
@@ -68,11 +61,6 @@ class TeacherManager {
         this.pendingTeacherRoute = null;
         this.routeReady = false;
         this.lastVocabularyRoute = null;
-        this.quizMaker = null;
-        this.quizMakerVocabKey = null;
-        this.quizEditorOpen = false;
-        this.quizReturnView = 'quizzes';
-
         this.init();
     }
 

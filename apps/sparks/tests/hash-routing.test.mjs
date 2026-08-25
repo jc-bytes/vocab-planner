@@ -78,7 +78,7 @@ test('teacher routes keep their public URL contract through the shared parser', 
 
     teacher.vocabularyMode = 'quizzes';
     teacher.libraryDrilldown = { subject: 'science', grade: '9', trimester: '3', month: 'October' };
-    teacher.quizDrilldown = { subject: 'technology', grade: '6', trimester: '1', month: 'March' };
+    window.location.hash = '#/teacher/vocabulary?subject=technology&grade=6&trimester=1&month=March&mode=quizzes';
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-dashboard-view'), {
         view: 'vocabulary',
         subject: 'technology',
@@ -86,5 +86,8 @@ test('teacher routes keep their public URL contract through the shared parser', 
         trimester: '1',
         month: 'March',
         mode: 'quizzes'
+    });
+    assert.deepEqual(teacher.libraryDrilldown, {
+        subject: 'science', grade: '9', trimester: '3', month: 'October'
     });
 });
