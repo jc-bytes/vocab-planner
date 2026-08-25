@@ -27,6 +27,7 @@ globalThis.window = { addEventListener() {}, removeEventListener() {} };
 
 const { installTeacherQuizCoreMethods } = await import('../js/teacherQuizCoreMethods.js');
 const { installTeacherQuizBrowserMethods } = await import('../js/teacherQuizBrowserMethods.js');
+const { resolveQuizVocabularyItem } = await import('../js/teacherQuizVocabularyResolver.js');
 
 class TeacherQuizHarness {}
 installTeacherQuizCoreMethods(TeacherQuizHarness);
@@ -163,4 +164,141 @@ test('Quiz implementation no longer depends on mutable Vocabulary browser state'
     assert.doesNotMatch(browserSource, /resetLibraryDrilldown|updateVocabularyRoute/);
     assert.match(workflowSource, /nextMode !== 'quizzes' && options\.updateRoute !== false/);
     assert.match(routingSource, /loadQuizzes: this\.vocabularyMode === 'quizzes',[\s\S]*drilldown: this\.libraryDrilldown/);
+});
+
+test('Quiz vocabulary resolver loads full data for remote and cloud metadata', async () => {
+    const calls = [];
+    const dependencies = {
+        loadRemote: async path => {
+            calls.push(['remote', path]);
+            return { id: 'repo-unit', words: [{ word: 'router', definition: 'Directs network traffic' }] };
+        },
+        loadCloud: async id => {
+            calls.push(['cloud', id]);
+            return { id, words: [{ word: 'database', definition: 'Stores organized information' }] };
+        }
+    };
+
+    const remote = await resolveQuizVocabularyItem({
+        vocab: { path: '/vocabulary/repo.json' }, type: 'remote'
+    }, dependencies);
+    const cloudMetadata = { id: 'cloud-unit', metadataOnly: true, wordCount: 1 };
+    const cloud = await resolveQuizVocabularyItem({ vocab: cloudMetadata, type: 'cloud' }, dependencies);
+    const localMetadata = { id: 'draft-unit', words: [{ word: 'draft', definition: 'Work in progress' }] };
+    const local = await resolveQuizVocabularyItem({ vocab: localMetadata, type: 'local' }, dependencies);
+
+    assert.deepEqual(calls, [
+        ['remote', '/vocabulary/repo.json'],
+        ['cloud', 'cloud-unit']
+    ]);
+    assert.deepEqual(remote.words, [{ word: 'router', definition: 'Directs network traffic' }]);
+    assert.equal(remote.source, 'remote');
+    assert.equal(remote.path, '/vocabulary/repo.json');
+    assert.deepEqual(cloud.words, [{ word: 'database', definition: 'Stores organized information' }]);
+    assert.equal(cloud.source, 'cloud');
+    assert.equal(local.source, 'local');
+    assert.notEqual(local, localMetadata);
+    local.words[0].word = 'changed';
+    assert.equal(localMetadata.words[0].word, 'draft');
+    assert.deepEqual(cloudMetadata, { id: 'cloud-unit', metadataOnly: true, wordCount: 1 });
+});
+
+test('Quiz vocabulary resolver rejects incomplete or malformed sources', async () => {
+    let requests = 0;
+    const dependencies = {
+        loadRemote: async () => { requests += 1; },
+        loadCloud: async () => { requests += 1; }
+    };
+
+    await assert.rejects(resolveQuizVocabularyItem(), /metadata is required/);
+    await assert.rejects(resolveQuizVocabularyItem({ vocab: {}, type: 'cloud' }, dependencies), /ID is required/);
+    await assert.rejects(resolveQuizVocabularyItem({ vocab: {}, type: 'remote' }, dependencies), /path is required/);
+    await assert.rejects(resolveQuizVocabularyItem({ vocab: { words: [] }, type: 'unknown' }, dependencies), /Unsupported/);
+    assert.equal(requests, 0);
+
+    await assert.rejects(resolveQuizVocabularyItem({ vocab: { id: 'missing' }, type: 'cloud' }, {
+        loadCloud: async () => null
+    }), /missing its words array/);
+    await assert.rejects(resolveQuizVocabularyItem({ vocab: { path: '/bad.json' }, type: 'remote' }, {
+        loadRemote: async () => ({ words: null })
+    }), /missing its words array/);
+});
+
+test('Quiz opener commits resolved cloud words before opening the builder', async () => {
+    const manager = createHarness();
+    const calls = [];
+    manager.updateFormUI = () => calls.push('form');
+    manager.renderWords = () => calls.push('words');
+    manager.updateQuizHubSummary = () => calls.push('summary');
+    manager.openQuizMaker = options => calls.push(['open', options]);
+
+    await manager.openQuizVocabularyItem({ id: 'cloud-unit', metadataOnly: true }, 'cloud', async item => {
+        assert.deepEqual(item, {
+            vocab: { id: 'cloud-unit', metadataOnly: true },
+            type: 'cloud'
+        });
+        return {
+            id: 'cloud-unit',
+            subjectSlug: 'technology',
+            source: 'cloud',
+            words: [{ word: 'database', definition: 'Stored information' }]
+        };
+    });
+
+    assert.deepEqual(manager.vocabSet.words, [
+        { word: 'database', definition: 'Stored information' }
+    ]);
+    assert.ok(manager.vocabSet.words.some(({ word, definition }) => word && definition));
+    assert.deepEqual(calls, ['form', 'words', 'summary', ['open', { returnTo: 'quizzes' }]]);
+});
+
+test('latest Quiz vocabulary selection wins when async sources resolve out of order', async () => {
+    const manager = createHarness();
+    const opened = [];
+    manager.updateFormUI = () => {};
+    manager.renderWords = () => {};
+    manager.updateQuizHubSummary = () => {};
+    manager.openQuizMaker = () => opened.push(manager.vocabSet.id);
+
+    let resolveFirst;
+    const first = manager.openQuizVocabularyItem({ id: 'first' }, 'cloud', () => new Promise(resolve => {
+        resolveFirst = resolve;
+    }));
+    const second = manager.openQuizVocabularyItem({ id: 'second' }, 'local', async () => ({
+        id: 'second', subjectSlug: 'technology', source: 'local',
+        words: [{ word: 'current', definition: 'The latest selection' }]
+    }));
+
+    assert.equal(await second, true);
+    resolveFirst({
+        id: 'first', subjectSlug: 'technology', source: 'cloud',
+        words: [{ word: 'stale', definition: 'An older selection' }]
+    });
+    assert.equal(await first, false);
+    assert.equal(manager.vocabSet.id, 'second');
+    assert.deepEqual(opened, ['second']);
+});
+
+test('a stale Quiz vocabulary failure does not replace a newer successful selection', async () => {
+    const manager = createHarness();
+    const opened = [];
+    manager.updateFormUI = () => {};
+    manager.renderWords = () => {};
+    manager.updateQuizHubSummary = () => {};
+    manager.openQuizMaker = () => opened.push(manager.vocabSet.id);
+
+    let rejectFirst;
+    const first = manager.openQuizVocabularyItem({ id: 'first' }, 'cloud', () => new Promise((resolve, reject) => {
+        rejectFirst = reject;
+    }));
+    const second = manager.openQuizVocabularyItem({ id: 'second' }, 'local', async () => ({
+        id: 'second', subjectSlug: 'technology', source: 'local',
+        words: [{ word: 'current', definition: 'The latest selection' }]
+    }));
+
+    assert.equal(await second, true);
+    rejectFirst(new Error('stale request failed'));
+    assert.equal(await first, false);
+    assert.equal(manager.vocabSet.id, 'second');
+    assert.deepEqual(opened, ['second']);
 });

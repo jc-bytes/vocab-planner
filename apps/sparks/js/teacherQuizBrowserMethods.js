@@ -1,10 +1,10 @@
 import { $, createElement, escapeHtml, notifications } from './main.js';
 import {
     getSubjectBySlug,
-    getVocabSubjectSlug,
-    loadVocabularyFile
+    getVocabSubjectSlug
 } from './services/vocabularyApi.js';
 import { filterTeacherVocabularyItems } from './teacherVocabularyLibrary/teacherVocabularyModel.js';
+import { resolveQuizVocabularyItem } from './teacherQuizVocabularyResolver.js';
 
 function installMethods(TeacherManager, MethodsClass) {
     for (const name of Object.getOwnPropertyNames(MethodsClass.prototype)) {
@@ -433,23 +433,26 @@ class TeacherQuizBrowserMethods {
         this.hydrateTeacherVocabularyRowWordCounts(list);
     }
 
-    async openQuizVocabularyItem(vocab, type) {
-        if (type === 'remote') {
-            const data = await loadVocabularyFile(vocab.path);
-            if (!data) {
-                notifications.error('Could not load that vocabulary.');
-                return;
-            }
-            this.vocabSet = data;
-        } else {
-            this.vocabSet = JSON.parse(JSON.stringify(vocab));
+    async openQuizVocabularyItem(vocab, type, resolveVocabulary = resolveQuizVocabularyItem) {
+        const selectionGeneration = (this.quizVocabularySelectionGeneration || 0) + 1;
+        this.quizVocabularySelectionGeneration = selectionGeneration;
+        try {
+            const resolvedVocabulary = await resolveVocabulary({ vocab, type });
+            if (selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
+
+            this.vocabSet = resolvedVocabulary;
             this.vocabSet.subjectSlug = getVocabSubjectSlug(this.vocabSet);
-            if (type === 'cloud') this.vocabSet.source = 'cloud';
+            this.updateFormUI();
+            this.renderWords();
+            this.updateQuizHubSummary();
+            this.openQuizMaker({ returnTo: 'quizzes' });
+            return true;
+        } catch (error) {
+            if (selectionGeneration !== this.quizVocabularySelectionGeneration) return false;
+            console.error('Failed to load Quiz vocabulary:', error);
+            notifications.error('Could not load that vocabulary.');
+            return false;
         }
-        this.updateFormUI();
-        this.renderWords();
-        this.updateQuizHubSummary();
-        this.openQuizMaker({ returnTo: 'quizzes' });
     }
 
     createQuizPickerCard(container, vocab, type) {

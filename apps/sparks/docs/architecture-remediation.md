@@ -143,6 +143,15 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Added focused contracts for independent filtering/navigation, Quiz-owned route metadata, removal of mutable Vocabulary state access, and all three Quiz route forms. This is a prerequisite only; the Quiz proxy, lifecycle, full cloud-vocabulary resolution, and nested editor cleanup remain for separate changes.
 - Verification: the complete suite, including the 13-game sandbox smoke, passed before the final route-timing hardening. After moving the route write ahead of the asynchronous picker load, the six Quiz composition tests, seven Vocabulary ownership tests, fourteen routing tests, build/lazy contracts, production build, and built-page smoke passed. Quiz remains lazy at 17.16 kB raw / 4.66 kB gzip; teacher entry JavaScript is 159.55 kB raw / 43.92 kB gzip, and deployment remains 13.6 MB.
 
+### Task 18d, resolve full Quiz vocabulary data
+
+- Confirmed that the cloud picker receives metadata-only records from `listMetadata()`: they intentionally carry `wordCount` but omit `words`. The old cloud path cloned this metadata and Quiz Maker rejected it as empty.
+- Added a value-returning Quiz vocabulary resolver. Cloud records load their full row by ID, repository records load by path, and local drafts are cloned without I/O. The resolver has no rendering, navigation, manager, persistence, or authorization side effects, and it rejects missing source keys, unknown sources, null responses, and missing word arrays before caller state changes.
+- The opener now commits only the latest selection. A monotonically increasing generation suppresses stale success and stale error when cloud or repository requests finish out of order. Resolved values retain source metadata and do not mutate picker inputs.
+- Tests use the real `{ word, definition }` shape, prove cloud/remote/local source dispatch and cloning, reject malformed metadata, prove usable cloud words reach the builder seam, and cover out-of-order success and rejection. The existing repository metadata contract continues to prove catalog rows omit full words.
+- Did not add cloud caching or change Supabase access. Full cloud reads continue through the authenticated repository/RLS boundary. The existing device-global Quiz draft key can now contain the selected cloud words, as it already can for local/repository vocabularies; account scoping and teardown remain part of the explicit Quiz feature conversion.
+- Verification: the complete suite and 13-game sandbox smoke passed after source resolution was added. After the independent review required the latest-selection guard and realistic word fixtures, all eleven Quiz tests, twelve build/lazy tests, production build, and built three-page smoke passed. The reviewer approved the corrected diff. Quiz remains lazy at 18.03 kB raw / 4.95 kB gzip; teacher entry JavaScript is 159.55 kB raw / 43.91 kB gzip, the service worker precaches 20 files totaling 1,027,448 bytes, and deployment remains 13.6 MB.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.
