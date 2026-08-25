@@ -64,7 +64,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
 | 24. Remove obsolete facade methods | DONE | Student/teacher obsolete bridges, aliases, broad read chain, and ownership/least-data contracts | Focused domain/security/build checks; complete regressions; production builds; browser smoke; independent audits | Removed 30 obsolete facade methods plus associated dead state/service code. Live owner APIs, bounded data paths, lazy loading, persistence, and security boundaries remain intact. |
-| 25. Move legacy game adapters into descriptors | TODO | | | |
+| 25. Move legacy game adapters into descriptors | IN PROGRESS | Dead host score-monitor duplicate; game integration audit | 19 game, 21 registry, security, package, build/lazy, 13-game smoke; complete regression; production build; independent map | Removed the unreachable host poller while preserving the live sandbox bridge. Score direction is the remaining justified scalar descriptor change; a formatter interface is deferred. |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
 | 28. Review Supabase seams | TODO | | | |
@@ -481,6 +481,23 @@ Task 24 remains in progress. The final subtask will remove the independently pro
 - Verification passed for 32 Teacher Progress, 23 Teacher Data plus smoke, 13 Word Hunt plus smoke, 12 repository, three student-interface, 14 security, and 11 build/lazy tests; the complete regression suite, 9-width student shell, three-page/game browser smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB; teacher entry JavaScript decreased from 182.12/48.97 kB to 180.60/48.70 kB raw/gzip.
 
 Task 24 is complete. The remaining manager and feature interfaces all have confirmed callers or intentional ownership/security value; no additional facade is removed based on method count alone. Task 25 will inspect legacy game-specific score/message behavior against the existing registry before changing the already-strong game architecture.
+
+### Architecture review after Task 24a-24e
+
+- Independent review found no capability, lazy-loading, data, persistence, security, or test-coverage regression across the five Task 24 commits. All removed names remain free of production and computed callers.
+- Confirmed that deleting the obsolete broad-request test did not weaken live account-isolation coverage: identity roster, paginated page, detail, filters, password resets, selection, and DOM cleanup each retain current-path tests.
+- Confirmed that the dormant registration UI implementation is intentional deferred auth/security debt, not a Task 24 compatibility shim or a reason to restore its dead manager bridges.
+- The net series reduced callable surface and source without moving owner implementations or adding replacement abstractions. Task 24 remains closed.
+
+### Task 25a, remove the dead host score monitor
+
+- Deleted `StudentGameScoreMonitor`, its eager loader construction, and its unused loader pass-through. The class duplicated Radius Raid, Packabunchas, and SpacePi polling but `loadHTMLGame()` never called it.
+- Preserved the live `legacy-score-bridge.js` asset loaded inside those three sandboxed games, including explicit desktop asset copying, cached legacy-global discovery, score messages, and game-over reporting.
+- Removed Trapdoor's unused `frame.injectScoreMonitor` value; no loader read that property. Preserved descriptor-owned message type, frame, leaderboard capability, iframe source/type checks, numeric coercion, score saves, and cleanup.
+- Did not introduce a generic descriptor formatter. Trapdoor is the sole structured status-text outlier, so a new callback interface would expose more surface than the one current condition. Host validation/save/lifecycle behavior likewise remains common host policy.
+- Verification passed for 19 Student Games, 21 registry/parity tests plus activity-loader smoke, 14 security tests, package contracts, 11 build/lazy checks, 13 HTML-game sandbox smoke, the complete regression suite, production build, scoped diff validation, and an independent game integration map. The build drops from 2,331 to 2,330 modules; the lazy Student Games chunk decreases from 39.47/10.52 kB to 30.67/9.24 kB raw/gzip.
+
+Task 25 remains in progress. SpacePi's lower-is-better direction is a genuine scalar game capability currently repeated in three host conditions; it will move to the descriptor next while database ordering enforcement remains independent.
 
 ### Phase 0, baseline
 

@@ -61,7 +61,6 @@ const {
     FORMATIVE_PASS_SECONDS,
     MAX_QUEUED_ARCADE_SECONDS
 } = await import('../js/student/studentArcadePolicy.js');
-const { StudentGameScoreMonitor } = await import('../js/student/studentGameScoreMonitor.js');
 const { StudentGameSettings } = await import('../js/student/studentGameSettingsMethods.js');
 const { StudentGameAccess } = await import('../js/student/studentGameAccessMethods.js');
 const { notifications } = await import('../js/notifications.js');
@@ -81,12 +80,11 @@ test('StudentGames owns explicit game components', () => {
     assert.ok(games.access instanceof StudentGameAccess);
     assert.ok(games.leaderboard instanceof StudentGameLeaderboard);
     assert.ok(games.htmlLoader instanceof StudentGameHtmlLoader);
-    assert.ok(games.htmlLoader.scoreMonitor instanceof StudentGameScoreMonitor);
+    assert.equal('scoreMonitor' in games.htmlLoader, false);
     assert.ok(games.lifecycle instanceof StudentGameLifecycle);
     assert.equal(games.settings.games, games);
     assert.equal(games.access.games, games);
     assert.equal(games.lifecycle.games, games);
-    assert.equal(games.htmlLoader.scoreMonitor.htmlLoader, games.htmlLoader);
     assert.equal(games.currentGame, null);
     assert.equal(games.gameTimeRemaining, 0);
     assert.equal(games.savedGameId, '');

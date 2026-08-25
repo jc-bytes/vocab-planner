@@ -1,6 +1,5 @@
 import { $ } from '../main.js';
 import { getStudentGame } from './studentGameRegistry.js';
-import { StudentGameScoreMonitor } from './studentGameScoreMonitor.js';
 import { readStudentJson, writeStudentJson } from './persistence/studentStorage.js';
 
 const GAME_STORAGE_PREFIX = 'vocab-game-storage:';
@@ -36,7 +35,6 @@ export class StudentGameHtmlLoader {
     constructor(games) {
         this.games = games;
         this.sm = games.sm;
-        this.scoreMonitor = new StudentGameScoreMonitor(this);
     }
 
     async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
@@ -296,10 +294,6 @@ export class StudentGameHtmlLoader {
                 canvas.style.margin = '0 auto'; // Center the canvas
             }
         };
-    }
-
-    getScoreMonitoringScript(gameId, messageType) {
-        return this.scoreMonitor.getScoreMonitoringScript(gameId, messageType);
     }
 
 }
