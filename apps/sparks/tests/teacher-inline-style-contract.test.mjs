@@ -398,7 +398,9 @@ test('Data Reset delegates fixed presentation while retaining its export gate st
         /resetSection\.style\.opacity\s*=\s*'1'/,
         /resetSection\.style\.pointerEvents\s*=\s*'auto'/,
         /resetBtn\.disabled\s*=\s*false/,
-        /resetStatus\.innerHTML\s*=\s*'<span class="runtime-status data-export-reset-enabled">/
+        /resetStatus\.querySelector\('\.data-reset-export-status__text'\)/,
+        /resetStatusText\.classList\.add\('data-export-reset-enabled'\)/,
+        /resetStatusText\.textContent\s*=\s*'Export completed\. Reset is now enabled\.'/
     ]) {
         assert.match(dataExport, runtimeAssignment);
     }

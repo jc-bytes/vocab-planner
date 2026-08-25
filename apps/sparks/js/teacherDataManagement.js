@@ -22,6 +22,14 @@ function clearElement(selector) {
     document.querySelector(selector)?.replaceChildren();
 }
 
+function resetSelect(selector, optionHtml, { disabled = false } = {}) {
+    const select = document.querySelector(selector);
+    if (!select) return;
+    select.innerHTML = optionHtml;
+    select.value = '';
+    select.disabled = disabled;
+}
+
 function destroyDataManagement(context) {
     if (context.destroyed) return;
     context.destroyed = true;
@@ -58,6 +66,17 @@ function destroyDataManagement(context) {
             const element = document.getElementById(id);
             if (element) element.textContent = '--';
         });
+    resetSelect('#dashboard-grade-filter', '<option value="">All Grades</option>');
+    resetSelect('#export-grade-select', '<option value="">Select grade...</option>', { disabled: true });
+    document.querySelectorAll('input[name="student-selection"]').forEach(radio => {
+        radio.checked = radio.value === 'all';
+    });
+    const exportLoadingText = document.getElementById('export-loading-text');
+    if (exportLoadingText) exportLoadingText.textContent = 'Preparing your data for download';
+    const exportProgressBar = document.getElementById('export-progress-bar');
+    if (exportProgressBar) exportProgressBar.style.width = '0%';
+    const exportStatusText = document.getElementById('export-status-text');
+    if (exportStatusText) exportStatusText.textContent = 'Ready to proceed with reset';
     const resetSection = document.getElementById('data-reset-section');
     const resetButton = document.getElementById('reset-data-btn');
     if (resetSection) {
@@ -66,8 +85,15 @@ function destroyDataManagement(context) {
     }
     if (resetButton) resetButton.disabled = true;
     const resetStatus = document.getElementById('reset-export-status');
-    const resetStatusText = resetStatus?.querySelector('.data-reset-export-status__text');
-    if (resetStatusText) resetStatusText.textContent = 'Export required before reset';
+    if (resetStatus) {
+        resetStatus.innerHTML = `
+            <div class="data-reset-export-status__row">
+                <i data-lucide="triangle-alert"></i>
+                <span class="runtime-status__description data-reset-export-status__text">Export required before reset</span>
+            </div>
+        `;
+        context.refreshIcons(resetStatus);
+    }
     const fileInput = document.getElementById('load-json-file');
     if (fileInput) fileInput.value = '';
     ['export-json-btn', 'export-csv-btn'].forEach(id => {

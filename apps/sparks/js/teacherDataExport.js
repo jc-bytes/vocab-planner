@@ -241,7 +241,13 @@ const teacherDataExportMethods = {
             resetSection.style.opacity = '1';
             resetSection.style.pointerEvents = 'auto';
             resetBtn.disabled = false;
-            resetStatus.innerHTML = '<span class="runtime-status data-export-reset-enabled">Export completed. Reset is now enabled.</span>';
+            const resetStatusText = resetStatus.querySelector('.data-reset-export-status__text');
+            if (resetStatusText) {
+                resetStatusText.classList.add('data-export-reset-enabled');
+                resetStatusText.textContent = 'Export completed. Reset is now enabled.';
+            } else {
+                resetStatus.textContent = 'Export completed. Reset is now enabled.';
+            }
         }
     },
 };

@@ -172,6 +172,28 @@ try {
         document.querySelector('#clear-file-btn').click();
         const viewerCleared = !document.querySelector('#viewer-summary-stats')?.textContent
             && !document.querySelector('#viewer-tables-content')?.textContent;
+
+        teacherExportRepository.getStudentProgressBatch = async () => {
+            exportRequests += 1;
+            return [];
+        };
+        await manager.showDataManagementView({ area: 'data', tab: 'export' });
+        document.querySelector('#export-json-btn').click();
+        for (let attempt = 0; attempt < 100; attempt += 1) {
+            if (document.querySelector('#reset-export-status .data-reset-export-status__text')?.textContent
+                === 'Export completed. Reset is now enabled.') break;
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+        const completedResetStatus = document.querySelector('#reset-export-status .data-reset-export-status__text');
+        const completedResetText = completedResetStatus?.textContent;
+        const completedResetSuccessClass = completedResetStatus?.classList.contains('data-export-reset-enabled');
+        manager.disposeLoadedTeacherFeatures();
+        const resetWarning = {
+            text: document.querySelector('#reset-export-status .data-reset-export-status__text')?.textContent,
+            icon: document.querySelector('#reset-export-status [data-lucide]')?.getAttribute('data-lucide'),
+            disabled: document.querySelector('#reset-data-btn')?.disabled,
+            opacity: document.querySelector('#data-reset-section')?.style.opacity
+        };
         HTMLAnchorElement.prototype.click = originalAnchorClick;
         return {
             ...first,
@@ -187,6 +209,9 @@ try {
             unsafeViewerHtml,
             viewerImportExecuted: window.viewerImportExecuted,
             viewerCleared,
+            completedResetText,
+            completedResetSuccessClass,
+            resetWarning,
             recreatedTitle,
             resetStatusPreserved,
             leakedStateAfterReload: Object.keys(manager).filter(key => /^(dataManagement|activeDataTab|dashboardAnalytics|loadedData)/.test(key))
@@ -199,7 +224,7 @@ try {
     if (result.activeSection !== 'data' || result.title !== 'Data' || !result.dashboardVisible || result.totalStudents !== '2') {
         throw new Error(`Data dashboard activation changed: ${JSON.stringify(result)}`);
     }
-    if (result.analyticsRequests !== 1 || result.rosterRequests !== 1 || result.route?.route?.tab !== 'dashboard') {
+    if (result.analyticsRequests !== 1 || result.rosterRequests !== 2 || result.route?.route?.tab !== 'dashboard') {
         throw new Error(`Data loading or routing changed: ${JSON.stringify(result)}`);
     }
     if (!result.chartsDestroyed || result.coinSaves !== 1 || result.recreatedTitle !== 'Settings' || !result.resetStatusPreserved) {
@@ -208,8 +233,16 @@ try {
     if (result.staleSameAreaResult !== false || result.staleSameAreaView !== 'newer-view') {
         throw new Error(`A stale same-area Data tab replaced the canonical default: ${JSON.stringify(result)}`);
     }
-    if (result.exportRequests !== 1 || result.exportLogs !== 0 || result.downloads !== 0) {
+    if (result.exportRequests !== 2 || result.exportLogs !== 1 || result.downloads !== 1) {
         throw new Error(`Disposed export produced a side effect: ${JSON.stringify(result)}`);
+    }
+    if (result.completedResetText !== 'Export completed. Reset is now enabled.'
+        || !result.completedResetSuccessClass
+        || result.resetWarning.text !== 'Export required before reset'
+        || result.resetWarning.icon !== 'triangle-alert'
+        || !result.resetWarning.disabled
+        || result.resetWarning.opacity !== '0.5') {
+        throw new Error(`Data reset status crossed feature disposal: ${JSON.stringify(result)}`);
     }
     if (!result.viewerText.includes('Second Teacher') || result.viewerText.includes('First Teacher')) {
         throw new Error(`Stale Viewer file replaced the latest file: ${JSON.stringify(result)}`);
