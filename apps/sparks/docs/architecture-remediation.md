@@ -71,7 +71,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 29. Add interfaces only where justified | DONE | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle; game/server score parity | Focused/full regression; production builds; registry/database contracts; independent reviews | Added only two justified seams: authoritative signed-in rewards and injectable teacher auth. Client leaderboard capability now exactly matches independent SQL authorization and score order. |
 | 30. Consolidate environment authority | DONE | Shared browser-key validation; hosted project identity; planner derivation | Focused config/auth/security tests; planner syntax/runtime checks; complete regression; production build; independent review | One hosted project ref derives the runtime URL and planner fallback. Runtime/build reject current secret and legacy service-role browser keys. Local/server/deployment boundaries remain intentionally separate. |
 | 31. Correct stale documentation | DONE | README and four architecture/reliability records | Full regression suite, production build, scoped diff check, reference audit, independent documentation review | Removed broken and stale release guidance; updated completed page/facade/data boundaries; marked the database cutover record historical. Runtime/package naming remains unchanged. |
-| 32. Create `ARCHITECTURE.md` | TODO | | | |
+| 32. Create `ARCHITECTURE.md` | DONE | `ARCHITECTURE.md`, tracker | Documented-path check, full regression suite, 13-game sandbox smoke, production build, independent ownership trace | One concise extension map now answers where and how to add activities, games, teacher features/pages, theme/UI, and data boundaries without duplicating implementation internals. |
 | 33. Organize changed features gradually | TODO | | | |
 | 34. Add delivery-size budgets | TODO | | | |
 | 35. Preserve lazy loading | TODO | | | |
@@ -1354,3 +1354,14 @@ Task 14 is complete. Loading, stacked notifications, centered rewards, persisten
 - Verification passed: scoped Markdown reference inspection, scoped diff validation, the complete `npm test` suite, the production build (2,332 modules, 13.5 MB deployment), and an independent stale-document audit.
 
 Task 31 is complete. Task 32 will add one concise current architecture map and link to detailed records instead of duplicating their histories.
+
+### Task 32, create the current architecture map
+
+- Added root `ARCHITECTURE.md` as an operational guide for the three Vite entries and their activity, game, teacher-feature, page, theme, UI, data, configuration, and database authorities.
+- Documented the minimum extension path and focused verification for a new activity, game, teacher lazy feature, and top-level teacher page. Examples use the real registry/factory contracts.
+- Made the security boundaries explicit: client catalogs do not authorize work, XP/rewards stay on the server, scoring games require independent SQL parity, browser features do not receive raw Supabase access, and secret/service-role keys are rejected.
+- Documented the intentional limits of each abstraction: the page registry owns only shared identity, managers remain composition roots, repositories are not wrapped without a real seam, and distinctive game/activity UI remains feature-owned.
+- Verified every explicit documented path exists. An independent source trace confirmed the ownership map, derived activity/game wiring, lazy feature lifecycle, page wiring, shared styling, and data boundaries.
+- Verification passed: the complete `npm test` suite, 9-width student regression, all-seven-page teacher smoke, three-page source smoke, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student and teacher entry JavaScript remain 236.26/60.50 kB and 181.79/48.89 kB raw/gzip.
+
+Task 32 is complete. Task 33 will inspect whether any additional file move is justified by material ownership work; it will not perform an import-only directory rearrangement.
