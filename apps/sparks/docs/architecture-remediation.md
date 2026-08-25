@@ -61,7 +61,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
 | 20. Migrate teacher pages | DONE | All seven primary teacher pages; primary-page browser smoke; account-isolation hardening | Per-page registry, routing, navigation, browser history, lazy feature, account-switch, complete regression suite, and production build | Every primary page now uses its registry descriptor. Data and Settings preserve route-based disambiguation on their intentional shared view. |
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
-| 22. Analyze broad forwarding interfaces | TODO | | | |
+| 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
 | 24. Remove obsolete facade methods | TODO | | | |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
@@ -377,6 +377,19 @@ Task 21 remains in progress. The editor's own request continuation can still mut
 - Verification passed for 22 Vocabulary tests, 26 Quiz/lifecycle tests plus its real lazy browser smoke, all seven teacher pages plus browser history/direct-route smoke, teacher progress/data suites, the complete regression suite, production build and delivery-size checks, and scoped diff validation. Three independent reviewers approved the final account, persistence, routing, and security behavior after the reproduced blockers were corrected.
 
 Task 21 is complete. Top-level page identity, browser-history dispatch, route intent, editor restoration, and account-scoped Vocabulary continuations now have explicit authorities without turning the page registry into a routing framework.
+
+### Task 22, analyze broad forwarding interfaces
+
+- Mapped 60 `StudentManager` forwarding names, 141 `StudentActivities` delegates, 26 `StudentGames` delegates, all seven teacher lazy entries, and the 28-capability Quiz vocabulary-browser adapter to their callers and actual owners.
+- Distinguished forwarding from the eager teacher method installers, which place implementations on the composition root rather than forwarding to another parallel object.
+- Confirmed that the manager session, route, shell, listener, subject, auth, and progress bridges are live cross-component contracts. Direct child access would expose more implementation detail and increase change impact.
+- Confirmed that the broad Student Activities boundary mostly coordinates 13 owned collaborators. A wholesale purge would replace stable domain calls with child-object reach-through rather than create cohesive use cases.
+- Found one demonstrated deepening seam: Arcade listeners know lifecycle state and coordinate multiple low-level game operations. Task 23 will migrate one intent at a time into the existing lifecycle owner, beginning with relative game selection.
+- Recorded a bounded high-confidence list of unused Student Activities and Student Games pass-throughs for Task 24. No method is removed from audit evidence alone; receiver calls and tests must be rechecked immediately before deletion.
+- Preserved the teacher lazy use cases and exact Quiz adapter. A generic feature invoker or wrapper around the existing 28 methods would be weaker, not simpler. A shared Quiz/Assign model remains optional only if it can atomically replace those calls with a genuinely deeper DOM-free interface.
+- Three independent read-only maps agreed that broad facade removal is unjustified and that Arcade intent ownership plus dead forwards are the smallest evidence-backed next changes. Full details and the verification matrix are in `docs/manager-facade-analysis.md`.
+
+Task 22 is complete. Task 23 starts with the smallest Arcade listener intent and will not redesign the already-strong game registry or lazy loader.
 
 ### Phase 0, baseline
 
