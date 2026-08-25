@@ -27,6 +27,7 @@ try {
         const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
         const { teacherVocabularyWorkflowMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
         const { teacherVocabularyDataMethods } = await import('/js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
+        const { teacherProgressDataMethods } = await import('/js/teacherStudentProgress/teacherProgressDataMethods.js');
         const teacherSource = await fetch('/teacher.html').then(response => response.text());
         const parsedTeacher = new DOMParser().parseFromString(teacherSource, 'text/html');
         const navigation = parsedTeacher.querySelector('#teacher-tab-shell').outerHTML;
@@ -55,20 +56,24 @@ try {
                 this.libraryLoads = 0;
                 this.workflowCalls = [];
                 this.sparkLoads = 0;
+                this.progressLoads = 0;
             }
             ensureAuthenticated() { return true; }
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
-            showProgressView() { this.switchView('teacher-progress-view'); }
             showGroupsView() { this.switchView('teacher-groups-view'); }
             showDataManagementView({ area }) { this.switchView('teacher-data-management-view', { updateRoute: false }); this.setActiveTeacherTab(area); }
             setVocabularyWorkflowTab(mode, options) { this.workflowCalls.push({ mode, options }); }
             loadLibrary() { this.libraryLoads += 1; return Promise.resolve(); }
             getTeacherLibrary() { return Promise.resolve({ items: [] }); }
+            loadStudentRosterFilters() { return Promise.resolve(); }
+            populateFilters() {}
+            fetchStudentProgressPage() { this.progressLoads += 1; return Promise.resolve(); }
         }
         Manager.prototype.showVocabularyLibrary = teacherVocabularyWorkflowMethods.showVocabularyLibrary;
         Manager.prototype.resetLibraryDrilldown = teacherVocabularyDataMethods.resetLibraryDrilldown;
+        Manager.prototype.showProgressView = teacherProgressDataMethods.showProgressView;
         installTeacherRoutingMethods(Manager);
         installTeacherShellMethods(Manager);
         const manager = new Manager();
@@ -223,7 +228,56 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'sparks'
     ));
 
-    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, and Sparks navigation, direct routing, and history.');
+    const students = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const loadsBefore = manager.progressLoads;
+        manager.showTeacherSection('students');
+        await new Promise(resolve => setTimeout(resolve, 0));
+        return {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            mobileLabel: document.querySelector('#teacher-mobile-section-label')?.textContent,
+            topLabel: document.querySelector('#teacher-top-bar-section')?.textContent,
+            loadDelta: manager.progressLoads - loadsBefore
+        };
+    });
+    if (students.hash !== '#/teacher/students'
+        || students.activeView !== 'teacher-progress-view'
+        || students.activeSection !== 'students'
+        || students.mobileLabel !== 'Students'
+        || students.topLabel !== 'Students'
+        || students.loadDelta !== 1) {
+        throw new Error(`Students navigation changed: ${JSON.stringify(students)}`);
+    }
+
+    const studentsDirect = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const loadsBefore = manager.progressLoads;
+        history.replaceState(null, '', '#/teacher/students');
+        await manager.handleRouteChange();
+        return {
+            activeView: document.querySelector('.view.active')?.id,
+            activeSection: document.querySelector('.teacher-tab.active')?.dataset.section,
+            loadDelta: manager.progressLoads - loadsBefore
+        };
+    });
+    if (studentsDirect.activeView !== 'teacher-progress-view'
+        || studentsDirect.activeSection !== 'students'
+        || studentsDirect.loadDelta !== 1) {
+        throw new Error(`Students direct route changed: ${JSON.stringify(studentsDirect)}`);
+    }
+
+    await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('overview'));
+    await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(() => (
+        window.location.hash === '#/teacher/students'
+        && document.querySelector('.view.active')?.id === 'teacher-progress-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
+    ));
+
+    console.log('Teacher primary-page smoke passed for Overview, Vocabulary, Sparks, and Students navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

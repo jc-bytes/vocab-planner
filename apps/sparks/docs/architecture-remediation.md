@@ -59,7 +59,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 17. Validate the teacher feature pattern | DONE | Tracker and teacher dependency map | Task 16 full regression/build/smoke evidence, lazy-adapter browser workflow, before/after coupling and bundle comparison, independent review | The factory pattern is accepted with constraints: narrow use cases, owned state/listeners, explicit capabilities, and no forced shared base class or route teardown. |
 | 18. Migrate remaining teacher features | DONE | Five explicit lazy feature factories; shared disposal; Data dashboard/export/viewer/settings composition; account cleanup; tests, browser workflows, and dependency map | Per-feature focused/full suites, lazy adapter workflows, production builds, built-page smoke, three independent Data reviews | Every lazy teacher feature now has a narrow explicit interface. The prototype capture and manager-fallback Proxy are gone. Data Management retains cohesive internal modules behind one `show`/`destroy` page interface. |
 | 19. Create a small page registry | DONE | `js/teacherPageRegistry.js`, teacher shell view discovery, registry contract, package script | Registry, navigation, routing, build/lazy, and source UI smoke checks; independent reviews | Seven primary teacher navigation pages now have one frozen `{id, viewId}` authority. Modes, aliases, loaders, labels, and route codecs stay with their current owners until their incremental migrations. |
-| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, and Sparks shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, lazy-feature, and UI checks | Overview, Vocabulary, and Sparks are migrated. Students is next; remaining primary pages will continue one at a time. |
+| 20. Migrate teacher pages | IN PROGRESS | Overview, Vocabulary, Sparks, and Students shell/route migrations; primary-page browser smoke | Per-page registry, routing, navigation, browser history, feature, and UI checks | Four primary pages are migrated. A separately verified Students account-reset defect will be fixed before Groups; Data and Settings follow independently. |
 | 21. Remove duplicated navigation wiring | TODO | | | |
 | 22. Analyze broad forwarding interfaces | TODO | | | |
 | 23. Reduce forwarding where a cohesive use case exists | TODO | | | |
@@ -255,7 +255,17 @@ Task 20 remains in progress.
 - Extended the page browser workflow for normal entry, canonical URL, visible view, active navigation labels, direct routing, and Back restoration. The dedicated Sparks lazy browser workflow continues to verify the real feature factory, loading, modal, persistence, disposal, and listener behavior.
 - Added exact teacher route parse/build/current-view assertions. All 41 focused checks, both page/Sparks browser workflows, the production build, bundle guardrails, scoped diff validation, and independent review pass. The Sparks feature remains a separate 34.57 kB raw / 9.15 kB gzip chunk.
 
-Task 20 remains in progress. Students is next.
+Task 20 remains in progress.
+
+### Task 20d, migrate Students
+
+- Replaced duplicated teacher Students primary page IDs and view IDs in the shell, router, Student Progress page owner, and Overview shortcut with the `students` registry descriptor.
+- Preserved the eager `showProgressView()` workflow and its authentication, loading, roster/filter, pagination, error, and cleanup order. Shared roster capabilities used by Groups and Data Management, selected-student state, detail modals, coin/password actions, repositories, and data shapes are unchanged.
+- Extended the primary-page browser workflow with the real production `showProgressView()` method and stubbed data capabilities. It verifies normal entry, one progress load, canonical URL, view/navigation labels, direct routing, and Back restoration without duplicating the changed activation method.
+- Added exact teacher route parse/build/current-view assertions. All 43 focused checks, the primary-page browser workflow, production build, bundle/deployment guardrails, scoped diff validation, and independent review pass.
+- Review exposed a pre-existing account-isolation gap: session reset does not clear the newer paginated roster cache/filter state or invalidate its requests. It is not caused or worsened by this identity-only change and will be the next separate reliability fix so its behavior and tests remain independently reviewable.
+
+Task 20 remains in progress. The Students account-reset fix is next; Groups migration resumes afterward.
 
 ### Phase 0, baseline
 

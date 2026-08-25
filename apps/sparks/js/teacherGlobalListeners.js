@@ -5,6 +5,7 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const TEACHER_RESIZE_DEBOUNCE_MS = 120;
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
+const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
 function debounceTeacherResize(callback) {
     let timer = null;
@@ -85,7 +86,7 @@ function bindOverviewListeners(manager) {
     $('#overview-create-vocab-btn')?.addEventListener('click', () => manager.startNewVocab());
     $('#overview-groups-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
     $('#overview-groups-action-btn')?.addEventListener('click', () => manager.showTeacherSection('groups'));
-    $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection('students'));
+    $('#overview-students-btn')?.addEventListener('click', () => manager.showTeacherSection(STUDENTS_PAGE.id));
     $('#overview-vocabulary-btn')?.addEventListener('click', () => manager.showTeacherSection(VOCABULARY_PAGE.id));
     $('#overview-quiz-btn')?.addEventListener('click', () => manager.showTeacherSection('quizzes'));
     $('#overview-sparks-btn')?.addEventListener('click', () => manager.showTeacherSection(SPARKS_PAGE.id));

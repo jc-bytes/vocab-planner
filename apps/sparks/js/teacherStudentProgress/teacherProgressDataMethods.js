@@ -1,10 +1,13 @@
 import { $, createElement, notifications } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
+import { teacherPageRegistry } from '../teacherPageRegistry.js';
+
+const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
 export const teacherProgressDataMethods = {
 async showProgressView() {
         if (!this.ensureAuthenticated(false)) return;
-        this.switchView('teacher-progress-view');
+        this.switchView(STUDENTS_PAGE.viewId);
 
         const loadingEl = $('#progress-loading');
         const listEl = $('#student-progress-list');

@@ -4,6 +4,7 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
+const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
 export function installTeacherRoutingMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -14,7 +15,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
 
             if (parts[0] !== 'teacher') return null;
             if (!parts[1] || parts[1] === OVERVIEW_PAGE.id) return { view: OVERVIEW_PAGE.id };
-            if (parts[1] === 'students') return { view: 'students' };
+            if (parts[1] === STUDENTS_PAGE.id) return { view: STUDENTS_PAGE.id };
             if (parts[1] === 'groups') return { view: 'groups' };
             if (parts[1] === 'word-hunt') return { view: VOCABULARY_PAGE.id, mode: 'review' };
             if (parts[1] === SPARKS_PAGE.id) return { view: SPARKS_PAGE.id };
@@ -51,7 +52,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         buildRoute(route) {
             if (!route || !route.view) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (route.view === OVERVIEW_PAGE.id) return `#/teacher/${OVERVIEW_PAGE.id}`;
-            if (route.view === 'students') return '#/teacher/students';
+            if (route.view === STUDENTS_PAGE.id) return `#/teacher/${STUDENTS_PAGE.id}`;
             if (route.view === 'groups') return '#/teacher/groups';
             if (route.view === 'word-hunt-review') return `#/teacher/${VOCABULARY_PAGE.id}?mode=review`;
             if (route.view === SPARKS_PAGE.id) return `#/teacher/${SPARKS_PAGE.id}`;
@@ -106,7 +107,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 };
             }
             if (viewId === SPARKS_PAGE.viewId) return { view: SPARKS_PAGE.id };
-            if (viewId === 'teacher-progress-view') return { view: 'students' };
+            if (viewId === STUDENTS_PAGE.viewId) return { view: STUDENTS_PAGE.id };
             if (viewId === 'teacher-groups-view') return { view: 'groups' };
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === 'teacher-data-management-view') {
@@ -201,7 +202,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                                 this.showEditor();
                             }
                             break;
-                        case 'students':
+                        case STUDENTS_PAGE.id:
                             await this.showProgressView();
                             break;
                         case 'groups':

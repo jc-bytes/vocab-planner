@@ -78,6 +78,9 @@ test('teacher routes keep their public URL contract through the shared parser', 
     assert.deepEqual(teacher.parseRoute('#/teacher/sparks'), { view: 'sparks' });
     assert.equal(teacher.buildRoute({ view: 'sparks' }), '#/teacher/sparks');
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-sparks-view'), { view: 'sparks' });
+    assert.deepEqual(teacher.parseRoute('#/teacher/students'), { view: 'students' });
+    assert.equal(teacher.buildRoute({ view: 'students' }), '#/teacher/students');
+    assert.deepEqual(teacher.currentTeacherRouteForView('teacher-progress-view'), { view: 'students' });
     assert.equal(teacher.buildRoute({ view: 'quizzes' }), '#/teacher/vocabulary?mode=quizzes');
     assert.equal(teacher.buildRoute({ view: 'quiz-editor' }), '#/teacher/quizzes/editor');
 

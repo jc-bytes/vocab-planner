@@ -5,6 +5,7 @@ const TEACHER_SIDEBAR_STORAGE_KEY = 'teacher_sidebar_collapsed';
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 const SPARKS_PAGE = teacherPageRegistry.get('sparks');
+const STUDENTS_PAGE = teacherPageRegistry.get('students');
 const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
     ...TEACHER_SHELL_VIEW_IDS,
@@ -115,12 +116,12 @@ class TeacherShellMethods {
             return VOCABULARY_PAGE.id;
         }
         if (viewId === SPARKS_PAGE.viewId) return SPARKS_PAGE.id;
+        if (viewId === STUDENTS_PAGE.viewId) return STUDENTS_PAGE.id;
         if (viewId === 'teacher-data-management-view') {
             const route = this.parseRoute?.();
             return route?.view === 'data' ? 'data' : 'settings';
         }
         const map = {
-            'teacher-progress-view': 'students',
             'teacher-groups-view': 'groups'
         };
         return map[viewId] || '';
@@ -188,7 +189,7 @@ class TeacherShellMethods {
             case SPARKS_PAGE.id:
                 this.showSparksView();
                 break;
-            case 'students':
+            case STUDENTS_PAGE.id:
                 this.showProgressView();
                 break;
             case 'groups':
