@@ -231,3 +231,28 @@ test('unfinished version 3 state reopens on the study side', () => {
     assert.equal(activity.isCurrentQuestionReady(), false);
     assert.equal(activity.isFlipped, true);
 });
+
+test('incomplete restored mastery resumes at the first unanswered card', () => {
+    const activity = createFlashcards([
+        { word: 'Data question', definition: 'A question answered with data.' },
+        { word: 'Measurable', definition: 'Able to be measured.' },
+        { word: 'Survey', definition: 'A set of questions.' },
+        { word: 'Data type', definition: 'A kind of data.' },
+        { word: 'Method', definition: 'A way to do something.' },
+        { word: 'Privacy', definition: 'Keeping information protected.' }
+    ]);
+    activity.initialState = {
+        masteryVersion: 3,
+        currentIndex: 5,
+        answeredCards: [1, 2, 3, 4, 5],
+        firstAttemptCorrectCards: [1, 2, 3, 4, 5],
+        attemptsByCard: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }
+    };
+
+    activity.restoreState();
+
+    assert.equal(activity.getScore().score, 83);
+    assert.equal(activity.getScore().isComplete, false);
+    assert.equal(activity.currentIndex, 0);
+    assert.equal(activity.isCurrentCardAnswered(), false);
+});

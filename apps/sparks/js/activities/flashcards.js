@@ -50,6 +50,10 @@ export class FlashcardsActivity {
             this.answeredCards = new Set(this.sanitizeCardIndexes(state.answeredCards));
             this.firstAttemptCorrectCards = new Set(this.sanitizeCardIndexes(state.firstAttemptCorrectCards));
             this.attemptsByCard = this.sanitizeAttempts(state.attemptsByCard);
+            const firstUnansweredIndex = this.words.findIndex((_, index) => !this.answeredCards.has(index));
+            if (firstUnansweredIndex >= 0 && this.answeredCards.has(this.currentIndex)) {
+                this.currentIndex = firstUnansweredIndex;
+            }
             // An unfinished card should always reopen on its study side. Restoring
             // the transient question stage can hide the definition before the
             // student has had a chance to review it in the new session.
