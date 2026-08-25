@@ -4,6 +4,9 @@ import {
     getVocabSubjectSlug,
     loadVocabularyFile
 } from './services/vocabularyApi.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 class TeacherVocabularyStorageMethods {
     async fetchCloudVocabs(options = {}) {
@@ -98,14 +101,7 @@ class TeacherVocabularyStorageMethods {
         card.addEventListener('click', (e) => {
             // Prevent click if deleting
             if (e.target.closest('.delete-vocab-btn')) return;
-
-            if (type === 'remote') {
-                this.loadVocabularyFromPath(vocab.path);
-            } else if (type === 'cloud') {
-                this.loadCloudVocabularyById(vocab.id);
-            } else {
-                this.loadLocalVocabulary(vocab);
-            }
+            this.openTeacherVocabularyItem(vocab, type);
         });
         card.addEventListener('keydown', (event) => {
             if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -153,26 +149,33 @@ class TeacherVocabularyStorageMethods {
         this.loadVocabularyObject(vocab, { source: 'local' });
     }
 
-    async loadVocabularyFromPath(path) {
-        if (!this.ensureAuthenticated()) return;
+    async loadVocabularyFromPath(path, options = {}) {
+        const isCurrent = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
+        if (!isCurrent() || !this.ensureAuthenticated()) return false;
         const data = await loadVocabularyFile(path);
+        if (!isCurrent()) return false;
         if (data) {
             this.loadVocabularyObject(data, { source: 'remote', path });
+            return true;
         } else {
             alert('Failed to load vocabulary file.');
+            return false;
         }
     }
 
-    async loadCloudVocabularyById(id) {
-        if (!this.ensureAuthenticated(false) || !id) return false;
+    async loadCloudVocabularyById(id, options = {}) {
+        const isCurrent = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
+        if (!isCurrent() || !this.ensureAuthenticated(false) || !id) return false;
         this.setCloudStatus('Loading vocabulary...', 'info');
         try {
             const vocabulary = await vocabularyRepository.get(id);
+            if (!isCurrent()) return false;
             if (!vocabulary) throw new Error('Vocabulary not found.');
             this.loadVocabularyObject(vocabulary, { source: 'cloud' });
             this.setCloudStatus('Ready', 'info');
             return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error(`Failed to load cloud vocabulary ${id}:`, error);
             this.setCloudStatus('Cloud load failed', 'error');
             notifications.error('Could not load that vocabulary. Please try again.');
@@ -180,8 +183,9 @@ class TeacherVocabularyStorageMethods {
         }
     }
 
-    async loadVocabularyById(vocabularyId) {
-        if (!this.ensureAuthenticated(false)) return false;
+    async loadVocabularyById(vocabularyId, options = {}) {
+        const isCurrent = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
+        if (!isCurrent() || !this.ensureAuthenticated(false)) return false;
         const id = String(vocabularyId || '').trim();
         if (!id) {
             this.showEditor();
@@ -192,28 +196,35 @@ class TeacherVocabularyStorageMethods {
 
         try {
             const library = await this.getTeacherLibrary();
+            if (!isCurrent()) return false;
             const item = library.items.find(({ vocab }) => vocab?.id === id);
             if (!item) {
                 notifications.warning('That vocabulary could not be found. Returning to the library.');
-                this.showVocabularyLibrary();
+                this.showTeacherSection(VOCABULARY_PAGE.id, { replaceRoute: true });
                 return false;
             }
 
             if (item.type === 'remote') {
                 const path = item.vocab.path;
                 const data = await loadVocabularyFile(path);
+                if (!isCurrent()) return false;
                 if (!data) throw new Error(`Could not load vocabulary file ${path}`);
                 this.loadVocabularyObject(data, { source: 'remote', path });
             } else if (item.type === 'cloud') {
-                return this.loadCloudVocabularyById(item.vocab.id);
+                const loaded = await this.loadCloudVocabularyById(item.vocab.id, { isCurrent });
+                if (!loaded && isCurrent()) {
+                    this.showTeacherSection(VOCABULARY_PAGE.id, { replaceRoute: true });
+                }
+                return loaded;
             } else {
                 this.loadVocabularyObject(item.vocab, { source: item.type });
             }
             return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Failed to restore vocabulary route:', error);
             notifications.error('Could not reopen that vocabulary after refresh.');
-            this.showVocabularyLibrary();
+            this.showTeacherSection(VOCABULARY_PAGE.id, { replaceRoute: true });
             return false;
         }
     }

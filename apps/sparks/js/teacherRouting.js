@@ -237,7 +237,9 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             break;
                         case 'editor':
                             if (routeToApply.vocabularyId && routeToApply.vocabularyId !== this.vocabSet?.id) {
-                                await this.loadVocabularyById(routeToApply.vocabularyId);
+                                await this.loadVocabularyById(routeToApply.vocabularyId, {
+                                    isCurrent: () => this.isTeacherNavigationCurrent(navigationToApply)
+                                });
                             } else {
                                 this.showEditor();
                             }

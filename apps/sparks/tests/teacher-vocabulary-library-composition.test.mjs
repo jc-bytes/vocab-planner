@@ -22,11 +22,14 @@ globalThis.document = {
 globalThis.window = { addEventListener() {}, removeEventListener() {} };
 
 const { installTeacherVocabularyLibraryMethods } = await import('../js/teacherVocabularyLibrary.js');
+const { installTeacherVocabularyStorageMethods } = await import('../js/teacherVocabularyStorage.js');
+const { installTeacherVocabularyEditorCoreMethods } = await import('../js/teacherVocabularyEditorCoreMethods.js');
 const { teacherVocabularyBrowserViewMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyBrowserViewMethods.js');
 const { teacherVocabularyDataMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
 const { teacherVocabularyRowViewMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyRowViewMethods.js');
 const { teacherVocabularyWorkflowMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
 const vocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
+const vocabularyStorageSource = await readFile(new URL('../js/teacherVocabularyStorage.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {
     getVocabGrades(vocab) { return vocab.grades || [vocab.grade || '6']; }
@@ -113,6 +116,99 @@ test('Vocabulary workflow navigation reserves the route before lazy activation',
     events.length = 0;
     manager.setVocabularyWorkflowTab('review', { updateRoute: false, loadReview: false });
     assert.deepEqual(events, []);
+});
+
+test('stale editor restoration cannot commit or report after navigation changes', async () => {
+    class StorageManager {}
+    installTeacherVocabularyStorageMethods(StorageManager);
+    const manager = new StorageManager();
+    let resolveLibrary;
+    const events = [];
+    let current = true;
+    manager.ensureAuthenticated = () => true;
+    manager.setCloudStatus = (...args) => events.push(['status', ...args]);
+    manager.getTeacherLibrary = () => new Promise(resolve => { resolveLibrary = resolve; });
+    manager.loadVocabularyObject = (...args) => events.push(['commit', ...args]);
+    manager.showTeacherSection = (...args) => events.push(['fallback', ...args]);
+
+    const loading = manager.loadVocabularyById('old-unit', { isCurrent: () => current });
+    current = false;
+    resolveLibrary({ items: [{ type: 'local', vocab: { id: 'old-unit', name: 'Old unit' } }] });
+
+    assert.equal(await loading, false);
+    assert.deepEqual(events, [['status', 'Loading vocabulary...', 'info']]);
+
+    const rejectedEvents = [];
+    const rejectedManager = new StorageManager();
+    let rejectLibrary;
+    let rejectedCurrent = true;
+    rejectedManager.ensureAuthenticated = () => true;
+    rejectedManager.setCloudStatus = (...args) => rejectedEvents.push(['status', ...args]);
+    rejectedManager.getTeacherLibrary = () => new Promise((resolve, reject) => { rejectLibrary = reject; });
+    rejectedManager.showTeacherSection = (...args) => rejectedEvents.push(['fallback', ...args]);
+    const rejectedLoad = rejectedManager.loadVocabularyById('old-unit', {
+        isCurrent: () => rejectedCurrent
+    });
+    rejectedCurrent = false;
+    rejectLibrary(new Error('stale failure'));
+    assert.equal(await rejectedLoad, false);
+    assert.deepEqual(rejectedEvents, [['status', 'Loading vocabulary...', 'info']]);
+
+    assert.match(vocabularyStorageSource, /loadCloudVocabularyById\(item\.vocab\.id, \{ isCurrent \}\)/);
+    assert.match(vocabularyEditorListeners, /#import-file[\s\S]*manager\.importJSON\(e\)/);
+    assert.match(vocabularyEditorListeners, /parseRoute\(\)\?\.view === 'editor'[\s\S]*beginTeacherNavigation\(\);[\s\S]*history\.back\(\)/);
+});
+
+test('direct remote and cloud failures restore the prior library route', async () => {
+    const manager = new TestTeacherManager();
+    const previousRoute = { view: 'vocabulary', subject: 'science', grade: '8' };
+    const events = [];
+    manager.ensureAuthenticated = () => true;
+    manager.parseRoute = () => previousRoute;
+    manager.beginTeacherNavigation = () => ({ generation: 1 });
+    manager.isTeacherNavigationCurrent = () => true;
+    manager.setRoute = (...args) => events.push(args);
+    manager.loadVocabularyFromPath = async () => false;
+    manager.loadCloudVocabularyById = async () => false;
+
+    await manager.openTeacherVocabularyItem({ id: 'remote-unit', path: '/missing.json' }, 'remote');
+    await manager.openTeacherVocabularyItem({ id: 'cloud-unit' }, 'cloud');
+
+    assert.deepEqual(events, [
+        [{ view: 'editor', vocabularyId: 'remote-unit' }],
+        [previousRoute, { replace: true }],
+        [{ view: 'editor', vocabularyId: 'cloud-unit' }],
+        [previousRoute, { replace: true }]
+    ]);
+});
+
+test('a stale JSON FileReader callback cannot reopen the editor', () => {
+    class EditorManager {}
+    installTeacherVocabularyEditorCoreMethods(EditorManager);
+    const manager = new EditorManager();
+    let current = true;
+    let reader;
+    const previousFileReader = globalThis.FileReader;
+    globalThis.FileReader = class {
+        constructor() { reader = this; }
+        readAsText() {}
+    };
+    manager.beginTeacherNavigation = () => ({ generation: 1 });
+    manager.isTeacherNavigationCurrent = () => current;
+    manager.ensureAuthenticated = () => true;
+    manager.vocabSet = { id: 'current-unit' };
+    manager.updateFormUI = () => assert.fail('stale import updated the form');
+    manager.renderWords = () => assert.fail('stale import rendered words');
+    manager.showEditor = () => assert.fail('stale import reopened Editor');
+
+    try {
+        manager.importJSON({ target: { files: [{}] } });
+        current = false;
+        reader.onload({ target: { result: '{"id":"stale-unit"}' } });
+        assert.deepEqual(manager.vocabSet, { id: 'current-unit' });
+    } finally {
+        globalThis.FileReader = previousFileReader;
+    }
 });
 
 test('teacher vocabulary deduplication keeps the strongest source and useful fallback metadata', () => {

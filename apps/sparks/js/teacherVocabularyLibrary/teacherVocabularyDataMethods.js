@@ -209,13 +209,22 @@ getTeacherVocabularyItemsForDrilldown(drilldown = {}) {
         });
     },
 
-openTeacherVocabularyItem(vocab, type) {
+async openTeacherVocabularyItem(vocab, type) {
+        if (!this.ensureAuthenticated(false)) return;
+        const returnRoute = this.parseRoute?.() || { view: VOCABULARY_PAGE.id };
+        const navigation = this.beginTeacherNavigation();
+        const isCurrent = () => this.isTeacherNavigationCurrent(navigation);
+        this.setRoute({ view: 'editor', vocabularyId: vocab?.id || null });
+        let loaded = true;
         if (type === 'remote') {
-            this.loadVocabularyFromPath(vocab.path);
+            loaded = await this.loadVocabularyFromPath(vocab.path, { isCurrent });
         } else if (type === 'cloud') {
-            this.loadCloudVocabularyById(vocab.id);
+            loaded = await this.loadCloudVocabularyById(vocab.id, { isCurrent });
         } else {
-            this.loadLocalVocabulary(vocab);
+            if (isCurrent()) this.loadLocalVocabulary(vocab);
+        }
+        if (!loaded && isCurrent()) {
+            this.setRoute(returnRoute, { replace: true });
         }
     }
 };

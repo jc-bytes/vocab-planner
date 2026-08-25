@@ -7,6 +7,7 @@ import {
 class TeacherVocabularyEditorCoreMethods {
     startNewVocab() {
         if (!this.ensureAuthenticated()) return;
+        this.beginTeacherNavigation();
         this.autoGenerateVocabId = true;
         this.vocabSet = { id: '', name: 'New Vocabulary', description: '', subjectSlug: DEFAULT_SUBJECT_SLUG, grades: [], words: [] };
         this.updateGeneratedVocabId();
@@ -246,11 +247,17 @@ class TeacherVocabularyEditorCoreMethods {
     }
 
     importJSON(event) {
+        if (!this.ensureAuthenticated()) {
+            event.target.value = '';
+            return;
+        }
         const file = event.target.files[0];
         if (!file) return;
 
+        const navigation = this.beginTeacherNavigation();
         const reader = new FileReader();
         reader.onload = (e) => {
+            if (!this.isTeacherNavigationCurrent(navigation)) return;
             try {
                 const data = JSON.parse(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
@@ -259,13 +266,16 @@ class TeacherVocabularyEditorCoreMethods {
 
                 this.updateFormUI();
                 this.renderWords();
+                this.triggerAutoSave();
                 this.showEditor();
             } catch (err) {
+                if (!this.isTeacherNavigationCurrent(navigation)) return;
                 alert('Error parsing JSON file');
                 console.error(err);
             }
         };
         reader.readAsText(file);
+        event.target.value = '';
     }
 }
 

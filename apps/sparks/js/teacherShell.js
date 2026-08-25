@@ -175,14 +175,20 @@ class TeacherShellMethods {
         const primaryPage = teacherPageRegistry.get(sectionId);
         if (primaryPage) {
             if (primaryPage.id === VOCABULARY_PAGE.id && options.editor) {
-                this.setRoute({ view: 'editor', vocabularyId: this.vocabSet?.id || null });
+                this.setRoute(
+                    { view: 'editor', vocabularyId: this.vocabSet?.id || null },
+                    { replace: options.replaceRoute === true }
+                );
             } else {
                 const defaultTab = primaryPage.id === DATA_PAGE.id
                     ? 'dashboard'
                     : primaryPage.id === SETTINGS_PAGE.id
                         ? 'subjects'
                         : undefined;
-                this.setRoute({ view: primaryPage.id, tab: options.tab || defaultTab });
+                this.setRoute(
+                    { view: primaryPage.id, tab: options.tab || defaultTab },
+                    { replace: options.replaceRoute === true }
+                );
             }
         }
         switch (sectionId) {

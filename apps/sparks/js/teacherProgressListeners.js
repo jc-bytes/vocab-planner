@@ -4,14 +4,6 @@ import { teacherPageRegistry } from './teacherPageRegistry.js';
 const DATA_PAGE = teacherPageRegistry.get('data');
 
 export function initTeacherProgressListeners(manager) {
-    $('#view-progress-btn')?.addEventListener('click', () => {
-        manager.showProgressView();
-    });
-
-    $('#back-to-dashboard-from-progress')?.addEventListener('click', () => {
-        manager.showDashboard();
-    });
-
     $('#filter-grade')?.addEventListener('change', () => manager.applyFilters());
     $('#filter-group')?.addEventListener('change', () => manager.applyFilters());
     $('#filter-search')?.addEventListener('input', () => manager.scheduleStudentProgressFilter());
@@ -52,9 +44,6 @@ export function initTeacherProgressListeners(manager) {
         manager.handleAddStudentSubmit(event);
     });
 
-    $('#back-to-progress-from-data')?.addEventListener('click', () => {
-        manager.showProgressView();
-    });
     $('#coin-adjust-btn').addEventListener('click', () => manager.handleCoinAdjust());
     $$('.quick-coin-btn').forEach(btn => {
         btn.addEventListener('click', () => {

@@ -1,5 +1,8 @@
 import { $, $$, closeModal as closeDialog } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
+import { teacherPageRegistry } from './teacherPageRegistry.js';
+
+const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
 function bindVocabularyMetaListeners(manager) {
     $('#vocab-name').addEventListener('input', (e) => {
@@ -165,32 +168,7 @@ function bindVocabularyImportExport(manager) {
     });
 
     $('#import-file').addEventListener('change', (e) => {
-        if (!manager.ensureAuthenticated()) {
-            e.target.value = '';
-            return;
-        }
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-            reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                data.subjectSlug = getVocabSubjectSlug(data);
-                manager.vocabSet = data;
-                manager.autoGenerateVocabId = false;
-
-                manager.updateFormUI();
-                manager.renderWords();
-                manager.triggerAutoSave();
-                manager.showEditor();
-            } catch (err) {
-                alert('Error parsing JSON file');
-                console.error(err);
-            }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
+        manager.importJSON(e);
     });
 }
 
@@ -224,6 +202,7 @@ export function initTeacherVocabularyEditorListeners(manager) {
         if (!manager.ensureAuthenticated(false)) return;
         manager.triggerAutoSave();
         if (manager.parseRoute()?.view === 'editor' && manager.lastVocabularyRoute && window.history.length > 1) {
+            manager.beginTeacherNavigation();
             window.history.back();
             return;
         }
@@ -232,7 +211,7 @@ export function initTeacherVocabularyEditorListeners(manager) {
             manager.applyRoute(manager.lastVocabularyRoute);
             return;
         }
-        manager.showVocabularyLibrary();
+        manager.showTeacherSection(VOCABULARY_PAGE.id);
     });
 
     bindVocabularyMetaListeners(manager);

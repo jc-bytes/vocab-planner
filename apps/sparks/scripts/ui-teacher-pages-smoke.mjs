@@ -443,6 +443,117 @@ try {
         && document.querySelector('.teacher-tab.active')?.dataset.section === 'settings'
     ));
 
+    const editorNavigation = await page.evaluate(async () => {
+        const { installTeacherShellMethods } = await import('/js/teacherShell.js');
+        const { installTeacherRoutingMethods } = await import('/js/teacherRouting.js');
+        const { installTeacherVocabularyStorageMethods } = await import('/js/teacherVocabularyStorage.js');
+        document.body.innerHTML = `
+            <div id="teacher-tab-shell"></div>
+            <div id="teacher-tabs"></div>
+            <span id="teacher-mobile-section-label"></span>
+            <span id="teacher-top-bar-section"></span>
+            <section id="teacher-overview-view" class="view hidden"></section>
+            <section id="teacher-dashboard-view" class="view hidden"></section>
+            <section id="teacher-editor-view" class="view hidden"></section>
+            <section id="teacher-loading-view" class="view hidden"></section>
+            <section id="teacher-login-view" class="view hidden"></section>
+        `;
+
+        class Manager {
+            constructor() {
+                this.currentUser = { id: 'teacher-a' };
+                this.isAuthenticated = true;
+                this.isApplyingRoute = false;
+                this.pendingTeacherRoute = null;
+                this.pendingTeacherNavigation = null;
+                this.teacherNavigationGeneration = 0;
+                this.vocabSet = { id: 'before', name: 'Before' };
+                this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
+                this.vocabularyMode = 'assign';
+                this.formUpdates = 0;
+                this.wordRenders = 0;
+                this.libraryFallbacks = 0;
+            }
+            ensureAuthenticated() { return true; }
+            refreshIcons() {}
+            loadTeacherOverview() {}
+            updateFormUI() { this.formUpdates += 1; }
+            renderWords() { this.wordRenders += 1; }
+            showVocabularyLibrary() {
+                this.libraryFallbacks += 1;
+                this.switchView('teacher-dashboard-view');
+            }
+            setVocabularyWorkflowTab() {}
+            loadLibrary() { return Promise.resolve(); }
+        }
+        installTeacherVocabularyStorageMethods(Manager);
+        installTeacherRoutingMethods(Manager);
+        installTeacherShellMethods(Manager);
+
+        let resolveLibrary;
+        const manager = new Manager();
+        manager.getTeacherLibrary = () => new Promise(resolve => { resolveLibrary = resolve; });
+        history.replaceState(null, '', '#/teacher/vocabulary/editor/old-unit');
+        const oldNavigation = manager.handleRouteChange();
+        await Promise.resolve();
+        manager.showTeacherSection('overview');
+        const beforeResolve = {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            vocabId: manager.vocabSet.id,
+            formUpdates: manager.formUpdates,
+            wordRenders: manager.wordRenders,
+            fallbacks: manager.libraryFallbacks
+        };
+        resolveLibrary({ items: [{ type: 'local', vocab: { id: 'old-unit', name: 'Stale unit', words: [] } }] });
+        await oldNavigation;
+        const afterResolve = {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            vocabId: manager.vocabSet.id,
+            formUpdates: manager.formUpdates,
+            wordRenders: manager.wordRenders,
+            fallbacks: manager.libraryFallbacks,
+            applying: manager.isApplyingRoute
+        };
+
+        const missingManager = new Manager();
+        missingManager.getTeacherLibrary = () => Promise.resolve({ items: [] });
+        history.replaceState(null, '', '#/teacher/vocabulary/editor/missing-unit');
+        const historyBeforeMissing = history.length;
+        await missingManager.handleRouteChange();
+        const missingResult = {
+            hash: window.location.hash,
+            activeView: document.querySelector('.view.active')?.id,
+            historyDelta: history.length - historyBeforeMissing,
+            fallbacks: missingManager.libraryFallbacks
+        };
+        return { beforeResolve, afterResolve, missingResult };
+    });
+    if (JSON.stringify(editorNavigation.beforeResolve) !== JSON.stringify({
+        hash: '#/teacher/overview',
+        activeView: 'teacher-overview-view',
+        vocabId: 'before',
+        formUpdates: 0,
+        wordRenders: 0,
+        fallbacks: 0
+    }) || JSON.stringify(editorNavigation.afterResolve) !== JSON.stringify({
+        hash: '#/teacher/overview',
+        activeView: 'teacher-overview-view',
+        vocabId: 'before',
+        formUpdates: 0,
+        wordRenders: 0,
+        fallbacks: 0,
+        applying: false
+    }) || JSON.stringify(editorNavigation.missingResult) !== JSON.stringify({
+        hash: '#/teacher/vocabulary',
+        activeView: 'teacher-dashboard-view',
+        historyDelta: 0,
+        fallbacks: 1
+    })) {
+        throw new Error(`Editor navigation lifecycle changed: ${JSON.stringify(editorNavigation)}`);
+    }
+
     console.log('Teacher primary-page smoke passed for all seven registered pages: navigation, direct routing, and history.');
 } finally {
     if (browser) await browser.close();

@@ -128,6 +128,7 @@ test('data-management settings load together and expose section-level failures',
 
 test('the Students analytics action opens the Data dashboard explicitly', () => {
     assert.match(progressListeners, /showTeacherSection\(DATA_PAGE\.id, \{ tab: 'dashboard' \}\)/);
+    assert.doesNotMatch(progressListeners, /view-progress-btn|back-to-dashboard-from-progress|back-to-progress-from-data/);
 });
 
 test('roster failures preserve the last successful page and expose a retry state', () => {
