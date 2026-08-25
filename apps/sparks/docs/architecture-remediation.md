@@ -532,6 +532,14 @@ Task 26 is complete. Task 27 will strengthen registry/build contracts only where
 
 Task 27 is complete. Task 28 will review the existing Supabase boundaries without replacing the repository layer or adding interfaces before a concrete seam is demonstrated.
 
+### Architecture review after Tasks 25-27
+
+- Independent review approved the complete game series with no required change. All live iframe senders match their descriptor message type and the strict score/game-over payload, whose score ceiling matches the database RPC.
+- Confirmed that iframe source validation, storage channels, sandbox isolation, listener cleanup, server-owned authorization, and all lazy-loading boundaries remain intact.
+- The series removes the unused 185-line host monitor and three repeated SpacePi policy checks. It adds one cohesive pure parser and test/build contracts, with no compatibility shim, duplicate registry, eager game import, or broad interface.
+- The concrete registry and manifest checks intentionally make a new dynamic import or game path an explicit architecture decision. A future sender/type static parity check is useful optional hardening, not a current runtime defect.
+- Verification passed again through the full regression suite, all 13 sandboxed HTML games, 60 focused game/registry/build tests, and the production validator for 20 games and seven lazy canvas bundles.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.
