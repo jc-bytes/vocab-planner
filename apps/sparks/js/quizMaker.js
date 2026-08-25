@@ -1,8 +1,6 @@
 import { installQuizMakerComposerMethods } from './quizMakerComposerMethods.js';
 import { installQuizMakerCoreMethods } from './quizMakerCoreMethods.js';
 import { installQuizMakerQuestionMethods } from './quizMakerQuestionMethods.js';
-import { installQuizMakerPrintMethods } from './quizMakerPrintMethods.js';
-import { installQuizMakerRasterExportMethods } from './quizMakerRasterExportMethods.js';
 import { installQuizMakerRenderMethods } from './quizMakerRenderMethods.js';
 import { installQuizMakerWordExportMethods } from './quizMakerWordExportMethods.js';
 import { cleanQuizTitle } from './quizMakerTitle.js';
@@ -63,7 +61,5 @@ export class QuizMaker {
 installQuizMakerComposerMethods(QuizMaker);
 installQuizMakerCoreMethods(QuizMaker);
 installQuizMakerQuestionMethods(QuizMaker);
-installQuizMakerPrintMethods(QuizMaker);
-installQuizMakerRasterExportMethods(QuizMaker);
 installQuizMakerRenderMethods(QuizMaker);
 installQuizMakerWordExportMethods(QuizMaker);

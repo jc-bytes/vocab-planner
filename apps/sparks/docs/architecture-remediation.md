@@ -152,6 +152,14 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 - Did not add cloud caching or change Supabase access. Full cloud reads continue through the authenticated repository/RLS boundary. The existing device-global Quiz draft key can now contain the selected cloud words, as it already can for local/repository vocabularies; account scoping and teardown remain part of the explicit Quiz feature conversion.
 - Verification: the complete suite and 13-game sandbox smoke passed after source resolution was added. After the independent review required the latest-selection guard and realistic word fixtures, all eleven Quiz tests, twelve build/lazy tests, production build, and built three-page smoke passed. The reviewer approved the corrected diff. Quiz remains lazy at 18.03 kB raw / 4.95 kB gzip; teacher entry JavaScript is 159.55 kB raw / 43.91 kB gzip, the service worker precaches 20 files totaling 1,027,448 bytes, and deployment remains 13.6 MB.
 
+### Task 18e, remove unreachable Quiz export systems
+
+- Repository-wide source tracing proved the Quiz Maker print, raster-image, and raster-PDF methods had no template control, listener, route, test, or runtime caller. The only live Quiz export control is Word/DOCX and remains bound to `exportAsWord()`.
+- Removed the two unreachable method installers and their unused `ensureHtml2Canvas`/`ensureJSZip` helpers instead of expanding the upcoming lifecycle contract around UI that cannot be reached. Removed `html2canvas` as a direct application dependency; it remains transitively available through the live report dependency and therefore still appears as a shared build chunk.
+- Independent review caught that the DOCX regression test imports `jszip` directly. Kept it explicitly as a development dependency rather than relying on `docx` dependency hoisting. The live Word exporter, generated document, and ZIP/XML validation are unchanged.
+- Added absence guards so both dead installers cannot return. Verification: focused Quiz, build/lazy, report, and live Word-generation tests; the complete suite; 9-width student regression; source UI smoke; 13-game sandbox smoke; production build; and built three-page smoke passed. The reviewer approved the corrected dependency boundary.
+- The Quiz Maker nested chunk decreased from 422.19/118.70 kB raw/gzip to 403.92/115.17 kB. The build dropped from 2,333 to 2,327 transformed modules and deployment from 13.6 to 13.5 MB. The lazy Quiz coordinator remains 17.94/4.92 kB, teacher entry remains 159.55/43.92 kB, and the service worker remains 20 files totaling 1,027,448 bytes.
+
 ### Phase 0, baseline
 
 - Confirmed a clean Sparks-scoped worktree on `main` before creating the remediation branch.

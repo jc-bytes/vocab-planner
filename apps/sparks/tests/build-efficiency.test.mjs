@@ -121,6 +121,8 @@ test('quiz maker styles load with the lazy quiz feature', () => {
 
 test('retired quiz preview cannot return beside the current Quiz Maker', async () => {
     await assert.rejects(access(new URL('../js/teacherQuizLegacyMethods.js', import.meta.url)));
+    await assert.rejects(access(new URL('../js/quizMakerPrintMethods.js', import.meta.url)));
+    await assert.rejects(access(new URL('../js/quizMakerRasterExportMethods.js', import.meta.url)));
 
     assert.match(teacherQuizEntry, /installTeacherQuizCoreMethods/);
     assert.match(teacherQuizEntry, /installTeacherQuizBrowserMethods/);

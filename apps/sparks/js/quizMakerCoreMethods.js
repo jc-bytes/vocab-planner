@@ -86,18 +86,6 @@ class QuizMakerCoreMethods {
         });
     }
 
-    async ensureHtml2Canvas() {
-        if (typeof window.html2canvas === 'function') return window.html2canvas;
-        const module = await import('html2canvas');
-        return module.default || module;
-    }
-
-    async ensureJSZip() {
-        if (typeof window.JSZip === 'function') return window.JSZip;
-        const module = await import('jszip');
-        return module.default || module;
-    }
-
     escapeHtml(value = '') {
         return String(value)
             .replace(/&/g, '&amp;')
