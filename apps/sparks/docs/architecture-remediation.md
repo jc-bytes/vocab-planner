@@ -70,7 +70,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
 | 29. Add interfaces only where justified | DONE | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle; game/server score parity | Focused/full regression; production builds; registry/database contracts; independent reviews | Added only two justified seams: authoritative signed-in rewards and injectable teacher auth. Client leaderboard capability now exactly matches independent SQL authorization and score order. |
 | 30. Consolidate environment authority | DONE | Shared browser-key validation; hosted project identity; planner derivation | Focused config/auth/security tests; planner syntax/runtime checks; complete regression; production build; independent review | One hosted project ref derives the runtime URL and planner fallback. Runtime/build reject current secret and legacy service-role browser keys. Local/server/deployment boundaries remain intentionally separate. |
-| 31. Correct stale documentation | TODO | | | |
+| 31. Correct stale documentation | DONE | README and four architecture/reliability records | Full regression suite, production build, scoped diff check, reference audit, independent documentation review | Removed broken and stale release guidance; updated completed page/facade/data boundaries; marked the database cutover record historical. Runtime/package naming remains unchanged. |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
 | 33. Organize changed features gradually | TODO | | | |
 | 34. Add delivery-size budgets | TODO | | | |
@@ -1335,3 +1335,22 @@ Task 14 remains in progress. Next is the repeated teacher inline-status behavior
 - Verification: 13 feedback/primitive tests; focused teacher progress, Sparks, inline-style, lazy/build, and brand-color checks; the complete `npm test` suite; 9-width student regression; three-page source smoke; 13-game sandbox smoke; production build; and built three-page smoke passed. Deployment remains 13.6 MB with 2,331 modules. Teacher CSS is 148.08/23.84 kB raw/gzip, teacher entry JavaScript is 158.95/43.70 kB, Groups remains lazy at 13.91/4.47 kB, Sparks remains lazy at 32.52/8.76 kB, and service-worker precache is 20 files totaling 1,027,448 bytes.
 
 Task 14 is complete. Loading, stacked notifications, centered rewards, persistent inline statuses, shared completion presentation, and cloud state indicators now have clear bounded owners. Table-row errors, rich notices, progress meters, activity-internal feedback, and game visuals remain feature-owned because their structures and behavior differ materially.
+
+### Architecture review after Tasks 28-30
+
+- Independent review approved the data-boundary, justified-interface, and environment-authority changes without a blocking finding. It found no new cycle, compatibility shim, eager dependency, or generic service layer.
+- The narrow `teacherAuthApi` remains justified as a security and test boundary; repositories remain the direct domain boundary elsewhere.
+- Client/server activity and game policy stay independently authoritative with static parity contracts. Local Supabase runtime verification remains unknown while Docker is unavailable.
+- Production identity is centralized without coupling local Supabase CLI identity, server secrets, deployment credentials, or developer overrides to browser configuration.
+
+### Task 31, correct stale documentation
+
+- Removed the README reference to a release checklist that does not exist and replaced a stale dependency-advisory snapshot with the actual `test:release` gates. Added the primary `npm test` command.
+- Clarified that tracked game outputs are production-ready; game rebuild scripts are source-maintenance tools rather than a prerequisite for normal use.
+- Updated the manager facade analysis from a pre-Task-23/24 proposal to the verified current ownership boundary and removal result. No brittle method-count snapshot was introduced.
+- Updated teacher page ownership to the completed `teacherPageRegistry` boundary and corrected the data-access document to the real `studentApi` and `teacherAuthApi` capability files.
+- Marked the normalized progress migration runbook as a completed cutover and retained reliability/rollback record.
+- Kept the current `Vocabulary Master` README, package, HTML, Tauri product, and application-bundle naming aligned. A Sparks product rename would require a separate coordinated product decision and was not inferred from an architecture-documentation task.
+- Verification passed: scoped Markdown reference inspection, scoped diff validation, the complete `npm test` suite, the production build (2,332 modules, 13.5 MB deployment), and an independent stale-document audit.
+
+Task 31 is complete. Task 32 will add one concise current architecture map and link to detailed records instead of duplicating their histories.

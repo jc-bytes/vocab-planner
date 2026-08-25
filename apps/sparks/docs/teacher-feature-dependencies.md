@@ -10,7 +10,7 @@ The manager remains the application shell. It owns authentication, top-level vie
 
 `disposeLoadedTeacherFeatures()` calls each loaded feature's `destroy()` method on sign-out or teacher-account replacement. A feature must remove its listeners, invalidate pending asynchronous work, and release browser resources there. Feature modules are cached by the JavaScript loader, but manager-specific instances and state are recreated.
 
-Top-level route and navigation metadata are still duplicated between `teacherShell.js` and `teacherRouting.js`. Tasks 19-21 own that separate problem.
+`teacherPageRegistry.js` owns the canonical top-level page and view IDs used by shell navigation and routing. Labels, nested modes, route aliases, loaders, and codecs remain with their feature or routing owner because they are not shared page metadata.
 
 ## Lazy feature interfaces
 

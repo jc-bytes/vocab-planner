@@ -1,5 +1,7 @@
 # Database reliability runbook
 
+> **Status (2026-08-25):** The normalized progress cutover and legacy-table retirement are complete. This document is the retained reliability, verification, and rollback record; it is not a pending migration checklist.
+
 ## Purpose
 
 This runbook defines the safety rules, service objectives, rollout gates, and

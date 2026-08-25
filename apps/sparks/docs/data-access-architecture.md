@@ -27,7 +27,7 @@ The migration preserved the existing camelCase application record shapes while m
 | Student RPC client | validated progress and score writes | domain-specific RPC methods such as `submitStudentActivityProgress` and `submitStudentGameScore` |
 | Word Hunt Storage service | `word-hunt-images` bucket | path construction, upload, download, delete |
 
-`studentApi.js` and `teacherApi.js` expose only the existing authenticated domain service. They do not re-export data primitives.
+`studentApi.js` and `teacherAuthApi.js` expose separate frozen capability allowlists for student operations and teacher authentication. They do not re-export data primitives or the broad internal Supabase service.
 
 ## Mapping and timestamps
 

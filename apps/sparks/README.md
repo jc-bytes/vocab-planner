@@ -43,6 +43,12 @@ npm install
 
 ## Testing
 
+Run the complete source regression suite:
+
+```bash
+npm test
+```
+
 Run a credential-free smoke test for the basic home, student, and teacher shells:
 
 ```bash
@@ -90,7 +96,7 @@ Run the release hardening suite:
 npm run test:release
 ```
 
-The release suite runs shell smoke, built-preview smoke, local authenticated smoke, local responsive audit, Supabase lint/advisors, and the desktop web build. It intentionally does not run `npm audit fix`. Current `npm audit --omit=dev` findings are transitive Excalidraw-related advisories through `nanoid`, `lodash-es`, and Mermaid parser dependencies; treat them as known release notes unless a compatible Excalidraw upgrade passes the full release suite.
+The release suite runs the complete source regression suite, production dependency audit, source and built-preview shell smoke, local authenticated and responsive checks, cross-browser smoke, Supabase acceptance/lint/advisor checks, and the desktop web build. It intentionally does not run `npm audit fix`; dependency upgrades must pass the same release gates.
 
 ## Desktop App
 
@@ -114,11 +120,11 @@ npm run desktop:build:mac-dmg
 npm run desktop:build:windows
 ```
 
-The desktop build bundles the app shell, local fonts/icons, core JavaScript, vocabularies, games, and other runtime assets. Cloud content and progress sync through Supabase when the device is online. See `DESKTOP_RELEASE_CHECKLIST.md` before distributing installers to students.
+The desktop build bundles the app shell, local fonts/icons, core JavaScript, vocabularies, games, and other runtime assets. Cloud content and progress sync through Supabase when the device is online.
 
 ## Building Games
 
-Some games in the arcade require building before they can be played:
+Playable game output is tracked and validated by the production build. The following source projects also provide developer rebuild scripts when their source changes:
 - **JS13K 2021**
 - **Callisto**
 - **Glitch Buster**
@@ -139,7 +145,7 @@ If you prefer the terminal:
 sudo chown -R $(whoami) ~/.npm
 ```
 
-If games fail to build, they will show a helpful error message when you try to play them, with instructions on how to build them manually.
+The normal application build does not require rebuilding unchanged game source.
 
 ## Teacher Instructions
 
