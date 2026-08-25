@@ -68,7 +68,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
-| 29. Add interfaces only where justified | IN PROGRESS | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle | Focused/full regression; production builds; independent reviews | Server snapshots exclusively award authenticated activity coins. Teacher authentication is injectable, rejects stale cached roles, clears rejected sessions, and permits same-account retries. Game/server parity remains. |
+| 29. Add interfaces only where justified | DONE | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle; game/server score parity | Focused/full regression; production builds; registry/database contracts; independent reviews | Added only two justified seams: authoritative signed-in rewards and injectable teacher auth. Client leaderboard capability now exactly matches independent SQL authorization and score order. |
 | 30. Consolidate environment authority | TODO | | | |
 | 31. Correct stale documentation | TODO | | | |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
@@ -572,6 +572,17 @@ Task 29 remains in progress. The next subtask will introduce only the auth seam 
 - Verification passed through seven new auth-boundary tests, focused settings/Vocabulary/startup/build/security checks, the complete regression suite, nine-width student regression, three-page smoke, 13-game sandbox smoke, production build, scoped diff validation, and independent review. Deployment remains 13.5 MB with 2,332 modules.
 
 Task 29 remains in progress. The next subtask will add a static parity contract between the independent game registry and the effective server score policy; it will not make client metadata authoritative for database security.
+
+### Task 29c, enforce independent game score policy parity
+
+- Extracted the existing effective-function/SQL-array parser into a focused test helper and reused it for both activity and game parity checks. It still fails on ambiguous definitions, computed arrays, signature drift, or a later function drop.
+- Added an exact membership contract between the client registry's leaderboard-capable games and the latest effective private score RPC. The contract compares sorted sets so database authorization does not control Arcade display order.
+- Added per-game direction parity: SpacePi remains the sole ascending/lower-is-better game; every other authorized leaderboard remains descending/higher-is-better.
+- Found and removed four stale server-authorized IDs whose client descriptors explicitly have no score reporting: `black-hole-square`, `glitch-buster`, `callisto`, and `js13k2021`. A CLI-generated migration changes only the private RPC allowlist; it does not delete historical score rows, alter game availability, weaken identity/range/metadata checks, or change the public wrapper and grants.
+- Kept the registry and SQL independently authoritative. The test detects drift without importing browser configuration into database security code.
+- Verification passed through 22 registry/parity tests and registry smoke, 61 focused game/repository/security tests, the complete regression suite, nine-width student regression, three-page smoke, 13-game sandbox smoke, production build, scoped diff validation, and independent migration review. Local migration application remains unverified because the local Supabase database cannot connect; static effective-migration checks pass. Deployment remains 13.5 MB with 2,332 modules.
+
+Task 29 is complete. No generic repository wrapper, service container, or read/write reshuffle was added because the existing repository and student capability boundaries already protect meaningful ownership and security seams.
 
 ### Phase 0, baseline
 
