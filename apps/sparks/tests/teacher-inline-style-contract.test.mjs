@@ -383,3 +383,39 @@ test('Data Viewer delegates fixed presentation while retaining file and drag sta
         assert.match(teacherCss, declaration);
     }
 });
+
+test('Data Reset delegates fixed presentation while retaining its export gate state', () => {
+    const start = teacherHtml.indexOf('<!-- Reset Tab -->');
+    const end = teacherHtml.indexOf('</section>', start);
+    assert.ok(start >= 0 && end > start, 'Missing bounded Data Reset template');
+    const resetTemplate = teacherHtml.slice(start, end);
+    const inlineStyles = [...resetTemplate.matchAll(/style="([^"]*)"/g)].map(match => match[1]);
+
+    assert.deepEqual(inlineStyles, [
+        'display: none; opacity: 0.5; pointer-events: none;'
+    ], 'Data Reset must keep only tab visibility and export-gate state inline');
+    assert.doesNotMatch(dataExport, /resetStatus\.innerHTML\s*=\s*['"`][^'"`]*style=/,
+        'Generated Reset status must use its existing class contract');
+
+    for (const runtimeAssignment of [
+        /resetSection\.style\.opacity\s*=\s*'1'/,
+        /resetSection\.style\.pointerEvents\s*=\s*'auto'/,
+        /resetBtn\.disabled\s*=\s*false/,
+        /resetStatus\.innerHTML\s*=\s*'<span class="runtime-status data-export-reset-enabled">/
+    ]) {
+        assert.match(dataExport, runtimeAssignment);
+    }
+
+    for (const declaration of [
+        /\.data-reset-header\s*\{[^}]*margin-bottom:\s*1\.5rem;/s,
+        /\.data-reset-header \.data-reset-title\s*\{[^}]*color:\s*var\(--color-danger\);[^}]*font-size:\s*1\.3rem;[^}]*font-weight:\s*600;/s,
+        /\.data-reset-description\s*\{[^}]*color:\s*var\(--color-text-muted\);[^}]*font-size:\s*0\.95rem;[^}]*line-height:\s*1\.5;/s,
+        /\.data-reset-export-status\s*\{[^}]*padding:\s*1rem 1\.25rem;[^}]*background:\s*rgba\(251, 191, 36, 0\.15\);/s,
+        /\.data-reset-export-status__row\s*\{[^}]*display:\s*flex;[^}]*color:\s*var\(--color-warning\);/s,
+        /\.data-reset-warning\s*\{[^}]*padding:\s*1\.5rem;[^}]*background:\s*rgba\(239, 68, 68, 0\.1\);/s,
+        /\.data-reset-warning__list\s*\{[^}]*padding-left:\s*1\.5rem;[^}]*color:\s*var\(--color-text\);/s,
+        /\.btn\.data-reset-action\s*\{[^}]*margin-top:\s*1\.5rem;[^}]*padding:\s*0\.75rem 2rem;[^}]*font-size:\s*1rem;/s
+    ]) {
+        assert.match(teacherCss, declaration);
+    }
+});

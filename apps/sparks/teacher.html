@@ -1413,27 +1413,27 @@
 
                 <!-- Reset Tab -->
                 <div id="data-reset-section" class="data-tab-content" role="tabpanel" aria-labelledby="data-tab-reset" style="display: none; opacity: 0.5; pointer-events: none;">
-                    <div style="margin-bottom: 1.5rem;">
-                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.3rem; font-weight: 600; color: var(--danger-color, #f87171);">Data Reset</h3>
-                        <p style="color: var(--text-muted, #cbd5f5); margin: 0; font-size: 0.95rem; line-height: 1.5;">
+                    <div class="data-reset-header">
+                        <h3 class="data-reset-title">Data Reset</h3>
+                        <p class="data-reset-description">
                             <strong>WARNING:</strong> This action cannot be undone. You must export data before resetting.
                         </p>
                     </div>
-                    <div id="reset-export-status" style="padding: 1rem 1.25rem; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #fbbf24;">
+                    <div id="reset-export-status" class="data-reset-export-status">
+                        <div class="data-reset-export-status__row">
                             <i data-lucide="triangle-alert"></i>
-                            <span class="runtime-status__description" style="color: var(--text-main, #f8fafc);">Export required before reset</span>
+                            <span class="runtime-status__description data-reset-export-status__text">Export required before reset</span>
                         </div>
                     </div>
-                    <div style="padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
-                        <h4 style="margin: 0 0 1rem 0; color: var(--danger-color, #f87171);">What will be deleted:</h4>
-                        <ul style="margin: 0; padding-left: 1.5rem; color: var(--text-main, #f8fafc);">
+                    <div class="data-reset-warning">
+                        <h4 class="data-reset-warning__title">What will be deleted:</h4>
+                        <ul class="data-reset-warning__list">
                             <li>All student progress data (vocabulary scores, activity completion)</li>
                             <li>All leaderboard scores</li>
                             <li>User roles (optional)</li>
                         </ul>
                     </div>
-                    <button id="reset-data-btn" class="btn danger-btn" style="margin-top: 1.5rem; padding: 0.75rem 2rem; font-size: 1rem;" disabled>
+                    <button id="reset-data-btn" class="btn danger-btn data-reset-action" disabled>
                         <i data-lucide="trash-2"></i>
                         Reset All Data
                     </button>
