@@ -63,7 +63,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 21. Remove duplicated navigation wiring | DONE | Teacher history listener; registry-derived reverse view mapping; navigation generation/owner tokens; primary route reservations; Vocabulary session/document lifecycle and save ownership; race tests | Focused teacher feature/editor/Quiz suites and browser races, all-seven-page smoke, complete regression suites, production builds, three independent final reviews | History has one authority; stale navigation, account data, cache results, editor work, image callbacks, and save UI cannot cross their owner. Saves use immutable per-document tickets with latest-result recovery. |
 | 22. Analyze broad forwarding interfaces | DONE | `docs/manager-facade-analysis.md`, tracker | Repository-wide caller/receiver tracing, existing ownership contracts, three independent maps | Most facades protect real ownership. Task 23 will deepen bounded Arcade intents; Task 24 has a small revalidated dead-forward list. Broad facade removal is rejected. |
 | 23. Reduce forwarding where a cohesive use case exists | DONE | Arcade selection, add-time, and exit lifecycle intents; listener contracts | Student Games, listener, routing, build/lazy, complete regression, production build, architecture review | Global listeners express complete Arcade intents. Route refresh, Data roster, and Quiz adapter remain unchanged because additional wrappers or cached authorities would increase coupling. |
-| 24. Remove obsolete facade methods | TODO | | | |
+| 24. Remove obsolete facade methods | IN PROGRESS | `StudentActivities` owner-only schedule/progress wrappers and ownership contract | 140 activity, 15 routing, 11 build/lazy checks; complete regression; production build; independent review | Removed the first 16 revalidated one-line pass-throughs while preserving their eager owner APIs. Student Games and secondary candidates remain separate evidence gates. |
 | 25. Move legacy game adapters into descriptors | TODO | | | |
 | 26. Define a host/game protocol | TODO | | | |
 | 27. Add game registry contract tests | TODO | | | |
@@ -432,6 +432,15 @@ The three demonstrated Arcade listener leaks are now localized. Task 23 will rec
 - Focused review reruns passed 18 Student Games, 8 Student Listener, 15 routing, and 11 build/lazy tests. The complete regression and production build gates close Task 23.
 
 Task 23 is complete. Task 24 will remove only pass-throughs whose receiver calls remain conclusively absent; it will not use facade size as deletion evidence.
+
+### Task 24a, remove owner-only Student Activities pass-throughs
+
+- Removed 13 schedule helpers and three progress-flow helpers from `StudentActivities` after exact receiver and dynamic-property tracing found no production or test caller through the parent facade.
+- Preserved every implementation on its existing eager `StudentActivitySchedule` or `StudentActivityProgressFlow` owner. Internal schedule composition, unit scoring, preload selection, authentication, persistence, routes, and lazy activity loading are unchanged.
+- Added an ownership contract preventing the 16 one-line wrappers from returning to the parent surface. An independent runtime review instantiated `StudentActivities` and confirmed the helpers remain callable on their owners.
+- Verification passed for 140 activity tests, 15 routing tests, 11 build/lazy checks, the complete regression suite, 9-width student shell and three-page/game browser smoke, production build, scoped diff validation, and independent review. The build remains 13.5 MB with 2,331 modules; student entry JavaScript is 236.53/60.56 kB raw/gzip.
+
+Task 24 remains in progress. Student Games candidates will be re-traced and removed as a separate change; broader StudentManager and teacher candidates remain unproven until their own caller and compatibility review.
 
 ### Phase 0, baseline
 

@@ -1170,6 +1170,33 @@ test('StudentActivities keeps vocabulary-loading collaborators behind its implem
     }
 });
 
+test('StudentActivities omits owner-only schedule and progress helpers', () => {
+    for (const method of [
+        'getMonthFromTrimesterWeek',
+        'getFallbackMonthForTrimester',
+        'getTrimesterKey',
+        'getCurrentScheduleWindow',
+        'getDateOnlyStart',
+        'getMonthKeyFromIndex',
+        'getSchoolWeekMajorityMonth',
+        'getVocabCalendarMonthKey',
+        'getVocabularyWeekStartDate',
+        'usesTrimesterWeekDate',
+        'alignDateToLabelMonth',
+        'advanceToWeekday',
+        'isWeekday',
+        'getPracticeRequiredRotationIndex',
+        'getUnitScores',
+        'getNextActivityPreloadType'
+    ]) {
+        assert.equal(
+            Object.prototype.hasOwnProperty.call(StudentActivities.prototype, method),
+            false,
+            `${method} belongs to the schedule or progress-flow owner`
+        );
+    }
+});
+
 test('StudentManager retains the cross-component dashboard bridge', () => {
     assert.equal(
         Object.prototype.hasOwnProperty.call(StudentManager.prototype, 'renderDashboard'),

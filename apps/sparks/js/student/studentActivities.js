@@ -61,18 +61,6 @@ export class StudentActivities {
         return this.schedule.getVocabSchedule(vocab, date);
     }
 
-    getMonthFromTrimesterWeek(trimester, week) {
-        return this.schedule.getMonthFromTrimesterWeek(trimester, week);
-    }
-
-    getFallbackMonthForTrimester(trimester) {
-        return this.schedule.getFallbackMonthForTrimester(trimester);
-    }
-
-    getTrimesterKey(trimester) {
-        return this.schedule.getTrimesterKey(trimester);
-    }
-
     getVocabTrimesterKey(vocab) {
         return this.schedule.getVocabTrimesterKey(vocab);
     }
@@ -117,26 +105,6 @@ export class StudentActivities {
         return this.schedule.compareVocabularySchedule(a, b);
     }
 
-    getCurrentScheduleWindow(date = new Date()) {
-        return this.schedule.getCurrentScheduleWindow(date);
-    }
-
-    getDateOnlyStart(date) {
-        return this.schedule.getDateOnlyStart(date);
-    }
-
-    getMonthKeyFromIndex(monthIndex) {
-        return this.schedule.getMonthKeyFromIndex(monthIndex);
-    }
-
-    getSchoolWeekMajorityMonth(date) {
-        return this.schedule.getSchoolWeekMajorityMonth(date);
-    }
-
-    getVocabCalendarMonthKey(vocab, date = new Date()) {
-        return this.schedule.getVocabCalendarMonthKey(vocab, date);
-    }
-
     filterStudentAvailableVocabulary(vocabs = [], date = new Date()) {
         return this.schedule.filterStudentAvailableVocabulary(vocabs, date);
     }
@@ -149,28 +117,8 @@ export class StudentActivities {
         return this.schedule.getTrimesterWeekStartDate(trimester, week, date);
     }
 
-    getVocabularyWeekStartDate(vocab, month, week, date = new Date()) {
-        return this.schedule.getVocabularyWeekStartDate(vocab, month, week, date);
-    }
-
-    usesTrimesterWeekDate(vocab) {
-        return this.schedule.usesTrimesterWeekDate(vocab);
-    }
-
     getMonthWeekStartDate(month, week, trimester, date = new Date()) {
         return this.schedule.getMonthWeekStartDate(month, week, trimester, date);
-    }
-
-    alignDateToLabelMonth(date, month) {
-        return this.schedule.alignDateToLabelMonth(date, month);
-    }
-
-    advanceToWeekday(date) {
-        return this.schedule.advanceToWeekday(date);
-    }
-
-    isWeekday(date) {
-        return this.schedule.isWeekday(date);
     }
 
     parseLocalDateOnly(value) {
@@ -253,10 +201,6 @@ export class StudentActivities {
         return this.progressFlow.getDefaultRequiredActivities(vocab);
     }
 
-    getPracticeRequiredRotationIndex(vocab = this.sm.currentVocab) {
-        return this.progressFlow.getPracticeRequiredRotationIndex(vocab);
-    }
-
     getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
         return this.progressFlow.getActivityPlayableCount(activityType, vocab);
     }
@@ -289,10 +233,6 @@ export class StudentActivities {
         return this.progressFlow.isActivityScoreComplete(scoreData);
     }
 
-    getUnitScores(vocab) {
-        return this.progressFlow.getUnitScores(vocab);
-    }
-
     getUnitRequiredCompletion(vocab) {
         return this.progressFlow.getUnitRequiredCompletion(vocab);
     }
@@ -315,10 +255,6 @@ export class StudentActivities {
 
     updateArcadeGateDisplay(status = this.getPendingRequiredWork()) {
         return this.progressFlow.updateArcadeGateDisplay(status);
-    }
-
-    getNextActivityPreloadType(flow = this.getActivityFlowConfig()) {
-        return this.progressFlow.getNextActivityPreloadType(flow);
     }
 
     scheduleActivityPreload(flow = this.getActivityFlowConfig()) {
