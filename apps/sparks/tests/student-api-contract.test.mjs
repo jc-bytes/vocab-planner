@@ -11,13 +11,11 @@ const EXPECTED_STUDENT_METHODS = [
     'ensureOwnStudentProgress',
     'getOwnArcadeTime',
     'getProfile',
-    'handleRedirectResult',
     'init',
     'onAuthStateChanged',
     'reportStudentActivityTime',
     'signInWithPassword',
     'signOut',
-    'signUpStudent',
     'spendStudentCoins',
     'startStudentActivityAttempt',
     'startStudentArcadeMinute',
@@ -45,6 +43,7 @@ test('student API does not expose teacher or raw-client operations', () => {
         'getStudentsWithProgress',
         'giftStudentCoins',
         'resetStudentPassword',
+        'signUpStudent',
         'signUpTeacher'
     ]) {
         assert.equal(method in studentApi, false, `${method} must stay outside the student API`);

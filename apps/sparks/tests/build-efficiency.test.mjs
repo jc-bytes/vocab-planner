@@ -37,6 +37,10 @@ test('unreachable platform-auth message code does not return as a duplicate UI s
     for (const source of [teacherAuth, studentAuth, studentAuthUi]) {
         assert.doesNotMatch(source, /showElectronAuthMessage|electron-auth-message|copy-url-btn/);
     }
+    assert.doesNotMatch(studentAuthUi, /register-|handleStudentRegister|joinGrade/);
+    assert.doesNotMatch(studentAuth, /handleRedirectResult|prefillRegistration/);
+    assert.doesNotMatch(teacherAuth, /TeacherSignup|EmailSignIn|email-signin|email-link/);
+    assert.doesNotMatch(teacherGlobalListeners, /teacher-signup|show-teacher-signup|show-teacher-login/);
 });
 
 test('student continuation art keeps only the optimized delivery asset', async () => {

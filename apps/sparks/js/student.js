@@ -285,10 +285,6 @@ export class StudentManager {
         return this.auth.hasCompleteStudentProfile(profile);
     }
 
-    showAuthPanel(panel) {
-        return this.auth.showAuthPanel(panel);
-    }
-
     handleStudentLogin(event) {
         return this.auth.handleStudentLogin(event);
     }
@@ -322,8 +318,6 @@ export class StudentManager {
         this.listeners.initListeners();
         window.addEventListener('online', () => this.setAuthStatus('Synced'));
         window.addEventListener('offline', () => this.setAuthStatus('Offline'));
-        this.auth.prefillRegistrationFromJoinLink();
-
         // Default view/state
         this.switchView('loading-view');
 

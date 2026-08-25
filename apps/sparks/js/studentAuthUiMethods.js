@@ -1,26 +1,10 @@
 import { $, closeModal as closeDialog, notifications, openModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 
-const STUDENT_EMAIL_DOMAIN = '@aid.edu.pa';
-
 export class StudentAuthUi {
     constructor(auth) {
         this.auth = auth;
         this.sm = auth.sm;
-        this.joinGrade = this.getJoinGradeFromUrl();
-    }
-
-    getJoinGradeFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const grade = params.get('grade') || params.get('join');
-        return /^[6-9]$/.test(String(grade || '')) ? String(grade) : '';
-    }
-
-    prefillRegistrationFromJoinLink() {
-        if (!this.joinGrade) return;
-        const gradeSelect = $('#register-grade');
-        if (gradeSelect) gradeSelect.value = this.joinGrade;
-        this.showAuthPanel('register');
     }
 
     normalizeStudentProfile(profile = {}) {
@@ -71,70 +55,6 @@ export class StudentAuthUi {
         );
     }
 
-    showAuthPanel(panel) {
-        const loginPanel = $('#student-login-panel');
-        const registerPanel = $('#student-register-panel');
-        const loginBtn = $('#show-login-btn');
-        const registerBtn = $('#show-register-btn');
-
-        if (loginPanel) loginPanel.style.display = panel === 'login' ? 'block' : 'none';
-        if (registerPanel) registerPanel.style.display = panel === 'register' ? 'block' : 'none';
-        if (loginBtn) {
-            loginBtn.classList.toggle('primary-btn', panel === 'login');
-            loginBtn.classList.toggle('secondary-btn', panel !== 'login');
-        }
-        if (registerBtn) {
-            registerBtn.classList.toggle('primary-btn', panel === 'register');
-            registerBtn.classList.toggle('secondary-btn', panel !== 'register');
-        }
-    }
-
-    validateRegistrationForm() {
-        const firstName = $('#register-first-name')?.value.trim() || '';
-        const lastName = $('#register-last-name')?.value.trim() || '';
-        const email = $('#register-email')?.value.trim().toLowerCase() || '';
-        const grade = $('#register-grade')?.value || '';
-        const section = ($('#register-section')?.value || '').trim().toUpperCase();
-        const password = $('#register-password')?.value || '';
-        const confirmPassword = $('#register-confirm-password')?.value || '';
-
-        if (!firstName || !lastName || !email || !grade || !section || !password) {
-            throw new Error('Complete every registration field.');
-        }
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            throw new Error('Enter a valid school email address.');
-        }
-
-        if (!email.endsWith(STUDENT_EMAIL_DOMAIN)) {
-            throw new Error(`Use your ${STUDENT_EMAIL_DOMAIN} school email address.`);
-        }
-
-        if (!/^[6-9]$/.test(grade)) {
-            throw new Error('Choose grade 6, 7, 8, or 9.');
-        }
-
-        if (!/^[A-Z]$/.test(section)) {
-            throw new Error('Section letter must be one uppercase letter.');
-        }
-
-        if (password.length < 10 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
-            throw new Error('Password must be at least 10 characters and include a letter and number.');
-        }
-
-        if (password !== confirmPassword) {
-            throw new Error('Passwords do not match.');
-        }
-
-        return {
-            firstName,
-            lastName,
-            email,
-            grade,
-            group: section
-        };
-    }
-
     async handleStudentLogin(event) {
         event.preventDefault();
         const email = $('#login-email')?.value.trim().toLowerCase() || '';
@@ -154,34 +74,7 @@ export class StudentAuthUi {
         } catch (error) {
             console.error('Student login failed:', error);
             this.sm.switchView('login-view');
-            this.showAuthPanel('login');
             this.auth.showLoginError(error.message || 'Could not sign in.');
-        }
-    }
-
-    async handleStudentRegister(event) {
-        event.preventDefault();
-
-        let profile;
-        try {
-            profile = this.validateRegistrationForm();
-        } catch (error) {
-            this.auth.showLoginError(error.message);
-            return;
-        }
-
-        this.auth.showLoginError('');
-        this.sm.switchView('loading-view');
-
-        try {
-            const result = await supabaseService.signUpStudent(profile, $('#register-password').value);
-            await this.auth.handleBackendSignIn(result.user);
-            notifications.success('Registration complete. Welcome!');
-        } catch (error) {
-            console.error('Student registration failed:', error);
-            this.sm.switchView('login-view');
-            this.showAuthPanel('register');
-            this.auth.showLoginError(error.message || 'Could not register.');
         }
     }
 

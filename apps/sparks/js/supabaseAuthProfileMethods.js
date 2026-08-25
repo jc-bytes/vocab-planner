@@ -73,93 +73,12 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return this.currentUser;
     },
 
-    getCurrentSession() {
-        return this.currentSession;
-    },
-
     async signInWithPassword(email, password) {
         await this.init();
         const { data, error } = await this.client.auth.signInWithPassword({ email, password });
         if (error) throw error;
         this.currentSession = data.session || null;
         this.currentUser = normalizeUser(data.user);
-        return { ...data, user: this.currentUser };
-    },
-
-    async signUpStudent(profile, password) {
-        await this.init();
-        const normalized = normalizeProfile(profile);
-        const { data, error } = await this.client.auth.signUp({
-            email: normalized.email,
-            password,
-            options: {
-                data: {
-                    first_name: normalized.firstName,
-                    last_name: normalized.lastName,
-                    full_name: normalized.name
-                }
-            }
-        });
-
-        if (error) throw error;
-
-        if (!data.session) {
-            const { data: loginData, error: loginError } = await this.client.auth.signInWithPassword({
-                email: normalized.email,
-                password
-            });
-
-            if (loginError) {
-                const message = loginError.message || '';
-                if (message.toLowerCase().includes('email not confirmed')) {
-                    throw new Error('This email was registered while confirmation was still required. Confirm or delete that user in Supabase Auth, then try again.');
-                }
-                throw new Error(`Account created, but no session was returned. Try logging in instead. ${message}`);
-            }
-
-            this.currentSession = loginData.session || null;
-            this.currentUser = normalizeUser(loginData.user);
-        } else {
-            this.currentSession = data.session || null;
-            this.currentUser = normalizeUser(data.user);
-        }
-
-        await this.upsertStudentProfile(this.currentUser.uid, normalized);
-        await this.ensureStudentProgress(this.currentUser.uid, normalized);
-        return { ...data, user: this.currentUser };
-    },
-
-    async signUpTeacher(email, password) {
-        await this.init();
-        const { data, error } = await this.client.auth.signUp({ email, password });
-        if (error) throw error;
-
-        if (!data.session) {
-            const { data: loginData, error: loginError } = await this.client.auth.signInWithPassword({
-                email,
-                password
-            });
-
-            if (loginError) {
-                const message = loginError.message || '';
-                if (message.toLowerCase().includes('email not confirmed')) {
-                    throw new Error('This teacher email was registered while confirmation was still required. Confirm or delete that user in Supabase Auth, then try again.');
-                }
-                throw new Error(`Teacher account created, but no session was returned. Try logging in instead. ${message}`);
-            }
-
-            this.currentSession = loginData.session || null;
-            this.currentUser = normalizeUser(loginData.user);
-        } else {
-            this.currentSession = data.session || null;
-            this.currentUser = normalizeUser(data.user);
-        }
-
-        const profile = await this.getProfile(this.currentUser.uid);
-        if (profile?.role !== 'teacher') {
-            await this.signOut();
-            throw new Error('This email is not in teacher_allowlist. Add it there before using teacher tools.');
-        }
         return { ...data, user: this.currentUser };
     },
 
@@ -407,20 +326,5 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return () => data.subscription.unsubscribe();
     },
 
-    isEmailSignInLink() {
-        return false;
-    },
-
-    async completeEmailSignIn() {
-        throw new Error('Email link sign-in is not enabled for this build.');
-    },
-
-    async sendEmailSignInLink() {
-        throw new Error('Email link sign-in is not enabled for this build.');
-    },
-
-    async handleRedirectResult() {
-        return null;
-    },
     });
 }

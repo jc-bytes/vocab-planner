@@ -41,16 +41,13 @@ const teacherGlobalListeners = await readFile(
 );
 
 const EXPECTED_TEACHER_AUTH_METHODS = [
-    'completeEmailSignIn',
     'ensureAllowlistedTeacherProfile',
     'getCurrentUser',
     'getProfile',
     'init',
     'onAuthStateChanged',
-    'sendEmailSignInLink',
     'signInWithPassword',
-    'signOut',
-    'signUpTeacher'
+    'signOut'
 ];
 
 function createManager(authApi) {

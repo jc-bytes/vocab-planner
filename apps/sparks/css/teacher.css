@@ -7128,7 +7128,6 @@ button.activity-card {
         min-height: auto;
     }
 
-    #student-register-panel form>div[style*="grid-template-columns"],
     #teacher-login-view form+form,
     #teacher-login-view .card>div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;

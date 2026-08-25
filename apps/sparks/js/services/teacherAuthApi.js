@@ -4,13 +4,10 @@ export const TEACHER_AUTH_API_METHODS = Object.freeze([
     'init',
     'getCurrentUser',
     'onAuthStateChanged',
-    'completeEmailSignIn',
     'signOut',
     'getProfile',
     'ensureAllowlistedTeacherProfile',
-    'signInWithPassword',
-    'signUpTeacher',
-    'sendEmailSignInLink'
+    'signInWithPassword'
 ]);
 
 const delegate = method => (...args) => supabaseService[method](...args);

@@ -41,9 +41,6 @@ function bindTeacherTabs(manager) {
 function bindTeacherAuthListeners(manager) {
     if (manager.authDisabled) return;
     $('#teacher-login-form')?.addEventListener('submit', (event) => manager.handleTeacherLogin(event));
-    $('#teacher-signup-form')?.addEventListener('submit', (event) => manager.handleTeacherSignup(event));
-    $('#show-teacher-login-btn')?.addEventListener('click', () => manager.showTeacherAuthPanel('login'));
-    $('#show-teacher-signup-btn')?.addEventListener('click', () => manager.showTeacherAuthPanel('signup'));
     $('#teacher-login-btn')?.addEventListener('click', () => manager.showLoginView());
 
     const signOutBtn = $('#teacher-sign-out-btn');

@@ -3,10 +3,8 @@ import { supabaseService } from '../supabaseService.js';
 export const STUDENT_API_METHODS = Object.freeze([
     'init',
     'signInWithPassword',
-    'signUpStudent',
     'signOut',
     'onAuthStateChanged',
-    'handleRedirectResult',
     'getProfile',
     'updateStudentProfile',
     'updatePasswordAndClearFlag',

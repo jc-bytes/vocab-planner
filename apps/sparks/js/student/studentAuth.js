@@ -24,10 +24,6 @@ export class StudentAuth {
         this.authUnsubscribe = null;
     }
 
-    prefillRegistrationFromJoinLink() {
-        return this.ui.prefillRegistrationFromJoinLink();
-    }
-
     normalizeStudentProfile(profile) {
         return this.ui.normalizeStudentProfile(profile);
     }
@@ -38,14 +34,6 @@ export class StudentAuth {
 
     hasCompleteStudentProfile(profile) {
         return this.ui.hasCompleteStudentProfile(profile);
-    }
-
-    showAuthPanel(panel) {
-        return this.ui.showAuthPanel(panel);
-    }
-
-    validateRegistrationForm() {
-        return this.ui.validateRegistrationForm();
     }
 
     handleStudentLogin(event) {
@@ -74,14 +62,6 @@ export class StudentAuth {
         try {
             await supabaseService.init();
             
-            // Check for redirect result (when using signInWithRedirect)
-            // This must be called before onAuthStateChanged
-            const redirectResult = await supabaseService.handleRedirectResult();
-            if (redirectResult?.user) {
-                console.log('Processing redirect sign-in result...');
-                await this.handleBackendSignIn(redirectResult.user);
-            }
-
             this.authUnsubscribe?.();
             this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
                 this.sm.logStudentDomUpdate?.('auth-state', {

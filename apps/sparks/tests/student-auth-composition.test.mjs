@@ -32,8 +32,8 @@ globalThis.window = {
     location: {
         hash: '',
         pathname: '/student.html',
-        search: '?grade=7',
-        href: 'http://localhost/student.html?grade=7'
+        search: '',
+        href: 'http://localhost/student.html'
     },
     history: {
         pushState() {},
@@ -70,7 +70,6 @@ test('StudentAuth owns the explicit authentication UI component', () => {
     assert.ok(auth.ui instanceof StudentAuthUi);
     assert.equal(auth.ui.auth, auth);
     assert.equal(auth.ui.sm, manager);
-    assert.equal(auth.ui.joinGrade, '7');
 });
 
 test('StudentManager declares only the cross-component auth interface directly', () => {
@@ -78,7 +77,6 @@ test('StudentManager declares only the cross-component auth interface directly',
         'normalizeStudentProfile',
         'mergeStudentProfile',
         'hasCompleteStudentProfile',
-        'showAuthPanel',
         'handleStudentLogin',
         'handleForcedPasswordChange',
         'setAuthStatus'
@@ -90,7 +88,6 @@ test('StudentManager declares only the cross-component auth interface directly',
         );
     }
 
-    assert.equal(Object.getOwnPropertyDescriptor(StudentManager.prototype, 'joinGrade'), undefined);
     assert.equal(
         Object.prototype.hasOwnProperty.call(StudentManager.prototype, 'handleStudentRegister'),
         false
@@ -101,6 +98,14 @@ test('StudentManager declares only the cross-component auth interface directly',
     );
     assert.equal(
         Object.prototype.hasOwnProperty.call(StudentAuth.prototype, 'getJoinGradeFromUrl'),
+        false
+    );
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentAuth.prototype, 'prefillRegistrationFromJoinLink'),
+        false
+    );
+    assert.equal(
+        Object.prototype.hasOwnProperty.call(StudentAuth.prototype, 'validateRegistrationForm'),
         false
     );
 });
@@ -148,38 +153,6 @@ test('profile completeness defaults to the manager-owned profile', () => {
     assert.equal(auth.hasCompleteStudentProfile(), true);
     manager.studentProfile.group = '';
     assert.equal(auth.hasCompleteStudentProfile(), false);
-});
-
-test('registration validation preserves the school account contract', () => {
-    const auth = new StudentAuth(createManager());
-    const setInputs = values => {
-        elements.clear();
-        Object.entries(values).forEach(([selector, value]) => elements.set(selector, { value }));
-    };
-
-    setInputs({
-        '#register-first-name': ' Ada ',
-        '#register-last-name': ' Lovelace ',
-        '#register-email': ' ADA@AID.EDU.PA ',
-        '#register-grade': '7',
-        '#register-section': 'b',
-        '#register-password': 'secretpass7',
-        '#register-confirm-password': 'secretpass7'
-    });
-
-    assert.deepEqual(auth.validateRegistrationForm(), {
-        firstName: 'Ada',
-        lastName: 'Lovelace',
-        email: 'ada@aid.edu.pa',
-        grade: '7',
-        group: 'B'
-    });
-
-    elements.get('#register-email').value = 'ada@example.com';
-    assert.throws(
-        () => auth.validateRegistrationForm(),
-        /@aid\.edu\.pa/
-    );
 });
 
 test('session initialization coalesces duplicate events and invalidates stale work', async () => {

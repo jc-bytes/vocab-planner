@@ -1423,3 +1423,14 @@ Task 36 remains in progress. The next cleanup will remove only independently tra
 - Verification passed: 13 repository tests, 23 teacher-data tests and smoke, 13 Word Hunt review tests and smoke, 140 student-activity tests, 21 build/lazy checks, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student initial delivery is 182.0 KiB gzip and the precache is 19 files/1,024,562 bytes.
 
 Task 36 remains in progress. Authentication compatibility code and dead CSS will be handled as separate changes after direct UI and caller verification.
+
+### Task 36c, remove unreachable public-auth compatibility code
+
+- Confirmed both entry pages intentionally expose password login only: neither has a student registration nor teacher signup/email-link panel, security tests require those panels to remain absent, and database configuration disables public account creation. Teacher-managed student provisioning remains the supported account path.
+- Removed the dormant student join-link, registration validation/submission, auth-panel switching, and redirect-result no-op chain from UI, composition, API, and Supabase service layers. A `?grade=` link can no longer hide the only live login panel.
+- Removed dormant teacher signup and email-link listeners, manager methods, API capabilities, and Supabase implementations. The email-link implementations had no UI and explicitly threw “not enabled.”
+- Removed two orphan mobile registration selector arms. Preserved password login, restored sessions, forced student password changes, teacher role verification/repair, teacher-managed account creation, and sign-out cleanup.
+- Tightened student and teacher auth capability contracts and added source guards preventing the unreachable systems from returning.
+- Verification passed: focused student-auth/API/listener, teacher-auth, security, and build/lazy tests; the complete `npm test` suite; 9-width student regression; three-page source smoke; 13-game sandbox smoke; production build; and built three-page smoke. The build remains 2,332 modules and 13.5 MB; student initial delivery decreased to 180.8 KiB gzip, teacher to 154.1 KiB gzip, and the precache to 19 files/1,019,339 bytes.
+
+Task 36 remains in progress. The remaining work is a source-traced CSS cleanup, with mixed or dynamically produced selectors preserved.
