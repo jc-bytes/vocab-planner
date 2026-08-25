@@ -74,7 +74,7 @@ function createPersistence() {
     return { persistence, sm, localSaves, coinAwards };
 }
 
-test('activity autosave stays local before the authoritative activity RPC', () => {
+test('authenticated activity autosave does not mint coins before the authoritative RPC', () => {
     const { persistence, localSaves, coinAwards } = createPersistence();
     const submitted = [];
     persistence.syncActivityProgressToCloud = (...args) => submitted.push(args);
@@ -83,8 +83,21 @@ test('activity autosave stays local before the authoritative activity RPC', () =
 
     assert.deepEqual(localSaves, [true]);
     assert.equal(submitted.length, 1);
-    assert.equal(coinAwards.length, 1);
-    assert.equal(coinAwards[0][3].skipCloud, true);
+    assert.equal(coinAwards.length, 0);
+});
+
+test('auth-disabled activities retain immediate local coin rewards', () => {
+    for (const activityType of ['matching', 'flashcards']) {
+        const { persistence, sm, coinAwards } = createPersistence();
+        sm.authDisabled = true;
+        sm.currentActivityType = activityType;
+        persistence.syncActivityProgressToCloud = () => null;
+
+        persistence.handleAutoSave({ score: 20, details: '2/10', isComplete: false });
+
+        assert.equal(coinAwards.length, 1, `${activityType} must retain its local reward`);
+        assert.equal(coinAwards[0][3].skipCloud, true);
+    }
 });
 
 test('reviewing completed flashcards preserves verified completion metadata', () => {

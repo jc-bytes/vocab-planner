@@ -68,7 +68,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 26. Define a host/game protocol | DONE | Normalized host score/game-over parser; strict payload contract; host integration | Focused game/registry/security/build checks; 13-game sandbox smoke; complete regression; production build; two independent reviews | Standardized only the live protocol. Source/type validation and lifecycle stay with the host; no unused ready/status/error events were invented. |
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
-| 29. Add interfaces only where justified | TODO | | | |
+| 29. Add interfaces only where justified | IN PROGRESS | Signed-in reward authority | Focused/full regression; production build; independent review | Server snapshots now exclusively award authenticated activity coins; explicit local mode retains immediate rewards. Auth and parity seams remain. |
 | 30. Consolidate environment authority | TODO | | | |
 | 31. Correct stale documentation | TODO | | | |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
@@ -551,6 +551,16 @@ Task 27 is complete. Task 28 will review the existing Supabase boundaries withou
 - Verification passed across repository, student API/auth, teacher progress/session, Word Hunt review, browser-storage, schema, RPC, and security contracts in two independent audits. No local or production Supabase was contacted; Docker-backed acceptance, lint, and advisors remain unavailable in this environment as previously recorded.
 
 Task 28 is complete. Task 29 will add only the narrow test/security seams needed to fix the two confirmed boundary defects and parity gap; it will not wrap every repository or reorganize data code for symmetry.
+
+### Task 29a, restore one authenticated reward authority
+
+- Stopped both replayable and non-replayable activity autosave paths from adding calculated coins to a signed-in student's local wallet before the database accepts the result. A rejected event can no longer leave phantom activity coins in browser state.
+- Preserved local score/evidence saving, debounce/coalescing, attempt timing, owner-bound offline queuing, payload settings, server reward calculation, and authoritative result application. Successful live or replayed RPC results still replace coin, XP, activity-earned, and progress state from the returned snapshot.
+- Preserved immediate calculated coin rewards in intentional `authDisabled` mode, where no server authority exists. Tests cover that behavior for both replayable Matching and non-replayable Flashcards.
+- Did not add a reward repository or rollback layer. A single mode guard removes the duplicate authority more clearly than compensating mutations after every failure path.
+- Verification passed for 108 focused activity/progress tests, 76 Student Progress tests in independent review, the complete regression suite, 13-game sandbox smoke, production build, scoped diff validation, and independent semantic review. Deployment remains 13.5 MB with 2,331 modules.
+
+Task 29 remains in progress. The next subtask will introduce only the auth seam required to test and eliminate stale teacher-role fail-open behavior.
 
 ### Phase 0, baseline
 

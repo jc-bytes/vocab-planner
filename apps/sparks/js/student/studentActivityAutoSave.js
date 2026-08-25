@@ -58,7 +58,7 @@ export class StudentActivityAutoSave {
             const stepsGained = Math.floor(newScore / 10) - Math.floor(oldScore / 10);
             let totalReward = Math.max(0, stepsGained * progressReward);
             if (newScore === 100 && oldScore < 100) totalReward += completionBonus;
-            if (totalReward > 0) {
+            if (totalReward > 0 && this.sm.authDisabled) {
                 this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
             }
         }
@@ -87,7 +87,7 @@ export class StudentActivityAutoSave {
             const stepsGained = Math.floor(newScore / 10) - Math.floor(sessionLastScore / 10);
             let totalReward = Math.max(0, stepsGained * progressReward);
             if (newScore === 100 && sessionLastScore < 100) totalReward += completionBonus;
-            if (totalReward > 0) {
+            if (totalReward > 0 && this.sm.authDisabled) {
                 this.sm.progress.addCoins(totalReward, 'activity', '', { skipCloud: true });
                 oldScoreData.totalEarned = (oldScoreData.totalEarned || 0) + totalReward;
             }
