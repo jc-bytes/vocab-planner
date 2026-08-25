@@ -72,7 +72,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 30. Consolidate environment authority | DONE | Shared browser-key validation; hosted project identity; planner derivation | Focused config/auth/security tests; planner syntax/runtime checks; complete regression; production build; independent review | One hosted project ref derives the runtime URL and planner fallback. Runtime/build reject current secret and legacy service-role browser keys. Local/server/deployment boundaries remain intentionally separate. |
 | 31. Correct stale documentation | DONE | README and four architecture/reliability records | Full regression suite, production build, scoped diff check, reference audit, independent documentation review | Removed broken and stale release guidance; updated completed page/facade/data boundaries; marked the database cutover record historical. Runtime/package naming remains unchanged. |
 | 32. Create `ARCHITECTURE.md` | DONE | `ARCHITECTURE.md`, tracker | Documented-path check, full regression suite, 13-game sandbox smoke, production build, independent ownership trace | One concise extension map now answers where and how to add activities, games, teacher features/pages, theme/UI, and data boundaries without duplicating implementation internals. |
-| 33. Organize changed features gradually | TODO | | | |
+| 33. Organize changed features gradually | DONE | Tracker only | Repository ownership/path trace, reference counts, prior full regression/build, independent organization audit | No additional move is justified now. Owned directories, consistent prefixes, registries, factories, and `ARCHITECTURE.md` make boundaries discoverable; import-only churn is rejected. |
 | 34. Add delivery-size budgets | TODO | | | |
 | 35. Preserve lazy loading | TODO | | | |
 | 36. Remove code and CSS proven obsolete | TODO | | | |
@@ -1365,3 +1365,13 @@ Task 31 is complete. Task 32 will add one concise current architecture map and l
 - Verification passed: the complete `npm test` suite, 9-width student regression, all-seven-page teacher smoke, three-page source smoke, 13-game sandbox smoke, and production build. The build remains 2,332 modules and 13.5 MB; student and teacher entry JavaScript remain 236.26/60.50 kB and 181.79/48.89 kB raw/gzip.
 
 Task 32 is complete. Task 33 will inspect whether any additional file move is justified by material ownership work; it will not perform an import-only directory rearrangement.
+
+### Task 33, preserve gradual feature organization
+
+- Confirmed that activity implementations live under `js/activities/`, game implementations and assets under `js/games/`, student composition under `js/student/`, domain data modules under `js/services/`, and repeated DOM behavior under `js/ui/`.
+- Confirmed that the flatter teacher area remains discoverable through cohesive `teacherData*`, `teacherQuiz*`, `teacherSparks*`, `teacherGroups*`, `teacherSettings*`, and other feature prefixes plus the single `teacherLazyFeatures.js` composition map. Several larger features already own subfolders.
+- Rejected moving teacher feature clusters after their behavioral migrations were complete. Those moves would now change imports and 3-13 source/test/smoke references per entry without changing an interface, dependency direction, lazy boundary, or feature ownership.
+- Future material work may move one complete prefix cluster into an owned folder in the same tested task. Folder moves must never be used as a substitute for an explicit feature interface.
+- Independent audit agreed that current ownership is clear and found no move whose locality benefit outweighed its import/build churn. Task 32's full regression and production build remain the applicable verification because Task 33 changes no runtime or build input.
+
+Task 33 is complete with no source move. Task 34 will add delivery-size budgets grounded in the current production manifest and compressed output.
