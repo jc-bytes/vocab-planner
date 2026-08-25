@@ -7,8 +7,6 @@ cd "$ROOT_DIR"
 DEFAULT_PORT="${PLANNER_PORT:-8000}"
 DEFAULT_HOST="${PLANNER_HOST:-127.0.0.1}"
 SCHOOL_DRIVE_DIR="${PLANNER_SCHOOL_DRIVE_DIR:-/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026}"
-REMOTE_SUPABASE_PROJECT_REF="${REMOTE_SUPABASE_PROJECT_REF:-ifofhiypzffruzhiukst}"
-REMOTE_SUPABASE_URL="${REMOTE_SUPABASE_URL:-https://ifofhiypzffruzhiukst.supabase.co}"
 
 has_supabase_placeholder() {
   local value="$1"
@@ -36,9 +34,17 @@ load_remote_supabase_config_from_cli() {
   command -v supabase >/dev/null 2>&1 || return 1
   command -v node >/dev/null 2>&1 || return 1
 
-  local key
+  local default_ref remote_project_ref remote_url key
+  default_ref="$(
+    node --input-type=module -e '
+import { PRODUCTION_SUPABASE_PROJECT_REF } from "./config/supabase-config.js";
+process.stdout.write(PRODUCTION_SUPABASE_PROJECT_REF);
+'
+  )" || return 1
+  remote_project_ref="${REMOTE_SUPABASE_PROJECT_REF:-$default_ref}"
+  remote_url="${REMOTE_SUPABASE_URL:-https://${remote_project_ref}.supabase.co}"
   key="$(
-    supabase projects api-keys --project-ref "$REMOTE_SUPABASE_PROJECT_REF" --output json 2>/dev/null \
+    supabase projects api-keys --project-ref "$remote_project_ref" --output json 2>/dev/null \
       | node -e '
 const fs = require("fs");
 const input = fs.readFileSync(0, "utf8");
@@ -68,7 +74,7 @@ process.stdout.write(selected.api_key);
 
   [[ -n "$key" ]] || return 1
   has_supabase_placeholder "$key" && return 1
-  export VITE_SUPABASE_URL="$REMOTE_SUPABASE_URL"
+  export VITE_SUPABASE_URL="$remote_url"
   export VITE_SUPABASE_PUBLISHABLE_KEY="$key"
   export ALLOW_PRODUCTION_SUPABASE_IN_DEV="${ALLOW_PRODUCTION_SUPABASE_IN_DEV:-1}"
   echo "Loaded remote Supabase browser config from the linked CLI project."

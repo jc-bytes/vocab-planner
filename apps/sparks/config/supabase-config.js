@@ -3,7 +3,8 @@ export const SUPABASE_CONFIG = {
     publishableKey: import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env?.VITE_SUPABASE_ANON_KEY || ''
 };
 
-export const PRODUCTION_SUPABASE_URL = 'https://ifofhiypzffruzhiukst.supabase.co';
+export const PRODUCTION_SUPABASE_PROJECT_REF = 'ifofhiypzffruzhiukst';
+export const PRODUCTION_SUPABASE_URL = `https://${PRODUCTION_SUPABASE_PROJECT_REF}.supabase.co`;
 
 function readLegacyKeyRole(key) {
     const payload = key.split('.')[1];

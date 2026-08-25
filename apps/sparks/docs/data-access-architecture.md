@@ -80,7 +80,7 @@ The August 2026 remediation review traced authentication/session, activity progr
 
 1. **Resolved — signed-in optimistic reward state:** authenticated activity coins now update only from accepted server snapshots; intentional auth-disabled mode retains local rewards.
 2. **Resolved — stale teacher role fallback:** the teacher shell now requires current verification, clears rejected state, and allows a fresh same-account retry after transient failures.
-3. **Medium — browser secret-key guard:** the shared configuration validator rejects placeholders but not known secret/service-role key formats. No leaked key was found. Task 30 will reject privileged formats in runtime and build validation.
+3. **Resolved — browser secret-key guard:** shared runtime/build validation rejects current secret keys, explicit service-role values, and legacy service-role JWTs before browser exposure.
 4. **Resolved — game policy drift:** the client leaderboard set and score directions must match the independently defined effective SQL policy. Four stale server-only capabilities were removed.
 5. **Medium — broad internal auth file:** `supabaseAuthProfileMethods.js` also contains teacher roster/progress RPC methods. This is internal module organization, not a leaked client interface. Split it only when one of those operations is materially changed; an import-only rearrangement is not justified.
 6. **Low — dead or uncertain surfaces:** unused export-repository methods, an unused Storage delete method, dormant auth flows, and the unpopulated `cloudVocabs` collection are candidates for Task 36. Each still requires exact caller and behavior confirmation before removal.

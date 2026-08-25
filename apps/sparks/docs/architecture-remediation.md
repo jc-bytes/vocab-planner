@@ -69,7 +69,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 27. Add game registry contract tests | DONE | Source registry contract; post-build asset/lazy-manifest validator | Registry/game/security/build checks; complete regression; 13-game sandbox smoke; production build; three independent maps | Registry entries must be valid, reachable, loadable, copied, and lazy in production. No second registry or eager validation path was added. |
 | 28. Review Supabase seams | DONE | Data-boundary map; raw-access trace; interface decision inputs | Focused repository/API/auth/storage/security suites; complete prior regression baseline; two independent boundary audits | Existing repositories and student capability boundary are sound. Confirmed reward-authority and stale-role risks move to Task 29; secret-key validation moves to Task 30. |
 | 29. Add interfaces only where justified | DONE | Signed-in reward authority; narrow teacher auth capability; fail-closed role lifecycle; game/server score parity | Focused/full regression; production builds; registry/database contracts; independent reviews | Added only two justified seams: authoritative signed-in rewards and injectable teacher auth. Client leaderboard capability now exactly matches independent SQL authorization and score order. |
-| 30. Consolidate environment authority | IN PROGRESS | Shared browser-key validation | Focused config/auth/security tests; production build | Runtime and every Vite command reject current secret keys and legacy service-role keys before client exposure. Production project authority consolidation remains. |
+| 30. Consolidate environment authority | DONE | Shared browser-key validation; hosted project identity; planner derivation | Focused config/auth/security tests; planner syntax/runtime checks; complete regression; production build; independent review | One hosted project ref derives the runtime URL and planner fallback. Runtime/build reject current secret and legacy service-role browser keys. Local/server/deployment boundaries remain intentionally separate. |
 | 31. Correct stale documentation | TODO | | | |
 | 32. Create `ARCHITECTURE.md` | TODO | | | |
 | 33. Organize changed features gradually | TODO | | | |
@@ -593,6 +593,16 @@ Task 29 is complete. No generic repository wrapper, service container, or read/w
 - Verification passed for 23 focused configuration/auth/security tests, production build, and scoped diff validation. The implementation follows current Supabase guidance that publishable/anon keys are browser-safe while secret/service-role keys bypass RLS and belong only in backend components.
 
 Task 30 remains in progress. The next subtask will remove the duplicated production project reference/URL authority used by the planner while preserving CLI project metadata and environment overrides.
+
+### Task 30b, consolidate hosted project identity
+
+- Added one exported hosted production project reference and derive the browser production URL from it. The reference and URL can no longer drift inside runtime configuration.
+- Removed the hardcoded hosted project reference and URL from the planner. Its existing Node-dependent remote-key fallback imports the shared reference, honors explicit `REMOTE_SUPABASE_PROJECT_REF` and `REMOTE_SUPABASE_URL` operator overrides, and otherwise derives the hosted URL.
+- Kept `supabase/config.toml` independent because its `project_id` names the local CLI/container stack, not the hosted production project. A reviewer caught and rejected an initial false parity rule before commit.
+- Kept CI secrets, ignored `.env.local`, browser test overrides, Edge Function secrets, maintenance service-role variables, and CSP host patterns separate because they are deployment inputs, server-only credentials, or transport policy rather than duplicate hosted identity authorities.
+- Verification passed for planner shell syntax/help execution, direct Node import, six configuration contracts, focused auth/security tests, production builds, scoped diff validation, and independent review.
+
+Task 30 is complete. No GitHub Pages URL was invented because no checked-in production site destination exists.
 
 ### Phase 0, baseline
 

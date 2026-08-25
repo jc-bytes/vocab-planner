@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import {
     PRODUCTION_SUPABASE_URL,
+    PRODUCTION_SUPABASE_PROJECT_REF,
     isSupabaseConfigured,
     isPrivilegedSupabaseKey,
     isValidSupabaseConfig
@@ -108,4 +109,15 @@ test('the example environment does not pre-authorize production in development',
     const example = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
     assert.doesNotMatch(example, /^ALLOW_PRODUCTION_SUPABASE_IN_DEV=1$/m);
     assert.match(example, /^# ALLOW_PRODUCTION_SUPABASE_IN_DEV=1$/m);
+});
+
+test('production project defaults have one guarded authority across runtime and planner tooling', async () => {
+    const planner = await readFile(new URL('../planner', import.meta.url), 'utf8');
+
+    assert.equal(PRODUCTION_SUPABASE_URL, `https://${PRODUCTION_SUPABASE_PROJECT_REF}.supabase.co`);
+    assert.doesNotMatch(planner, new RegExp(PRODUCTION_SUPABASE_PROJECT_REF));
+    assert.doesNotMatch(planner, new RegExp(PRODUCTION_SUPABASE_URL.replaceAll('.', '\\.')));
+    assert.match(planner, /PRODUCTION_SUPABASE_PROJECT_REF/);
+    assert.match(planner, /\.\/config\/supabase-config\.js/);
+    assert.match(planner, /remote_url="\$\{REMOTE_SUPABASE_URL:-https:\/\/\$\{remote_project_ref\}\.supabase\.co\}"/);
 });
