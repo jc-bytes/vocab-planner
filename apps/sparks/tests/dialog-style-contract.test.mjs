@@ -68,7 +68,7 @@ test('page and lazy styles retain refinements without recreating the dialog core
 
     assert.match(studentFeatureCss, /\.modal-content\s*\{[^}]*max-width:\s*calc\(100vw - 64px\)\s*!important/s);
     assert.match(teacherCss, /#student-detail-modal \.modal-content\s*\{/);
-    assert.match(teacherCss, /\.activity-student-preview-modal\s*\{/);
+    assert.doesNotMatch(teacherCss, /\.activity-student-preview-/);
     assert.match(teacherQuizCss, /\.rubric-modal-backdrop\s*\{/);
     assert.match(fillInBlankJs, /modal hidden fib-hint-modal/);
     assert.match(sparkReadingJs, /modal hidden spark-check-modal/);

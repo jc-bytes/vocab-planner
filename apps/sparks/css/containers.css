@@ -70,10 +70,6 @@
     margin-top: var(--spacing-sm);
 }
 
-.teacher-library-groups {
-    margin-top: var(--spacing-lg);
-}
-
 .teacher-library-browser {
     display: flex;
     flex-direction: column;

@@ -75,7 +75,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 33. Organize changed features gradually | DONE | Tracker only | Repository ownership/path trace, reference counts, prior full regression/build, independent organization audit | No additional move is justified now. Owned directories, consistent prefixes, registries, factories, and `ARCHITECTURE.md` make boundaries discoverable; import-only churn is rejected. |
 | 34. Add delivery-size budgets | DONE | Manifest-driven budget authority, build enforcement, focused tests, architecture map | 16 focused checks, full regression, production build, independent review | Build now limits total deployment, complete initial student/teacher JS+CSS graphs, and the three largest lazy chunks using deterministic gzip and stable manifest names. |
 | 35. Preserve lazy loading | DONE | Production lazy-graph validator, build integration, fixture contracts, architecture map | 21 focused build checks, full regression, production builds, student precache validation, independent runtime/manifest review | Nine feature edges and deferred student styles must remain lazy; optional games, activities, reports, teacher tools, Quiz Maker, charts, CSS, and assets cannot enter initial graphs/precache. |
-| 36. Remove code and CSS proven obsolete | TODO | | | |
+| 36. Remove code and CSS proven obsolete | DONE | Activity state; repository/auth surfaces; teacher, Quiz, and container styles; focused contracts | Focused ownership/style/auth checks, full regression, 9-width regression, source and built smoke, 13-game sandbox, production build, independent reviews | Removed only source-proven zero-caller code and orphan styles. Live security, lazy-feature, student, teacher, Quiz, and shared vocabulary behavior remains owned and tested. |
 | 37. Final architecture verification | TODO | | | |
 
 ## Change log
@@ -1434,3 +1434,13 @@ Task 36 remains in progress. Authentication compatibility code and dead CSS will
 - Verification passed: focused student-auth/API/listener, teacher-auth, security, and build/lazy tests; the complete `npm test` suite; 9-width student regression; three-page source smoke; 13-game sandbox smoke; production build; and built three-page smoke. The build remains 2,332 modules and 13.5 MB; student initial delivery decreased to 180.8 KiB gzip, teacher to 154.1 KiB gzip, and the precache to 19 files/1,019,339 bytes.
 
 Task 36 remains in progress. The remaining work is a source-traced CSS cleanup, with mixed or dynamically produced selectors preserved.
+
+### Task 36d, remove source-proven obsolete styles
+
+- Removed copied student activity-menu, dashboard, subject/home, app-header, tab, mobile-navigation, Spark, and preview rules from the teacher stylesheet after tracing every affected selector against static markup, DOM producers, and lazy feature templates.
+- Removed retired teacher-library hierarchy, structured-mode, export-menu, document-preview, and legacy Quiz question-card families. Preserved current `doc-q-*` Quiz output, teacher progress/detail selectors, shared vocabulary rows, responsive behavior, and feature-owned lazy styles.
+- Removed the last orphan `teacher-library-groups` container rule. Corrected style contracts that still treated retired selectors as ownership sentinels; the contracts now require the live replacement selectors and reject the obsolete families.
+- Independent review found no removed live selector and no remaining high-confidence dead-style family that should be included in this task. All styles parse, the scoped diff is clean, and 34 focused build/style contracts pass.
+- Final verification passed: the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, production build, and built three-page smoke. The build remains 2,332 modules and 13.5 MB. Teacher CSS decreased from the baseline 149.89 kB raw / 24.40 kB gzip to 125.98 kB raw / 20.78 kB gzip; teacher initial delivery is 151.2 KiB gzip.
+
+Task 36 is complete. Task 37 will repeat the architecture audit and change-impact tests against the final repository state.

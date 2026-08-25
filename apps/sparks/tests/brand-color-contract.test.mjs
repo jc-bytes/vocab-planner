@@ -114,9 +114,12 @@ test('app shell identity effects and activity summary meters use semantic tokens
     }
 
     assert.doesNotMatch(landingCss(), /rgba\((?:99, 102, 241|14, 165, 233|249, 115, 22),/);
-    for (const [name, css] of [['student.css', studentCss], ['teacher.css', teacherCss]]) {
-        assert.match(css, /activity-menu-summary-meter div\s*\{[^}]*background:\s*var\(--color-brand\)/s, `${name} meter must use --color-brand`);
-    }
+    assert.match(
+        studentCss,
+        /activity-menu-summary-meter div\s*\{[^}]*background:\s*var\(--color-brand\)/s,
+        'student.css meter must use --color-brand'
+    );
+    assert.doesNotMatch(teacherCss, /activity-menu-summary-meter/);
 });
 
 test('migrated styles and known app UI producers do not recreate the default brand value', async () => {

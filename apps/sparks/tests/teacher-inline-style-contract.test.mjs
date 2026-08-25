@@ -140,7 +140,7 @@ test('Student Progress roster delegates static presentation to its owned stylesh
     }
 
     const rosterCssStart = teacherCss.indexOf('.student-filter-card');
-    const rosterCssEnd = teacherCss.indexOf('.activity-student-preview-modal', rosterCssStart);
+    const rosterCssEnd = teacherCss.indexOf('#student-detail-modal .modal-content', rosterCssStart);
     assert.ok(rosterCssStart >= 0 && rosterCssEnd > rosterCssStart);
     assert.doesNotMatch(teacherCss.slice(rosterCssStart, rosterCssEnd), /!important/);
     assert.doesNotMatch(teacherCss, /#teacher-progress-view \.card>div\[style\*="overflow-x"\]/,

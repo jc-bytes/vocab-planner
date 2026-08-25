@@ -167,7 +167,8 @@ test('retired quiz preview cannot return beside the current Quiz Maker', async (
     assert.match(teacherHtml, /id="teacher-quizzes-view-template"/);
     assert.match(teacherHtml, /id="quiz-maker-view"/);
     assert.match(teacherQuizCss, /\.quiz-maker-container/);
-    assert.match(teacherQuizCss, /\.question-card/);
+    assert.match(teacherQuizCss, /\.document-page \.doc-q-card/);
+    assert.doesNotMatch(teacherQuizCss, /\.question-card/);
 });
 
 test('the local Lucide registry covers icons present in the teacher shell', () => {

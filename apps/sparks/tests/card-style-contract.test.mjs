@@ -81,5 +81,5 @@ test('entry styles do not recreate the shared structural card core', () => {
     assert.doesNotMatch(studentFeatureCss, /(?:^|\n)\.card\s*\{/);
     assert.match(studentCss, /\.card\s*\{[^}]*border-radius:\s*var\(--radius-panel\)/s);
     assert.match(studentCss, /\.card:hover,/);
-    assert.match(teacherQuizCss, /\.question-card\s*\{/);
+    assert.match(teacherQuizCss, /\.document-page \.doc-q-card\s*\{/);
 });
