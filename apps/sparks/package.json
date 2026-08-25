@@ -15,7 +15,7 @@
     "test:teacher-progress-composition": "node --test tests/teacher-student-progress-composition.test.mjs",
     "test:teacher-vocabulary-library": "node --test tests/teacher-vocabulary-library-composition.test.mjs tests/teacher-vocabulary-session-isolation.test.mjs",
     "test:teacher-groups": "node --test tests/teacher-groups.test.mjs && node scripts/ui-teacher-groups-smoke.mjs",
-    "test:build-efficiency": "node --test tests/build-efficiency.test.mjs",
+    "test:build-efficiency": "node --test tests/build-efficiency.test.mjs tests/delivery-size-budget.test.mjs",
     "test:theme": "node --test tests/theme-contract.test.mjs",
     "test:brand-colors": "node --test tests/brand-color-contract.test.mjs",
     "test:specificity": "node --test tests/specificity-contract.test.mjs",

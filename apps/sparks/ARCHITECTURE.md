@@ -34,6 +34,7 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | Browser Supabase initialization | `js/services/supabaseClient.js` and `js/supabaseService.js` |
 | Database authority | `supabase/migrations/` plus RLS and RPC contracts |
 | Environment validation | `config/supabase-config.js`, `vite.config.mjs`, and `planner` |
+| Delivery-size budgets | `scripts/lib/deliverySizeBudgets.mjs`, enforced by `scripts/check-dist-size.mjs` after every production build |
 
 Managers are application composition roots. They may coordinate shell-level use cases, but new feature internals should not be installed as broad manager methods or reach through a manager to another feature's private object.
 
@@ -156,5 +157,7 @@ For every architectural change:
 3. Run focused contracts, then `npm test` and `npm run desktop:build:web`.
 4. Run the relevant browser smoke when routes, UI, games, or account lifecycle change.
 5. Inspect the scoped diff and production manifest. Do not commit generated `dist-desktop` output.
+
+The production build enforces gzip budgets for the complete initial student and teacher JS/CSS graphs and for the largest lazy chunks. Raise a budget only after explaining the intentional delivery-cost change; do not move code between chunks merely to evade a limit.
 
 Use `docs/architecture-remediation.md` as the resumable task record and `README.md` for development and release commands.

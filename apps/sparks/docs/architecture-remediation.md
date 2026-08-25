@@ -73,7 +73,7 @@ The test suite intentionally exercises handled failure paths that log errors. Th
 | 31. Correct stale documentation | DONE | README and four architecture/reliability records | Full regression suite, production build, scoped diff check, reference audit, independent documentation review | Removed broken and stale release guidance; updated completed page/facade/data boundaries; marked the database cutover record historical. Runtime/package naming remains unchanged. |
 | 32. Create `ARCHITECTURE.md` | DONE | `ARCHITECTURE.md`, tracker | Documented-path check, full regression suite, 13-game sandbox smoke, production build, independent ownership trace | One concise extension map now answers where and how to add activities, games, teacher features/pages, theme/UI, and data boundaries without duplicating implementation internals. |
 | 33. Organize changed features gradually | DONE | Tracker only | Repository ownership/path trace, reference counts, prior full regression/build, independent organization audit | No additional move is justified now. Owned directories, consistent prefixes, registries, factories, and `ARCHITECTURE.md` make boundaries discoverable; import-only churn is rejected. |
-| 34. Add delivery-size budgets | TODO | | | |
+| 34. Add delivery-size budgets | DONE | Manifest-driven budget authority, build enforcement, focused tests, architecture map | 16 focused checks, full regression, production build, independent review | Build now limits total deployment, complete initial student/teacher JS+CSS graphs, and the three largest lazy chunks using deterministic gzip and stable manifest names. |
 | 35. Preserve lazy loading | TODO | | | |
 | 36. Remove code and CSS proven obsolete | TODO | | | |
 | 37. Final architecture verification | TODO | | | |
@@ -1375,3 +1375,20 @@ Task 32 is complete. Task 33 will inspect whether any additional file move is ju
 - Independent audit agreed that current ownership is clear and found no move whose locality benefit outweighed its import/build churn. Task 32's full regression and production build remain the applicable verification because Task 33 changes no runtime or build input.
 
 Task 33 is complete with no source move. Task 34 will add delivery-size budgets grounded in the current production manifest and compressed output.
+
+### Task 34, add delivery-size budgets
+
+- Extended the existing post-build size check instead of introducing a parallel build tool. The 30 MiB raw deployment limit remains responsible for copied games, images, fonts, vocabularies, and other assets.
+- Added one frozen budget authority for the complete static student and teacher JS/CSS graphs plus Report Generator, Quiz Maker, and teacher charts. Manifest `name` fields resolve hashed and query-string chunk keys without filename globs.
+- Initial graphs recursively include static imports and their CSS exactly once. Dynamic imports, fonts, images, HTML games, and other on-demand assets are intentionally excluded from the entry graph instead of being misreported as initial delivery.
+- Deterministic level-9 gzip now reports and enforces: student 182.5/210 KiB, teacher 155.6/180 KiB, Report Generator 132.4/150 KiB, Quiz Maker 112.7/130 KiB, and teacher charts 69.6/80 KiB. The limits provide approximately 13-16% headroom over the current build.
+- Added tests for required budget coverage, recursive de-duplication and cycle safety, CSS inclusion, lazy exclusion, chunk-only measurement, missing/duplicate/broken manifest failures, and exact limit enforcement. The budget tests run in the existing build-efficiency suite.
+- Verification passed: 16 build-efficiency/budget tests, the complete `npm test` suite, 9-width student regression, three-page source smoke, 13-game sandbox smoke, and production build. Independent review recalculated every current metric and approved the measurement and thresholds after requiring CSS inclusion.
+
+### Architecture review after Tasks 31-34
+
+- Independent review found no new coupling, lazy-loading regression, compatibility layer, or unnecessary application abstraction. Documentation is aligned with the current extension seams and the no-move decision avoided cosmetic import churn.
+- Review corrections clarified the Sparks repository versus historical Vocabulary Master product naming, changed a stale facade table heading and Task 22 result, and made every shared CSS path explicit.
+- The delivery guard measures actual initial JS/CSS graphs rather than entry chunks alone, so moving code into shared static imports cannot evade the budget. Lazy feature budgets remain separate and do not pull those features into an eager graph.
+
+Task 34 is complete. Task 35 will verify that every intended lazy boundary remains outside the initial student and teacher graphs and strengthen only missing production-manifest contracts.
