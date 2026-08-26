@@ -117,7 +117,8 @@ test('Vocabulary cleanup scrubs account state and preserves device-local policy'
     for (const selector of [
         '#vocab-name', '#vocab-id', '#library-list', '#teacher-vocab-breadcrumb', '#words-container',
         '#vocab-editor-subtitle', '#word-input', '#def-input', '#example-input', '#image-input',
-        '#pos-input', '#word-hunt-input', '#image-preview', '#word-modal'
+        '#synonyms-input', '#antonyms-input', '#difficulty-input', '#pos-input', '#word-hunt-input',
+        '#image-preview', '#vocab-data-readiness', '#word-modal'
     ]) {
         elements.set(selector, createElement('ACCOUNT A SECRET'));
     }
@@ -151,8 +152,11 @@ test('Vocabulary cleanup scrubs account state and preserves device-local policy'
     assert.equal(elements.get('#word-input').value, '');
     assert.equal(elements.get('#def-input').value, '');
     assert.equal(elements.get('#example-input').value, '');
+    assert.equal(elements.get('#synonyms-input').value, '');
+    assert.equal(elements.get('#antonyms-input').value, '');
     assert.equal(elements.get('#image-input').value, '');
-    assert.equal(elements.get('#pos-input').value, 'noun');
+    assert.equal(elements.get('#difficulty-input').value, '1');
+    assert.equal(elements.get('#pos-input').value, '');
     assert.equal(elements.get('#word-hunt-input').checked, false);
     assert.equal(elements.get('#image-preview').textContent, 'No Image');
     assert.equal(elements.get('#word-modal').classList.contains('hidden'), true);

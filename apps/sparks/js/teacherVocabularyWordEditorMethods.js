@@ -1,4 +1,9 @@
 import { $, closeModal as closeDialog, createElement, openModal } from './main.js';
+import {
+    buildVocabularyWord,
+    getVocabularyDataIssues,
+    validateVocabularyWord
+} from './teacherVocabularyWordModel.js';
 
 class TeacherVocabularyWordEditorMethods {
     renderWords() {
@@ -66,7 +71,6 @@ class TeacherVocabularyWordEditorMethods {
                     <button class="btn text-btn edit-btn" data-index="${index}" aria-label="Edit ${word.word}"><i data-lucide="pencil"></i></button>
                     <button class="btn text-btn delete-btn" data-index="${index}" aria-label="Delete ${word.word}"><i data-lucide="trash-2"></i></button>
                 </div>
-                ${word.image ? `<div class="word-image-path">${word.image}</div>` : ''}
             `;
 
             card.querySelector('.edit-btn').addEventListener('click', () => this.openWordModal(index));
@@ -96,7 +100,29 @@ class TeacherVocabularyWordEditorMethods {
         }
 
         this.updateVocabularyEditorSummary();
+        this.renderVocabularyDataReadiness();
         this.refreshIcons();
+    }
+
+    getEnabledVocabularyActivityIds(vocab = this.vocabSet) {
+        const flow = this.getActivityFlowConfig(vocab);
+        return [...flow.required, ...flow.additional];
+    }
+
+    renderVocabularyDataReadiness() {
+        const container = $('#vocab-data-readiness');
+        if (!container) return;
+
+        const issues = getVocabularyDataIssues({
+            words: this.vocabSet?.words,
+            enabledActivityIds: this.getEnabledVocabularyActivityIds()
+        });
+        container.replaceChildren(...issues.map(issue => {
+            const row = createElement('p', 'vocab-data-issue');
+            row.dataset.issue = issue.id;
+            row.textContent = issue.message;
+            return row;
+        }));
     }
 
     isWordHuntRequired(vocab = this.vocabSet) {
@@ -163,10 +189,12 @@ class TeacherVocabularyWordEditorMethods {
 
         // Reset fields
         $('#word-input').value = '';
-        $('#pos-input').value = 'noun';
+        $('#pos-input').value = '';
         $('#def-input').value = '';
         $('#example-input').value = '';
-        $('#image-input').value = '';
+        $('#difficulty-input').value = '1';
+        $('#synonyms-input').value = '';
+        $('#antonyms-input').value = '';
         $('#word-hunt-input').checked = false;
         const wordHuntModalToggle = document.querySelector('.word-hunt-modal-toggle');
         if (wordHuntModalToggle) {
@@ -175,18 +203,17 @@ class TeacherVocabularyWordEditorMethods {
                 this.isWordHuntRequired() && !this.isWordHuntCustomSelection()
             );
         }
-        this.updateImagePreview('');
-
         if (index > -1) {
             const word = this.vocabSet.words[index];
             title.textContent = 'Edit Word';
             $('#word-input').value = word.word;
-            $('#pos-input').value = word.part_of_speech;
+            $('#pos-input').value = word.part_of_speech || word.partOfSpeech || '';
             $('#def-input').value = word.definition;
             $('#example-input').value = word.example || '';
-            $('#image-input').value = word.image || '';
+            $('#difficulty-input').value = String(word.difficulty === 2 ? 2 : 1);
+            $('#synonyms-input').value = Array.isArray(word.synonyms) ? word.synonyms.join(', ') : String(word.synonyms || '');
+            $('#antonyms-input').value = Array.isArray(word.antonyms) ? word.antonyms.join(', ') : String(word.antonyms || '');
             $('#word-hunt-input').checked = this.isWordHuntWord(word);
-            this.updateImagePreview(word.image || '');
         } else {
             title.textContent = 'Add New Word';
         }
@@ -202,24 +229,28 @@ class TeacherVocabularyWordEditorMethods {
         const existingWord = this.editingWordIndex > -1
             ? this.vocabSet.words[this.editingWordIndex]
             : {};
-        const newWord = {
-            ...existingWord,
-            word: $('#word-input').value.trim(),
-            part_of_speech: $('#pos-input').value,
-            definition: $('#def-input').value.trim(),
-            example: $('#example-input').value.trim(),
-            image: $('#image-input').value.trim(),
+        const newWord = buildVocabularyWord({
+            existingWord,
+            word: $('#word-input').value,
+            partOfSpeech: $('#pos-input').value,
+            definition: $('#def-input').value,
+            example: $('#example-input').value,
+            difficulty: $('#difficulty-input').value,
+            synonyms: $('#synonyms-input').value,
+            antonyms: $('#antonyms-input').value,
             wordHunt: this.isWordHuntRequired() && !this.isWordHuntCustomSelection()
                 ? true
-                : $('#word-hunt-input').checked,
-            difficulty: existingWord.difficulty || 1,
-            synonyms: existingWord.synonyms || [],
-            antonyms: existingWord.antonyms || []
-        };
-        delete newWord.word_hunt;
+                : $('#word-hunt-input').checked
+        });
+        const validationError = validateVocabularyWord({
+            draft: newWord,
+            words: this.vocabSet.words,
+            editingIndex: this.editingWordIndex,
+            enabledActivityIds: this.getEnabledVocabularyActivityIds()
+        });
 
-        if (!newWord.word || !newWord.definition) {
-            alert('Word and Definition are required!');
+        if (validationError) {
+            alert(validationError);
             return;
         }
 
@@ -242,30 +273,6 @@ class TeacherVocabularyWordEditorMethods {
         }
     }
 
-    updateImagePreview(path) {
-        const previewBox = $('#image-preview');
-        if (!path) {
-            previewBox.textContent = 'No Image';
-            previewBox.innerHTML = 'No Image';
-            return;
-        }
-
-        // In a real repo, this would point to the relative path
-        // We can try to load it. If it fails, show error.
-        const documentGeneration = this.teacherVocabularyDocumentGeneration || 0;
-        const isCurrent = this.createTeacherVocabularyOperationGuard();
-        const img = document.createElement('img');
-        img.src = path;
-        img.onerror = () => {
-            if (!isCurrent() || documentGeneration !== (this.teacherVocabularyDocumentGeneration || 0)) return;
-            previewBox.innerHTML = '<span class="vocab-image-error">Image not found at path</span>';
-        };
-        img.onload = () => {
-            if (!isCurrent() || documentGeneration !== (this.teacherVocabularyDocumentGeneration || 0)) return;
-            previewBox.innerHTML = '';
-            previewBox.appendChild(img);
-        };
-    }
 }
 
 export function installTeacherVocabularyWordEditorMethods(TeacherManager) {

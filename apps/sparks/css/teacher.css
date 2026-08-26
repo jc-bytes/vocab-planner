@@ -981,6 +981,27 @@ body {
     overflow-wrap: anywhere;
 }
 
+.vocab-data-readiness {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.45rem;
+}
+
+.vocab-data-readiness:empty {
+    display: none;
+}
+
+.vocab-data-issue {
+    margin: 0;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid rgba(251, 191, 36, 0.32);
+    border-radius: var(--radius-sm);
+    background: rgba(120, 53, 15, 0.2);
+    color: #fde68a;
+    font-size: var(--type-caption-size);
+    line-height: var(--type-caption-line-height);
+}
+
 .vocab-editor-workspace {
     display: block;
 }

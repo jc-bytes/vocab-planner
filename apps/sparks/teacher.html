@@ -843,6 +843,7 @@
                             <div>
                                 <h2>Words</h2>
                                 <p id="vocab-words-summary">No words yet.</p>
+                                <div id="vocab-data-readiness" class="vocab-data-readiness" role="status" aria-live="polite"></div>
                             </div>
                             <div class="vocab-words-tools">
                                 <label for="vocab-word-filter" class="vocab-word-filter-label">
@@ -1607,6 +1608,7 @@
                     <div class="form-group">
                         <label for="pos-input">Part of Speech</label>
                         <select id="pos-input">
+                            <option value="">Not specified</option>
                             <option value="noun">Noun</option>
                             <option value="verb">Verb</option>
                             <option value="adjective">Adjective</option>
@@ -1622,14 +1624,26 @@
                 <div class="form-group">
                     <label for="example-input">Example Sentence</label>
                     <textarea id="example-input"></textarea>
+                    <small class="modal-caption">Required when Fill in Blank is enabled.</small>
                 </div>
-                <div class="form-group">
-                    <label for="image-input">Image Path (Repo Path)</label>
-                    <div class="image-path-input">
-                        <input type="text" id="image-input" placeholder="images/unitX/word.png">
-                        <div id="image-preview" class="image-preview-box">No Image</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="difficulty-input">Difficulty</label>
+                        <select id="difficulty-input">
+                            <option value="1">1 - Core</option>
+                            <option value="2">2 - Challenge</option>
+                        </select>
                     </div>
-                    <small class="modal-caption">Images must be uploaded to the repo manually.</small>
+                    <div class="form-group">
+                        <label for="synonyms-input">Synonyms</label>
+                        <textarea id="synonyms-input" rows="2" placeholder="result, outcome, finding"></textarea>
+                        <small class="modal-caption">Separate words with commas.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="antonyms-input">Antonyms</label>
+                        <textarea id="antonyms-input" rows="2" placeholder="input, output"></textarea>
+                        <small class="modal-caption">Separate words with commas.</small>
+                    </div>
                 </div>
                 <label class="word-hunt-modal-toggle">
                     <input type="checkbox" id="word-hunt-input">

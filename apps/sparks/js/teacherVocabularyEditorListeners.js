@@ -154,10 +154,6 @@ function bindVocabularyModalListeners(manager) {
 }
 
 function bindVocabularyImportExport(manager) {
-    $('#image-input').addEventListener('input', (e) => {
-        manager.updateImagePreview(e.target.value);
-    });
-
     $('#export-btn').addEventListener('click', () => {
         if (!manager.ensureAuthenticated()) return;
         manager.prepareWordHuntWordsForSave();

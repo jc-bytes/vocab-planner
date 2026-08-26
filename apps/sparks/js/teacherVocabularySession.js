@@ -53,21 +53,23 @@ export function clearTeacherVocabularySessionState(owner) {
 
     ['#vocab-id', '#vocab-name', '#vocab-desc', '#vocab-grade', '#vocab-assigned-date',
         '#vocab-trimester', '#vocab-month', '#vocab-week', '#vocab-word-filter', '#import-file',
-        '#word-input', '#def-input', '#example-input', '#image-input'].forEach(selector => {
+        '#word-input', '#def-input', '#example-input', '#synonyms-input', '#antonyms-input', '#image-input'].forEach(selector => {
         const input = document.querySelector(selector);
         if (input) input.value = '';
     });
     const partOfSpeech = document.querySelector('#pos-input');
-    if (partOfSpeech) partOfSpeech.value = 'noun';
+    if (partOfSpeech) partOfSpeech.value = '';
+    const difficulty = document.querySelector('#difficulty-input');
+    if (difficulty) difficulty.value = '1';
     const wordHunt = document.querySelector('#word-hunt-input');
     if (wordHunt) wordHunt.checked = false;
-    ['#library-list', '#teacher-vocab-breadcrumb', '#words-container', '#activity-flow-settings'].forEach(selector => {
+    ['#library-list', '#teacher-vocab-breadcrumb', '#words-container', '#activity-flow-settings', '#vocab-data-readiness'].forEach(selector => {
         document.querySelector(selector)?.replaceChildren();
     });
-    const imagePreview = document.querySelector('#image-preview');
-    if (imagePreview) {
-        imagePreview.replaceChildren();
-        imagePreview.textContent = 'No Image';
+    const legacyImagePreview = document.querySelector('#image-preview');
+    if (legacyImagePreview) {
+        legacyImagePreview.replaceChildren();
+        legacyImagePreview.textContent = 'No Image';
     }
     const summaryDefaults = {
         '#vocab-editor-subtitle': '',
