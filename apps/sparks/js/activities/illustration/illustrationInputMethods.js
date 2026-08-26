@@ -20,7 +20,7 @@ async handlePaste(event) {
         }
 
         const textarea = event.target?.closest?.('[data-word-hunt-writing="true"]');
-        if (textarea && this.clipboardContainsText(event.clipboardData || event.originalEvent?.clipboardData)) {
+        if (!this.allowTextPaste && textarea && this.clipboardContainsText(event.clipboardData || event.originalEvent?.clipboardData)) {
             event.preventDefault();
             this.showTextPasteBlocked(textarea);
         }
@@ -34,17 +34,20 @@ clipboardContainsText(clipboardData) {
 
 handleWritingBeforeInput(event, textarea) {
         if (!['insertFromPaste', 'insertFromDrop'].includes(event.inputType)) return;
+        if (this.allowTextPaste) return;
         event.preventDefault();
         this.showTextPasteBlocked(textarea);
     },
 
 async handleWritingDrop(event, textarea) {
         const image = Array.from(event.dataTransfer?.files || []).find(file => file.type.startsWith('image/'));
-        event.preventDefault();
         if (image) {
+            event.preventDefault();
             await this.processAndSaveImage(image);
             return;
         }
+        if (this.allowTextPaste) return;
+        event.preventDefault();
         this.showTextPasteBlocked(textarea);
     },
 
@@ -111,4 +114,3 @@ extractImageDataUrl(text = '') {
         return dataUrlMatch ? dataUrlMatch[0] : '';
     },
 };
-

@@ -280,6 +280,7 @@ test('Illustration descriptor preserves selection policies and special construct
         uploadImage() {},
         loadImage() {},
         onDownloadWordHunt() {},
+        allowTextPaste: true,
         researchContext: { grade: '6', subjectName: 'Technology' }
     };
     const container = {};
@@ -310,6 +311,7 @@ test('Illustration descriptor preserves selection policies and special construct
             uploadImage: featureContext.uploadImage,
             loadImage: featureContext.loadImage,
             onDownloadWordHunt: featureContext.onDownloadWordHunt,
+            allowTextPaste: true,
             researchContext: featureContext.researchContext
         }
     ]);

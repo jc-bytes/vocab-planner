@@ -102,6 +102,10 @@ function bindVocabularyEditorTabs() {
 
 function bindActivitySettingInputs(manager) {
     $('#activity-flow-settings')?.addEventListener('change', (e) => {
+        if (e.target.dataset.wordHuntTextPaste !== undefined) {
+            manager.setWordHuntTextPasteAllowed(e.target.value);
+            return;
+        }
         if (!e.target.classList.contains('activity-flow-select')) return;
         manager.setActivityFlowChoice(e.target.dataset.activity, e.target.value);
         manager.updateVocabularyEditorSummary();

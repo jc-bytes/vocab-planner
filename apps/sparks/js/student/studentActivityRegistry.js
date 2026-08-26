@@ -209,6 +209,7 @@ function createIllustrationActivity({
             uploadImage: featureContext.uploadImage,
             loadImage: featureContext.loadImage,
             onDownloadWordHunt: featureContext.onDownloadWordHunt,
+            allowTextPaste: featureContext.allowTextPaste,
             researchContext: featureContext.researchContext
         }
     );

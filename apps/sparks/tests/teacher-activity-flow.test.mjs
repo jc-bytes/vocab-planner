@@ -79,6 +79,20 @@ test('teacher activity time limits are stored per activity and can be removed', 
     assert.equal(saves, 2);
 });
 
+test('teacher can allow or block text paste for Word Hunt', () => {
+    const manager = new TeacherFlowHarness();
+    let saves = 0;
+    manager.vocabSet = { activitySettings: {} };
+    manager.triggerAutoSave = () => { saves += 1; };
+
+    manager.setWordHuntTextPasteAllowed('allow');
+    assert.equal(manager.vocabSet.activitySettings.wordHuntAllowTextPaste, true);
+
+    manager.setWordHuntTextPasteAllowed('typing');
+    assert.equal(manager.vocabSet.activitySettings.wordHuntAllowTextPaste, false);
+    assert.equal(saves, 2);
+});
+
 test('teacher activity rewards use the shared defaults and activity override precedence', () => {
     const manager = new TeacherFlowHarness();
     manager.vocabSet = {

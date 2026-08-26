@@ -135,6 +135,12 @@ class TeacherVocabularyActivityFlowMethods {
         this.triggerAutoSave();
     }
 
+    setWordHuntTextPasteAllowed(value) {
+        if (!this.vocabSet.activitySettings) this.vocabSet.activitySettings = {};
+        this.vocabSet.activitySettings.wordHuntAllowTextPaste = value === true || value === 'allow';
+        this.triggerAutoSave();
+    }
+
     getActivityRewardSettings(activityId) {
         const settings = this.vocabSet?.activitySettings || {};
         return resolveActivityCoinRewards(settings, activityId);
@@ -180,6 +186,12 @@ class TeacherVocabularyActivityFlowMethods {
             const flowSelectDisabled = activity.id === 'flashcards'
                 ? ' disabled title="Flashcards is always required as Step 1"'
                 : '';
+            const answerEntrySetting = activity.id === 'illustration'
+                ? `<select aria-label="Word Hunt answer entry" data-word-hunt-text-paste${disabled}>
+                    <option value="typing"${settings.wordHuntAllowTextPaste === false ? ' selected' : ''}>Typing only</option>
+                    <option value="allow"${settings.wordHuntAllowTextPaste === false ? '' : ' selected'}>Allow paste</option>
+                </select>`
+                : '<span class="activity-setting-not-applicable" aria-label="Not applicable">-</span>';
             const group = createElement('div', `form-group activity-flow-choice${currentValue === 'hidden' ? ' is-hidden' : ''}`);
             group.setAttribute('role', 'row');
             group.innerHTML = `
@@ -196,6 +208,7 @@ class TeacherVocabularyActivityFlowMethods {
                 <input type="number" min="1" max="480" placeholder="No limit" aria-label="${activity.label} active time limit in minutes" data-activity-time-limit="${activity.id}" value="${timeLimit || ''}"${disabled}>
                 <input type="number" min="0" aria-label="${activity.label} completion coins" data-activity-reward="completionBonus" data-activity="${activity.id}" value="${rewardSettings.completionBonus}"${disabled}>
                 <input type="number" min="0" aria-label="${activity.label} progress coins" data-activity-reward="progressReward" data-activity="${activity.id}" value="${rewardSettings.progressReward}"${disabled}>
+                ${answerEntrySetting}
             `;
             container.appendChild(group);
         });

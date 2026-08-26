@@ -26,6 +26,7 @@ export class StudentActivityLauncher {
         return {
             sourceWords: vocab.words,
             activitySettings: settings,
+            allowTextPaste: settings.wordHuntAllowTextPaste !== false,
             isRequired: this.activities.getActivityFlowConfig(vocab).required.includes('illustration'),
             vocabName: vocab.name,
             initialData: this.sm.unitWordHunt,

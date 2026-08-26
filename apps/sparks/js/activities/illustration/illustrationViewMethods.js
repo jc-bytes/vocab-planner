@@ -196,7 +196,7 @@ createTextField({ id, label, value, placeholder, field, helper = '' }) {
         group.appendChild(writingSuggestions);
         const pasteFeedback = createElement('p', 'word-hunt-text-paste-feedback');
         pasteFeedback.setAttribute('role', 'alert');
-        pasteFeedback.textContent = 'Text pasting is disabled for Word Hunt. Type this answer in your own words.';
+        pasteFeedback.textContent = 'Your teacher set Word Hunt to typing only. Type this answer in your own words.';
         pasteFeedback.hidden = true;
         group.appendChild(pasteFeedback);
         if (helper) {

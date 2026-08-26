@@ -27,6 +27,7 @@ export class IllustrationActivity {
         this.researchContext = options.researchContext && typeof options.researchContext === 'object'
             ? options.researchContext
             : {};
+        this.allowTextPaste = options.allowTextPaste !== false;
         this.ownerUserId = options.ownerUserId || getActiveStudentStorageOwner();
         this.currentIndex = this.clampIndex(options.initialIndex || 0);
         this.entries = this.mergeEntries(initialData);

@@ -27,6 +27,7 @@ function writingTarget() {
 
 test('Word Hunt blocks pasted text in its writing fields', async () => {
     const activity = Object.create(IllustrationActivity.prototype);
+    activity.allowTextPaste = false;
     const { textarea, feedback } = writingTarget();
     let prevented = false;
 
@@ -38,6 +39,22 @@ test('Word Hunt blocks pasted text in its writing fields', async () => {
 
     assert.equal(prevented, true);
     assert.equal(feedback.hidden, false);
+});
+
+test('Word Hunt accepts pasted text by default', async () => {
+    const activity = Object.create(IllustrationActivity.prototype);
+    activity.allowTextPaste = true;
+    const { textarea, feedback } = writingTarget();
+    let prevented = false;
+
+    await activity.handlePaste({
+        target: textarea,
+        clipboardData: { types: ['text/plain'], items: [{ type: 'text/plain' }] },
+        preventDefault() { prevented = true; }
+    });
+
+    assert.equal(prevented, false);
+    assert.equal(feedback.hidden, true);
 });
 
 test('Word Hunt still accepts pasted images when a writing field is focused', async () => {

@@ -671,13 +671,14 @@ test('Illustration feature context exposes only its required data and capabiliti
     });
 
     assert.deepEqual(Object.keys(context).sort(), [
-        'activitySettings', 'initialData', 'initialIndex', 'isRequired', 'loadImage',
+        'activitySettings', 'allowTextPaste', 'initialData', 'initialIndex', 'isRequired', 'loadImage',
         'onDownloadWordHunt', 'onSave', 'onWordChange', 'ownerUserId', 'researchContext',
         'sourceWords', 'uploadImage', 'vocabName'
     ]);
     assert.equal(context.ownerUserId, 'student-3');
     assert.equal(context.initialIndex, 2);
     assert.equal(context.isRequired, true);
+    assert.equal(context.allowTextPaste, true);
     assert.deepEqual(context.researchContext, {
         grade: '6',
         subjectName: 'Technology',
