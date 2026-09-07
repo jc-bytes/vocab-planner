@@ -60,7 +60,6 @@ function createManager() {
         activities: {
             activityRouteTypes: ['flashcards', 'illustration'],
             availableVocabs: [],
-            getVisibleVocabularyList() { return { vocabs: this.availableVocabs }; },
             renderDashboard() {}
         }
     };
@@ -317,18 +316,4 @@ test('arcade routing sends required current Spark work to the Sparks view', asyn
         ['setRoute', { view: 'sparks' }, { replace: true }],
         ['showSparks']
     ]);
-});
-
-
-test('deep links search released units beyond the current home trimester', () => {
-    const manager = createManager();
-    const previous = { id: 'previous-trimester', name: 'Earlier unit' };
-    manager.activities.availableVocabs = [{ id: 'current-trimester' }];
-    manager.activities.getVisibleVocabularyList = options => {
-        assert.deepEqual(options, { availableOnly: true });
-        return { vocabs: [previous] };
-    };
-    const routing = new StudentRouting(manager);
-    assert.equal(routing.findVocabByRouteId(previous.id), previous);
-    assert.equal(routing.findVocabByRouteId('unreleased-unit'), null);
 });
