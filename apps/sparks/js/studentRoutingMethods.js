@@ -186,11 +186,10 @@ export class StudentRouting {
         const normalized = String(unitId || '').trim();
         if (!normalized) return null;
 
-        if (this.sm.activities.availableVocabs.length === 0) {
-            this.sm.activities.renderDashboard();
-        }
-
-        return this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+        // Home rendering narrows availableVocabs to the current trimester.
+        // Deep links must search every released unit for this grade and subject.
+        const { vocabs } = this.sm.activities.getVisibleVocabularyList({ availableOnly: true });
+        return vocabs.find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
     }
 
     isKnownActivityType(activityType) {
