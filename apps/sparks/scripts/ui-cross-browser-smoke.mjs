@@ -141,6 +141,8 @@ async function runEngine(name, browserType, browserConfig) {
 
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
+        // The audit unit belongs to August/T2; keep its release window stable.
+        await studentPage.clock.setFixedTime(new Date('2026-08-24T15:00:00Z'));
         trackPageProblems(teacherPage, `${name}:teacher`, problems);
         trackPageProblems(studentPage, `${name}:student`, problems);
 
