@@ -1596,8 +1596,8 @@
     },
     {
       "id": "grade7_t3_2026_w01_part2",
-      "name": "G7 T3 W01 Part 2 - Read spreadsheet cells",
-      "description": "Read spreadsheet cells. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "name": "G7 T3 W01 Part 2 - Practise cells and formulas",
+      "description": "Practise cells and formulas. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "7"
       ],
@@ -1610,8 +1610,8 @@
     },
     {
       "id": "grade7_t3_2026_w02_part1",
-      "name": "G7 T3 W02 Part 1 - Use spreadsheet formulas",
-      "description": "Use spreadsheet formulas. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "name": "G7 T3 W02 Part 1 - Read spreadsheet cells",
+      "description": "Read spreadsheet cells. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "7"
       ],

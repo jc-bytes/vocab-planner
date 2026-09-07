@@ -1,7 +1,7 @@
 {
   "id": "grade7_t3_2026_w02_part1",
-  "name": "G7 T3 W02 Part 1 - Use spreadsheet formulas",
-  "description": "Use spreadsheet formulas. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "name": "G7 T3 W02 Part 1 - Read spreadsheet cells",
+  "description": "Read spreadsheet cells. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
   "grades": [
     "7"
   ],
@@ -13,19 +13,19 @@
   "purpose": "practice",
   "words": [
     {
-      "word": "Formula",
-      "definition": "A calculation written in a spreadsheet.",
-      "source": "https://techterms.com/definition/formula",
-      "example": "The formula =B2+B3 adds two cell values.",
+      "word": "Row",
+      "definition": "A line of cells going across a table.",
+      "source": "https://techterms.com/definition/row",
+      "example": "Row 3 holds all the information about the chess club.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
     },
     {
-      "word": "Function",
-      "definition": "A ready-made calculation, such as SUM, that uses the numbers you give it.",
-      "source": "https://techterms.com/definition/function",
-      "example": "The function SUM adds the numbers in B2:B5.",
+      "word": "Column",
+      "definition": "A line of cells going down a table.",
+      "source": "https://techterms.com/definition/column",
+      "example": "Column B holds the number of students in each club.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
