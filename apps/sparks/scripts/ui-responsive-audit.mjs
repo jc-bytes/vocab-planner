@@ -586,6 +586,7 @@ async function main() {
         const studentPage = await studentContext.newPage();
 
         if (process.env.UI_AUDIT_DATE) {
+            await teacherPage.clock.setFixedTime(new Date(`${process.env.UI_AUDIT_DATE}T15:00:00Z`));
             await studentPage.clock.setFixedTime(new Date(`${process.env.UI_AUDIT_DATE}T15:00:00Z`));
         }
         await loginTeacher(teacherPage, baseUrl);
