@@ -2825,6 +2825,7 @@ select:focus,
 }
 
 .student-continue-hero {
+    box-sizing: border-box;
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;

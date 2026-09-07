@@ -65,6 +65,8 @@ async function resolveServer() {
 }
 
 async function installFixture(page) {
+    // Keep scheduled catalog fixtures available regardless of the CI run date.
+    await page.clock.setFixedTime(new Date('2026-09-14T15:00:00Z'));
     await page.goto(`${baseUrl}/student.html`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.studentApp?.activities?.manifest?.vocabularies?.length, null, { timeout: 15000 });
     await page.evaluate(async () => {
@@ -663,7 +665,7 @@ try {
     });
     const page = await context.newPage();
     page.on('console', message => {
-        if (message.type() === 'error') browserProblems.push(`console.error: ${message.text()}`);
+        if (message.type() === 'error') browserProblems.push(`console.error: ${message.text()} ${JSON.stringify(message.location())}`);
     });
     page.on('pageerror', error => browserProblems.push(`pageerror: ${error.message}`));
     await installFixture(page);
@@ -692,6 +694,21 @@ try {
     }
 
     await assertCompactTodaySupportRow(page);
+    // Exercise the empty hero as well as the populated button hero.
+    await page.clock.setFixedTime(new Date('2026-01-01T15:00:00Z'));
+    await page.evaluate(async () => {
+        await window.studentApp.activities.renderStudentHome();
+        window.studentApp.switchView('main-menu-view');
+    });
+    await page.waitForTimeout(340);
+    assert.equal(await page.locator('section.student-continue-hero').count(), 1);
+    for (const width of widths) {
+        await page.setViewportSize({ width, height: viewportHeight });
+        await page.waitForTimeout(340);
+        assertShellState(await readShellState(page, width, 'Today'));
+    }
+    await page.clock.setFixedTime(new Date('2026-09-14T15:00:00Z'));
+    await page.evaluate(() => window.studentApp.activities.renderStudentHome());
     await assertShortDesktopTodayStartsAtTop(page);
     await assertCollapsedSidebar(page);
     await assertResizeTransition(page);
