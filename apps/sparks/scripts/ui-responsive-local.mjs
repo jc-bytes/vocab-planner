@@ -26,6 +26,8 @@ function runNodeScript(script, env) {
     });
 }
 
+// Exercise a teaching day, including a Spark scheduled for that same day.
+process.env.UI_AUDIT_DATE = '2026-08-24';
 const seeded = await seedLocalAuditData({ resetSubmissions: false });
 
 await runNodeScript('scripts/ui-responsive-audit.mjs', {

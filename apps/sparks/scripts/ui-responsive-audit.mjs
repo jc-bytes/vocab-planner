@@ -561,7 +561,7 @@ async function assertStudentMobileMenu(page, baseUrl) {
 
 async function assertStudentActivityCardsAreButtons(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
-    await page.goto(`${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
 
     const result = await page.evaluate(() => {
@@ -578,13 +578,16 @@ async function main() {
 
     try {
         browser = await chromium.launch({ headless: true });
-        const teacherContext = await browser.newContext();
-        const studentContext = await browser.newContext();
+        const teacherContext = await browser.newContext({ timezoneId: 'America/Panama' });
+        const studentContext = await browser.newContext({ timezoneId: 'America/Panama' });
         await applySupabaseOverride(teacherContext);
         await applySupabaseOverride(studentContext);
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
 
+        if (process.env.UI_AUDIT_DATE) {
+            await studentPage.clock.setFixedTime(new Date(`${process.env.UI_AUDIT_DATE}T15:00:00Z`));
+        }
         await loginTeacher(teacherPage, baseUrl);
         await loginStudent(studentPage, baseUrl);
 
@@ -601,8 +604,8 @@ async function main() {
         const studentRoutes = [
             ['Student Dashboard', `${baseUrl}/student.html#/menu`],
             ['Student Units', `${baseUrl}/student.html#/units?all=1`],
-            ['Student Unit Menu', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product`],
-            ['Student Flashcards', `${baseUrl}/student.html#/unit/grade6_t1_may_week3_awareness_product/activity/flashcards`],
+            ['Student Unit Menu', `${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards`],
+            ['Student Flashcards', `${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards/activity/flashcards`],
             ['Student Arcade', `${baseUrl}/student.html#/arcade`]
         ];
 

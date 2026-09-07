@@ -217,7 +217,7 @@ function buildAuditSparks({ teacherId }) {
             source_url: '',
             subject_slug: 'technology',
             target_grades: ['6'],
-            scheduled_date: getPanamaDateValue(),
+            scheduled_date: process.env.UI_AUDIT_DATE || getPanamaDateValue(),
             status: 'scheduled',
             owner_id: teacherId
         },
