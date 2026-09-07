@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w01_part2",
+  "name": "G8 T3 W01 Part 2 - Map your lunch app",
+  "description": "Map your lunch app. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "assignedDate": "2026-09-14",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Event",
+      "definition": "Something that happens, such as a button click.",
+      "source": "https://www.merriam-webster.com/dictionary/event",
+      "example": "A button click is an event that starts the next action.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that holds a value.",
+      "source": "https://techterms.com/definition/variable",
+      "example": "The variable meal stores the chosen lunch.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

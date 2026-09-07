@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w07_part1",
+  "name": "G7 T3 W07 Part 1 - Repeat a Scratch task",
+  "description": "Repeat a Scratch task. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 7,
+  "assignedDate": "2026-10-26",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Function",
+      "definition": "A named group of instructions that performs a task.",
+      "source": "https://techterms.com/definition/function",
+      "example": "The function deliver groups the Scratch steps for one delivery.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Loop",
+      "definition": "Instructions that a program repeats.",
+      "source": "https://techterms.com/definition/loop",
+      "example": "The loop repeats the move instruction four times.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

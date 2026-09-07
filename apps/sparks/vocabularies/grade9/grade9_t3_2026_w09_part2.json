@@ -1,0 +1,44 @@
+{
+  "id": "grade9_t3_2026_w09_part2",
+  "name": "G9 T3 W09 Part 2 - Practise your project demonstration",
+  "description": "Practise your project demonstration. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 9,
+  "assignedDate": "2026-11-09",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Prototype",
+      "definition": "An early version of a product used to test an idea.",
+      "source": "https://www.merriam-webster.com/dictionary/prototype",
+      "example": "The paper bridge is a prototype we can test before building a stronger bridge.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback says the bridge bends in the middle.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

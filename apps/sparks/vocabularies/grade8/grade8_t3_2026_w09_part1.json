@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w09_part1",
+  "name": "G8 T3 W09 Part 1 - Test your Python fixes",
+  "description": "Test your Python fixes. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 9,
+  "assignedDate": "2026-11-09",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Bug",
+      "definition": "A mistake that makes a program behave incorrectly.",
+      "source": "https://techterms.com/definition/bug",
+      "example": "A bug makes the total subtract instead of add.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that holds a value.",
+      "source": "https://techterms.com/definition/variable",
+      "example": "The variable total stores the answer to the calculation.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

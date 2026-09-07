@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w10_part2",
+  "name": "G7 T3 W10 Part 2 - Send a Mandrake warning",
+  "description": "Send a Mandrake warning. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 10,
+  "assignedDate": "2026-11-16",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Sensor",
+      "definition": "A part that detects a change, such as light or distance.",
+      "source": "https://www.merriam-webster.com/dictionary/sensor",
+      "example": "The sensor measures the light around the micro:bit.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Threshold",
+      "definition": "The value where a program changes its response.",
+      "source": "https://www.merriam-webster.com/dictionary/threshold",
+      "example": "The threshold is 100, so a reading of 99 is below it.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

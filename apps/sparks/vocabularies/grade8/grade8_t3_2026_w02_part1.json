@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w02_part1",
+  "name": "G8 T3 W02 Part 1 - Test your lunch map",
+  "description": "Test your lunch map. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "assignedDate": "2026-09-21",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "We test the bridge with the same small weight each time.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bug",
+      "definition": "A mistake that makes a program behave incorrectly.",
+      "source": "https://techterms.com/definition/bug",
+      "example": "A bug makes the app show Rice after the user chooses Vegetables.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w09_part2",
+  "name": "G7 T3 W09 Part 2 - Find your saved files",
+  "description": "Find your saved files. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 9,
+  "assignedDate": "2026-11-09",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "File",
+      "definition": "A saved piece of work on a computer.",
+      "source": "https://techterms.com/definition/file",
+      "example": "I save my spreadsheet as a file named ClubResults.xlsx.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Folder",
+      "definition": "A place on a computer for keeping files together.",
+      "source": "https://techterms.com/definition/folder",
+      "example": "The folder keeps my three project files together.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

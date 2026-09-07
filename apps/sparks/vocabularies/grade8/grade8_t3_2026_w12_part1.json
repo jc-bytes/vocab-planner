@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w12_part1",
+  "name": "G8 T3 W12 Part 1 - Test Catch the Star",
+  "description": "Test Catch the Star. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "December",
+  "week": 12,
+  "assignedDate": "2026-11-30",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Loop",
+      "definition": "Instructions that a program repeats.",
+      "source": "https://techterms.com/definition/loop",
+      "example": "The loop repeats the move instruction four times.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Condition",
+      "definition": "A rule that must be true for an action to happen.",
+      "source": "https://www.merriam-webster.com/dictionary/condition",
+      "example": "The condition checks whether the player touches the star.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

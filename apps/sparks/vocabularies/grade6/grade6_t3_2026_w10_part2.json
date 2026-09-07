@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w10_part2",
+  "name": "G6 T3 W10 Part 2 - Demonstrate your saved work",
+  "description": "Demonstrate your saved work. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 10,
+  "assignedDate": "2026-11-16",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "A test compares the saved result with the rule for the task.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback names one change that would improve that result.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

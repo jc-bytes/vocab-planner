@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w03_part1",
+  "name": "G8 T3 W03 Part 1 - Organise your app work",
+  "description": "Organise your app work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "File",
+      "definition": "A saved piece of work on a computer.",
+      "source": "https://techterms.com/definition/file",
+      "example": "I save my spreadsheet as a file named ClubResults.xlsx.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Folder",
+      "definition": "A place on a computer for keeping files together.",
+      "source": "https://techterms.com/definition/folder",
+      "example": "The folder keeps my three project files together.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

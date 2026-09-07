@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w05_part1",
+  "name": "G7 T3 W05 Part 1 - Test your STEAM project",
+  "description": "Test your STEAM project. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 5,
+  "assignedDate": "2026-10-12",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "A test checks whether the project meets its stated goal.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback names one project result that needs to improve.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

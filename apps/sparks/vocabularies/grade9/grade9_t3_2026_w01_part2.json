@@ -1,0 +1,44 @@
+{
+  "id": "grade9_t3_2026_w01_part2",
+  "name": "G9 T3 W01 Part 2 - Picture and sound data",
+  "description": "Picture and sound data. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "assignedDate": "2026-09-14",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Sample",
+      "definition": "One measurement of sound taken at one moment.",
+      "source": "https://techterms.com/definition/sample",
+      "example": "A sample stores one sound measurement from one moment.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Sample rate",
+      "definition": "The number of sound measurements taken each second.",
+      "source": "https://techterms.com/definition/sample_rate",
+      "example": "A sample rate of 8 means eight sound measurements each second in our small example.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

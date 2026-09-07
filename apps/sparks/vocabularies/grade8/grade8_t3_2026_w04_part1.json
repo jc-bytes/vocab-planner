@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w04_part1",
+  "name": "G8 T3 W04 Part 1 - Plan your STEAM work",
+  "description": "Plan your STEAM work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 4,
+  "assignedDate": "2026-10-05",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Prototype",
+      "definition": "An early version of a product used to test an idea.",
+      "source": "https://www.merriam-webster.com/dictionary/prototype",
+      "example": "The paper bridge is a prototype we can test before building a stronger bridge.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Model",
+      "definition": "A simple version that shows what an object looks like.",
+      "source": "https://www.merriam-webster.com/dictionary/model",
+      "example": "The small cardboard model shows the shape of the bridge.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

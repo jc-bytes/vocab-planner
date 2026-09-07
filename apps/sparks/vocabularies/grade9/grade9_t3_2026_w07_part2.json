@@ -1,0 +1,44 @@
+{
+  "id": "grade9_t3_2026_w07_part2",
+  "name": "G9 T3 W07 Part 2 - Review safety and compare risks",
+  "description": "Review safety and compare risks. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 7,
+  "assignedDate": "2026-10-26",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Probability",
+      "definition": "How likely something is to happen.",
+      "source": "https://www.merriam-webster.com/dictionary/probability",
+      "example": "The probability of losing a file is higher when there is only one copy.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Impact",
+      "definition": "How much harm a problem could cause.",
+      "source": "https://www.merriam-webster.com/dictionary/impact",
+      "example": "Losing the only project copy has a high impact because the work is gone.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

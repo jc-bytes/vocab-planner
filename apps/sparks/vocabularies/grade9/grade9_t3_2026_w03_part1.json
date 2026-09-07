@@ -1,0 +1,44 @@
+{
+  "id": "grade9_t3_2026_w03_part1",
+  "name": "G9 T3 W03 Part 1 - Spot online dangers",
+  "description": "Spot online dangers. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Phishing",
+      "definition": "A trick that uses a fake message to steal private information.",
+      "source": "https://techterms.com/definition/phishing",
+      "example": "A phishing message asks for a password on a fake login page.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Malware",
+      "definition": "Software made to harm a computer or steal information.",
+      "source": "https://techterms.com/definition/malware",
+      "example": "The malware damages files after an unsafe download.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w06_part1",
+  "name": "G6 T3 W06 Part 1 - Practise your STEAM explanation",
+  "description": "Practise your STEAM explanation. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 6,
+  "assignedDate": "2026-10-19",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Prototype",
+      "definition": "An early version of a product used to test an idea.",
+      "source": "https://www.merriam-webster.com/dictionary/prototype",
+      "example": "The paper bridge is a prototype we can test before building a stronger bridge.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback says the bridge bends in the middle.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

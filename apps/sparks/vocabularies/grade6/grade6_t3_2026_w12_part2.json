@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w12_part2",
+  "name": "G6 T3 W12 Part 2 - Build and test a night-light",
+  "description": "Build and test a night-light. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "December",
+  "week": 12,
+  "assignedDate": "2026-11-30",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Input",
+      "definition": "Information sent into a computer.",
+      "source": "https://techterms.com/definition/input",
+      "example": "Pressing button A gives the program an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information produced by a computer.",
+      "source": "https://techterms.com/definition/output",
+      "example": "The number shown on the screen is an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w02_part2",
+  "name": "G7 T3 W02 Part 2 - Build a column chart",
+  "description": "Build a column chart. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "assignedDate": "2026-09-21",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Table",
+      "definition": "Information arranged in rows and columns.",
+      "source": "https://techterms.com/definition/table",
+      "example": "The table puts club names beside their student counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "example": "The chart uses bars to compare the club counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

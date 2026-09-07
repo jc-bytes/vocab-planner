@@ -1,0 +1,44 @@
+{
+  "id": "grade9_t3_2026_w01_part1",
+  "name": "G9 T3 W01 Part 1 - Picture size in bits",
+  "description": "Picture size in bits. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "assignedDate": "2026-09-14",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Pixel",
+      "definition": "A tiny square of colour that helps make a digital picture.",
+      "source": "https://techterms.com/definition/pixel",
+      "example": "Each pixel adds one tiny square of colour to the picture.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bit",
+      "definition": "A single 0 or 1 used to store information.",
+      "source": "https://techterms.com/definition/bit",
+      "example": "A bit can store a 0 or a 1.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

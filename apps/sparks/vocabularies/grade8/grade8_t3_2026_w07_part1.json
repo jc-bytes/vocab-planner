@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w07_part1",
+  "name": "G8 T3 W07 Part 1 - Calculate with Python",
+  "description": "Calculate with Python. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 7,
+  "assignedDate": "2026-10-26",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Input",
+      "definition": "Information sent into a computer.",
+      "source": "https://techterms.com/definition/input",
+      "example": "Typing 6 gives the Python program an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that holds a value.",
+      "source": "https://techterms.com/definition/variable",
+      "example": "The variable total stores the answer to the calculation.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

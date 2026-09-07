@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w03_part1",
+  "name": "G6 T3 W03 Part 1 - Build a table and chart",
+  "description": "Build a table and chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Data",
+      "definition": "Facts and values that a computer can store and use.",
+      "source": "https://techterms.com/definition/data",
+      "example": "The data shows that 12 students chose chess.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "example": "The chart uses bars to compare the club counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "grade6_t3_2026_w10_part1",
+  "name": "G6 T3 W10 Part 1 - Check a model; build a counter",
+  "description": "Check a model; build a counter. 3 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 10,
+  "assignedDate": "2026-11-16",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Dimension",
+      "definition": "A measurement such as length, width or height.",
+      "source": "https://www.merriam-webster.com/dictionary/dimension",
+      "example": "One dimension of the box is its 50 mm length.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Input",
+      "definition": "Information sent into a computer.",
+      "source": "https://techterms.com/definition/input",
+      "example": "Pressing button A gives the program an input.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information produced by a computer.",
+      "source": "https://techterms.com/definition/output",
+      "example": "The number shown on the screen is an output.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 3,
+    "matching": 3,
+    "fillInBlank": 3
+  }
+}

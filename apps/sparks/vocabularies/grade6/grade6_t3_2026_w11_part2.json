@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w11_part2",
+  "name": "G6 T3 W11 Part 2 - Test your micro:bit program",
+  "description": "Test your micro:bit program. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 11,
+  "assignedDate": "2026-11-23",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "We test the program with a known input and check the response.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback names the response that needs to change.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

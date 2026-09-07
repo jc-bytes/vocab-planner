@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w03_part2",
+  "name": "G7 T3 W03 Part 2 - Explain spreadsheet data",
+  "description": "Explain spreadsheet data. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Formula",
+      "definition": "A calculation written in a spreadsheet.",
+      "source": "https://techterms.com/definition/formula",
+      "example": "The formula =B2+B3 adds two cell values.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "example": "The chart uses bars to compare the club counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

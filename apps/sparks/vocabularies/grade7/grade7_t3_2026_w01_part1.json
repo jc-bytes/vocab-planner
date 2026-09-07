@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w01_part1",
+  "name": "G7 T3 W01 Part 1 - Find a spreadsheet cell",
+  "description": "Find a spreadsheet cell. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "assignedDate": "2026-09-14",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Row",
+      "definition": "A line of cells going across a table.",
+      "source": "https://techterms.com/definition/row",
+      "example": "Row 3 holds all the information about the chess club.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Column",
+      "definition": "A line of cells going down a table.",
+      "source": "https://techterms.com/definition/column",
+      "example": "Column B holds the number of students in each club.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

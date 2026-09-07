@@ -1,0 +1,44 @@
+{
+  "id": "grade7_t3_2026_w11_part1",
+  "name": "G7 T3 W11 Part 1 - Make the warning clearer",
+  "description": "Make the warning clearer. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 11,
+  "assignedDate": "2026-11-23",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "We test the program with a known input and check the response.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback names the response that needs to change.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

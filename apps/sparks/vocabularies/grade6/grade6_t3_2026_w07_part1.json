@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w07_part1",
+  "name": "G6 T3 W07 Part 1 - Make a table and chart",
+  "description": "Make a table and chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 7,
+  "assignedDate": "2026-10-26",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Table",
+      "definition": "Information arranged in rows and columns.",
+      "source": "https://techterms.com/definition/table",
+      "example": "The table puts club names beside their student counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "example": "The chart uses bars to compare the club counts.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

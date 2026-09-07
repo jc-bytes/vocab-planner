@@ -1,0 +1,44 @@
+{
+  "id": "grade8_t3_2026_w11_part2",
+  "name": "G8 T3 W11 Part 2 - Build Catch the Star",
+  "description": "Build Catch the Star. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 11,
+  "assignedDate": "2026-11-23",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Loop",
+      "definition": "Instructions that a program repeats.",
+      "source": "https://techterms.com/definition/loop",
+      "example": "The loop repeats the move instruction four times.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Condition",
+      "definition": "A rule that must be true for an action to happen.",
+      "source": "https://www.merriam-webster.com/dictionary/condition",
+      "example": "The condition checks whether the player touches the star.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

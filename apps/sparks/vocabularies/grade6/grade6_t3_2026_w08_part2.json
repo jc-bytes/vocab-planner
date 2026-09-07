@@ -1,0 +1,44 @@
+{
+  "id": "grade6_t3_2026_w08_part2",
+  "name": "G6 T3 W08 Part 2 - Measure and model an eraser",
+  "description": "Measure and model an eraser. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 8,
+  "assignedDate": "2026-11-02",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Dimension",
+      "definition": "A measurement such as length, width or height.",
+      "source": "https://www.merriam-webster.com/dictionary/dimension",
+      "example": "One dimension of the box is its 50 mm length.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Model",
+      "definition": "A simple version that shows what an object looks like.",
+      "source": "https://www.merriam-webster.com/dictionary/model",
+      "example": "The small cardboard model shows the shape of the bridge.",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2,
+    "matching": 2,
+    "fillInBlank": 2
+  }
+}

@@ -303,152 +303,6 @@
       "path": "vocabularies/grade6/grade6_t2_august_week3_demo_reflection.json"
     },
     {
-      "id": "grade6_t3_summative_spreadsheet_vocabulary",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Summative: IIIT Vocabulary",
-      "description": "Ten core third-trimester words for the Grade 6 IIIT summative vocabulary table.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "month": "september",
-      "week": 1,
-      "purpose": "summative",
-      "path": "vocabularies/grade6/grade6_t3_summative_spreadsheet_vocabulary.json"
-    },
-    {
-      "id": "grade6_t3_september_week2_formulas",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: September Week 2 - Formulas",
-      "description": "Practice words for spreadsheet formulas and values.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_september_week2_formulas.json"
-    },
-    {
-      "id": "grade6_t3_october_week1_budget_planning",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: October Week 1 - Budget Planning",
-      "description": "Practice words for planning with quantities, costs, and totals.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_october_week1_budget_planning.json"
-    },
-    {
-      "id": "grade6_t3_october_week2_charts",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: October Week 2 - Charts",
-      "description": "Practice words for chart parts and conclusions.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_october_week2_charts.json"
-    },
-    {
-      "id": "grade6_t3_october_week3_3d_basics",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: October Week 3 - 3D Basics",
-      "description": "Practice words for basic 3D modeling actions.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_october_week3_3d_basics.json"
-    },
-    {
-      "id": "grade6_t3_october_week4_design_prototype",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: October Week 4 - Design Prototype",
-      "description": "Practice words for planning and improving a simple model.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_october_week4_design_prototype.json"
-    },
-    {
-      "id": "grade6_t3_november_week1_present_reflect",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: November Week 1 - Present and Reflect",
-      "description": "Practice words for presenting, feedback, and reflection.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_november_week1_present_reflect.json"
-    },
-    {
-      "id": "grade6_t3_november_week2_microbit_io",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: November Week 2 - micro:bit Input and Output",
-      "description": "Practice words for micro:bit parts, inputs, and outputs.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_november_week2_microbit_io.json"
-    },
-    {
-      "id": "grade6_t3_november_week3_microbit_variables",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: November Week 3 - micro:bit Variables",
-      "description": "Practice words for counters and changing values.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_november_week3_microbit_variables.json"
-    },
-    {
-      "id": "grade6_t3_december_week1_sensors_conditions",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: December Week 1 - Sensors and Conditions",
-      "description": "Practice words for sensors, conditions, and messages.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_december_week1_sensors_conditions.json"
-    },
-    {
-      "id": "grade6_t3_december_week2_final_project",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: December Week 2 - Final Project",
-      "description": "Practice words for building and improving the final micro:bit project.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_december_week2_final_project.json"
-    },
-    {
-      "id": "grade6_t3_december_week3_demonstrate_explain",
-      "subjectSlug": "technology",
-      "name": "Grade 6 T3 Practice: December Week 3 - Demonstrate and Explain",
-      "description": "Practice words for demonstrating and explaining the final project.",
-      "grades": [
-        "6"
-      ],
-      "trimester": "3",
-      "purpose": "practice",
-      "path": "vocabularies/grade6/grade6_t3_december_week3_demonstrate_explain.json"
-    },
-    {
       "id": "grade7_it_summative_robotics_parts",
       "subjectSlug": "technology",
       "name": "Grade 7 IT Summative: Robotics Parts",
@@ -739,152 +593,6 @@
       "trimester": "IIT",
       "purpose": "practice",
       "path": "vocabularies/grade7/grade7_iit_august_week12_demo.json"
-    },
-    {
-      "id": "grade7_iiit_summative_spreadsheets",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Summative: Spreadsheets",
-      "description": "Ten core third-trimester words for the Grade 7 spreadsheet vocabulary table.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "month": "september",
-      "week": 1,
-      "purpose": "summative",
-      "path": "vocabularies/grade7/grade7_iiit_summative_spreadsheets.json"
-    },
-    {
-      "id": "grade7_iiit_september_week2_formulas_charts",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: September Week 2 - Formulas and Charts",
-      "description": "Practice words for formulas, functions, and chart interpretation.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_september_week2_formulas_charts.json"
-    },
-    {
-      "id": "grade7_iiit_october_week3_data_analysis",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: October Week 3 - Data Analysis",
-      "description": "Practice words for sorting, filtering, and patterns.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_october_week3_data_analysis.json"
-    },
-    {
-      "id": "grade7_iiit_october_week4_scratch_decomposition",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: October Week 4 - Scratch Decomposition",
-      "description": "Practice words for decomposition and subroutines.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_october_week4_scratch_decomposition.json"
-    },
-    {
-      "id": "grade7_iiit_october_week5_sources_lists",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: October Week 5 - Sources and Lists",
-      "description": "Practice words for lists, credible sources, and citation.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_october_week5_sources_lists.json"
-    },
-    {
-      "id": "grade7_iiit_october_week6_blog_media",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: October Week 6 - Blog Media",
-      "description": "Practice words for blog posts and media layout.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_october_week6_blog_media.json"
-    },
-    {
-      "id": "grade7_iiit_october_week7_sensor_systems",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: October Week 7 - Sensor Systems",
-      "description": "Practice words for micro:bit input and output systems.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_october_week7_sensor_systems.json"
-    },
-    {
-      "id": "grade7_iiit_november_week8_test_table",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: November Week 8 - Test Table",
-      "description": "Practice words for sensor testing and reliability.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_november_week8_test_table.json"
-    },
-    {
-      "id": "grade7_iiit_november_week9_review_setup",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: November Week 9 - Review Setup",
-      "description": "Practice words for reviewing third-trimester concepts.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_november_week9_review_setup.json"
-    },
-    {
-      "id": "grade7_iiit_november_week10_project_plan",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: November Week 10 - Project Plan",
-      "description": "Practice words for planning the Mandrake Detection System.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_november_week10_project_plan.json"
-    },
-    {
-      "id": "grade7_iiit_november_week11_debug_reliability",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: November Week 11 - Debug Reliability",
-      "description": "Practice words for retesting and improving reliability.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_november_week11_debug_reliability.json"
-    },
-    {
-      "id": "grade7_iiit_november_week12_presentation",
-      "subjectSlug": "technology",
-      "name": "Grade 7 IIIT Practice: November Week 12 - Presentation",
-      "description": "Practice words for presenting the final system.",
-      "grades": [
-        "7"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade7/grade7_iiit_november_week12_presentation.json"
     },
     {
       "id": "grade8_it_summative_vector_graphics",
@@ -1203,152 +911,6 @@
       "path": "vocabularies/grade8/grade8_iit_august_week13_cleanup.json"
     },
     {
-      "id": "grade8_iiit_summative_app_design",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Summative: App Design",
-      "description": "Ten core third-trimester words for the Grade 8 app design vocabulary table.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "month": "september",
-      "week": 1,
-      "purpose": "summative",
-      "path": "vocabularies/grade8/grade8_iiit_summative_app_design.json"
-    },
-    {
-      "id": "grade8_iiit_september_week2_events_flow",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: September Week 2 - Events and Flow",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_september_week2_events_flow.json"
-    },
-    {
-      "id": "grade8_iiit_september_week3_user_needs",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: September Week 3 - User Needs",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_september_week3_user_needs.json"
-    },
-    {
-      "id": "grade8_iiit_october_week4_first_python",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: October Week 4 - First Python",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_october_week4_first_python.json"
-    },
-    {
-      "id": "grade8_iiit_october_week5_numbers_selection",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: October Week 5 - Numbers and Selection",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_october_week5_numbers_selection.json"
-    },
-    {
-      "id": "grade8_iiit_october_week6_loops_branches",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: October Week 6 - Loops and Branches",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_october_week6_loops_branches.json"
-    },
-    {
-      "id": "grade8_iiit_october_week7_debugging",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: October Week 7 - Debugging",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_october_week7_debugging.json"
-    },
-    {
-      "id": "grade8_iiit_october_week8_microbit_setup",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: October Week 8 - Micro:bit Setup",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_october_week8_microbit_setup.json"
-    },
-    {
-      "id": "grade8_iiit_november_week9_binary_representation",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: November Week 9 - Binary Representation",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_november_week9_binary_representation.json"
-    },
-    {
-      "id": "grade8_iiit_november_week10_game_build",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: November Week 10 - Game Build",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_november_week10_game_build.json"
-    },
-    {
-      "id": "grade8_iiit_november_week11_user_testing",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: November Week 11 - User Testing",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_november_week11_user_testing.json"
-    },
-    {
-      "id": "grade8_iiit_november_week12_presentation",
-      "subjectSlug": "technology",
-      "name": "Grade 8 IIIT Practice: November Week 12 - Presentation",
-      "description": "Practice words for Grade 8 third-trimester app, Python, and Micro:bit work.",
-      "grades": [
-        "8"
-      ],
-      "trimester": "IIIT",
-      "purpose": "practice",
-      "path": "vocabularies/grade8/grade8_iiit_november_week12_presentation.json"
-    },
-    {
       "id": "grade9_it_summative_physical_computing",
       "subjectSlug": "technology",
       "name": "Grade 9 IT Summative: Physical Computing",
@@ -1655,150 +1217,1278 @@
       "path": "vocabularies/grade9/grade9_iit_august_week12_presentation.json"
     },
     {
-      "id": "grade9_iiit_summative_digital_media",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Summative: Digital Media",
-      "description": "Ten core third-trimester words for the Grade 9 digital media vocabulary table.",
+      "id": "grade6_t3_2026_w01_part1",
+      "name": "G6 T3 W01 Part 1 - Find a spreadsheet cell",
+      "description": "Find a spreadsheet cell. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
-        "9"
+        "6"
       ],
-      "trimester": "IIIT",
-      "month": "september",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
       "week": 1,
-      "purpose": "summative",
-      "path": "vocabularies/grade9/grade9_iiit_summative_digital_media.json"
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w01_part1.json"
     },
     {
-      "id": "grade9_iiit_september_week2_sound_quality",
+      "id": "grade6_t3_2026_w01_part2",
+      "name": "G6 T3 W01 Part 2 - Turn sentences into a table",
+      "description": "Turn sentences into a table. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
       "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: September Week 2 - Sound Quality",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w01_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w02_part1",
+      "name": "G6 T3 W02 Part 1 - Build a column chart",
+      "description": "Build a column chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w02_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w02_part2",
+      "name": "G6 T3 W02 Part 2 - Read spreadsheet cells",
+      "description": "Read spreadsheet cells. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w02_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w03_part1",
+      "name": "G6 T3 W03 Part 1 - Build a table and chart",
+      "description": "Build a table and chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w03_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w03_part2",
+      "name": "G6 T3 W03 Part 2 - Build a story table",
+      "description": "Build a story table. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w03_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w04_part1",
+      "name": "G6 T3 W04 Part 1 - Plan your STEAM work",
+      "description": "Plan your STEAM work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w04_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w04_part2",
+      "name": "G6 T3 W04 Part 2 - Build your STEAM part",
+      "description": "Build your STEAM part. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w04_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w05_part1",
+      "name": "G6 T3 W05 Part 1 - Test your STEAM part",
+      "description": "Test your STEAM part. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w05_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w05_part2",
+      "name": "G6 T3 W05 Part 2 - Show your STEAM contribution",
+      "description": "Show your STEAM contribution. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w05_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w06_part1",
+      "name": "G6 T3 W06 Part 1 - Practise your STEAM explanation",
+      "description": "Practise your STEAM explanation. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w06_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w06_part2",
+      "name": "G6 T3 W06 Part 2 - Present your STEAM project",
+      "description": "Present your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w06_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w07_part1",
+      "name": "G6 T3 W07 Part 1 - Make a table and chart",
+      "description": "Make a table and chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w07_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w07_part2",
+      "name": "G6 T3 W07 Part 2 - Check your table and chart",
+      "description": "Check your table and chart. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w07_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w08_part1",
+      "name": "G6 T3 W08 Part 1 - Measure your eraser",
+      "description": "Measure your eraser. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 8,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w08_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w08_part2",
+      "name": "G6 T3 W08 Part 2 - Measure and model an eraser",
+      "description": "Measure and model an eraser. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 8,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w08_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w09_part1",
+      "name": "G6 T3 W09 Part 1 - Build your measured model",
+      "description": "Build your measured model. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w09_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w09_part2",
+      "name": "G6 T3 W09 Part 2 - Build and check your model",
+      "description": "Build and check your model. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w09_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w10_part1",
+      "name": "G6 T3 W10 Part 1 - Check a model; build a counter",
+      "description": "Check a model; build a counter. 3 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w10_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w10_part2",
+      "name": "G6 T3 W10 Part 2 - Demonstrate your saved work",
+      "description": "Demonstrate your saved work. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w10_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w11_part1",
+      "name": "G6 T3 W11 Part 1 - Control a micro:bit response",
+      "description": "Control a micro:bit response. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w11_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w11_part2",
+      "name": "G6 T3 W11 Part 2 - Test your micro:bit program",
+      "description": "Test your micro:bit program. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w11_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w12_part1",
+      "name": "G6 T3 W12 Part 1 - Predict the light response",
+      "description": "Predict the light response. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w12_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w12_part2",
+      "name": "G6 T3 W12 Part 2 - Build and test a night-light",
+      "description": "Build and test a night-light. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w12_part2.json"
+    },
+    {
+      "id": "grade6_t3_2026_w13_part1",
+      "name": "G6 T3 W13 Part 1 - Explain your night-light",
+      "description": "Explain your night-light. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 13,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w13_part1.json"
+    },
+    {
+      "id": "grade6_t3_2026_w13_part2",
+      "name": "G6 T3 W13 Part 2 - Demonstrate your night-light",
+      "description": "Demonstrate your night-light. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "6"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 13,
+      "purpose": "practice",
+      "path": "vocabularies/grade6/grade6_t3_2026_w13_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w01_part1",
+      "name": "G7 T3 W01 Part 1 - Find a spreadsheet cell",
+      "description": "Find a spreadsheet cell. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w01_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w01_part2",
+      "name": "G7 T3 W01 Part 2 - Read spreadsheet cells",
+      "description": "Read spreadsheet cells. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w01_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w02_part1",
+      "name": "G7 T3 W02 Part 1 - Use spreadsheet formulas",
+      "description": "Use spreadsheet formulas. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w02_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w02_part2",
+      "name": "G7 T3 W02 Part 2 - Build a column chart",
+      "description": "Build a column chart. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w02_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w03_part1",
+      "name": "G7 T3 W03 Part 1 - Explain your chart",
+      "description": "Explain your chart. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w03_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w03_part2",
+      "name": "G7 T3 W03 Part 2 - Explain spreadsheet data",
+      "description": "Explain spreadsheet data. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w03_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w04_part1",
+      "name": "G7 T3 W04 Part 1 - Plan your STEAM work",
+      "description": "Plan your STEAM work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w04_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w04_part2",
+      "name": "G7 T3 W04 Part 2 - Build your STEAM project",
+      "description": "Build your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w04_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w05_part1",
+      "name": "G7 T3 W05 Part 1 - Test your STEAM project",
+      "description": "Test your STEAM project. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w05_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w05_part2",
+      "name": "G7 T3 W05 Part 2 - Show your project work",
+      "description": "Show your project work. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w05_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w06_part1",
+      "name": "G7 T3 W06 Part 1 - Practise your STEAM explanation",
+      "description": "Practise your STEAM explanation. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w06_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w06_part2",
+      "name": "G7 T3 W06 Part 2 - Present your STEAM project",
+      "description": "Present your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w06_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w07_part1",
+      "name": "G7 T3 W07 Part 1 - Repeat a Scratch task",
+      "description": "Repeat a Scratch task. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w07_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w07_part2",
+      "name": "G7 T3 W07 Part 2 - Deliver with a Scratch loop",
+      "description": "Deliver with a Scratch loop. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w07_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w08_part2",
+      "name": "G7 T3 W08 Part 2 - Organise three files",
+      "description": "Organise three files. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 8,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w08_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w09_part1",
+      "name": "G7 T3 W09 Part 1 - Organise three files",
+      "description": "Organise three files. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w09_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w09_part2",
+      "name": "G7 T3 W09 Part 2 - Find your saved files",
+      "description": "Find your saved files. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w09_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w10_part1",
+      "name": "G7 T3 W10 Part 1 - Test a distance rule",
+      "description": "Test a distance rule. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w10_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w10_part2",
+      "name": "G7 T3 W10 Part 2 - Send a Mandrake warning",
+      "description": "Send a Mandrake warning. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w10_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w11_part1",
+      "name": "G7 T3 W11 Part 1 - Make the warning clearer",
+      "description": "Make the warning clearer. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w11_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w11_part2",
+      "name": "G7 T3 W11 Part 2 - Compare a project change",
+      "description": "Compare a project change. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w11_part2.json"
+    },
+    {
+      "id": "grade7_t3_2026_w12_part1",
+      "name": "G7 T3 W12 Part 1 - Practise your Mandrake demo",
+      "description": "Practise your Mandrake demo. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w12_part1.json"
+    },
+    {
+      "id": "grade7_t3_2026_w12_part2",
+      "name": "G7 T3 W12 Part 2 - Demonstrate your warning system",
+      "description": "Demonstrate your warning system. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "7"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade7/grade7_t3_2026_w12_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w01_part1",
+      "name": "G8 T3 W01 Part 1 - Plan a lunch app",
+      "description": "Plan a lunch app. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w01_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w01_part2",
+      "name": "G8 T3 W01 Part 2 - Map your lunch app",
+      "description": "Map your lunch app. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w01_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w02_part1",
+      "name": "G8 T3 W02 Part 1 - Test your lunch map",
+      "description": "Test your lunch map. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w02_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w02_part2",
+      "name": "G8 T3 W02 Part 2 - Plan a club signup app",
+      "description": "Plan a club signup app. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w02_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w03_part1",
+      "name": "G8 T3 W03 Part 1 - Organise your app work",
+      "description": "Organise your app work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w03_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w03_part2",
+      "name": "G8 T3 W03 Part 2 - Check and improve your app",
+      "description": "Check and improve your app. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w03_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w04_part1",
+      "name": "G8 T3 W04 Part 1 - Plan your STEAM work",
+      "description": "Plan your STEAM work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w04_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w04_part2",
+      "name": "G8 T3 W04 Part 2 - Build your STEAM project",
+      "description": "Build your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w04_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w05_part1",
+      "name": "G8 T3 W05 Part 1 - Test your STEAM project",
+      "description": "Test your STEAM project. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w05_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w05_part2",
+      "name": "G8 T3 W05 Part 2 - Show your project work",
+      "description": "Show your project work. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w05_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w06_part1",
+      "name": "G8 T3 W06 Part 1 - Practise your STEAM explanation",
+      "description": "Practise your STEAM explanation. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w06_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w06_part2",
+      "name": "G8 T3 W06 Part 2 - Present your STEAM project",
+      "description": "Present your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w06_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w07_part1",
+      "name": "G8 T3 W07 Part 1 - Calculate with Python",
+      "description": "Calculate with Python. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w07_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w07_part2",
+      "name": "G8 T3 W07 Part 2 - Fix Python mistakes",
+      "description": "Fix Python mistakes. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w07_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w08_part1",
+      "name": "G8 T3 W08 Part 1 - Check a Python total",
+      "description": "Check a Python total. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 8,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w08_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w09_part1",
+      "name": "G8 T3 W09 Part 1 - Test your Python fixes",
+      "description": "Test your Python fixes. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w09_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w09_part2",
+      "name": "G8 T3 W09 Part 2 - Fix five Python errors",
+      "description": "Fix five Python errors. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w09_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w10_part1",
+      "name": "G8 T3 W10 Part 1 - Read binary numbers",
+      "description": "Read binary numbers. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w10_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w10_part2",
+      "name": "G8 T3 W10 Part 2 - Binary check and game controls",
+      "description": "Binary check and game controls. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w10_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w11_part1",
+      "name": "G8 T3 W11 Part 1 - Add game rules",
+      "description": "Add game rules. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w11_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w11_part2",
+      "name": "G8 T3 W11 Part 2 - Build Catch the Star",
+      "description": "Build Catch the Star. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 11,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w11_part2.json"
+    },
+    {
+      "id": "grade8_t3_2026_w12_part1",
+      "name": "G8 T3 W12 Part 1 - Test Catch the Star",
+      "description": "Test Catch the Star. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w12_part1.json"
+    },
+    {
+      "id": "grade8_t3_2026_w12_part2",
+      "name": "G8 T3 W12 Part 2 - Demonstrate Catch the Star",
+      "description": "Demonstrate Catch the Star. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "8"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "December",
+      "week": 12,
+      "purpose": "practice",
+      "path": "vocabularies/grade8/grade8_t3_2026_w12_part2.json"
+    },
+    {
+      "id": "grade9_t3_2026_w01_part1",
+      "name": "G9 T3 W01 Part 1 - Picture size in bits",
+      "description": "Picture size in bits. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_september_week2_sound_quality.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w01_part1.json"
     },
     {
-      "id": "grade9_iiit_october_week3_personal_data",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: October Week 3 - Personal Data",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w01_part2",
+      "name": "G9 T3 W01 Part 2 - Picture and sound data",
+      "description": "Picture and sound data. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 1,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_october_week3_personal_data.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w01_part2.json"
     },
     {
-      "id": "grade9_iiit_october_week4_social_malware",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: October Week 4 - Social Engineering and Malware",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w02_part1",
+      "name": "G9 T3 W02 Part 1 - Organise your work",
+      "description": "Organise your work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_october_week4_social_malware.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w02_part1.json"
     },
     {
-      "id": "grade9_iiit_october_week5_security_risk",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: October Week 5 - Security Risk",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w02_part2",
+      "name": "G9 T3 W02 Part 2 - Picture and sound check",
+      "description": "Picture and sound check. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 2,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_october_week5_security_risk.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w02_part2.json"
     },
     {
-      "id": "grade9_iiit_october_week6_project_problem",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: October Week 6 - Project Problem",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w03_part1",
+      "name": "G9 T3 W03 Part 1 - Spot online dangers",
+      "description": "Spot online dangers. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_october_week6_project_problem.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w03_part1.json"
     },
     {
-      "id": "grade9_iiit_october_week7_risk_map",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: October Week 7 - Risk Map",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w03_part2",
+      "name": "G9 T3 W03 Part 2 - Choose a safe response",
+      "description": "Choose a safe response. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "September",
+      "week": 3,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_october_week7_risk_map.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w03_part2.json"
     },
     {
-      "id": "grade9_iiit_november_week8_proposal",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: November Week 8 - Proposal",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w04_part1",
+      "name": "G9 T3 W04 Part 1 - Plan your STEAM work",
+      "description": "Plan your STEAM work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_november_week8_proposal.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w04_part1.json"
     },
     {
-      "id": "grade9_iiit_november_week9_project_habits",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: November Week 9 - Project Habits",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w04_part2",
+      "name": "G9 T3 W04 Part 2 - Build your STEAM project",
+      "description": "Build your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 4,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_november_week9_project_habits.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w04_part2.json"
     },
     {
-      "id": "grade9_iiit_november_week10_build_evidence",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: November Week 10 - Build Evidence",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w05_part1",
+      "name": "G9 T3 W05 Part 1 - Test your STEAM project",
+      "description": "Test your STEAM project. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_november_week10_build_evidence.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w05_part1.json"
     },
     {
-      "id": "grade9_iiit_november_week11_testing_improvement",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: November Week 11 - Testing and Improvement",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w05_part2",
+      "name": "G9 T3 W05 Part 2 - Show your project work",
+      "description": "Show your project work. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_november_week11_testing_improvement.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w05_part2.json"
     },
     {
-      "id": "grade9_iiit_december_week12_final_demo",
-      "subjectSlug": "technology",
-      "name": "Grade 9 IIIT Practice: December Week 12 - Final Demo",
-      "description": "Practice words for Grade 9 third-trimester STEM and cybersecurity work.",
+      "id": "grade9_t3_2026_w06_part1",
+      "name": "G9 T3 W06 Part 1 - Practise your STEAM explanation",
+      "description": "Practise your STEAM explanation. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
       "grades": [
         "9"
       ],
-      "trimester": "IIIT",
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
       "purpose": "practice",
-      "path": "vocabularies/grade9/grade9_iiit_december_week12_final_demo.json"
+      "path": "vocabularies/grade9/grade9_t3_2026_w06_part1.json"
+    },
+    {
+      "id": "grade9_t3_2026_w06_part2",
+      "name": "G9 T3 W06 Part 2 - Present your STEAM project",
+      "description": "Present your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 6,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w06_part2.json"
+    },
+    {
+      "id": "grade9_t3_2026_w07_part1",
+      "name": "G9 T3 W07 Part 1 - Online safety check",
+      "description": "Online safety check. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w07_part1.json"
+    },
+    {
+      "id": "grade9_t3_2026_w07_part2",
+      "name": "G9 T3 W07 Part 2 - Review safety and compare risks",
+      "description": "Review safety and compare risks. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 7,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w07_part2.json"
+    },
+    {
+      "id": "grade9_t3_2026_w08_part1",
+      "name": "G9 T3 W08 Part 1 - Online risk check",
+      "description": "Online risk check. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 8,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w08_part1.json"
+    },
+    {
+      "id": "grade9_t3_2026_w09_part1",
+      "name": "G9 T3 W09 Part 1 - Prepare your project record",
+      "description": "Prepare your project record. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w09_part1.json"
+    },
+    {
+      "id": "grade9_t3_2026_w09_part2",
+      "name": "G9 T3 W09 Part 2 - Practise your project demonstration",
+      "description": "Practise your project demonstration. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 9,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w09_part2.json"
+    },
+    {
+      "id": "grade9_t3_2026_w10_part1",
+      "name": "G9 T3 W10 Part 1 - Check your project demonstration",
+      "description": "Check your project demonstration. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w10_part1.json"
+    },
+    {
+      "id": "grade9_t3_2026_w10_part2",
+      "name": "G9 T3 W10 Part 2 - Demonstrate your STEAM project",
+      "description": "Demonstrate your STEAM project. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "November",
+      "week": 10,
+      "purpose": "practice",
+      "path": "vocabularies/grade9/grade9_t3_2026_w10_part2.json"
     }
   ]
 }

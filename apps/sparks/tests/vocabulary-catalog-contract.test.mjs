@@ -25,6 +25,26 @@ test('every vocabulary unit has explicit valid placement and activity flow', asy
     }
 });
 
+test('T3 class parts have small sourced word sets and distinct required practice', async () => {
+    const records = await loadVocabularyCatalog(workspaceRoot);
+    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)));
+    assert.equal(t3.length, 91);
+    for (const v of t3) {
+        assert.match(v.id, /^grade[6-9]_t3_2026_w\d{2}_part[12]$/);
+        assert.ok(v.words.length === 2 || v.words.length === 3);
+        const part = v.id.endsWith('part1') ? 1 : 2;
+        assert.match(v.name, new RegExp(`Part ${part} - `));
+        assert.deepEqual(v.activitySettings.requiredActivities,
+            ['flashcards', part === 1 ? 'matching' : 'fill-in-blank']);
+        assert.deepEqual(v.activitySettings.additionalActivities, []);
+        for (const word of v.words) {
+            assert.ok(word.definition && word.example);
+            assert.match(word.source, /^https:\/\//);
+            assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
+        }
+    }
+});
+
 test('catalog SQL updates existing rows and verifies database parity transactionally', () => {
     const sql = execFileSync(process.execPath, [
         'scripts/generate-vocabulary-catalog-upsert.mjs', '--grade', 'all'
