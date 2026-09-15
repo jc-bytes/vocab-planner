@@ -8489,7 +8489,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     html body .app-container:has(#student-tab-shell:not(.hidden)) > .student-top-bar .student-identity {
         grid-template-columns: max-content minmax(0, 28rem) !important;
         gap: 20px !important;
-        width: min(100%, 36rem) !important;
-        max-width: 36rem !important;
+        width: min(100%, 28rem) !important;
+        max-width: 28rem !important;
     }
 }
