@@ -47,7 +47,7 @@
     "test:student-routing": "node --test tests/hash-routing.test.mjs tests/student-routing-composition.test.mjs",
     "test:teacher-pages": "node --test tests/teacher-page-registry.test.mjs && node scripts/ui-teacher-pages-smoke.mjs",
     "test:student-shell-composition": "node --test tests/student-shell-composition.test.mjs",
-    "test:student-listeners": "node --test tests/student-listener-composition.test.mjs",
+    "test:student-listeners": "node --test tests/student-listener-composition.test.mjs tests/student-app-updates.test.mjs",
     "test:student-subjects": "node --test tests/student-subject-composition.test.mjs",
     "test:student-registries": "node --test tests/student-registry-contracts.test.mjs tests/activity-catalog-server-parity.test.mjs tests/game-score-server-parity.test.mjs && node scripts/ui-activity-registry-smoke.mjs",
     "test:security-hardening": "node --test tests/security-hardening.test.mjs tests/cross-user-offline-replay-security.test.mjs",

@@ -1,3 +1,4 @@
+import { installStudentAppUpdates } from './student/studentAppUpdates.js';
 // Import modular components
 import { StudentAuth } from './student/studentAuth.js';
 import { StudentProgress } from './student/studentProgress.js';
@@ -361,9 +362,6 @@ if (document.readyState === 'loading') {
 }
 
 if (import.meta.env?.PROD === true && typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./student-sw.js').catch(error => {
-            console.warn('Offline support could not be enabled:', error);
-        });
-    }, { once: true });
+    if (document.readyState === 'complete') installStudentAppUpdates();
+    else window.addEventListener('load', () => installStudentAppUpdates(), { once: true });
 }
