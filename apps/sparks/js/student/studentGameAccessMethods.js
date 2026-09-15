@@ -1,3 +1,4 @@
+import { renderArcadeHeader } from './studentArcadeHeader.js';
 import { studentApi } from '../services/studentApi.js';
 import { ARCADE_MINUTE_SECONDS } from './studentArcadePolicy.js';
 import { consumeLocalArcadeMinute, readLocalArcadeTime } from './studentArcadeTimeStorage.js';
@@ -22,6 +23,7 @@ export class StudentGameAccess {
         } else {
             this.arcadeTime = { availableSeconds: 0 };
         }
+        renderArcadeHeader(this.getAvailableSeconds());
         return this.arcadeTime;
     }
 
@@ -31,6 +33,7 @@ export class StudentGameAccess {
             const coinCost = this.games.getExchangeRate();
             if (!await this.sm.progress.deductCoins(coinCost)) return null;
             this.arcadeTime = consumeLocalArcadeMinute();
+            renderArcadeHeader(this.getAvailableSeconds());
             return this.arcadeTime
                 ? { arcadeTime: this.arcadeTime, minuteSeconds: ARCADE_MINUTE_SECONDS, coinCost }
                 : null;
@@ -45,6 +48,7 @@ export class StudentGameAccess {
             this.sm.progress.cloud.applyRemoteCoinProgress(result.coinWallet);
         }
         this.arcadeTime = result?.arcadeTime || this.arcadeTime;
+        renderArcadeHeader(this.getAvailableSeconds());
         return result;
     }
 }

@@ -1,3 +1,4 @@
+import { refreshArcadeHeader } from './studentArcadeHeader.js';
 import { DEFAULT_COIN_DATA } from '../studentProgressDefaults.js';
 import { getStudentExperience } from './studentExperience.js';
 import {
@@ -16,6 +17,7 @@ export class StudentProgressCore {
     }
 
     updateLevelDisplay() {
+        refreshArcadeHeader(this.sm);
         const levelDisplay = document.querySelector('#student-level-display');
         if (!levelDisplay) return;
 
