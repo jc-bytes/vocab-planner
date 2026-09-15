@@ -325,3 +325,28 @@ test('XP migration uses difficulty rewards and restores awards blocked by the ol
     assert.match(migration, /create trigger award_uncapped_student_activity_xp/i);
     assert.match(migration, /if exists \([\s\S]*event\.attempt_id = new\.id::text[\s\S]*return new;/i);
 });
+
+test('Fill in Blank submits each answer once and saves the final state before reporting 100 percent', async (t) => {
+    const { notifications } = await import('../js/main.js');
+    t.mock.method(notifications, 'success', () => {});
+    const callbacks = [];
+    const reports = [];
+    const input = { value: 'data', classList: { add() {} } };
+    const activity = Object.assign(Object.create(FillInBlankActivity.prototype), {
+        words: [{ word: 'data' }], currentWord: { word: 'data' }, currentIndex: 0,
+        container: { querySelector: () => input },
+        timeouts: { schedule(callback) { callbacks.push(callback); } },
+        startRound() {},
+        saveState() { this.savedIndex = this.currentIndex; },
+        onProgress(score) { reports.push({ ...score, savedIndex: activity.savedIndex }); }
+    });
+    activity.checkAnswer();
+    activity.checkAnswer();
+    assert.equal(callbacks.length, 1, 'Repeated Enter/click must not queue the same answer twice');
+    callbacks.shift()();
+    assert.equal(activity.currentIndex, 1);
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].score, 100);
+    assert.equal(reports[0].isComplete, true);
+    assert.equal(reports[0].savedIndex, 1, 'The completion payload must use the completed state');
+});

@@ -15,6 +15,7 @@ export class FillInBlankActivity {
         this.score = 0;
         this.currentWord = null;
         this.attempts = 0;
+        this.answerPending = false;
         this.timeouts = new ActivityTimeoutController();
 
         this.init();
@@ -125,19 +126,24 @@ export class FillInBlankActivity {
     }
 
     checkAnswer() {
+        if (this.answerPending || this.currentIndex >= this.words.length) return;
         const input = this.container.querySelector('.fib-input');
+        if (!input || !this.currentWord) return;
         const val = input.value.trim().toLowerCase();
         const correct = this.currentWord.word.toLowerCase();
 
         if (val === correct) {
             // Correct
+            this.answerPending = true;
+            input.disabled = true;
             input.classList.add('correct');
             this.timeouts.schedule(() => {
                 notifications.success('Correct!');
                 this.currentIndex++;
-                this.checkProgress();
                 this.startRound();
                 this.saveState();
+                this.answerPending = false;
+                this.checkProgress();
             }, 500);
         } else {
             // Wrong
