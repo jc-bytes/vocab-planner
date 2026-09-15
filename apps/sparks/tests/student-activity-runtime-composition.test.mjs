@@ -2004,3 +2004,21 @@ test('Word Hunt export state is isolated inside its component', () => {
     assert.equal(second.wordHunt.wordHuntExportInProgress, false);
     assert.equal('wordHuntExportInProgress' in first, false);
 });
+
+test('Grade 9 week 1 part 2 unit card counts the same required activities as its open unit', async () => {
+    const { readFile } = await import('node:fs/promises');
+    const manifest = JSON.parse(await readFile(new URL('../vocabularies/manifest.json', import.meta.url)));
+    const meta = manifest.vocabularies.find(v => v.id === 'grade9_t3_2026_w01_part2');
+    const full = JSON.parse(await readFile(new URL(`../${meta.path}`, import.meta.url)));
+    const scores = {
+        flashcards: { score: 100, isComplete: true, verified: true },
+        'fill-in-blank': { score: 100, isComplete: true, verified: true }
+    };
+    const manager = { currentUser: { uid: 'student' }, authDisabled: false,
+        getVocabRouteId: v => v.id, currentVocab: full, unitScores: scores,
+        progressData: { units: { [`technology:${meta.id}`]: { scores } } } };
+    const activities = new StudentActivities(manager);
+    assert.deepEqual(activities.getActivityFlowConfig(meta).required, activities.getActivityFlowConfig(full).required);
+    assert.equal(activities.getUnitRequiredCompletion(meta).completed, 2);
+    assert.equal(activities.getUnitRequiredCompletion(meta).isComplete, true);
+});

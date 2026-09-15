@@ -71,3 +71,12 @@ test('database writes normalize explicit required and additional activity flow',
     assert.match(migration, /update public\.vocabularies[\s\S]*jsonb_typeof[\s\S]*is distinct from 'array'/i);
     assert.match(migration, /revoke all on function private\.normalize_vocabulary_activity_flow\(\)/i);
 });
+
+test('unit cards and opened vocabularies use identical activity requirements', async () => {
+    for (const { entry, vocabulary } of await loadVocabularyCatalog(workspaceRoot)) {
+        assert.deepEqual(entry.activitySettings?.requiredActivities,
+            vocabulary.activitySettings.requiredActivities, `${entry.id}: required activities`);
+        assert.deepEqual(entry.activitySettings?.additionalActivities,
+            vocabulary.activitySettings.additionalActivities, `${entry.id}: additional activities`);
+    }
+});
