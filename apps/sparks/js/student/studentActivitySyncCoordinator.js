@@ -201,12 +201,18 @@ export class StudentActivitySyncCoordinator {
                 const minimum = attempt?.attemptId === payload.attemptId
                     ? Number(attempt.minimumSeconds) : 60;
                 const delayMs = Math.max(5, Math.min(60, minimum || 60)) * 1000 + 250;
-                this.sm.setAuthStatus('Saving completed activity...');
-                await new Promise(resolve => setTimeout(resolve, delayMs));
                 if (!isActiveStudentStorageOwner(ownerUserId)
                     || this.sm.currentUser?.uid !== ownerUserId) return null;
-                // Retry the same event once. The server still validates and awards it.
-                progress = await studentApi.submitStudentActivityProgress(payload, { ownerUserId });
+                await imageDB.enqueueSyncAction('student-activity-progress', {
+                    ...payload, retryNotBefore: Date.now() + delayMs
+                }, { ownerUserId });
+                this.sm.setAuthStatus('Saved locally - checking in background');
+                setTimeout(() => {
+                    if (!isActiveStudentStorageOwner(ownerUserId)
+                        || this.sm.currentUser?.uid !== ownerUserId) return;
+                    void this.sm.progress.flushLocalSyncQueue({ silent: true, ownerUserId });
+                }, delayMs);
+                return null;
             }
             if (!isActiveStudentStorageOwner(ownerUserId)
                 || this.sm.currentUser?.uid !== ownerUserId) return null;

@@ -533,49 +533,59 @@ test('a cloud result from the previous student cannot overwrite the active sessi
     }
 });
 
-test('a too-fast completion retries the unchanged result after the server minimum wait', async (t) => {
-    const owner = getActiveStudentStorageOwner();
-    t.after(() => setActiveStudentStorageOwner(owner));
-    setActiveStudentStorageOwner('student-1');
-    const { persistence } = createPersistence();
-    persistence.activities.session.activityAttempt.minimumSeconds = 5;
-    const submitted = [];
-    const waits = [];
-    t.mock.method(globalThis, 'setTimeout', (callback, delay) => {
-        waits.push(delay); queueMicrotask(callback); return 0;
-    });
-    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
-        submitted.push(payload);
-        if (submitted.length === 1) throw Object.assign(new Error('The activity was completed too quickly to verify.'), { code: 'P0001' });
-        return { totalXp: 100, activity: { score: 100, isComplete: true, verified: true } };
-    });
-    persistence.applyActivityProgressResult = () => {};
-    persistence.showActivityXpReward = () => {};
-    const payload = { eventId: 'completion-1', attemptId: 'attempt-1', activityType: 'fill-in-blank', score: 100,
-        isComplete: true, isFinished: true, details: { evidence: { correctCount: 2, totalCount: 2 } } };
-    const result = await persistence.submitActivityProgressPayload(payload, { ownerUserId: 'student-1' });
-    assert.deepEqual(waits, [5250]);
-    assert.equal(submitted.length, 2);
-    assert.equal(submitted[0], payload);
-    assert.equal(submitted[1], payload);
-    assert.equal(result.activity.verified, true);
-});
-
-test('minimum-time retry stops if the student account changes during the wait', async (t) => {
+test('a too-fast completion is durable before exit returns and retries in the background', async (t) => {
     const owner = getActiveStudentStorageOwner();
     t.after(() => setActiveStudentStorageOwner(owner));
     setActiveStudentStorageOwner('student-1');
     const { persistence, sm } = createPersistence();
-    let requests = 0;
-    t.mock.method(globalThis, 'setTimeout', callback => {
-        setActiveStudentStorageOwner('student-2'); sm.currentUser = { uid: 'student-2' };
-        queueMicrotask(callback); return 0;
+    persistence.activities.session.activityAttempt.minimumSeconds = 5;
+    let callback;
+    let queued;
+    let flushes = 0;
+    sm.progress.flushLocalSyncQueue = async () => { flushes++; };
+    t.mock.method(globalThis, 'setTimeout', (fn, delay) => {
+        assert.equal(delay, 5250); callback = fn; return 0;
+    });
+    t.mock.method(imageDB, 'enqueueSyncAction', async (type, payload, options) => {
+        queued = { type, payload, options };
     });
     t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => {
-        requests++;
         throw Object.assign(new Error('The activity was completed too quickly to verify.'), { code: 'P0001' });
     });
-    const result = await persistence.submitActivityProgressPayload({ isComplete: true, attemptId: 'attempt-1' }, { ownerUserId: 'student-1' });
+    const payload = { eventId: 'completion-1', attemptId: 'attempt-1', activityType: 'fill-in-blank',
+        score: 100, isComplete: true, isFinished: true, details: { evidence: { correctCount: 2, totalCount: 2 } } };
+    const before = Date.now();
+    const result = await persistence.submitActivityProgressPayload(payload, { ownerUserId: 'student-1' });
     assert.equal(result, null);
-    assert.equal(requests, 1);
+    assert.equal(flushes, 0, 'Exit returns before the background wait');
+    assert.equal(queued.type, 'student-activity-progress');
+    assert.equal(queued.payload.eventId, payload.eventId);
+    assert.deepEqual(queued.payload.details, payload.details);
+    assert.ok(queued.payload.retryNotBefore >= before + 5250);
+    assert.equal(queued.options.ownerUserId, 'student-1');
+    callback();
+    assert.equal(flushes, 1);
+    setActiveStudentStorageOwner('student-2'); sm.currentUser = { uid: 'student-2' };
+    callback();
+    assert.equal(flushes, 1, 'The old account cannot flush in a new student session');
+});
+
+test('queued timing checks defer without blocking other work or consuming retries', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const delayed = { id: 'delayed', ownerUserId: 'student-1', type: 'student-activity-progress',
+        payload: { retryNotBefore: Date.now() + 60000 } };
+    t.mock.method(imageDB, 'getPendingSyncActions', async () => [delayed, { id: 'ready', ownerUserId: 'student-1', payload: {} }]);
+    const completed = [];
+    t.mock.method(imageDB, 'completeSyncAction', async id => completed.push(id));
+    t.mock.method(imageDB, 'markSyncActionFailed', async () => assert.fail('Waiting is not a failed attempt'));
+    const cloud = new StudentProgressCloud({ sm: { authDisabled: false,
+        currentUser: { uid: 'student-1' }, setAuthStatus() {} } });
+    cloud.syncQueuedRecord = async () => {};
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.deepEqual(completed, ['ready']);
+    delayed.payload.retryNotBefore = Date.now() - 1;
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.deepEqual(completed, ['ready', 'delayed', 'ready']);
 });

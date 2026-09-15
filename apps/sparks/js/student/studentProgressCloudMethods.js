@@ -88,6 +88,7 @@ export class StudentProgressCloud {
             : COIN_SYNC_INTERVAL_MS;
         this.coinSyncInterval = window.setInterval(() => {
             if (document.visibilityState === 'hidden') return;
+            void this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
             this.scheduleCoinRefresh({ silent: true, reason: 'interval', ownerUserId: userId, generation });
         }, syncInterval);
 

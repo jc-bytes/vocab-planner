@@ -74,10 +74,15 @@ export class StudentProgressSyncQueue {
 
         let retryableFailures = 0;
         let terminalFailures = 0;
+        let deferred = 0;
 
         for (const record of pending) {
             if (!this.cloud.isCurrentOwner(ownerUserId, options)
                 || generation !== this.cloud.cloudGeneration) return;
+            if (Number(record.payload?.retryNotBefore) > Date.now()) {
+                deferred += 1;
+                continue;
+            }
             try {
                 await syncRecord(record, { ...options, ownerUserId, generation });
                 if (!this.cloud.isCurrentOwner(ownerUserId, options)
@@ -103,6 +108,8 @@ export class StudentProgressSyncQueue {
             if (!options.silent) {
                 notifications.warning('Some saved changes were rejected, but other work continued syncing.');
             }
+        } else if (deferred > 0) {
+            this.sm.setAuthStatus('Saved locally - checking in background');
         } else if (retryableFailures > 0) {
             this.sm.setAuthStatus('Sync paused - saved locally');
         } else {

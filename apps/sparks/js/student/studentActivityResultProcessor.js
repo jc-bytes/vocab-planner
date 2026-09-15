@@ -67,6 +67,10 @@ export class StudentActivityResultProcessor {
         this.sm.progress.updateLevelDisplay?.();
         this.sm.progress.saveLocalProgress(true);
         this.activities.updateArcadeGateDisplay?.();
+        if (typeof document !== 'undefined'
+            && document.querySelector('#vocab-selection-view')?.classList.contains('active')) {
+            this.activities.renderDashboard?.();
+        }
 
         const activityMenuView = typeof document === 'undefined'
             ? null

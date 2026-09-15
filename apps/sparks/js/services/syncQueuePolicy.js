@@ -39,6 +39,9 @@ export function classifySyncError(error, options = {}) {
         .map(value => String(value || '').toLowerCase())
         .join(' ');
 
+    if (code === 'P0001' && String(error?.message || '') === 'The activity was completed too quickly to verify.') {
+        return { retryable: true, reason: 'minimum-activity-time', status };
+    }
     if (TERMINAL_ERROR_CODES.has(code)) {
         return { retryable: false, reason: 'cancelled-or-invalid', status };
     }

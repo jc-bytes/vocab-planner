@@ -57,7 +57,7 @@ async function fetchJsonFromNetwork(path, { fresh = false, signal = null, timeou
     return response.json();
 }
 
-export async function loadManifest({ fresh = false } = {}) {
+export async function loadManifest({ fresh = true } = {}) {
     const cached = readManifestCache();
 
     if (!fresh && isManifestCacheFresh(cached)) {
@@ -123,7 +123,7 @@ function writeCachedVocabFile(path, data) {
     writeVocabFileCache(cache);
 }
 
-export async function loadVocabularyFile(path, { fresh = false, silent = false, signal = null, timeoutMs = 10000 } = {}) {
+export async function loadVocabularyFile(path, { fresh = true, silent = false, signal = null, timeoutMs = 10000 } = {}) {
     const normalizedPath = String(path || '').trim();
     if (!normalizedPath) return null;
 

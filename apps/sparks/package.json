@@ -9,7 +9,7 @@
     "catalog:validate": "node scripts/validate-vocabulary-catalog.mjs",
     "catalog:normalize": "node scripts/validate-vocabulary-catalog.mjs --write",
     "test:catalog": "npm run catalog:validate && node --test tests/vocabulary-catalog-contract.test.mjs",
-    "test:vocabulary-api": "node --test tests/vocabulary-api-composition.test.mjs",
+    "test:vocabulary-api": "node --test tests/vocabulary-api-composition.test.mjs tests/vocabulary-cache-refresh.test.mjs",
     "test:repositories": "node --test tests/repository-contracts.test.mjs",
     "test:teacher-data": "node --test tests/teacher-data-efficiency.test.mjs tests/teacher-data-management-composition.test.mjs tests/teacher-settings-session-isolation.test.mjs && node scripts/ui-teacher-data-management-smoke.mjs",
     "test:teacher-progress-composition": "node --test tests/teacher-student-progress-composition.test.mjs",
