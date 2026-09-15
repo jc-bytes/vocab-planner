@@ -532,3 +532,50 @@ test('a cloud result from the previous student cannot overwrite the active sessi
         setActiveStudentStorageOwner(originalOwner);
     }
 });
+
+test('a too-fast completion retries the unchanged result after the server minimum wait', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence } = createPersistence();
+    persistence.activities.session.activityAttempt.minimumSeconds = 5;
+    const submitted = [];
+    const waits = [];
+    t.mock.method(globalThis, 'setTimeout', (callback, delay) => {
+        waits.push(delay); queueMicrotask(callback); return 0;
+    });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async payload => {
+        submitted.push(payload);
+        if (submitted.length === 1) throw Object.assign(new Error('The activity was completed too quickly to verify.'), { code: 'P0001' });
+        return { totalXp: 100, activity: { score: 100, isComplete: true, verified: true } };
+    });
+    persistence.applyActivityProgressResult = () => {};
+    persistence.showActivityXpReward = () => {};
+    const payload = { eventId: 'completion-1', attemptId: 'attempt-1', activityType: 'fill-in-blank', score: 100,
+        isComplete: true, isFinished: true, details: { evidence: { correctCount: 2, totalCount: 2 } } };
+    const result = await persistence.submitActivityProgressPayload(payload, { ownerUserId: 'student-1' });
+    assert.deepEqual(waits, [5250]);
+    assert.equal(submitted.length, 2);
+    assert.equal(submitted[0], payload);
+    assert.equal(submitted[1], payload);
+    assert.equal(result.activity.verified, true);
+});
+
+test('minimum-time retry stops if the student account changes during the wait', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const { persistence, sm } = createPersistence();
+    let requests = 0;
+    t.mock.method(globalThis, 'setTimeout', callback => {
+        setActiveStudentStorageOwner('student-2'); sm.currentUser = { uid: 'student-2' };
+        queueMicrotask(callback); return 0;
+    });
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => {
+        requests++;
+        throw Object.assign(new Error('The activity was completed too quickly to verify.'), { code: 'P0001' });
+    });
+    const result = await persistence.submitActivityProgressPayload({ isComplete: true, attemptId: 'attempt-1' }, { ownerUserId: 'student-1' });
+    assert.equal(result, null);
+    assert.equal(requests, 1);
+});

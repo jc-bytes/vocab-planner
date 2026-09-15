@@ -189,7 +189,25 @@ export class StudentActivitySyncCoordinator {
                     timeLimitSeconds: payload.timeLimitSeconds
                 });
             }
-            const progress = await studentApi.submitStudentActivityProgress(payload, { ownerUserId });
+            let progress;
+            try {
+                progress = await studentApi.submitStudentActivityProgress(payload, { ownerUserId });
+            } catch (error) {
+                const isMinimumTimeRejection = payload.isComplete
+                    && error?.code === 'P0001'
+                    && error?.message === 'The activity was completed too quickly to verify.';
+                if (!isMinimumTimeRejection) throw error;
+                const attempt = this.activities.session.activityAttempt;
+                const minimum = attempt?.attemptId === payload.attemptId
+                    ? Number(attempt.minimumSeconds) : 60;
+                const delayMs = Math.max(5, Math.min(60, minimum || 60)) * 1000 + 250;
+                this.sm.setAuthStatus('Saving completed activity...');
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+                if (!isActiveStudentStorageOwner(ownerUserId)
+                    || this.sm.currentUser?.uid !== ownerUserId) return null;
+                // Retry the same event once. The server still validates and awards it.
+                progress = await studentApi.submitStudentActivityProgress(payload, { ownerUserId });
+            }
             if (!isActiveStudentStorageOwner(ownerUserId)
                 || this.sm.currentUser?.uid !== ownerUserId) return null;
             const xpAwarded = this.persistence.getAwardedXp(previousTotalXp, progress);

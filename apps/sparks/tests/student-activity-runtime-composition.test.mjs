@@ -2022,3 +2022,18 @@ test('Grade 9 week 1 part 2 unit card counts the same required activities as its
     assert.equal(activities.getUnitRequiredCompletion(meta).completed, 2);
     assert.equal(activities.getUnitRequiredCompletion(meta).isComplete, true);
 });
+
+test('completed Fill in Blank work can resume verification without replay, but unrelated or verified states cannot', () => {
+    const words = [{ word: 'Sample' }, { word: 'Sample rate' }];
+    const manager = { unitScores: {} };
+    const launcher = new StudentActivityLauncher({ sm: manager });
+    const state = { currentIndex: 2, shuffledWords: words };
+    const result = { score: 100, isComplete: true, evidence: { correctCount: 2, totalCount: 2 } };
+    const activity = { getScore: () => result };
+    assert.equal(launcher.getRestoredCompletion('fill-in-blank', state, activity, words), result);
+    assert.equal(launcher.getRestoredCompletion('fill-in-blank', { ...state, currentIndex: 1 }, activity, words), null);
+    assert.equal(launcher.getRestoredCompletion('fill-in-blank', state, activity, [{ word: 'Other' }, { word: 'Words' }]), null);
+    assert.equal(launcher.getRestoredCompletion('matching', state, activity, words), null);
+    manager.unitScores['fill-in-blank'] = { verified: true, isComplete: true };
+    assert.equal(launcher.getRestoredCompletion('fill-in-blank', state, activity, words), null);
+});

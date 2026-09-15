@@ -309,7 +309,25 @@ export class StudentActivityLauncher {
         }
         this.sm.activityInstance = activityInstance;
         session.startActivityTimer();
+        const restoredCompletion = this.getRestoredCompletion(type, initialState, activityInstance, playableWords);
+        if (restoredCompletion) onProgress(restoredCompletion);
         setStudentPageLoading(activityView, false);
+    }
+
+    getRestoredCompletion(type, initialState, activity, playableWords) {
+        if (type !== 'fill-in-blank') return null;
+        const score = this.sm.unitScores?.[type];
+        if (score?.verified && (score.isComplete || Number(score.score) >= 100)) return null;
+        const savedWords = initialState?.shuffledWords;
+        if (!Array.isArray(savedWords) || !savedWords.length
+            || initialState.currentIndex !== savedWords.length
+            || savedWords.length !== playableWords.length) return null;
+        const keys = words => words.map(word => String(word.word || '').trim().toLowerCase()).sort();
+        if (JSON.stringify(keys(savedWords)) !== JSON.stringify(keys(playableWords))) return null;
+        const result = activity?.getScore?.();
+        return result?.isComplete && result.score === 100
+            && result.evidence?.correctCount === savedWords.length
+            && result.evidence?.totalCount === savedWords.length ? result : null;
     }
 
     startActivityWithStateRecovery(type, initialState, createActivity) {
