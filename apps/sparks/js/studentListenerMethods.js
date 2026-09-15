@@ -70,9 +70,16 @@ export class StudentListeners {
         } catch (error) {
             console.warn('Could not finish saving activity progress before exit:', error);
         } finally {
-            this.sm.cleanupActivity();
-            this.sm.navigateTo(unitId ? { view: 'unit', unitId } : { view: 'units' });
-            this.activityExitInProgress = false;
+            try {
+                this.sm.cleanupActivity();
+                this.sm.navigateTo(unitId ? { view: 'unit', unitId } : { view: 'units' });
+            } finally {
+                [backButton, closeButton].filter(Boolean).forEach(button => {
+                    button.disabled = false;
+                    button.removeAttribute('aria-busy');
+                });
+                this.activityExitInProgress = false;
+            }
         }
     }
 

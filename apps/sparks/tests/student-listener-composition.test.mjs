@@ -183,3 +183,24 @@ test('export button state remains reversible', () => {
     assert.equal(button.innerHTML, '<span>Download</span>');
     assert.equal('idleHtml' in button.dataset, false);
 });
+
+test('Back and Close are enabled again after leaving an activity', async (t) => {
+    const buttons = [0, 1].map(() => ({
+        disabled: false, busy: false,
+        setAttribute() { this.busy = true; },
+        removeAttribute() { this.busy = false; }
+    }));
+    t.mock.method(document, 'querySelector', selector =>
+        selector === '#back-to-menu-btn' ? buttons[0] :
+        selector === '#close-activity-btn' ? buttons[1] : null);
+    const listeners = new StudentListeners({
+        activities: { async flushPendingActivityProgress() {} },
+        getCurrentVocabRouteId: () => 'unit-1',
+        cleanupActivity() {}, navigateTo() {}
+    });
+    await listeners.exitActivity();
+    for (const button of buttons) {
+        assert.equal(button.disabled, false, 'Shared exit buttons must work in the next activity');
+        assert.equal(button.busy, false);
+    }
+});
