@@ -350,3 +350,18 @@ test('Fill in Blank submits each answer once and saves the final state before re
     assert.equal(reports[0].isComplete, true);
     assert.equal(reports[0].savedIndex, 1, 'The completion payload must use the completed state');
 });
+
+test('Picture size in bits unlocks optional practice after its two verified required activities', async () => {
+    const currentVocab = JSON.parse(await readFile(new URL('../vocabularies/grade9/grade9_t3_2026_w01_part1.json', import.meta.url), 'utf8'));
+    const sm = { currentVocab, currentUser: { uid: 'test-student' }, unitScores: {} };
+    const flow = new StudentActivityProgressFlow({ sm });
+    assert.equal(flow.isActivityUnlocked('quiz'), false);
+    sm.unitScores.flashcards = { score: 100, isComplete: true, verified: true };
+    assert.equal(flow.isActivityUnlocked('quiz'), false);
+    sm.unitScores.matching = { score: 100, isComplete: true, verified: true };
+    assert.equal(flow.getRequiredCompletion().isComplete, true);
+    assert.equal(flow.isActivityUnlocked('quiz'), true);
+    assert.equal(flow.isActivityUnlocked('word-search'), true);
+    assert.deepEqual(flow.getActivityFlowConfig().hidden, []);
+    assert.equal(flow.getActivityPlayableCount('synonym-antonym'), 0);
+});

@@ -45,7 +45,18 @@
       "flashcards",
       "matching"
     ],
-    "additionalActivities": [],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
     "flashcards": 3,
     "matching": 3,
     "fillInBlank": 3

@@ -5,6 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
+    ACTIVITY_IDS,
     loadVocabularyCatalog,
     resolveActivityFlow,
     validateVocabulary
@@ -36,7 +37,9 @@ test('T3 class parts have small sourced word sets and distinct required practice
         assert.match(v.name, new RegExp(`Part ${part} - `));
         assert.deepEqual(v.activitySettings.requiredActivities,
             ['flashcards', part === 1 ? 'matching' : 'fill-in-blank']);
-        assert.deepEqual(v.activitySettings.additionalActivities, []);
+        assert.deepEqual(v.activitySettings.additionalActivities,
+            ACTIVITY_IDS.filter(id => !v.activitySettings.requiredActivities.includes(id)),
+            `${v.id}: optional practice must remain available`);
         for (const word of v.words) {
             assert.ok(word.definition && word.example);
             assert.match(word.source, /^https:\/\//);
