@@ -1,0 +1,92 @@
+{
+  "id": "grade7_t3_2026_w02_weekly_v1",
+  "name": "G7 T3 W02 - Spreadsheet cells, charts and formulas",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "assignedDate": "2026-09-23",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Cell",
+      "definition": "One box in a spreadsheet where a row and column meet.",
+      "example": "Cell B3 contains the number of students in the club.",
+      "source": "https://techterms.com/definition/cell",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Table",
+      "definition": "Information arranged in rows and columns.",
+      "example": "The table puts each club name beside its student count.",
+      "source": "https://www.merriam-webster.com/dictionary/table",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Formula",
+      "definition": "An expression that tells a spreadsheet how to calculate a result.",
+      "example": "The formula =B2+B3 adds two cell values.",
+      "source": "https://techterms.com/definition/formula",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Function",
+      "definition": "A named operation or group of instructions that performs a task.",
+      "example": "The function SUM adds a range of spreadsheet values.",
+      "source": "https://techterms.com/definition/function",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that presents data so people can compare or understand it.",
+      "example": "The chart uses bars to compare the club counts.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-09-23",
+      "B": "2026-09-24"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

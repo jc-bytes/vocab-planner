@@ -1,0 +1,92 @@
+{
+  "id": "grade7_t3_2026_w07_weekly_v1",
+  "name": "G7 T3 W07 - Distance warning rule",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 7,
+  "assignedDate": "2026-10-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Sensor",
+      "definition": "A device that detects or measures something, such as light or distance.",
+      "example": "A distance sensor measures how far away an object is.",
+      "source": "https://www.merriam-webster.com/dictionary/sensor",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Threshold",
+      "definition": "A limit at which a response changes.",
+      "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+      "source": "https://www.merriam-webster.com/dictionary/threshold",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Input",
+      "definition": "Information or a signal given to a computer or program.",
+      "example": "Pressing button A provides an input to the program.",
+      "source": "https://techterms.com/definition/input",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information or a signal produced by a computer or program.",
+      "example": "The displayed number is an output from the counter.",
+      "source": "https://techterms.com/definition/output",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Condition",
+      "definition": "A test that a program evaluates as true or false.",
+      "example": "The condition checks whether the distance is greater than 18.",
+      "source": "https://www.merriam-webster.com/dictionary/condition",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-10-28",
+      "B": "2026-10-29"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

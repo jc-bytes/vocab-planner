@@ -1,0 +1,688 @@
+[
+  {
+    "id": "grade6_t3_2026_w02_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W02 - Cells and charts - Words in use 1",
+    "spark_text": "Row 3 contains the club name and its student count. Column B contains the student counts. Cell B3 contains the number of students in the club.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/row"
+  },
+  {
+    "id": "grade6_t3_2026_w02_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W02 - Cells and charts - Words in use 2",
+    "spark_text": "The table puts each club name beside its student count. The chart uses bars to compare the club counts.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/table"
+  },
+  {
+    "id": "grade6_t3_2026_w03_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W03 - Tables and story data - Words in use 1",
+    "spark_text": "The data shows that twelve students chose chess. The table puts each club name beside its student count. Row 3 contains the club name and its student count.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/data"
+  },
+  {
+    "id": "grade6_t3_2026_w03_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W03 - Tables and story data - Words in use 2",
+    "spark_text": "Column B contains the student counts. The chart uses bars to compare the club counts.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/column"
+  },
+  {
+    "id": "grade6_t3_2026_w04_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W04 - Finish and check spreadsheets - Words in use 1",
+    "spark_text": "The table puts each club name beside its student count. The chart uses bars to compare the club counts. The label under each bar names the club.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/table"
+  },
+  {
+    "id": "grade6_t3_2026_w04_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W04 - Finish and check spreadsheets - Words in use 2",
+    "spark_text": "The value in B3 is 12. Our comparison shows that chess has more students than art.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/value"
+  },
+  {
+    "id": "grade6_t3_2026_w05_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w05_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w06_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w06_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w07_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W07 - Measure and model an eraser - Words in use 1",
+    "spark_text": "Check each dimension of the model against the eraser. The length of the eraser is 50 millimetres. The width of the eraser is 20 millimetres.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/dimension"
+  },
+  {
+    "id": "grade6_t3_2026_w07_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W07 - Measure and model an eraser - Words in use 2",
+    "spark_text": "The height of the eraser is 10 millimetres. The digital model has the same dimensions as the eraser.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/height"
+  },
+  {
+    "id": "grade6_t3_2026_w08_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w08_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w09_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w09_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w10_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W10 - Button counters - Words in use 1",
+    "spark_text": "Pressing button A provides an input to the program. The displayed number is an output from the counter. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/input"
+  },
+  {
+    "id": "grade6_t3_2026_w10_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W10 - Button counters - Words in use 2",
+    "spark_text": "Press the button to add one to the counter. The counter increases by one after each button press.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/button"
+  },
+  {
+    "id": "grade6_t3_2026_w11_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W11 - Explain and improve saved work - Words in use 1",
+    "spark_text": "Pressing button A provides an input to the program. The displayed number is an output from the counter. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/input"
+  },
+  {
+    "id": "grade6_t3_2026_w11_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W11 - Explain and improve saved work - Words in use 2",
+    "spark_text": "We test the program by pressing the button three times. The feedback says to check the displayed total after a reset.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/test"
+  },
+  {
+    "id": "grade6_t3_2026_w12_part1_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W12 - Complete the improvement - Words in use 1",
+    "spark_text": "Pressing button A provides an input to the program. The displayed number is an output from the counter. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/input"
+  },
+  {
+    "id": "grade6_t3_2026_w12_part2_spark",
+    "status": "scheduled",
+    "title": "G6 T3 W12 - Complete the improvement - Words in use 2",
+    "spark_text": "We test the program by pressing the button three times. The feedback says to check the displayed total after a reset.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/test"
+  },
+  {
+    "id": "grade6_t3_2026_w13_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade6_t3_2026_w13_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade7_t3_2026_w02_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W02 - Spreadsheet cells, charts and formulas - Words in use 1",
+    "spark_text": "Cell B3 contains the number of students in the club. The table puts each club name beside its student count. The formula =B2+B3 adds two cell values.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/cell"
+  },
+  {
+    "id": "grade7_t3_2026_w02_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W02 - Spreadsheet cells, charts and formulas - Words in use 2",
+    "spark_text": "The function SUM adds a range of spreadsheet values. The chart uses bars to compare the club counts.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/function"
+  },
+  {
+    "id": "grade7_t3_2026_w03_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W03 - Interpret charts and calculations - Words in use 1",
+    "spark_text": "The formula =B2+B3 adds two cell values. The total is the number of bottles collected by all teams. The average for 10, 20 and 30 is 20.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/formula"
+  },
+  {
+    "id": "grade7_t3_2026_w03_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W03 - Interpret charts and calculations - Words in use 2",
+    "spark_text": "The chart uses bars to compare the club counts. Our comparison shows that chess has more students than art.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/chart"
+  },
+  {
+    "id": "grade7_t3_2026_w04_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W04 - Scratch delivery practice - Words in use 1",
+    "spark_text": "The deliver function moves the sprite and adds one delivery. The loop repeats the delivery three times. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/function"
+  },
+  {
+    "id": "grade7_t3_2026_w04_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W04 - Scratch delivery practice - Words in use 2",
+    "spark_text": "The sprite starts at position x equals zero. Click the green flag to reset the sprite and delivery count.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/position"
+  },
+  {
+    "id": "grade7_t3_2026_w05_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade7_t3_2026_w05_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade7_t3_2026_w06_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade7_t3_2026_w06_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade7_t3_2026_w07_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W07 - Distance warning rule - Words in use 1",
+    "spark_text": "A distance sensor measures how far away an object is. The threshold is 18 centimetres, so only larger distances trigger the warning. Pressing button A provides an input to the program.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/sensor"
+  },
+  {
+    "id": "grade7_t3_2026_w07_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W07 - Distance warning rule - Words in use 2",
+    "spark_text": "The displayed number is an output from the counter. The condition checks whether the distance is greater than 18.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/output"
+  },
+  {
+    "id": "grade7_t3_2026_w08_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W08 - Compare a Scratch change - Words in use 2",
+    "spark_text": "The sprite starts at position x equals zero. Click the green flag to reset the sprite and delivery count.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/position"
+  },
+  {
+    "id": "grade7_t3_2026_w09_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W09 - Radio warning system - Words in use 1",
+    "spark_text": "A distance sensor measures how far away an object is. The threshold is 18 centimetres, so only larger distances trigger the warning. The micro:bit uses radio to send ALERT to the receiver.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/sensor"
+  },
+  {
+    "id": "grade7_t3_2026_w09_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W09 - Radio warning system - Words in use 2",
+    "spark_text": "The receiver shows an icon when the message is ALERT. The displayed number is an output from the counter.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/message"
+  },
+  {
+    "id": "grade7_t3_2026_w10_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W10 - Rehearse and demonstrate the warning - Words in use 1",
+    "spark_text": "A distance sensor measures how far away an object is. The threshold is 18 centimetres, so only larger distances trigger the warning. The micro:bit uses radio to send ALERT to the receiver.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/sensor"
+  },
+  {
+    "id": "grade7_t3_2026_w10_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W10 - Rehearse and demonstrate the warning - Words in use 2",
+    "spark_text": "The receiver shows an icon when the message is ALERT. The displayed number is an output from the counter.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/message"
+  },
+  {
+    "id": "grade7_t3_2026_w11_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W11 - Improve the warning - Words in use 1",
+    "spark_text": "A distance sensor measures how far away an object is. The threshold is 18 centimetres, so only larger distances trigger the warning. The micro:bit uses radio to send ALERT to the receiver.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/sensor"
+  },
+  {
+    "id": "grade7_t3_2026_w11_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W11 - Improve the warning - Words in use 2",
+    "spark_text": "The receiver shows an icon when the message is ALERT. The displayed number is an output from the counter.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/message"
+  },
+  {
+    "id": "grade7_t3_2026_w12_part1_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W12 - Finish the feedback improvement - Words in use 1",
+    "spark_text": "A distance sensor measures how far away an object is. The threshold is 18 centimetres, so only larger distances trigger the warning. The micro:bit uses radio to send ALERT to the receiver.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/sensor"
+  },
+  {
+    "id": "grade7_t3_2026_w12_part2_spark",
+    "status": "scheduled",
+    "title": "G7 T3 W12 - Finish the feedback improvement - Words in use 2",
+    "spark_text": "The receiver shows an icon when the message is ALERT. The displayed number is an output from the counter.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/message"
+  },
+  {
+    "id": "grade8_t3_2026_w02_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W02 - Test and finish LunchApp - Words in use 1",
+    "spark_text": "Pressing button A provides an input to the program. The displayed number is an output from the counter. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/input"
+  },
+  {
+    "id": "grade8_t3_2026_w02_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W02 - Test and finish LunchApp - Words in use 2",
+    "spark_text": "We test the program by pressing the button three times. The bug makes the app show the wrong lunch choice.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/test"
+  },
+  {
+    "id": "grade8_t3_2026_w03_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W03 - Explain and improve LunchApp - Words in use 1",
+    "spark_text": "The variable count stores the number of button presses. A button click is an event that starts the instructions. We test the program by pressing the button three times.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/variable"
+  },
+  {
+    "id": "grade8_t3_2026_w03_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W03 - Explain and improve LunchApp - Words in use 2",
+    "spark_text": "The result of the test is a message showing the chosen lunch. The feedback says to check the displayed total after a reset.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/result"
+  },
+  {
+    "id": "grade8_t3_2026_w04_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W04 - Binary numbers - Words in use 1",
+    "spark_text": "One bit can store either 0 or 1. The binary number 101 represents five. The decimal number five is written as 101 in binary.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/bit"
+  },
+  {
+    "id": "grade8_t3_2026_w04_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W04 - Binary numbers - Words in use 2",
+    "spark_text": "Each digit in 101 is either zero or one. The leftmost place value in four-bit binary is eight.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/digit"
+  },
+  {
+    "id": "grade8_t3_2026_w05_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade8_t3_2026_w05_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade8_t3_2026_w06_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade8_t3_2026_w06_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade8_t3_2026_w07_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W07 - Python multiplication and debugging - Words in use 1",
+    "spark_text": "Pressing button A provides an input to the program. The variable count stores the number of button presses. The integer 4 can be stored in the quantity variable.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/input"
+  },
+  {
+    "id": "grade8_t3_2026_w07_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W07 - Python multiplication and debugging - Words in use 2",
+    "spark_text": "The displayed number is an output from the counter. The bug makes the app show the wrong lunch choice.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/output"
+  },
+  {
+    "id": "grade8_t3_2026_w08_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade8_t3_2026_w09_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W09 - Scratch controls - Words in use 1",
+    "spark_text": "A button click is an event that starts the instructions. The variable count stores the number of button presses. Pressing button A provides an input to the program.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events"
+  },
+  {
+    "id": "grade8_t3_2026_w09_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W09 - Scratch controls - Words in use 2",
+    "spark_text": "The displayed number is an output from the counter. The bug makes the app show the wrong lunch choice.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/output"
+  },
+  {
+    "id": "grade8_t3_2026_w10_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W10 - Scratch game rules - Words in use 1",
+    "spark_text": "The Player sprite moves when the arrow key is pressed. A button click is an event that starts the instructions. The loop repeats the delivery three times.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/sprite"
+  },
+  {
+    "id": "grade8_t3_2026_w10_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W10 - Scratch game rules - Words in use 2",
+    "spark_text": "The condition checks whether the distance is greater than 18. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/condition"
+  },
+  {
+    "id": "grade8_t3_2026_w11_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W11 - Rehearse and demonstrate the game - Words in use 1",
+    "spark_text": "The Player sprite moves when the arrow key is pressed. A button click is an event that starts the instructions. The loop repeats the delivery three times.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/sprite"
+  },
+  {
+    "id": "grade8_t3_2026_w11_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W11 - Rehearse and demonstrate the game - Words in use 2",
+    "spark_text": "The condition checks whether the distance is greater than 18. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/condition"
+  },
+  {
+    "id": "grade8_t3_2026_w12_part1_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W12 - Improve one game rule - Words in use 1",
+    "spark_text": "The Player sprite moves when the arrow key is pressed. A button click is an event that starts the instructions. The loop repeats the delivery three times.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/sprite"
+  },
+  {
+    "id": "grade8_t3_2026_w12_part2_spark",
+    "status": "scheduled",
+    "title": "G8 T3 W12 - Improve one game rule - Words in use 2",
+    "spark_text": "The condition checks whether the distance is greater than 18. The variable count stores the number of button presses.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/condition"
+  },
+  {
+    "id": "grade9_t3_2026_w02_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W02 - Online dangers - Words in use 1",
+    "spark_text": "The phishing message asks for the school-account password. The unsafe download installs malware on the computer. The ransomware locks the project files and demands money.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/phishing"
+  },
+  {
+    "id": "grade9_t3_2026_w02_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W02 - Online dangers - Words in use 2",
+    "spark_text": "Keep your password private when a message asks you to share it. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/password"
+  },
+  {
+    "id": "grade9_t3_2026_w03_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W03 - Compare and explain online risks - Words in use 1",
+    "spark_text": "Saving only one copy creates a risk of losing the project. Repeated failed logins increase our concern about the probability of an account attack. A separate backup reduces the impact of losing the working file.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/risk"
+  },
+  {
+    "id": "grade9_t3_2026_w03_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W03 - Compare and explain online risks - Words in use 2",
+    "spark_text": "The repeated password requests are evidence that the message is suspicious. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/evidence"
+  },
+  {
+    "id": "grade9_t3_2026_w04_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W04 - Explain the message risk - Words in use 1",
+    "spark_text": "The phishing message asks for the school-account password. Saving only one copy creates a risk of losing the project. Repeated failed logins increase our concern about the probability of an account attack.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/phishing"
+  },
+  {
+    "id": "grade9_t3_2026_w04_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W04 - Explain the message risk - Words in use 2",
+    "spark_text": "A separate backup reduces the impact of losing the working file. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/impact"
+  },
+  {
+    "id": "grade9_t3_2026_w05_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade9_t3_2026_w05_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade9_t3_2026_w06_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade9_t3_2026_w06_part2_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade9_t3_2026_w07_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W07 - Project-copy risk and priority - Words in use 1",
+    "spark_text": "Keep a backup of the project in a separate location. Repeated failed logins increase our concern about the probability of an account attack. A separate backup reduces the impact of losing the working file.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/backup"
+  },
+  {
+    "id": "grade9_t3_2026_w07_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W07 - Project-copy risk and priority - Words in use 2",
+    "spark_text": "Protecting the only project copy is our first priority. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/priority"
+  },
+  {
+    "id": "grade9_t3_2026_w08_part1_spark",
+    "status": "archived"
+  },
+  {
+    "id": "grade9_t3_2026_w09_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W09 - Rehearse online-safety decisions - Words in use 1",
+    "spark_text": "Keep a backup of the project in a separate location. Repeated failed logins increase our concern about the probability of an account attack. A separate backup reduces the impact of losing the working file.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/backup"
+  },
+  {
+    "id": "grade9_t3_2026_w09_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W09 - Rehearse online-safety decisions - Words in use 2",
+    "spark_text": "Protecting the only project copy is our first priority. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/priority"
+  },
+  {
+    "id": "grade9_t3_2026_w10_part1_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W10 - Present and explain safety decisions - Words in use 1",
+    "spark_text": "Keep a backup of the project in a separate location. Repeated failed logins increase our concern about the probability of an account attack. A separate backup reduces the impact of losing the working file.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://techterms.com/definition/backup"
+  },
+  {
+    "id": "grade9_t3_2026_w10_part2_spark",
+    "status": "scheduled",
+    "title": "G9 T3 W10 - Present and explain safety decisions - Words in use 2",
+    "spark_text": "Protecting the only project copy is our first priority. A separate backup provides protection against losing the only project copy.",
+    "why_it_matters": "Use these words to explain what happens in this week\u2019s Technology work.",
+    "question": "Choose one example. Explain what its vocabulary word means in that situation.",
+    "source_title": "Weekly Technology vocabulary examples",
+    "source_url": "https://www.merriam-webster.com/dictionary/priority"
+  }
+]

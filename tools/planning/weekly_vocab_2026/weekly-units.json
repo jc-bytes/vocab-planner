@@ -1,0 +1,3031 @@
+[
+  {
+    "id": "grade6_t3_2026_w02_weekly_v1",
+    "name": "G6 T3 W02 - Cells and charts",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 2,
+    "assignedDate": "2026-09-21",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Row",
+        "definition": "A line of cells going across a table.",
+        "example": "Row 3 contains the club name and its student count.",
+        "source": "https://techterms.com/definition/row",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Column",
+        "definition": "A line of cells going down a table.",
+        "example": "Column B contains the student counts.",
+        "source": "https://techterms.com/definition/column",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Cell",
+        "definition": "One box in a spreadsheet where a row and column meet.",
+        "example": "Cell B3 contains the number of students in the club.",
+        "source": "https://techterms.com/definition/cell",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Table",
+        "definition": "Information arranged in rows and columns.",
+        "example": "The table puts each club name beside its student count.",
+        "source": "https://www.merriam-webster.com/dictionary/table",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Chart",
+        "definition": "A picture that presents data so people can compare or understand it.",
+        "example": "The chart uses bars to compare the club counts.",
+        "source": "https://www.merriam-webster.com/dictionary/chart",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-09-21",
+        "B": "2026-09-22",
+        "C": "2026-09-23"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w03_weekly_v1",
+    "name": "G6 T3 W03 - Tables and story data",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 3,
+    "assignedDate": "2026-09-28",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Data",
+        "definition": "Facts or values that can be stored and used.",
+        "example": "The data shows that twelve students chose chess.",
+        "source": "https://techterms.com/definition/data",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Table",
+        "definition": "Information arranged in rows and columns.",
+        "example": "The table puts each club name beside its student count.",
+        "source": "https://www.merriam-webster.com/dictionary/table",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Row",
+        "definition": "A line of cells going across a table.",
+        "example": "Row 3 contains the club name and its student count.",
+        "source": "https://techterms.com/definition/row",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Column",
+        "definition": "A line of cells going down a table.",
+        "example": "Column B contains the student counts.",
+        "source": "https://techterms.com/definition/column",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Chart",
+        "definition": "A picture that presents data so people can compare or understand it.",
+        "example": "The chart uses bars to compare the club counts.",
+        "source": "https://www.merriam-webster.com/dictionary/chart",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-09-28",
+        "B": "2026-09-29",
+        "C": "2026-09-30"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w04_weekly_v1",
+    "name": "G6 T3 W04 - Finish and check spreadsheets",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 4,
+    "assignedDate": "2026-10-05",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Table",
+        "definition": "Information arranged in rows and columns.",
+        "example": "The table puts each club name beside its student count.",
+        "source": "https://www.merriam-webster.com/dictionary/table",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Chart",
+        "definition": "A picture that presents data so people can compare or understand it.",
+        "example": "The chart uses bars to compare the club counts.",
+        "source": "https://www.merriam-webster.com/dictionary/chart",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Label",
+        "definition": "A name or short piece of text that identifies something.",
+        "example": "The label under each bar names the club.",
+        "source": "https://www.merriam-webster.com/dictionary/label",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Value",
+        "definition": "The information stored in a cell or variable.",
+        "example": "The value in B3 is 12.",
+        "source": "https://www.merriam-webster.com/dictionary/value",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Comparison",
+        "definition": "A check of how two things are similar or different.",
+        "example": "Our comparison shows that chess has more students than art.",
+        "source": "https://www.merriam-webster.com/dictionary/comparison",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-10-05",
+        "B": "2026-10-06",
+        "C": "2026-10-07"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w07_weekly_v1",
+    "name": "G6 T3 W07 - Measure and model an eraser",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 7,
+    "assignedDate": "2026-10-26",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Dimension",
+        "definition": "A measurement such as length, width or height.",
+        "example": "Check each dimension of the model against the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/dimension",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Length",
+        "definition": "The measurement from one end of an object to the other.",
+        "example": "The length of the eraser is 50 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/length",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Width",
+        "definition": "The measurement from one side of an object to the other.",
+        "example": "The width of the eraser is 20 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/width",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Height",
+        "definition": "The measurement from the bottom of an object to its top.",
+        "example": "The height of the eraser is 10 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/height",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Model",
+        "definition": "A representation used to show what an object is like.",
+        "example": "The digital model has the same dimensions as the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/model",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-10-26",
+        "B": "2026-10-28",
+        "C": "2026-10-28"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w08_weekly_v1",
+    "name": "G6 T3 W08 - Check your measured model",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 8,
+    "assignedDate": "2026-11-06",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Dimension",
+        "definition": "A measurement such as length, width or height.",
+        "example": "Check each dimension of the model against the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/dimension",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Length",
+        "definition": "The measurement from one end of an object to the other.",
+        "example": "The length of the eraser is 50 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/length",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Width",
+        "definition": "The measurement from one side of an object to the other.",
+        "example": "The width of the eraser is 20 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/width",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Height",
+        "definition": "The measurement from the bottom of an object to its top.",
+        "example": "The height of the eraser is 10 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/height",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Model",
+        "definition": "A representation used to show what an object is like.",
+        "example": "The digital model has the same dimensions as the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/model",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "C"
+      ],
+      "releaseDates": {
+        "C": "2026-11-06"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w09_weekly_v1_ab",
+    "name": "G6 T3 W09 - Measured model review",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 9,
+    "assignedDate": "2026-11-09",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Dimension",
+        "definition": "A measurement such as length, width or height.",
+        "example": "Check each dimension of the model against the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/dimension",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Length",
+        "definition": "The measurement from one end of an object to the other.",
+        "example": "The length of the eraser is 50 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/length",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Width",
+        "definition": "The measurement from one side of an object to the other.",
+        "example": "The width of the eraser is 20 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/width",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Height",
+        "definition": "The measurement from the bottom of an object to its top.",
+        "example": "The height of the eraser is 10 millimetres.",
+        "source": "https://www.merriam-webster.com/dictionary/height",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Model",
+        "definition": "A representation used to show what an object is like.",
+        "example": "The digital model has the same dimensions as the eraser.",
+        "source": "https://www.merriam-webster.com/dictionary/model",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-09",
+        "B": "2026-11-11"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w09_weekly_v1_c",
+    "name": "G6 T3 W09 - Button counter",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 9,
+    "assignedDate": "2026-11-11",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Button",
+        "definition": "A control that you press or select to make something happen.",
+        "example": "Press the button to add one to the counter.",
+        "source": "https://www.merriam-webster.com/dictionary/button",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Counter",
+        "definition": "A value or device used to keep track of how many times something happens.",
+        "example": "The counter increases by one after each button press.",
+        "source": "https://www.merriam-webster.com/dictionary/counter",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "C"
+      ],
+      "releaseDates": {
+        "C": "2026-11-11"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w10_weekly_v1",
+    "name": "G6 T3 W10 - Button counters",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 10,
+    "assignedDate": "2026-11-16",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Button",
+        "definition": "A control that you press or select to make something happen.",
+        "example": "Press the button to add one to the counter.",
+        "source": "https://www.merriam-webster.com/dictionary/button",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Counter",
+        "definition": "A value or device used to keep track of how many times something happens.",
+        "example": "The counter increases by one after each button press.",
+        "source": "https://www.merriam-webster.com/dictionary/counter",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-11-16",
+        "B": "2026-11-17",
+        "C": "2026-11-18"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w11_weekly_v1",
+    "name": "G6 T3 W11 - Explain and improve saved work",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 11,
+    "assignedDate": "2026-11-23",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Test",
+        "definition": "A check used to find out whether something works as expected.",
+        "example": "We test the program by pressing the button three times.",
+        "source": "https://www.merriam-webster.com/dictionary/test",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Feedback",
+        "definition": "Information about work that can help someone improve it.",
+        "example": "The feedback says to check the displayed total after a reset.",
+        "source": "https://www.merriam-webster.com/dictionary/feedback",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-11-23",
+        "B": "2026-11-24",
+        "C": "2026-11-25"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade6_t3_2026_w12_weekly_v1",
+    "name": "G6 T3 W12 - Complete the improvement",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "6"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 12,
+    "assignedDate": "2026-11-30",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Test",
+        "definition": "A check used to find out whether something works as expected.",
+        "example": "We test the program by pressing the button three times.",
+        "source": "https://www.merriam-webster.com/dictionary/test",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Feedback",
+        "definition": "Information about work that can help someone improve it.",
+        "example": "The feedback says to check the displayed total after a reset.",
+        "source": "https://www.merriam-webster.com/dictionary/feedback",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B",
+        "C"
+      ],
+      "releaseDates": {
+        "A": "2026-11-30",
+        "B": "2026-12-01",
+        "C": "2026-12-04"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w02_weekly_v1",
+    "name": "G7 T3 W02 - Spreadsheet cells, charts and formulas",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 2,
+    "assignedDate": "2026-09-23",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Cell",
+        "definition": "One box in a spreadsheet where a row and column meet.",
+        "example": "Cell B3 contains the number of students in the club.",
+        "source": "https://techterms.com/definition/cell",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Table",
+        "definition": "Information arranged in rows and columns.",
+        "example": "The table puts each club name beside its student count.",
+        "source": "https://www.merriam-webster.com/dictionary/table",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Formula",
+        "definition": "An expression that tells a spreadsheet how to calculate a result.",
+        "example": "The formula =B2+B3 adds two cell values.",
+        "source": "https://techterms.com/definition/formula",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Function",
+        "definition": "A named operation or group of instructions that performs a task.",
+        "example": "The function SUM adds a range of spreadsheet values.",
+        "source": "https://techterms.com/definition/function",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Chart",
+        "definition": "A picture that presents data so people can compare or understand it.",
+        "example": "The chart uses bars to compare the club counts.",
+        "source": "https://www.merriam-webster.com/dictionary/chart",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-23",
+        "B": "2026-09-24"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w03_weekly_v1",
+    "name": "G7 T3 W03 - Interpret charts and calculations",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 3,
+    "assignedDate": "2026-09-30",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Formula",
+        "definition": "An expression that tells a spreadsheet how to calculate a result.",
+        "example": "The formula =B2+B3 adds two cell values.",
+        "source": "https://techterms.com/definition/formula",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Total",
+        "definition": "The amount found by adding all the relevant values.",
+        "example": "The total is the number of bottles collected by all teams.",
+        "source": "https://www.merriam-webster.com/dictionary/total",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Average",
+        "definition": "A number found by adding the values and dividing by how many values there are.",
+        "example": "The average for 10, 20 and 30 is 20.",
+        "source": "https://www.merriam-webster.com/dictionary/average",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Chart",
+        "definition": "A picture that presents data so people can compare or understand it.",
+        "example": "The chart uses bars to compare the club counts.",
+        "source": "https://www.merriam-webster.com/dictionary/chart",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Comparison",
+        "definition": "A check of how two things are similar or different.",
+        "example": "Our comparison shows that chess has more students than art.",
+        "source": "https://www.merriam-webster.com/dictionary/comparison",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-30",
+        "B": "2026-10-01"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w04_weekly_v1",
+    "name": "G7 T3 W04 - Scratch delivery practice",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 4,
+    "assignedDate": "2026-10-07",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Function",
+        "definition": "A named operation or group of instructions that performs a task.",
+        "example": "The deliver function moves the sprite and adds one delivery.",
+        "source": "https://techterms.com/definition/function",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Loop",
+        "definition": "Instructions that a program repeats.",
+        "example": "The loop repeats the delivery three times.",
+        "source": "https://techterms.com/definition/loop",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Position",
+        "definition": "The place where an object is located.",
+        "example": "The sprite starts at position x equals zero.",
+        "source": "https://www.merriam-webster.com/dictionary/position",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Reset",
+        "definition": "To return something to its starting state.",
+        "example": "Click the green flag to reset the sprite and delivery count.",
+        "source": "https://www.merriam-webster.com/dictionary/reset",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-07",
+        "B": "2026-10-09"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w07_weekly_v1",
+    "name": "G7 T3 W07 - Distance warning rule",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 7,
+    "assignedDate": "2026-10-28",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sensor",
+        "definition": "A device that detects or measures something, such as light or distance.",
+        "example": "A distance sensor measures how far away an object is.",
+        "source": "https://www.merriam-webster.com/dictionary/sensor",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Threshold",
+        "definition": "A limit at which a response changes.",
+        "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+        "source": "https://www.merriam-webster.com/dictionary/threshold",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Condition",
+        "definition": "A test that a program evaluates as true or false.",
+        "example": "The condition checks whether the distance is greater than 18.",
+        "source": "https://www.merriam-webster.com/dictionary/condition",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-28",
+        "B": "2026-10-29"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w08_weekly_v1",
+    "name": "G7 T3 W08 - Compare a Scratch change",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 8,
+    "assignedDate": "2026-11-06",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Function",
+        "definition": "A named operation or group of instructions that performs a task.",
+        "example": "The deliver function moves the sprite and adds one delivery.",
+        "source": "https://techterms.com/definition/function",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Loop",
+        "definition": "Instructions that a program repeats.",
+        "example": "The loop repeats the delivery three times.",
+        "source": "https://techterms.com/definition/loop",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Position",
+        "definition": "The place where an object is located.",
+        "example": "The sprite starts at position x equals zero.",
+        "source": "https://www.merriam-webster.com/dictionary/position",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Reset",
+        "definition": "To return something to its starting state.",
+        "example": "Click the green flag to reset the sprite and delivery count.",
+        "source": "https://www.merriam-webster.com/dictionary/reset",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-06",
+        "B": "2026-11-06"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w09_weekly_v1",
+    "name": "G7 T3 W09 - Radio warning system",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 9,
+    "assignedDate": "2026-11-11",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sensor",
+        "definition": "A device that detects or measures something, such as light or distance.",
+        "example": "A distance sensor measures how far away an object is.",
+        "source": "https://www.merriam-webster.com/dictionary/sensor",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Threshold",
+        "definition": "A limit at which a response changes.",
+        "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+        "source": "https://www.merriam-webster.com/dictionary/threshold",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Radio",
+        "definition": "A way to send signals without wires using radio waves.",
+        "example": "The micro:bit uses radio to send ALERT to the receiver.",
+        "source": "https://www.merriam-webster.com/dictionary/radio",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Message",
+        "definition": "Information sent from one person or device to another.",
+        "example": "The receiver shows an icon when the message is ALERT.",
+        "source": "https://www.merriam-webster.com/dictionary/message",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-11",
+        "B": "2026-11-12"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w10_weekly_v1",
+    "name": "G7 T3 W10 - Rehearse and demonstrate the warning",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 10,
+    "assignedDate": "2026-11-18",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sensor",
+        "definition": "A device that detects or measures something, such as light or distance.",
+        "example": "A distance sensor measures how far away an object is.",
+        "source": "https://www.merriam-webster.com/dictionary/sensor",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Threshold",
+        "definition": "A limit at which a response changes.",
+        "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+        "source": "https://www.merriam-webster.com/dictionary/threshold",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Radio",
+        "definition": "A way to send signals without wires using radio waves.",
+        "example": "The micro:bit uses radio to send ALERT to the receiver.",
+        "source": "https://www.merriam-webster.com/dictionary/radio",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Message",
+        "definition": "Information sent from one person or device to another.",
+        "example": "The receiver shows an icon when the message is ALERT.",
+        "source": "https://www.merriam-webster.com/dictionary/message",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-18",
+        "B": "2026-11-19"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w11_weekly_v1",
+    "name": "G7 T3 W11 - Improve the warning",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 11,
+    "assignedDate": "2026-11-25",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sensor",
+        "definition": "A device that detects or measures something, such as light or distance.",
+        "example": "A distance sensor measures how far away an object is.",
+        "source": "https://www.merriam-webster.com/dictionary/sensor",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Threshold",
+        "definition": "A limit at which a response changes.",
+        "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+        "source": "https://www.merriam-webster.com/dictionary/threshold",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Radio",
+        "definition": "A way to send signals without wires using radio waves.",
+        "example": "The micro:bit uses radio to send ALERT to the receiver.",
+        "source": "https://www.merriam-webster.com/dictionary/radio",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Message",
+        "definition": "Information sent from one person or device to another.",
+        "example": "The receiver shows an icon when the message is ALERT.",
+        "source": "https://www.merriam-webster.com/dictionary/message",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-25",
+        "B": "2026-11-26"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade7_t3_2026_w12_weekly_v1",
+    "name": "G7 T3 W12 - Finish the feedback improvement",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "7"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 12,
+    "assignedDate": "2026-12-03",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sensor",
+        "definition": "A device that detects or measures something, such as light or distance.",
+        "example": "A distance sensor measures how far away an object is.",
+        "source": "https://www.merriam-webster.com/dictionary/sensor",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Threshold",
+        "definition": "A limit at which a response changes.",
+        "example": "The threshold is 18 centimetres, so only larger distances trigger the warning.",
+        "source": "https://www.merriam-webster.com/dictionary/threshold",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Radio",
+        "definition": "A way to send signals without wires using radio waves.",
+        "example": "The micro:bit uses radio to send ALERT to the receiver.",
+        "source": "https://www.merriam-webster.com/dictionary/radio",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Message",
+        "definition": "Information sent from one person or device to another.",
+        "example": "The receiver shows an icon when the message is ALERT.",
+        "source": "https://www.merriam-webster.com/dictionary/message",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-12-04",
+        "B": "2026-12-03"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w02_weekly_v1",
+    "name": "G8 T3 W02 - Test and finish LunchApp",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 2,
+    "assignedDate": "2026-09-21",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Test",
+        "definition": "A check used to find out whether something works as expected.",
+        "example": "We test the program by pressing the button three times.",
+        "source": "https://www.merriam-webster.com/dictionary/test",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Bug",
+        "definition": "An error that makes a program behave incorrectly.",
+        "example": "The bug makes the app show the wrong lunch choice.",
+        "source": "https://techterms.com/definition/bug",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-23",
+        "B": "2026-09-21"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w03_weekly_v1",
+    "name": "G8 T3 W03 - Explain and improve LunchApp",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 3,
+    "assignedDate": "2026-09-28",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Event",
+        "definition": "An action or occurrence that a program can respond to.",
+        "example": "A button click is an event that starts the instructions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Test",
+        "definition": "A check used to find out whether something works as expected.",
+        "example": "We test the program by pressing the button three times.",
+        "source": "https://www.merriam-webster.com/dictionary/test",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Result",
+        "definition": "What happens or is produced after an action or calculation.",
+        "example": "The result of the test is a message showing the chosen lunch.",
+        "source": "https://www.merriam-webster.com/dictionary/result",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Feedback",
+        "definition": "Information about work that can help someone improve it.",
+        "example": "The feedback says to check the displayed total after a reset.",
+        "source": "https://www.merriam-webster.com/dictionary/feedback",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-30",
+        "B": "2026-09-28"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w04_weekly_v1",
+    "name": "G8 T3 W04 - Binary numbers",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 4,
+    "assignedDate": "2026-10-05",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Bit",
+        "definition": "A single binary digit, either zero or one.",
+        "example": "One bit can store either 0 or 1.",
+        "source": "https://techterms.com/definition/bit",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Binary",
+        "definition": "A number system that uses only the digits zero and one.",
+        "example": "The binary number 101 represents five.",
+        "source": "https://techterms.com/definition/binary",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Decimal",
+        "definition": "The base-ten number system, which uses the digits zero to nine.",
+        "example": "The decimal number five is written as 101 in binary.",
+        "source": "https://www.merriam-webster.com/dictionary/decimal",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Digit",
+        "definition": "One symbol used to write a number.",
+        "example": "Each digit in 101 is either zero or one.",
+        "source": "https://www.merriam-webster.com/dictionary/digit",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Place value",
+        "definition": "The value a digit has because of its position in a number.",
+        "example": "The leftmost place value in four-bit binary is eight.",
+        "source": "https://www.merriam-webster.com/dictionary/place%20value",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-07",
+        "B": "2026-10-05"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w07_weekly_v1",
+    "name": "G8 T3 W07 - Python multiplication and debugging",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 7,
+    "assignedDate": "2026-10-26",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Integer",
+        "definition": "A whole number, including zero and negative whole numbers.",
+        "example": "The integer 4 can be stored in the quantity variable.",
+        "source": "https://techterms.com/definition/integer",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Bug",
+        "definition": "An error that makes a program behave incorrectly.",
+        "example": "The bug makes the app show the wrong lunch choice.",
+        "source": "https://techterms.com/definition/bug",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-28",
+        "B": "2026-10-26"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w09_weekly_v1",
+    "name": "G8 T3 W09 - Scratch controls",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 9,
+    "assignedDate": "2026-11-09",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Event",
+        "definition": "An action or occurrence that a program can respond to.",
+        "example": "A button click is an event that starts the instructions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Input",
+        "definition": "Information or a signal given to a computer or program.",
+        "example": "Pressing button A provides an input to the program.",
+        "source": "https://techterms.com/definition/input",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Output",
+        "definition": "Information or a signal produced by a computer or program.",
+        "example": "The displayed number is an output from the counter.",
+        "source": "https://techterms.com/definition/output",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Bug",
+        "definition": "An error that makes a program behave incorrectly.",
+        "example": "The bug makes the app show the wrong lunch choice.",
+        "source": "https://techterms.com/definition/bug",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-11",
+        "B": "2026-11-09"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w10_weekly_v1",
+    "name": "G8 T3 W10 - Scratch game rules",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 10,
+    "assignedDate": "2026-11-16",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sprite",
+        "definition": "A programmable graphic object in Scratch.",
+        "example": "The Player sprite moves when the arrow key is pressed.",
+        "source": "https://techterms.com/definition/sprite",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Event",
+        "definition": "An action or occurrence that a program can respond to.",
+        "example": "A button click is an event that starts the instructions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Loop",
+        "definition": "Instructions that a program repeats.",
+        "example": "The loop repeats the delivery three times.",
+        "source": "https://techterms.com/definition/loop",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Condition",
+        "definition": "A test that a program evaluates as true or false.",
+        "example": "The condition checks whether the distance is greater than 18.",
+        "source": "https://www.merriam-webster.com/dictionary/condition",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-18",
+        "B": "2026-11-16"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w11_weekly_v1",
+    "name": "G8 T3 W11 - Rehearse and demonstrate the game",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 11,
+    "assignedDate": "2026-11-23",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sprite",
+        "definition": "A programmable graphic object in Scratch.",
+        "example": "The Player sprite moves when the arrow key is pressed.",
+        "source": "https://techterms.com/definition/sprite",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Event",
+        "definition": "An action or occurrence that a program can respond to.",
+        "example": "A button click is an event that starts the instructions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Loop",
+        "definition": "Instructions that a program repeats.",
+        "example": "The loop repeats the delivery three times.",
+        "source": "https://techterms.com/definition/loop",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Condition",
+        "definition": "A test that a program evaluates as true or false.",
+        "example": "The condition checks whether the distance is greater than 18.",
+        "source": "https://www.merriam-webster.com/dictionary/condition",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-25",
+        "B": "2026-11-23"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade8_t3_2026_w12_weekly_v1",
+    "name": "G8 T3 W12 - Improve one game rule",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "8"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 12,
+    "assignedDate": "2026-11-30",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Sprite",
+        "definition": "A programmable graphic object in Scratch.",
+        "example": "The Player sprite moves when the arrow key is pressed.",
+        "source": "https://techterms.com/definition/sprite",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Event",
+        "definition": "An action or occurrence that a program can respond to.",
+        "example": "A button click is an event that starts the instructions.",
+        "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Loop",
+        "definition": "Instructions that a program repeats.",
+        "example": "The loop repeats the delivery three times.",
+        "source": "https://techterms.com/definition/loop",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Condition",
+        "definition": "A test that a program evaluates as true or false.",
+        "example": "The condition checks whether the distance is greater than 18.",
+        "source": "https://www.merriam-webster.com/dictionary/condition",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Variable",
+        "definition": "A named place in a program that stores a value which can change.",
+        "example": "The variable count stores the number of button presses.",
+        "source": "https://techterms.com/definition/variable",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-12-03",
+        "B": "2026-11-30"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w02_weekly_v1",
+    "name": "G9 T3 W02 - Online dangers",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 2,
+    "assignedDate": "2026-09-21",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Phishing",
+        "definition": "A trick that uses a fake message or website to steal private information.",
+        "example": "The phishing message asks for the school-account password.",
+        "source": "https://techterms.com/definition/phishing",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Malware",
+        "definition": "Software made to harm a device, disrupt it or steal information.",
+        "example": "The unsafe download installs malware on the computer.",
+        "source": "https://techterms.com/definition/malware",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Ransomware",
+        "definition": "Malware that blocks access to files or a device and demands payment.",
+        "example": "The ransomware locks the project files and demands money.",
+        "source": "https://techterms.com/definition/ransomware",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Password",
+        "definition": "A secret set of characters used to help prove that someone may access an account.",
+        "example": "Keep your password private when a message asks you to share it.",
+        "source": "https://techterms.com/definition/password",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-21",
+        "B": "2026-09-21"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w03_weekly_v1",
+    "name": "G9 T3 W03 - Compare and explain online risks",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "September",
+    "week": 3,
+    "assignedDate": "2026-09-28",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Risk",
+        "definition": "The possibility that something harmful may happen.",
+        "example": "Saving only one copy creates a risk of losing the project.",
+        "source": "https://www.merriam-webster.com/dictionary/risk",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Probability",
+        "definition": "How likely something is to happen.",
+        "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+        "source": "https://www.merriam-webster.com/dictionary/probability",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Impact",
+        "definition": "The effect or harm caused by a problem.",
+        "example": "A separate backup reduces the impact of losing the working file.",
+        "source": "https://www.merriam-webster.com/dictionary/impact",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Evidence",
+        "definition": "Facts or observations that support an explanation or decision.",
+        "example": "The repeated password requests are evidence that the message is suspicious.",
+        "source": "https://www.merriam-webster.com/dictionary/evidence",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-09-28",
+        "B": "2026-09-28"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w04_weekly_v1",
+    "name": "G9 T3 W04 - Explain the message risk",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 4,
+    "assignedDate": "2026-10-05",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Phishing",
+        "definition": "A trick that uses a fake message or website to steal private information.",
+        "example": "The phishing message asks for the school-account password.",
+        "source": "https://techterms.com/definition/phishing",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Risk",
+        "definition": "The possibility that something harmful may happen.",
+        "example": "Saving only one copy creates a risk of losing the project.",
+        "source": "https://www.merriam-webster.com/dictionary/risk",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Probability",
+        "definition": "How likely something is to happen.",
+        "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+        "source": "https://www.merriam-webster.com/dictionary/probability",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Impact",
+        "definition": "The effect or harm caused by a problem.",
+        "example": "A separate backup reduces the impact of losing the working file.",
+        "source": "https://www.merriam-webster.com/dictionary/impact",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-05",
+        "B": "2026-10-05"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w07_weekly_v1",
+    "name": "G9 T3 W07 - Project-copy risk and priority",
+    "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "October",
+    "week": 7,
+    "assignedDate": "2026-10-26",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Backup",
+        "definition": "A separate copy kept so that information can be recovered if the working copy is lost.",
+        "example": "Keep a backup of the project in a separate location.",
+        "source": "https://techterms.com/definition/backup",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Probability",
+        "definition": "How likely something is to happen.",
+        "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+        "source": "https://www.merriam-webster.com/dictionary/probability",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Impact",
+        "definition": "The effect or harm caused by a problem.",
+        "example": "A separate backup reduces the impact of losing the working file.",
+        "source": "https://www.merriam-webster.com/dictionary/impact",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Priority",
+        "definition": "Something chosen to be dealt with before other things.",
+        "example": "Protecting the only project copy is our first priority.",
+        "source": "https://www.merriam-webster.com/dictionary/priority",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-10-26",
+        "B": "2026-10-26"
+      },
+      "reviewOnly": false,
+      "requiredActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank"
+      ],
+      "additionalActivities": [
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w09_weekly_v1",
+    "name": "G9 T3 W09 - Rehearse online-safety decisions",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 9,
+    "assignedDate": "2026-11-09",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Backup",
+        "definition": "A separate copy kept so that information can be recovered if the working copy is lost.",
+        "example": "Keep a backup of the project in a separate location.",
+        "source": "https://techterms.com/definition/backup",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Probability",
+        "definition": "How likely something is to happen.",
+        "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+        "source": "https://www.merriam-webster.com/dictionary/probability",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Impact",
+        "definition": "The effect or harm caused by a problem.",
+        "example": "A separate backup reduces the impact of losing the working file.",
+        "source": "https://www.merriam-webster.com/dictionary/impact",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Priority",
+        "definition": "Something chosen to be dealt with before other things.",
+        "example": "Protecting the only project copy is our first priority.",
+        "source": "https://www.merriam-webster.com/dictionary/priority",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-09",
+        "B": "2026-11-09"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  },
+  {
+    "id": "grade9_t3_2026_w10_weekly_v1",
+    "name": "G9 T3 W10 - Present and explain safety decisions",
+    "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+    "grades": [
+      "9"
+    ],
+    "subjectSlug": "technology",
+    "trimester": "3",
+    "month": "November",
+    "week": 10,
+    "assignedDate": "2026-11-16",
+    "purpose": "practice",
+    "words": [
+      {
+        "word": "Backup",
+        "definition": "A separate copy kept so that information can be recovered if the working copy is lost.",
+        "example": "Keep a backup of the project in a separate location.",
+        "source": "https://techterms.com/definition/backup",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Probability",
+        "definition": "How likely something is to happen.",
+        "example": "Repeated failed logins increase our concern about the probability of an account attack.",
+        "source": "https://www.merriam-webster.com/dictionary/probability",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Impact",
+        "definition": "The effect or harm caused by a problem.",
+        "example": "A separate backup reduces the impact of losing the working file.",
+        "source": "https://www.merriam-webster.com/dictionary/impact",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Priority",
+        "definition": "Something chosen to be dealt with before other things.",
+        "example": "Protecting the only project copy is our first priority.",
+        "source": "https://www.merriam-webster.com/dictionary/priority",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      },
+      {
+        "word": "Protection",
+        "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+        "example": "A separate backup provides protection against losing the only project copy.",
+        "source": "https://www.merriam-webster.com/dictionary/protection",
+        "difficulty": 1,
+        "synonyms": [],
+        "antonyms": []
+      }
+    ],
+    "activitySettings": {
+      "weeklyPoolVersion": 1,
+      "sections": [
+        "A",
+        "B"
+      ],
+      "releaseDates": {
+        "A": "2026-11-16",
+        "B": "2026-11-16"
+      },
+      "reviewOnly": true,
+      "requiredActivities": [],
+      "additionalActivities": [
+        "flashcards",
+        "matching",
+        "fill-in-blank",
+        "illustration",
+        "quiz",
+        "synonym-antonym",
+        "word-search",
+        "crossword",
+        "hangman",
+        "scramble",
+        "wordle",
+        "speed-match"
+      ],
+      "flashcards": 5,
+      "matching": 5,
+      "fillInBlank": 5
+    }
+  }
+]

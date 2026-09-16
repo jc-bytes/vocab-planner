@@ -1,0 +1,91 @@
+{
+  "id": "grade8_t3_2026_w03_weekly_v1",
+  "name": "G8 T3 W03 - Explain and improve LunchApp",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-28",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that stores a value which can change.",
+      "example": "The variable count stores the number of button presses.",
+      "source": "https://techterms.com/definition/variable",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Event",
+      "definition": "An action or occurrence that a program can respond to.",
+      "example": "A button click is an event that starts the instructions.",
+      "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Test",
+      "definition": "A check used to find out whether something works as expected.",
+      "example": "We test the program by pressing the button three times.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Result",
+      "definition": "What happens or is produced after an action or calculation.",
+      "example": "The result of the test is a message showing the chosen lunch.",
+      "source": "https://www.merriam-webster.com/dictionary/result",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Feedback",
+      "definition": "Information about work that can help someone improve it.",
+      "example": "The feedback says to check the displayed total after a reset.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-09-30",
+      "B": "2026-09-28"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

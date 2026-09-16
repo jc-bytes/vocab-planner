@@ -116,6 +116,14 @@ export class StudentActivityMenu {
                 || '';
         }
 
+        document.getElementById('weekly-retirement-notice')?.remove();
+        if (this.sm.currentVocab.activitySettings?.retiredWeeklySet && descriptionEl) {
+            const notice = document.createElement('p');
+            notice.id = 'weekly-retirement-notice';
+            notice.textContent = 'This earlier class set is archived. Your saved results and exports remain available. Open Units to find this week’s vocabulary. Project weeks have no vocabulary tasks.';
+            descriptionEl.after(notice);
+        }
+
         // Get word coverage stats
         const coverageStats = this.activities.getWordCoverageStats();
         const activityFlow = this.activities.getActivityFlowConfig();

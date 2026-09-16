@@ -1,3 +1,4 @@
+import { weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
 import { vocabularyRepository } from '../services/vocabularyRepository.js';
@@ -87,7 +88,7 @@ export class StudentActivityVocabularyData {
 
     getVisibleVocabularyList(options = {}) {
         const { availableOnly = false, currentTrimesterOnly = false } = options;
-        let vocabs = this.getAllVocabularySources();
+        let vocabs = this.getAllVocabularySources().filter(v => weeklyVocabularyVisible(v, this.sm.studentProfile));
 
         if (vocabs.length === 0) {
             return { vocabs: [], message: 'No vocabularies found.' };
@@ -158,7 +159,7 @@ export class StudentActivityVocabularyData {
     }
 
     getGradeMatchedVocabularySources() {
-        let vocabs = this.getAllVocabularySources();
+        let vocabs = this.getAllVocabularySources().filter(v => weeklyVocabularyVisible(v, this.sm.studentProfile));
         const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
 
         if (studentGrade) {
