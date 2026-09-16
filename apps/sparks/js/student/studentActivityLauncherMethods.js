@@ -1,3 +1,4 @@
+import { activityHasPlayableRound, weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
@@ -56,6 +57,7 @@ export class StudentActivityLauncher {
 
     createRegisteredActivity(descriptor, ActivityClass, context) {
         const prepared = descriptor.prepare({
+            vocab: this.sm.currentVocab,
             savedState: context.savedState,
             wordLimit: context.wordLimit,
             playableWords: context.playableWords,
@@ -131,6 +133,11 @@ export class StudentActivityLauncher {
         await this.activities.session.waitForVocabularyOverride();
         if (!this.sm.currentVocab) return;
 
+        if (!weeklyVocabularyVisible(this.sm.currentVocab, this.sm.studentProfile, new Date())
+            || !activityHasPlayableRound(type, this.sm.currentVocab, this.activities.getActivityPlayableCount(type))) {
+            notifications.warning('This activity is not available for this unit.');
+            return;
+        }
         if (!this.activities.isActivityUnlocked(type)) {
             const flow = this.activities.getActivityFlowConfig();
             const requiredIndex = flow.required.indexOf(type);

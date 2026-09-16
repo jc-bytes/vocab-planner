@@ -1,0 +1,92 @@
+{
+  "id": "grade8_t3_2026_w04_weekly_v1",
+  "name": "G8 T3 W04 - Binary numbers",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 4,
+  "assignedDate": "2026-10-05",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Bit",
+      "definition": "A single binary digit, either zero or one.",
+      "example": "One bit can store either 0 or 1.",
+      "source": "https://techterms.com/definition/bit",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Binary",
+      "definition": "A number system that uses only the digits zero and one.",
+      "example": "The binary number 101 represents five.",
+      "source": "https://techterms.com/definition/binary",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Decimal",
+      "definition": "The base-ten number system, which uses the digits zero to nine.",
+      "example": "The decimal number five is written as 101 in binary.",
+      "source": "https://www.merriam-webster.com/dictionary/decimal",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Digit",
+      "definition": "One symbol used to write a number.",
+      "example": "Each digit in 101 is either zero or one.",
+      "source": "https://www.merriam-webster.com/dictionary/digit",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Place value",
+      "definition": "The value a digit has because of its position in a number.",
+      "example": "The leftmost place value in four-bit binary is eight.",
+      "source": "https://www.merriam-webster.com/dictionary/place%20value",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-10-07",
+      "B": "2026-10-05"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

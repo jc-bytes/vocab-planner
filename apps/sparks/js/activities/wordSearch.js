@@ -14,7 +14,7 @@ const wordSearchMethodGroups = [
 export class WordSearchActivity {
     constructor(container, words, onProgress, vocabID, onSaveState = null, initialState = null, options = {}) {
         this.container = container;
-        this.gridSize = 15;
+        this.gridSize = options.gridSize || 15;
         // Words are pre-filtered by student.js based on settings. Keep only terms that can
         // become playable word-search entries in this grid.
         this.words = this.prepareWords(words);

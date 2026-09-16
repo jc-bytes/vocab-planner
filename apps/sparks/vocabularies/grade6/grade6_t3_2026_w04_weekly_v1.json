@@ -1,0 +1,94 @@
+{
+  "id": "grade6_t3_2026_w04_weekly_v1",
+  "name": "G6 T3 W04 - Finish and check spreadsheets",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 4,
+  "assignedDate": "2026-10-05",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Table",
+      "definition": "Information arranged in rows and columns.",
+      "example": "The table puts each club name beside its student count.",
+      "source": "https://www.merriam-webster.com/dictionary/table",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that presents data so people can compare or understand it.",
+      "example": "The chart uses bars to compare the club counts.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Label",
+      "definition": "A name or short piece of text that identifies something.",
+      "example": "The label under each bar names the club.",
+      "source": "https://www.merriam-webster.com/dictionary/label",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Value",
+      "definition": "The information stored in a cell or variable.",
+      "example": "The value in B3 is 12.",
+      "source": "https://www.merriam-webster.com/dictionary/value",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Comparison",
+      "definition": "A check of how two things are similar or different.",
+      "example": "Our comparison shows that chess has more students than art.",
+      "source": "https://www.merriam-webster.com/dictionary/comparison",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B",
+      "C"
+    ],
+    "releaseDates": {
+      "A": "2026-10-05",
+      "B": "2026-10-06",
+      "C": "2026-10-07"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

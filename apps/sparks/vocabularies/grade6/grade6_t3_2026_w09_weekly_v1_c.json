@@ -1,0 +1,90 @@
+{
+  "id": "grade6_t3_2026_w09_weekly_v1_c",
+  "name": "G6 T3 W09 - Button counter",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 9,
+  "assignedDate": "2026-11-11",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Input",
+      "definition": "Information or a signal given to a computer or program.",
+      "example": "Pressing button A provides an input to the program.",
+      "source": "https://techterms.com/definition/input",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information or a signal produced by a computer or program.",
+      "example": "The displayed number is an output from the counter.",
+      "source": "https://techterms.com/definition/output",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that stores a value which can change.",
+      "example": "The variable count stores the number of button presses.",
+      "source": "https://techterms.com/definition/variable",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Button",
+      "definition": "A control that you press or select to make something happen.",
+      "example": "Press the button to add one to the counter.",
+      "source": "https://www.merriam-webster.com/dictionary/button",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Counter",
+      "definition": "A value or device used to keep track of how many times something happens.",
+      "example": "The counter increases by one after each button press.",
+      "source": "https://www.merriam-webster.com/dictionary/counter",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "C"
+    ],
+    "releaseDates": {
+      "C": "2026-11-11"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

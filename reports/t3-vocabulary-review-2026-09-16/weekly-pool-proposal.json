@@ -1,0 +1,1145 @@
+{
+  "status": "review proposal only; not a deployable catalog",
+  "week_1": "frozen",
+  "rows": [
+    {
+      "grade": 6,
+      "week": 2,
+      "week_start": "2026-09-21",
+      "topic": "Cells and charts",
+      "mode": "teaching",
+      "proposed_pool": [
+        "row",
+        "column",
+        "cell",
+        "table",
+        "chart"
+      ],
+      "note": "Use the chart lesson to introduce cell; reuse the other terms.",
+      "existing_ids": [
+        "grade6_t3_2026_w02_part1",
+        "grade6_t3_2026_w02_part2"
+      ],
+      "existing_topics": [
+        "Build a column chart",
+        "Read spreadsheet cells"
+      ],
+      "existing_words": [
+        "Table",
+        "Chart",
+        "Row",
+        "Column"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 3,
+      "week_start": "2026-09-28",
+      "topic": "Tables and story data",
+      "mode": "review",
+      "proposed_pool": [
+        "data",
+        "table",
+        "row",
+        "column",
+        "chart"
+      ],
+      "note": "Reuse taught words before the story-table assessment. 6A misses Sep 29; follow its October continuation.",
+      "existing_ids": [
+        "grade6_t3_2026_w03_part1",
+        "grade6_t3_2026_w03_part2"
+      ],
+      "existing_topics": [
+        "Build a table and chart",
+        "Build a story table"
+      ],
+      "existing_words": [
+        "Data",
+        "Chart",
+        "Table"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 4,
+      "week_start": "2026-10-05",
+      "topic": "Finish and check spreadsheets",
+      "mode": "teaching",
+      "proposed_pool": [
+        "table",
+        "chart",
+        "label",
+        "value",
+        "comparison"
+      ],
+      "note": "The current plan still teaches spreadsheets on Oct 5\u20139. Introduce task language through the worked chart, not new assessment content.",
+      "existing_ids": [
+        "grade6_t3_2026_w04_part1",
+        "grade6_t3_2026_w04_part2"
+      ],
+      "existing_topics": [
+        "Plan your STEAM work",
+        "Build your STEAM part"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Model"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 5,
+      "week_start": "2026-10-12",
+      "topic": "Assigned STEAM project work",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade6_t3_2026_w05_part1",
+        "grade6_t3_2026_w05_part2"
+      ],
+      "existing_topics": [
+        "Test your STEAM part",
+        "Show your STEAM contribution"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 6,
+      "week_start": "2026-10-19",
+      "topic": "STEAM grade records",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade6_t3_2026_w06_part1",
+        "grade6_t3_2026_w06_part2"
+      ],
+      "existing_topics": [
+        "Practise your STEAM explanation",
+        "Present your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 7,
+      "week_start": "2026-10-26",
+      "topic": "Measure and model an eraser",
+      "mode": "teaching",
+      "proposed_pool": [
+        "dimension",
+        "length",
+        "width",
+        "height",
+        "model"
+      ],
+      "note": "Model work moves to Oct 26\u201330. Respect Student Day and the separate 6A/6B/6C lessons.",
+      "existing_ids": [
+        "grade6_t3_2026_w07_part1",
+        "grade6_t3_2026_w07_part2"
+      ],
+      "existing_topics": [
+        "Make a table and chart",
+        "Check your table and chart"
+      ],
+      "existing_words": [
+        "Table",
+        "Chart"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 8,
+      "week_start": "2026-11-02",
+      "topic": "6C model check; 6A/6B closed",
+      "mode": "review",
+      "proposed_pool": [
+        "dimension",
+        "length",
+        "width",
+        "height",
+        "model"
+      ],
+      "note": "Release only for 6C\u2019s Nov 6 lesson. No required work for 6A/6B during closures.",
+      "existing_ids": [
+        "grade6_t3_2026_w08_part1",
+        "grade6_t3_2026_w08_part2"
+      ],
+      "existing_topics": [
+        "Measure your eraser",
+        "Measure and model an eraser"
+      ],
+      "existing_words": [
+        "Dimension",
+        "Model"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 9,
+      "week_start": "2026-11-09",
+      "topic": "Models for 6A/6B; counter for 6C",
+      "mode": "split",
+      "proposed_pool": [
+        "dimension",
+        "length",
+        "width",
+        "height",
+        "model"
+      ],
+      "note": "6A/6B keep the model pool. 6C uses input, output, variable, button, counter for its Nov 11/13 lessons.",
+      "existing_ids": [
+        "grade6_t3_2026_w09_part1",
+        "grade6_t3_2026_w09_part2"
+      ],
+      "existing_topics": [
+        "Build your measured model",
+        "Build and check your model"
+      ],
+      "existing_words": [
+        "Dimension",
+        "Model"
+      ],
+      "group_pools": {
+        "6A/6B": [
+          "dimension",
+          "length",
+          "width",
+          "height",
+          "model"
+        ],
+        "6C": [
+          "input",
+          "output",
+          "variable",
+          "button",
+          "counter"
+        ]
+      }
+    },
+    {
+      "grade": 6,
+      "week": 10,
+      "week_start": "2026-11-16",
+      "topic": "Button counters",
+      "mode": "teaching",
+      "proposed_pool": [
+        "input",
+        "output",
+        "variable",
+        "button",
+        "counter"
+      ],
+      "note": "6A/6B begin counters; 6C reuses this pool during explanation and saving.",
+      "existing_ids": [
+        "grade6_t3_2026_w10_part1",
+        "grade6_t3_2026_w10_part2"
+      ],
+      "existing_topics": [
+        "Check a model; build a counter",
+        "Demonstrate your saved work"
+      ],
+      "existing_words": [
+        "Dimension",
+        "Input",
+        "Output",
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 11,
+      "week_start": "2026-11-23",
+      "topic": "Explain and improve saved work",
+      "mode": "review",
+      "proposed_pool": [
+        "input",
+        "output",
+        "variable",
+        "test",
+        "feedback"
+      ],
+      "note": "Use familiar review terms. No added five-new-word requirement during end-of-term work.",
+      "existing_ids": [
+        "grade6_t3_2026_w11_part1",
+        "grade6_t3_2026_w11_part2"
+      ],
+      "existing_topics": [
+        "Control a micro:bit response",
+        "Test your micro:bit program"
+      ],
+      "existing_words": [
+        "Input",
+        "Output",
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 12,
+      "week_start": "2026-11-30",
+      "topic": "Complete the improvement",
+      "mode": "review",
+      "proposed_pool": [
+        "input",
+        "output",
+        "variable",
+        "test",
+        "feedback"
+      ],
+      "note": "Reuse Week 11. Respect the Dec 2 holiday.",
+      "existing_ids": [
+        "grade6_t3_2026_w12_part1",
+        "grade6_t3_2026_w12_part2"
+      ],
+      "existing_topics": [
+        "Predict the light response",
+        "Build and test a night-light"
+      ],
+      "existing_words": [
+        "Sensor",
+        "Threshold",
+        "Input",
+        "Output"
+      ]
+    },
+    {
+      "grade": 6,
+      "week": 13,
+      "week_start": "2026-12-07",
+      "topic": "Exams and closure",
+      "mode": "no_class",
+      "proposed_pool": [],
+      "note": "Withdraw future scheduled night-light work; no normal Technology lesson is planned.",
+      "existing_ids": [
+        "grade6_t3_2026_w13_part1",
+        "grade6_t3_2026_w13_part2"
+      ],
+      "existing_topics": [
+        "Explain your night-light",
+        "Demonstrate your night-light"
+      ],
+      "existing_words": [
+        "Sensor",
+        "Threshold",
+        "Input",
+        "Output"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 2,
+      "week_start": "2026-09-21",
+      "topic": "Spreadsheet cells, charts and formulas",
+      "mode": "teaching",
+      "proposed_pool": [
+        "cell",
+        "table",
+        "formula",
+        "function",
+        "chart"
+      ],
+      "note": "Keep the spreadsheet assessment\u2019s existing vocabulary available; select five focus words, not the only words allowed in the lesson.",
+      "existing_ids": [
+        "grade7_t3_2026_w02_part1",
+        "grade7_t3_2026_w02_part2"
+      ],
+      "existing_topics": [
+        "Read spreadsheet cells",
+        "Build a column chart"
+      ],
+      "existing_words": [
+        "Row",
+        "Column",
+        "Table",
+        "Chart"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 3,
+      "week_start": "2026-09-28",
+      "topic": "Interpret charts and calculations",
+      "mode": "review",
+      "proposed_pool": [
+        "formula",
+        "total",
+        "average",
+        "chart",
+        "comparison"
+      ],
+      "note": "Review words already met in Week 1/2 modelling before the activity-afternoon assessment.",
+      "existing_ids": [
+        "grade7_t3_2026_w03_part1",
+        "grade7_t3_2026_w03_part2"
+      ],
+      "existing_topics": [
+        "Explain your chart",
+        "Explain spreadsheet data"
+      ],
+      "existing_words": [
+        "Formula",
+        "Chart"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 4,
+      "week_start": "2026-10-05",
+      "topic": "Scratch delivery practice",
+      "mode": "teaching",
+      "proposed_pool": [
+        "function",
+        "loop",
+        "variable",
+        "position",
+        "reset"
+      ],
+      "note": "Actual Oct 7/9 lesson, replacing the old STEAM-planning set. 7B has no Oct 8 lesson.",
+      "existing_ids": [
+        "grade7_t3_2026_w04_part1",
+        "grade7_t3_2026_w04_part2"
+      ],
+      "existing_topics": [
+        "Plan your STEAM work",
+        "Build your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Model"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 5,
+      "week_start": "2026-10-12",
+      "topic": "Assigned STEAM project work",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade7_t3_2026_w05_part1",
+        "grade7_t3_2026_w05_part2"
+      ],
+      "existing_topics": [
+        "Test your STEAM project",
+        "Show your project work"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 6,
+      "week_start": "2026-10-19",
+      "topic": "STEAM grade records",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade7_t3_2026_w06_part1",
+        "grade7_t3_2026_w06_part2"
+      ],
+      "existing_topics": [
+        "Practise your STEAM explanation",
+        "Present your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 7,
+      "week_start": "2026-10-26",
+      "topic": "Distance rule plus Scratch assessment",
+      "mode": "teaching",
+      "proposed_pool": [
+        "sensor",
+        "threshold",
+        "input",
+        "output",
+        "condition"
+      ],
+      "note": "Use this pool for the ungraded distance lesson. Keep Week 4\u2019s Scratch pool accessible for the separate delivery assessment.",
+      "existing_ids": [
+        "grade7_t3_2026_w07_part1",
+        "grade7_t3_2026_w07_part2"
+      ],
+      "existing_topics": [
+        "Repeat a Scratch task",
+        "Deliver with a Scratch loop"
+      ],
+      "existing_words": [
+        "Function",
+        "Loop"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 8,
+      "week_start": "2026-11-02",
+      "topic": "Compare a Scratch change",
+      "mode": "review",
+      "proposed_pool": [
+        "function",
+        "loop",
+        "variable",
+        "position",
+        "reset"
+      ],
+      "note": "Only the Nov 6 assessment session remains. No new vocabulary instruction or required extra task before that assessment.",
+      "existing_ids": [
+        "grade7_t3_2026_w08_part2"
+      ],
+      "existing_topics": [
+        "Organise three files"
+      ],
+      "existing_words": [
+        "File",
+        "Folder"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 9,
+      "week_start": "2026-11-09",
+      "topic": "Radio warning system",
+      "mode": "teaching",
+      "proposed_pool": [
+        "sensor",
+        "threshold",
+        "radio",
+        "message",
+        "output"
+      ],
+      "note": "Introduce radio and message through the actual sender/receiver demonstration; retain earlier input/condition review.",
+      "existing_ids": [
+        "grade7_t3_2026_w09_part1",
+        "grade7_t3_2026_w09_part2"
+      ],
+      "existing_topics": [
+        "Organise three files",
+        "Find your saved files"
+      ],
+      "existing_words": [
+        "File",
+        "Folder"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 10,
+      "week_start": "2026-11-16",
+      "topic": "Rehearse and demonstrate the warning",
+      "mode": "review",
+      "proposed_pool": [
+        "sensor",
+        "threshold",
+        "radio",
+        "message",
+        "output"
+      ],
+      "note": "Reuse Week 9 for the exam; do not introduce new assessed language.",
+      "existing_ids": [
+        "grade7_t3_2026_w10_part1",
+        "grade7_t3_2026_w10_part2"
+      ],
+      "existing_topics": [
+        "Test a distance rule",
+        "Send a Mandrake warning"
+      ],
+      "existing_words": [
+        "Sensor",
+        "Threshold"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 11,
+      "week_start": "2026-11-23",
+      "topic": "Improve the warning",
+      "mode": "review",
+      "proposed_pool": [
+        "sensor",
+        "threshold",
+        "radio",
+        "message",
+        "output"
+      ],
+      "note": "Keep review optional in the reduced week; Nov 27 is a school event.",
+      "existing_ids": [
+        "grade7_t3_2026_w11_part1",
+        "grade7_t3_2026_w11_part2"
+      ],
+      "existing_topics": [
+        "Make the warning clearer",
+        "Compare a project change"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 7,
+      "week": 12,
+      "week_start": "2026-11-30",
+      "topic": "Finish the feedback improvement",
+      "mode": "review",
+      "proposed_pool": [
+        "sensor",
+        "threshold",
+        "radio",
+        "message",
+        "output"
+      ],
+      "note": "Same pool; honor 7A\u2019s Dec 2 closure and the actual remaining sessions.",
+      "existing_ids": [
+        "grade7_t3_2026_w12_part1",
+        "grade7_t3_2026_w12_part2"
+      ],
+      "existing_topics": [
+        "Practise your Mandrake demo",
+        "Demonstrate your warning system"
+      ],
+      "existing_words": [
+        "Sensor",
+        "Threshold"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 2,
+      "week_start": "2026-09-21",
+      "topic": "Test and finish LunchApp",
+      "mode": "teaching",
+      "proposed_pool": [
+        "input",
+        "output",
+        "variable",
+        "test",
+        "bug"
+      ],
+      "note": "Replace the outdated club-signup/map wording. Actual lessons use a running LunchApp.",
+      "existing_ids": [
+        "grade8_t3_2026_w02_part1",
+        "grade8_t3_2026_w02_part2"
+      ],
+      "existing_topics": [
+        "Test your lunch map",
+        "Plan a club signup app"
+      ],
+      "existing_words": [
+        "Test",
+        "Bug",
+        "Variable"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 3,
+      "week_start": "2026-09-28",
+      "topic": "Explain and improve LunchApp",
+      "mode": "review",
+      "proposed_pool": [
+        "variable",
+        "event",
+        "test",
+        "result",
+        "feedback"
+      ],
+      "note": "Use the real app/test evidence; do not create a file-organisation lesson.",
+      "existing_ids": [
+        "grade8_t3_2026_w03_part1",
+        "grade8_t3_2026_w03_part2"
+      ],
+      "existing_topics": [
+        "Organise your app work",
+        "Check and improve your app"
+      ],
+      "existing_words": [
+        "File",
+        "Folder",
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 4,
+      "week_start": "2026-10-05",
+      "topic": "Binary numbers",
+      "mode": "teaching",
+      "proposed_pool": [
+        "bit",
+        "binary",
+        "decimal",
+        "digit",
+        "place value"
+      ],
+      "note": "Move binary from the app\u2019s Week 10 to the actual Oct 5\u20138 teaching. Explain all five before the binary assessment.",
+      "existing_ids": [
+        "grade8_t3_2026_w04_part1",
+        "grade8_t3_2026_w04_part2"
+      ],
+      "existing_topics": [
+        "Plan your STEAM work",
+        "Build your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Model"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 5,
+      "week_start": "2026-10-12",
+      "topic": "Assigned STEAM project work",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade8_t3_2026_w05_part1",
+        "grade8_t3_2026_w05_part2"
+      ],
+      "existing_topics": [
+        "Test your STEAM project",
+        "Show your project work"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 6,
+      "week_start": "2026-10-19",
+      "topic": "STEAM grade records",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade8_t3_2026_w06_part1",
+        "grade8_t3_2026_w06_part2"
+      ],
+      "existing_topics": [
+        "Practise your STEAM explanation",
+        "Present your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 7,
+      "week_start": "2026-10-26",
+      "topic": "Python multiplication and debugging",
+      "mode": "teaching",
+      "proposed_pool": [
+        "input",
+        "variable",
+        "integer",
+        "output",
+        "bug"
+      ],
+      "note": "Use the actual two-number Python program and familiar corrections.",
+      "existing_ids": [
+        "grade8_t3_2026_w07_part1",
+        "grade8_t3_2026_w07_part2"
+      ],
+      "existing_topics": [
+        "Calculate with Python",
+        "Fix Python mistakes"
+      ],
+      "existing_words": [
+        "Input",
+        "Variable",
+        "Bug"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 8,
+      "week_start": "2026-11-02",
+      "topic": "School closure and existing-record review",
+      "mode": "no_class",
+      "proposed_pool": [],
+      "note": "No student lesson. Remove the scheduled Python-total requirement; existing practice may remain voluntarily accessible.",
+      "existing_ids": [
+        "grade8_t3_2026_w08_part1"
+      ],
+      "existing_topics": [
+        "Check a Python total"
+      ],
+      "existing_words": [
+        "Bug",
+        "Variable"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 9,
+      "week_start": "2026-11-09",
+      "topic": "Scratch controls plus Python assessment",
+      "mode": "review",
+      "proposed_pool": [
+        "event",
+        "variable",
+        "input",
+        "output",
+        "bug"
+      ],
+      "note": "Reuse input/output/variable/bug; event comes from the earlier app. Keep the Week 7 Python pool accessible for assessment review.",
+      "existing_ids": [
+        "grade8_t3_2026_w09_part1",
+        "grade8_t3_2026_w09_part2"
+      ],
+      "existing_topics": [
+        "Test your Python fixes",
+        "Fix five Python errors"
+      ],
+      "existing_words": [
+        "Bug",
+        "Variable"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 10,
+      "week_start": "2026-11-16",
+      "topic": "Scratch game rules",
+      "mode": "teaching",
+      "proposed_pool": [
+        "sprite",
+        "event",
+        "loop",
+        "condition",
+        "variable"
+      ],
+      "note": "Use the actual Player/Balloon/Wall build. Fix the inconsistent Catch the Star/Balloon titles when synchronising descriptions.",
+      "existing_ids": [
+        "grade8_t3_2026_w10_part1",
+        "grade8_t3_2026_w10_part2"
+      ],
+      "existing_topics": [
+        "Read binary numbers",
+        "Binary check and game controls"
+      ],
+      "existing_words": [
+        "Bit",
+        "Binary"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 11,
+      "week_start": "2026-11-23",
+      "topic": "Rehearse and demonstrate the game",
+      "mode": "review",
+      "proposed_pool": [
+        "sprite",
+        "event",
+        "loop",
+        "condition",
+        "variable"
+      ],
+      "note": "Reuse Week 10 during the final assessment.",
+      "existing_ids": [
+        "grade8_t3_2026_w11_part1",
+        "grade8_t3_2026_w11_part2"
+      ],
+      "existing_topics": [
+        "Add game rules",
+        "Build Catch the Star"
+      ],
+      "existing_words": [
+        "Loop",
+        "Condition"
+      ]
+    },
+    {
+      "grade": 8,
+      "week": 12,
+      "week_start": "2026-11-30",
+      "topic": "Improve one game rule",
+      "mode": "review",
+      "proposed_pool": [
+        "sprite",
+        "event",
+        "loop",
+        "condition",
+        "variable"
+      ],
+      "note": "Reuse the same pool; no new vocabulary burden during feedback/closure.",
+      "existing_ids": [
+        "grade8_t3_2026_w12_part1",
+        "grade8_t3_2026_w12_part2"
+      ],
+      "existing_topics": [
+        "Test Catch the Star",
+        "Demonstrate Catch the Star"
+      ],
+      "existing_words": [
+        "Loop",
+        "Condition"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 2,
+      "week_start": "2026-09-21",
+      "topic": "Online dangers plus the data assessment",
+      "mode": "teaching",
+      "proposed_pool": [
+        "phishing",
+        "malware",
+        "ransomware",
+        "password",
+        "protection"
+      ],
+      "note": "Safety teaching starts Sep 21. Keep frozen Week 1 pixel/bit/sample/sample-rate review accessible for the separate picture-and-sound assessment.",
+      "existing_ids": [
+        "grade9_t3_2026_w02_part1",
+        "grade9_t3_2026_w02_part2"
+      ],
+      "existing_topics": [
+        "Organise your work",
+        "Picture and sound check"
+      ],
+      "existing_words": [
+        "Pixel",
+        "Bit",
+        "Sample",
+        "Sample rate"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 3,
+      "week_start": "2026-09-28",
+      "topic": "Compare and explain online risks",
+      "mode": "teaching",
+      "proposed_pool": [
+        "risk",
+        "probability",
+        "impact",
+        "evidence",
+        "protection"
+      ],
+      "note": "Introduce in the Sep 28 worked risk examples before the independent safety/risk assessments. Earlier threat names remain available in Week 2.",
+      "existing_ids": [
+        "grade9_t3_2026_w03_part1",
+        "grade9_t3_2026_w03_part2"
+      ],
+      "existing_topics": [
+        "Spot online dangers",
+        "Choose a safe response"
+      ],
+      "existing_words": [
+        "Phishing",
+        "Malware"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 4,
+      "week_start": "2026-10-05",
+      "topic": "Explain the message risk",
+      "mode": "review",
+      "proposed_pool": [
+        "phishing",
+        "risk",
+        "probability",
+        "impact",
+        "protection"
+      ],
+      "note": "Use the real online-safety slides, replacing the stale STEAM-planning topic.",
+      "existing_ids": [
+        "grade9_t3_2026_w04_part1",
+        "grade9_t3_2026_w04_part2"
+      ],
+      "existing_topics": [
+        "Plan your STEAM work",
+        "Build your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Model"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 5,
+      "week_start": "2026-10-12",
+      "topic": "Assigned STEAM project work",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade9_t3_2026_w05_part1",
+        "grade9_t3_2026_w05_part2"
+      ],
+      "existing_topics": [
+        "Test your STEAM project",
+        "Show your project work"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 6,
+      "week_start": "2026-10-19",
+      "topic": "STEAM grade records",
+      "mode": "no_vocabulary",
+      "proposed_pool": [],
+      "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers.",
+      "existing_ids": [
+        "grade9_t3_2026_w06_part1",
+        "grade9_t3_2026_w06_part2"
+      ],
+      "existing_topics": [
+        "Practise your STEAM explanation",
+        "Present your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Feedback"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 7,
+      "week_start": "2026-10-26",
+      "topic": "Project-copy risk and priority",
+      "mode": "teaching",
+      "proposed_pool": [
+        "backup",
+        "probability",
+        "impact",
+        "priority",
+        "protection"
+      ],
+      "note": "Tie backup/priority to the taught case comparison. 9A has no Oct 27 lesson.",
+      "existing_ids": [
+        "grade9_t3_2026_w07_part1",
+        "grade9_t3_2026_w07_part2"
+      ],
+      "existing_topics": [
+        "Online safety check",
+        "Review safety and compare risks"
+      ],
+      "existing_words": [
+        "Phishing",
+        "Malware",
+        "Probability",
+        "Impact"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 8,
+      "week_start": "2026-11-02",
+      "topic": "School closure",
+      "mode": "no_class",
+      "proposed_pool": [],
+      "note": "No Technology task for either group; remove the scheduled risk-check unit from required work.",
+      "existing_ids": [
+        "grade9_t3_2026_w08_part1"
+      ],
+      "existing_topics": [
+        "Online risk check"
+      ],
+      "existing_words": [
+        "Phishing",
+        "Malware"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 9,
+      "week_start": "2026-11-09",
+      "topic": "Rehearse online-safety decisions",
+      "mode": "review",
+      "proposed_pool": [
+        "backup",
+        "probability",
+        "impact",
+        "priority",
+        "protection"
+      ],
+      "note": "Reuse Week 7 for the actual safety-presentation rehearsal; no STEAM demonstration or new words.",
+      "existing_ids": [
+        "grade9_t3_2026_w09_part1",
+        "grade9_t3_2026_w09_part2"
+      ],
+      "existing_topics": [
+        "Prepare your project record",
+        "Practise your project demonstration"
+      ],
+      "existing_words": [
+        "Test",
+        "Feedback",
+        "Prototype"
+      ]
+    },
+    {
+      "grade": 9,
+      "week": 10,
+      "week_start": "2026-11-16",
+      "topic": "Present and explain safety decisions",
+      "mode": "review",
+      "proposed_pool": [
+        "backup",
+        "probability",
+        "impact",
+        "priority",
+        "protection"
+      ],
+      "note": "Reuse the taught pool for the Nov 17/18 exam. Add no Grade 9 academic work after the planned finish.",
+      "existing_ids": [
+        "grade9_t3_2026_w10_part1",
+        "grade9_t3_2026_w10_part2"
+      ],
+      "existing_topics": [
+        "Check your project demonstration",
+        "Demonstrate your STEAM project"
+      ],
+      "existing_words": [
+        "Prototype",
+        "Feedback"
+      ]
+    }
+  ],
+  "project_weeks": {
+    "weeks": [
+      5,
+      6
+    ],
+    "week_starts": [
+      "2026-10-12",
+      "2026-10-19"
+    ],
+    "rule": "No vocabulary sets or tasks for Grades 6\u20139 during either project week."
+  }
+}

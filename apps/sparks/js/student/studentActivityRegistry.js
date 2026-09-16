@@ -1,3 +1,4 @@
+import { weeklySettings, weeklyWordPlayable } from './weeklyVocabularyPolicy.js';
 const CROSSWORD_ICON = `
     <svg class="activity-art-icon" viewBox="0 0 32 32" aria-hidden="true">
         <rect x="13" y="5" width="6" height="22" rx="1.2"></rect>
@@ -134,12 +135,14 @@ function prepareWordleActivity({ savedState, wordLimit, prioritize, restore }) {
     };
 }
 
-function prepareWordSearchActivity({ savedState, wordLimit, prioritize, restore }) {
+function prepareWordSearchActivity({ savedState, wordLimit, prioritize, restore, vocab }) {
+    const playable = word => weeklyWordPlayable('word-search', word, vocab, isWordSearchWordPlayable);
     return {
+        ...(weeklySettings(vocab) ? { compactGrid: true } : {}),
         words: restore(
             savedState,
-            prioritize(wordLimit, isWordSearchWordPlayable),
-            isWordSearchWordPlayable
+            prioritize(wordLimit, playable),
+            playable
         )
     };
 }
@@ -184,7 +187,9 @@ function createWordSearchActivity({
         persistenceId,
         onSaveState,
         savedState,
-        { onNewPuzzle: onNewRound }
+        { onNewPuzzle: onNewRound, ...(prepared.compactGrid ? { gridSize:
+            Math.min(15, Math.max(8, ...prepared.words.map(word => String(word.word).replace(/[^A-Za-z0-9]/g, '').length + 2)))
+            } : {}) }
     );
 }
 
