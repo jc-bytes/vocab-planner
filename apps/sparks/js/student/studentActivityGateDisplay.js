@@ -100,6 +100,9 @@ export class StudentActivityGateDisplay {
         grid.querySelectorAll(':scope > .unit-loading-state').forEach(state => state.remove());
 
         const completion = this.getRequiredCompletion(flow);
+        const hasPlayableWords = activityType => this.activities.getActivityPlayableCount(activityType) > 0;
+        const visibleAdditionalCount = flow.additional.filter(hasPlayableWords).length;
+        const visibleHiddenCount = flow.hidden.filter(hasPlayableWords).length;
         const allCards = Array.from(cards);
         const cardByType = new Map(allCards.map(card => [card.dataset.activity, card]));
         const nextActivityType = completion.isComplete
@@ -222,8 +225,8 @@ export class StudentActivityGateDisplay {
             'summary',
             'activity-disclosure__summary',
             completion.isComplete
-                ? `Additional Practice (${flow.additional.length})`
-                : `Additional Practice (${flow.additional.length}) · locked`
+                ? `Additional Practice (${visibleAdditionalCount})`
+                : `Additional Practice (${visibleAdditionalCount}) · locked`
         );
         const additionalGrid = createElement('div', 'activities-grid-inner activity-secondary-grid');
         additionalDetails.appendChild(additionalSummary);
@@ -238,7 +241,7 @@ export class StudentActivityGateDisplay {
 
         const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure activity-disclosure');
         unavailableDetails.open = false;
-        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Not Required (${flow.hidden.length})`);
+        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Not Required (${visibleHiddenCount})`);
         const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
         unavailableDetails.appendChild(unavailableSummary);
         unavailableDetails.appendChild(createElement(
@@ -254,7 +257,10 @@ export class StudentActivityGateDisplay {
             const isRequired = flow.required.includes(activityType);
             const isAdditional = flow.additional.includes(activityType);
             const isHidden = flow.hidden.includes(activityType);
-            const hasPlayableContent = this.activities.getActivityPlayableCount(activityType) > 0;
+            const hasPlayableContent = hasPlayableWords(activityType);
+            // Keep cards in the DOM so opening another unit can show them again.
+            card.hidden = !hasPlayableContent;
+            card.style.display = hasPlayableContent ? '' : 'none';
             const requiredIndex = flow.required.indexOf(activityType);
             const isComplete = this.isActivityComplete(activityType);
             const isLockedRequired = isRequired
@@ -323,6 +329,7 @@ export class StudentActivityGateDisplay {
             if (card) additionalGrid.appendChild(card);
         });
 
+        additionalDetails.style.display = visibleAdditionalCount > 0 ? '' : 'none';
         if (flow.additional.length > 0) grid.appendChild(additionalDetails);
 
         flow.hidden.forEach(activityType => {
@@ -331,6 +338,7 @@ export class StudentActivityGateDisplay {
             if (card) unavailableGrid.appendChild(card);
         });
 
+        unavailableDetails.style.display = visibleHiddenCount > 0 ? '' : 'none';
         if (flow.hidden.length > 0) grid.appendChild(unavailableDetails);
 
         this.updateActivityScrollCue();
