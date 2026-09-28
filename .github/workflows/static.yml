@@ -81,6 +81,10 @@ jobs:
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
+      - name: Add Grade 9 risk practice pilot
+        run: |
+          mkdir -p dist-desktop/g9-risk-practice-site
+          cp -R ../../public/g9-risk-practice-site/. dist-desktop/g9-risk-practice-site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
