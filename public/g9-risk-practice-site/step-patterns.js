@@ -5,10 +5,10 @@ const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;',
 
 // These patterns turn one authored question into its screen and PDF versions.
 // build-printable.mjs reads the resulting screen section for the paper version.
-export function exampleStep({id, title, short, explanation, source, action, table, takeaway}) {
+export function exampleStep({id, title, short, explanation, source, action, table, takeaway, context}) {
   return {
     id, title, short, kind:'html', stage:'model', authoring:{table},
-    html:`<p>${escape(explanation)}</p><div class="fm-source"><p>${escape(source)}</p></div><p>${escape(action)}</p>${tableHtml(table)}<p>${escape(takeaway)}</p>`,
+    html:`<p>${escape(explanation)}</p><div class="fm-source"><p>${escape(source)}</p></div><p>${escape(action)}</p>${tableHtml(table)}<p>${escape(takeaway)}</p>${context ? `<div class="fm-context"><p><strong>Context.</strong> ${escape(context)}</p></div>` : ''}`,
   };
 }
 
@@ -38,6 +38,7 @@ export function choiceSetStep({id, title, short, table, items, stage='practice'}
       options: item.options,
       answer: item.answer,
       retry: item.hint,
+      context: item.context || '',
     })),
   };
 }
