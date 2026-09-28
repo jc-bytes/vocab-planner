@@ -23,10 +23,10 @@ export const riskCases = {
   caption: 'Risk cases',
   columns: ['Case', 'Facts'],
   rows: [
-    ['R1: Attendance account', 'Unknown logins; short shared password; student records'],
-    ['R4: Library computer', 'Updates missing for six months; students download attachments'],
-    ['R6: Project folder', 'No backup; a file is deleted about once each month'],
-    ['P1: Club account', 'Unknown logins; short shared password; private contact details'],
+    ['Attendance account', 'Unknown logins; short shared password; student records'],
+    ['Library computer', 'Updates missing for six months; students download attachments'],
+    ['Project folder', 'No backup; a file is deleted about once each month'],
+    ['Club account', 'Unknown logins; short shared password; private contact details'],
   ],
 };
 
