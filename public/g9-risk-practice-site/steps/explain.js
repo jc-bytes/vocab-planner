@@ -1,0 +1,6 @@
+import { riskCases, tableHtml } from '../content.js';
+
+export const explain = {
+  id: 'explain', title: 'Learn to rate a risk', short: 'Risk example', kind: 'html', stage: 'guided',
+  html: `<p>Probability asks, <strong>How likely is it?</strong> Impact asks, <strong>How much harm could it cause?</strong></p><p>Example: A project file is deleted every week and has no backup. Probability is high because deletion happens often. Impact is high because the only copy could be lost. A separate backup protects the work because it allows recovery.</p>${tableHtml(riskCases)}<p>For each risk, use one fact for probability, one fact for impact, and one protection that matches the danger.</p>`,
+};

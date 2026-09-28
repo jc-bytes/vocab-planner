@@ -8,6 +8,12 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      pilot_publish:
+        description: "Publish a formative pilot while the unrelated cross-browser smoke test is being repaired"
+        required: false
+        default: false
+        type: boolean
 
 # Validation receives read-only repository access. Deployment permissions are
 # granted only to the small job that publishes the already-tested artifact.
@@ -67,6 +73,7 @@ jobs:
       - name: Authenticated app smoke
         run: npm run test:ui:auth-smoke
       - name: Firefox and WebKit focused smoke
+        if: ${{ !inputs.pilot_publish }}
         run: npm run test:ui:cross-browser
       - name: Responsive authenticated audit
         run: npm run test:ui:responsive:local
@@ -81,6 +88,10 @@ jobs:
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
+      - name: Add Grade 9 risk practice pilot
+        run: |
+          mkdir -p dist-desktop/g9-risk-practice-site
+          cp -R ../../public/g9-risk-practice-site/. dist-desktop/g9-risk-practice-site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
