@@ -92,6 +92,10 @@ jobs:
         run: |
           mkdir -p dist-desktop/g9-risk-practice-site
           cp -R ../../public/g9-risk-practice-site/. dist-desktop/g9-risk-practice-site/
+      - name: Add Grade 9 Summative 2 safety check
+        run: |
+          mkdir -p dist-desktop/g9-summative2-safety-check-site
+          cp -R ../../public/g9-summative2-safety-check-site/. dist-desktop/g9-summative2-safety-check-site/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
