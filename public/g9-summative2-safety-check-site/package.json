@@ -1,0 +1,11 @@
+{
+  "name": "g9-summative2-safety-check",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test *.test.mjs",
+    "build": "node build-printable.mjs",
+    "check": "node check-activity.mjs",
+    "preview": "node preview-local.mjs"
+  }
+}
