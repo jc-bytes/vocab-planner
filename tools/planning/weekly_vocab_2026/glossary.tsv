@@ -1,0 +1,55 @@
+word	definition	example	source
+row	A line of cells going across a table.	Row 3 contains the club name and its student count.	https://techterms.com/definition/row
+column	A line of cells going down a table.	Column B contains the student counts.	https://techterms.com/definition/column
+cell	One box in a spreadsheet where a row and column meet.	Cell B3 contains the number of students in the club.	https://techterms.com/definition/cell
+table	Information arranged in rows and columns.	The table puts each club name beside its student count.	https://www.merriam-webster.com/dictionary/table
+chart	A picture that presents data so people can compare or understand it.	The chart uses bars to compare the club counts.	https://www.merriam-webster.com/dictionary/chart
+data	Facts or values that can be stored and used.	The data shows that twelve students chose chess.	https://techterms.com/definition/data
+label	A name or short piece of text that identifies something.	The label under each bar names the club.	https://www.merriam-webster.com/dictionary/label
+value	The information stored in a cell or variable.	The value in B3 is 12.	https://www.merriam-webster.com/dictionary/value
+comparison	A check of how two things are similar or different.	Our comparison shows that chess has more students than art.	https://www.merriam-webster.com/dictionary/comparison
+dimension	A measurement such as length, width or height.	Check each dimension of the model against the eraser.	https://www.merriam-webster.com/dictionary/dimension
+length	The measurement from one end of an object to the other.	The length of the eraser is 50 millimetres.	https://www.merriam-webster.com/dictionary/length
+width	The measurement from one side of an object to the other.	The width of the eraser is 20 millimetres.	https://www.merriam-webster.com/dictionary/width
+height	The measurement from the bottom of an object to its top.	The height of the eraser is 10 millimetres.	https://www.merriam-webster.com/dictionary/height
+model	A representation used to show what an object is like.	The digital model has the same dimensions as the eraser.	https://www.merriam-webster.com/dictionary/model
+input	Information or a signal given to a computer or program.	Pressing button A provides an input to the program.	https://techterms.com/definition/input
+output	Information or a signal produced by a computer or program.	The displayed number is an output from the counter.	https://techterms.com/definition/output
+variable	A named place in a program that stores a value which can change.	The variable count stores the number of button presses.	https://techterms.com/definition/variable
+button	A control that you press or select to make something happen.	Press the button to add one to the counter.	https://www.merriam-webster.com/dictionary/button
+counter	A value or device used to keep track of how many times something happens.	The counter increases by one after each button press.	https://www.merriam-webster.com/dictionary/counter
+test	A check used to find out whether something works as expected.	We test the program by pressing the button three times.	https://www.merriam-webster.com/dictionary/test
+feedback	Information about work that can help someone improve it.	The feedback says to check the displayed total after a reset.	https://www.merriam-webster.com/dictionary/feedback
+formula	An expression that tells a spreadsheet how to calculate a result.	The formula =B2+B3 adds two cell values.	https://techterms.com/definition/formula
+function	A named operation or group of instructions that performs a task.	The function SUM adds a range of spreadsheet values.	https://techterms.com/definition/function
+total	The amount found by adding all the relevant values.	The total is the number of bottles collected by all teams.	https://www.merriam-webster.com/dictionary/total
+average	A number found by adding the values and dividing by how many values there are.	The average for 10, 20 and 30 is 20.	https://www.merriam-webster.com/dictionary/average
+loop	Instructions that a program repeats.	The loop repeats the delivery three times.	https://techterms.com/definition/loop
+position	The place where an object is located.	The sprite starts at position x equals zero.	https://www.merriam-webster.com/dictionary/position
+reset	To return something to its starting state.	Click the green flag to reset the sprite and delivery count.	https://www.merriam-webster.com/dictionary/reset
+sensor	A device that detects or measures something, such as light or distance.	A distance sensor measures how far away an object is.	https://www.merriam-webster.com/dictionary/sensor
+threshold	A limit at which a response changes.	The threshold is 18 centimetres, so only larger distances trigger the warning.	https://www.merriam-webster.com/dictionary/threshold
+condition	A test that a program evaluates as true or false.	The condition checks whether the distance is greater than 18.	https://www.merriam-webster.com/dictionary/condition
+radio	A way to send signals without wires using radio waves.	The micro:bit uses radio to send ALERT to the receiver.	https://www.merriam-webster.com/dictionary/radio
+message	Information sent from one person or device to another.	The receiver shows an icon when the message is ALERT.	https://www.merriam-webster.com/dictionary/message
+bug	An error that makes a program behave incorrectly.	The bug makes the app show the wrong lunch choice.	https://techterms.com/definition/bug
+event	An action or occurrence that a program can respond to.	A button click is an event that starts the instructions.	https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events
+result	What happens or is produced after an action or calculation.	The result of the test is a message showing the chosen lunch.	https://www.merriam-webster.com/dictionary/result
+bit	A single binary digit, either zero or one.	One bit can store either 0 or 1.	https://techterms.com/definition/bit
+binary	A number system that uses only the digits zero and one.	The binary number 101 represents five.	https://techterms.com/definition/binary
+decimal	The base-ten number system, which uses the digits zero to nine.	The decimal number five is written as 101 in binary.	https://www.merriam-webster.com/dictionary/decimal
+digit	One symbol used to write a number.	Each digit in 101 is either zero or one.	https://www.merriam-webster.com/dictionary/digit
+place value	The value a digit has because of its position in a number.	The leftmost place value in four-bit binary is eight.	https://www.merriam-webster.com/dictionary/place%20value
+integer	A whole number, including zero and negative whole numbers.	The integer 4 can be stored in the quantity variable.	https://techterms.com/definition/integer
+sprite	A programmable graphic object in Scratch.	The Player sprite moves when the arrow key is pressed.	https://techterms.com/definition/sprite
+phishing	A trick that uses a fake message or website to steal private information.	The phishing message asks for the school-account password.	https://techterms.com/definition/phishing
+malware	Software made to harm a device, disrupt it or steal information.	The unsafe download installs malware on the computer.	https://techterms.com/definition/malware
+ransomware	Malware that blocks access to files or a device and demands payment.	The ransomware locks the project files and demands money.	https://techterms.com/definition/ransomware
+password	A secret set of characters used to help prove that someone may access an account.	Keep your password private when a message asks you to share it.	https://techterms.com/definition/password
+protection	An action or safeguard that reduces the chance or harm of a problem.	A separate backup provides protection against losing the only project copy.	https://www.merriam-webster.com/dictionary/protection
+risk	The possibility that something harmful may happen.	Saving only one copy creates a risk of losing the project.	https://www.merriam-webster.com/dictionary/risk
+probability	How likely something is to happen.	Repeated failed logins increase our concern about the probability of an account attack.	https://www.merriam-webster.com/dictionary/probability
+impact	The effect or harm caused by a problem.	A separate backup reduces the impact of losing the working file.	https://www.merriam-webster.com/dictionary/impact
+evidence	Facts or observations that support an explanation or decision.	The repeated password requests are evidence that the message is suspicious.	https://www.merriam-webster.com/dictionary/evidence
+backup	A separate copy kept so that information can be recovered if the working copy is lost.	Keep a backup of the project in a separate location.	https://techterms.com/definition/backup
+priority	Something chosen to be dealt with before other things.	Protecting the only project copy is our first priority.	https://www.merriam-webster.com/dictionary/priority

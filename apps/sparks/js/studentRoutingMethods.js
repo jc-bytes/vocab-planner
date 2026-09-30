@@ -190,7 +190,15 @@ export class StudentRouting {
             this.sm.activities.renderDashboard();
         }
 
-        return this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+        const visible = this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized);
+        if (visible) return visible;
+        // Archived sets remain addressable for their own grade's saved evidence.
+        const grade = String(this.sm.studentProfile?.grade || '');
+        return this.sm.activities.getAllVocabularySources?.().find(vocab => (
+            vocab.activitySettings?.retiredWeeklySet
+            && this.getVocabRouteId(vocab) === normalized
+            && vocab.grades?.map(String).includes(grade)
+        )) || null;
     }
 
     isKnownActivityType(activityType) {
@@ -355,8 +363,13 @@ export class StudentRouting {
                 await this.sm.activities.loadVocabulary(vocab, {
                     fromRoute: true,
                     skipActivityPreload: targetRoute.view === 'activity',
-                    deferActivityMenu: targetRoute.view === 'activity'
+                    deferActivityMenu: targetRoute.view === 'activity' && !vocab.activitySettings?.retiredWeeklySet
                 });
+
+                if (vocab.activitySettings?.retiredWeeklySet) {
+                    this.setRoute({ view: 'unit', unitId: this.getVocabRouteId(vocab) }, { replace: true });
+                    return;
+                }
 
                 if (targetRoute.view === 'unit') {
                     return;

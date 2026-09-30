@@ -1,0 +1,91 @@
+{
+  "id": "grade8_t3_2026_w09_weekly_v1",
+  "name": "G8 T3 W09 - Scratch controls",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 9,
+  "assignedDate": "2026-11-09",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Event",
+      "definition": "An action or occurrence that a program can respond to.",
+      "example": "A button click is an event that starts the instructions.",
+      "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that stores a value which can change.",
+      "example": "The variable count stores the number of button presses.",
+      "source": "https://techterms.com/definition/variable",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Input",
+      "definition": "Information or a signal given to a computer or program.",
+      "example": "Pressing button A provides an input to the program.",
+      "source": "https://techterms.com/definition/input",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information or a signal produced by a computer or program.",
+      "example": "The displayed number is an output from the counter.",
+      "source": "https://techterms.com/definition/output",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bug",
+      "definition": "An error that makes a program behave incorrectly.",
+      "example": "The bug makes the app show the wrong lunch choice.",
+      "source": "https://techterms.com/definition/bug",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-11-11",
+      "B": "2026-11-09"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

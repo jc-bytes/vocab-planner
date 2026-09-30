@@ -1,0 +1,91 @@
+{
+  "id": "grade8_t3_2026_w12_weekly_v1",
+  "name": "G8 T3 W12 - Improve one game rule",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "November",
+  "week": 12,
+  "assignedDate": "2026-11-30",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Sprite",
+      "definition": "A programmable graphic object in Scratch.",
+      "example": "The Player sprite moves when the arrow key is pressed.",
+      "source": "https://techterms.com/definition/sprite",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Event",
+      "definition": "An action or occurrence that a program can respond to.",
+      "example": "A button click is an event that starts the instructions.",
+      "source": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Events",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Loop",
+      "definition": "Instructions that a program repeats.",
+      "example": "The loop repeats the delivery three times.",
+      "source": "https://techterms.com/definition/loop",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Condition",
+      "definition": "A test that a program evaluates as true or false.",
+      "example": "The condition checks whether the distance is greater than 18.",
+      "source": "https://www.merriam-webster.com/dictionary/condition",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that stores a value which can change.",
+      "example": "The variable count stores the number of button presses.",
+      "source": "https://techterms.com/definition/variable",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-12-03",
+      "B": "2026-11-30"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

@@ -1,3 +1,4 @@
+import { weeklySettings, weeklyWordPlayable, isVocabularyProjectBreak } from './weeklyVocabularyPolicy.js';
 import { StudentActivityGateDisplay } from './studentActivityGateDisplay.js';
 import { getCurrentSchoolYear, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import {
@@ -86,13 +87,13 @@ export class StudentActivityProgressFlow {
 
     getActivityPlayableCount(activityType, vocab = this.sm.currentVocab) {
         const words = Array.isArray(vocab?.words) ? vocab.words : [];
-        return words.filter(word => this.isActivityWordPlayable(activityType, word)).length;
+        return words.filter(word => weeklyWordPlayable(activityType, word, vocab, getStudentActivity(activityType)?.isPlayable)).length;
     }
 
     isActivityWordPlayable(activityType, word = {}) {
         const descriptor = getStudentActivity(activityType);
         if (descriptor?.isPlayable) {
-            return descriptor.isPlayable(word);
+            return weeklyWordPlayable(activityType, word, this.sm.currentVocab, descriptor.isPlayable);
         }
 
         return false;
@@ -142,7 +143,7 @@ export class StudentActivityProgressFlow {
         const required = (Array.isArray(requestedRequired) ? requestedRequired : defaultRequired)
             .filter(id => validIds.has(id));
         let uniqueRequired = [
-            'flashcards',
+            ...(weeklySettings(vocab)?.reviewOnly ? [] : ['flashcards']),
             ...required.filter(id => id !== 'flashcards')
         ];
         uniqueRequired = [...new Set(uniqueRequired)];
@@ -199,7 +200,7 @@ export class StudentActivityProgressFlow {
         return {
             completed,
             total: flow.required.length,
-            isComplete: flow.required.length > 0 && completed >= flow.required.length,
+            isComplete: (flow.required.length > 0 || weeklySettings(vocab)?.reviewOnly) && completed >= flow.required.length,
             nextActivityType,
             remaining: Math.max(0, flow.required.length - completed),
             flow,
@@ -211,7 +212,8 @@ export class StudentActivityProgressFlow {
         const currentTrimester = this.activities.getCurrentTrimesterKey(date);
         const vocabs = this.activities
             .filterStudentAvailableVocabulary(this.activities.getGradeMatchedVocabularySources(), date)
-            .filter(vocab => this.activities.getVocabTrimesterKey(vocab) === currentTrimester);
+            .filter(vocab => this.activities.getVocabTrimesterKey(vocab) === currentTrimester)
+            .filter(vocab => !vocab.activitySettings?.retiredWeeklySet && !weeklySettings(vocab)?.reviewOnly && !isVocabularyProjectBreak(date));
 
         const units = vocabs
             .map(vocab => {
@@ -257,7 +259,7 @@ export class StudentActivityProgressFlow {
         return {
             completed,
             total: flow.required.length,
-            isComplete: flow.required.length > 0 && completed >= flow.required.length
+            isComplete: (flow.required.length > 0 || weeklySettings(this.sm.currentVocab)?.reviewOnly) && completed >= flow.required.length
         };
     }
 

@@ -28,7 +28,7 @@ test('every vocabulary unit has explicit valid placement and activity flow', asy
 
 test('T3 class parts have small sourced word sets and distinct required practice', async () => {
     const records = await loadVocabularyCatalog(workspaceRoot);
-    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)));
+    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)) && !v.activitySettings.weeklyPoolVersion);
     assert.equal(t3.length, 91);
     for (const v of t3) {
         assert.match(v.id, /^grade[6-9]_t3_2026_w\d{2}_part[12]$/);

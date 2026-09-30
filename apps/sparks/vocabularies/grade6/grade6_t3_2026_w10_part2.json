@@ -50,6 +50,10 @@
     ],
     "flashcards": 2,
     "matching": 2,
-    "fillInBlank": 2
+    "fillInBlank": 2,
+    "retiredWeeklySet": true,
+    "replacementIds": [
+      "grade6_t3_2026_w10_weekly_v1"
+    ]
   }
 }

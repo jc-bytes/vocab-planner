@@ -1,0 +1,91 @@
+{
+  "id": "grade7_t3_2026_w03_weekly_v1",
+  "name": "G7 T3 W03 - Interpret charts and calculations",
+  "description": "Optional review. No required vocabulary task this week. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "7"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "assignedDate": "2026-09-30",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Formula",
+      "definition": "An expression that tells a spreadsheet how to calculate a result.",
+      "example": "The formula =B2+B3 adds two cell values.",
+      "source": "https://techterms.com/definition/formula",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Total",
+      "definition": "The amount found by adding all the relevant values.",
+      "example": "The total is the number of bottles collected by all teams.",
+      "source": "https://www.merriam-webster.com/dictionary/total",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Average",
+      "definition": "A number found by adding the values and dividing by how many values there are.",
+      "example": "The average for 10, 20 and 30 is 20.",
+      "source": "https://www.merriam-webster.com/dictionary/average",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Chart",
+      "definition": "A picture that presents data so people can compare or understand it.",
+      "example": "The chart uses bars to compare the club counts.",
+      "source": "https://www.merriam-webster.com/dictionary/chart",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Comparison",
+      "definition": "A check of how two things are similar or different.",
+      "example": "Our comparison shows that chess has more students than art.",
+      "source": "https://www.merriam-webster.com/dictionary/comparison",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-09-30",
+      "B": "2026-10-01"
+    },
+    "reviewOnly": true,
+    "requiredActivities": [],
+    "additionalActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank",
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}
