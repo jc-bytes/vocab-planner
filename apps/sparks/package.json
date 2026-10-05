@@ -72,7 +72,8 @@
     "desktop:preview": "npm run desktop:build:web && vite preview --outDir dist-desktop --host 127.0.0.1",
     "plans:sync-school": "python3 ../../tools/planning/sync_school_word_plans.py",
     "plans:sync-school-drive": "python3 ../../tools/planning/sync_school_word_plans.py --layout school --dest \"/Users/pjriosc/Library/CloudStorage/GoogleDrive-prios@aid.edu.pa/.shortcut-targets-by-id/1z8d70VgvSNCAdqpJl6eDbh0aeG-oX3Ix/TECHNOLOGY 2026\"",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "test:ui:arcade-gameplay": "node scripts/ui-arcade-gameplay-smoke.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",

@@ -9,6 +9,9 @@ const manifest = JSON.parse(await readFile(join(outDir, '.vite', 'manifest.json'
 
 for (const game of STUDENT_GAME_REGISTRY) {
     await access(join(outDir, game.art));
+    for (const asset of game.launch.assets || []) {
+        await access(join(outDir, asset));
+    }
     if (game.launch.mode === 'html') {
         await access(join(outDir, game.launch.path));
     }

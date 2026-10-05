@@ -17,14 +17,15 @@ const allowedGameArt = new Set(
   STUDENT_GAME_REGISTRY.map(game => game.art).filter(Boolean)
 );
 
-const htmlGameEntries = new Set([
+const gameAssetEntries = new Set([
   'js/games/sandbox-storage.js',
   'js/games/legacy-score-bridge.js'
 ]);
 for (const game of STUDENT_GAME_REGISTRY) {
+  for (const asset of game.launch.assets || []) gameAssetEntries.add(asset);
   if (game.launch.mode !== 'html') continue;
   const gamePath = game.launch.path;
-  htmlGameEntries.add(dirname(gamePath) === 'js/games' ? gamePath : dirname(gamePath));
+  gameAssetEntries.add(dirname(gamePath) === 'js/games' ? gamePath : dirname(gamePath));
 }
 
 function shouldCopyAsset(path) {
@@ -67,7 +68,7 @@ for (const entry of entries) {
   await copyEntry(entry);
 }
 
-for (const entry of htmlGameEntries) {
+for (const entry of gameAssetEntries) {
   await copyEntry(entry);
 }
 

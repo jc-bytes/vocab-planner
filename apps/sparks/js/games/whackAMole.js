@@ -79,16 +79,18 @@ export class WhackAMole {
     }
 
     bindControls() {
-        this.canvas.addEventListener('mousemove', (e) => {
+        this.mouseMoveHandler = (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = e.clientX - rect.left;
-            this.mouseY = e.clientY - rect.top;
+            this.mouseX = (e.clientX - rect.left) * this.canvas.width / rect.width;
+            this.mouseY = (e.clientY - rect.top) * this.canvas.height / rect.height;
             this.hammer.x = this.mouseX;
             this.hammer.y = this.mouseY;
-        });
+        };
+        this.canvas.addEventListener('mousemove', this.mouseMoveHandler);
 
-        this.clickHandler = () => {
+        this.clickHandler = (e) => {
             if (!this.isRunning || this.gameOver) return;
+            this.mouseMoveHandler(e);
             // Hammer animation
             this.hammer.state = 'hit';
             this.hammer.angle = -45;
@@ -240,6 +242,7 @@ export class WhackAMole {
         this.isRunning = false;
         if (this.animationId) cancelAnimationFrame(this.animationId);
         this.canvas.removeEventListener('mousedown', this.clickHandler);
+        this.canvas.removeEventListener('mousemove', this.mouseMoveHandler);
     }
 
     loop() {

@@ -88,6 +88,8 @@ jobs:
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
+      - name: Verify built Arcade sprites and gameplay
+        run: npm run test:ui:arcade-gameplay
       - name: Add Grade 9 risk practice pilot
         run: |
           mkdir -p dist-desktop/g9-risk-practice-site

@@ -222,7 +222,7 @@ export class FlappyBird {
 
     draw() {
         // Background
-        if (this.sprites.bg && this.sprites.bg.complete) {
+        if (this.sprites.bg && this.sprites.bg.complete && this.sprites.bg.naturalWidth > 0) {
             this.ctx.drawImage(this.sprites.bg, 0, 0, this.width, this.baseY);
         } else {
             this.ctx.fillStyle = '#4ec0ca';
@@ -230,7 +230,7 @@ export class FlappyBird {
         }
 
         // Pipes
-        if (this.sprites.pipe && this.sprites.pipe.complete) {
+        if (this.sprites.pipe && this.sprites.pipe.complete && this.sprites.pipe.naturalWidth > 0) {
             this.pipes.forEach(pipe => {
                 // Top pipe (flipped)
                 this.ctx.save();
@@ -264,7 +264,7 @@ export class FlappyBird {
         }
 
         // Base
-        if (this.sprites.base && this.sprites.base.complete) {
+        if (this.sprites.base && this.sprites.base.complete && this.sprites.base.naturalWidth > 0) {
             this.ctx.drawImage(this.sprites.base, this.baseX, this.baseY, 336 * 3, 112);
             this.ctx.drawImage(this.sprites.base, this.baseX + 336 * 3, this.baseY, 336 * 3, 112);
         } else {
@@ -274,7 +274,7 @@ export class FlappyBird {
 
         // Bird
         const birdSprite = this.sprites[`bird${this.bird.frame}`];
-        if (birdSprite && birdSprite.complete) {
+        if (birdSprite && birdSprite.complete && birdSprite.naturalWidth > 0) {
             this.ctx.save();
             this.ctx.translate(this.bird.x + this.bird.width / 2, this.bird.y + this.bird.height / 2);
             const rotation = Math.min(Math.max(this.bird.velocity * 0.05, -0.5), 0.5);

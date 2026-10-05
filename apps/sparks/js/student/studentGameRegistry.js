@@ -1,7 +1,7 @@
-function canvasGame({ id, name, icon, art, desc, load, exportName, leaderboard = true, scoreOrder = 'desc', create }) {
+function canvasGame({ id, name, icon, art, desc, load, exportName, assets = [], leaderboard = true, scoreOrder = 'desc', create }) {
     return {
         id, name, icon, art, desc, leaderboard, scoreOrder,
-        launch: Object.freeze({ mode: 'canvas', load, exportName, create })
+        launch: Object.freeze({ mode: 'canvas', load, exportName, create, assets: Object.freeze(assets) })
     };
 }
 
@@ -36,11 +36,13 @@ export const STUDENT_GAME_REGISTRY = Object.freeze([
         }
     }),
     canvasGame({ id: 'snake', name: 'Snake', icon: 'activity', art: 'images/game-art/snake-cover-neon-cyberpunk-friendly-v8.webp', desc: 'Grow and avoid yourself!', load: () => import('../games/snake.js'), exportName: 'Snake', create: standardCanvasFactory }),
-    canvasGame({ id: 'flappy-bird', name: 'Flappy Bird', icon: 'send', art: 'images/game-art/flappy-bird-cover-neon-cyberpunk-readable-v2.webp', desc: 'Fly through pipes!', load: () => import('../games/flappyBird.js'), exportName: 'FlappyBird', create: standardCanvasFactory }),
+    canvasGame({ id: 'flappy-bird', name: 'Flappy Bird', icon: 'send', art: 'images/game-art/flappy-bird-cover-neon-cyberpunk-readable-v2.webp', desc: 'Fly through pipes!', load: () => import('../games/flappyBird.js'), exportName: 'FlappyBird', create: standardCanvasFactory,
+        assets: ['background-day', 'base', 'yellowbird-upflap', 'yellowbird-midflap', 'yellowbird-downflap', 'pipe-green', 'gameover'].map(name => `js/games/flappy-bird-sprites/${name}.png`) }),
     canvasGame({ id: 'space-invaders', name: 'Space Invaders', icon: 'scan-face', art: 'images/game-art/space-invaders-cover-neon-cyberpunk-v1.webp', desc: 'Defend Earth!', load: () => import('../games/spaceInvaders.js'), exportName: 'SpaceInvaders', create: standardCanvasFactory }),
     canvasGame({ id: 'target-shooter', name: 'Target Shooter', icon: 'compass', art: 'images/game-art/target-shooter-cover-neon-cyberpunk-v1.webp', desc: 'Hit the targets!', load: () => import('../games/targetShooter.js'), exportName: 'TargetShooter', create: standardCanvasFactory }),
     canvasGame({ id: 'pong', name: 'Pong', icon: 'repeat-2', art: 'images/game-art/pong-cover-neon-cyberpunk-v1.webp', desc: 'Use W/S keys to move!', load: () => import('../games/pong.js'), exportName: 'Pong', create: standardCanvasFactory }),
-    canvasGame({ id: 'whack-a-mole', name: 'Whack-a-Mole', icon: 'timer', art: 'images/game-art/whack-a-mole-cover-neon-cyberpunk-v1.webp', desc: 'Whack the moles!', load: () => import('../games/whackAMole.js'), exportName: 'WhackAMole', create: standardCanvasFactory }),
+    canvasGame({ id: 'whack-a-mole', name: 'Whack-a-Mole', icon: 'timer', art: 'images/game-art/whack-a-mole-cover-neon-cyberpunk-v1.webp', desc: 'Whack the moles!', load: () => import('../games/whackAMole.js'), exportName: 'WhackAMole', create: standardCanvasFactory,
+        assets: Array.from({ length: 45 }, (_, index) => `js/games/whack-a-mol-assets/tile${String(index).padStart(3, '0')}.png`) }),
     htmlGame({ id: 'trapdoor-trials', name: 'Trapdoor Trials', icon: 'log-out', art: 'images/game-art/trapdoor-trials-cover-neon-cyberpunk-v1.webp', desc: 'Outsmart every surprise trap!', path: 'js/games/trapdoor-trials/index.html', scoreMessageType: 'trapdoor-trials-score', frame: { width: 960, height: 540, overflow: 'hidden' } }),
     htmlGame({ id: 'tilt-maze', name: 'Tilt Maze', icon: 'layout-grid', art: 'images/game-art/tilt-maze-cover-neon-cyberpunk-v1.webp', desc: 'Tilt a 3D maze to reach the goal!', path: 'js/games/tilt-maze/index.html', scoreMessageType: 'tilt-maze-score', frame: { responsive: true, height: 600 } }),
     htmlGame({ id: 'basic-platformer', name: 'Circuit Sprint', icon: 'timer', art: 'images/game-art/circuit-sprint-cover-neon-cyberpunk-v1.webp', desc: 'Run the checkpoint course and chase a clean time!', path: 'js/games/basic-platformer/index.html', scoreMessageType: 'basic-platformer-score', frame: { width: 1280, height: 720, overflow: 'hidden' } }),
