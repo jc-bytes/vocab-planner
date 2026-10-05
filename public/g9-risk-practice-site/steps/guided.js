@@ -1,8 +1,7 @@
-import { threatCases } from '../content.js';
 import { choiceSetStep } from '../step-patterns.js';
 
 export const guided = choiceSetStep({
-  id: 'guided', title: 'Identify the danger', short: 'Threat clues', stage: 'guided', table: threatCases,
+  id: 'guided', title: 'Identify the danger', short: 'Threat clues', stage: 'guided',
   items: [
     {title:'Case 1: New login page', question:'What danger matches a message that asks for your school password on a new page?', options:['Phishing','Ransomware','Brute-force attack'], answer:0, hint:'A fake message or login page that asks for private information is phishing.', context:'You receive an email that looks like it comes from your school\'s IT team. It says your account will be locked in 24 hours unless you confirm your password on a new login page. The message creates urgency and asks you to enter your school password on a page you have not used before.'},
     {title:'Case 2: Locked files', question:'What danger matches a download that locks files and asks for money?', options:['Phishing','Ransomware','Firewall'], answer:1, hint:'Ransomware locks files and demands payment.', context:'A classmate downloads a free game from an unfamiliar website. After opening it, every file on the computer displays a message: "Pay $200 to unlock your files." The files are no longer accessible, and the message demands money to restore them.'},

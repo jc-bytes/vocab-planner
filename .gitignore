@@ -12,3 +12,22 @@ artifacts/temporary/
 apps/sparks/.env
 apps/sparks/.env.*
 !apps/sparks/.env.example
+
+# Local dependencies, caches, credentials, and review output
+**/node_modules/
+**/__pycache__/
+*.py[cod]
+*.tsbuildinfo
+*.pem
+.env
+.env.*
+!.env.example
+learning-modules/technology-learning-hub/dist/
+learning-modules/technology-learning-hub/outputs/
+reports/
+outputs/
+artifacts/generated/
+tmp/
+plans/Administration/
+~$*
+.~lock.*#

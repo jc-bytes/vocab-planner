@@ -8,7 +8,7 @@ const escape = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;',
 export function exampleStep({id, title, short, explanation, source, action, table, takeaway, context}) {
   return {
     id, title, short, kind:'html', stage:'model', authoring:{table},
-    html:`<p>${escape(explanation)}</p><div class="fm-source"><p>${escape(source)}</p></div><p>${escape(action)}</p>${tableHtml(table)}<p>${escape(takeaway)}</p>${context ? `<div class="fm-context"><p><strong>Context.</strong> ${escape(context)}</p></div>` : ''}`,
+    html:`${context ? `<div class="fm-context"><p><strong>Context.</strong> ${escape(context)}</p></div>` : ''}<p>${escape(explanation)}</p><div class="fm-source"><p>${escape(source)}</p></div><p>${escape(action)}</p>${tableHtml(table)}<p>${escape(takeaway)}</p>`,
   };
 }
 
@@ -33,7 +33,7 @@ export function choiceSetStep({id, title, short, table, items, stage='practice'}
     id, title, short, kind: 'choice', stage,
     items: items.map(item => ({
       title: item.title || 'Practice question',
-      visual: tableHtml(item.table || table),
+      visual: item.table || table ? tableHtml(item.table || table) : '',
       question: item.question,
       options: item.options,
       answer: item.answer,

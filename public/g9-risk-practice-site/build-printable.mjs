@@ -3,13 +3,13 @@ import { lesson } from './lesson.js';
 import { validateLesson } from './validate.js';
 validateLesson(lesson);
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const line = label => `<p>${escape(label)}</p><p class="answer">________________________________________________________________</p>`;
+const line = (label, context='') => `${context ? `<div class="fm-context"><p><strong>Context.</strong> ${escape(context)}</p></div>` : ''}<p>${escape(label)}</p><p class="answer">________________________________________________________________</p>`;
 const pages = lesson.sections.filter(p=>p.kind!=='review').map(p=>{
   let body=p.html || p.intro || '';
   body=body.replace(/<t3-check[^>]*>([\s\S]*?)<\/t3-check>/g,(_,content)=>content
     .replace(/<select\b[^>]*>[\s\S]*?<\/select>/g,'<span class="answer">________________________</span>')
     .replace(/<input\b[^>]*>/g,'<span class="answer">________________________</span>'));
-  if(p.kind==='form')body+=p.fields.map(f=>line(f.label)).join('');
+  if(p.kind==='form')body+=p.fields.map(f=>line(f.label, f.context)).join('');
   if(p.kind==='choice')body+=p.items.map(q=>`${q.visual || ''}${line(q.question)}<p>${q.options.map(escape).join(' / ')}</p>`).join('');
   return `<section data-step="${escape(p.id)}"><h2>${escape(p.title)}</h2>${body}</section>`;
 }).join('');

@@ -90,7 +90,8 @@ export function mountFoundationModule(config) {
     const input=field.type==='textarea'?`<textarea name="${field.name}" rows="${field.rows || 4}">${escapeHtml(saved[field.name] || '')}</textarea>`:`<input name="${field.name}" value="${escapeHtml(saved[field.name] ?? '')}" type="${field.type || 'text'}" ${field.min!==undefined?`min="${field.min}"`:''}>`;
     const count = config.layout === 'clean-step' && item.fields.length === 1 ? '' : `<p>Part ${position+1} of ${item.fields.length}</p>`;
     const answerNav = config.layout === 'clean-step' && item.fields.length === 1 ? '' : `<nav class="fm-pager" aria-label="Answer navigation">${position?`<button class="fm-button quiet" data-form-position="${position-1}">Previous part</button>`:'<span></span>'}${position<item.fields.length-1?`<button class="fm-button primary" data-form-position="${position+1}">Next part</button>`:''}</nav>`;
-    return `${hero(item)}${position===0?item.intro || '':''}<form id="fm-record-form" class="fm-record-form">${count}<label class="fm-field"><span>${field.label}</span>${input}<small>${field.help || ''}</small></label></form>${answerNav}${pager(item)}`;
+    const fieldContext = field.context ? `<div class="fm-context"><p><strong>Context.</strong> ${escapeHtml(field.context)}</p></div>` : '';
+    return `${hero(item)}${position===0?item.intro || '':''}${fieldContext}<form id="fm-record-form" class="fm-record-form">${count}<label class="fm-field"><span>${field.label}</span>${input}<small>${field.help || ''}</small></label></form>${answerNav}${pager(item)}`;
   }
   function sensorPage(item) {
     const stored = state.responses[item.id] || {};
