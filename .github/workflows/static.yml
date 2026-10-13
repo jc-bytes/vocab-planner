@@ -78,12 +78,13 @@ jobs:
         run: supabase start
       - name: Smoke test app shells
         run: npm run test:ui:smoke
-      - name: Unit and composition tests
+      - name: Configure local worker lifecycle builds
         run: |
           sparks_test_config=$(supabase status --output json)
-          export VITE_SUPABASE_URL=$(printf '%s' "$sparks_test_config" | jq -r '.API_URL')
-          export VITE_SUPABASE_PUBLISHABLE_KEY=$(printf '%s' "$sparks_test_config" | jq -r '.PUBLISHABLE_KEY // .ANON_KEY')
-          npm test
+          printf 'VITE_SUPABASE_URL=%s\n' "$(printf '%s' "$sparks_test_config" | jq -r '.API_URL')" >> "$GITHUB_ENV"
+          printf 'VITE_SUPABASE_PUBLISHABLE_KEY=%s\n' "$(printf '%s' "$sparks_test_config" | jq -r '.PUBLISHABLE_KEY // .ANON_KEY')" >> "$GITHUB_ENV"
+      - name: Unit and composition tests
+        run: npm test
       - name: Verify school authorization and database regressions
         run: npm run test:school-platform:rest
       - name: Verify student insight and feedback database regressions
