@@ -1,0 +1,135 @@
+{
+  "id": "grade9_t3_2026_w05_hoaxes_fakes_ab",
+  "name": "G9 T3 W05 - Hoaxes and Fakes - 9A and 9B",
+  "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards, Matching and Fill in Blank once each this week. Ungraded formative practice.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 5,
+  "assignedDate": "2026-10-13",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Misinformation",
+      "definition": "False or inaccurate information, whether or not the person sharing it intends to mislead.",
+      "example": "A person may spread misinformation while believing it is true.",
+      "source": "https://www.commonsense.org/education/digital-citizenship/lesson/hoaxes-and-fakes",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Disinformation",
+      "definition": "False information deliberately shared to mislead people.",
+      "example": "Inventing a false story to fool readers is disinformation.",
+      "source": "https://www.commonsense.org/education/digital-citizenship/lesson/hoaxes-and-fakes",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Lateral reading",
+      "definition": "Checking an online source by leaving its page and consulting other sources.",
+      "example": "I use lateral reading to investigate who runs an unfamiliar website.",
+      "source": "https://www.commonsense.org/education/digital-citizenship/lesson/hoaxes-and-fakes",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Corroboration",
+      "definition": "Support for a claim from additional independent evidence.",
+      "example": "Corroboration from an independent source makes the claim better supported.",
+      "source": "https://www.commonsense.org/education/digital-citizenship/lesson/hoaxes-and-fakes",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Claim",
+      "definition": "A statement that can be examined using evidence.",
+      "example": "The claim says that the video shows a real rescue.",
+      "source": "https://www.merriam-webster.com/dictionary/claim",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Evidence",
+      "definition": "Information that helps show whether a claim is supported.",
+      "example": "The original recording provides evidence about how the video was made.",
+      "source": "https://www.merriam-webster.com/dictionary/evidence",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Source",
+      "definition": "The person, organization or original material that provides information.",
+      "example": "I check the source before repeating a surprising story.",
+      "source": "https://www.merriam-webster.com/dictionary/source",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Credibility",
+      "definition": "How trustworthy a person or source is for a particular question.",
+      "example": "Relevant expertise and accurate reporting can support credibility.",
+      "source": "https://www.merriam-webster.com/dictionary/credibility",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Context",
+      "definition": "The surrounding details that help explain information.",
+      "example": "The date and location give context to an old photograph.",
+      "source": "https://www.merriam-webster.com/dictionary/context",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Hoax",
+      "definition": "A deliberate trick meant to make people believe something false.",
+      "example": "The invented rescue was a hoax designed to fool viewers.",
+      "source": "https://www.merriam-webster.com/dictionary/hoax",
+      "difficulty": 2,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-10-13",
+      "B": "2026-10-13"
+    },
+    "flashcards": 10,
+    "matching": 10,
+    "fillInBlank": 10,
+    "onlineLessonException": true
+  }
+}

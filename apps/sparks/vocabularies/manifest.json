@@ -5935,6 +5935,50 @@
         "onlineLessonException": true
       },
       "path": "vocabularies/grade6/grade6_t3_2026_w05_online_safety_ab.json"
+    },
+    {
+      "id": "grade9_t3_2026_w05_hoaxes_fakes_ab",
+      "name": "G9 T3 W05 - Hoaxes and Fakes - 9A and 9B",
+      "description": "Check online claims using sources and evidence. Review 10 words. Complete Flashcards, Matching and Fill in Blank once each this week. Ungraded formative practice.",
+      "grades": [
+        "9"
+      ],
+      "subjectSlug": "technology",
+      "trimester": "3",
+      "month": "October",
+      "week": 5,
+      "assignedDate": "2026-10-13",
+      "purpose": "practice",
+      "activitySettings": {
+        "requiredActivities": [
+          "flashcards",
+          "matching",
+          "fill-in-blank"
+        ],
+        "additionalActivities": [
+          "illustration",
+          "quiz",
+          "word-search",
+          "crossword",
+          "hangman",
+          "scramble",
+          "wordle",
+          "speed-match"
+        ],
+        "sections": [
+          "A",
+          "B"
+        ],
+        "releaseDates": {
+          "A": "2026-10-13",
+          "B": "2026-10-13"
+        },
+        "flashcards": 10,
+        "matching": 10,
+        "fillInBlank": 10,
+        "onlineLessonException": true
+      },
+      "path": "vocabularies/grade9/grade9_t3_2026_w05_hoaxes_fakes_ab.json"
     }
   ]
 }

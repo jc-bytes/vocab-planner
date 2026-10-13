@@ -51,8 +51,8 @@ test('T3 class parts have small sourced word sets and distinct required practice
 test('October 13 online lesson has five sourced words and three required activities', async () => {
     const records = await loadVocabularyCatalog(workspaceRoot);
     const exceptions = records.map(r => r.vocabulary).filter(v => v.activitySettings.onlineLessonException);
-    assert.equal(exceptions.length, 1);
-    const v = exceptions[0];
+    assert.equal(exceptions.length, 2);
+    const v = exceptions.find(v => v.id === 'grade6_t3_2026_w05_online_safety_ab');
     assert.equal(v.id, 'grade6_t3_2026_w05_online_safety_ab');
     assert.deepEqual(v.grades, ['6']);
     assert.equal(v.assignedDate, '2026-10-13');
