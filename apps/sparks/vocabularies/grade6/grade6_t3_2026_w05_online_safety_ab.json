@@ -1,0 +1,81 @@
+{
+  "id": "grade6_t3_2026_w05_online_safety_ab",
+  "name": "G6 T3 W05 - Online Safety - 6A and 6B",
+  "description": "Practise safe choices in online chats. Complete Flashcards, Matching and Fill in Blank once each this week. This is formative practice.",
+  "grades": [
+    "6"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "October",
+  "week": 5,
+  "assignedDate": "2026-10-13",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Privacy",
+      "definition": "Keeping personal information under your control.",
+      "example": "I protect my privacy by keeping my home address out of the chat.",
+      "source": "https://www.merriam-webster.com/dictionary/privacy",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Boundary",
+      "definition": "A limit you set about what you are willing to do or share.",
+      "example": "My boundary is that I do not share my password.",
+      "source": "https://www.merriam-webster.com/dictionary/boundary",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Pressure",
+      "definition": "An attempt to make someone do something they do not want to do.",
+      "example": "I feel pressure when a player says I must send a photo to stay on the team.",
+      "source": "https://www.merriam-webster.com/dictionary/pressure",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Permission",
+      "definition": "An agreement that allows someone to do something.",
+      "example": "I ask for permission before posting my friend's photo.",
+      "source": "https://www.merriam-webster.com/dictionary/permission",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Report",
+      "definition": "Tell the platform about harmful behaviour so it can review it.",
+      "example": "I report a harmful message using the app's safety button.",
+      "source": "https://www.merriam-webster.com/dictionary/report",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [],
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-10-13",
+      "B": "2026-10-13"
+    },
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5,
+    "onlineLessonException": true
+  }
+}
