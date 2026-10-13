@@ -21,6 +21,7 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
     manager.studentDashboardCharts = null;
     const current = () => manager.activeStudentId === studentId && manager.studentInsightRequest === request
         && (manager.studentProgressSessionGeneration || 0) === session;
+    await import('../css/teacher-student-profile.css');
     await import('../css/teacher-student-feedback.css');
     await import('../css/teacher-student-dashboard.css');
     if (!current()) return;

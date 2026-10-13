@@ -9,6 +9,7 @@ const [
     teacherHtml,
     teacherCss,
     teacherQuizCss,
+    studentProfileCss,
     dashboardRecentActivity,
     teacherDataViewer,
     studentProgressRenderer,
@@ -20,6 +21,7 @@ const [
     read('teacher.html'),
     read('css/teacher.css'),
     read('css/teacherQuiz.css'),
+    read('css/teacher-student-profile.css'),
     read('js/teacherDataDashboardRecentActivityMethods.js'),
     read('js/teacherDataViewer.js'),
     read('js/teacherStudentProgressRenderMethods.js'),
@@ -202,7 +204,7 @@ test('Student Profile delegates static presentation while retaining calculated p
         /\.student-profile-account-grid\s*\{[^}]*grid-template-columns:/s,
         /@container\s*\(max-width:\s*900px\)/s
     ]) {
-        assert.match(teacherCss, declaration);
+        assert.match(studentProfileCss, declaration);
     }
 
     assert.doesNotMatch(teacherCss, /#student-detail-modal/,
