@@ -28,7 +28,7 @@ test('every vocabulary unit has explicit valid placement and activity flow', asy
 
 test('T3 class parts have small sourced word sets and distinct required practice', async () => {
     const records = await loadVocabularyCatalog(workspaceRoot);
-    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)));
+    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)) && !v.activitySettings.onlineLessonException);
     assert.equal(t3.length, 91);
     for (const v of t3) {
         assert.match(v.id, /^grade[6-9]_t3_2026_w\d{2}_part[12]$/);
@@ -45,6 +45,24 @@ test('T3 class parts have small sourced word sets and distinct required practice
             assert.match(word.source, /^https:\/\//);
             assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
         }
+    }
+});
+
+test('October 13 online lesson has five sourced words and three required activities', async () => {
+    const records = await loadVocabularyCatalog(workspaceRoot);
+    const exceptions = records.map(r => r.vocabulary).filter(v => v.activitySettings.onlineLessonException);
+    assert.equal(exceptions.length, 1);
+    const v = exceptions[0];
+    assert.equal(v.id, 'grade6_t3_2026_w05_online_safety_ab');
+    assert.deepEqual(v.grades, ['6']);
+    assert.equal(v.assignedDate, '2026-10-13');
+    assert.deepEqual(v.activitySettings.sections, ['A', 'B']);
+    assert.deepEqual(v.activitySettings.requiredActivities, ['flashcards', 'matching', 'fill-in-blank']);
+    assert.deepEqual(v.words.map(w => w.word), ['Privacy', 'Boundary', 'Pressure', 'Permission', 'Report']);
+    for (const word of v.words) {
+        assert.ok(word.definition);
+        assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
+        assert.match(word.source, /^https:\/\//);
     }
 });
 
