@@ -35,6 +35,21 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_TELEMETRY_DISABLED: "1"
+      UI_SMOKE_PORT: "8560"
+      UI_TEACHER_QUIZ_PORT: "8561"
+      UI_TEACHER_SPARKS_PORT: "8562"
+      UI_TEACHER_PAGES_PORT: "8563"
+      UI_TEACHER_DATA_PORT: "8564"
+      UI_TEACHER_GROUPS_PORT: "8565"
+      UI_TEACHER_WORD_HUNT_PORT: "8566"
+      UI_ACTIVITY_REGISTRY_PORT: "8567"
+      STUDENT_SHELL_TEST_PORT: "8568"
+      UI_CROSS_BROWSER_PORT: "8571"
+      UI_AUTH_SMOKE_PORT: "8572"
+      UI_AUDIT_PORT: "8573"
+      PRIVATE_CLASSROOM_UI_PORT: "8574"
     defaults:
       run:
         working-directory: apps/sparks
