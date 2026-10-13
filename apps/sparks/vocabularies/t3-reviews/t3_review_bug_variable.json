@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_bug_variable",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Bug and variable",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "3",
+  "month": "November",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "bug",
+      "definition": "A mistake that makes a program behave incorrectly.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/bug"
+    },
+    {
+      "word": "variable",
+      "definition": "A named place in a program that holds a changeable value.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/variable"
+    }
+  ]
+}

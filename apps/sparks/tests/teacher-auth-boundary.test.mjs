@@ -41,18 +41,18 @@ const teacherGlobalListeners = await readFile(
 );
 
 const EXPECTED_TEACHER_AUTH_METHODS = [
-    'ensureAllowlistedTeacherProfile',
     'getCurrentUser',
-    'getProfile',
     'init',
     'onAuthStateChanged',
     'signInWithPassword',
     'signOut'
 ];
 
-function createManager(authApi) {
+function createManager(authApi, options = {}) {
     class Manager {}
-    installTeacherAuthMethods(Manager, { authApi });
+    let roles = [];
+    const schoolAccess = { async load(id) { const profile = await authApi.getProfile(id, {}); roles = [profile.role]; return { schools: [{ id: 'school-a', roles }] }; }, hasRole: role => roles.includes(role), clear() { roles = []; } };
+    installTeacherAuthMethods(Manager, { authApi, schoolAccess, bindSchoolSession() {}, ...options });
     const calls = [];
     const manager = new Manager();
     Object.assign(manager, {
@@ -68,7 +68,9 @@ function createManager(authApi) {
         showLoginView: () => calls.push('login'),
         loadSubjectSettings: async options => calls.push(['subjects', options]),
         loadSchoolCalendarSettings: async options => calls.push(['calendar', options]),
-        restoreRouteOrDefault: async () => calls.push('route')
+        restoreRouteOrDefault: async () => calls.push('route'),
+        setRoute: route => calls.push(['set-route', route]),
+        showSchoolAdministration: async () => calls.push('administration')
     });
     return { manager, calls };
 }
@@ -89,16 +91,6 @@ test('teacher auth lifecycle consumers use the injected capability', () => {
     assert.match(teacherGlobalListeners, /manager\.teacherAuthApi\.signOut\(\)/);
 });
 
-test('teacher role lookup ignores a cached role when current verification fails', async () => {
-    storage.set('userRole_teacher-1', 'teacher');
-    const failure = new Error('network unavailable');
-    const { manager } = createManager({
-        getProfile: async () => { throw failure; }
-    });
-
-    await assert.rejects(manager.fetchUserRole({ uid: 'teacher-1' }), failure);
-});
-
 test('teacher role verification failure closes and clears an existing teacher session', async () => {
     storage.set('userRole_teacher-1', 'teacher');
     const { manager, calls } = createManager({
@@ -115,7 +107,7 @@ test('teacher role verification failure closes and clears an existing teacher se
         'clear-settings',
         'clear-vocabulary',
         ['auth-ui', null],
-        ['error', 'Could not verify teacher role.'],
+        ['error', 'Could not verify school access.'],
         'login'
     ]);
 });
@@ -135,23 +127,19 @@ test('a transient role failure does not cache a rejected same-account session', 
     assert.equal(attempts, 2);
 });
 
-test('a currently verified non-teacher cannot retain the shell when sign-out fails', async () => {
-    let signOuts = 0;
-    const { manager, calls } = createManager({
-        getProfile: async () => ({ role: 'student' }),
-        ensureAllowlistedTeacherProfile: async () => ({ role: 'student' }),
-        signOut: async () => {
-            signOuts += 1;
-            throw new Error('sign-out network failure');
-        }
-    });
+test('a member without a teacher role can accept invitations without opening teaching tools', async () => {
+    const { manager, calls } = createManager({ getProfile: async () => ({ role: 'student' }) });
+    assert.equal(await manager.initializeAuthWithRole({ uid: 'member-1' }, currentContext), true);
+    assert.equal(manager.currentRole, 'school_member');
+    assert.ok(calls.includes('administration'));
+    assert.ok(!calls.some(call => Array.isArray(call) && call[0] === 'subjects'));
+});
 
-    assert.equal(await manager.initializeAuthWithRole({ uid: 'teacher-1' }, currentContext), false);
-    assert.equal(signOuts, 1);
-    assert.equal(manager.isAuthenticated, false);
-    assert.equal(manager.currentUser, null);
-    assert.ok(calls.some(call => Array.isArray(call) && call[0] === 'error'
-        && call[1] === 'Access restricted to allowlisted teacher emails.'));
+test('a school administrator can enter without a global teacher profile', async () => {
+    const { manager, calls } = createManager({ getProfile: async () => ({ role: 'school_admin' }) });
+    assert.equal(await manager.initializeAuthWithRole({ uid: 'admin-1' }, currentContext), true);
+    assert.equal(manager.isAuthenticated, true);
+    assert.ok(calls.includes('route'));
 });
 
 test('a currently verified teacher initializes through the injected auth capability', async () => {
@@ -170,10 +158,57 @@ test('a currently verified teacher initializes through the injected auth capabil
     assert.equal(manager.currentUser, user);
     assert.equal(manager.currentRole, 'teacher');
     assert.equal(storage.get('was_logged_in'), 'true');
-    assert.deepEqual(calls, [
-        ['auth-ui', user],
-        ['subjects', { isCurrent: currentContext.isCurrent }],
-        ['calendar', { isCurrent: currentContext.isCurrent }],
-        'route'
+    assert.deepEqual(calls.map(call => Array.isArray(call) ? call[0] : call), [
+        'auth-ui', 'subjects', 'calendar', 'route'
     ]);
+    for (const callName of ['subjects', 'calendar']) {
+        const options = calls.find(call => Array.isArray(call) && call[0] === callName)[1];
+        assert.equal(options.isCurrent, currentContext.isCurrent);
+        assert.equal(options.surfaceErrors, true);
+        assert.ok(options.signal instanceof AbortSignal);
+    }
+});
+
+test('teacher boot applies the bounded request seam to profile and critical settings', async () => {
+    const labels = [];
+    const signals = [];
+    const requestTimeout = async (createRequest, options) => {
+        labels.push(options.label);
+        const signal = new AbortController().signal;
+        signals.push(signal);
+        return createRequest(signal);
+    };
+    const user = { uid: 'teacher-timeout-test' };
+    const { manager, calls } = createManager({
+        getProfile: async (userId, options) => {
+            assert.equal(userId, user.uid);
+            return { role: 'teacher' };
+        }
+    }, { requestTimeout });
+    manager.isAuthenticated = false;
+    manager.currentUser = null;
+
+    assert.equal(await manager.initializeAuthWithRole(user, currentContext), true);
+    assert.deepEqual(labels, ['School access', 'Teacher subjects', 'School calendar']);
+    assert.equal(calls.find(call => call[0] === 'subjects')[1].signal, signals[1]);
+    assert.equal(calls.find(call => call[0] === 'calendar')[1].signal, signals[2]);
+});
+
+test('a bounded settings failure uses defaults, reports it, and still restores navigation', async () => {
+    const timeoutError = Object.assign(new Error('request timed out'), { code: 'REQUEST_TIMEOUT' });
+    const requestTimeout = async (createRequest, options) => {
+        if (options.label === 'Teacher subjects') throw timeoutError;
+        return createRequest(new AbortController().signal);
+    };
+    const { manager, calls } = createManager({
+        getProfile: async () => ({ role: 'teacher' })
+    }, { requestTimeout });
+    manager.isAuthenticated = false;
+    manager.currentUser = null;
+
+    assert.equal(await manager.initializeAuthWithRole({ uid: 'teacher-1' }, currentContext), true);
+    assert.ok(calls.some(call => Array.isArray(call)
+        && call[0] === 'error'
+        && call[1] === 'Some teacher settings could not load. Using defaults.'));
+    assert.equal(calls.at(-1), 'route');
 });

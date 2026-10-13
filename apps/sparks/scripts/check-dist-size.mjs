@@ -4,6 +4,7 @@ import { gzipSync } from 'node:zlib';
 
 import {
   assertDeliverySizeBudgets,
+  getDeliverySizeStatus,
   measureDeliverySizeBudgets
 } from './lib/deliverySizeBudgets.mjs';
 
@@ -37,6 +38,11 @@ const deliveryResults = await measureDeliverySizeBudgets(
 for (const result of deliveryResults) {
   const actualKilobytes = result.actualGzipBytes / 1024;
   const maximumKilobytes = result.maximumGzipBytes / 1024;
-  console.log(`${result.label}: ${actualKilobytes.toFixed(1)} KiB gzip (limit ${maximumKilobytes.toFixed(0)} KiB).`);
+  const status = getDeliverySizeStatus(result);
+  const headroomKilobytes = status.headroomBytes / 1024;
+  console.log(`${result.label}: ${actualKilobytes.toFixed(1)} KiB gzip (limit ${maximumKilobytes.toFixed(0)} KiB; ${(status.usageRatio * 100).toFixed(1)}% used; ${headroomKilobytes.toFixed(1)} KiB headroom).`);
+  if (status.shouldWarn) {
+    console.warn(`${result.label} has less than 5% delivery-budget headroom. Inspect the production manifest before adding more eager code.`);
+  }
 }
 assertDeliverySizeBudgets(deliveryResults);

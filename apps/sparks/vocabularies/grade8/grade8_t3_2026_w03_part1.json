@@ -1,7 +1,7 @@
 {
   "id": "grade8_t3_2026_w03_part1",
-  "name": "G8 T3 W03 Part 1 - Organise your app work",
-  "description": "Organise your app work. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "name": "G8 T3 W03 Part 1 - Practise your app explanation",
+  "description": "Practise your app explanation. 2 words. Required: Flashcards and Matching. Use the assigned class link; review the same words in 04 Sparks Review if unavailable.",
   "grades": [
     "8"
   ],
@@ -13,19 +13,19 @@
   "purpose": "practice",
   "words": [
     {
-      "word": "File",
-      "definition": "A saved piece of work on a computer.",
-      "source": "https://techterms.com/definition/file",
-      "example": "I save my spreadsheet as a file named ClubResults.xlsx.",
+      "word": "Test",
+      "definition": "A check to find out whether something works.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "example": "We test the app by choosing a lunch and checking the order message.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
     },
     {
-      "word": "Folder",
-      "definition": "A place on a computer for keeping files together.",
-      "source": "https://techterms.com/definition/folder",
-      "example": "The folder keeps my three project files together.",
+      "word": "Feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "source": "https://www.merriam-webster.com/dictionary/feedback",
+      "example": "The feedback says the app should show the chosen lunch.",
       "difficulty": 1,
       "synonyms": [],
       "antonyms": []
@@ -50,6 +50,10 @@
     ],
     "flashcards": 2,
     "matching": 2,
-    "fillInBlank": 2
+    "fillInBlank": 2,
+    "retiredWeeklySet": true,
+    "replacementIds": [
+      "grade8_t3_2026_w03_weekly_v1"
+    ]
   }
 }

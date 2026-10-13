@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { collectStudentPrecacheFiles } from '../scripts/student-precache.mjs';
 
 import {
   REQUIRED_LAZY_EDGES,
@@ -67,6 +68,11 @@ test('student and teacher initial graphs reject optional features, activities, a
   const featureStyles = createValidManifest();
   featureStyles.student.imports.push('js/student/studentFeatureStyles.js');
   assert.throws(() => validateLazyBuildContracts(featureStyles), /student loads deferred asset js\/student\/studentFeatureStyles\.js eagerly/);
+
+  const classrooms = createValidManifest();
+  classrooms['js/services/classroomRepository.js'] = { file: 'classroomRepository.js' };
+  classrooms.student.imports.push('js/services/classroomRepository.js');
+  assert.throws(() => validateLazyBuildContracts(classrooms), /student loads the optional classroom repository eagerly/);
 });
 
 test('duplicate manifest names and broken static imports fail clearly', () => {
@@ -79,19 +85,21 @@ test('duplicate manifest names and broken static imports fail clearly', () => {
   assert.throws(() => validateLazyBuildContracts(broken), /missing or has no emitted file/);
 });
 
-test('student precache cannot contain lazy feature code, styles, or assets', () => {
+test('offline precache covers student lazy code and styles while excluding teacher code and game media', () => {
   const manifest = createValidManifest();
   manifest.studentGames.css = ['student-games.css'];
   manifest.studentGames.assets = ['game-cover.webp'];
-  assert.doesNotThrow(() => validateLazyBuildContracts(manifest, {
-    precacheFiles: new Set(['student.html', 'student.js', 'shared.js'])
-  }));
-  for (const file of ['studentGames.js', 'student-games.css', 'game-cover.webp']) {
+  const precacheFiles = collectStudentPrecacheFiles(manifest, 'student');
+  assert.ok(precacheFiles.has('studentGames.js'));
+  assert.ok(precacheFiles.has('student-games.css'));
+  assert.doesNotThrow(() => validateLazyBuildContracts(manifest, { precacheFiles }));
+  for (const file of ['teacherQuiz.js', 'game-cover.webp']) {
     assert.throws(() => validateLazyBuildContracts(manifest, {
-      precacheFiles: new Set(['student.html', file])
-    }), new RegExp(`Student precache includes lazy delivery file ${file.replace('.', '\\.')}\\.`));
+      precacheFiles: new Set([...precacheFiles, file])
+    }), /outside its code graph/);
   }
+  precacheFiles.delete('studentGames.js');
   assert.throws(() => validateLazyBuildContracts(manifest, {
-    precacheFiles: new Set(['student.html', 'student-features.css'])
-  }), /Student precache includes lazy delivery file student-features\.css/);
+    precacheFiles
+  }), /missing code graph file studentGames.js/);
 });

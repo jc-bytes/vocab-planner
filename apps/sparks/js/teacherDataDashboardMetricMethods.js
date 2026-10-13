@@ -1,22 +1,22 @@
+import { ACTIVITY_DEFINITIONS } from './activityMetadata.js';
+
+function getActivityMetrics(analytics, metricIds) {
+    return metricIds
+        .map(metricId => analytics?.activities?.[metricId])
+        .filter(Boolean);
+}
+
 const teacherDataDashboardMetricMethods = {
     calculateActivityCompletion() {
-        const activityLabels = {
-            matching: 'Matching',
-            flashcards: 'Flashcards',
-            quiz: 'Quiz',
-            hangman: 'Hangman',
-            fillInBlank: 'Fill in Blank',
-            wordSearch: 'Word Search',
-            crossword: 'Crossword',
-            scramble: 'Word Scramble',
-            wordle: 'Vocabulary Wordle'
-        };
         const completion = {};
 
-        Object.entries(activityLabels).forEach(([activityKey, activityLabel]) => {
-            completion[activityLabel] = Number(
-                this.dashboardAnalytics?.activities?.[activityKey]?.completionRate
-            ) || 0;
+        ACTIVITY_DEFINITIONS.forEach(({ metricIds, label }) => {
+            const metrics = getActivityMetrics(this.dashboardAnalytics, metricIds);
+            const attempted = metrics.reduce((total, metric) => total + (Number(metric.attempted) || 0), 0);
+            const completed = metrics.reduce((total, metric) => total + (Number(metric.completed) || 0), 0);
+            completion[label] = attempted > 0
+                ? Math.round((completed / attempted) * 100)
+                : (Number(metrics[0]?.completionRate) || 0);
         });
         return completion;
     },
@@ -33,27 +33,15 @@ const teacherDataDashboardMetricMethods = {
     },
 
     calculateActivityUsage() {
-        const activityLabels = {
-            matching: 'Matching',
-            flashcards: 'Flashcards',
-            quiz: 'Quiz',
-            hangman: 'Hangman',
-            fillInBlank: 'Fill in Blank',
-            wordSearch: 'Word Search',
-            crossword: 'Crossword',
-            scramble: 'Word Scramble',
-            wordle: 'Vocabulary Wordle'
-        };
         const usage = {};
 
-        Object.values(activityLabels).forEach(label => {
+        ACTIVITY_DEFINITIONS.forEach(({ label }) => {
             usage[label] = 0;
         });
 
-        Object.entries(activityLabels).forEach(([activityKey, activityLabel]) => {
-            usage[activityLabel] = Number(
-                this.dashboardAnalytics?.activities?.[activityKey]?.completed
-            ) || 0;
+        ACTIVITY_DEFINITIONS.forEach(({ metricIds, label }) => {
+            usage[label] = getActivityMetrics(this.dashboardAnalytics, metricIds)
+                .reduce((total, metric) => total + (Number(metric.completed) || 0), 0);
         });
         return usage;
     },

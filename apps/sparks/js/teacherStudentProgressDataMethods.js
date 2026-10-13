@@ -1,11 +1,13 @@
 import { teacherProgressDataMethods } from './teacherStudentProgress/teacherProgressDataMethods.js';
 import { teacherProgressPageMethods } from './teacherStudentProgress/teacherProgressPageMethods.js';
+import { teacherRosterProgressMethods } from './teacherStudentProgress/teacherRosterProgressMethods.js';
 import { teacherStudentCsvImportMethods } from './teacherStudentProgress/teacherStudentCsvImportMethods.js';
 import { teacherStudentProvisioningMethods } from './teacherStudentProgress/teacherStudentProvisioningMethods.js';
 
 const teacherStudentProgressMethodGroups = [
     teacherProgressDataMethods,
     teacherProgressPageMethods,
+    teacherRosterProgressMethods,
     teacherStudentProvisioningMethods,
     teacherStudentCsvImportMethods
 ];

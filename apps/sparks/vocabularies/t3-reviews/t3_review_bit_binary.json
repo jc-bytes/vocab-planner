@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_bit_binary",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Bit and binary",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "3",
+  "month": "November",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "bit",
+      "definition": "A single 0 or 1 used to store information.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/bit"
+    },
+    {
+      "word": "binary",
+      "definition": "A number system that uses only 0 and 1.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/binary"
+    }
+  ]
+}

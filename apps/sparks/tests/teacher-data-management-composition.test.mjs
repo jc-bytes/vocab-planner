@@ -215,8 +215,9 @@ test('Data Management ownership does not leak back onto TeacherManager', async (
     assert.match(lazySource, /createTeacherDataManagementFeature\(\{/);
     assert.doesNotMatch(shellSource, /this\.dataManagementArea|this\.activeDataTab/);
     assert.doesNotMatch(routingSource, /this\.dataManagementArea|this\.activeDataTab/);
-    assert.match(shellSource, /primaryPage\.id === DATA_PAGE\.id[\s\S]*'dashboard'[\s\S]*setRoute\([\s\S]*\{ view: primaryPage\.id, tab: options\.tab \|\| defaultTab \}[\s\S]*replace: options\.replaceRoute === true/);
-    assert.match(shellSource, /case DATA_PAGE\.id:[\s\S]*showDataManagementView\(\{ \.\.\.options, area: DATA_PAGE\.id, updateRoute: false \}\)/);
+    assert.match(shellSource, /primaryPage\.id === DATA_PAGE\.id[\s\S]*'dashboard'[\s\S]*setRoute\([\s\S]*\{ view: primaryPage\.id,[\s\S]*tab: options\.tab \|\| defaultTab \}[\s\S]*replace: options\.replaceRoute === true/);
+    assert.match(shellSource, /case DATA_PAGE\.id:[\s\S]*showTeacherSection\(SETTINGS_PAGE\.id, options\)/);
+    assert.match(shellSource, /case SETTINGS_PAGE\.id:[\s\S]*showDataManagementView\(\{ \.\.\.options, area: SETTINGS_PAGE\.id, updateRoute: false \}\)/);
     assert.doesNotMatch(calendarSource, /calendarBound/);
     assert.match(calendarSource, /bindSchoolCalendarInputs\(listen[\s\S]*listen\(input, 'input'/);
     assert.match(dashboardSource, /await this\.renderDashboardCharts\(\);\s*if \(this\.destroyed[\s\S]*this\.renderRecentActivity\(\)/);

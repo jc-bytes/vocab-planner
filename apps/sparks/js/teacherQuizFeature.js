@@ -19,10 +19,8 @@ export function createTeacherQuizFeature(dependencies = {}) {
     if (missingCapability) {
         throw new TypeError(`Teacher Quiz vocabulary browser requires ${missingCapability}().`);
     }
-    Object.assign(context, Object.fromEntries(QUIZ_VOCABULARY_BROWSER_CAPABILITIES.map(name => [
-        name,
-        vocabularyBrowser[name]
-    ])), {
+    Object.assign(context, {
+        vocabularyBrowser,
         ensureAuthenticated: dependencies.ensureAuthenticated,
         activateQuizHub: dependencies.activateQuizHub,
         showQuizEditor: dependencies.showQuizEditor,

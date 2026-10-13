@@ -50,7 +50,7 @@ export function normalizeSubject(subject = {}, index = 0) {
 }
 
 export function normalizeSubjects(subjects = []) {
-    const bySlug = new Map(DEFAULT_SUBJECTS.map((subject, index) => [
+    const bySlug = new Map((subjects.length ? [] : DEFAULT_SUBJECTS).map((subject, index) => [
         subject.slug,
         normalizeSubject(subject, index)
     ]));
@@ -90,8 +90,8 @@ export async function loadSubjects(api = null, options = {}) {
         await api.init();
         return normalizeSubjects(await subjectsRepository.list(options));
     } catch (error) {
+        if (options.surfaceErrors) throw error;
         console.warn('Could not load subjects, using defaults:', error);
         return normalizeSubjects();
     }
 }
-

@@ -1,4 +1,5 @@
 import { FINAL_REPORT_ACTIVITIES } from "./reportConstants.js";
+import { getActivityLabel } from "../activityMetadata.js";
 
 export const reportMetadataMethods = {
     getStudentInfo(studentProfile = {}) {
@@ -134,8 +135,8 @@ export const reportMetadataMethods = {
     },
 
     getActivityLabel(activityType) {
-        return FINAL_REPORT_ACTIVITIES.find(([key]) => key === activityType)?.[1]
-            || String(activityType || 'Activity').replace(/-/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
+        const label = getActivityLabel(activityType, '');
+        return label || String(activityType || 'Activity').replace(/-/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
     },
 
     buildActivityReportFileName(studentProfile, vocabOrName, activityType, options = {}) {
@@ -188,4 +189,3 @@ export const reportMetadataMethods = {
             }));
     },
 };
-

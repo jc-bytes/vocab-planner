@@ -1,4 +1,5 @@
 import { createElement } from '../main.js';
+import { shuffled } from '../randomUtils.js';
 import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 const FLASHCARD_MASTERY_VERSION = 3;
@@ -200,24 +201,20 @@ export class FlashcardsActivity {
     }
 
     shuffleDefinitionOptions(options) {
-        const shuffled = [...options];
-        for (let index = shuffled.length - 1; index > 0; index -= 1) {
-            const swapIndex = Math.floor(Math.random() * (index + 1));
-            [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-        }
+        const nextOptions = shuffled(options);
 
         const previous = this.definitionOptionOrders[this.currentIndex];
         const correctKey = this.normalizeDefinition(this.getDefinition());
-        if (previous?.length === shuffled.length && shuffled.length > 1) {
+        if (previous?.length === nextOptions.length && nextOptions.length > 1) {
             const previousCorrectIndex = previous.findIndex(option => this.normalizeDefinition(option) === correctKey);
-            const nextCorrectIndex = shuffled.findIndex(option => this.normalizeDefinition(option) === correctKey);
+            const nextCorrectIndex = nextOptions.findIndex(option => this.normalizeDefinition(option) === correctKey);
             if (previousCorrectIndex === nextCorrectIndex) {
-                shuffled.push(shuffled.shift());
+                nextOptions.push(nextOptions.shift());
             }
         }
 
-        this.definitionOptionOrders[this.currentIndex] = [...shuffled];
-        return shuffled;
+        this.definitionOptionOrders[this.currentIndex] = [...nextOptions];
+        return nextOptions;
     }
 
     getDefinitionOptions() {

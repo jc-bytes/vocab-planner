@@ -3,9 +3,11 @@ import test from 'node:test';
 
 import {
   DELIVERY_SIZE_BUDGETS,
+  DELIVERY_SIZE_WARNING_RATIO,
   assertDeliverySizeBudgets,
   collectStaticDeliveryFiles,
   collectStaticImportKeys,
+  getDeliverySizeStatus,
   measureDeliverySizeBudgets
 } from '../scripts/lib/deliverySizeBudgets.mjs';
 
@@ -21,6 +23,22 @@ test('delivery budgets cover both initial entries and the largest lazy features'
     ]
   );
   assert.ok(DELIVERY_SIZE_BUDGETS.every(budget => budget.maximumGzipBytes > 0));
+});
+
+test('delivery status reports exact headroom and warns before the hard limit', () => {
+  assert.equal(DELIVERY_SIZE_WARNING_RATIO, 0.95);
+  assert.deepEqual(getDeliverySizeStatus({
+    actualGzipBytes: 95 * 1024,
+    maximumGzipBytes: 100 * 1024
+  }), {
+    usageRatio: 0.95,
+    headroomBytes: 5 * 1024,
+    shouldWarn: true
+  });
+  assert.equal(getDeliverySizeStatus({
+    actualGzipBytes: 94 * 1024,
+    maximumGzipBytes: 100 * 1024
+  }).shouldWarn, false);
 });
 
 test('initial delivery measurement includes static JS and CSS once and excludes lazy imports', async () => {

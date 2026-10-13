@@ -7,7 +7,7 @@ import {
 export const teacherWordHuntReviewStateMethods = {
 getWordHuntReviewNotes() {
         try {
-            return JSON.parse(this.storage.getItem(WORD_HUNT_REVIEW_STORAGE_KEY) || '{}');
+            return JSON.parse(this.storage.getItem(`${WORD_HUNT_REVIEW_STORAGE_KEY}:${this.getCurrentUser?.()?.uid || this.getCurrentUser?.()?.id || 'demo'}`) || '{}');
         } catch (error) {
             console.warn('Could not read Word Hunt review notes:', error);
             return {};
@@ -22,7 +22,7 @@ saveWordHuntReviewNote(key, patch = {}) {
             ...patch,
             updatedAt: new Date().toISOString()
         };
-        this.storage.setItem(WORD_HUNT_REVIEW_STORAGE_KEY, JSON.stringify(notes));
+        this.storage.setItem(`${WORD_HUNT_REVIEW_STORAGE_KEY}:${this.getCurrentUser?.()?.uid || this.getCurrentUser?.()?.id || 'demo'}`, JSON.stringify(notes));
         this.wordHuntReviewRows = this.wordHuntReviewRows.map(row => (
             row.key === key ? { ...row, note: notes[key] } : row
         ));
@@ -31,10 +31,10 @@ saveWordHuntReviewNote(key, patch = {}) {
 
 getWordHuntReviewStoredViewModes() {
         try {
-            const saved = JSON.parse(this.storage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY) || '{}');
+            const saved = JSON.parse(this.storage.getItem(`${WORD_HUNT_REVIEW_VIEW_MODE_KEY}:${this.getCurrentUser?.()?.uid || this.getCurrentUser?.()?.id || 'demo'}`) || '{}');
             if (saved && typeof saved === 'object' && !Array.isArray(saved)) return saved;
         } catch (error) {
-            const legacyMode = this.storage.getItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY);
+            const legacyMode = this.storage.getItem(`${WORD_HUNT_REVIEW_VIEW_MODE_KEY}:${this.getCurrentUser?.()?.uid || this.getCurrentUser?.()?.id || 'demo'}`);
             if (legacyMode === 'rows') return { subjects: 'rows' };
         }
         return {};
@@ -59,7 +59,7 @@ setWordHuntReviewViewMode(mode) {
             ...(this.wordHuntReviewViewModes || {}),
             [depth]: mode === 'rows' ? 'rows' : 'cards'
         };
-        this.storage.setItem(WORD_HUNT_REVIEW_VIEW_MODE_KEY, JSON.stringify(this.wordHuntReviewViewModes));
+        this.storage.setItem(`${WORD_HUNT_REVIEW_VIEW_MODE_KEY}:${this.getCurrentUser?.()?.uid || this.getCurrentUser?.()?.id || 'demo'}`, JSON.stringify(this.wordHuntReviewViewModes));
     },
 
 getWordHuntRowsForDrilldown(drilldown = this.wordHuntReviewDrilldown || {}) {

@@ -4,11 +4,23 @@ import { readFile } from 'node:fs/promises';
 
 const attributes = new WeakMap();
 globalThis.document = {
+    readyState: 'loading',
+    addEventListener() {},
+    getElementById() {
+        return null;
+    },
+    querySelectorAll() {
+        return [];
+    },
+    body: {
+        appendChild() {}
+    },
     createElement(tagName) {
         const element = {
             tagName: tagName.toUpperCase(),
             className: '',
             textContent: '',
+            style: {},
             setAttribute(name, value) {
                 attributes.get(element).set(name, String(value));
             },
@@ -20,8 +32,13 @@ globalThis.document = {
         return element;
     }
 };
+globalThis.window = {
+    addEventListener() {}
+};
 
 const { showLoadingState } = await import('../js/ui/loadingState.js');
+const { getKeyboardNavigatedTab } = await import('../js/ui/tabNavigation.js');
+const { refreshIcons } = await import('../js/main.js');
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
 function createContainer() {
@@ -66,4 +83,41 @@ test('the first migrated teacher consumers use the shared loading primitive', as
     }
     assert.match(quizCore, /showLoadingState\(container, 'Loading vocabulary choices\.\.\.'\)/);
     assert.match(vocabularyData, /showLoadingState\(list, 'Loading library\.\.\.'\)/);
+});
+
+test('tab keyboard navigation wraps and supports list endpoints', () => {
+    const tabs = [{ id: 'first' }, { id: 'middle' }, { id: 'last' }];
+
+    assert.equal(getKeyboardNavigatedTab(tabs, tabs[0], 'ArrowLeft'), tabs[2]);
+    assert.equal(getKeyboardNavigatedTab(tabs, tabs[2], 'ArrowRight'), tabs[0]);
+    assert.equal(getKeyboardNavigatedTab(tabs, tabs[1], 'Home'), tabs[0]);
+    assert.equal(getKeyboardNavigatedTab(tabs, tabs[1], 'End'), tabs[2]);
+});
+
+test('tab keyboard navigation ignores unsupported keys and enables vertical arrows explicitly', () => {
+    const tabs = [{ id: 'first' }, { id: 'last' }];
+
+    assert.equal(getKeyboardNavigatedTab(tabs, tabs[0], 'ArrowDown'), null);
+    assert.equal(
+        getKeyboardNavigatedTab(tabs, tabs[0], 'ArrowDown', { vertical: true }),
+        tabs[1]
+    );
+    assert.equal(getKeyboardNavigatedTab(tabs, {}, 'ArrowRight'), null);
+});
+
+test('icon refresh uses one optional Lucide call and normalizes invalid roots', () => {
+    const calls = [];
+    globalThis.window = {
+        lucide: {
+            createIcons(options) {
+                calls.push(options);
+            }
+        }
+    };
+    const root = { querySelectorAll() {} };
+
+    refreshIcons(root);
+    refreshIcons(null);
+
+    assert.deepEqual(calls, [{ root }, { root: document }]);
 });

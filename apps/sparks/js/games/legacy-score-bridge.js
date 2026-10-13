@@ -44,11 +44,9 @@
         const score = Math.round(Number(game.levelStats.score) || 0);
         const level = Number(game.level ?? -1);
         const menuMode = game.menuMode !== undefined ? Boolean(game.menuMode) : true;
-        if (!menuMode && game.levelPlaying && score !== lastScore) {
-            report({ score, level: level + 1, gameOver: false });
-        }
-        if (!lastMenuMode && menuMode && lastLevel >= 0) {
-            report({ score: Math.max(0, lastScore, score), level: lastLevel + 1, gameOver: false });
+        const completedSuccessfully = game.levelEndStatus?.[1] === true;
+        if (!lastMenuMode && menuMode && lastLevel >= 0 && completedSuccessfully && score > 0) {
+            report({ score, level: lastLevel + 1, gameOver: false });
         }
         lastScore = score;
         lastLevel = level;

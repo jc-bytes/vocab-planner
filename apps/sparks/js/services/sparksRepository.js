@@ -1,3 +1,4 @@
+import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, normalizeTextArray, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions } from '../sparkCheckModel.js';
@@ -12,7 +13,7 @@ export function mapSparkRow(row) {
         questions: normalizeSparkQuestions(row.questions),
         targetGrades: normalizeTextArray(row.target_grades || ['6', '7', '8', '9']),
         sourceTitle: row.source_title || '', sourceUrl: row.source_url || '',
-        subjectSlug: row.subject_slug || 'technology', scheduledDate: row.scheduled_date || '',
+        subjectSlug: row.teacher_subject_id || row.subject_slug || 'technology', scheduledDate: row.scheduled_date || '',
         status: row.status || 'draft', ownerId: row.owner_id || null,
         createdAt: toClientTimestamp(row.created_at), updatedAt: toClientTimestamp(row.updated_at)
     };
@@ -31,23 +32,30 @@ export function sparkPayload(spark = {}, id = null) {
         target_grades: normalizeTextArray(spark.targetGrades ?? spark.target_grades ?? ['6', '7', '8', '9']),
         source_title: spark.sourceTitle ?? spark.source_title ?? '',
         source_url: spark.sourceUrl ?? spark.source_url ?? '',
-        subject_slug: spark.subjectSlug || spark.subject_slug || 'technology',
+        subject_slug: 'technology',
+        teacher_subject_id: /^[0-9a-f-]{36}$/.test(spark.subjectSlug || '') ? spark.subjectSlug : undefined,
         scheduled_date: (spark.scheduledDate ?? spark.scheduled_date) || null,
-        status: spark.status || 'draft', owner_id: spark.ownerId || spark.owner_id || null,
+        status: spark.status || 'draft', owner_id: spark.ownerId || spark.owner_id || undefined,
         updated_at: spark.updatedAt ? timestampToIso(spark.updatedAt) : undefined
     });
 }
 
 export const sparksRepository = {
-    async list() {
+    async list(options = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('weekly_sparks').select('*');
+        let query = supabaseService.getClient().from('weekly_sparks').select('*').eq('school_id', schoolId);
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return (data || []).map(mapSparkRow);
     },
     async listScheduledForStudent({ subjectSlug, onOrAfter = '', onOrBefore, targetGrade = '', limit = 20 }) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        let query = supabaseService.getClient().from('weekly_sparks').select('*')
+        let query = supabaseService.getClient().from('weekly_sparks').select('*').eq('school_id', schoolId)
             .eq('subject_slug', subjectSlug).eq('status', 'scheduled').lte('scheduled_date', onOrBefore);
         if (onOrAfter) query = query.gte('scheduled_date', onOrAfter);
         if (targetGrade) query = query.contains('target_grades', [String(targetGrade)]);
@@ -59,20 +67,22 @@ export const sparksRepository = {
         return (data || []).map(mapSparkRow);
     },
     async save(id, spark = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
         const payload = sparkPayload({ ...spark, updatedAt: spark.updatedAt || new Date().toISOString() }, id);
         const { error } = await supabaseService.getClient()
-            .from('weekly_sparks').upsert(payload, { onConflict: 'id' });
+            .from('weekly_sparks').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' });
         if (error) throw error;
         return { id, ...spark };
     },
     async update(id, patch = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
         const { id: _id, ...payload } = sparkPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id);
         const { data, error } = await supabaseService.getClient()
-            .from('weekly_sparks').update(payload).eq('id', id).select('*').maybeSingle();
+            .from('weekly_sparks').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle();
         if (error) throw error;
         if (data) return mapSparkRow(data);
-        return this.save(id, patch);
+        throw new Error('This material is unavailable in the selected school.');
     }
 };

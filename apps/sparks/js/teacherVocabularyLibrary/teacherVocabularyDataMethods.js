@@ -1,51 +1,67 @@
 import { $ } from '../main.js';
 import { getVocabSubjectSlug, loadManifest } from '../services/vocabularyApi.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { showLoadingState } from '../ui/loadingState.js';
 import { filterTeacherVocabularyItems } from './teacherVocabularyModel.js';
 
+export const TEACHER_VOCABULARY_CLOUD_QUERY_KEY = ['teacher', 'vocabulary-library-cloud'];
+
+function staleTeacherLibraryResult() {
+    return { cloudVocabs: [], remoteVocabs: [], localVocabs: [], items: [], stale: true };
+}
+
 export const teacherVocabularyDataMethods = {
 async getTeacherLibrary({ forceRefresh = false } = {}) {
-        if (!forceRefresh && this.teacherLibraryCache) {
-            return this.teacherLibraryCache;
-        }
-
-        if (!forceRefresh && this.teacherLibraryPromise) {
-            return this.teacherLibraryPromise;
-        }
-
         const isCurrent = this.createTeacherVocabularyOperationGuard();
-        const request = Promise.all([
-            this.fetchCloudVocabs({ isCurrent }),
-            loadManifest()
-        ]).then(([cloudVocabs, manifestData]) => {
-            if (!isCurrent() || this.teacherLibraryPromise !== request) {
-                return { cloudVocabs: [], remoteVocabs: [], localVocabs: [], items: [], stale: true };
-            }
-            const remoteVocabs = Array.isArray(manifestData?.vocabularies)
-                ? manifestData.vocabularies.map(vocab => ({ ...vocab, subjectSlug: getVocabSubjectSlug(vocab) }))
-                : [];
-            const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
-            const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
-            const items = this.dedupeTeacherVocabularyItems([
-                ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
-                ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
-                ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
-            ]);
+        const accountId = this.currentUser?.uid || this.currentUser?.id;
+        if (!accountId || !isCurrent()) return staleTeacherLibraryResult();
 
-            const result = {
-                cloudVocabs,
-                remoteVocabs,
-                localVocabs,
-                items,
-                loadedAt: Date.now()
-            };
-            this.teacherLibraryCache = result;
-            return result;
-        }).finally(() => {
-            if (this.teacherLibraryPromise === request) this.teacherLibraryPromise = null;
-        });
-        this.teacherLibraryPromise = request;
-        return request;
+        let loadGeneration = this.teacherVocabularyLibraryLoadGeneration || 0;
+        if (forceRefresh) {
+            loadGeneration += 1;
+            this.teacherVocabularyLibraryLoadGeneration = loadGeneration;
+        }
+        const isLatest = () => loadGeneration === (this.teacherVocabularyLibraryLoadGeneration || 0);
+        const queryService = this.teacherVocabularyQueryService || serverStateQuery;
+        const cloudQuery = {
+            accountId,
+            key: TEACHER_VOCABULARY_CLOUD_QUERY_KEY,
+            queryFn: ({ signal }) => this.fetchCloudVocabs({ isCurrent, signal })
+        };
+
+        let cloudVocabs;
+        let manifestData;
+        try {
+            [cloudVocabs, manifestData] = await Promise.all([
+                forceRefresh ? queryService.refresh(cloudQuery) : queryService.ensure(cloudQuery),
+                loadManifest({ fresh: forceRefresh })
+            ]);
+        } catch (error) {
+            if (!isCurrent() || !isLatest()) return staleTeacherLibraryResult();
+            throw error;
+        }
+
+        if (!isCurrent() || !isLatest()) return staleTeacherLibraryResult();
+
+        cloudVocabs = cloudVocabs.map(vocab => ({ ...vocab }));
+        const remoteVocabs = Array.isArray(manifestData?.vocabularies)
+            ? manifestData.vocabularies.map(vocab => ({ ...vocab, subjectSlug: getVocabSubjectSlug(vocab) }))
+            : [];
+        const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
+        const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
+        const items = this.dedupeTeacherVocabularyItems([
+            ...cloudVocabs.map(vocab => ({ vocab, type: 'cloud' })),
+            ...remoteVocabs.map(vocab => ({ vocab, type: 'remote' })),
+            ...localVocabs.map(vocab => ({ vocab, type: 'local' }))
+        ]);
+
+        return {
+            cloudVocabs,
+            remoteVocabs,
+            localVocabs,
+            items,
+            loadedAt: Date.now()
+        };
     },
 
 getTeacherVocabularyItemPriority(type = '') {
@@ -150,7 +166,9 @@ async loadLibrary(options = {}) {
         showLoadingState(list, 'Loading library...');
 
         try {
-            const { cloudVocabs, remoteVocabs, localVocabs, items, stale } = await this.getTeacherLibrary();
+            const { cloudVocabs, remoteVocabs, localVocabs, items, stale } = await this.getTeacherLibrary({
+                forceRefresh: options.forceRefresh === true
+            });
             if (!isCurrent() || stale) return;
 
             list.innerHTML = '';

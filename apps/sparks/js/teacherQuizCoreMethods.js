@@ -1,6 +1,7 @@
 import { $ } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
 import { showLoadingState } from './ui/loadingState.js';
+import { validateQuizBuilderDraft } from './quizMakerStateValidation.js';
 
 const QUIZ_BUILDER_DRAFT_KEY = 'teacher_quiz_builder_active_draft';
 
@@ -20,7 +21,10 @@ class TeacherQuizCoreMethods {
 
     readQuizBuilderDraft() {
         try {
-            return JSON.parse(this.storage.getItem(this.getOwnedStorageKey(QUIZ_BUILDER_DRAFT_KEY)) || 'null');
+            const value = JSON.parse(this.storage.getItem(this.getOwnedStorageKey(QUIZ_BUILDER_DRAFT_KEY)) || 'null');
+            const draft = validateQuizBuilderDraft(value);
+            if (value && !draft) console.warn('Quiz Builder draft does not match the expected format.');
+            return draft;
         } catch {
             return null;
         }

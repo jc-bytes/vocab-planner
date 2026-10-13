@@ -1,4 +1,5 @@
 import { openDB } from 'idb';
+import { createUniqueId } from './randomUtils.js';
 import {
     MAX_SYNC_ATTEMPTS,
     MAX_SYNC_QUEUE_RECORDS,
@@ -11,9 +12,7 @@ import {
 } from './student/persistence/studentStorage.js';
 
 function createStorageId(type) {
-    const id = globalThis.crypto?.randomUUID?.()
-        || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-    return `${type}-${id}`;
+    return createUniqueId(`${type}-`);
 }
 
 export class ImageDB {
@@ -171,38 +170,57 @@ export class ImageDB {
         const ownerUserId = this.resolveOwnerFromOptions(options);
         const now = new Date().toISOString();
         const dedupeKey = getSyncActionDedupeKey(type, payload);
+        const tx = db.transaction(this.syncStoreName, 'readwrite');
+        const store = tx.objectStore(this.syncStoreName);
         if (dedupeKey) {
-            const existing = await db.getFromIndex(
-                this.syncStoreName,
-                'ownerDedupeKey',
-                [ownerUserId, dedupeKey]
-            );
-            if (existing && existing.status !== 'failed') {
+            let existing = await store.index('ownerDedupeKey').get([ownerUserId, dedupeKey]);
+            if (type === 'student-unit-work') {
+                // Also compact snapshots saved by versions that keyed unit work by event ID.
+                const unitRecords = (await store.getAll()).filter(record => record.ownerUserId === ownerUserId
+                    && record.type === type && record.payload?.unitKey === payload.unitKey);
+                existing = unitRecords.reduce((latest, record) => !latest
+                    || (Number(record.payload?.snapshotOrder) || 0) > (Number(latest.payload?.snapshotOrder) || 0)
+                    ? record : latest, existing);
+                if (existing && (Number(existing.payload?.snapshotOrder) || 0) > (Number(payload.snapshotOrder) || 0)) {
+                    await tx.done;
+                    return { ...existing, skipped: true };
+                }
+                for (const record of unitRecords) {
+                    if (record.id !== existing.id) await store.delete(record.id);
+                }
+            }
+            if (existing && (existing.status !== 'failed' || type === 'student-unit-work')) {
                 const updated = {
                     ...existing,
                     payload,
+                    dedupeKey,
+                    ...(type === 'student-unit-work' && payload.eventId !== existing.payload?.eventId
+                        ? { attempts: 0, lastError: '', failureReason: '' } : {}),
+                    revision: (Number(existing.revision) || 0) + 1,
                     status: 'pending',
                     nextAttemptAt: null,
                     updatedAt: now
                 };
-                await db.put(this.syncStoreName, updated);
+                await store.put(updated);
+                await tx.done;
                 return updated;
             }
         }
 
-        const allRecords = (await db.getAll(this.syncStoreName))
+        const allRecords = (await store.getAll())
             .filter(record => record.ownerUserId === ownerUserId);
         const terminalRecords = allRecords
             .filter(record => record.status === 'failed' || record.status === 'quarantined')
             .sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)));
         while (allRecords.length >= MAX_SYNC_QUEUE_RECORDS && terminalRecords.length > 0) {
             const discarded = terminalRecords.shift();
-            await db.delete(this.syncStoreName, discarded.id);
+            await store.delete(discarded.id);
             allRecords.splice(allRecords.findIndex(record => record.id === discarded.id), 1);
         }
         if (allRecords.length >= MAX_SYNC_QUEUE_RECORDS) {
             const error = new Error('Offline sync storage is full. Reconnect before saving more work.');
             error.code = 'SYNC_QUEUE_FULL';
+            await tx.done;
             throw error;
         }
 
@@ -214,12 +232,31 @@ export class ImageDB {
             dedupeKey,
             status: 'pending',
             attempts: 0,
+            revision: 1,
             nextAttemptAt: null,
             createdAt: now,
             updatedAt: now
         };
-        await db.put(this.syncStoreName, record);
+        await store.put(record);
+        await tx.done;
         return record;
+    }
+
+    async retireUnitSyncActions(payload, options = {}) {
+        const db = await this.open();
+        const ownerUserId = this.resolveOwnerFromOptions(options);
+        const tx = db.transaction(this.syncStoreName, 'readwrite');
+        const store = tx.objectStore(this.syncStoreName);
+        const confirmedOrder = Number(payload.snapshotOrder) || 0;
+        for (const record of await store.getAll()) {
+            if (record.ownerUserId !== ownerUserId || record.type !== 'student-unit-work'
+                || record.payload?.unitKey !== payload.unitKey) continue;
+            if ((Number(record.payload.snapshotOrder) || 0) < confirmedOrder
+                || record.payload.eventId === payload.eventId) {
+                await store.delete(record.id);
+            }
+        }
+        await tx.done;
     }
 
     async getPendingSyncActions(options = {}) {
@@ -232,17 +269,22 @@ export class ImageDB {
         );
         const now = Number(options.now) || Date.now();
         return records
-            .filter(record => !record.nextAttemptAt || Date.parse(record.nextAttemptAt) <= now)
+            .filter(record => options.includeDeferred || !record.nextAttemptAt || Date.parse(record.nextAttemptAt) <= now)
             .sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
     }
 
     async completeSyncAction(id, options = {}) {
         const db = await this.open();
         const ownerUserId = this.resolveOwnerFromOptions(options);
-        const record = await db.get(this.syncStoreName, id);
-        if (!record || record.ownerUserId !== ownerUserId) return false;
-        await db.delete(this.syncStoreName, id);
-        return true;
+        const tx = db.transaction(this.syncStoreName, 'readwrite');
+        const store = tx.objectStore(this.syncStoreName);
+        const record = await store.get(id);
+        const matches = record && record.ownerUserId === ownerUserId
+            && (options.expectedRevision === undefined
+                || (Number(record.revision) || 0) === (Number(options.expectedRevision) || 0));
+        if (matches) await store.delete(id);
+        await tx.done;
+        return Boolean(matches);
     }
 
     async markSyncActionFailed(record, error, options = {}) {
@@ -251,11 +293,21 @@ export class ImageDB {
         if (!record || record.ownerUserId !== ownerUserId) {
             throw new Error('Offline sync record ownership changed before it could be updated.');
         }
-        const attempts = (Number(record.attempts) || 0) + 1;
+        const tx = db.transaction(this.syncStoreName, 'readwrite');
+        const store = tx.objectStore(this.syncStoreName);
+        const current = await store.get(record.id);
+        // Another tab may have replaced or acknowledged this snapshot during the request.
+        if (!current || current.ownerUserId !== ownerUserId
+            || (Number(current.revision) || 0) !== (Number(record.revision) || 0)) {
+            await tx.done;
+            return { ...(current || record), skipped: true };
+        }
+        const attempts = (Number(current.attempts) || 0) + 1;
         const terminal = options.terminal === true || attempts >= MAX_SYNC_ATTEMPTS;
         const now = Date.now();
         const updated = {
-            ...record,
+            ...current,
+            revision: (Number(current.revision) || 0) + 1,
             status: terminal ? 'failed' : 'pending',
             attempts,
             lastError: error?.message || String(error || 'Sync failed'),
@@ -263,7 +315,8 @@ export class ImageDB {
             nextAttemptAt: terminal ? null : new Date(now + getSyncRetryDelayMs(attempts)).toISOString(),
             updatedAt: new Date(now).toISOString()
         };
-        await db.put(this.syncStoreName, updated);
+        await store.put(updated);
+        await tx.done;
         return updated;
     }
 

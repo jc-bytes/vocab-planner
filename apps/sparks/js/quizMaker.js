@@ -32,7 +32,7 @@ export class QuizMaker {
             name: '',
             score: ''
         };
-        this.dragSrcEl = null;
+        this.questionSortables = [];
         this.sectionIdCounter = 0;
         this.autoGenerateTimer = null;
         this.rubricOverlays = new Set();

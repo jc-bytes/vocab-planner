@@ -6,7 +6,6 @@ const root = process.cwd();
 const outDir = join(root, 'dist-desktop');
 
 const entries = [
-  'vocabularies',
   'images',
   'favicon.ico',
   'logo.jpeg',

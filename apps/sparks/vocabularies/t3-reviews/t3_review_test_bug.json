@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_test_bug",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Test and bug",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "test",
+      "definition": "A check to find out whether something works.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/test"
+    },
+    {
+      "word": "bug",
+      "definition": "A mistake that makes a program behave incorrectly.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/bug"
+    }
+  ]
+}

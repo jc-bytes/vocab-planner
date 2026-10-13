@@ -1,3 +1,33 @@
+.quiz-vocab-row {
+    grid-template-columns: minmax(260px, 1fr) 96px 112px 88px 92px 112px 76px 92px 1.1rem;
+}
+
+.quiz-vocab-row.teacher-vocab-row-depth-grade {
+    grid-template-columns: minmax(260px, 1fr) 112px 88px 92px 112px 76px 92px 1.1rem;
+}
+
+.quiz-vocab-row.teacher-vocab-row-depth-trimester {
+    grid-template-columns: minmax(260px, 1fr) 88px 92px 112px 76px 92px 1.1rem;
+}
+
+.quiz-vocab-row.teacher-vocab-row-depth-month {
+    grid-template-columns: minmax(260px, 1fr) 92px 112px 76px 92px 1.1rem;
+}
+
+.quiz-vocab-row-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #dbeafe;
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.quiz-vocab-row-action svg {
+    width: 0.95rem;
+    height: 0.95rem;
+}
+
 /* Quiz Maker Styles */
 .app-container:has(#quiz-maker-view:not(.hidden)) {
     max-width: min(96vw, 1800px);
@@ -514,9 +544,72 @@
 }
 
 .document-page .doc-q-card {
+    position: relative;
     margin-bottom: 1rem;
     break-inside: avoid;
     page-break-inside: avoid;
+}
+
+.quiz-question-reorder {
+    position: absolute;
+    top: 0;
+    right: calc(100% + 0.3rem);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    opacity: 0.2;
+    transition: opacity 120ms ease;
+}
+
+.doc-q-card:hover > .quiz-question-reorder,
+.doc-q-card:focus-within > .quiz-question-reorder,
+.quiz-question-chosen > .quiz-question-reorder {
+    opacity: 1;
+}
+
+.quiz-question-reorder button {
+    display: inline-grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 1px solid #94a3b8;
+    border-radius: 0.35rem;
+    place-items: center;
+    background: #fff;
+    color: #0f172a;
+    font: 700 0.9rem/1 Arial, sans-serif;
+    cursor: pointer;
+}
+
+.quiz-question-reorder button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.quiz-question-reorder button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+.quiz-question-drag-handle {
+    cursor: grab;
+    touch-action: none;
+}
+
+.quiz-question-dragging > * {
+    opacity: 0.65;
+}
+
+.quiz-question-ghost {
+    background: #dbeafe;
+    opacity: 0.45;
+}
+
+@media print {
+    .quiz-question-reorder {
+        display: none;
+    }
 }
 
 .document-page .q-option {

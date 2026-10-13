@@ -43,6 +43,8 @@ const { StudentProgressCoins } = await import('../js/student/studentProgressCoin
 const { StudentProgressCore } = await import('../js/student/studentProgressCoreMethods.js');
 const { StudentProgressSyncQueue } = await import('../js/student/studentProgressSyncQueue.js');
 const { StudentCoinNotifications } = await import('../js/student/studentCoinNotifications.js');
+const { studentProgressRepository } = await import('../js/services/studentProgressRepository.js');
+const { setActiveStudentStorageOwner } = await import('../js/student/persistence/studentStorage.js');
 
 function createManager() {
     return {
@@ -258,14 +260,89 @@ test('coin operations use the coordinator for core persistence', () => {
     assert.equal(saveCount, 1);
 });
 
-test('cloud synchronization state is owned by the cloud component', () => {
+test('cloud synchronization observation state is owned by the cloud component', () => {
     const first = new StudentProgress(createManager());
     const second = new StudentProgress(createManager());
 
-    first.cloud.coinRefreshInFlight = true;
-    first.cloud.coinRefreshPendingOptions = { reason: 'test' };
+    first.cloud.lastAppliedSummary = { totalXp: 10 };
+    first.cloud.lastAppliedSummaryUpdatedAt = 20;
 
-    assert.equal(second.cloud.coinRefreshInFlight, false);
-    assert.equal(second.cloud.coinRefreshPendingOptions, null);
-    assert.equal('coinRefreshInFlight' in first, false);
+    assert.equal(second.cloud.lastAppliedSummary, null);
+    assert.equal(second.cloud.lastAppliedSummaryUpdatedAt, 0);
+    assert.equal('coinRefreshInFlight' in first.cloud, false);
+    assert.equal('coinRefreshPendingOptions' in first.cloud, false);
+});
+
+test('coin sync observes an account-scoped query and feeds realtime snapshots through its cache', () => {
+    const manager = createManager();
+    manager.authDisabled = false;
+    manager.currentUser = { uid: 'student-1' };
+    setActiveStudentStorageOwner('student-1');
+
+    let queryOptions = null;
+    let queryListener = null;
+    let observationUnsubscribed = false;
+    let realtimeListener = null;
+    let realtimeUnsubscribed = false;
+    let queueFlushes = 0;
+    const applied = [];
+    const queryService = {
+        observe(options, listener) {
+            queryOptions = options;
+            queryListener = listener;
+            return {
+                unsubscribe() {
+                    observationUnsubscribed = true;
+                }
+            };
+        },
+        setData({ updater }) {
+            queryListener({ isSuccess: true, data: updater, dataUpdatedAt: 100 });
+        }
+    };
+    const progress = {
+        sm: manager,
+        queryService,
+        migrateCoinData: value => value,
+        applyCoinSnapshot() {},
+        updateLevelDisplay() {}
+    };
+    const cloud = new StudentProgressCloud(progress);
+    cloud.flushLocalSyncQueue = () => {
+        queueFlushes += 1;
+    };
+    cloud.applyRemoteCoinProgress = value => applied.push(value);
+
+    const originalSubscribe = studentProgressRepository.subscribe;
+    studentProgressRepository.subscribe = (_userId, listener) => {
+        realtimeListener = listener;
+        return () => {
+            realtimeUnsubscribed = true;
+        };
+    };
+
+    try {
+        cloud.startCoinSync();
+
+        assert.equal(queryOptions.accountId, 'student-1');
+        assert.deepEqual(queryOptions.key, ['student', 'progress-summary']);
+        assert.equal(queryOptions.refetchOnWindowFocus, true);
+        assert.equal(queryOptions.refetchOnReconnect, 'always');
+        assert.equal(queryOptions.refetchIntervalInBackground, false);
+        assert.equal(typeof queryOptions.queryFn, 'function');
+        assert.equal(queueFlushes, 1);
+
+        realtimeListener({ totalXp: 42 });
+        assert.deepEqual(applied, [{ totalXp: 42 }]);
+
+        cloud.stopCoinSync();
+        assert.equal(observationUnsubscribed, true);
+        assert.equal(realtimeUnsubscribed, true);
+
+        queryListener({ isSuccess: true, data: { totalXp: 99 }, dataUpdatedAt: 200 });
+        assert.deepEqual(applied, [{ totalXp: 42 }]);
+    } finally {
+        studentProgressRepository.subscribe = originalSubscribe;
+        setActiveStudentStorageOwner('local-dev');
+    }
 });

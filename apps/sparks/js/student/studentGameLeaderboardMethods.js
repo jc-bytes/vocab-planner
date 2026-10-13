@@ -13,6 +13,16 @@ export class StudentGameLeaderboard {
         this.games = games;
         this.sm = games.sm;
         this.scoreSyncStates = new Map();
+        this.loadGeneration = 0;
+        this.syncGeneration = 0;
+        this.destroyed = false;
+    }
+
+    ownsCurrentSession() {
+        const activeOwnerId = this.sm.currentUser?.uid
+            || this.sm.currentUser?.id
+            || (this.sm.authDisabled ? 'local-dev' : 'anonymous');
+        return activeOwnerId === this.games.sessionOwnerId;
     }
 
     isBetterScore(score, previous, lowerIsBetter) {
@@ -34,6 +44,9 @@ export class StudentGameLeaderboard {
     }
 
     saveHighScore(gameId, score, metadata = null, options = {}) {
+        if (this.destroyed || this.games.destroyed || !this.ownsCurrentSession()) {
+            return Promise.resolve(null);
+        }
         if (this.sm.authDisabled) {
             return Promise.resolve(null);
         }
@@ -65,6 +78,7 @@ export class StudentGameLeaderboard {
                 pending: null,
                 inFlight: null,
                 timer: null,
+                abortController: null,
                 lastSubmittedAt: 0
             };
             this.scoreSyncStates.set(gameId, state);
@@ -99,7 +113,7 @@ export class StudentGameLeaderboard {
 
     async flushHighScore(gameId) {
         const state = this.scoreSyncStates.get(gameId);
-        if (!state) return null;
+        if (!state || this.destroyed || this.games.destroyed || !this.ownsCurrentSession()) return null;
         if (state.timer) {
             window.clearTimeout(state.timer);
             state.timer = null;
@@ -111,11 +125,21 @@ export class StudentGameLeaderboard {
         if (!state.pending) return null;
 
         const submission = state.pending;
+        const syncGeneration = this.syncGeneration;
+        const ownerId = this.games.sessionOwnerId;
+        const abortController = new AbortController();
         state.pending = null;
+        state.abortController = abortController;
         state.lastSubmittedAt = Date.now();
         state.inFlight = (async () => {
             try {
-                const saved = await supabaseService.submitStudentGameScore(submission);
+                const saved = await supabaseService.submitStudentGameScore(submission, {
+                    signal: abortController.signal
+                });
+                if (this.destroyed
+                    || syncGeneration !== this.syncGeneration
+                    || ownerId !== this.games.sessionOwnerId
+                    || !this.ownsCurrentSession()) return null;
                 const savedScore = Number(saved?.score);
                 if (Number.isFinite(savedScore)) state.bestPersisted = savedScore;
                 if (this.games.gamesList[this.games.currentGameIndex]?.id === gameId) {
@@ -123,6 +147,9 @@ export class StudentGameLeaderboard {
                 }
                 return saved;
             } catch (error) {
+                if (abortController.signal.aborted
+                    || this.destroyed
+                    || syncGeneration !== this.syncGeneration) return null;
                 console.error('Error saving score:', error);
                 notifications.warning('Could not save your score to the leaderboard. Your game can continue.');
                 return null;
@@ -132,7 +159,12 @@ export class StudentGameLeaderboard {
         try {
             return await state.inFlight;
         } finally {
+            if (state.abortController === abortController) state.abortController = null;
             state.inFlight = null;
+            if (this.destroyed || syncGeneration !== this.syncGeneration) {
+                state.pending = null;
+                return;
+            }
             if (state.pending?.immediate) {
                 void this.flushHighScore(gameId);
             } else if (state.pending) {
@@ -141,11 +173,24 @@ export class StudentGameLeaderboard {
         }
     }
 
+    destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        this.syncGeneration += 1;
+        this.loadGeneration += 1;
+        for (const state of this.scoreSyncStates.values()) {
+            if (state.timer) window.clearTimeout(state.timer);
+            state.timer = null;
+            state.pending = null;
+            state.abortController?.abort();
+        }
+    }
+
     updateLeaderboardGame() {
         const game = this.games.gamesList[this.games.currentGameIndex];
         const nameEl = $('#current-game-name');
         if (nameEl) nameEl.textContent = game.name;
-        
+
         // Update leaderboard button visibility
         const leaderboardBtn = $('#show-leaderboard-btn');
         if (leaderboardBtn) {
@@ -155,7 +200,7 @@ export class StudentGameLeaderboard {
                 leaderboardBtn.style.display = 'none';
             }
         }
-        
+
     }
 
     showLeaderboardModal() {
@@ -171,6 +216,7 @@ export class StudentGameLeaderboard {
     }
 
     hideLeaderboardModal() {
+        this.loadGeneration += 1;
         const modal = $('#leaderboard-modal');
         if (modal) {
             closeModal(modal);
@@ -178,8 +224,19 @@ export class StudentGameLeaderboard {
     }
 
     async loadLeaderboard(gameId) {
+        const loadGeneration = ++this.loadGeneration;
         const container = $('#leaderboard-list');
-        if (!container) return; // Modal might not be in DOM yet
+        const modal = $('#leaderboard-modal');
+        if (!container || !modal || modal.classList.contains('hidden')) return;
+
+        const accountId = this.sm.currentUser?.uid || this.sm.currentUser?.id || null;
+        const isActiveLoad = () => (
+            loadGeneration === this.loadGeneration
+            && accountId === (this.sm.currentUser?.uid || this.sm.currentUser?.id || null)
+            && this.games.gamesList[this.games.currentGameIndex]?.id === gameId
+            && $('#leaderboard-list') === container
+            && !modal.classList.contains('hidden')
+        );
 
         if (this.sm.authDisabled) {
             container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Leaderboards are disabled in local development.</p>';
@@ -205,6 +262,8 @@ export class StudentGameLeaderboard {
                 lowerIsBetter: isLowerBetter,
                 limit: 5
             });
+
+            if (!isActiveLoad()) return;
 
             container.innerHTML = '';
 
@@ -264,6 +323,7 @@ export class StudentGameLeaderboard {
             });
 
         } catch (error) {
+            if (!isActiveLoad()) return;
             console.error('Error loading leaderboard:', error);
             container.innerHTML = '<p style="text-align: center; color: var(--danger-color);">Could not load leaderboard. (Index might be building)</p>';
         }

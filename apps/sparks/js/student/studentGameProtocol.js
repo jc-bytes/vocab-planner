@@ -1,3 +1,15 @@
+import {
+    boolean,
+    finite,
+    looseObject,
+    maxValue,
+    minValue,
+    number,
+    pipe,
+    safeParse,
+    string
+} from 'valibot';
+
 export const GAME_HOST_EVENT = Object.freeze({
     SCORE: 'score',
     GAME_OVER: 'game-over'
@@ -16,27 +28,29 @@ const NUMERIC_METADATA_FIELDS = Object.freeze([
 
 const MAX_GAME_SCORE = 100_000_000;
 
+const finiteNumberSchema = pipe(number(), finite());
+const gameHostMessageSchema = looseObject({
+    type: string(),
+    score: pipe(finiteNumberSchema, minValue(0), maxValue(MAX_GAME_SCORE)),
+    gameOver: boolean()
+});
+
 export function parseGameHostMessage(data, expectedType) {
-    if (!expectedType || !data || typeof data !== 'object' || data.type !== expectedType) {
-        return null;
-    }
-    if (typeof data.score !== 'number'
-        || !Number.isFinite(data.score)
-        || data.score < 0
-        || data.score > MAX_GAME_SCORE
-        || typeof data.gameOver !== 'boolean') return null;
+    if (!expectedType) return null;
+    const result = safeParse(gameHostMessageSchema, data);
+    if (!result.success || result.output.type !== expectedType) return null;
 
     const metadata = {};
     NUMERIC_METADATA_FIELDS.forEach(field => {
-        if (typeof data[field] === 'number' && Number.isFinite(data[field])) {
-            metadata[field] = data[field];
+        if (typeof result.output[field] === 'number' && Number.isFinite(result.output[field])) {
+            metadata[field] = result.output[field];
         }
     });
-    if (typeof data.completed === 'boolean') metadata.completed = data.completed;
+    if (typeof result.output.completed === 'boolean') metadata.completed = result.output.completed;
 
     return {
-        event: data.gameOver ? GAME_HOST_EVENT.GAME_OVER : GAME_HOST_EVENT.SCORE,
-        score: data.score,
+        event: result.output.gameOver ? GAME_HOST_EVENT.GAME_OVER : GAME_HOST_EVENT.SCORE,
+        score: result.output.score,
         metadata
     };
 }

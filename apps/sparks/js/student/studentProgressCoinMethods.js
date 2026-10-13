@@ -1,5 +1,18 @@
-import { $ } from '../main.js';
+import { getActiveStudentStorageOwner, normalizeStudentOwnerId } from './persistence/studentStorage.js';
+import { $, refreshIcons } from '../main.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
+import { createUniqueId } from '../randomUtils.js';
+
+export function captureCoinSession(progress) {
+    const { sm, cloud } = progress;
+    const owner = normalizeStudentOwnerId(sm.currentUser);
+    const storageOwner = getActiveStudentStorageOwner();
+    const generation = cloud?.cloudGeneration;
+    const local = sm.authDisabled;
+    return () => sm.progress === progress && progress.cloud === cloud && cloud?.cloudGeneration === generation
+        && sm.authDisabled === local && normalizeStudentOwnerId(sm.currentUser) === owner
+        && getActiveStudentStorageOwner() === storageOwner && (local || owner && owner === storageOwner);
+}
 
 export class StudentProgressCoins {
     constructor(progress) {
@@ -10,7 +23,7 @@ export class StudentProgressCoins {
     addCoinHistory(type, amount, source, description = '') {
         const timestamp = new Date().toISOString();
         this.sm.coinHistory.push({
-            id: `${this.progress.clientId}-${timestamp}-${Math.random().toString(36).slice(2, 8)}`,
+            id: createUniqueId(`${this.progress.clientId}-${timestamp}-`),
             type,
             amount,
             source,
@@ -39,6 +52,8 @@ export class StudentProgressCoins {
     }
 
     async deductCoins(amount) {
+        const isCurrent = captureCoinSession(this.progress);
+        if (!isCurrent()) return false;
         if (this.sm.authDisabled) {
             if (this.sm.coinData.balance < amount) return false;
             this.sm.coinData.balance -= amount;
@@ -58,11 +73,13 @@ export class StudentProgressCoins {
                 source: 'game',
                 description: 'Spent on game',
                 clientId: this.progress.clientId
-            });
+            }, { isCurrent });
+            if (!isCurrent()) return false;
             this.progress.cloud.applyRemoteCoinProgress(progress);
             this.sm.setAuthStatus('Synced');
             return true;
         } catch (error) {
+            if (!isCurrent()) return false;
             console.error('Error spending coins:', error);
             this.sm.setAuthStatus(navigator.onLine ? 'Could not spend coins' : 'Saved locally - offline');
             return false;
@@ -70,6 +87,8 @@ export class StudentProgressCoins {
     }
 
     async acceptGiftCoins() {
+        const isCurrent = captureCoinSession(this.progress);
+        if (!isCurrent()) return;
         if (this.sm.authDisabled) {
             this.progress.hideNotificationBadge();
             return;
@@ -86,11 +105,13 @@ export class StudentProgressCoins {
         this.progress.hideNotificationBadge();
 
         try {
-            const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.progress.clientId });
+            const progress = await supabaseService.acceptStudentGiftCoins({ clientId: this.progress.clientId }, { isCurrent });
+            if (!isCurrent()) return;
             this.progress.cloud.applyRemoteCoinProgress(progress);
             this.sm.showToast(`You received ${amount} coins!`);
             this.sm.setAuthStatus('Synced');
         } catch (error) {
+            if (!isCurrent()) return;
             console.error('Error saving after accepting coins:', error);
             this.sm.updateCoinDisplay();
             this.sm.showToast('Error saving. Please try again.', 5000);
@@ -105,12 +126,12 @@ export class StudentProgressCoins {
             if (!balanceValue) {
                 coinEl.innerHTML = '<i data-lucide="coins" aria-hidden="true"></i><span class="student-coin-label">Coins</span><span data-coin-balance-value></span>';
                 balanceValue = coinEl.querySelector?.('[data-coin-balance-value]');
-                window.lucide?.createIcons({ root: coinEl });
+                refreshIcons(coinEl);
             }
             if (balanceValue) balanceValue.textContent = String(this.sm.coinData.balance);
             coinEl.style.display = (this.sm.currentUser || this.sm.authDisabled) ? 'flex' : 'none';
         }
-        
+
         // Update notification badge
         if (this.sm.coinData.giftCoins > 0) {
             this.progress.showNotificationBadge();

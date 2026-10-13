@@ -1,5 +1,5 @@
 
-import { createElement, $ } from '../main.js';
+import { createElement, $, refreshIcons } from '../main.js';
 import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
 
 export class SpeedMatchActivity {
@@ -207,7 +207,7 @@ export class SpeedMatchActivity {
             '<i data-lucide="heart" aria-hidden="true"></i>'
         )).join('');
         livesEl.setAttribute('aria-label', `${lives} ${lives === 1 ? 'life' : 'lives'}`);
-        window.lucide?.createIcons({ root: livesEl });
+        refreshIcons(livesEl);
     }
 
     showFeedback(text, type) {
@@ -268,7 +268,7 @@ export class SpeedMatchActivity {
         this.saveState(); // Save high score
 
         const isNewHighScore = this.score > 0 && this.score >= this.highScore;
-        
+
         this.container.innerHTML = `
             <div class="completion-screen">
                 <h2 class="activity-result-heading">
@@ -283,7 +283,7 @@ export class SpeedMatchActivity {
                 </button>
             </div>
         `;
-        window.lucide?.createIcons({ root: this.container });
+        refreshIcons(this.container);
 
         $('#restart-speed-match').addEventListener('click', () => {
             // Notify progress system of new session

@@ -1,7 +1,8 @@
 import {
-    readStudentActivityValue,
+    readStudentActivityJson,
     writeStudentActivityValue
 } from '../../student/persistence/studentStorage.js';
+import { crosswordStateSchema, validateActivityState } from '../activityStateValidation.js';
 
 export const crosswordGridStateMethods = {
 init() {
@@ -11,34 +12,32 @@ init() {
         this.render();
     },
 
-restoreState() {
+    restoreState() {
         // Try initial state passed from StudentManager (Cloud/Local consolidated)
-        if (this.initialState) {
-            this.grid = this.initialState.grid;
-            this.placedWords = this.initialState.placedWords;
-            this.revealedWordNumbers = new Set(this.initialState.revealedWordNumbers || []);
+        const initialState = validateActivityState(crosswordStateSchema, this.initialState);
+        if (initialState) {
+            this.grid = initialState.grid;
+            this.placedWords = initialState.placedWords;
+            this.revealedWordNumbers = new Set(initialState.revealedWordNumbers || []);
             this.solvedWordNumbers = new Set(
-                this.initialState.solvedWordNumbers || this.findCompletedWordNumbers()
+                initialState.solvedWordNumbers || this.findCompletedWordNumbers()
             );
             return true;
         }
 
         // Fallback to local storage if not found in manager (legacy or direct usage)
         const key = `crossword_state_${this.words.length}`; // Simple key
-        const saved = readStudentActivityValue(key);
+        const saved = readStudentActivityJson(key, null, {
+            validate: value => validateActivityState(crosswordStateSchema, value)
+        });
         if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                this.grid = state.grid;
-                this.placedWords = state.placedWords;
-                this.revealedWordNumbers = new Set(state.revealedWordNumbers || []);
-                this.solvedWordNumbers = new Set(
-                    state.solvedWordNumbers || this.findCompletedWordNumbers()
-                );
-                return true;
-            } catch (e) {
-                console.error('Failed to restore crossword state', e);
-            }
+            this.grid = saved.grid;
+            this.placedWords = saved.placedWords;
+            this.revealedWordNumbers = new Set(saved.revealedWordNumbers || []);
+            this.solvedWordNumbers = new Set(
+                saved.solvedWordNumbers || this.findCompletedWordNumbers()
+            );
+            return true;
         }
         return false;
     },
@@ -257,4 +256,3 @@ syncSolvedState() {
         });
     },
 };
-

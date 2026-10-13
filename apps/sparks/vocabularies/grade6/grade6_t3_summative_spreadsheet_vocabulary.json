@@ -2,7 +2,7 @@
   "id": "grade6_t3_summative_spreadsheet_vocabulary",
   "subjectSlug": "technology",
   "name": "Grade 6 T3 Summative: IIIT Vocabulary",
-  "description": "Ten core third-trimester words for the Grade 6 IIIT summative vocabulary table.",
+  "description": "Ten September spreadsheet words for Word Hunt. Meanings and examples must use the student's own words.",
   "grades": [
     "6"
   ],
@@ -31,6 +31,8 @@
     "flashcards": 10,
     "quiz": 10,
     "illustration": 10,
+    "wordHuntSelectionMode": "custom",
+    "wordHuntAllowTextPaste": false,
     "synonymAntonym": 10,
     "wordSearch": 10,
     "crossword": 10,
@@ -42,107 +44,103 @@
   "words": [
     {
       "word": "data",
-      "definition": "Facts or values that can be collected.",
-      "example": "Students collected class data about favorite colors in a spreadsheet.",
+      "definition": "Facts and values that a computer can store and use.",
+      "example": "",
       "difficulty": 1,
-      "synonyms": [
-        "facts",
-        "values"
-      ],
-      "antonyms": []
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/data"
     },
     {
       "word": "table",
       "definition": "Information arranged in rows and columns.",
-      "example": "The table listed each project material, quantity, and price.",
+      "example": "",
       "difficulty": 1,
       "synonyms": [],
-      "antonyms": []
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/table"
+    },
+    {
+      "word": "spreadsheet",
+      "definition": "A computer document that organises data in cells.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/spreadsheet"
+    },
+    {
+      "word": "row",
+      "definition": "A line of cells going across a table.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/row"
+    },
+    {
+      "word": "column",
+      "definition": "A line of cells going down a table.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/column"
+    },
+    {
+      "word": "cell",
+      "definition": "One box in a spreadsheet where a row and column meet.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/cell"
     },
     {
       "word": "formula",
-      "definition": "A rule or calculation used by a spreadsheet.",
-      "example": "The formula added the material costs to find the total budget.",
+      "definition": "A calculation written in a spreadsheet.",
+      "example": "",
       "difficulty": 1,
-      "synonyms": [
-        "calculation",
-        "rule"
-      ],
-      "antonyms": []
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/formula"
     },
     {
       "word": "chart",
-      "definition": "A spreadsheet visual that compares data, costs, or totals.",
-      "example": "The chart compared the cost of each group project.",
-      "difficulty": 1,
-      "synonyms": [
-        "graph",
-        "visual"
-      ],
-      "antonyms": []
-    },
-    {
-      "word": "3D",
-      "definition": "Having height, width, and depth.",
-      "example": "The student used a cube as the base of a 3D model.",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "example": "",
       "difficulty": 1,
       "synonyms": [],
-      "antonyms": []
-    },
-    {
-      "word": "shape",
-      "definition": "A form such as a cube, sphere, or cylinder.",
-      "example": "The model started with one shape and then added a roof.",
-      "difficulty": 1,
-      "synonyms": [
-        "form"
-      ],
-      "antonyms": []
-    },
-    {
-      "word": "model",
-      "definition": "A simple version or design of something.",
-      "example": "The 3D model showed the student's desk organizer idea.",
-      "difficulty": 1,
-      "synonyms": [
-        "version",
-        "representation"
-      ],
-      "antonyms": []
-    },
-    {
-      "word": "micro:bit",
-      "definition": "A tiny computer used to learn coding.",
-      "example": "The micro:bit showed a heart icon after the button was pressed.",
-      "difficulty": 1,
-      "synonyms": [],
-      "antonyms": []
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/chart"
     },
     {
       "word": "input",
-      "definition": "Data or a button press that a spreadsheet, model, or micro:bit uses.",
-      "example": "A button press was the input that changed the micro:bit display.",
+      "definition": "Information sent into a computer.",
+      "example": "",
       "difficulty": 1,
-      "synonyms": [
-        "entry",
-        "data in"
-      ],
-      "antonyms": [
-        "output"
-      ]
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/input"
     },
     {
       "word": "output",
-      "definition": "A result shown by a spreadsheet, model explanation, or micro:bit display.",
-      "example": "The icon on the LED display was the micro:bit output.",
+      "definition": "Information produced by a computer.",
+      "example": "",
       "difficulty": 1,
-      "synonyms": [
-        "result",
-        "response"
-      ],
-      "antonyms": [
-        "input"
-      ]
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": true,
+      "definitionSource": "https://techterms.com/definition/output"
     }
   ]
 }

@@ -1,0 +1,69 @@
+.student-dashboard { display: grid; gap: 1rem; }
+.student-dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.student-dashboard-heading h3 { margin: 0; }
+.student-dashboard-heading p { margin: 0 0 .35rem; color: var(--text-muted); }
+.student-dashboard-progress { display: grid; gap: .8rem; }
+.student-dashboard-progress span { display: block; margin-top: .3rem; color: var(--text-muted); }
+.student-dashboard progress { display: block; width: 100%; height: .65rem; accent-color: var(--primary-color, #6366f1); }
+.student-dashboard-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.student-dashboard-stat { display: flex; flex-direction: column; align-items: flex-start; gap: .4rem; margin: 0; }
+.student-dashboard-stat > strong { font-size: 2rem; line-height: 1.2; }
+.student-dashboard-stat > p { margin: 0 0 .5rem; flex: 1; color: var(--text-muted); }
+.student-dashboard-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.student-dashboard .teacher-panel { margin-bottom: 0; min-width: 0; }
+.student-dashboard-work-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color, #e5e7eb); }
+.student-dashboard-work-row:last-child { border-bottom: 0; }
+.student-dashboard-work-row > div { flex: 1; min-width: 0; }
+.student-dashboard h4 { margin: 0; overflow-wrap: anywhere; }
+.student-dashboard-work-row p { margin: .3rem 0; color: var(--text-muted); }
+.student-dashboard-work-row progress { margin-top: .5rem; }
+.student-dashboard .btn { flex-shrink: 0; }
+.student-dashboard-help { padding: 1rem 0; border-bottom: 1px solid var(--border-color, #e5e7eb); }
+.student-dashboard-help:last-of-type { border-bottom: 0; }
+.student-dashboard-caption { color: var(--text-muted); font-size: .85rem; }
+@media (max-width: 800px) {
+    .student-dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .student-dashboard-columns { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .student-dashboard-heading { align-items: flex-start; }
+    .student-dashboard-work-row { align-items: flex-start; flex-direction: column; }
+    .student-dashboard-work-row > div { width: 100%; }
+    .student-dashboard-stat { padding: .85rem; }
+}
+.student-profile-tabs .secondary-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .6rem .85rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-subtle);
+    color: var(--color-text);
+    cursor: pointer;
+}
+.student-profile-tabs .secondary-tab.active {
+    background: color-mix(in srgb, var(--color-brand) 25%, transparent);
+    border-color: var(--color-brand);
+}
+.student-profile-tabs .secondary-tab:hover { background: var(--color-control-background); }
+.student-profile-tabs .secondary-tab svg { width: 1rem; height: 1rem; }
+.student-dashboard progress {
+    appearance: none;
+    border: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--color-surface-subtle);
+}
+.student-dashboard progress::-webkit-progress-bar { background: var(--color-surface-subtle); }
+.student-dashboard progress::-webkit-progress-value { background: var(--color-success); }
+.student-dashboard progress::-moz-progress-bar { background: var(--color-success); }
+.student-dashboard-chart-frame { position: relative; height: 240px; width: 100%; min-width: 0; margin-block: 1rem; }
+.student-dashboard-chart-picker { display: grid; gap: .4rem; margin-block: 1rem; }
+.student-dashboard-chart-picker select { width: 100%; min-width: 0; }
+.student-dashboard-graph-values { display: grid; gap: .75rem; }
+.student-dashboard-graph-values > div { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.student-dashboard-graph-values span { overflow-wrap: anywhere; min-width: 0; font-size: .85rem; }
+[data-dashboard-trend] > .btn { margin-top: .75rem; }
+@media (max-width: 480px) { .student-dashboard-graph-values > div { flex-wrap: wrap; } }
+.student-dashboard-chart-frame canvas { max-width: 100%; }

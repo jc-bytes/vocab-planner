@@ -75,7 +75,7 @@ test('page styles retain responsive shell refinements without recreating the com
 
 test('top-level navigation keeps its accessible tab and mobile-menu contract', () => {
     for (const [name, html, tabCount] of [
-        ['student', studentHtml, 4],
+        ['student', studentHtml, 5],
         ['teacher', teacherHtml, 7]
     ]) {
         const tabListId = name === 'student' ? 'student-tabs' : 'teacher-tabs';

@@ -68,6 +68,7 @@ try {
         class Manager {
             constructor() {
                 this.authDisabled = false;
+                this.currentUser = { id: 'teacher-word-hunt-smoke' };
                 this.vocabularyMode = 'assign';
                 this.currentView = '';
                 this.workflowCalls = [];
@@ -126,8 +127,8 @@ try {
             internalState: Object.keys(manager).filter(key => key.startsWith('wordHuntReview'))
         };
     });
-    if (disposal.revokedAfterDispose !== 1 || disposal.requestsAfterReload !== 2) {
-        throw new Error(`Feature disposal did not release URLs and clear cached data: ${JSON.stringify(disposal)}`);
+    if (disposal.revokedAfterDispose !== 1 || disposal.requestsAfterReload !== 1) {
+        throw new Error(`Feature disposal did not release URLs or preserve the account cache: ${JSON.stringify(disposal)}`);
     }
     if (disposal.internalState.length) {
         throw new Error(`Word Hunt state leaked after disposal: ${JSON.stringify(disposal.internalState)}`);

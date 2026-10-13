@@ -1,4 +1,4 @@
-import { createElement, escapeHtml } from '../main.js';
+import { createElement, escapeHtml, refreshIcons } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
 
 export class StudentActivityBrowserCards {
@@ -6,6 +6,9 @@ export class StudentActivityBrowserCards {
         this.browser = browser;
         this.activities = browser.activities;
         this.sm = browser.sm;
+        this.calendar = browser.calendar;
+        this.schedule = browser.schedule;
+        this.vocabularyData = browser.vocabularyData;
     }
 
     createStudentLibraryChoiceCard({ title, count, meta, icon }) {
@@ -55,15 +58,13 @@ export class StudentActivityBrowserCards {
     }
 
     refreshIcons(root = document) {
-        if (window.lucide) {
-            window.lucide.createIcons({ root });
-        }
+        refreshIcons(root);
     }
 
     renderVocabularyGroups(container, vocabs) {
-        const visibleVocabs = this.browser.filterStudentAvailableVocabulary(vocabs);
+        const visibleVocabs = this.schedule.filterStudentAvailableVocabulary(vocabs);
         const grouped = visibleVocabs.reduce((groups, vocab) => {
-            const key = this.browser.getVocabTrimesterKey(vocab);
+            const key = this.schedule.getVocabTrimesterKey(vocab);
             if (!groups[key]) groups[key] = [];
             groups[key].push(vocab);
             return groups;
@@ -76,25 +77,25 @@ export class StudentActivityBrowserCards {
             const group = createElement('section', 'vocab-trimester-group');
             const heading = createElement('div', 'vocab-trimester-heading');
             heading.innerHTML = `
-                <h3>${this.browser.getTrimesterLabel(trimester)}</h3>
+                <h3>${this.schedule.getTrimesterLabel(trimester)}</h3>
                 <span>${trimesterVocabs.length} ${trimesterVocabs.length === 1 ? 'unit' : 'units'}</span>
             `;
 
-            const monthGroups = this.browser.buildVocabularyMonthGroups(trimesterVocabs);
+            const monthGroups = this.schedule.buildVocabularyMonthGroups(trimesterVocabs);
             const monthList = createElement('div', 'student-vocab-month-list');
             Array.from(monthGroups.entries())
-                .sort(([monthA], [monthB]) => this.browser.getMonthOrder(monthA) - this.browser.getMonthOrder(monthB))
+                .sort(([monthA], [monthB]) => this.schedule.getMonthOrder(monthA) - this.schedule.getMonthOrder(monthB))
                 .forEach(([monthKey, monthVocabs]) => {
                     const monthSection = createElement('section', 'student-vocab-month-group');
                     const monthHeading = createElement('div', 'student-vocab-month-heading');
                     monthHeading.innerHTML = `
-                        <h4>${this.browser.getMonthLabel(monthKey)}</h4>
+                        <h4>${this.schedule.getMonthLabel(monthKey)}</h4>
                         <span>${monthVocabs.length} ${monthVocabs.length === 1 ? 'unit' : 'units'}</span>
                     `;
 
                     const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
                     monthVocabs
-                        .sort((a, b) => this.browser.compareVocabularySchedule(a, b))
+                        .sort((a, b) => this.schedule.compareVocabularySchedule(a, b))
                         .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
 
                     monthSection.appendChild(monthHeading);
@@ -157,16 +158,16 @@ export class StudentActivityBrowserCards {
             card.addEventListener('pointerenter', preload, { once: true });
             card.addEventListener('focus', preload, { once: true });
         }
-        card.addEventListener('click', () => this.browser.loadVocabulary(vocab));
+        card.addEventListener('click', () => this.vocabularyData.loadVocabulary(vocab));
         return card;
     }
 
     createVocabularyRow(vocab) {
         const subject = getSubjectBySlug(this.sm.subjects, getVocabSubjectSlug(vocab));
-        const schedule = this.browser.getVocabSchedule(vocab);
+        const schedule = this.schedule.getVocabSchedule(vocab);
         const title = this.formatVocabularyCardTitle(vocab);
         const purposeLabel = this.formatVocabularyPurpose(vocab.purpose);
-        const monthLabel = this.browser.getMonthLabel(schedule.month);
+        const monthLabel = this.schedule.getMonthLabel(schedule.month);
         const weekLabel = schedule.week ? `Week ${schedule.week}` : 'No week';
         const progress = this.getVocabularyRequiredProgress(vocab);
         const progressState = progress.isComplete
@@ -197,7 +198,7 @@ export class StudentActivityBrowserCards {
             row.addEventListener('pointerenter', preload, { once: true });
             row.addEventListener('focus', preload, { once: true });
         }
-        row.addEventListener('click', () => this.browser.loadVocabulary(vocab));
+        row.addEventListener('click', () => this.vocabularyData.loadVocabulary(vocab));
         return row;
     }
 
@@ -246,8 +247,8 @@ export class StudentActivityBrowserCards {
     }
 
     formatVocabularyScheduleLabel(vocab) {
-        const schedule = this.browser.getVocabSchedule(vocab);
-        return schedule.label || this.browser.getTrimesterLabel(this.browser.getVocabTrimesterKey(vocab));
+        const schedule = this.schedule.getVocabSchedule(vocab);
+        return schedule.label || this.schedule.getTrimesterLabel(this.schedule.getVocabTrimesterKey(vocab));
     }
 
     formatVocabularyCardDescription(vocab, title) {
@@ -272,7 +273,7 @@ export class StudentActivityBrowserCards {
         const path = firstRepoCard?.dataset?.vocabPath;
         if (!path) return;
 
-        this.browser.scheduleIdleTask(() => {
+        this.calendar.scheduleIdleTask(() => {
             preloadVocabularyFile(path);
         }, 1200);
     }

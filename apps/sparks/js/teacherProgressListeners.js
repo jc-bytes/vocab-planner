@@ -1,9 +1,13 @@
 import { $, $$, closeModal as closeDialog } from './main.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
-const DATA_PAGE = teacherPageRegistry.get('data');
+const SETTINGS_PAGE = teacherPageRegistry.get('settings');
+const STUDENTS_PAGE = teacherPageRegistry.get('students');
 
 export function initTeacherProgressListeners(manager) {
+    $('#refresh-student-progress-btn')?.addEventListener('click', () => {
+        manager.fetchStudentProgressPage({ forceRefresh: true }).catch(() => {});
+    });
     $('#filter-grade')?.addEventListener('change', () => manager.applyFilters());
     $('#filter-group')?.addEventListener('change', () => manager.applyFilters());
     $('#filter-search')?.addEventListener('input', () => manager.scheduleStudentProgressFilter());
@@ -17,12 +21,17 @@ export function initTeacherProgressListeners(manager) {
         }
     });
 
-    $('#close-detail-modal').addEventListener('click', () => {
-        closeDialog('#student-detail-modal');
+    $('#student-profile-back-btn')?.addEventListener('click', () => {
+        manager.showTeacherSection(STUDENTS_PAGE.id);
+    });
+    $('#student-profile-previous-btn')?.addEventListener('click', () => manager.moveStudentProfile(-1));
+    $('#student-profile-next-btn')?.addEventListener('click', () => manager.moveStudentProfile(1));
+    $$('[data-student-profile-tab]').forEach(button => {
+        button.addEventListener('click', () => manager.setStudentProfileTab(button.dataset.studentProfileTab));
     });
 
     $('#open-data-management-btn')?.addEventListener('click', () => {
-        manager.showTeacherSection(DATA_PAGE.id, { tab: 'dashboard' });
+        manager.showTeacherSection(SETTINGS_PAGE.id, { tab: 'export' });
     });
     $('#open-add-student-modal-btn')?.addEventListener('click', () => {
         manager.showAddStudentModal();

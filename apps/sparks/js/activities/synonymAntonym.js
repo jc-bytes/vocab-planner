@@ -1,7 +1,9 @@
-import { createElement, $ } from '../main.js';
+import { createElement, $, refreshIcons } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
 import { hasConsistentMultipleChoiceState } from './multipleChoiceState.js';
-import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { readStudentActivityJson, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { synonymAntonymStateSchema, validateActivityState } from './activityStateValidation.js';
+import { shuffled } from '../randomUtils.js';
 
 const MASTERY_ACCURACY = 80;
 
@@ -43,7 +45,7 @@ export class SynonymAntonymActivity {
                         type: 'Synonym',
                         word: word.word,
                         correctAnswer: correct,
-                        options: this.shuffle([correct, ...distractors])
+                        options: shuffled([correct, ...distractors])
                     });
                 }
             }
@@ -57,13 +59,13 @@ export class SynonymAntonymActivity {
                         type: 'Antonym',
                         word: word.word,
                         correctAnswer: correct,
-                        options: this.shuffle([correct, ...distractors])
+                        options: shuffled([correct, ...distractors])
                     });
                 }
             }
         });
 
-        return this.shuffle(questions);
+        return shuffled(questions);
     }
 
     normalizeAnswer(value) {
@@ -84,14 +86,14 @@ export class SynonymAntonymActivity {
 
     getCorrectAnswer(word, type) {
         const answers = this.getAnswerList(word, type);
-        return this.shuffle([...answers])[0] || null;
+        return shuffled(answers)[0] || null;
     }
 
     getDistractors(targetWord, type) {
         const distractors = [];
         const targetAnswers = new Set(this.getAnswerList(targetWord, type).map(answer => this.normalizeAnswer(answer)));
         const used = new Set(targetAnswers);
-        const otherWords = this.shuffle(this.words.filter(w => w !== targetWord));
+        const otherWords = shuffled(this.words.filter(w => w !== targetWord));
 
         for (const w of otherWords) {
             for (const answer of this.getAnswerList(w, type)) {
@@ -105,15 +107,6 @@ export class SynonymAntonymActivity {
         }
 
         return distractors;
-    }
-
-    shuffle(array) {
-        const shuffled = [...array];
-        for (let index = shuffled.length - 1; index > 0; index -= 1) {
-            const swapIndex = Math.floor(Math.random() * (index + 1));
-            [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-        }
-        return shuffled;
     }
 
     getQuestionKey(question = {}) {
@@ -152,16 +145,13 @@ export class SynonymAntonymActivity {
     }
 
     restoreState() {
-        if (this.applySavedState(this.initialState)) return;
+        if (this.applySavedState(validateActivityState(synonymAntonymStateSchema, this.initialState))) return;
 
-        const saved = readStudentActivityValue(this.getStorageKey());
+        const saved = readStudentActivityJson(this.getStorageKey(), null, {
+            validate: value => validateActivityState(synonymAntonymStateSchema, value)
+        });
         if (!saved) return;
-
-        try {
-            this.applySavedState(JSON.parse(saved));
-        } catch (error) {
-            console.error('Error restoring synonym activity state:', error);
-        }
+        this.applySavedState(saved);
     }
 
     applySavedState(state) {
@@ -379,11 +369,11 @@ export class SynonymAntonymActivity {
         `;
 
         this.container.appendChild(summary);
-        window.lucide?.createIcons({ root: summary });
+        refreshIcons(summary);
 
         $('#restart-quiz').addEventListener('click', () => this.restart());
     }
-    
+
     restart() {
         // Reset game state
         this.currentIndex = 0;
@@ -391,17 +381,17 @@ export class SynonymAntonymActivity {
         this.answeredCount = 0;
         this.selectedAnswers = [];
         this.isFinished = false;
-        
+
         // Regenerate questions with new shuffle
         this.questions = this.generateQuestions();
         this.totalQuestions = this.questions.length;
         this.saveState();
-        
+
         // Notify progress system of new session
         if (this.onProgress) {
             this.onProgress({ score: 0, details: `Answered: 0/${this.totalQuestions}. Correct: 0/0 (0% accuracy)`, accuracy: 0, isComplete: false, isReplay: true });
         }
-        
+
         this.render();
     }
 

@@ -1063,7 +1063,7 @@
         linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
         rgba(15, 23, 42, 0.76);
     box-shadow: 0 30px 70px -36px rgba(0, 0, 0, 0.85);
-}.login-container h2 {
+}.login-container h1 {
     margin-bottom: var(--spacing-md);
     text-align: center;
     font-size: clamp(1.65rem, 4vw, 2rem);
@@ -5212,7 +5212,7 @@ section.student-continue-hero {
     }
 
     html body .app-container.student-sidebar-collapsed:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tabs {
-        gap: 10px !important;
+        gap: 12px !important;
     }
 
     html body .app-container.student-sidebar-collapsed:has(#student-tab-shell:not(.hidden)) > header.app-header.student-app-header .student-tab {

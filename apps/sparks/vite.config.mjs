@@ -58,11 +58,14 @@ export default defineConfig(({ command, mode }) => {
           teacher: resolve(__dirname, 'teacher.html')
         },
         output: {
+          // Keep shared helpers out of feature chunks so they do not pull the
+          // entire feature into another entry point.
           manualChunks(id) {
+            if (id.endsWith('/js/randomUtils.js')) return 'random-utils';
             if (id.includes('node_modules/@supabase')) return 'supabase-vendor';
             if (id.includes('node_modules/chart.js')) return 'teacher-charts';
-            if (id.endsWith('/js/main.js') || id.endsWith('/js/notifications.js')) return 'app-shared';
-            if (id.endsWith('/js/db.js')) return 'student-storage';
+            if (id.includes('node_modules/focus-trap') || id.includes('node_modules/tabbable') || id.endsWith('/js/main.js') || id.endsWith('/js/notifications.js')) return 'app-shared';
+            if (id.includes('node_modules/idb/') || id.endsWith('/js/db.js')) return 'student-storage';
             if (id.endsWith('/js/quizMaker.js')) return 'teacher-quiz-maker';
           }
         }

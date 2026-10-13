@@ -9,11 +9,32 @@ import {
 } from '../sparkCheckModel.js';
 import { SPARK_GRADE_LEVELS } from '../sparkModel.js';
 import { setInlineStatus } from '../ui/inlineStatus.js';
+import { createUniqueId } from '../randomUtils.js';
 
 export const teacherSparkEditorMethods = {
+async showSparkEditor({ materialId } = {}) {
+        if (!this.ensureAuthenticated(false)) return;
+        const generation = ++this.weeklySparkEditorGeneration;
+        const lifecycle = this.weeklySparkLifecycleGeneration;
+        const owner = this.getCurrentUser()?.uid || this.getCurrentUser()?.id;
+        if (!materialId) { this.openSparkModal(); return; }
+        try {
+            const items = await this.getWeeklySparks();
+            if (generation !== this.weeklySparkEditorGeneration || lifecycle !== this.weeklySparkLifecycleGeneration
+                || owner !== (this.getCurrentUser()?.uid || this.getCurrentUser()?.id)) return;
+            const spark = items.find(item => item.id === materialId);
+            if (!spark) throw new Error('This material is unavailable.');
+            this.openSparkModal(spark);
+        } catch (error) {
+            if (generation === this.weeklySparkEditorGeneration && lifecycle === this.weeklySparkLifecycleGeneration) {
+                this.feedback.error(error.message || 'Could not open this material.');
+            }
+        }
+    },
+
 createSparkQuestionDraft(type = SPARK_QUESTION_TYPES.SHORT_TEXT) {
         return {
-            id: `q-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            id: createUniqueId('q-'),
             type,
             prompt: '',
             options: type === SPARK_QUESTION_TYPES.MULTIPLE_CHOICE ? ['', '', '', ''] : [],
@@ -126,6 +147,7 @@ changeSparkQuestionType(index, type) {
     },
 
 openSparkModal(spark = null, options = {}) {
+        this.weeklySparkEditorGeneration += 1;
         const source = this.normalizeSpark(spark || this.createDefaultSpark());
         const duplicate = options.duplicate === true;
         this.sparkModalMode = source.id && !duplicate ? 'edit' : 'create';
@@ -166,7 +188,8 @@ openSparkModal(spark = null, options = {}) {
         this.updateSparkCheckModeUi();
 
         this.setSparkModalStatus('');
-        this.openDialog('#spark-modal', { initialFocus: '#spark-title-input' });
+        this.showEditorView({ materialId: this.editingSparkId || undefined });
+        this.query('#spark-title-input')?.focus();
     },
 
 readSparkTargetGradesFromForm() {

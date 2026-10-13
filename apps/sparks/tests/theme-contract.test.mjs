@@ -38,6 +38,24 @@ const requiredSemanticTokens = [
     'interactive-disabled'
 ];
 
+const requiredStructuralRoles = [
+    'color-control-background',
+    'color-control-background-muted',
+    'color-control-background-strong',
+    'color-surface-subtle',
+    'color-overlay',
+    'color-placeholder',
+    'color-border-interactive',
+    'color-border-interactive-hover',
+    'color-text-soft',
+    'color-danger-surface',
+    'color-on-danger-surface',
+    'color-accent-strong',
+    'shadow-surface',
+    'shadow-surface-hover',
+    'shadow-dialog'
+];
+
 function getBlock(source, selector) {
     const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const match = source.match(new RegExp(`${escapedSelector}\\s*\\{([\\s\\S]*?)\\}`));
@@ -57,6 +75,33 @@ test('the shared and student themes provide the complete semantic color contract
         const declaration = new RegExp(`--color-${token}\\s*:`);
         assert.match(sharedTheme, declaration, `Shared theme is missing --color-${token}`);
         assert.match(studentTheme, declaration, `Student theme is missing --color-${token}`);
+    }
+
+    for (const role of requiredStructuralRoles) {
+        const declaration = new RegExp(`--${role}\\s*:`);
+        assert.match(sharedTheme, declaration, `Shared theme is missing --${role}`);
+        assert.match(studentTheme, declaration, `Student theme is missing --${role}`);
+    }
+});
+
+test('shared UI families consume structural theme roles instead of dark-theme literals', async () => {
+    const sharedFamilies = await Promise.all([
+        'css/forms.css',
+        'css/cards.css',
+        'css/dialogs.css',
+        'css/navigation.css',
+        'css/containers.css',
+        'css/buttons.css'
+    ].map(read));
+    const darkStructuralLiteral = /(?:rgba?\(\s*(?:0|15|203|239|255)\s*,|#(?:d7e3f8|fb923c|fecaca)\b)/i;
+
+    for (const source of sharedFamilies) {
+        assert.doesNotMatch(source, darkStructuralLiteral);
+    }
+
+    const combined = sharedFamilies.join('\n');
+    for (const role of requiredStructuralRoles) {
+        assert.match(combined, new RegExp(`var\\(--${role}\\)`), `Shared UI does not consume --${role}`);
     }
 });
 

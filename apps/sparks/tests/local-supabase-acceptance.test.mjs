@@ -1,13 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createClient } from '@supabase/supabase-js';
+import { createClassroomRepository } from '../js/services/classroomRepository.js';
+import { execFileSync } from 'node:child_process';
 
 import {
     AUDIT_PASSWORD,
-    AUDIT_STUDENT_EMAIL,
-    AUDIT_TEACHER_EMAIL,
-    seedLocalAuditData
+    readLocalSupabaseStatus, createLocalAdminClient, getBrowserSupabaseConfig, runLocalAuditSql
 } from '../scripts/lib/local-supabase-audit.mjs';
+import { serverStateQuery } from '../js/services/serverStateQuery.js';
+import { schoolContext } from '../js/services/schoolContext.js';
 import { leaderboardRepository } from '../js/services/leaderboardRepository.js';
 import { settingsRepository } from '../js/services/settingsRepository.js';
 import { sparksRepository } from '../js/services/sparksRepository.js';
@@ -22,6 +24,7 @@ import {
 } from '../js/student/persistence/studentStorage.js';
 
 const RUN_ID = `acceptance-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const ACTIVITY_TIME_BOUNDARY_BUFFER_MS = 1000;
 const IDS = {
     settings: `${RUN_ID}-settings`,
     subject: `${RUN_ID}-subject`,
@@ -61,6 +64,9 @@ async function withServiceClient(client, callback) {
     supabaseService.initialized = true;
     supabaseService.initPromise = null;
     try {
+        const { data: { user } } = await client.auth.getUser();
+        supabaseService.currentUser = user ? { ...user, uid:user.id } : null;
+        await schoolContext.load(user?.id);
         return await callback();
     } finally {
         supabaseService.client = previousClient;
@@ -97,6 +103,16 @@ async function waitFor(predicate, message, timeoutMs = 8000) {
         await new Promise(resolve => setTimeout(resolve, 50));
     }
     throw new Error(`${message}${lastError ? `: ${lastError.message}` : ''}`);
+}
+
+async function waitForMinimumActivityDuration(attempt) {
+    const minimumSeconds = Number(attempt?.minimumSeconds);
+    assert.ok(Number.isFinite(minimumSeconds) && minimumSeconds >= 0,
+        'Expected the activity attempt to provide a valid minimum duration.');
+    await new Promise(resolve => setTimeout(
+        resolve,
+        (minimumSeconds * 1000) + ACTIVITY_TIME_BOUNDARY_BUFFER_MS
+    ));
 }
 
 function channelJoined(client) {
@@ -144,8 +160,43 @@ async function createPeerStudent(admin) {
     return peer;
 }
 
-async function cleanupAcceptanceData({ admin, peer, student }) {
-    const activityUnitKey = `technology:${IDS.vocabulary}`;
+// Per-run school fixtures avoid changing the shared browser-audit accounts/content.
+async function seedSchoolAcceptanceData() {
+ const status=await readLocalSupabaseStatus({startIfStopped:false});
+ const admin=createLocalAdminClient(status), browserConfig=getBrowserSupabaseConfig(status), users={};
+ for(const [role,label] of [['teacher','Teacher'],['student','Student']]) {
+  const email=`${RUN_ID}-${role}@aid.edu.pa`, token=crypto.randomUUID();
+  await admin.rpc('issue_auth_user_provisioning_ticket',{p_email:email,p_token:token}).throwOnError();
+  const {data,error}=await admin.auth.admin.createUser({email,password:AUDIT_PASSWORD,email_confirm:true,user_metadata:{provisioning_token:token,first_name:'Audit',last_name:label}});
+  if(error)throw error; users[role]=data.user;
+  await admin.from('profiles').update({role,first_name:'Audit',last_name:label,grade_level:role==='student'?6:null,section_letter:role==='student'?'A':null,must_change_password:false}).eq('user_id',data.user.id).throwOnError();
+ }
+ const schoolId=crypto.randomUUID();
+ runLocalAuditSql(`insert into public.schools(id,name,timezone) values('${schoolId}','${RUN_ID}','America/Panama');
+ insert into public.school_memberships(school_id,user_id,active,grade,section) values('${schoolId}','${users.teacher.id}',true,null,null),('${schoolId}','${users.student.id}',true,'6','A');
+ insert into public.school_member_roles(school_id,user_id,role) values('${schoolId}','${users.teacher.id}','school_admin'),('${schoolId}','${users.teacher.id}','teacher'),('${schoolId}','${users.student.id}','student');`);
+ const client=localClient(browserConfig); await signIn(client,users.teacher.email);
+ try {
+  await client.rpc('set_school_year_v1',{p_school_id:schoolId,p_year:2026,p_label:'2026',p_archived:false}).throwOnError();
+  const repo=createClassroomRepository(()=>client,()=>schoolId), subject=await repo.createSubject('Technology');
+  const classroom=await repo.createClass({name:'Audit 6A',subjectId:subject.id,schoolYear:2026});
+  await admin.from('class_memberships').insert({class_id:classroom.id,student_id:users.student.id,active:true}).throwOnError();
+  return {status,admin,browserConfig,users,schoolId,classroom,subject};
+ } finally {await client.auth.signOut();}
+}
+
+async function cleanupAcceptanceData({ admin, peer, student, teacher, schoolId, classroom, subject, assignmentId }) {
+    const activityUnitKey = `assignment:${assignmentId}`;
+    if (assignmentId) {
+        assert.match(assignmentId, /^[0-9a-f-]{36}$/);
+        execFileSync('docker', ['exec', '-i', process.env.SPARKS_TEST_DB_CONTAINER || 'supabase_db_ifofhiypzffruzhiukst', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1'], {
+            input: `begin; delete from public.student_activity_state where assignment_id='${assignmentId}';
+            delete from public.student_activity_progress where assignment_id='${assignmentId}';
+            delete from public.student_unit_progress where assignment_id='${assignmentId}';
+            delete from private.student_activity_attempts where assignment_id='${assignmentId}';
+            delete from public.class_assignments where id='${assignmentId}';
+            delete from private.class_material_versions where vocabulary_id='${IDS.vocabulary}'; commit;`, stdio: ['pipe', 'ignore', 'pipe'] });
+    }
     await admin.from('export_logs').delete().eq('filename', IDS.exportFilename);
     await admin.from('weekly_sparks').delete().eq('id', IDS.spark);
     await admin.from('student_arcade_time_ledger').delete()
@@ -153,31 +204,41 @@ async function cleanupAcceptanceData({ admin, peer, student }) {
     await admin.from('student_activity_progress').delete()
         .eq('user_id', student.id).eq('unit_key', activityUnitKey);
     await admin.from('vocabularies').delete().eq('id', IDS.vocabulary);
-    await admin.from('app_settings').delete().eq('key', IDS.settings);
-    await admin.from('subjects').delete().eq('slug', IDS.subject);
+    await admin.from('teacher_settings').delete().eq('key', IDS.settings);
+    await admin.from('teacher_subjects').delete().eq('id', IDS.subject);
     await admin.from('scores').delete().eq('user_id', student.id).eq('game_id', 'snake');
     await admin.from('student_xp_events').delete().eq('user_id', student.id).eq('unit_key', `technology:${IDS.vocabulary}`);
-    if (peer?.id) await admin.auth.admin.deleteUser(peer.id);
+    if (classroom?.id) {
+        await admin.from('class_memberships').delete().eq('class_id',classroom.id).throwOnError();
+        runLocalAuditSql(`delete from public.class_teachers where class_id='${classroom.id}';`);
+        await admin.from('teaching_classes').delete().eq('id',classroom.id).throwOnError();
+    }
+    if (subject?.id) await admin.from('teacher_subjects').delete().eq('id',subject.id).throwOnError();
+    if (schoolId) execFileSync('docker',['exec',process.env.SPARKS_TEST_DB_CONTAINER || 'supabase_db_ifofhiypzffruzhiukst','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-c',
+        `delete from private.school_admin_events where school_id='${schoolId}'; delete from private.school_invitations where school_id='${schoolId}'; delete from public.school_settings where school_id='${schoolId}'; delete from public.school_member_roles where school_id='${schoolId}'; delete from public.school_memberships where school_id='${schoolId}'; delete from public.school_academic_years where school_id='${schoolId}'; delete from public.schools where id='${schoolId}';`],{stdio:'pipe'});
+    for(const user of [peer,student,teacher]) if(user?.id) await admin.auth.admin.deleteUser(user.id);
+    schoolContext.clear();
 }
 
 test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 120000 }, async t => {
-    const seeded = await seedLocalAuditData();
+    const seeded = await seedSchoolAcceptanceData();
     const { admin, browserConfig, users } = seeded;
     const teacherClient = localClient(browserConfig);
     const studentClient = localClient(browserConfig);
     const peerClient = localClient(browserConfig);
     const anonClient = localClient(browserConfig);
     let peer = null;
+    let assignmentId = null;
 
     try {
-        const teacher = await signIn(teacherClient, AUDIT_TEACHER_EMAIL);
-        const student = await signIn(studentClient, AUDIT_STUDENT_EMAIL);
+        const teacher = await signIn(teacherClient, users.teacher.email);
+        const student = await signIn(studentClient, users.student.email);
         peer = await createPeerStudent(admin);
         await signIn(peerClient, IDS.peerEmail);
         assert.equal(teacher.id, users.teacher.id);
         assert.equal(student.id, users.student.id);
 
-        await t.test('Public signup is disabled', async () => {
+        await t.test('Uninvited public signup is rejected', async () => {
             const { data, error } = await anonClient.auth.signUp({
                 email: IDS.signupEmail,
                 password: AUDIT_PASSWORD
@@ -217,7 +278,16 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             const created = await withServiceClient(teacherClient, () => settingsRepository.get(IDS.settings));
             assert.equal(created.marker, 'teacher-created');
             assert.equal(created.count, 1);
-            assert.equal(typeof created.updatedAt.toDate, 'function');
+            assert.equal(created.key, IDS.settings);
+            // School settings store one server timestamp for the whole settings
+            // record; individual values no longer expose teacher-row timestamps.
+            runLocalAuditSql(`do $$ begin
+                if not exists(select 1 from public.school_settings where school_id='${seeded.schoolId}'
+                    and settings->'${IDS.settings}'->>'marker'='teacher-created'
+                    and updated_at >= now()-interval '5 minutes') then
+                    raise exception 'School setting value or server timestamp was not persisted';
+                end if;
+            end $$;`);
 
             await withServiceClient(teacherClient, () => settingsRepository.save(IDS.settings, {
                 marker: 'teacher-updated', count: 2
@@ -234,9 +304,10 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         });
 
         await t.test('Teacher subject mutation succeeds and Student create/update/delete are denied', async () => {
-            await withServiceClient(teacherClient, () => subjectsRepository.saveAll([{
+            const createdSubjects = await withServiceClient(teacherClient, () => subjectsRepository.saveAll([{
                 slug: IDS.subject, name: 'Acceptance Subject', color: '#123456', sortOrder: 987, active: true
             }]));
+            IDS.subject = createdSubjects[0].slug;
             let subject = (await withServiceClient(teacherClient, () => subjectsRepository.list()))
                 .find(item => item.slug === IDS.subject);
             assert.deepEqual({ name: subject.name, sortOrder: subject.sortOrder, active: subject.active }, {
@@ -259,7 +330,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             }])));
 
             const { data: deleted, error: deleteError } = await studentClient
-                .from('subjects').delete().eq('slug', IDS.subject).select('slug');
+                .from('teacher_subjects').delete().eq('id', IDS.subject).select('id');
             if (deleteError) assert.match(deleteError.message, /permission|policy|row-level security/i);
             assert.deepEqual(deleted || [], []);
             const stillPresent = (await withServiceClient(teacherClient, () => subjectsRepository.list()))
@@ -270,7 +341,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         await t.test('Teacher vocabulary CRUD succeeds and Student mutations are denied', async () => {
             const source = {
                 name: 'Acceptance Vocabulary', description: 'Created by local acceptance validation',
-                grades: ['6'], subjectSlug: 'technology', assignedDate: '2026-07-14',
+                grades: ['6'], subjectSlug: seeded.subject.id, assignedDate: '2026-07-14',
                 trimester: '1', month: 'July', week: 2,
                 activitySettings: { completionBonus: 25 },
                 words: [{ word: 'Repository', definition: 'A domain data access boundary.' }],
@@ -281,7 +352,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             let vocabulary = await withServiceClient(teacherClient, () => vocabularyRepository.get(IDS.vocabulary));
             assert.equal(vocabulary.id, IDS.vocabulary);
             assert.equal(vocabulary.name, source.name);
-            assert.equal(vocabulary.subjectSlug, 'technology');
+            assert.match(vocabulary.subjectSlug, /^[0-9a-f-]{36}$/);
             assert.equal(vocabulary.createdAt.toDate() instanceof Date, true);
             assert.equal(vocabulary.updatedAt.toDate() instanceof Date, true);
             assert.equal((await withServiceClient(teacherClient, () => vocabularyRepository.list()))
@@ -338,7 +409,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 sparkType: 'trivia', title: 'Acceptance Spark', sparkText: 'Repository integration test',
                 whyItMatters: 'It proves real RLS behavior.', question: 'Did the mutation persist?',
                 gradeQuestions: { 6: 'What changed?' }, targetGrades: ['6'],
-                sourceTitle: 'Local acceptance', sourceUrl: '', subjectSlug: 'technology',
+                sourceTitle: 'Local acceptance', sourceUrl: '', subjectSlug: seeded.subject.id,
                 scheduledDate: '', status: 'draft', ownerId: teacher.id
             };
             await withServiceClient(teacherClient, () => sparksRepository.save(IDS.spark, source));
@@ -384,7 +455,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         });
 
         await t.test('Teacher roster summaries paginate and detailed batches remain teacher-only', async () => {
-            const { data: page, error: pageError } = await teacherClient.rpc('list_student_progress_summaries_v1', {
+            const { data: page, error: pageError } = await teacherClient.rpc('list_student_progress_summaries_school_v1', { p_school_id:seeded.schoolId,
                 p_limit: 1,
                 p_offset: 0
             });
@@ -394,51 +465,52 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             assert.equal(Object.hasOwn(page.items[0], 'units'), false);
 
             const { data: filters, error: filtersError } = await teacherClient.rpc(
-                'list_student_roster_filters_v1'
+                'list_student_roster_filters_school_v1', {p_school_id:seeded.schoolId}
             );
             if (filtersError) throw filtersError;
             assert.ok(filters.grades.includes(6));
             assert.ok(filters.classes.some(item => item.grade === '6' && item.section === 'A'));
 
             const { data: identityRoster, error: identityRosterError } = await teacherClient.rpc(
-                'list_student_identity_roster_v1'
+                'list_student_identity_roster_school_v1', {p_school_id:seeded.schoolId}
             );
             if (identityRosterError) throw identityRosterError;
-            assert.ok(identityRoster.some(item => item.id === student.id));
+            assert.ok(identityRoster.some(item => item.userId === student.id));
             assert.equal(identityRoster.every(item => !Object.hasOwn(item, 'units')), true);
 
             const { data: wordHuntReviews, error: wordHuntReviewsError } = await teacherClient.rpc(
-                'list_word_hunt_reviews_v1'
+                'list_word_hunt_reviews_school_v1', {p_school_id:seeded.schoolId}
             );
             if (wordHuntReviewsError) throw wordHuntReviewsError;
             assert.ok(Array.isArray(wordHuntReviews));
 
             const { data: analytics, error: analyticsError } = await teacherClient.rpc(
-                'get_teacher_dashboard_analytics_v1', { p_grade: 6 }
+                'get_teacher_dashboard_analytics_school_v1', { p_school_id:seeded.schoolId, p_grade: 6 }
             );
             if (analyticsError) throw analyticsError;
             assert.ok(analytics.totalStudents >= 1);
             assert.ok(Array.isArray(analytics.coinDistribution));
             assert.ok(Array.isArray(analytics.recentActivities));
 
-            const { data: details, error: detailsError } = await teacherClient.rpc('get_students_progress_by_ids_v1', {
+            const { data: details, error: detailsError } = await teacherClient.rpc('get_students_progress_by_ids_school_v1', { p_school_id:seeded.schoolId,
                 p_user_ids: [student.id, peer.id]
             });
             if (detailsError) throw detailsError;
-            assert.equal(details.length, 2);
+            assert.equal(details.length, 1);
+            assert.equal(details[0].userId, student.id, 'Unenrolled peer must be omitted from teacher exports');
             assert.equal(details.every(item => item.units && typeof item.units === 'object'), true);
 
-            await expectRejected(() => studentClient.rpc('list_student_progress_summaries_v1', {
+            await expectRejected(() => studentClient.rpc('list_student_progress_summaries_school_v1', { p_school_id:seeded.schoolId,
                 p_limit: 10,
                 p_offset: 0
             }).throwOnError());
-            await expectRejected(() => studentClient.rpc('get_students_progress_by_ids_v1', {
+            await expectRejected(() => studentClient.rpc('get_students_progress_by_ids_school_v1', { p_school_id:seeded.schoolId,
                 p_user_ids: [peer.id]
             }).throwOnError());
-            await expectRejected(() => studentClient.rpc('list_student_roster_filters_v1').throwOnError());
-            await expectRejected(() => studentClient.rpc('list_student_identity_roster_v1').throwOnError());
-            await expectRejected(() => studentClient.rpc('list_word_hunt_reviews_v1').throwOnError());
-            await expectRejected(() => studentClient.rpc('get_teacher_dashboard_analytics_v1', {
+            await expectRejected(() => studentClient.rpc('list_student_roster_filters_school_v1', {p_school_id:seeded.schoolId}).throwOnError());
+            await expectRejected(() => studentClient.rpc('list_student_identity_roster_school_v1', {p_school_id:seeded.schoolId}).throwOnError());
+            await expectRejected(() => studentClient.rpc('list_word_hunt_reviews_school_v1', {p_school_id:seeded.schoolId}).throwOnError());
+            await expectRejected(() => studentClient.rpc('get_teacher_dashboard_analytics_school_v1', { p_school_id:seeded.schoolId,
                 p_grade: 6
             }).throwOnError());
         });
@@ -446,7 +518,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
         await t.test('Student RPCs enforce authentication, role, ownership, idempotency, and score uniqueness', async () => {
             await withServiceClient(teacherClient, () => vocabularyRepository.save(IDS.vocabulary, {
                 name: 'Verified Activity Unit', description: 'Acceptance activity verification',
-                grades: ['6'], subjectSlug: 'technology', assignedDate: '2026-07-14',
+                grades: ['6'], subjectSlug: seeded.subject.id, assignedDate: '2026-07-14',
                 trimester: 'IIT', month: 'July', week: 1,
                 activitySettings: {
                     requiredActivities: ['flashcards', 'matching'],
@@ -461,9 +533,11 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                 ],
                 ownerId: teacher.id
             }));
-            const activityUnitKey = `technology:${IDS.vocabulary}`;
+            const [assignment] = await createClassroomRepository(() => teacherClient).publishMaterial({ classIds: [seeded.classroom.id], kind: 'vocabulary', materialId: IDS.vocabulary, releaseAt: '2026-01-01T00:00:00Z', publicationKey: crypto.randomUUID() });
+            assignmentId = assignment.id;
+            const activityUnitKey = `assignment:${assignment.id}`;
             const initial = await withServiceClient(studentClient, () => supabaseService.ensureOwnStudentProgress({
-                firstName: 'Audit', lastName: 'Student', email: AUDIT_STUDENT_EMAIL, grade: '6', group: 'A'
+                firstName: 'Audit', lastName: 'Student', email: users.student.email, grade: '6', group: 'A'
             }));
             assert.equal(initial.userId, student.id);
 
@@ -517,7 +591,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             await expectRejected(() => withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
             )), /quickly/i);
-            await new Promise(resolve => setTimeout(resolve, (attempt.minimumSeconds * 1000) + 100));
+            await waitForMinimumActivityDuration(attempt);
             const activity = await withServiceClient(studentClient, () => (
                 supabaseService.submitStudentActivityProgress(activityPayload)
             ));
@@ -544,7 +618,7 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
                     activityType: 'matching'
                 })
             ));
-            await new Promise(resolve => setTimeout(resolve, (matchingAttempt.minimumSeconds * 1000) + 100));
+            await waitForMinimumActivityDuration(matchingAttempt);
             const matchingPayload = {
                 unitKey: activityUnitKey,
                 activityType: 'matching',
@@ -630,10 +704,9 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             const scores = await withServiceClient(studentClient, () => leaderboardRepository.listForUser(student.id));
             assert.equal(scores.filter(score => score.gameId === 'snake').length, 1);
 
-            const gifted = await withServiceClient(teacherClient, () => supabaseService.giftStudentCoins({
+            await expectRejected(() => withServiceClient(teacherClient, () => supabaseService.giftStudentCoins({
                 studentId: student.id, amount: 7, message: 'Acceptance gift'
-            }));
-            assert.ok(gifted.coinData.giftCoins >= 7);
+            })), /permission/i);
             const accepted = await withServiceClient(studentClient, () => supabaseService.acceptStudentGiftCoins({
                 clientId: `${RUN_ID}-accept-gift`
             }));
@@ -645,21 +718,22 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             })));
             await expectRejected(() => withServiceClient(studentClient, () => supabaseService.giftStudentCoins({
                 studentId: peer.id, amount: 1
-            })), /teacher/i);
+            })), /permission/i);
             await expectRejected(() => withServiceClient(teacherClient, () => supabaseService.submitStudentGameScore({
                 gameId: 'snake', score: 1
             })), /student/i);
             await expectRejected(() => withServiceClient(teacherClient, () => supabaseService.syncStudentUnitWork({
-                unitKey: IDS.unit, unitContext: {}, workPatch: { denied: true }
-            })), /student/i);
+                unitKey: activityUnitKey, unitContext: {}, workPatch: { denied: true }
+            })), /student|unavailable|not accepting work/i);
             await expectRejected(() => withServiceClient(teacherClient, () => supabaseService.giftStudentCoins({
                 studentId: crypto.randomUUID(), amount: 1
-            })), /not found/i);
+            })), /permission/i);
 
-            await expectRejected(
+            const crossStudentReadError = await expectRejected(
                 () => withServiceClient(studentClient, () => studentProgressRepository.get(peer.id)),
-                /not allowed to read/i
+                /school-scoped report/i
             );
+            assert.equal(crossStudentReadError.code, '42501');
             const { error: studentCrossWriteError } = await studentClient.from('student_progress_summary')
                 .update({ total_xp: 999999 }).eq('user_id', peer.id);
             assert.ok(studentCrossWriteError, 'A Student direct cross-user progress write must be rejected.');
@@ -817,11 +891,18 @@ test('local Supabase repository, RLS, RPC, and Realtime acceptance', { timeout: 
             }
         });
     } finally {
-        await cleanupAcceptanceData({ admin, peer, student: users.student });
-        await Promise.allSettled([
-            teacherClient.removeAllChannels(), studentClient.removeAllChannels(), peerClient.removeAllChannels(),
-            teacherClient.auth.signOut(), studentClient.auth.signOut(), peerClient.auth.signOut()
-        ]);
+        await cleanupAcceptanceData({ admin, peer, student: users.student, teacher:users.teacher, schoolId:seeded.schoolId, classroom:seeded.classroom, subject:seeded.subject, assignmentId });
+        const acceptanceClients = [teacherClient, studentClient, peerClient, anonClient];
+        for (const client of acceptanceClients) {
+            await client.removeAllChannels();
+            assert.equal(client.getChannels().length, 0,
+                'Expected acceptance cleanup to remove every Realtime channel.');
+        }
+        for (const client of acceptanceClients) {
+            await client.auth.signOut({ scope: 'local' });
+        }
+        // Release the shared query cache timers created by application initialization.
+        serverStateQuery.clear();
         supabaseService.client = null;
         supabaseService.currentUser = null;
         supabaseService.currentSession = null;

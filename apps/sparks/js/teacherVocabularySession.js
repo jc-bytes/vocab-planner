@@ -1,4 +1,5 @@
 import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
 
 export function createEmptyTeacherVocabulary() {
     return {
@@ -31,8 +32,11 @@ export function beginTeacherVocabularyDocument(owner) {
 }
 
 export function clearTeacherVocabularySessionState(owner) {
+    const accountId = getOwnerId(owner);
+    if (accountId) void (owner.teacherVocabularyQueryService || serverStateQuery).clearAccount(accountId);
     owner.teacherVocabularySessionGeneration = (owner.teacherVocabularySessionGeneration || 0) + 1;
     owner.teacherVocabularyDocumentGeneration = (owner.teacherVocabularyDocumentGeneration || 0) + 1;
+    owner.teacherVocabularyLibraryLoadGeneration = (owner.teacherVocabularyLibraryLoadGeneration || 0) + 1;
     globalThis.clearTimeout(owner.teacherVocabularyStatusTimer);
     owner.teacherVocabularySaveDebounces?.forEach(timeoutId => globalThis.clearTimeout(timeoutId));
     owner.teacherVocabularySaveDebounces?.clear();
@@ -41,8 +45,6 @@ export function clearTeacherVocabularySessionState(owner) {
     // but it must not serialize saves started by the next signed-in teacher.
     owner.teacherVocabularySaveQueue = null;
     owner.teacherVocabularyStatusTimer = null;
-    owner.teacherLibraryCache = null;
-    owner.teacherLibraryPromise = null;
     owner.libraryItems = [];
     owner.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
     owner.lastVocabularyRoute = null;

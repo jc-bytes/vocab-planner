@@ -1,3 +1,5 @@
+import { applyStudentSchoolPlacement, bindStudentSchoolSession } from './studentSchoolSession.js';
+import { schoolContext } from '../services/schoolContext.js';
 /**
  * Student Authentication Module
  * Handles backend authentication, user profile, and auth state
@@ -8,6 +10,7 @@ import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
 import { SessionInitializationCoordinator } from '../services/sessionInitialization.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { StudentAuthUi } from '../studentAuthUiMethods.js';
 import {
     getActiveStudentStorageOwner,
@@ -61,7 +64,8 @@ export class StudentAuth {
 
         try {
             await supabaseService.init();
-            
+            void import('../schoolAccountAccess.js').then(({ mountSchoolAccountAccess }) => mountSchoolAccountAccess(document.getElementById('login-view'))).catch(error => console.warn('Account access unavailable:', error));
+
             this.authUnsubscribe?.();
             this.authUnsubscribe = supabaseService.onAuthStateChanged((user, event) => {
                 this.sm.logStudentDomUpdate?.('auth-state', {
@@ -100,6 +104,10 @@ export class StudentAuth {
     async initializeBackendSignIn(user, context) {
         const ownerChanged = getActiveStudentStorageOwner() !== user.uid;
         if (ownerChanged) {
+            const previousOwner = getActiveStudentStorageOwner();
+            if (previousOwner && previousOwner !== 'local-dev') {
+                void serverStateQuery.clearAccount(previousOwner);
+            }
             this.sm.progress.stopCoinSync();
             this.sm.progress.cancelScheduledCloudSync();
             this.sm.activities?.progressPersistence?.resetForSession?.();
@@ -113,7 +121,7 @@ export class StudentAuth {
         // Restore the last verified local snapshot before making any network call.
         // This keeps the signed-in shell useful when the device starts offline.
         this.sm.progress.loadLocalProgress({ ownerUserId: user.uid });
-        
+
         // Update UI immediately (works offline)
         this.setAuthStatus('Signed in');
         this.updateGuestStatus(false);
@@ -217,6 +225,8 @@ export class StudentAuth {
 
         if (!isCurrent()) return false;
 
+        applyStudentSchoolPlacement(this.sm);
+        bindStudentSchoolSession(this.sm);
         this.updateHeader();
         if (navigator.onLine) this.sm.progress.startCoinSync();
         await Promise.all([
@@ -243,6 +253,11 @@ export class StudentAuth {
     }
 
     handleBackendSignOut() {
+        this.sm.studentSchoolUnsubscribe?.();
+        this.sm.studentSchoolUnsubscribe = null;
+        schoolContext.clear();
+        const accountId = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        if (accountId) void serverStateQuery.clearAccount(accountId);
         this.sessionCoordinator.invalidate();
         this.sm.progress.stopCoinSync();
         this.sm.progress.cancelScheduledCloudSync();
@@ -287,7 +302,10 @@ export class StudentAuth {
                 localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
                 return this.sm.currentRole;
             }
-            this.sm.currentRole = profile.role || 'unknown';
+            const access = await schoolContext.load(user.uid);
+            if (context && !context.isCurrent()) return null;
+            this.sm.currentRole = access?.schools.some(school => school.roles.includes('student'))
+                ? 'student' : profile.role || 'unknown';
             this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
 
             if (profile && this.sm.currentRole === 'student') {
@@ -295,12 +313,13 @@ export class StudentAuth {
                     firstName: profile.firstName || '',
                     lastName: profile.lastName || '',
                     name: profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim(),
-                    grade: profile.grade || '',
-                    group: profile.group || profile.sectionLetter || profile.section_letter || '',
+                    grade: '',
+                    group: '',
                     email: profile.email || user.email || ''
                 });
             }
 
+            applyStudentSchoolPlacement(this.sm);
             localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
         } catch (error) {
             if (context && !context.isCurrent()) return null;
@@ -366,6 +385,7 @@ export class StudentAuth {
             $('#student-group').value = '';
         }
 
+        for (const id of ['#student-grade', '#student-group']) { const input = $(id); if (input) { input.disabled = !this.sm.authDisabled; input.readOnly = !this.sm.authDisabled; input.required = false; input.title = this.sm.authDisabled ? '' : 'Managed by your school administrator'; } }
         openModal(modal, {
             dismissible: false,
             initialFocus: '#student-firstname'

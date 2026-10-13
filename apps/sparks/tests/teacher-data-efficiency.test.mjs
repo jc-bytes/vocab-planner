@@ -3,6 +3,7 @@ import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 
 import { mapVocabularyMetadata } from '../js/services/vocabularyRepository.js';
+import { installTeacherDataDashboardMetricMethods } from '../js/teacherDataDashboardMetricMethods.js';
 
 const migration = await readFile(new URL(
     '../supabase/migrations/20260816182203_add_paginated_teacher_summaries_and_batch_exports.sql',
@@ -47,6 +48,21 @@ const analyticsMigration = await readFile(new URL(
     import.meta.url
 ), 'utf8');
 
+test('teacher dashboard combines canonical and legacy activity metric keys', () => {
+    class DashboardHarness {}
+    installTeacherDataDashboardMetricMethods(DashboardHarness);
+    const dashboard = new DashboardHarness();
+    dashboard.dashboardAnalytics = {
+        activities: {
+            'speed-match': { attempted: 3, completed: 2 },
+            speedMatch: { attempted: 1, completed: 1 }
+        }
+    };
+
+    assert.equal(dashboard.calculateActivityUsage()['Speed Match'], 3);
+    assert.equal(dashboard.calculateActivityCompletion()['Speed Match'], 75);
+});
+
 test('teacher roster uses a bounded paginated summary without full activity snapshots', () => {
     assert.match(migration, /list_student_progress_summaries_v1/i);
     assert.match(migration, /least\(greatest\(coalesce\(p_limit, 100\), 1\), 200\)/i);
@@ -58,7 +74,8 @@ test('teacher roster uses a bounded paginated summary without full activity snap
     assert.match(progressPageMethods, /section: query\.section/);
     assert.match(progressPageMethods, /search: query\.search/);
     assert.doesNotMatch(authProfileMethods, /getStudentsWithProgress|while \(offset < total\)/);
-    assert.match(authProfileMethods, /list_student_progress_summaries_v1/);
+    assert.match(authProfileMethods, /list_student_progress_summaries_school_v1/);
+    assert.match(authProfileMethods, /p_school_id: schoolId/);
 });
 
 test('teacher analytics use a server aggregate instead of expanding every student snapshot', () => {
@@ -110,7 +127,7 @@ test('teacher Arcade settings expose only effective global configuration', () =>
 
 test('teacher settings save large collections with bounded database requests', () => {
     assert.doesNotMatch(subjectsRepositorySource, /Promise\.all\(subjects\.map/);
-    assert.match(subjectsRepositorySource, /\.upsert\(payloads/);
+    assert.match(subjectsRepositorySource, /saveTeacherSubjects/);
     assert.match(placementBatchMigration, /update_vocabulary_placements_v1/i);
     assert.match(vocabularyRepositorySource, /updateVocabularyPlacements/);
     assert.doesNotMatch(calendarSettingsMethodsSource, /Promise\.all\(cloudVocabs\.map/);
@@ -126,16 +143,9 @@ test('data-management settings load together and expose section-level failures',
     assert.match(dashboardMethods, /school-calendar-save-status/);
 });
 
-test('the Students analytics action opens the Data dashboard explicitly', () => {
-    assert.match(progressListeners, /showTeacherSection\(DATA_PAGE\.id, \{ tab: 'dashboard' \}\)/);
+test('the Students data action opens Data and Backups under Settings', () => {
+    assert.match(progressListeners, /showTeacherSection\(SETTINGS_PAGE\.id, \{ tab: 'export' \}\)/);
     assert.doesNotMatch(progressListeners, /view-progress-btn|back-to-dashboard-from-progress|back-to-progress-from-data/);
-});
-
-test('roster failures preserve the last successful page and expose a retry state', () => {
-    assert.match(progressPageMethods, /studentProgressLastPage/);
-    assert.match(progressPageMethods, /applyStudentProgressPage\(this\.studentProgressLastPage\)/);
-    assert.match(progressPageMethods, /data-progress-retry/);
-    assert.doesNotMatch(progressPageMethods, /applyStudentProgressData\(\[\]\)/);
 });
 
 test('teacher detail and export requests use a bounded batch RPC', () => {

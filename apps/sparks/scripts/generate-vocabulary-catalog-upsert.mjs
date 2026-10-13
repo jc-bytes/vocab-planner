@@ -8,6 +8,12 @@ function argumentValue(name) {
     return index >= 0 ? process.argv[index + 1] : '';
 }
 
+function argumentValues(name) {
+    return process.argv.flatMap((value, index) => (
+        value === name && process.argv[index + 1] ? [String(process.argv[index + 1]).trim()] : []
+    )).filter(Boolean);
+}
+
 function sqlText(value) {
     if (value === null || value === undefined || value === '') return 'null';
     return `'${String(value).replaceAll("'", "''")}'`;
@@ -24,14 +30,24 @@ function sqlTextArray(values = []) {
 
 const grade = String(argumentValue('--grade') || '').trim();
 if (grade !== 'all' && !/^\d+$/.test(grade)) {
-    throw new Error('Usage: node scripts/generate-vocabulary-catalog-upsert.mjs --grade <number|all>');
+    throw new Error('Usage: node scripts/generate-vocabulary-catalog-upsert.mjs --grade <number|all> [--id <vocabulary-id> ...]');
 }
+const requestedIds = new Set(argumentValues('--id'));
 
 const catalog = await loadVocabularyCatalog(workspaceRoot);
 const entries = catalog.filter(({ vocabulary }) => (
-    grade === 'all'
-    || (Array.isArray(vocabulary.grades) && vocabulary.grades.map(String).includes(grade))
+    (grade === 'all'
+        || (Array.isArray(vocabulary.grades) && vocabulary.grades.map(String).includes(grade)))
+    && (requestedIds.size === 0 || requestedIds.has(vocabulary.id))
 ));
+
+if (requestedIds.size > 0) {
+    const foundIds = new Set(entries.map(({ vocabulary }) => vocabulary.id));
+    const missingIds = [...requestedIds].filter(id => !foundIds.has(id));
+    if (missingIds.length > 0) {
+        throw new Error(`Vocabulary IDs not found for Grade ${grade}: ${missingIds.join(', ')}`);
+    }
+}
 
 const rows = [];
 for (const { entry, vocabulary } of entries) {

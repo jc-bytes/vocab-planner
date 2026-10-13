@@ -68,7 +68,11 @@ async function installFixture(page) {
     // Keep scheduled catalog fixtures available regardless of the CI run date.
     await page.clock.setFixedTime(new Date('2026-09-14T15:00:00Z'));
     await page.goto(`${baseUrl}/student.html`, { waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => window.studentApp?.activities?.manifest?.vocabularies?.length, null, { timeout: 15000 });
+    await page.waitForFunction(() => window.studentApp?.activities, null, { timeout: 15000 });
+    await page.evaluate(async () => {
+        window.studentApp.authDisabled = true;
+        await window.studentApp.activities.loadManifest();
+    });
     await page.evaluate(async () => {
         const app = window.studentApp;
         const source = app.activities.manifest.vocabularies.find(vocab => {
@@ -99,6 +103,172 @@ async function installFixture(page) {
         const style = document.createElement('style');
         style.textContent = 'html body .app-container{--student-sidebar-transition-duration:0ms!important}*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';
         document.head.appendChild(style);
+    });
+}
+
+async function assertWordSearchShortDesktopLayout(page) {
+    // A 1366x768 classroom laptop leaves roughly 640 CSS pixels for the page
+    // after Chrome's tabs and toolbar and the Windows taskbar.
+    await page.setViewportSize({ width: 1366, height: 640 });
+    await page.evaluate(async () => {
+        await import('/js/student/studentFeatureStyles.js');
+        const { WordSearchActivity } = await import('/js/activities/wordSearch.js');
+        const app = window.studentApp;
+        const activityView = document.querySelector('#activity-view');
+        const container = document.querySelector('#activity-container');
+
+        app.activityInstance?.destroy?.();
+        app.switchView('activity-view');
+        activityView.classList.forEach(className => {
+            if (className.startsWith('activity-type-')) activityView.classList.remove(className);
+        });
+        activityView.classList.add('activity-type-word-search');
+        const activityTitle = document.querySelector('#activity-header-title');
+        activityTitle.textContent = 'Word Search';
+        activityTitle.classList.remove('hidden');
+        document.querySelector('#activity-progress-indicator').textContent = 'Progress: 83%';
+        document.querySelector('#activity-progress-indicator').classList.remove('hidden');
+        container.innerHTML = '';
+
+        const words = [
+            { word: 'problem' },
+            { word: 'improve' },
+            { word: 'debug' },
+            { word: 'route' },
+            { word: 'path' },
+            { word: 'test' }
+        ];
+        const activity = new WordSearchActivity(container, words, null, 'student-shell-word-search');
+        activity.foundWords = new Set(activity.words.slice(0, 5).map(word => word.puzzleWord));
+        activity.render();
+        app.activityInstance = activity;
+        activityView.scrollTop = 0;
+    });
+    await page.waitForTimeout(120);
+
+    const layout = await page.evaluate(() => {
+        const rect = selector => {
+            const bounds = document.querySelector(selector)?.getBoundingClientRect();
+            return bounds ? {
+                top: Math.round(bounds.top),
+                right: Math.round(bounds.right),
+                bottom: Math.round(bounds.bottom),
+                left: Math.round(bounds.left),
+                width: Math.round(bounds.width),
+                height: Math.round(bounds.height)
+            } : null;
+        };
+        const activityView = document.querySelector('#activity-view');
+        const wordList = document.querySelector('.word-list-container');
+        const cells = [...document.querySelectorAll('.word-search-cell')];
+        const visibleBottom = Math.min(window.innerHeight, activityView.getBoundingClientRect().bottom);
+        const clippedCells = cells.filter(cell => {
+            const bounds = cell.getBoundingClientRect();
+            return bounds.top < activityView.getBoundingClientRect().top
+                || bounds.bottom > visibleBottom + 1
+                || bounds.left < activityView.getBoundingClientRect().left
+                || bounds.right > activityView.getBoundingClientRect().right;
+        }).length;
+        const firstCell = cells[0]?.getBoundingClientRect();
+
+        return {
+            titleCount: [...activityView.querySelectorAll('h2')]
+                .filter(title => {
+                    const style = window.getComputedStyle(title);
+                    const bounds = title.getBoundingClientRect();
+                    return title.textContent.trim() === 'Word Search'
+                        && style.display !== 'none'
+                        && style.visibility !== 'hidden'
+                        && bounds.width > 0
+                        && bounds.height > 0;
+                }).length,
+            activityOverflowY: window.getComputedStyle(activityView).overflowY,
+            activity: rect('#activity-view'),
+            list: rect('.word-list-container'),
+            grid: rect('.word-search-grid'),
+            gridContainer: rect('.word-search-grid-container'),
+            cellCount: cells.length,
+            clippedCells,
+            cellSize: firstCell ? Math.round(Math.min(firstCell.width, firstCell.height)) : 0,
+            listHasVerticalScroll: wordList.scrollHeight > wordList.clientHeight + 1,
+            newPuzzleVisible: Boolean(document.querySelector('.word-search-header .primary-btn')?.getBoundingClientRect().height),
+            documentOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth
+        };
+    });
+
+    assert.equal(layout.titleCount, 1, `Word Search repeats its page title: ${JSON.stringify(layout)}`);
+    assert.equal(layout.activityOverflowY, 'auto', `Word Search must keep the activity view as its scroll owner: ${JSON.stringify(layout)}`);
+    assert.equal(layout.cellCount, 225, `Word Search grid is incomplete: ${JSON.stringify(layout)}`);
+    assert.equal(layout.clippedCells, 0, `Word Search cells are clipped on a 1366x768 classroom laptop: ${JSON.stringify(layout)}`);
+    assert.ok(layout.list.bottom <= layout.activity.bottom + 1, `Word Search word list is hidden below the classroom viewport: ${JSON.stringify(layout)}`);
+    assert.ok(Math.abs(layout.grid.width - layout.grid.height) <= 2, `Word Search grid is distorted: ${JSON.stringify(layout)}`);
+    assert.ok(layout.cellSize >= 28, `Word Search cells are too small to read on a 1366x768 classroom laptop: ${JSON.stringify(layout)}`);
+    assert.equal(layout.listHasVerticalScroll, false, `Word Search has a nested word-list scrollbar: ${JSON.stringify(layout)}`);
+    assert.equal(layout.newPuzzleVisible, true, `Word Search New Puzzle control is missing: ${JSON.stringify(layout)}`);
+    assert.equal(layout.documentOverflow, 0, `Word Search causes horizontal page overflow: ${JSON.stringify(layout)}`);
+
+    if (snapshotDir) {
+        await page.screenshot({ path: path.join(snapshotDir, '1366x768-laptop-word-search.png'), animations: 'disabled' });
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.evaluate(() => {
+        document.querySelector('#activity-view').scrollTop = 0;
+    });
+    await page.waitForTimeout(120);
+
+    const narrowLayout = await page.evaluate(() => {
+        const activityView = document.querySelector('#activity-view');
+        const wrapper = document.querySelector('.word-search-wrapper');
+        const wordList = document.querySelector('.word-list-container');
+        const grid = document.querySelector('.word-search-grid');
+        const cells = [...document.querySelectorAll('.word-search-cell')];
+        const viewBounds = activityView.getBoundingClientRect();
+        const listBounds = wordList.getBoundingClientRect();
+        const gridBounds = grid.getBoundingClientRect();
+        const firstCell = cells[0]?.getBoundingClientRect();
+        const horizontallyClippedCells = cells.filter(cell => {
+            const bounds = cell.getBoundingClientRect();
+            return bounds.left < viewBounds.left - 1 || bounds.right > viewBounds.right + 1;
+        }).length;
+
+        return {
+            activityOverflowY: window.getComputedStyle(activityView).overflowY,
+            gridColumns: window.getComputedStyle(wrapper).gridTemplateColumns,
+            listBottom: Math.round(listBounds.bottom),
+            gridTop: Math.round(gridBounds.top),
+            gridWidth: Math.round(gridBounds.width),
+            gridHeight: Math.round(gridBounds.height),
+            cellSize: firstCell ? Math.round(Math.min(firstCell.width, firstCell.height)) : 0,
+            horizontallyClippedCells,
+            listHasVerticalScroll: wordList.scrollHeight > wordList.clientHeight + 1,
+            documentScrollable: document.documentElement.scrollHeight > window.innerHeight + 1,
+            documentOverflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth
+        };
+    });
+
+    assert.equal(narrowLayout.activityOverflowY, 'visible', `Narrow Word Search must hand scrolling back to the document: ${JSON.stringify(narrowLayout)}`);
+    assert.equal(narrowLayout.documentScrollable, true, `Narrow Word Search has no usable vertical scroll owner: ${JSON.stringify(narrowLayout)}`);
+    assert.ok(narrowLayout.gridTop >= narrowLayout.listBottom, `Narrow Word Search panels do not stack: ${JSON.stringify(narrowLayout)}`);
+    assert.ok(Math.abs(narrowLayout.gridWidth - narrowLayout.gridHeight) <= 2, `Narrow Word Search grid is distorted: ${JSON.stringify(narrowLayout)}`);
+    assert.ok(narrowLayout.cellSize >= 20, `Narrow Word Search cells are too small to read: ${JSON.stringify(narrowLayout)}`);
+    assert.equal(narrowLayout.horizontallyClippedCells, 0, `Narrow Word Search cells are horizontally clipped: ${JSON.stringify(narrowLayout)}`);
+    assert.equal(narrowLayout.listHasVerticalScroll, false, `Narrow Word Search has a nested word-list scrollbar: ${JSON.stringify(narrowLayout)}`);
+    assert.equal(narrowLayout.documentOverflow, 0, `Narrow Word Search causes horizontal page overflow: ${JSON.stringify(narrowLayout)}`);
+
+    if (snapshotDir) {
+        await page.screenshot({ path: path.join(snapshotDir, '390x844-word-search.png'), animations: 'disabled' });
+    }
+
+    await page.evaluate(() => {
+        window.studentApp.activityInstance?.destroy?.();
+        window.studentApp.activityInstance = null;
+        const activityView = document.querySelector('#activity-view');
+        activityView?.classList.remove('activity-type-word-search');
+        const container = document.querySelector('#activity-container');
+        if (container) container.innerHTML = '';
+        document.querySelector('#activity-header-title')?.classList.add('hidden');
+        document.querySelector('#activity-progress-indicator')?.classList.add('hidden');
     });
 }
 
@@ -473,14 +643,14 @@ async function assertCollapsedSidebar(page) {
         iconPresent: true,
         toggleWidth: 44,
         toggleHeight: 44,
-        navLabels: ['Today', 'Vocabulary', 'Sparks'],
+        navLabels: ['My classes', 'Today', 'Vocabulary'],
         coinTop: 0,
         logoutTop: 0,
         toggleIconCenter: [0, 0],
         activeNavIconCenter: [0, 0],
         overflow: 0
     });
-    assert.match(collapsed.navLabels[3], /^Arcade/);
+    assert.match(collapsed.navLabels[4], /^Arcade/);
     assert.ok(collapsed.coinTop > 700, `collapsed coins are not in the lower rail: ${collapsed.coinTop}`);
     assert.ok(collapsed.logoutTop > collapsed.coinTop, `collapsed logout is not below coins: ${JSON.stringify(collapsed)}`);
     assert.ok(
@@ -671,6 +841,8 @@ try {
     await installFixture(page);
     await page.waitForTimeout(320);
 
+    await assertWordSearchShortDesktopLayout(page);
+
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
         for (const [view, viewId] of views) {
@@ -709,6 +881,7 @@ try {
     }
     await page.clock.setFixedTime(new Date('2026-09-14T15:00:00Z'));
     await page.evaluate(() => window.studentApp.activities.renderStudentHome());
+
     await assertShortDesktopTodayStartsAtTop(page);
     await assertCollapsedSidebar(page);
     await assertResizeTransition(page);

@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_sample_sample_rate",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Sample and sample rate",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "sample",
+      "definition": "One measurement of sound taken at one moment.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/sample"
+    },
+    {
+      "word": "sample rate",
+      "definition": "The number of sound measurements taken each second.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/sample_rate"
+    }
+  ]
+}

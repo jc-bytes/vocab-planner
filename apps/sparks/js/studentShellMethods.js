@@ -1,4 +1,5 @@
-import { $, $$ } from './main.js';
+import { $, $$, refreshIcons } from './main.js';
+import { getStudentSectionForView as resolveStudentSectionForView } from './student/studentSectionRegistry.js';
 
 const STUDENT_SCROLL_KEY_PREFIX = 'student_scroll_position';
 const STUDENT_SCROLL_SAVE_DELAY_MS = 160;
@@ -35,7 +36,7 @@ export class StudentShell {
         toggle.setAttribute('aria-label', isCollapsed ? 'Expand navigation' : 'Collapse navigation');
         toggle.title = isCollapsed ? 'Expand navigation' : 'Collapse navigation';
         toggle.innerHTML = `<i data-lucide="${isCollapsed ? 'panel-left-open' : 'panel-left-close'}" aria-hidden="true"></i>`;
-        window.lucide?.createIcons?.({ root: toggle });
+        refreshIcons(toggle);
 
         if (persist) {
             try {
@@ -80,9 +81,7 @@ export class StudentShell {
         }
 
         this.updateStudentNav(viewId);
-        if (window.lucide && targetView) {
-            window.lucide.createIcons({ root: targetView });
-        }
+        if (targetView) refreshIcons(targetView);
 
         if (shouldRestoreSectionScroll) {
             this.restoreStudentSectionScroll(viewId);
@@ -305,15 +304,7 @@ export class StudentShell {
     }
 
     getStudentSectionForView(viewId) {
-        if (viewId === 'arcade-view') return 'arcade';
-        if (viewId === 'student-sparks-view') return 'sparks';
-        if ([
-            'vocab-selection-view',
-            'activity-menu-view',
-            'activity-view'
-        ].includes(viewId)) return 'vocabulary';
-        if (viewId === 'main-menu-view') return 'today';
-        return '';
+        return resolveStudentSectionForView(viewId);
     }
 
     isStudentWideShell() {

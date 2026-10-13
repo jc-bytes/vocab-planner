@@ -1,4 +1,5 @@
-import { $ } from '../main.js';
+import { captureCoinSession } from './studentProgressCoinMethods.js';
+import { $, refreshIcons } from '../main.js';
 
 export class StudentCoinNotifications {
     constructor(progress) {
@@ -59,6 +60,8 @@ export class StudentCoinNotifications {
     }
 
     showNotificationPanel() {
+        const isCurrent = captureCoinSession(this.progress);
+        if (!isCurrent()) return;
         let panel = $('#coin-notification-panel');
         if (panel) panel.remove();
         if (this.sm.coinData.giftCoins <= 0) return;
@@ -118,10 +121,11 @@ export class StudentCoinNotifications {
         `;
         document.head.appendChild(style);
         document.body.appendChild(panel);
-        window.lucide?.createIcons({ root: panel });
+        refreshIcons(panel);
 
         $('#close-notification-panel').addEventListener('click', () => panel.remove());
         $('#accept-gift-coins').addEventListener('click', async () => {
+            if (!isCurrent()) { panel.remove(); return; }
             await this.progress.acceptGiftCoins();
             panel.remove();
         });

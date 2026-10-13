@@ -100,14 +100,14 @@ groupSparksByWeek(sparks) {
     },
 
 formatSparkStatusLabel(status) {
-        if (status === 'scheduled') return 'Scheduled';
+        if (status === 'scheduled') return 'Saved material';
         if (status === 'archived') return 'Archived';
         return 'Draft';
     },
 
 formatSparkDateLabel(spark) {
-        if (!spark.scheduledDate) return 'No scheduled date';
-        return `Starts ${formatShortDate(spark.scheduledDate)}`;
+        if (!spark.scheduledDate) return 'Library material';
+        return `Library date ${formatShortDate(spark.scheduledDate)}`;
     },
 
 getSparkTypeLabel(sparkType) {
@@ -155,4 +155,3 @@ findSparkById(id) {
         return this.weeklySparkItems.find(spark => spark.id === id) || null;
     },
 };
-

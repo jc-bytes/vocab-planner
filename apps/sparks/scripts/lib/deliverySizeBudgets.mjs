@@ -31,6 +31,19 @@ export const DELIVERY_SIZE_BUDGETS = Object.freeze([
   })
 ]);
 
+export const DELIVERY_SIZE_WARNING_RATIO = 0.95;
+
+export function getDeliverySizeStatus(result) {
+  const actualGzipBytes = Number(result?.actualGzipBytes) || 0;
+  const maximumGzipBytes = Number(result?.maximumGzipBytes) || 0;
+  const usageRatio = maximumGzipBytes > 0 ? actualGzipBytes / maximumGzipBytes : 0;
+  return Object.freeze({
+    usageRatio,
+    headroomBytes: Math.max(0, maximumGzipBytes - actualGzipBytes),
+    shouldWarn: usageRatio >= DELIVERY_SIZE_WARNING_RATIO
+  });
+}
+
 function findManifestKey(manifest, name) {
   const matches = Object.entries(manifest)
     .filter(([, entry]) => entry?.name === name);

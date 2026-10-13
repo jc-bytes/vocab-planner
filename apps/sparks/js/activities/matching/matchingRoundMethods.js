@@ -1,3 +1,5 @@
+import { shuffled } from '../../randomUtils.js';
+
 export const matchingRoundMethods = {
 getAllIds() {
         return this.words.map((_, index) => index);
@@ -8,7 +10,7 @@ getRoundSize() {
     },
 
 shuffleIds(ids) {
-        return [...ids].sort(() => Math.random() - 0.5);
+        return shuffled(ids);
     },
 
 sampleRoundIds() {
@@ -171,4 +173,3 @@ getScore() {
         };
     },
 };
-

@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_input_variable",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Input and variable",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "3",
+  "month": "October",
+  "week": 4,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "input",
+      "definition": "Information sent into a computer.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/input"
+    },
+    {
+      "word": "variable",
+      "definition": "A named place in a program that holds a changeable value.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/variable"
+    }
+  ]
+}

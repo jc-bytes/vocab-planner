@@ -15,7 +15,7 @@ export class StudentActivityStateStore {
     resetActivityState(activityType) {
         if (!this.sm.currentVocab) return;
 
-        const vocabName = this.sm.currentVocab.name;
+        const vocabName = this.activities.getUnitProgressKey(this.sm.currentVocab);
         const vocabID = this.sm.currentVocab.id || vocabName;
         const wordCount = this.sm.currentVocab.words.length;
         const firstWord = this.sm.currentVocab.words[0]?.word || 'empty';

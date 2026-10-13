@@ -30,6 +30,8 @@ const { teacherVocabularyRowViewMethods } = await import('../js/teacherVocabular
 const { teacherVocabularyWorkflowMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
 const vocabularyEditorListeners = await readFile(new URL('../js/teacherVocabularyEditorListeners.js', import.meta.url), 'utf8');
 const vocabularyStorageSource = await readFile(new URL('../js/teacherVocabularyStorage.js', import.meta.url), 'utf8');
+const vocabularyDataSource = await readFile(new URL('../js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js', import.meta.url), 'utf8');
+const vocabularySessionSource = await readFile(new URL('../js/teacherVocabularySession.js', import.meta.url), 'utf8');
 const teacherSource = await readFile(new URL('../js/teacher.js', import.meta.url), 'utf8');
 
 class TestTeacherManager {
@@ -84,6 +86,13 @@ test('teacher composition omits obsolete vocabulary and progress aliases', () =>
     assert.doesNotMatch(vocabularyStorageSource, /\bdeleteLocalVocab\b/);
     assert.match(vocabularyStorageSource, /this\.removeLocalVocab\(vocab\.id\)/);
     assert.doesNotMatch(teacherSource, /\bVOCAB_COLLECTION\b/);
+    assert.doesNotMatch(teacherSource, /teacherLibrary(?:Cache|Promise)/);
+    assert.doesNotMatch(vocabularyDataSource, /teacherLibrary(?:Cache|Promise)/);
+    assert.doesNotMatch(vocabularySessionSource, /teacherLibrary(?:Cache|Promise)/);
+    assert.match(vocabularyDataSource, /queryFn: \(\{ signal \}\) => this\.fetchCloudVocabs\(\{ isCurrent, signal \}\)/);
+    assert.match(vocabularyDataSource, /loadManifest\(\{ fresh: forceRefresh \}\)/);
+    assert.match(vocabularyDataSource, /queryService\.(?:refresh|ensure)/);
+    assert.doesNotMatch(vocabularyStorageSource, /localStorage\.setItem\('teacher_vocab_library'[\s\S]{0,120}invalidateTeacherLibraryCache/);
 });
 
 test('Vocabulary workflow navigation reserves the route before lazy activation', () => {

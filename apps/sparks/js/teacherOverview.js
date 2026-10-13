@@ -1,8 +1,17 @@
 import { $, escapeHtml } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
+import { getActivityLabel } from './activityMetadata.js';
 
 const OVERVIEW_PAGE = teacherPageRegistry.get('overview');
+const OVERVIEW_QUERY_KEY = ['teacher', 'dashboard-analytics'];
+const OVERVIEW_STALE_TIME_MS = 60_000;
+
+function getTeacherAccountId(owner) {
+    if (owner.authDisabled) return 'local-development';
+    return owner.currentUser?.uid || owner.currentUser?.id || '';
+}
 
 export function installTeacherOverviewMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
@@ -11,19 +20,14 @@ export function installTeacherOverviewMethods(TeacherManager) {
             this.renderOverviewLoadingState();
             this.loadOverviewVocabCount();
 
-            if (this.overviewAnalytics) {
-                this.renderOverviewStats();
-                this.renderOverviewRecentActivity();
-                return;
-            }
-
             this.scheduleOverviewStudentDataLoad();
         },
 
         renderOverviewLoadingState() {
             $('#overview-total-students').textContent = this.overviewAnalytics ? this.overviewAnalytics.totalStudents : '--';
-            $('#overview-active-students').textContent = this.overviewAnalytics ? this.overviewAnalytics.activeStudents : '--';
-            $('#overview-avg-coins').textContent = this.overviewAnalytics ? this.overviewAnalytics.averageCoins : '--';
+            $('#overview-recent-activity-count').textContent = this.overviewAnalytics
+                ? `${this.overviewAnalytics.recentActivities?.length || 0}`
+                : '--';
             const recentContainer = $('#overview-recent-activity');
             if (recentContainer && !this.overviewAnalytics) {
                 recentContainer.innerHTML = '<div class="loading-spinner runtime-status">Loading recent activity...</div>';
@@ -31,12 +35,20 @@ export function installTeacherOverviewMethods(TeacherManager) {
         },
 
         scheduleOverviewStudentDataLoad() {
-            if (this.overviewStudentLoadScheduled) return;
-            this.overviewStudentLoadScheduled = true;
+            const accountId = getTeacherAccountId(this);
+            const generation = this.teacherSettingsSessionGeneration || 0;
 
             const load = async () => {
                 try {
-                    this.overviewAnalytics = await supabaseService.getTeacherDashboardAnalytics();
+                    const analytics = await serverStateQuery.ensure({
+                        accountId,
+                        key: OVERVIEW_QUERY_KEY,
+                        staleTime: OVERVIEW_STALE_TIME_MS,
+                        queryFn: () => supabaseService.getTeacherDashboardAnalytics()
+                    });
+                    if (generation !== (this.teacherSettingsSessionGeneration || 0)
+                        || accountId !== getTeacherAccountId(this)) return;
+                    this.overviewAnalytics = analytics;
                     if (this.getSectionForView(OVERVIEW_PAGE.viewId) === OVERVIEW_PAGE.id && !$(`#${OVERVIEW_PAGE.viewId}`)?.classList.contains('hidden')) {
                         this.renderOverviewStats();
                         this.renderOverviewRecentActivity();
@@ -46,8 +58,6 @@ export function installTeacherOverviewMethods(TeacherManager) {
                     if (recentContainer) {
                         recentContainer.innerHTML = '<p class="teacher-empty-state">Student activity is unavailable right now.</p>';
                     }
-                } finally {
-                    this.overviewStudentLoadScheduled = false;
                 }
             };
 
@@ -57,8 +67,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
         renderOverviewStats() {
             const analytics = this.overviewAnalytics || {};
             $('#overview-total-students').textContent = `${analytics.totalStudents ?? '--'}`;
-            $('#overview-active-students').textContent = `${analytics.activeStudents ?? '--'}`;
-            $('#overview-avg-coins').textContent = `${analytics.averageCoins ?? '--'}`;
+            $('#overview-recent-activity-count').textContent = `${analytics.recentActivities?.length || 0}`;
         },
 
         async loadOverviewVocabCount() {
@@ -79,11 +88,6 @@ export function installTeacherOverviewMethods(TeacherManager) {
         renderOverviewRecentActivity() {
             const container = $('#overview-recent-activity');
             if (!container) return;
-            const activityLabels = {
-                matching: 'Matching', flashcards: 'Flashcards', quiz: 'Quiz', hangman: 'Hangman',
-                fillInBlank: 'Fill in Blank', wordSearch: 'Word Search', crossword: 'Crossword',
-                scramble: 'Word Scramble', wordle: 'Vocabulary Wordle', illustration: 'Word Hunt'
-            };
             const recent = (this.overviewAnalytics?.recentActivities || []).slice(0, 20);
 
             if (recent.length === 0) {
@@ -93,7 +97,7 @@ export function installTeacherOverviewMethods(TeacherManager) {
 
             container.innerHTML = recent.map(activity => {
                 const name = activity.student || 'Unknown student';
-                const label = activityLabels[activity.activityType] || activity.activityType || 'Activity';
+                const label = getActivityLabel(activity.activityType);
                 const date = activity.occurredAt ? new Date(activity.occurredAt).toLocaleString() : '';
                 return `
                     <div class="teacher-activity-item">

@@ -152,6 +152,10 @@ test('profile completeness defaults to the manager-owned profile', () => {
 
     assert.equal(auth.hasCompleteStudentProfile(), true);
     manager.studentProfile.group = '';
+    manager.studentProfile.grade = '';
+    assert.equal(auth.hasCompleteStudentProfile(), true);
+    manager.studentProfile.lastName = '';
+    manager.studentProfile.name = manager.studentProfile.firstName;
     assert.equal(auth.hasCompleteStudentProfile(), false);
 });
 

@@ -1,6 +1,7 @@
 import process from 'node:process';
 import { chromium } from 'playwright';
 
+import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
 import {
     AUDIT_PASSWORD,
     AUDIT_STUDENT_EMAIL,
@@ -24,6 +25,22 @@ async function resolveServer() {
 }
 
 async function addLocalSupabaseOverride(context, browserConfig) {
+    if (process.env.SPARKS_TEST_SUPABASE_WORKDIR) {
+        const api = new URL(browserConfig.url);
+        if (api.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(api.hostname)) {
+            throw new Error('Isolated auth smoke requires a loopback Supabase API.');
+        }
+        await context.grantPermissions(['local-network-access'], { origin: baseUrl });
+        await context.route(`${baseUrl}/*.html`, async route => {
+            const response = await route.fetch();
+            const html = await response.text();
+            const body = html.replace(/(<meta\b[^>]*http-equiv="Content-Security-Policy"[^>]*content=")([^"]*)("[^>]*>)/gi,
+                (_, start, policy, end) => start + policy.replace(/(connect-src\s+)([^;]*)/g,
+                    (_, directive, sources) => directive + sources.replace(/(http|ws):\/\/(?:127\.0\.0\.1|localhost):54321(?=\s|$)/g,
+                        (_, protocol) => `${protocol}://${api.host}`)) + end);
+            await route.fulfill({ response, body });
+        });
+    }
     await context.addInitScript(config => {
         window.SUPABASE_CONFIG = {
             url: config.url,
@@ -107,19 +124,27 @@ try {
     await loginTeacher(teacherPage);
     await teacherPage.locator('#tab-vocabulary').click();
     await teacherPage.locator('#teacher-dashboard-view:not(.hidden)').waitFor({ timeout: 15000 });
-    await teacherPage.locator('#tab-sparks').click();
+    await teacherPage.locator(
+        '#teacher-dashboard-view:not(.hidden) [data-content-destination="sparks"]'
+    ).click();
     await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
+    await assertNoAccessibilityViolations(teacherPage, 'Authenticated teacher Sparks page');
 
     await loginStudent(studentPage);
-    await studentPage.locator('#main-menu-view:not(.hidden), #vocab-selection-view:not(.hidden)').first().waitFor({ timeout: 15000 });
-    await studentPage.goto(`${baseUrl}/student.html#/units?all=1`, { waitUntil: 'domcontentloaded' });
-    await studentPage.locator('#vocab-selection-view:not(.hidden)').waitFor({ timeout: 15000 });
+    await studentPage.locator('#student-classes-view:not(.hidden), #main-menu-view:not(.hidden), #vocab-selection-view:not(.hidden)').first().waitFor({ timeout: 15000 });
+    await studentPage.goto(`${baseUrl}/student.html#/classes`, { waitUntil: 'domcontentloaded' });
+    await studentPage.locator('#student-classes-view:not(.hidden)').waitFor({ timeout: 15000 });
+    await studentPage.getByRole('button', { name: 'Cross-browser Audit Vocabulary', exact: true }).waitFor();
+    await assertNoAccessibilityViolations(studentPage, 'Authenticated student Classes page');
 
     if (problems.length) {
         throw new Error(`Browser errors during auth smoke:\n${problems.join('\n')}`);
     }
 
     console.log('Authenticated UI smoke passed.');
+} catch (error) {
+    if (problems.length) console.error(problems.join('\n'));
+    throw error;
 } finally {
     await browser?.close().catch(() => {});
     if (server) server.kill();

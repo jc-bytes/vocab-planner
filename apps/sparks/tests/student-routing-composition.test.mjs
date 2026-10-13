@@ -266,6 +266,30 @@ test('reset clears only routing lifecycle state', () => {
     assert.equal(routing.games, games);
 });
 
+test('session reset invalidates a pending lazy Arcade construction', async () => {
+    const routing = new StudentRouting(createManager());
+    let resolveModule;
+    let constructions = 0;
+    routing.loadGamesModule = () => new Promise(resolve => {
+        resolveModule = resolve;
+    });
+
+    const pendingGames = routing.getGames();
+    routing.resetSession();
+    resolveModule({
+        StudentGames: class {
+            constructor() {
+                constructions += 1;
+            }
+        }
+    });
+
+    assert.equal(await pendingGames, null);
+    assert.equal(constructions, 0);
+    assert.equal(routing.games, null);
+    assert.equal(routing.gamesPromise, null);
+});
+
 test('arcade routing redirects blocked students to their oldest pending unit', async () => {
     const manager = createManager();
     const pendingVocab = { id: 'unit-1', name: 'Pending Unit' };

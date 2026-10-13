@@ -7,10 +7,8 @@ export const SPARK_TYPE_META = {
 };
 
 export const SPARK_VIEW_TABS = [
-    { id: 'week', label: 'This Week', icon: 'calendar-days' },
-    { id: 'month', label: 'This Month', icon: 'calendar-range' },
     { id: 'types', label: 'By Type', icon: 'list-filter' },
-    { id: 'planning', label: 'Planning', icon: 'archive' }
+    { id: 'planning', label: 'Drafts and archive', icon: 'archive' }
 ];
 
 export const SPARK_TYPE_FILTERS = [

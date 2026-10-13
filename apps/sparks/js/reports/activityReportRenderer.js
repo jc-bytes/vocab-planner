@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
 import { PDF_PAGE_FORMAT } from "./reportConstants.js";
 
 export const activityReportMethods = {
@@ -196,30 +197,53 @@ export const activityReportMethods = {
         const rows = this.getActivityVocabularyRows(vocabOrName);
         if (rows.length === 0) return false;
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const pageWidth = pdf.internal.pageSize.getWidth();
         const margin = 42;
         let y = this.startActivityAppendixPage(
             pdf,
             `${activityLabel} Completed Work`,
             'Vocabulary used in this completed activity. Saved activity state is reflected where available.'
         );
-
-        rows.forEach(row => {
-            const definitionLines = pdf.splitTextToSize(row.definition || 'No definition saved', pageWidth - 232);
-            const rowHeight = Math.max(34, 16 + (definitionLines.length * 9));
-            if (y + rowHeight > pageHeight - 46) {
-                y = this.startActivityAppendixPage(pdf, `${activityLabel} Completed Work - continued`);
+        autoTable(pdf, {
+            startY: y,
+            head: [['Status', 'Vocabulary word', 'Definition']],
+            body: rows.map(row => ['Completed', `${row.number}. ${row.word}`, row.definition || 'No definition saved']),
+            margin: { top: 86, right: margin, bottom: 46, left: margin },
+            tableWidth: 528,
+            showHead: 'everyPage',
+            pageBreak: 'auto',
+            rowPageBreak: 'avoid',
+            styles: {
+                font: 'helvetica',
+                fontSize: 8,
+                textColor: [75, 85, 99],
+                lineColor: [229, 231, 235],
+                lineWidth: 0.5,
+                cellPadding: 9,
+                minCellHeight: 34,
+                valign: 'middle',
+                overflow: 'linebreak'
+            },
+            headStyles: {
+                fillColor: [243, 244, 246],
+                textColor: [31, 41, 55],
+                fontStyle: 'bold',
+                fontSize: 9
+            },
+            columnStyles: {
+                0: { cellWidth: 78, fontStyle: 'bold', textColor: [6, 95, 70] },
+                1: { cellWidth: 150, fontStyle: 'bold', fontSize: 9, textColor: [31, 41, 55] },
+                2: { cellWidth: 300 }
+            },
+            willDrawPage: data => {
+                if (data.pageNumber === 1) return;
+                this.setPdfTextStyle(pdf, { size: 16, style: 'bold', color: [17, 24, 39] });
+                pdf.text(`${activityLabel} Completed Work - continued`, margin, 48);
+                pdf.setDrawColor(79, 70, 229);
+                pdf.setLineWidth(1.2);
+                pdf.line(margin, 66, pdf.internal.pageSize.getWidth() - margin, 66);
             }
-            pdf.setDrawColor(229, 231, 235);
-            pdf.rect(margin, y, pageWidth - (margin * 2), rowHeight);
-            this.setPdfTextStyle(pdf, { size: 8, style: 'bold', color: [6, 95, 70] });
-            pdf.text('COMPLETED', margin + 9, y + 18);
-            this.setPdfTextStyle(pdf, { size: 9, style: 'bold', color: [31, 41, 55] });
-            pdf.text(`${row.number}. ${row.word}`, margin + 78, y + 18);
-            this.setPdfTextStyle(pdf, { size: 8, color: [75, 85, 99] });
-            pdf.text(definitionLines, margin + 148, y + 17);
-            y += rowHeight;
         });
+        y = (pdf.lastAutoTable?.finalY || y) + 18;
 
         if (activityLabel === 'Matching' && Array.isArray(state?.roundStats) && state.roundStats.length > 0) {
             y += 18;
@@ -347,16 +371,34 @@ export const activityReportMethods = {
             this.setPdfTextStyle(pdf, { size: 13, style: 'bold', color: [31, 41, 55] });
             pdf.text('Saved evidence', margin, y);
             y += 18;
-            evidenceRows.forEach(row => {
-                const valueLines = this.getPdfTextLines(pdf, row.value, contentWidth - 170, 9);
-                const rowHeight = Math.max(30, 14 + (valueLines.length * 10));
-                pdf.setDrawColor(229, 231, 235);
-                pdf.rect(margin, y, contentWidth, rowHeight);
-                this.setPdfTextStyle(pdf, { size: 9, style: 'bold', color: [55, 65, 81] });
-                pdf.text(row.label, margin + 10, y + 18);
-                this.setPdfTextStyle(pdf, { size: 9, color: [75, 85, 99] });
-                pdf.text(valueLines, margin + 170, y + 18);
-                y += rowHeight;
+            autoTable(pdf, {
+                startY: y,
+                body: evidenceRows.map(row => [row.label, row.value]),
+                margin: { top: 70, right: margin, bottom: 46, left: margin },
+                tableWidth: contentWidth,
+                showHead: 'never',
+                pageBreak: 'auto',
+                rowPageBreak: 'avoid',
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 9,
+                    textColor: [75, 85, 99],
+                    lineColor: [229, 231, 235],
+                    lineWidth: 0.5,
+                    cellPadding: 10,
+                    minCellHeight: 30,
+                    valign: 'middle',
+                    overflow: 'linebreak'
+                },
+                columnStyles: {
+                    0: { cellWidth: 160, fontStyle: 'bold', textColor: [55, 65, 81] },
+                    1: { cellWidth: contentWidth - 160 }
+                },
+                willDrawPage: data => {
+                    if (data.pageNumber === 1) return;
+                    this.setPdfTextStyle(pdf, { size: 13, style: 'bold', color: [31, 41, 55] });
+                    pdf.text('Saved evidence - continued', margin, 48);
+                }
             });
         }
 
@@ -365,4 +407,3 @@ export const activityReportMethods = {
         pdf.save(this.buildActivityReportFileName(studentProfile, vocabOrName, activityType, options));
     },
 };
-

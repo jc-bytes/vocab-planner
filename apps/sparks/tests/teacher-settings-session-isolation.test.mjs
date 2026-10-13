@@ -278,3 +278,105 @@ test('all auth exit paths clear account-owned settings state', async () => {
     assert.match(authSource, /else \{[\s\S]*clearTeacherSettingsSessionState\?\.\(\)[\s\S]*currentUser = null/);
     assert.match(listenersSource, /clearTeacherSettingsSessionState\?\.\(\)[\s\S]*currentUser = null/);
 });
+
+const { schoolContext } = await import('../js/services/schoolContext.js');
+const { saveTeacherSubjects } = await import('../js/services/teacherSubjectWrites.js');
+
+async function subjectWriteFixture(t) {
+    t.mock.method(supabaseService, 'init', async () => {});
+    t.mock.method(supabaseService, 'getClient', () => ({ rpc: () => ({ abortSignal: async () => ({ data: { schools: [
+        { id: 'school-a', roles: ['teacher'] }, { id: 'school-b', roles: ['teacher'] }
+    ] }, error: null }) }) }));
+    await schoolContext.load('teacher-a');
+    t.after(() => schoolContext.clear());
+    const requests = [];
+    t.mock.method(supabaseService, 'getClient', () => ({ from: () => ({
+        update(payload) { this.payload = payload; return this; },
+        insert(payload) { this.payload = payload; return this; },
+        eq() { return this; }, select() { return this; },
+        single() {
+            const pending = deferred();
+            const request = { ...pending, payload: this.payload };
+            requests.push(request);
+            return { abortSignal(signal) { request.signal = signal; return this; }, then: (...args) => pending.promise.then(...args) };
+        }
+    }) }));
+    const manager = createManager();
+    manager.subjects = [
+        { id: '11111111-1111-1111-1111-111111111111', name: 'Subject one' },
+        { id: '22222222-2222-2222-2222-222222222222', name: 'Subject two' }
+    ];
+    return { manager, requests };
+}
+
+async function waitForSubjectRequest(requests, count = 1) {
+    for (let attempt = 0; attempt < 20 && requests.length < count; attempt++) await new Promise(resolve => setImmediate(resolve));
+    assert.equal(requests.length, count);
+}
+
+function finishSubject(request, id = '11111111-1111-1111-1111-111111111111') {
+    request.resolve({ data: { id, ...request.payload }, error: null });
+}
+
+test('subject caller and repository cancel account/school changes before the first dispatch', async (t) => {
+    const { manager, requests } = await subjectWriteFixture(t);
+    const saving = manager.saveSubjectSettings();
+    manager.currentUser = { uid: 'teacher-b' };
+    assert.equal(await saving, false);
+    assert.equal(requests.length, 0);
+    const repositorySave = subjectsRepository.saveAll(manager.subjects);
+    schoolContext.select('school-b');
+    await assert.rejects(repositorySave, error => error.name === 'AbortError');
+    assert.equal(requests.length, 0);
+});
+
+test('subject batches preserve committed items and stop subsequent account or school writes', async (t) => {
+    for (const replacement of ['account', 'school']) {
+        await t.test(replacement, async subtest => {
+            const { manager, requests } = await subjectWriteFixture(subtest);
+            const saving = manager.saveSubjectSettings();
+            await waitForSubjectRequest(requests);
+            if (replacement === 'account') manager.currentUser = { uid: 'teacher-b' };
+            else schoolContext.select('school-b');
+            clearTeacherSettingsSessionState(manager);
+            manager.subjects = [{ slug: 'replacement-draft', name: 'Replacement draft' }];
+            finishSubject(requests[0]);
+            assert.equal(await saving, false);
+            assert.equal(requests.length, 1, 'The already dispatched item remains; no later item is sent');
+            assert.equal(manager.subjects[0].slug, 'replacement-draft');
+            assert.equal(manager.subjectSettingsLoaded, false);
+        });
+    }
+});
+
+test('subject writes recheck ownership after initialization and forward cancellation', async (t) => {
+    const initialized = deferred();
+    let current = true, dispatched = 0;
+    const service = { init: () => initialized.promise, getClient: () => { dispatched++; return {}; } };
+    const pending = saveTeacherSubjects(service, [{}], 'school-a', { isCurrent: () => current });
+    current = false;
+    initialized.resolve();
+    await assert.rejects(pending, error => error.name === 'AbortError');
+    assert.equal(dispatched, 0);
+    const { manager, requests } = await subjectWriteFixture(t);
+    const controller = new AbortController();
+    const saving = subjectsRepository.saveAll(manager.subjects, { signal: controller.signal });
+    await waitForSubjectRequest(requests);
+    assert.equal(requests[0].signal, controller.signal);
+    controller.abort();
+    finishSubject(requests[0]);
+    await assert.rejects(saving, error => error.name === 'AbortError');
+    assert.equal(requests.length, 1);
+});
+
+test('an unchanged subject session still saves every subject in order', async (t) => {
+    const { manager, requests } = await subjectWriteFixture(t);
+    const saving = manager.saveSubjectSettings();
+    await waitForSubjectRequest(requests);
+    finishSubject(requests[0]);
+    await waitForSubjectRequest(requests, 2);
+    finishSubject(requests[1], '22222222-2222-2222-2222-222222222222');
+    assert.equal(await saving, true);
+    assert.deepEqual(requests.map(request => request.payload.name), ['Subject one', 'Subject two']);
+    assert.equal(manager.subjectSettingsLoaded, true);
+});

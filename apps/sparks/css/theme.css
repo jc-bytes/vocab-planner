@@ -32,6 +32,21 @@
     --color-on-interactive: var(--color-on-brand);
     --color-interactive-hover: var(--color-brand-hover);
     --color-interactive-disabled: rgba(203, 213, 245, 0.45);
+    --color-control-background: rgba(15, 23, 42, 0.45);
+    --color-control-background-muted: rgba(15, 23, 42, 0.28);
+    --color-control-background-strong: rgba(15, 23, 42, 0.72);
+    --color-surface-subtle: rgba(255, 255, 255, 0.05);
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-placeholder: rgba(255, 255, 255, 0.55);
+    --color-border-interactive: rgba(255, 255, 255, 0.35);
+    --color-border-interactive-hover: rgba(255, 255, 255, 0.65);
+    --color-text-soft: #d7e3f8;
+    --color-danger-surface: rgba(239, 68, 68, 0.16);
+    --color-on-danger-surface: #fecaca;
+    --color-accent-strong: #fb923c;
+    --shadow-surface: 0 14px 30px -22px rgba(15, 23, 42, 0.7);
+    --shadow-surface-hover: 0 20px 45px -20px rgba(15, 23, 42, 0.75);
+    --shadow-dialog: 0 25px 50px -20px rgba(0, 0, 0, 0.8);
 
     /* Compatibility aliases for component families not migrated yet. */
     --primary-color: var(--color-brand);
@@ -70,6 +85,21 @@
     --color-on-interactive: var(--color-on-brand);
     --color-interactive-hover: var(--color-brand-hover);
     --color-interactive-disabled: rgba(194, 198, 214, 0.45);
+    --color-control-background: rgba(15, 23, 42, 0.45);
+    --color-control-background-muted: rgba(15, 23, 42, 0.28);
+    --color-control-background-strong: rgba(15, 23, 42, 0.72);
+    --color-surface-subtle: rgba(255, 255, 255, 0.05);
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-placeholder: rgba(203, 213, 245, 0.62);
+    --color-border-interactive: rgba(255, 255, 255, 0.35);
+    --color-border-interactive-hover: rgba(255, 255, 255, 0.65);
+    --color-text-soft: #d7e3f8;
+    --color-danger-surface: rgba(239, 68, 68, 0.16);
+    --color-on-danger-surface: #fecaca;
+    --color-accent-strong: #fb923c;
+    --shadow-surface: 0 14px 30px -22px rgba(15, 23, 42, 0.7);
+    --shadow-surface-hover: 0 20px 45px -20px rgba(15, 23, 42, 0.75);
+    --shadow-dialog: 0 25px 50px -20px rgba(0, 0, 0, 0.8);
 
     /* Student palette details used by existing feature styles. */
     --color-surface-container-lowest: #060e20;

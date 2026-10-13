@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_table_data",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Table and data",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "table",
+      "definition": "Information arranged in rows and columns.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/table"
+    },
+    {
+      "word": "data",
+      "definition": "Facts and values that a computer can store and use.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/data"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import {
     DEFAULT_SUBJECT_SLUG,
     getVocabSubjectSlug
 } from './services/vocabularyApi.js';
+import { parseVocabularyJson } from './services/vocabularyValidation.js';
 
 class TeacherVocabularyEditorCoreMethods {
     startNewVocab() {
@@ -95,19 +96,21 @@ class TeacherVocabularyEditorCoreMethods {
     }
 
     updatePlacementControlState() {
-        const isDerived = Boolean(this.vocabSet.assignedDate);
         ['#vocab-trimester', '#vocab-month', '#vocab-week'].forEach(selector => {
             const field = $(selector);
             if (!field) return;
-            field.disabled = isDerived;
-            field.title = isDerived
-                ? 'Derived from the assigned date and school calendar. Clear Assigned Date to edit manually.'
-                : '';
+            field.disabled = false;
+            field.title = 'Library organization only. Set class availability in Assignments.';
         });
     }
 
     setVocabPlacementField(field, value) {
         const cleanedValue = String(value || '').trim();
+        // A deliberate placement edit replaces legacy date-derived organization.
+        // Until then the imported date remains intact for compatibility.
+        this.vocabSet.assignedDate = '';
+        const legacyDate = $('#vocab-assigned-date');
+        if (legacyDate) legacyDate.value = '';
 
         if (field === 'trimester') {
             const trimester = this.normalizeTeacherTrimester(cleanedValue);
@@ -183,6 +186,8 @@ class TeacherVocabularyEditorCoreMethods {
             week ? `week${week}` : '',
             title
         ].filter(Boolean);
+        const owner = this.currentUser?.uid || this.currentUser?.id;
+        if (owner) parts.unshift(owner);
         return parts.join('_') || `vocab_${Date.now()}`;
     }
 
@@ -275,7 +280,7 @@ class TeacherVocabularyEditorCoreMethods {
         reader.onload = (e) => {
             if (!this.isTeacherNavigationCurrent(navigation)) return;
             try {
-                const data = JSON.parse(e.target.result);
+                const data = parseVocabularyJson(e.target.result);
                 data.subjectSlug = getVocabSubjectSlug(data);
                 this.beginTeacherVocabularyDocument();
                 this.vocabSet = data;
@@ -287,7 +292,7 @@ class TeacherVocabularyEditorCoreMethods {
                 this.showEditor();
             } catch (err) {
                 if (!this.isTeacherNavigationCurrent(navigation)) return;
-                alert('Error parsing JSON file');
+                alert(err?.message || 'Could not import that vocabulary file.');
                 console.error(err);
             }
         };

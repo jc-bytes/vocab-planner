@@ -3,6 +3,9 @@ const STUDENT_STORAGE_QUARANTINE_PREFIX = 'student:quarantine:v1';
 const LOCAL_DEVELOPMENT_OWNER = 'local-dev';
 
 let activeStudentOwnerId = LOCAL_DEVELOPMENT_OWNER;
+let activeAssignmentId = '';
+
+export function setStudentActivityAssignment(id = '') { activeAssignmentId = String(id || ''); }
 
 export function normalizeStudentOwnerId(value) {
     const candidate = typeof value === 'object'
@@ -12,6 +15,7 @@ export function normalizeStudentOwnerId(value) {
 }
 
 export function setActiveStudentStorageOwner(value) {
+    activeAssignmentId = '';
     activeStudentOwnerId = normalizeStudentOwnerId(value) || LOCAL_DEVELOPMENT_OWNER;
     return activeStudentOwnerId;
 }
@@ -92,7 +96,13 @@ export function readStudentJson(baseKey, fallback = null, options = {}) {
     const rawValue = readStudentValue(baseKey, options);
     if (rawValue === null) return fallback;
     try {
-        return JSON.parse(rawValue);
+        const value = JSON.parse(rawValue);
+        if (!options.validate) return value;
+
+        const validated = options.validate(value);
+        if (validated !== null && validated !== undefined) return validated;
+        console.warn(`Student storage key ${baseKey} does not match its expected format.`);
+        return fallback;
     } catch (error) {
         console.warn(`Could not parse student storage key ${baseKey}:`, error);
         return fallback;
@@ -104,17 +114,27 @@ export function writeStudentJson(baseKey, value, options = {}) {
 }
 
 export function getStudentActivityStorageKey(legacyKey) {
-    return `activity:${String(legacyKey || '').trim()}`;
+    return `activity:${activeAssignmentId ? activeAssignmentId + ':' : ''}${String(legacyKey || '').trim()}`;
 }
 
 export function readStudentActivityValue(legacyKey, options = {}) {
+    if (activeAssignmentId) return null; // Assigned games restore the normalized unit state.
     return readStudentValue(getStudentActivityStorageKey(legacyKey), {
         ...options,
         legacyKeys: [legacyKey, ...(options.legacyKeys || [])]
     });
 }
 
+export function readStudentActivityJson(legacyKey, fallback = null, options = {}) {
+    if (activeAssignmentId) return fallback;
+    return readStudentJson(getStudentActivityStorageKey(legacyKey), fallback, {
+        ...options,
+        legacyKeys: [legacyKey, ...(options.legacyKeys || [])]
+    });
+}
+
 export function writeStudentActivityValue(legacyKey, value, options = {}) {
+    if (activeAssignmentId) return; // onSaveState persists through the owner/assignment queue.
     return writeStudentValue(getStudentActivityStorageKey(legacyKey), value, options);
 }
 

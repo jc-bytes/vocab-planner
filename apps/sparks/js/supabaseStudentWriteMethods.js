@@ -1,12 +1,10 @@
 import { mapScoreRow } from './services/supabaseValues.js';
+import { createUniqueId } from './randomUtils.js';
+import { requestWithTimeout } from './services/requestReliability.js';
 
 const firstRow = (data) => Array.isArray(data) ? data[0] : data;
 
-const createEventId = operation => {
-    const randomPart = globalThis.crypto?.randomUUID?.()
-        || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-    return `${operation}:${randomPart}`;
-};
+const createEventId = operation => createUniqueId(`${operation}:`);
 
 const requireRpcResult = (mapper, data, error) => {
     if (error) throw error;
@@ -35,6 +33,11 @@ async function resolveExpectedStudentOwner(service, options = {}) {
     }
 
     return expectedOwnerUserId;
+}
+
+function assertCoinOperationCurrent(options) {
+    options.signal?.throwIfAborted();
+    if (options.isCurrent && !options.isCurrent()) throw new DOMException('Coin session changed', 'AbortError');
 }
 
 export function installSupabaseStudentWriteMethods(service) {
@@ -115,15 +118,19 @@ export function installSupabaseStudentWriteMethods(service) {
         await this.init();
         const expectedOwnerUserId = await resolveExpectedStudentOwner(this, options);
         payload.eventId ||= createEventId('unit-work');
-        const { data, error } = await this.client.rpc('sync_student_unit_work_owned_v1', {
-            p_expected_user_id: expectedOwnerUserId,
-            p_event_id: payload.eventId,
-            p_unit_key: payload.unitKey,
-            p_unit_context: payload.unitContext || {},
-            p_work_patch: payload.workPatch || {}
-        });
-        if (error) throw error;
-        return firstRow(data);
+        return requestWithTimeout(async signal => {
+            let query = this.client.rpc('sync_student_unit_work_owned_v1', {
+                p_expected_user_id: expectedOwnerUserId,
+                p_event_id: payload.eventId,
+                p_unit_key: payload.unitKey,
+                p_unit_context: payload.unitContext || {},
+                p_work_patch: payload.workPatch || {}
+            });
+            if (typeof query.abortSignal === 'function') query = query.abortSignal(signal);
+            const { data, error } = await query;
+            if (error) throw error;
+            return firstRow(data);
+        }, { signal: options.signal, timeoutMs: 30000, label: 'Saving unit work' });
     };
 
     service.getOwnArcadeTime = async function getOwnArcadeTime() {
@@ -133,8 +140,10 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.startStudentArcadeMinute = async function startStudentArcadeMinute(payload = {}) {
+    service.startStudentArcadeMinute = async function startStudentArcadeMinute(payload = {}, options = {}) {
+        assertCoinOperationCurrent(options);
         await this.init();
+        assertCoinOperationCurrent(options);
         payload.eventId ||= createEventId('arcade-minute');
         const { data, error } = await this.client.rpc('start_student_arcade_minute_v1', {
             p_event_id: payload.eventId,
@@ -145,27 +154,37 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.spendStudentCoins = async function spendStudentCoins(payload = {}) {
+    service.spendStudentCoins = async function spendStudentCoins(payload = {}, options = {}) {
+        assertCoinOperationCurrent(options);
         await this.init();
+        assertCoinOperationCurrent(options);
         payload.eventId ||= createEventId('spend-coins');
-        const { data, error } = await this.client.rpc('spend_student_coins_v2', {
+        let query = this.client.rpc('spend_student_coins_v2', {
             p_event_id: payload.eventId,
             p_amount: Number(payload.amount) || 0,
             p_source: payload.source || 'game',
             p_description: payload.description || 'Spent on game',
             p_client_id: payload.clientId || ''
         });
+        if (options.signal) query = query.abortSignal(options.signal);
+        const { data, error } = await query;
+        assertCoinOperationCurrent(options);
         if (error) throw error;
         return firstRow(data);
     };
 
-    service.acceptStudentGiftCoins = async function acceptStudentGiftCoins(payload = {}) {
+    service.acceptStudentGiftCoins = async function acceptStudentGiftCoins(payload = {}, options = {}) {
+        assertCoinOperationCurrent(options);
         await this.init();
+        assertCoinOperationCurrent(options);
         payload.eventId ||= createEventId('accept-gift');
-        const { data, error } = await this.client.rpc('accept_student_gift_coins_v2', {
+        let query = this.client.rpc('accept_student_gift_coins_v2', {
             p_event_id: payload.eventId,
             p_client_id: payload.clientId || ''
         });
+        if (options.signal) query = query.abortSignal(options.signal);
+        const { data, error } = await query;
+        assertCoinOperationCurrent(options);
         if (error) throw error;
         return firstRow(data);
     };
@@ -194,13 +213,17 @@ export function installSupabaseStudentWriteMethods(service) {
         return firstRow(data);
     };
 
-    service.submitStudentGameScore = async function submitStudentGameScore(payload = {}) {
+    service.submitStudentGameScore = async function submitStudentGameScore(payload = {}, options = {}) {
         await this.init();
-        const { data, error } = await this.client.rpc('submit_student_game_score', {
+        let request = this.client.rpc('submit_student_game_score', {
             p_game_id: payload.gameId,
             p_score: Number(payload.score) || 0,
             p_metadata: payload.metadata || {}
         });
+        if (options.signal && typeof request.abortSignal === 'function') {
+            request = request.abortSignal(options.signal);
+        }
+        const { data, error } = await request;
         return requireRpcResult(mapScoreRow, data, error);
     };
 }

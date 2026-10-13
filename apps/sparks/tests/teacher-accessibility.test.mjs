@@ -16,7 +16,9 @@ test('teacher editor fields have explicit accessible labels', () => {
         'pos-input',
         'def-input',
         'example-input',
-        'image-input'
+        'difficulty-input',
+        'synonyms-input',
+        'antonyms-input'
     ];
 
     for (const id of fieldIds) {

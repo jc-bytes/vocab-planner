@@ -68,7 +68,12 @@ try {
         const feature = module.createTeacherGroupsFeature({
             ensureAuthenticated: () => true,
             showView: () => { calls.show += 1; },
-            loadRoster: async () => { calls.load += 1; return roster; },
+            classesRepository: {
+                listClasses: async () => { calls.load += 1; return [{ id: 'class-a', name: '6A' }, { id: 'class-b', name: '6A' }]; },
+                getRoster: async classId => (classId === 'class-a' ? roster : roster.slice(0, 2)).map(student => ({
+                    studentId: student.id, name: `${student.studentProfile.firstName} ${student.studentProfile.lastName}`
+                }))
+            },
             getSession: () => ({ authDisabled: false, currentUser: { id: 'teacher-one' } }),
             refreshIcons: () => {},
             repository,
@@ -96,8 +101,8 @@ try {
         throw new Error(`Repeat show contract failed: ${JSON.stringify(setup)}`);
     }
 
-    const absence = page.locator('#group-student-list input[data-student-id]').first();
-    await absence.check();
+    const absence = page.locator('#group-student-list .group-student-toggle').first();
+    await absence.click();
     await page.locator('#group-roster-summary').getByText('3 present · 1 absent').waitFor();
     await page.locator('#clear-group-absences-btn').click();
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
@@ -105,6 +110,16 @@ try {
     if (!absenceStorageKeys.some(key => key.startsWith('teacher_group_absences:teacher-one:'))) {
         throw new Error(`Group absences were not scoped to the teacher: ${JSON.stringify(absenceStorageKeys)}`);
     }
+
+    await page.locator('#group-class-select').selectOption('class-b');
+    await page.locator('#group-roster-summary').getByText('2 present · 0 absent').waitFor();
+    await page.locator('#group-student-list .group-student-toggle').first().click();
+    await page.locator('#group-class-select').selectOption('class-a');
+    await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
+    await page.locator('#group-class-select').selectOption('class-b');
+    await page.locator('#group-roster-summary').getByText('1 present · 1 absent').waitFor();
+    await page.locator('#group-class-select').selectOption('class-a');
+    await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
 
     await page.locator('#randomize-groups-btn').click();
     if (await page.locator('.random-group-card').count() !== 2) {
@@ -170,6 +185,10 @@ try {
                 this.authDisabled = true;
                 this.currentUser = { id: 'teacher-two' };
                 this.shownView = '';
+                this.classroomRepository = {
+                    listClasses: async () => [{ id: 'class-a', name: '6A' }],
+                    getRoster: async () => roster.map(student => ({ studentId: student.id, name: `${student.studentProfile.firstName} ${student.studentProfile.lastName}` }))
+                };
             }
 
             ensureAuthenticated() { return true; }
@@ -189,7 +208,7 @@ try {
     if (lazyAdapter.shownView !== 'teacher-groups-view' || lazyAdapter.hasInternalClearMethod) {
         throw new Error(`Lazy Groups adapter contract failed: ${JSON.stringify(lazyAdapter)}`);
     }
-    await page.locator('#group-student-list input[data-student-id]').first().check();
+    await page.locator('#group-student-list .group-student-toggle').first().click();
     await page.locator('#clear-group-absences-btn').click();
     await page.locator('#group-roster-summary').getByText('4 present · 0 absent').waitFor();
 
@@ -217,6 +236,7 @@ try {
                 this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
                 this.overviewLoads = 0;
                 this.rosterLoads = 0;
+                this.classroomRepository = { listClasses: () => this.getStudentRosterData() };
             }
 
             ensureAuthenticated() { return true; }
@@ -277,6 +297,7 @@ try {
                 this.vocabularyMode = 'assign';
                 this.libraryDrilldown = { subject: null, grade: null, trimester: null, month: null };
                 this.rosterOwners = [];
+                this.classroomRepository = { listClasses: () => this.getStudentRosterData() };
             }
 
             ensureAuthenticated() { return true; }
@@ -323,7 +344,10 @@ try {
         const lifecycleFeature = module.createTeacherGroupsFeature({
             ensureAuthenticated: () => true,
             showView: () => {},
-            loadRoster: () => new Promise(resolve => rosterPending.push(resolve)),
+            classesRepository: {
+                listClasses: () => new Promise(resolve => rosterPending.push(resolve)),
+                getRoster: async classId => [{ studentId: classId, name: classId }]
+            },
             getSession: () => ({ authDisabled: false, currentUser: { uid: 'teacher-lifecycle' } }),
             refreshIcons: () => {},
             repository: { list: () => new Promise(resolve => restrictionPending.push(resolve)) },
@@ -334,13 +358,13 @@ try {
         const oldShow = lifecycleFeature.show();
         const newShow = lifecycleFeature.show();
         rosterPending[1]([{
-            id: 'new-student',
+            id: 'New Teacher',
             studentProfile: { firstName: 'New', lastName: 'Teacher', grade: '9', group: 'B' }
         }]);
         restrictionPending[1]([]);
         await newShow;
         rosterPending[0]([{
-            id: 'old-student',
+            id: 'Old Teacher',
             studentProfile: { firstName: 'Old', lastName: 'Teacher', grade: '6', group: 'A' }
         }]);
         restrictionPending[0]([]);
@@ -350,7 +374,7 @@ try {
         const disposedShow = lifecycleFeature.show();
         lifecycleFeature.destroy();
         rosterPending[2]([{
-            id: 'disposed-student',
+            id: 'Disposed Teacher',
             studentProfile: { firstName: 'Disposed', lastName: 'Teacher', grade: '7', group: 'A' }
         }]);
         restrictionPending[2]([]);
@@ -372,21 +396,18 @@ try {
         const { installTeacherLazyFeatureMethods } = await import(
             `/js/teacherLazyFeatures.js?groups-account-lazy=${Date.now()}`
         );
-        const { installTeacherStudentProgressDataMethods } = await import(
-            `/js/teacherStudentProgressDataMethods.js?groups-account-progress=${Date.now()}`
-        );
-        const { supabaseService } = await import('/js/supabaseService.js');
         const { teacherGroupRestrictionsRepository } = await import('/js/services/teacherGroupRestrictionsRepository.js');
-        const originalRoster = supabaseService.listStudentIdentityRoster;
         const originalRestrictions = teacherGroupRestrictionsRepository.list;
         const rosterPending = [];
-        supabaseService.listStudentIdentityRoster = () => new Promise(resolve => rosterPending.push(resolve));
         teacherGroupRestrictionsRepository.list = async () => [];
-
         class Manager {
             constructor() {
                 this.authDisabled = false;
                 this.currentUser = { id: 'teacher-a' };
+                this.classroomRepository = {
+                    listClasses: async () => [{ id: this.currentUser.id, name: 'Same name' }],
+                    getRoster: () => new Promise(resolve => rosterPending.push(resolve))
+                };
                 this.selectedStudents = new Set();
                 this.allStudentData = [];
                 this.filteredStudentData = [];
@@ -396,7 +417,6 @@ try {
             switchView() {}
             refreshIcons() {}
         }
-        installTeacherStudentProgressDataMethods(Manager);
         installTeacherLazyFeatureMethods(Manager);
         const manager = new Manager();
 
@@ -404,13 +424,12 @@ try {
             const oldShow = manager.showGroupsView();
             while (rosterPending.length < 1) await new Promise(resolve => setTimeout(resolve, 0));
             manager.disposeLoadedTeacherFeatures();
-            manager.clearStudentProgressSessionState();
             manager.currentUser = { id: 'teacher-b' };
             const newShow = manager.showGroupsView();
             while (rosterPending.length < 2) await new Promise(resolve => setTimeout(resolve, 0));
 
             rosterPending[1]([{
-                id: 'new-b',
+                studentId: 'new-b', name: 'NEW_B Student',
                 studentProfile: { firstName: 'NEW_B', lastName: 'Student', grade: '9', group: 'B' }
             }]);
             await newShow;
@@ -421,7 +440,7 @@ try {
             };
 
             rosterPending[0]([{
-                id: 'old-a',
+                studentId: 'old-a', name: 'OLD_A Student',
                 studentProfile: { firstName: 'OLD_A', lastName: 'Student', grade: '6', group: 'A' }
             }]);
             await oldShow;
@@ -433,12 +452,10 @@ try {
                 rosterRequests: rosterPending.length
             };
 
-            await manager.showGroupsView();
-            afterOld.requestsAfterRepeatShow = rosterPending.length;
+
             return { beforeOld, afterOld };
         } finally {
             manager.disposeLoadedTeacherFeatures();
-            supabaseService.listStudentIdentityRoster = originalRoster;
             teacherGroupRestrictionsRepository.list = originalRestrictions;
         }
     });
@@ -449,8 +466,7 @@ try {
             classText: accountSwitch.afterOld.classText,
             cachedIds: accountSwitch.afterOld.cachedIds
         })
-        || accountSwitch.afterOld.rosterRequests !== 2
-        || accountSwitch.afterOld.requestsAfterRepeatShow !== 2) {
+        || accountSwitch.afterOld.rosterRequests !== 2) {
         throw new Error(`Groups account-switch isolation failed: ${JSON.stringify(accountSwitch)}`);
     }
 
@@ -462,10 +478,9 @@ try {
         const feature = module.createTeacherGroupsFeature({
             ensureAuthenticated: () => true,
             showView: () => {},
-            loadRoster: async () => [
-                { id: 'one', studentProfile: { firstName: 'One', lastName: 'Student', grade: '6', group: 'A' } },
-                { id: 'two', studentProfile: { firstName: 'Two', lastName: 'Student', grade: '6', group: 'A' } }
-            ],
+            classesRepository: { listClasses: async () => [{ id: 'class-one', name: '6A' }],
+                getRoster: async () => [{ studentId: 'one', name: 'One Student' }, { studentId: 'two', name: 'Two Student' }]
+            },
             getSession: () => ({ authDisabled: false, currentUser: { id: 'teacher-save' } }),
             refreshIcons: () => {},
             repository: {

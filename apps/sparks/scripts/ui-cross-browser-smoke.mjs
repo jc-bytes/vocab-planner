@@ -13,7 +13,7 @@ import { ensureViteServer } from './lib/local-vite-server.mjs';
 const host = process.env.UI_CROSS_BROWSER_HOST || '127.0.0.1';
 const port = Number(process.env.UI_CROSS_BROWSER_PORT || 8125);
 const baseUrl = (process.env.UI_CROSS_BROWSER_BASE_URL || `http://${host}:${port}`).replace(/\/$/, '');
-const activityPath = `/student.html#/unit/${AUDIT_VOCABULARY_ID}/activity/flashcards`;
+let activityPath;
 const sandboxGame = {
     id: 'trapdoor-trials',
     path: 'js/games/trapdoor-trials/index.html',
@@ -39,6 +39,14 @@ function trackPageProblems(page, label, problems, options = {}) {
 }
 
 async function addLocalSupabaseOverride(context, browserConfig) {
+    const target = new URL(browserConfig.url);
+    if (target.hostname === '127.0.0.1' && target.port !== '54321') {
+        await context.route('**/*.html', async route => {
+            const response = await route.fetch();
+            const body = (await response.text()).replaceAll(':54321', ':' + target.port);
+            await route.fulfill({ response, body });
+        });
+    }
     await context.addInitScript(config => {
         window.SUPABASE_CONFIG = {
             url: config.url,
@@ -162,7 +170,8 @@ async function runEngine(name, browserType, browserConfig) {
         await teacherPage.waitForFunction(() => (
             getComputedStyle(document.querySelector('.quiz-tool-tabs')).display === 'grid'
         ), null, { timeout: 15000 });
-        await teacherPage.locator('#tab-sparks').click();
+        await teacherPage.locator('#tab-vocabulary').click();
+        await teacherPage.locator('#teacher-dashboard-view:not(.hidden) [data-content-destination="sparks"]').click();
         await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
 
         console.log(`${name}: checking student authentication and activity routing...`);
@@ -211,6 +220,7 @@ async function runEngine(name, browserType, browserConfig) {
 }
 
 const seeded = await seedLocalAuditData({ resetSubmissions: false });
+activityPath = `/student.html#/unit/assignment.${seeded.vocabularyAssignmentId}/activity/flashcards`;
 const server = await ensureViteServer({
     baseUrl,
     probePath: '/student.html',

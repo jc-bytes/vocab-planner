@@ -44,12 +44,13 @@ try {
                 <section id="teacher-loading-view" class="view hidden"></section>
                 <section id="teacher-login-view" class="view hidden"></section>
                 <section id="teacher-editor-view" class="view hidden"></section>
-                <section id="quiz-maker-view" class="view hidden"></section>
+                <section id="quiz-maker-view" class="view hidden"></section><section id="teacher-spark-editor-view" class="view hidden"></section>
             </div>
         `;
 
         class Manager {
             constructor() {
+                this.authDisabled = true;
                 this.isAuthenticated = true;
                 this.isApplyingRoute = false;
                 this.pendingTeacherRoute = null;
@@ -67,6 +68,9 @@ try {
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
+            showClassesView(context) { this.workspaceContext = context; this.switchView('teacher-classes-view', { updateRoute: false }); }
+            showAssignmentsView(context) { this.workspaceContext = context; this.switchView(`teacher-${context.mode}-view`, { updateRoute: false }); }
+            showSparkEditor(context) { this.workspaceContext = context; this.switchView('teacher-spark-editor-view', { updateRoute: false }); }
             showGroupsView() { this.groupLoads += 1; this.switchView(groupsPage.viewId); }
             showDataManagementView({ area, tab }) {
                 this.dataCalls.push({ area, tab });
@@ -104,8 +108,8 @@ try {
     if (initial.hash !== '#/teacher/overview'
         || initial.activeView !== 'teacher-overview-view'
         || initial.activeSection !== 'overview'
-        || initial.mobileLabel !== 'Overview'
-        || initial.topLabel !== 'Overview'
+        || initial.mobileLabel !== 'Home'
+        || initial.topLabel !== 'Home'
         || initial.loads !== 2) {
         throw new Error(`Overview navigation changed: ${JSON.stringify(initial)}`);
     }
@@ -155,8 +159,8 @@ try {
     if (vocabulary.hash !== '#/teacher/vocabulary'
         || vocabulary.activeView !== 'teacher-dashboard-view'
         || vocabulary.activeSection !== 'vocabulary'
-        || vocabulary.mobileLabel !== 'Vocabulary'
-        || vocabulary.topLabel !== 'Vocabulary'
+        || vocabulary.mobileLabel !== 'Library'
+        || vocabulary.topLabel !== 'Library'
         || vocabulary.mode !== 'assign'
         || Object.values(vocabulary.drilldown).some(Boolean)
         || vocabulary.libraryLoads !== 1) {
@@ -210,9 +214,9 @@ try {
     });
     if (sparks.hash !== '#/teacher/sparks'
         || sparks.activeView !== 'teacher-sparks-view'
-        || sparks.activeSection !== 'sparks'
-        || sparks.mobileLabel !== 'Sparks'
-        || sparks.topLabel !== 'Sparks'
+        || sparks.activeSection !== 'vocabulary'
+        || sparks.mobileLabel !== 'Library'
+        || sparks.topLabel !== 'Library'
         || sparks.loads !== 1) {
         throw new Error(`Sparks navigation changed: ${JSON.stringify(sparks)}`);
     }
@@ -228,7 +232,7 @@ try {
         };
     });
     if (sparksDirect.activeView !== 'teacher-sparks-view'
-        || sparksDirect.activeSection !== 'sparks'
+        || sparksDirect.activeSection !== 'vocabulary'
         || sparksDirect.loads !== 2) {
         throw new Error(`Sparks direct route changed: ${JSON.stringify(sparksDirect)}`);
     }
@@ -239,7 +243,7 @@ try {
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/sparks'
         && document.querySelector('.view.active')?.id === 'teacher-sparks-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'sparks'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'vocabulary'
     ));
 
     const students = await page.evaluate(async () => {
@@ -258,9 +262,9 @@ try {
     });
     if (students.hash !== '#/teacher/students'
         || students.activeView !== 'teacher-progress-view'
-        || students.activeSection !== 'students'
-        || students.mobileLabel !== 'Students'
-        || students.topLabel !== 'Students'
+        || students.activeSection !== 'classes'
+        || students.mobileLabel !== 'Classes'
+        || students.topLabel !== 'Classes'
         || students.loadDelta !== 1) {
         throw new Error(`Students navigation changed: ${JSON.stringify(students)}`);
     }
@@ -277,7 +281,7 @@ try {
         };
     });
     if (studentsDirect.activeView !== 'teacher-progress-view'
-        || studentsDirect.activeSection !== 'students'
+        || studentsDirect.activeSection !== 'classes'
         || studentsDirect.loadDelta !== 1) {
         throw new Error(`Students direct route changed: ${JSON.stringify(studentsDirect)}`);
     }
@@ -288,7 +292,7 @@ try {
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/students'
         && document.querySelector('.view.active')?.id === 'teacher-progress-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
     ));
 
     const groups = await page.evaluate(() => {
@@ -306,9 +310,9 @@ try {
     });
     if (groups.hash !== '#/teacher/groups'
         || groups.activeView !== 'teacher-groups-view'
-        || groups.activeSection !== 'groups'
-        || groups.mobileLabel !== 'Groups'
-        || groups.topLabel !== 'Groups'
+        || groups.activeSection !== 'classes'
+        || groups.mobileLabel !== 'Classes'
+        || groups.topLabel !== 'Classes'
         || groups.loadDelta !== 1) {
         throw new Error(`Groups navigation changed: ${JSON.stringify(groups)}`);
     }
@@ -325,7 +329,7 @@ try {
         };
     });
     if (groupsDirect.activeView !== 'teacher-groups-view'
-        || groupsDirect.activeSection !== 'groups'
+        || groupsDirect.activeSection !== 'classes'
         || groupsDirect.loadDelta !== 1) {
         throw new Error(`Groups direct route changed: ${JSON.stringify(groupsDirect)}`);
     }
@@ -336,7 +340,7 @@ try {
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/groups'
         && document.querySelector('.view.active')?.id === 'teacher-groups-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'groups'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
     ));
 
     const data = await page.evaluate(() => {
@@ -352,15 +356,13 @@ try {
             calls: manager.dataCalls.slice(callsBefore)
         };
     });
-    if (data.hash !== '#/teacher/data?tab=dashboard'
-        || data.activeView !== 'teacher-data-management-view'
-        || data.activeSection !== 'data'
-        || data.mobileLabel !== 'Data'
-        || data.topLabel !== 'Data'
-        || data.calls.length !== 1
-        || data.calls[0].area !== 'data'
-        || data.calls[0].tab !== undefined) {
-        throw new Error(`Data navigation changed: ${JSON.stringify(data)}`);
+    if (data.hash !== '#/teacher/overview'
+        || data.activeView !== 'teacher-overview-view'
+        || data.activeSection !== 'overview'
+        || data.mobileLabel !== 'Home'
+        || data.topLabel !== 'Home'
+        || data.calls.length !== 0) {
+        throw new Error(`Legacy Data navigation did not redirect Home: ${JSON.stringify(data)}`);
     }
 
     const dataDirect = await page.evaluate(async () => {
@@ -374,12 +376,10 @@ try {
             calls: manager.dataCalls.slice(callsBefore)
         };
     });
-    if (dataDirect.activeView !== 'teacher-data-management-view'
-        || dataDirect.activeSection !== 'data'
-        || dataDirect.calls.length !== 1
-        || dataDirect.calls[0].area !== 'data'
-        || dataDirect.calls[0].tab !== 'export') {
-        throw new Error(`Data direct route changed: ${JSON.stringify(dataDirect)}`);
+    if (dataDirect.activeView !== 'teacher-review-view'
+        || dataDirect.activeSection !== 'review'
+        || dataDirect.calls.length !== 0) {
+        throw new Error(`Legacy Data export did not redirect Review: ${JSON.stringify(dataDirect)}`);
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('overview'));
@@ -387,8 +387,8 @@ try {
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/data?tab=export'
-        && document.querySelector('.view.active')?.id === 'teacher-data-management-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'data'
+        && document.querySelector('.view.active')?.id === 'teacher-review-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'review'
     ));
 
     const settings = await page.evaluate(() => {
@@ -463,6 +463,7 @@ try {
         class Manager {
             constructor() {
                 this.currentUser = { id: 'teacher-a' };
+                this.authDisabled = true;
                 this.isAuthenticated = true;
                 this.isApplyingRoute = false;
                 this.pendingTeacherRoute = null;
@@ -582,7 +583,31 @@ try {
         throw new Error(`Editor navigation lifecycle changed: ${JSON.stringify(editorNavigation)}`);
     }
 
-    console.log('Teacher primary-page smoke passed for all seven registered pages: navigation, direct routing, and history.');
+    const workspaceRoutes = await page.evaluate(async () => {
+        const manager = window.teacherPageSmokeManager;
+        const routes = [
+            { view: 'classes', classId: 'class/a', tab: 'work' },
+            { view: 'assignments', classId: 'class-a' },
+            { view: 'review', classId: 'class-a', assignmentId: 'assignment-a' },
+            { view: 'spark-editor', materialId: 'spark-a' }
+        ];
+        const output = [];
+        for (const route of routes) {
+            const hash = manager.buildRoute(route);
+            const parsed = manager.parseRoute(hash);
+            await manager.applyRoute(parsed);
+            output.push({ route, hash, parsed, context: manager.workspaceContext, view: document.querySelector('.view.active')?.id });
+        }
+        return output;
+    });
+    for (const result of workspaceRoutes) {
+        for (const [key, value] of Object.entries(result.route)) {
+            if (result.parsed[key] !== value) throw new Error(`Workspace route lost ${key}: ${JSON.stringify(result)}`);
+        }
+        if (result.route.classId && result.context.classId !== result.route.classId) throw new Error('Class context was not passed to workspace.');
+        if (result.route.assignmentId && result.context.assignmentId !== result.route.assignmentId) throw new Error('Assignment context was not passed to review.');
+    }
+    console.log('Teacher navigation smoke passed: primary tools, context routes, editor lifecycle, direct routing and history.');
 } finally {
     if (browser) await browser.close();
     if (server) server.kill();

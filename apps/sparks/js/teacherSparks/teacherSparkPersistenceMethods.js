@@ -21,9 +21,10 @@ async saveSparkFromForm(statusOverride = null) {
                 updatedAt: new Date().toISOString()
             });
             if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
-            this.invalidateWeeklySparkCache();
-            this.closeDialog('#spark-modal');
-            this.feedback.success(spark.status === 'scheduled' ? 'Spark scheduled.' : 'Spark saved.');
+            await this.invalidateWeeklySparks();
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
+            this.showView();
+            this.feedback.success('Material saved. Published assignments stay unchanged.');
             await this.loadWeeklySparks({ forceRefresh: true });
         } catch (error) {
             if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
@@ -49,7 +50,8 @@ async archiveSpark(id) {
                 updatedAt: new Date().toISOString()
             });
             if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
-            this.invalidateWeeklySparkCache();
+            await this.invalidateWeeklySparks();
+            if (lifecycleGeneration !== this.weeklySparkLifecycleGeneration) return;
             this.feedback.success('Spark archived.');
             await this.loadWeeklySparks({ forceRefresh: true });
         } catch (error) {

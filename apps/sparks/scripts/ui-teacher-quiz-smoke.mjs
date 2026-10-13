@@ -219,6 +219,115 @@ try {
         || navigationRace.repeatedQuizResult.historyDelta !== 0) {
         throw new Error(`A stale Quiz import replaced newer Vocabulary navigation: ${JSON.stringify(navigationRace)}`);
     }
+
+    const reorderPage = await browser.newPage();
+    reorderPage.on('console', message => {
+        if (message.type() === 'error') problems.push(`reorder console.error: ${message.text()}`);
+    });
+    reorderPage.on('pageerror', error => problems.push(`reorder pageerror: ${error.message}`));
+    await reorderPage.route('**/__quiz-reorder-smoke.html', route => route.fulfill({
+        contentType: 'text/html',
+        body: '<!doctype html><html><head><link rel="stylesheet" href="/css/theme.css"><link rel="stylesheet" href="/css/teacherQuiz.css"></head><body></body></html>'
+    }));
+    await reorderPage.goto(`${baseUrl}/__quiz-reorder-smoke.html`, { waitUntil: 'load' });
+    const reorderSetup = await reorderPage.evaluate(async () => {
+        document.body.innerHTML = `
+            <main id="quiz-reorder-smoke">
+                <button id="quiz-maker-back-btn"></button>
+                <button id="quiz-maker-close-btn"></button>
+                <button id="quiz-maker-word-btn"></button>
+                <button id="add-quiz-section-btn"></button>
+                <button id="generate-questions-btn"></button>
+                <button id="edit-rubric-btn"></button>
+                <input id="quiz-title-input">
+                <textarea id="quiz-instructions-input"></textarea>
+                <input id="quiz-school-input">
+                <input id="quiz-teacher-input">
+                <input id="quiz-grade-input">
+                <input id="quiz-border-toggle" type="checkbox">
+                <select id="quiz-font-select"><option value="Arial, sans-serif">Arial</option></select>
+                <div id="quiz-section-list"></div>
+                <div style="width: 1100px"><div id="quiz-questions-list"></div></div>
+            </main>
+        `;
+        const { QuizMaker } = await import(`/js/quizMaker.js?reorder-smoke=${Date.now()}`);
+        const questions = Array.from({ length: 24 }, (_, index) => ({
+            id: `question-${index}`,
+            type: 'short',
+            points: 1,
+            prompt: `Explain term ${index}.`,
+            answer: `Answer ${index}.`
+        }));
+        const maker = new QuizMaker(
+            { name: 'Reorder smoke', grade: '6', words: [{ word: 'term', definition: 'meaning' }] },
+            () => {},
+            { state: { quizSections: [], questions } }
+        );
+        window.quizReorderSmoke = maker;
+        return {
+            order: maker.questions.map(question => question.id),
+            pages: document.querySelectorAll('#quiz-questions-list .document-page').length,
+            sortables: maker.questionSortables.length,
+            reorderControls: document.querySelectorAll('.quiz-question-move-up').length
+        };
+    });
+    if (reorderSetup.pages < 2 || reorderSetup.sortables !== reorderSetup.pages || reorderSetup.reorderControls !== 24) {
+        throw new Error(`Quiz reorder did not cover every preview page: ${JSON.stringify(reorderSetup)}`);
+    }
+
+    await reorderPage.locator('.doc-q-card').nth(1).locator('.quiz-question-move-up').click();
+    const buttonReorder = await reorderPage.evaluate(() => {
+        const cards = Array.from(document.querySelectorAll('.doc-q-card'));
+        return {
+            order: window.quizReorderSmoke.questions.map(question => question.id),
+            focusLabel: document.activeElement?.getAttribute('aria-label'),
+            firstUpDisabled: cards[0]?.querySelector('.quiz-question-move-up')?.disabled,
+            lastDownDisabled: cards.at(-1)?.querySelector('.quiz-question-move-down')?.disabled
+        };
+    });
+    if (buttonReorder.order[0] !== 'question-1'
+        || buttonReorder.order[1] !== 'question-0'
+        || buttonReorder.focusLabel !== 'Move question 1 down'
+        || buttonReorder.firstUpDisabled !== true
+        || buttonReorder.lastDownDisabled !== true) {
+        throw new Error(`Quiz button reorder or focus restoration changed: ${JSON.stringify(buttonReorder)}`);
+    }
+
+    const crossPageReorder = await reorderPage.evaluate(() => {
+        const container = document.querySelector('#quiz-questions-list');
+        const pages = Array.from(container.querySelectorAll('.document-page'));
+        const firstCard = container.querySelector('.doc-q-card');
+        const lastPageCard = pages.at(-1)?.querySelector('.doc-q-card');
+        pages.at(-1)?.insertBefore(firstCard, lastPageCard || null);
+        const movedId = window.quizReorderSmoke.questions[Number.parseInt(firstCard.dataset.index, 10)]?.id;
+        window.quizReorderSmoke.questionSortables.at(-1).options.onEnd();
+        return {
+            movedId,
+            order: window.quizReorderSmoke.questions.map(question => question.id),
+            pages: document.querySelectorAll('#quiz-questions-list .document-page').length,
+            sortables: window.quizReorderSmoke.questionSortables.length
+        };
+    });
+    if (crossPageReorder.order.at(-1) === crossPageReorder.movedId
+        || crossPageReorder.order.indexOf(crossPageReorder.movedId) < 1
+        || crossPageReorder.order.length !== 24
+        || new Set(crossPageReorder.order).size !== 24
+        || crossPageReorder.pages < 2
+        || crossPageReorder.sortables !== crossPageReorder.pages) {
+        throw new Error(`Quiz data order across preview page containers changed: ${JSON.stringify(crossPageReorder)}`);
+    }
+
+    const reorderTeardown = await reorderPage.evaluate(() => {
+        window.quizReorderSmoke.destroy();
+        return {
+            disposed: window.quizReorderSmoke.disposed,
+            sortables: window.quizReorderSmoke.questionSortables.length
+        };
+    });
+    if (!reorderTeardown.disposed || reorderTeardown.sortables !== 0) {
+        throw new Error(`Quiz reorder teardown changed: ${JSON.stringify(reorderTeardown)}`);
+    }
+    await reorderPage.close();
     if (problems.length) throw new Error(problems.join('\n'));
     console.log('Teacher Quiz lazy-feature smoke passed.');
 } finally {

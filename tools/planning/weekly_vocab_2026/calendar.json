@@ -1,0 +1,411 @@
+[
+  {
+    "grade": 6,
+    "week": 2,
+    "week_start": "2026-09-21",
+    "mode": "teaching",
+    "units": [
+      "grade6_t3_2026_w02_weekly_v1"
+    ],
+    "note": "Use the chart lesson to introduce cell; reuse the other terms."
+  },
+  {
+    "grade": 6,
+    "week": 3,
+    "week_start": "2026-09-28",
+    "mode": "review",
+    "units": [
+      "grade6_t3_2026_w03_weekly_v1"
+    ],
+    "note": "Reuse taught words before the story-table assessment. 6A misses Sep 29; follow its October continuation."
+  },
+  {
+    "grade": 6,
+    "week": 4,
+    "week_start": "2026-10-05",
+    "mode": "teaching",
+    "units": [
+      "grade6_t3_2026_w04_weekly_v1"
+    ],
+    "note": "The current plan still teaches spreadsheets on Oct 5\u20139. Introduce task language through the worked chart, not new assessment content."
+  },
+  {
+    "grade": 6,
+    "week": 5,
+    "week_start": "2026-10-12",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 6,
+    "week": 6,
+    "week_start": "2026-10-19",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 6,
+    "week": 7,
+    "week_start": "2026-10-26",
+    "mode": "teaching",
+    "units": [
+      "grade6_t3_2026_w07_weekly_v1"
+    ],
+    "note": "Model work moves to Oct 26\u201330. Respect Student Day and the separate 6A/6B/6C lessons."
+  },
+  {
+    "grade": 6,
+    "week": 8,
+    "week_start": "2026-11-02",
+    "mode": "review",
+    "units": [
+      "grade6_t3_2026_w08_weekly_v1"
+    ],
+    "note": "Release only for 6C\u2019s Nov 6 lesson. No required work for 6A/6B during closures."
+  },
+  {
+    "grade": 6,
+    "week": 9,
+    "week_start": "2026-11-09",
+    "mode": "split",
+    "units": [
+      "grade6_t3_2026_w09_weekly_v1_ab",
+      "grade6_t3_2026_w09_weekly_v1_c"
+    ],
+    "note": "6A/6B keep the model pool. 6C uses input, output, variable, button, counter for its Nov 11/13 lessons."
+  },
+  {
+    "grade": 6,
+    "week": 10,
+    "week_start": "2026-11-16",
+    "mode": "teaching",
+    "units": [
+      "grade6_t3_2026_w10_weekly_v1"
+    ],
+    "note": "6A/6B begin counters; 6C reuses this pool during explanation and saving."
+  },
+  {
+    "grade": 6,
+    "week": 11,
+    "week_start": "2026-11-23",
+    "mode": "review",
+    "units": [
+      "grade6_t3_2026_w11_weekly_v1"
+    ],
+    "note": "Use familiar review terms. No added five-new-word requirement during end-of-term work."
+  },
+  {
+    "grade": 6,
+    "week": 12,
+    "week_start": "2026-11-30",
+    "mode": "review",
+    "units": [
+      "grade6_t3_2026_w12_weekly_v1"
+    ],
+    "note": "Reuse Week 11. Respect the Dec 2 holiday."
+  },
+  {
+    "grade": 6,
+    "week": 13,
+    "week_start": "2026-12-07",
+    "mode": "no_class",
+    "units": [],
+    "note": "Withdraw future scheduled night-light work; no normal Technology lesson is planned."
+  },
+  {
+    "grade": 7,
+    "week": 2,
+    "week_start": "2026-09-21",
+    "mode": "teaching",
+    "units": [
+      "grade7_t3_2026_w02_weekly_v1"
+    ],
+    "note": "Keep the spreadsheet assessment\u2019s existing vocabulary available; select five focus words, not the only words allowed in the lesson."
+  },
+  {
+    "grade": 7,
+    "week": 3,
+    "week_start": "2026-09-28",
+    "mode": "review",
+    "units": [
+      "grade7_t3_2026_w03_weekly_v1"
+    ],
+    "note": "Review words already met in Week 1/2 modelling before the activity-afternoon assessment."
+  },
+  {
+    "grade": 7,
+    "week": 4,
+    "week_start": "2026-10-05",
+    "mode": "teaching",
+    "units": [
+      "grade7_t3_2026_w04_weekly_v1"
+    ],
+    "note": "Actual Oct 7/9 lesson, replacing the old STEAM-planning set. 7B has no Oct 8 lesson."
+  },
+  {
+    "grade": 7,
+    "week": 5,
+    "week_start": "2026-10-12",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 7,
+    "week": 6,
+    "week_start": "2026-10-19",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 7,
+    "week": 7,
+    "week_start": "2026-10-26",
+    "mode": "teaching",
+    "units": [
+      "grade7_t3_2026_w07_weekly_v1"
+    ],
+    "note": "Use this pool for the ungraded distance lesson. Keep Week 4\u2019s Scratch pool accessible for the separate delivery assessment."
+  },
+  {
+    "grade": 7,
+    "week": 8,
+    "week_start": "2026-11-02",
+    "mode": "review",
+    "units": [
+      "grade7_t3_2026_w08_weekly_v1"
+    ],
+    "note": "Only the Nov 6 assessment session remains. No new vocabulary instruction or required extra task before that assessment."
+  },
+  {
+    "grade": 7,
+    "week": 9,
+    "week_start": "2026-11-09",
+    "mode": "teaching",
+    "units": [
+      "grade7_t3_2026_w09_weekly_v1"
+    ],
+    "note": "Introduce radio and message through the actual sender/receiver demonstration; retain earlier input/condition review."
+  },
+  {
+    "grade": 7,
+    "week": 10,
+    "week_start": "2026-11-16",
+    "mode": "review",
+    "units": [
+      "grade7_t3_2026_w10_weekly_v1"
+    ],
+    "note": "Reuse Week 9 for the exam; do not introduce new assessed language."
+  },
+  {
+    "grade": 7,
+    "week": 11,
+    "week_start": "2026-11-23",
+    "mode": "review",
+    "units": [
+      "grade7_t3_2026_w11_weekly_v1"
+    ],
+    "note": "Keep review optional in the reduced week; Nov 27 is a school event."
+  },
+  {
+    "grade": 7,
+    "week": 12,
+    "week_start": "2026-11-30",
+    "mode": "review",
+    "units": [
+      "grade7_t3_2026_w12_weekly_v1"
+    ],
+    "note": "Same pool; honor 7A\u2019s Dec 2 closure and the actual remaining sessions."
+  },
+  {
+    "grade": 8,
+    "week": 2,
+    "week_start": "2026-09-21",
+    "mode": "teaching",
+    "units": [
+      "grade8_t3_2026_w02_weekly_v1"
+    ],
+    "note": "Replace the outdated club-signup/map wording. Actual lessons use a running LunchApp."
+  },
+  {
+    "grade": 8,
+    "week": 3,
+    "week_start": "2026-09-28",
+    "mode": "review",
+    "units": [
+      "grade8_t3_2026_w03_weekly_v1"
+    ],
+    "note": "Use the real app/test evidence; do not create a file-organisation lesson."
+  },
+  {
+    "grade": 8,
+    "week": 4,
+    "week_start": "2026-10-05",
+    "mode": "teaching",
+    "units": [
+      "grade8_t3_2026_w04_weekly_v1"
+    ],
+    "note": "Move binary from the app\u2019s Week 10 to the actual Oct 5\u20138 teaching. Explain all five before the binary assessment."
+  },
+  {
+    "grade": 8,
+    "week": 5,
+    "week_start": "2026-10-12",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 8,
+    "week": 6,
+    "week_start": "2026-10-19",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 8,
+    "week": 7,
+    "week_start": "2026-10-26",
+    "mode": "teaching",
+    "units": [
+      "grade8_t3_2026_w07_weekly_v1"
+    ],
+    "note": "Use the actual two-number Python program and familiar corrections."
+  },
+  {
+    "grade": 8,
+    "week": 8,
+    "week_start": "2026-11-02",
+    "mode": "no_class",
+    "units": [],
+    "note": "No student lesson. Remove the scheduled Python-total requirement; existing practice may remain voluntarily accessible."
+  },
+  {
+    "grade": 8,
+    "week": 9,
+    "week_start": "2026-11-09",
+    "mode": "review",
+    "units": [
+      "grade8_t3_2026_w09_weekly_v1"
+    ],
+    "note": "Reuse input/output/variable/bug; event comes from the earlier app. Keep the Week 7 Python pool accessible for assessment review."
+  },
+  {
+    "grade": 8,
+    "week": 10,
+    "week_start": "2026-11-16",
+    "mode": "teaching",
+    "units": [
+      "grade8_t3_2026_w10_weekly_v1"
+    ],
+    "note": "Use the actual Player/Balloon/Wall build. Fix the inconsistent Catch the Star/Balloon titles when synchronising descriptions."
+  },
+  {
+    "grade": 8,
+    "week": 11,
+    "week_start": "2026-11-23",
+    "mode": "review",
+    "units": [
+      "grade8_t3_2026_w11_weekly_v1"
+    ],
+    "note": "Reuse Week 10 during the final assessment."
+  },
+  {
+    "grade": 8,
+    "week": 12,
+    "week_start": "2026-11-30",
+    "mode": "review",
+    "units": [
+      "grade8_t3_2026_w12_weekly_v1"
+    ],
+    "note": "Reuse the same pool; no new vocabulary burden during feedback/closure."
+  },
+  {
+    "grade": 9,
+    "week": 2,
+    "week_start": "2026-09-21",
+    "mode": "teaching",
+    "units": [
+      "grade9_t3_2026_w02_weekly_v1"
+    ],
+    "note": "Safety teaching starts Sep 21. Keep frozen Week 1 pixel/bit/sample/sample-rate review accessible for the separate picture-and-sound assessment."
+  },
+  {
+    "grade": 9,
+    "week": 3,
+    "week_start": "2026-09-28",
+    "mode": "teaching",
+    "units": [
+      "grade9_t3_2026_w03_weekly_v1"
+    ],
+    "note": "Introduce in the Sep 28 worked risk examples before the independent safety/risk assessments. Earlier threat names remain available in Week 2."
+  },
+  {
+    "grade": 9,
+    "week": 4,
+    "week_start": "2026-10-05",
+    "mode": "review",
+    "units": [
+      "grade9_t3_2026_w04_weekly_v1"
+    ],
+    "note": "Use the real online-safety slides, replacing the stale STEAM-planning topic."
+  },
+  {
+    "grade": 9,
+    "week": 5,
+    "week_start": "2026-10-12",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 9,
+    "week": 6,
+    "week_start": "2026-10-19",
+    "mode": "no_vocabulary",
+    "units": [],
+    "note": "No vocabulary set or task during this project week. Do not schedule required or optional vocabulary, deadlines, completion targets or Arcade blockers."
+  },
+  {
+    "grade": 9,
+    "week": 7,
+    "week_start": "2026-10-26",
+    "mode": "teaching",
+    "units": [
+      "grade9_t3_2026_w07_weekly_v1"
+    ],
+    "note": "Tie backup/priority to the taught case comparison. 9A has no Oct 27 lesson."
+  },
+  {
+    "grade": 9,
+    "week": 8,
+    "week_start": "2026-11-02",
+    "mode": "no_class",
+    "units": [],
+    "note": "No Technology task for either group; remove the scheduled risk-check unit from required work."
+  },
+  {
+    "grade": 9,
+    "week": 9,
+    "week_start": "2026-11-09",
+    "mode": "review",
+    "units": [
+      "grade9_t3_2026_w09_weekly_v1"
+    ],
+    "note": "Reuse Week 7 for the actual safety-presentation rehearsal; no STEAM demonstration or new words."
+  },
+  {
+    "grade": 9,
+    "week": 10,
+    "week_start": "2026-11-16",
+    "mode": "review",
+    "units": [
+      "grade9_t3_2026_w10_weekly_v1"
+    ],
+    "note": "Reuse the taught pool for the Nov 17/18 exam. Add no Grade 9 academic work after the planned finish."
+  }
+]

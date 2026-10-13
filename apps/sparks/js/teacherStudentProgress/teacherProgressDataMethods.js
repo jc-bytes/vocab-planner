@@ -1,8 +1,33 @@
 import { $, closeModal, createElement } from '../main.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { supabaseService } from '../supabaseService.js';
 import { teacherPageRegistry } from '../teacherPageRegistry.js';
 
 const STUDENTS_PAGE = teacherPageRegistry.get('students');
+const TEACHER_PROGRESS_QUERY_ROOT = ['teacher', 'student-progress'];
+
+export function getTeacherProgressAccountId(owner) {
+    if (owner.authDisabled) return 'local-development';
+    return owner.currentUser?.uid || owner.currentUser?.id || '';
+}
+
+export function getTeacherProgressQueryKey(owner, ...parts) {
+    return [
+        ...TEACHER_PROGRESS_QUERY_ROOT,
+        'session',
+        owner.studentProgressSessionGeneration || 0,
+        ...parts
+    ];
+}
+
+export function getTeacherProgressQueryService(owner) {
+    return owner.serverStateQuery || serverStateQuery;
+}
+
+function runTeacherProgressQuery(owner, options, forceRefresh) {
+    const service = getTeacherProgressQueryService(owner);
+    return forceRefresh ? service.refresh(options) : service.ensure(options);
+}
 
 function resetStudentProgressView() {
     ['#student-progress-list', '#student-progress-cards', '#student-progress-pagination', '#student-progress-status', '#student-roster-import-status']
@@ -42,7 +67,7 @@ function resetStudentProgressView() {
         const element = $(selector);
         if (element) element.textContent = value;
     });
-    ['#detail-activity-list', '#coin-adjust-status', '#reset-password-status', '#temporary-password-output']
+    ['#student-profile-assigned-work', '#student-insight-summary', '#detail-activity-list', '#coin-adjust-status', '#reset-password-status', '#temporary-password-output']
         .forEach(selector => {
             const element = $(selector);
             if (!element) return;
@@ -53,6 +78,13 @@ function resetStudentProgressView() {
     if (coinInput) coinInput.value = '10';
     const temporaryPassword = $('#temporary-password-output');
     if (temporaryPassword) temporaryPassword.style.display = 'none';
+    $('#student-profile-content')?.classList.add('hidden');
+    $('#student-profile-loading')?.classList.remove('hidden');
+    const profileError = $('#student-profile-error');
+    if (profileError) {
+        profileError.textContent = '';
+        profileError.classList.add('hidden');
+    }
     const resetPasswordButton = $('#reset-student-password-btn');
     if (resetPasswordButton) resetPasswordButton.disabled = false;
     ['#select-all-students', '#select-visible-students-mobile'].forEach(selector => {
@@ -67,7 +99,6 @@ function resetStudentProgressView() {
     const bulkCoinInput = $('#bulk-coin-input');
     if (bulkCoinInput) bulkCoinInput.value = '10';
 
-    closeModal('#student-detail-modal', { restoreFocus: false });
     const addStudentForm = $('#add-student-form');
     addStudentForm?.reset();
     ['add-student-password', 'add-student-confirm-password'].forEach(inputId => {
@@ -130,51 +161,51 @@ async getStudentRosterData({ forceRefresh = false } = {}) {
             return [];
         }
 
-        if (forceRefresh) this.studentIdentityRosterCache = null;
-        if (!this.studentIdentityRosterCache) {
-            const generation = this.studentIdentityRosterGeneration || 0;
-            let request = this.studentIdentityRosterPromise;
-            if (!request) {
-                request = supabaseService.listStudentIdentityRoster()
-                    .then(students => {
-                        if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
-                        this.studentIdentityRosterCache = students;
-                        return students;
-                    })
-                    .finally(() => {
-                        if (this.studentIdentityRosterPromise === request) this.studentIdentityRosterPromise = null;
-                    });
-                this.studentIdentityRosterPromise = request;
-            }
-            await request;
-            if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
-        }
+        const generation = this.studentIdentityRosterGeneration || 0;
+        const students = await runTeacherProgressQuery(this, {
+            accountId: getTeacherProgressAccountId(this),
+            key: getTeacherProgressQueryKey(this, 'identity-roster'),
+            queryFn: ({ signal }) => supabaseService.listStudentIdentityRoster({ signal })
+        }, forceRefresh);
+        if (generation !== (this.studentIdentityRosterGeneration || 0)) return [];
 
-        this.applyStudentProgressData(this.studentIdentityRosterCache || []);
-        return this.studentIdentityRosterCache || [];
+        this.applyStudentProgressData(students || []);
+        return students || [];
     },
 
-clearStudentProgressSessionState() {
+    invalidateStudentProgressQueries() {
+        return getTeacherProgressQueryService(this).invalidate({
+            accountId: getTeacherProgressAccountId(this),
+            key: getTeacherProgressQueryKey(this)
+        });
+    },
+
+    clearStudentProgressSessionState() {
+        this.studentInsightYear = undefined;
+        this.studentInsightRequest = (this.studentInsightRequest || 0) + 1;
+        this.studentDashboardCharts?.dispose();
+        this.studentDashboardCharts = null;
+        this.studentProfileRequest = (this.studentProfileRequest || 0) + 1;
         this.studentProgressSessionGeneration = (this.studentProgressSessionGeneration || 0) + 1;
         this.studentIdentityRosterGeneration = (this.studentIdentityRosterGeneration || 0) + 1;
         this.studentProgressDetailGeneration = (this.studentProgressDetailGeneration || 0) + 1;
         this.studentProgressPageGeneration = (this.studentProgressPageGeneration || 0) + 1;
         this.studentRosterFiltersGeneration = (this.studentRosterFiltersGeneration || 0) + 1;
         this.studentPasswordResetGeneration = (this.studentPasswordResetGeneration || 0) + 1;
-        this.studentIdentityRosterCache = null;
-        this.studentIdentityRosterPromise = null;
-        this.studentProgressPageCache = null;
         this.studentProgressLastPage = null;
+        this.studentRosterProgressById = new Map();
         this.studentProgressPage = null;
         this.studentProgressLoadState = 'idle';
         this.studentRosterFilters = null;
         globalThis.clearTimeout(this.studentProgressFilterTimer);
         this.studentProgressFilterTimer = null;
-        this.studentProgressDetailPromises?.clear();
         this.allStudentData = [];
         this.filteredStudentData = [];
         this.selectedStudents.clear();
         this.activeStudentId = null;
+        this.activeStudentProfile = null;
+        this.activeStudentProfileModel = null;
+        this.activeStudentProfileTab = 'overview';
         resetStudentProgressView();
     },
 
@@ -198,26 +229,15 @@ mergeStudentProgressDetail(detail) {
 
 async ensureStudentProgressDetail(student, { forceRefresh = false } = {}) {
         if (!student?.id) throw new Error('Student progress cannot be loaded without an ID.');
-        if (!forceRefresh && student.progressDetailLoaded) return student;
-
-        this.studentProgressDetailPromises ||= new Map();
-        if (!forceRefresh && this.studentProgressDetailPromises.has(student.id)) {
-            return this.studentProgressDetailPromises.get(student.id);
-        }
 
         const generation = this.studentProgressDetailGeneration || 0;
-        const request = supabaseService.getStudentProgressForTeacher(student.id)
-            .then(detail => {
-                if (generation !== (this.studentProgressDetailGeneration || 0)) return null;
-                return this.mergeStudentProgressDetail(detail) || student;
-            })
-            .finally(() => {
-                if (this.studentProgressDetailPromises.get(student.id) === request) {
-                    this.studentProgressDetailPromises.delete(student.id);
-                }
-            });
-        this.studentProgressDetailPromises.set(student.id, request);
-        return request;
+        const detail = await runTeacherProgressQuery(this, {
+            accountId: getTeacherProgressAccountId(this),
+            key: getTeacherProgressQueryKey(this, 'detail', student.id),
+            queryFn: ({ signal }) => supabaseService.getStudentProgressForTeacher(student.id, { signal })
+        }, forceRefresh);
+        if (generation !== (this.studentProgressDetailGeneration || 0)) return null;
+        return this.mergeStudentProgressDetail(detail) || student;
     },
 
     async ensureStudentProgressDetails(studentIds = []) {
@@ -229,9 +249,12 @@ async ensureStudentProgressDetail(student, { forceRefresh = false } = {}) {
         if (pendingIds.length === 0) return;
 
         for (let index = 0; index < pendingIds.length; index += 100) {
-            const details = await supabaseService.getStudentsProgressForTeacher(
-                pendingIds.slice(index, index + 100)
-            );
+            const ids = pendingIds.slice(index, index + 100);
+            const details = await getTeacherProgressQueryService(this).ensure({
+                accountId: getTeacherProgressAccountId(this),
+                key: getTeacherProgressQueryKey(this, 'detail-batch', ids),
+                queryFn: ({ signal }) => supabaseService.getStudentsProgressForTeacher(ids, { signal })
+            });
             if (generation !== (this.studentProgressDetailGeneration || 0)) return;
             details.forEach(detail => this.mergeStudentProgressDetail(detail));
         }

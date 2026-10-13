@@ -5,12 +5,12 @@ import test from 'node:test';
 const { defineTeacherPages, teacherPageRegistry } = await import('../js/teacherPageRegistry.js');
 
 const EXPECTED_PRIMARY_PAGES = [
+    { id: 'administration', viewId: 'teacher-administration-view' },
+    { id: 'classes', viewId: 'teacher-classes-view' },
     { id: 'overview', viewId: 'teacher-overview-view' },
     { id: 'vocabulary', viewId: 'teacher-dashboard-view' },
-    { id: 'sparks', viewId: 'teacher-sparks-view' },
-    { id: 'students', viewId: 'teacher-progress-view' },
-    { id: 'groups', viewId: 'teacher-groups-view' },
-    { id: 'data', viewId: 'teacher-data-management-view' },
+    { id: 'assignments', viewId: 'teacher-assignments-view' },
+    { id: 'review', viewId: 'teacher-review-view' },
     { id: 'settings', viewId: 'teacher-data-management-view' }
 ];
 
@@ -37,14 +37,18 @@ test('teacher page registry matches every top-level navigation destination', asy
         assert.deepEqual(Object.keys(page), ['id', 'viewId']);
         assert.equal(teacherPageRegistry.get(page.id), page);
     });
-    assert.deepEqual(teacherPageRegistry.pages, EXPECTED_PRIMARY_PAGES);
     assert.deepEqual(htmlPages, EXPECTED_PRIMARY_PAGES);
+    assert.deepEqual(
+        teacherPageRegistry.pages.filter(page => EXPECTED_PRIMARY_PAGES.some(primary => primary.id === page.id)),
+        EXPECTED_PRIMARY_PAGES
+    );
     assert.match(teacherShell, /teacherPageRegistry\.pages\.map\(page => page\.viewId\)/);
     EXPECTED_PRIMARY_PAGES.forEach(page => {
         assert.match(teacherHtml, new RegExp(`\\sid=["']${page.viewId}["']`));
     });
     assert.equal(teacherPageRegistry.get('quizzes'), null);
     assert.equal(teacherPageRegistry.get('word-hunt-review'), null);
+    assert.equal(teacherPageRegistry.get('student-profile'), null);
 });
 
 test('teacher page descriptors reject ambiguous registration', () => {

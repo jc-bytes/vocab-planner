@@ -3,6 +3,16 @@ import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 import { SPARK_CHECK_MODES } from '../sparkCheckModel.js';
 import { normalizeSparkRecord, SPARK_GRADE_LEVELS } from '../sparkModel.js';
 import { compareSparkSchedule } from './sparkSchedule.js';
+import { createUniqueId } from '../randomUtils.js';
+
+const WEEKLY_SPARK_STALE_TIME_MS = 60 * 1000;
+const WEEKLY_SPARK_QUERY_KEY = ['teacher', 'weekly-sparks'];
+
+function getWeeklySparkAccountId(owner) {
+    if (owner.isAuthenticationDisabled()) return 'local-development';
+    const user = owner.getCurrentUser?.();
+    return user?.uid || user?.id || '';
+}
 
 export const teacherSparkDataMethods = {
 normalizeSpark(spark = {}) {
@@ -21,45 +31,41 @@ createDefaultSpark() {
     },
 
 createSparkId() {
-        return `spark_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        return createUniqueId('spark_');
     },
 
-    invalidateWeeklySparkCache() {
+    async invalidateWeeklySparks() {
         this.weeklySparkLoadGeneration += 1;
-        this.weeklySparkCache = null;
-        this.weeklySparkPromise = null;
+        await this.queryService.invalidate({
+            accountId: getWeeklySparkAccountId(this),
+            key: WEEKLY_SPARK_QUERY_KEY,
+            exact: true
+        });
     },
 
-    async fetchWeeklySparks() {
+    async fetchWeeklySparks({ signal } = {}) {
         if (this.isAuthenticationDisabled()) return [];
         if (!this.ensureAuthenticated(false)) return [];
 
-        return (await this.repository.list())
+        return (await this.repository.list({ signal }))
             .map(spark => this.normalizeSpark(spark))
             .sort(compareSparkSchedule);
     },
 
-    async getWeeklySparks({ forceRefresh = false, generation = null } = {}) {
-        if (!forceRefresh && this.weeklySparkCache) return this.weeklySparkCache;
-        if (!forceRefresh && this.weeklySparkPromise) return this.weeklySparkPromise;
-
-        const requestGeneration = generation ?? ++this.weeklySparkLoadGeneration;
-        const request = this.fetchWeeklySparks()
-            .then(sparks => {
-                if (requestGeneration === this.weeklySparkLoadGeneration) {
-                    this.weeklySparkCache = sparks;
-                }
-                return sparks;
-            })
-            .finally(() => {
-                if (this.weeklySparkPromise === request) this.weeklySparkPromise = null;
-            });
-        this.weeklySparkPromise = request;
-
-        return request;
+    getWeeklySparks({ forceRefresh = false } = {}) {
+        const query = {
+            accountId: getWeeklySparkAccountId(this),
+            key: WEEKLY_SPARK_QUERY_KEY,
+            staleTime: WEEKLY_SPARK_STALE_TIME_MS,
+            queryFn: ({ signal }) => this.fetchWeeklySparks({ signal })
+        };
+        return forceRefresh
+            ? this.queryService.refresh(query)
+            : this.queryService.ensure(query);
     },
 
 async showSparksView() {
+        this.weeklySparkEditorGeneration += 1;
         if (!this.ensureAuthenticated(false)) return;
         this.showView();
         await this.loadWeeklySparks();
@@ -69,10 +75,7 @@ async showSparksView() {
         const list = this.query('#spark-library-list');
         if (!list) return;
 
-        let generation = this.weeklySparkLoadGeneration;
-        if (forceRefresh || (!this.weeklySparkCache && !this.weeklySparkPromise)) {
-            generation = ++this.weeklySparkLoadGeneration;
-        }
+        const generation = ++this.weeklySparkLoadGeneration;
         if (!this.weeklySparkItems.length) {
             list.innerHTML = '<div class="loading-spinner">Loading Sparks...</div>';
         } else {
@@ -80,7 +83,7 @@ async showSparksView() {
         }
 
         try {
-            const sparks = await this.getWeeklySparks({ forceRefresh, generation });
+            const sparks = await this.getWeeklySparks({ forceRefresh });
             if (generation !== this.weeklySparkLoadGeneration) return;
             this.weeklySparkItems = sparks;
             this.renderSparkLibrary();

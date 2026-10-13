@@ -1,7 +1,7 @@
 {
   "id": "grade8_t3_2026_w02_part2",
-  "name": "G8 T3 W02 Part 2 - Plan a club signup app",
-  "description": "Plan a club signup app. 2 words. Required: Flashcards and Fill in Blank. Read the Spark with the same name. Use this part in its Technology class.",
+  "name": "G8 T3 W02 Part 2 - Complete your lunch app",
+  "description": "Complete your lunch app. 2 words. Required: Flashcards and Fill in Blank. Use the assigned class link; review the same words in 04 Sparks Review if unavailable.",
   "grades": [
     "8"
   ],
@@ -50,6 +50,10 @@
     ],
     "flashcards": 2,
     "matching": 2,
-    "fillInBlank": 2
+    "fillInBlank": 2,
+    "retiredWeeklySet": true,
+    "replacementIds": [
+      "grade8_t3_2026_w02_weekly_v1"
+    ]
   }
 }

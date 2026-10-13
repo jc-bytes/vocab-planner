@@ -1,4 +1,5 @@
-import { readStudentActivityValue, writeStudentActivityValue } from '../../student/persistence/studentStorage.js';
+import { readStudentActivityJson, writeStudentActivityValue } from '../../student/persistence/studentStorage.js';
+import { validateActivityState, wordSearchStateSchema } from '../activityStateValidation.js';
 
 export const wordSearchPuzzleStateMethods = {
 prepareWords(words) {
@@ -21,21 +22,15 @@ getOriginalLabel(wordObj) {
             .replace(/\b[A-Za-z]/g, char => char.toUpperCase());
     },
 
-restoreState() {
-        if (this.applySavedState(this.initialState)) return;
+    restoreState() {
+        if (this.applySavedState(validateActivityState(wordSearchStateSchema, this.initialState))) return;
 
         // Use vocabID in key for stability
         const key = `word_search_state_${this.vocabID}`;
-        const saved = readStudentActivityValue(key);
-
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                this.applySavedState(state);
-            } catch (e) {
-                console.error('Error restoring word search state:', e);
-            }
-        }
+        const saved = readStudentActivityJson(key, null, {
+            validate: value => validateActivityState(wordSearchStateSchema, value)
+        });
+        if (saved) this.applySavedState(saved);
     },
 
 applySavedState(state) {
@@ -174,4 +169,3 @@ placeWord(word, row, col, dir) {
         });
     }
 };
-

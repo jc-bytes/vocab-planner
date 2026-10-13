@@ -63,7 +63,9 @@ globalThis.localStorage = {
 globalThis.fetch = async () => ({ ok: true, json: async () => ({ vocabularies: [] }) });
 
 const { vocabularyRepository } = await import('../js/services/vocabularyRepository.js');
+const { createServerStateQuery } = await import('../js/services/serverStateQuery.js');
 const { teacherVocabularyDataMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyDataMethods.js');
+const { teacherVocabularyWorkflowMethods } = await import('../js/teacherVocabularyLibrary/teacherVocabularyWorkflowMethods.js');
 const { installTeacherVocabularyStorageMethods } = await import('../js/teacherVocabularyStorage.js');
 const { installTeacherVocabularyEditorCoreMethods } = await import('../js/teacherVocabularyEditorCoreMethods.js');
 const {
@@ -77,6 +79,7 @@ function createManagerClass() {
     installTeacherVocabularyStorageMethods(Manager);
     installTeacherVocabularyEditorCoreMethods(Manager);
     Manager.prototype.getTeacherLibrary = teacherVocabularyDataMethods.getTeacherLibrary;
+    Manager.prototype.invalidateTeacherLibraryCache = teacherVocabularyWorkflowMethods.invalidateTeacherLibraryCache;
     return Manager;
 }
 
@@ -91,8 +94,8 @@ function initializeManager(manager, ownerId = 'teacher-a') {
         teacherVocabularySaveQueue: null,
         teacherVocabularySaveDebounces: new Map(),
         teacherVocabularyLatestSaveByDocument: new Map(),
-        teacherLibraryCache: null,
-        teacherLibraryPromise: null,
+        teacherVocabularyQueryService: createServerStateQuery({ gcTime: Infinity }),
+        teacherVocabularyLibraryLoadGeneration: 0,
         libraryItems: [],
         libraryDrilldown: { subject: null, grade: null, trimester: null, month: null },
         vocabSet: { id: 'unit-a', name: 'Account A', subjectSlug: 'technology', activitySettings: {}, words: [] }
@@ -103,10 +106,6 @@ function initializeManager(manager, ownerId = 'teacher-a') {
     manager.normalizeActivityFlowSettings = (vocab = manager.vocabSet) => {
         vocab.activitySettings ||= {};
         return { required: [], additional: [] };
-    };
-    manager.invalidateTeacherLibraryCache = () => {
-        manager.teacherLibraryCache = null;
-        manager.teacherLibraryPromise = null;
     };
     manager.getLocalVocabs = () => [];
     manager.dedupeTeacherVocabularyItems = items => items;
@@ -204,7 +203,7 @@ test('a pending save from account A cannot block account B saves', async () => {
     }
 });
 
-test('an old library request cannot populate or clear the next account cache', async () => {
+test('an old library request cannot populate the next account query', async () => {
     const Manager = createManagerClass();
     const manager = initializeManager(new Manager());
     const accountA = deferred();
@@ -219,12 +218,9 @@ test('an old library request cannot populate or clear the next account cache', a
     clearTeacherVocabularySessionState(manager);
     manager.currentUser = { uid: 'teacher-b' };
     const newRequest = manager.getTeacherLibrary();
-    const newInternalRequest = manager.teacherLibraryPromise;
     accountA.resolve([{ id: 'a-only' }]);
     const oldResult = await oldRequest;
     assert.equal(oldResult.stale, true);
-    assert.equal(manager.teacherLibraryPromise, newInternalRequest);
-    assert.equal(manager.teacherLibraryCache, null);
     const sharedNewRequest = manager.getTeacherLibrary();
     assert.equal(fetchCount, 2);
 
@@ -232,8 +228,69 @@ test('an old library request cannot populate or clear the next account cache', a
     const [newResult, sharedResult] = await Promise.all([newRequest, sharedNewRequest]);
     assert.deepEqual(newResult.cloudVocabs.map(vocab => vocab.id), ['b-only']);
     assert.deepEqual(sharedResult.cloudVocabs.map(vocab => vocab.id), ['b-only']);
-    assert.deepEqual(manager.teacherLibraryCache.cloudVocabs.map(vocab => vocab.id), ['b-only']);
-    assert.equal(manager.teacherLibraryPromise, null);
+});
+
+test('local drafts are rebuilt immediately without refetching cloud metadata', async () => {
+    const Manager = createManagerClass();
+    const manager = initializeManager(new Manager());
+    let fetchCount = 0;
+    let drafts = [{ id: 'draft-a', name: 'Draft A' }];
+    manager.fetchCloudVocabs = async () => {
+        fetchCount += 1;
+        return [{ id: 'cloud-a', name: 'Cloud A' }];
+    };
+    manager.getLocalVocabs = () => drafts;
+
+    const first = await manager.getTeacherLibrary();
+    drafts = [{ id: 'draft-b', name: 'Draft B' }];
+    const second = await manager.getTeacherLibrary();
+
+    assert.equal(fetchCount, 1);
+    assert.deepEqual(first.localVocabs.map(vocab => vocab.id), ['draft-a']);
+    assert.deepEqual(second.localVocabs.map(vocab => vocab.id), ['draft-b']);
+
+    await manager.getTeacherLibrary({ forceRefresh: true });
+    assert.equal(fetchCount, 2);
+});
+
+test('cloud invalidation makes the next library read fetch fresh metadata', async () => {
+    const Manager = createManagerClass();
+    const manager = initializeManager(new Manager());
+    let fetchCount = 0;
+    manager.fetchCloudVocabs = async () => [{ version: ++fetchCount }];
+
+    const first = await manager.getTeacherLibrary();
+    await manager.invalidateTeacherLibraryCache();
+    const second = await manager.getTeacherLibrary();
+
+    assert.equal(fetchCount, 2);
+    assert.equal(first.cloudVocabs[0].version, 1);
+    assert.equal(second.cloudVocabs[0].version, 2);
+});
+
+test('a forced library refresh is latest-wins for the same account', async () => {
+    const Manager = createManagerClass();
+    const manager = initializeManager(new Manager());
+    const requests = [];
+    manager.fetchCloudVocabs = () => {
+        const request = deferred();
+        requests.push(request);
+        return request.promise;
+    };
+
+    const older = manager.getTeacherLibrary();
+    await new Promise(resolve => setImmediate(resolve));
+    const newer = manager.getTeacherLibrary({ forceRefresh: true });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(requests.length, 2);
+
+    requests[1].resolve([{ id: 'newer' }]);
+    const newResult = await newer;
+    requests[0].resolve([{ id: 'older' }]);
+    const oldResult = await older;
+
+    assert.deepEqual(newResult.cloudVocabs.map(vocab => vocab.id), ['newer']);
+    assert.equal(oldResult.stale, true);
 });
 
 test('cloud saves use immutable snapshots and reach the repository in initiation order', async () => {

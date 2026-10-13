@@ -26,7 +26,7 @@ const icons = await readFile(new URL('../js/icons.js', import.meta.url), 'utf8')
 const typographyCss = await readFile(new URL('../css/typography.css', import.meta.url), 'utf8');
 const landingCss = await readFile(new URL('../css/landing.css', import.meta.url), 'utf8');
 const mainModule = await readFile(new URL('../js/main.js', import.meta.url), 'utf8');
-const { collectStudentPrecacheFiles } = await import('../scripts/student-precache.mjs');
+const { collectStudentPrecacheFiles, collectStudentShellFiles } = await import('../scripts/student-precache.mjs');
 
 test('obsolete client save stubs do not return as a second persistence system', async () => {
     assert.doesNotMatch(mainModule, /export const store\s*=/);
@@ -48,7 +48,7 @@ test('student continuation art keeps only the optimized delivery asset', async (
     await assert.rejects(access(new URL('../images/ui/student-continue-data-wave.png', import.meta.url)));
 });
 
-test('student offline shell is generated from the student entry graph only', () => {
+test('student offline code includes lazy chunks while initial shell delivery stays static', () => {
     assert.match(viteConfig, /manifest:\s*true/);
     assert.match(serviceWorkerGenerator, /manifest\.json/);
     assert.match(serviceWorkerGenerator, /src === 'student\.html'/);
@@ -66,15 +66,15 @@ test('student offline shell is generated from the student entry graph only', () 
         'activity.js': { file: 'assets/activity.js' }
     };
     assert.deepEqual(
-        Array.from(collectStudentPrecacheFiles(manifest, 'student.html')).sort(),
+        Array.from(collectStudentShellFiles(manifest, 'student.html')).sort(),
         [
             'assets/shared.js',
             'assets/student.css',
             'assets/student.js',
-            'student.html',
-            'vocabularies/manifest.json'
+            'student.html'
         ]
     );
+    assert.ok(collectStudentPrecacheFiles(manifest, 'student.html').has('assets/activity.js'));
 });
 
 test('large upstream game artifacts remain excluded from deployment assets', () => {
@@ -123,6 +123,8 @@ test('teacher feature bundles are loaded only when their views are opened', () =
 test('quiz maker styles load with the lazy quiz feature', () => {
     assert.match(teacherQuizEntry, /import ['"]\.\.\/css\/teacherQuiz\.css['"]/);
     assert.match(teacherQuizCss, /\/\* Quiz Maker Styles \*\//);
+    assert.match(teacherQuizCss, /\.quiz-vocab-row/);
+    assert.doesNotMatch(teacherCss, /^\.quiz-vocab-row/m);
     assert.match(teacherQuizCss, /\.quiz-maker-container/);
     assert.match(teacherQuizCss, /\.document-page/);
     assert.doesNotMatch(teacherCss, /\/\* Quiz Maker Styles \*\//);

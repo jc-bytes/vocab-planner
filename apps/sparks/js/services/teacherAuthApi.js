@@ -5,8 +5,6 @@ export const TEACHER_AUTH_API_METHODS = Object.freeze([
     'getCurrentUser',
     'onAuthStateChanged',
     'signOut',
-    'getProfile',
-    'ensureAllowlistedTeacherProfile',
     'signInWithPassword'
 ]);
 

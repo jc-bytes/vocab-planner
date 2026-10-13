@@ -1,4 +1,6 @@
 import { $, escapeHtml } from './main.js';
+import { parseTeacherDataExport } from './services/teacherDataImportValidation.js';
+import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
 
 function finiteNumber(value) {
     const number = Number(value);
@@ -17,18 +19,12 @@ const teacherDataViewerMethods = {
         tabButtons.forEach(btn => {
             this.addOwnedListener(btn, 'click', () => this.switchDataTab(btn.dataset.tab));
             this.addOwnedListener(btn, 'keydown', event => {
-                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                 const visibleTabButtons = tabButtons.filter(button => !button.hidden);
-                if (!visibleTabButtons.length) return;
-                const currentIndex = visibleTabButtons.indexOf(btn);
-                let nextIndex = currentIndex;
-                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % visibleTabButtons.length;
-                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + visibleTabButtons.length) % visibleTabButtons.length;
-                if (event.key === 'Home') nextIndex = 0;
-                if (event.key === 'End') nextIndex = visibleTabButtons.length - 1;
+                const nextTab = getKeyboardNavigatedTab(visibleTabButtons, btn, event.key);
+                if (!nextTab) return;
                 event.preventDefault();
-                visibleTabButtons[nextIndex].focus();
-                this.switchDataTab(visibleTabButtons[nextIndex].dataset.tab);
+                nextTab.focus();
+                this.switchDataTab(nextTab.dataset.tab);
             });
         });
 
@@ -92,7 +88,7 @@ const teacherDataViewerMethods = {
         };
         const allowedTabs = this.dataManagementArea === 'data'
             ? ['dashboard', 'export', 'view', 'reset']
-            : ['subjects', 'gamification', 'calendar'];
+            : ['subjects', 'gamification', 'calendar', 'export', 'view', 'reset'];
         const activeTab = allowedTabs.includes(tab) ? tab : allowedTabs[0];
         const activeSectionId = sections[activeTab];
         const dataView = document.getElementById('teacher-data-management-view');
@@ -142,10 +138,7 @@ const teacherDataViewerMethods = {
             if (this.destroyed
                 || lifecycleGeneration !== this.lifecycleGeneration
                 || generation !== this.fileLoadGeneration) return false;
-            const data = JSON.parse(text);
-
-            // Validate structure
-            this.validateJSONStructure(data);
+            const data = parseTeacherDataExport(text);
 
             // Store loaded data
             this.loadedData = this.processLoadedData(data);
@@ -167,24 +160,6 @@ const teacherDataViewerMethods = {
             this.showFileError(error.message || 'Failed to load file. Please check the file format.');
             this.feedback.error('Failed to load file. Please check the file format.');
             return false;
-        }
-    },
-
-    validateJSONStructure(data) {
-        if (!data) {
-            throw new Error('File is empty or invalid JSON');
-        }
-
-        if (!data.studentProgress && !data.scores && !data.userRoles) {
-            throw new Error('Invalid export format: file must contain studentProgress, scores, or userRoles');
-        }
-
-        if (data.studentProgress && !Array.isArray(data.studentProgress)) {
-            throw new Error('Invalid format: studentProgress must be an array');
-        }
-
-        if (data.scores && !Array.isArray(data.scores)) {
-            throw new Error('Invalid format: scores must be an array');
         }
     },
 

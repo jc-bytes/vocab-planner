@@ -1,6 +1,6 @@
 # Sparks architecture
 
-This is the practical map for extending Sparks. It describes current ownership and the shortest safe path for common changes. Detailed decisions and completed migrations are recorded in `docs/architecture-remediation.md`.
+This is the practical map for extending Sparks. It describes current ownership and the shortest safe path for common changes. Detailed decisions and completed migrations are recorded in `docs/architecture-remediation.md`. The current audit and repair evidence is in `docs/architecture-audit-2026-10-07.md`. The earlier assessment remains in `docs/architecture-audit-2026-08-30.md`.
 
 The repository and classroom system are called Sparks. The currently shipped HTML titles, npm package, Tauri product, and desktop bundle retain the historical product name Vocabulary Master; changing those together is a separate product-release decision.
 
@@ -14,13 +14,14 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | `student.html` | `js/student.js` | Student shell, learning activities, progress, and Arcade |
 | `teacher.html` | `js/teacher.js` | Teacher shell, content, students, settings, and lazy tools |
 
-`vite.config.mjs` builds all three entries. Large activities, games, teacher tools, reports, charts, and Quiz Maker stay behind dynamic imports. `scripts/generate-service-worker.mjs` derives the student offline shell from the production manifest rather than maintaining a second asset list.
+`vite.config.mjs` builds all three entries. Large activities, games, teacher tools, reports, charts, and Quiz Maker stay behind dynamic imports. `scripts/generate-service-worker.mjs` derives the full student offline code graph from the production manifest rather than maintaining a second asset list.
 
 ## Ownership map
 
 | Concern | Authority |
 | --- | --- |
-| Student activity metadata and construction | `js/student/studentActivityRegistry.js` |
+| Student activity runtime metadata and construction | `js/student/studentActivityRegistry.js` |
+| Cross-surface activity labels and persisted metric aliases | `js/activityMetadata.js` |
 | Activity implementations | `js/activities/` |
 | Arcade game metadata and loading | `js/student/studentGameRegistry.js` |
 | Game implementations and HTML assets | `js/games/` |
@@ -34,6 +35,7 @@ Sparks is a vanilla JavaScript multi-page Vite application with three entries:
 | Browser Supabase initialization | `js/services/supabaseClient.js` and `js/supabaseService.js` |
 | Database authority | `supabase/migrations/` plus RLS and RPC contracts |
 | Environment validation | `config/supabase-config.js`, `vite.config.mjs`, and `planner` |
+| Student worker version/cache ownership | `js/student/studentWorkerLifecycle.js`, loaded only by the generated worker; `scripts/student-precache.mjs` derives the student graph |
 | Delivery-size budgets | `scripts/lib/deliverySizeBudgets.mjs`, enforced by `scripts/check-dist-size.mjs` after every production build |
 | Lazy production graph | `scripts/lib/lazyBuildContracts.mjs`, enforced by `scripts/validate-lazy-build.mjs` after every production build |
 
@@ -42,10 +44,11 @@ Managers are application composition roots. They may coordinate shell-level use 
 ## Add an activity
 
 1. Add the implementation under `js/activities/`. Export a class whose name ends in `Activity` and give it an explicit cleanup method when it owns listeners, timers, URLs, or callbacks.
-2. Add one descriptor to `STUDENT_ACTIVITY_REGISTRY` in `js/student/studentActivityRegistry.js`.
-3. Define eligibility, word preparation, and construction on that descriptor. Use shared helpers only when the lifecycle is genuinely the same.
-4. Add the activity ID to the independently controlled database activity policy through a migration when the server must accept it. Do not import client metadata into authorization code.
-5. Add focused behavior tests and update the exact client/server parity expectation.
+2. Add its canonical ID, shared label, and any legacy persisted metric aliases to `ACTIVITY_DEFINITIONS` in `js/activityMetadata.js`.
+3. Add one descriptor to `STUDENT_ACTIVITY_REGISTRY` in `js/student/studentActivityRegistry.js`.
+4. Define eligibility, word preparation, and construction on that descriptor. Use shared helpers only when the lifecycle is genuinely the same.
+5. Add the activity ID to the independently controlled database activity policy through a migration when the server must accept it. Do not import client metadata into authorization code.
+6. Add focused behavior tests and update the exact client/server parity expectation.
 
 ```js
 {
@@ -62,7 +65,7 @@ Managers are application composition roots. They may coordinate shell-level use 
 }
 ```
 
-The registry drives cards, routes, teacher setting keys, ordering, lazy loading, replay/coverage policy, and launch behavior. XP and authorization remain server-authoritative. Run `npm run test:student-registries`, the activity's focused tests, `npm run test:student-activities`, and the production build.
+The runtime registry drives cards, routes, teacher setting keys, ordering, lazy loading, replay/coverage policy, and launch behavior. The shared metadata module stays separate so reports and teacher dashboards can label canonical and legacy persisted metrics without importing student launch code. An exact parity test prevents their canonical ID sets from drifting; persisted aliases never become launchable routes. XP and authorization remain server-authoritative. Run `npm run test:student-registries`, the activity's focused tests, `npm run test:student-activities`, and the production build.
 
 ## Add a game
 
@@ -129,11 +132,21 @@ First-party UI does not build Supabase queries. Use these boundaries:
 - `supabaseService.js` composes internal Supabase adapters; it is not a feature dependency to pass broadly.
 - RLS and RPCs in `supabase/migrations/` remain authoritative for identity, roles, rewards, progress, Arcade time, and scores.
 
+`serverStateQuery.js` captures account lifetime and school generation before asynchronous work. Reads default to school scope; use `scope: 'account'` only for data shared across that account's schools, such as the wallet summary. Cleanup invalidates old account lifetimes before awaiting cancellation. Keep ownership checks before dispatch and after awaited results; a cache key alone cannot protect a dynamically scoped repository request.
+
 Do not wrap every repository. Add a new interface only for a real security boundary, alternate implementation, platform boundary, or needed test double. For transactional multi-record behavior, add a domain RPC instead of a generic client batch.
 
 Environment URLs and browser-key validation live in `config/supabase-config.js`. Browser builds accept publishable or legacy anonymous keys and reject secret/service-role keys. Local Supabase CLI identity and deployment credentials remain separate authorities.
 
 Run repository/API contract tests, the affected security/parity tests, and local Supabase acceptance checks when the local stack is available. See `docs/data-access-architecture.md` for the detailed boundary map.
+
+## Own asynchronous UI work
+
+Give each replaceable request a current-owner predicate and check it after every await before changing a model, storage or DOM. A view generation covers replacement of the whole view; independently replaceable previews need their own request identity. Cancel obsolete reads where supported, and still guard their results and errors.
+
+Arcade access/settings share `captureArcadeSession` from `studentGameAccessMethods.js`. Lifecycle start operations own the purchase and launch lock. Stop cancels the launch but retains a confirmed purchase as resumable time; destroy invalidates the session. Keep that distinction when extending game controls. Client cancellation cannot undo a server purchase that already committed.
+
+Wallet operations and gift panels share `captureCoinSession` from `studentProgressCoinMethods.js`. The progress instance can survive account changes, so identity alone is insufficient: retain account/storage ownership and cloud generation too. Pass captured ownership through backend initialization to the RPC dispatch; guarding only the returned result still allows an old action to execute under a new account. Subject batches apply the same rule before each item, preserving already-dispatched partial saves.
 
 ## Where new code belongs
 

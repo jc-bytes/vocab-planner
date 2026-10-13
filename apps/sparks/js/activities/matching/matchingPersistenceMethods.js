@@ -1,7 +1,9 @@
 import {
+    readStudentActivityJson,
     readStudentActivityValue,
     writeStudentActivityValue
 } from '../../student/persistence/studentStorage.js';
+import { matchingStateSchema, validateActivityState } from '../activityStateValidation.js';
 
 export const matchingPersistenceMethods = {
 getStorageKey() {
@@ -87,9 +89,7 @@ hasMatchingWordKeys(wordKeys) {
     },
 
 restoreState() {
-        const state = this.initialState && typeof this.initialState === 'object'
-            ? this.initialState
-            : null;
+        const state = validateActivityState(matchingStateSchema, this.initialState);
 
         if (state && this.applySavedState(state)) {
             return;
@@ -97,17 +97,15 @@ restoreState() {
 
         let saved = null;
         try {
-            saved = readStudentActivityValue(this.getStorageKey());
+            saved = readStudentActivityJson(this.getStorageKey(), null, {
+                validate: value => validateActivityState(matchingStateSchema, value)
+            });
         } catch (error) {
             console.warn('Unable to read matching progress:', error);
         }
         if (!saved) return;
 
-        try {
-            this.applySavedState(JSON.parse(saved));
-        } catch (error) {
-            console.error('Error restoring matching state:', error);
-        }
+        this.applySavedState(saved);
     },
 
 applySavedState(state) {
@@ -167,4 +165,3 @@ getNextTargetRounds() {
         return this.getAccuracyPercent() > 85 ? this.targetRounds + 1 : this.targetRounds;
     },
 };
-

@@ -7,12 +7,13 @@ import { StudentProgressCloud } from './studentProgressCloudMethods.js';
 import { StudentProgressCoins } from './studentProgressCoinMethods.js';
 import { StudentProgressCore } from './studentProgressCoreMethods.js';
 import { StudentCoinNotifications } from './studentCoinNotifications.js';
+import { createUniqueId } from '../randomUtils.js';
 
 export class StudentProgress {
     constructor(studentManager) {
         this.sm = studentManager;
         this.clientId = sessionStorage.getItem('student_coin_client_id') ||
-            (crypto.randomUUID ? crypto.randomUUID() : `client-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+            createUniqueId('client-');
         sessionStorage.setItem('student_coin_client_id', this.clientId);
         this.scheduledCloudSaveTimeout = null;
         this.core = new StudentProgressCore(this);

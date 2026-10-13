@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
 import { FINAL_REPORT_ACTIVITIES, PDF_PAGE_FORMAT } from "./reportConstants.js";
 
 export const finalReportMethods = {
@@ -112,65 +113,75 @@ export const finalReportMethods = {
         return y + 72;
     },
 
-    getFinalReportColumns() {
-        const widths = [138, 62, 214, 114];
-        let x = 42;
-        const labels = ['Activity', 'Score', 'Details', 'Status'];
-        const items = widths.map((width, index) => {
-            const column = { label: labels[index], width, x, index };
-            x += width;
-            return column;
+    drawFinalReportActivityTable(pdf, rows, startY, headerContext) {
+        autoTable(pdf, {
+            startY,
+            head: [['Activity', 'Score', 'Details', 'Status']],
+            body: rows.map(row => [
+                row.label,
+                row.score === null ? '-' : `${row.score}%`,
+                row.details,
+                row.status
+            ]),
+            margin: { top: 112, right: 42, bottom: 42, left: 42 },
+            tableWidth: 528,
+            showHead: 'everyPage',
+            pageBreak: 'auto',
+            rowPageBreak: 'avoid',
+            styles: {
+                font: 'helvetica',
+                fontSize: 8,
+                textColor: [75, 85, 99],
+                lineColor: [229, 231, 235],
+                lineWidth: 0.5,
+                cellPadding: 8,
+                minCellHeight: 34,
+                valign: 'middle',
+                overflow: 'linebreak'
+            },
+            headStyles: {
+                fillColor: [243, 244, 246],
+                textColor: [31, 41, 55],
+                fontStyle: 'bold',
+                fontSize: 9,
+                minCellHeight: 26
+            },
+            columnStyles: {
+                0: { cellWidth: 138, fontStyle: 'bold', fontSize: 9, textColor: [31, 41, 55] },
+                1: { cellWidth: 62, fontStyle: 'bold', fontSize: 10 },
+                2: { cellWidth: 214 },
+                3: { cellWidth: 114, fontStyle: 'bold' }
+            },
+            didParseCell: data => {
+                if (data.section !== 'body') return;
+                const row = rows[data.row.index];
+                if (!row) return;
+                if (data.column.index === 1) {
+                    data.cell.styles.textColor = row.score === null
+                        ? [156, 163, 175]
+                        : (row.score >= 80 ? [6, 95, 70] : (row.score >= 50 ? [146, 64, 14] : [153, 27, 27]));
+                }
+                if (data.column.index === 2 && !row.started) {
+                    data.cell.styles.textColor = [156, 163, 175];
+                }
+                if (data.column.index === 3) {
+                    data.cell.styles.fillColor = row.completed
+                        ? [209, 250, 229]
+                        : (row.started ? [219, 234, 254] : [243, 244, 246]);
+                    data.cell.styles.textColor = row.completed
+                        ? [6, 95, 70]
+                        : (row.started ? [30, 64, 175] : [107, 114, 128]);
+                }
+            },
+            willDrawPage: data => {
+                if (data.pageNumber === 1) return;
+                this.drawFinalReportHeader(pdf, {
+                    ...headerContext,
+                    pageNumber: pdf.getNumberOfPages()
+                });
+            }
         });
-        return { items, totalWidth: widths.reduce((sum, width) => sum + width, 0) };
-    },
-
-    drawFinalReportTableHeader(pdf, y) {
-        const columns = this.getFinalReportColumns();
-        pdf.setFillColor(243, 244, 246);
-        pdf.setDrawColor(229, 231, 235);
-        pdf.rect(42, y, columns.totalWidth, 26, 'FD');
-        this.setPdfTextStyle(pdf, { size: 9, style: 'bold', color: [31, 41, 55] });
-        columns.items.forEach(column => {
-            pdf.text(column.label, column.x + 8, y + 17);
-            if (column.index > 0) pdf.line(column.x, y, column.x, y + 26);
-        });
-        return y + 26;
-    },
-
-    getFinalReportRowHeight(pdf, row) {
-        const detailsWidth = this.getFinalReportColumns().items[2].width - 16;
-        return Math.max(34, 16 + (this.getPdfTextLines(pdf, row.details, detailsWidth, 8).length * 9));
-    },
-
-    drawFinalReportRow(pdf, row, y, height) {
-        const columns = this.getFinalReportColumns().items;
-        const totalWidth = columns.reduce((sum, column) => sum + column.width, 0);
-        pdf.setDrawColor(229, 231, 235);
-        pdf.rect(columns[0].x, y, totalWidth, height);
-        columns.slice(1).forEach(column => pdf.line(column.x, y, column.x, y + height));
-
-        this.drawWrappedPdfText(pdf, row.label, columns[0].x + 8, y + 17, columns[0].width - 16, {
-            size: 9, style: 'bold', color: [31, 41, 55], lineHeight: 10
-        });
-        this.setPdfTextStyle(pdf, {
-            size: 10,
-            style: 'bold',
-            color: row.score === null ? [156, 163, 175] : (row.score >= 80 ? [6, 95, 70] : (row.score >= 50 ? [146, 64, 14] : [153, 27, 27]))
-        });
-        pdf.text(row.score === null ? '-' : `${row.score}%`, columns[1].x + 8, y + 17);
-        this.drawWrappedPdfText(pdf, row.details, columns[2].x + 8, y + 16, columns[2].width - 16, {
-            size: 8, color: row.started ? [75, 85, 99] : [156, 163, 175], lineHeight: 9
-        });
-
-        const badge = row.completed
-            ? { fill: [209, 250, 229], text: [6, 95, 70], label: 'Completed', width: 58 }
-            : (row.started
-                ? { fill: [219, 234, 254], text: [30, 64, 175], label: 'In progress', width: 64 }
-                : { fill: [243, 244, 246], text: [107, 114, 128], label: 'Not started', width: 66 });
-        pdf.setFillColor(...badge.fill);
-        pdf.roundedRect(columns[3].x + 8, y + 8, badge.width, 16, 8, 8, 'F');
-        this.setPdfTextStyle(pdf, { size: 7, style: 'bold', color: badge.text });
-        pdf.text(badge.label, columns[3].x + 8 + (badge.width / 2), y + 19, { align: 'center' });
+        return pdf.lastAutoTable?.finalY || startY;
     },
 
     async generateReport(studentProfile, vocabOrName, scores, options = {}) {
@@ -181,6 +192,7 @@ export const finalReportMethods = {
         try {
             const words = this.getWordHuntWords(vocabOrName);
             const wordHuntRows = await this.buildWordHuntPdfRows(vocabName, words, options);
+            options.assertCurrent?.();
             const activityRows = this.getFinalReportActivityRows(scores);
             const summary = this.getFinalReportSummary(activityRows, wordHuntRows);
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: PDF_PAGE_FORMAT });
@@ -196,21 +208,10 @@ export const finalReportMethods = {
             y += 14;
             this.setPdfTextStyle(pdf, { size: 8, color: [107, 114, 128] });
             pdf.text('Best saved result for each activity in this vocabulary unit.', 42, y);
-            y = this.drawFinalReportTableHeader(pdf, y + 12);
-
-            for (const row of activityRows) {
-                const rowHeight = this.getFinalReportRowHeight(pdf, row);
-                if (y + rowHeight > pageHeight - bottomMargin) {
-                    pdf.addPage(PDF_PAGE_FORMAT, 'portrait');
-                    pageNumber += 1;
-                    y = this.drawFinalReportHeader(pdf, {
-                        vocabName, subjectName, fullName, grade, group, pageNumber
-                    });
-                    y = this.drawFinalReportTableHeader(pdf, y);
-                }
-                this.drawFinalReportRow(pdf, row, y, rowHeight);
-                y += rowHeight;
-            }
+            y = this.drawFinalReportActivityTable(pdf, activityRows, y + 12, {
+                vocabName, subjectName, fullName, grade, group
+            });
+            pageNumber = pdf.getNumberOfPages();
 
             if (wordHuntRows.length > 0) {
                 pdf.addPage(PDF_PAGE_FORMAT, 'portrait');
@@ -251,11 +252,12 @@ export const finalReportMethods = {
                     align: 'right'
                 });
             }
+            options.assertCurrent?.();
             pdf.save(this.buildFinalReportFileName(studentProfile, vocabOrName, options));
         } catch (err) {
+            if (err?.name === 'AbortError') throw err;
             console.error('Report generation failed:', err);
             alert('Failed to generate final report PDF.');
         }
     },
 };
-

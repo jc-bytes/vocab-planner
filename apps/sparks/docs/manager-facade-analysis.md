@@ -1,6 +1,6 @@
 # Manager and forwarding interface analysis
 
-This map began as the Task 22 caller and ownership analysis and now records the verified Task 23-24 result. It distinguishes real forwarding from implementation methods installed on a composition root. Method count alone is not treated as an architectural defect.
+This map began as the Task 22 caller and ownership analysis and now records the verified Task 23-24 result plus the later vocabulary-browser cleanup. It distinguishes real forwarding from implementation methods installed on a composition root. Method count alone is not treated as an architectural defect.
 
 ## Summary
 
@@ -10,7 +10,7 @@ This map began as the Task 22 caller and ownership analysis and now records the 
 | `StudentActivities` | Stable activity boundary over 13 owned collaborators | Runtime, presentation, schedule, vocabulary, progress, and Word Hunt collaboration | Preserve high-level contracts; 16 uncalled low-level wrappers were removed. |
 | `StudentGames` | Lazy Arcade boundary | Settings, access, leaderboard, HTML loading, and lifecycle owners | Listener-facing Arcade intents now live in lifecycle; four unused wrappers were removed. |
 | `TeacherManager` lazy entries | 7 methods over 5 features | Stable lazy-loading use cases | Preserve. A generic feature invoker would expose loader details to routing. |
-| Quiz vocabulary-browser adapter | 28 validated capabilities | Explicit replacement for the former open manager Proxy | Preserve for now. Replace only if a cohesive DOM-free browser model removes the adapter atomically. |
+| Quiz vocabulary-browser adapter | 10 cohesive capabilities | Shared hierarchy rendering plus Quiz-specific row and card presentation | Preserve. Quiz owns its state while the adapter reuses the Vocabulary model and renderer. |
 
 ## StudentManager
 
@@ -87,7 +87,7 @@ The large eager teacher surface is mostly implementation installed onto the appl
 
 Data Management receives several explicit capabilities because its private dashboard, export, viewer, and settings workflows are genuinely different. Its roster snapshot remains an intentional cross-page boundary because account cleanup and explicit Student Progress selections also own that state.
 
-Quiz's 28 browser capabilities are broad but exact, frozen, tested, and all used. They replaced an unbounded Proxy. A future DOM-free vocabulary-browser model may provide a deeper interface, but nesting or renaming the same 28 methods would be cosmetic. Keep the adapter until a model can replace it in one verified change.
+Quiz and Assign now share one vocabulary hierarchy renderer. The Quiz adapter reduced its interface from 28 low-level formatting and grouping calls to 10 cohesive operations for hierarchy rendering, filtering, view depth, row presentation, ordering, counts, and picker presentation. Quiz still owns its library array, drilldown, preferences, routes, async selection, and builder lifecycle. The shared renderer never reads or writes Quiz state directly.
 
 ## Task 24 result
 

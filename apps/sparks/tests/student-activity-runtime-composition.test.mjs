@@ -642,6 +642,7 @@ test('Illustration feature context exposes only its required data and capabiliti
         },
         getActivityFlowConfig: () => ({ required: ['flashcards', 'illustration'] }),
         getUnitGrade: () => '6',
+        getUnitProgressKey: () => 'assignment:example',
         handleIllustrationSave(...args) {
             calls.push(['save', ...args]);
         },
@@ -676,6 +677,7 @@ test('Illustration feature context exposes only its required data and capabiliti
         'sourceWords', 'uploadImage', 'vocabName'
     ]);
     assert.equal(context.ownerUserId, 'student-3');
+    assert.equal(context.vocabName, 'assignment:example');
     assert.equal(context.initialIndex, 2);
     assert.equal(context.isRequired, true);
     assert.equal(context.allowTextPaste, true);
@@ -969,7 +971,7 @@ test('StudentActivities owns explicit browser and home components', () => {
     assert.equal(activities.browser.cards.browser, activities.browser);
     assert.equal(activities.browser.navigation.browser, activities.browser);
     assert.equal(activities.home.spark.home, activities.home);
-    assert.equal(activities.home.currentSparkSessionCache, activities.home.spark.currentSparkSessionCache);
+    assert.equal('currentSparkSessionCache' in activities.home, false);
     assert.equal(activities.browser.sm, manager);
     assert.equal(activities.home.sm, manager);
 });
@@ -1875,13 +1877,10 @@ test('activity module caches are isolated per StudentActivities instance', () =>
     assert.equal('activityModulePromises' in first, false);
 });
 
-test('Spark session caches are isolated and owned by the home component', () => {
+test('Spark server-state caching stays out of the student manager', () => {
     const first = new StudentActivities({});
-    const second = new StudentActivities({});
-
-    first.home.currentSparkSessionCache.set('technology:6:2026-07-14', { id: 'spark-1' });
-
-    assert.equal(second.home.currentSparkSessionCache.size, 0);
+    assert.equal('currentSparkSessionCache' in first.home, false);
+    assert.equal('currentSparkSessionCache' in first.home.spark, false);
     assert.equal('currentSparkSessionCache' in first.sm, false);
 });
 

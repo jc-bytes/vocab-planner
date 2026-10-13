@@ -72,3 +72,18 @@ test('activity timer restores saved time and marks only time beyond the limit la
     assert.match(indicator.textContent, /^Late by/);
     timer.destroy();
 });
+
+
+test('untimed attempts count foreground time without displaying a limit or creating lateness', () => {
+    let now = 0;
+    const timer = new StudentActivityWorkTimer({ now: () => now });
+    visibilityState = 'visible'; focused = true;
+    timer.start({ attemptId: 'untimed-attempt', activeSeconds: 0 });
+    now = 30_000;
+    assert.equal(timer.getSnapshot().activeSeconds, 30);
+    assert.equal(timer.getSnapshot().isLate, false);
+    timer.render(); assert.equal(indicator.hidden, true);
+    timer.handleBlur(); now = 90_000;
+    assert.equal(timer.getSnapshot().activeSeconds, 30);
+    timer.destroy();
+});

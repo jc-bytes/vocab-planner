@@ -33,6 +33,7 @@ const { StudentActivityProgressPersistence } = await import('../js/student/stude
 const { StudentProgressCloud } = await import('../js/student/studentProgressCloudMethods.js');
 const { imageDB } = await import('../js/db.js');
 const { supabaseService } = await import('../js/supabaseService.js');
+test.beforeEach(t => t.mock.method(imageDB, 'retireUnitSyncActions', async () => {}));
 const {
     getActiveStudentStorageOwner,
     setActiveStudentStorageOwner
@@ -543,6 +544,9 @@ test('a too-fast completion is durable before exit returns and retries in the ba
     let queued;
     let flushes = 0;
     sm.progress.flushLocalSyncQueue = async () => { flushes++; };
+    const cloud = new StudentProgressCloud({ sm });
+    cloud.flushLocalSyncQueue = async () => { flushes++; };
+    sm.progress.syncQueue = cloud.syncQueue;
     t.mock.method(globalThis, 'setTimeout', (fn, delay) => {
         assert.equal(delay, 5250); callback = fn; return 0;
     });
@@ -588,4 +592,426 @@ test('queued timing checks defer without blocking other work or consuming retrie
     delayed.payload.retryNotBefore = Date.now() - 1;
     await cloud.flushLocalSyncQueue({ silent: true });
     assert.deepEqual(completed, ['ready', 'delayed', 'ready']);
+});
+
+test('queued Spark replay preserves answers edited while its request is pending', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    const originalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+    t.after(() => {
+        setActiveStudentStorageOwner(owner);
+        if (originalStorage) Object.defineProperty(globalThis, 'localStorage', originalStorage);
+        else delete globalThis.localStorage;
+    });
+    setActiveStudentStorageOwner('student-1');
+    let cached = JSON.stringify({ spark: { answers: { q: 'old' }, syncStatus: 'pending' } });
+    Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
+        getItem: () => cached, setItem: (_key, value) => { cached = value; }
+    } });
+    let resolveRequest;
+    t.mock.method(supabaseService, 'submitStudentSparkResponse', () => new Promise(resolve => { resolveRequest = resolve; }));
+    const cloud = new StudentProgressCloud({ sm: { currentUser: { uid: 'student-1' } } });
+    const replay = cloud.syncQueuedRecord({ ownerUserId: 'student-1', type: 'student-spark-response',
+        payload: { sparkId: 'spark', storageKey: 'spark-cache', answers: { q: 'old' } } });
+    cached = JSON.stringify({ spark: { answers: { q: 'new' }, syncStatus: 'pending' } });
+    resolveRequest({ spark_id: 'spark', answers: { q: 'old' } });
+    await replay;
+    assert.equal(JSON.parse(cached).spark.answers.q, 'new');
+    assert.equal(JSON.parse(cached).spark.syncStatus, 'pending');
+});
+
+test('overlapping queue flushes share one request for the current account generation', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    t.mock.method(imageDB, 'getPendingSyncActions', async () => [{ id: 'record', revision: 2,
+        ownerUserId: 'student-1', payload: {} }]);
+    let acknowledgeOptions;
+    t.mock.method(imageDB, 'completeSyncAction', async (_id, options) => { acknowledgeOptions = options; });
+    let requests = 0;
+    let finish;
+    const cloud = new StudentProgressCloud({ sm: { authDisabled: false,
+        currentUser: { uid: 'student-1' }, setAuthStatus() {} } });
+    cloud.syncQueuedRecord = () => { requests++; return new Promise(resolve => { finish = resolve; }); };
+    const first = cloud.flushLocalSyncQueue({ silent: true });
+    const second = cloud.flushLocalSyncQueue({ silent: true });
+    await Promise.resolve();
+    assert.equal(requests, 1);
+    finish();
+    await Promise.all([first, second]);
+    assert.equal(acknowledgeOptions.expectedRevision, 2);
+});
+
+test('queue schedules delayed startup work, retries failures, and stops after exhaustion', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    let now = 10000;
+    let timer;
+    let timerId = 0;
+    const statuses = [];
+    let rows = [{ id: 'delayed', ownerUserId: 'student-1', revision: 1, attempts: 0,
+        nextAttemptAt: new Date(now + 2000).toISOString(), payload: { retryNotBefore: now + 5000 } }];
+    let failures = [];
+    t.mock.method(imageDB, 'getPendingSyncActions', async options => {
+        assert.equal(options.includeDeferred, true);
+        return rows;
+    });
+    t.mock.method(imageDB, 'getFailedSyncActions', async () => failures);
+    t.mock.method(imageDB, 'markSyncActionFailed', async record => {
+        const updated = { ...record, revision: record.revision + 1, attempts: record.attempts + 1,
+            nextAttemptAt: new Date(now + 1000).toISOString(), status: record.attempts >= 1 ? 'failed' : 'pending' };
+        rows = updated.status === 'failed' ? [] : [updated];
+        failures = updated.status === 'failed' ? [updated] : [];
+        return updated;
+    });
+    const cloud = new StudentProgressCloud({ sm: { currentUser: { uid: 'student-1' },
+        setAuthStatus: value => statuses.push(value) } });
+    cloud.syncQueue.scheduler = { now: () => now,
+        setTimeout: (callback, delay) => { timer = { callback, delay, id: ++timerId }; return timerId; },
+        clearTimeout: id => { if (timer?.id === id) timer = null; } };
+    let requests = 0;
+    cloud.syncQueuedRecord = async () => { requests++; throw new TypeError('Failed to fetch'); };
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.equal(requests, 0);
+    assert.equal(timer.delay, 5000, 'Both persisted retry deadlines are respected');
+    now += timer.delay;
+    { const fire = timer.callback; timer = null; fire(); }
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.equal(requests, 1);
+    assert.equal(timer.delay, 1000);
+    now += timer.delay;
+    { const fire = timer.callback; timer = null; fire(); }
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.equal(requests, 2);
+    assert.equal(timer, null, 'Exhausted rows do not create a polling loop');
+    assert.equal(statuses.at(-1), 'Some local changes need attention');
+    await cloud.flushLocalSyncQueue({ silent: true });
+    assert.equal(statuses.at(-1), 'Some local changes need attention', 'Startup/drains keep existing failures visible');
+});
+
+test('retry timers are canceled on stop and cannot replay into a new account generation', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = new StudentProgressCloud({ sm: { currentUser: { uid: 'student-1' } } });
+    let callback;
+    let canceled = 0;
+    let flushes = 0;
+    cloud.flushLocalSyncQueue = async () => { flushes++; };
+    cloud.syncQueue.scheduler = { now: () => 0, setTimeout: fn => { callback = fn; return 1; },
+        clearTimeout: () => { canceled++; } };
+    cloud.syncQueue.scheduleRetry();
+    cloud.stopCoinSync();
+    assert.equal(canceled, 1);
+    callback();
+    assert.equal(flushes, 0, 'Even a canceled callback cannot run after generation changes');
+    cloud.syncQueue.scheduleRetry();
+    cloud.sm.currentUser = { uid: 'student-2' };
+    setActiveStudentStorageOwner('student-2');
+    callback();
+    assert.equal(flushes, 0);
+});
+
+test('new online activity and unit enqueues wake the queue without a reconnect event', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => ({}));
+    t.mock.method(supabaseService, 'submitStudentActivityProgress', async () => { throw new TypeError('Failed to fetch'); });
+    const { persistence, sm } = createPersistence();
+    const cloud = new StudentProgressCloud({ sm });
+    sm.progress.syncQueue = cloud.syncQueue;
+    let schedules = 0;
+    t.mock.method(cloud.syncQueue, 'scheduleRetry', options => {
+        assert.equal(options.ownerUserId, 'student-1'); schedules++;
+    });
+    await persistence.submitActivityProgressPayload({ eventId: 'transient-1',
+        activityType: 'matching', score: 50 }, { ownerUserId: 'student-1' });
+    assert.equal(schedules, 1);
+    t.mock.method(cloud.syncQueue, 'buildUnitWorkSyncPayload', () => ({ eventId: 'unit-1', unitKey: 'unit' }));
+    await cloud.syncQueue.enqueueProgressSync({ ownerUserId: 'student-1' });
+    assert.equal(schedules, 2);
+});
+
+test('coin refresh preserves persisted queue attention and retry failures are handled', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const statuses = [];
+    const cloud = new StudentProgressCloud({ sm: { currentUser: { uid: 'student-1' }, progressData: {},
+        setAuthStatus: status => statuses.push(status) },
+        migrateCoinData: () => ({ coinData: {} }), applyCoinSnapshot() {}, updateLevelDisplay() {} });
+    t.mock.method(imageDB, 'getPendingSyncActions', async () => []);
+    t.mock.method(imageDB, 'getFailedSyncActions', async () => [{ id: 'exhausted' }]);
+    await cloud.flushLocalSyncQueue({ silent: true });
+    cloud.applyRemoteCoinProgress({ totalXp: 10 });
+    assert.equal(statuses.at(-1), 'Some local changes need attention');
+    let callback;
+    cloud.syncQueue.scheduler = { now: () => 0, setTimeout: fn => { callback = fn; return 1; }, clearTimeout() {} };
+    cloud.flushLocalSyncQueue = async () => { throw new Error('Storage closed'); };
+    t.mock.method(console, 'warn', () => {});
+    cloud.syncQueue.scheduleRetry();
+    callback();
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(statuses.at(-1), 'Local sync needs attention');
+});
+
+function unitSaveCloud() {
+    const sm = { currentUser: { uid: 'student-1' }, currentVocab: { id: 'unit-a', name: 'A' },
+        activities: { getUnitProgressKey: vocab => vocab.id },
+        progressData: { units: { 'unit-a': { states: { matching: { answer: 'original' } } } } },
+        setAuthStatus() {} };
+    return new StudentProgressCloud({ sm });
+}
+
+test('failed unit save queues its detached attempted snapshot after navigation', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    let attempted;
+    let rejectRequest;
+    t.mock.method(supabaseService, 'syncStudentUnitWork', payload => {
+        attempted = payload;
+        return new Promise((_resolve, reject) => { rejectRequest = reject; });
+    });
+    let queued;
+    t.mock.method(imageDB, 'enqueueSyncAction', async (_type, payload) => { queued = payload; return { id: 'queued' }; });
+    t.mock.method(cloud.syncQueue, 'scheduleRetry', () => {});
+    t.mock.method(console, 'error', () => {});
+    cloud.sm.progressData.units['unit-a'].updatedAt = { seconds: 123, nanoseconds: 0, toDate: () => new Date(123000) };
+    const nextSnapshot = cloud.buildUnitWorkSyncPayload();
+    const saving = cloud.saveProgressToCloud();
+    assert.notEqual(nextSnapshot.eventId, attempted.eventId, 'Changed cumulative snapshots use fresh receipt IDs');
+    cloud.sm.progressData.units['unit-a'].states.matching.answer = 'later';
+    cloud.sm.currentVocab = { id: 'unit-b' };
+    cloud.sm.progressData.units['unit-b'] = { states: { matching: { answer: 'other' } } };
+    rejectRequest(new TypeError('Failed to fetch'));
+    await saving;
+    assert.equal(queued.unitKey, 'unit-a');
+    assert.deepEqual(queued.workPatch.updatedAt, { seconds: 123, nanoseconds: 0 });
+    assert.equal(queued.workPatch.states.matching.answer, 'original');
+    assert.equal(queued.eventId, attempted.eventId, 'Retry retains exactly the attempted event receipt ID');
+    assert.deepEqual(queued, attempted);
+});
+
+test('unit queue errors propagate and failed queue writes never claim saved locally', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    const statuses = [];
+    cloud.sm.setAuthStatus = status => statuses.push(status);
+    const { notifications } = await import('../js/notifications.js');
+    const warnings = [];
+    t.mock.method(notifications, 'warning', message => warnings.push(message));
+    const full = Object.assign(new Error('full'), { code: 'SYNC_QUEUE_FULL' });
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw full; });
+    await assert.rejects(cloud.enqueueProgressSync(), error => error === full);
+    t.mock.method(supabaseService, 'syncStudentUnitWork', async () => { throw new TypeError('Failed to fetch'); });
+    t.mock.method(console, 'error', () => {});
+    t.mock.method(console, 'warn', () => {});
+    await cloud.saveProgressToCloud();
+    assert.equal(statuses.at(-1), 'Local sync storage is full');
+    assert.equal(cloud.syncQueue.getAuthStatus(), 'Local sync storage is full');
+    assert.equal(warnings.length, 1);
+    assert.ok(statuses.every(status => !status.includes('saved locally')));
+    cloud.sm.currentVocab = null;
+    t.mock.method(supabaseService, 'ensureOwnStudentProgress', async () => { throw new TypeError('Failed to fetch'); });
+    await cloud.saveProgressToCloud();
+    assert.equal(statuses.at(-1), 'Cloud save failed');
+});
+
+test('unit saves keep newest captured work when direct requests settle in reverse order', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    t.mock.method(console, 'error', () => {});
+    for (const newerSucceeds of [false, true]) {
+        const cloud = unitSaveCloud();
+        const requests = [];
+        t.mock.method(supabaseService, 'syncStudentUnitWork', payload => new Promise((resolve, reject) => {
+            requests.push({ payload, resolve, reject });
+        }));
+        const queued = [];
+        t.mock.method(imageDB, 'enqueueSyncAction', async (_type, payload) => { queued.push(payload); return { id: 'queued' }; });
+        t.mock.method(cloud.syncQueue, 'scheduleRetry', () => {});
+        const applied = [];
+        t.mock.method(cloud, 'applyUnitProgressResult', (_data, payload) => applied.push(payload));
+        const oldSave = cloud.saveProgressToCloud();
+        cloud.sm.progressData.units['unit-a'].states.matching.answer = 'new';
+        const newSave = cloud.saveProgressToCloud();
+        assert.equal(requests.length, 1, 'The newer save waits for the active unit RPC');
+        requests[0].reject(new TypeError('Failed to fetch'));
+        await oldSave;
+        assert.ok(requests[1].payload.snapshotOrder > requests[0].payload.snapshotOrder);
+        if (newerSucceeds) requests[1].resolve({ unit: { states: {} } });
+        else requests[1].reject(new TypeError('Failed to fetch'));
+        await newSave;
+        assert.equal(queued.length, newerSucceeds ? 0 : 1);
+        if (!newerSucceeds) assert.equal(queued[0].workPatch.states.matching.answer, 'new');
+        assert.equal(applied.length, newerSucceeds ? 1 : 0);
+    }
+});
+
+test('stale successful direct and queued unit replies cannot replace newer local snapshots', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    let resolveRequest;
+    t.mock.method(supabaseService, 'syncStudentUnitWork', () => new Promise(resolve => { resolveRequest = resolve; }));
+    let applied = 0;
+    t.mock.method(cloud, 'applyUnitProgressResult', () => { applied++; });
+    const saving = cloud.saveProgressToCloud();
+    cloud.sm.progressData.units['unit-a'].states.matching.answer = 'new';
+    cloud.buildUnitWorkSyncPayload();
+    resolveRequest({ unit: { states: { matching: { answer: 'old' } } } });
+    await saving;
+    assert.equal(applied, 0);
+    const oldPayload = cloud.buildUnitWorkSyncPayload();
+    const replaying = cloud.syncQueuedRecord({ ownerUserId: 'student-1', type: 'student-unit-work', payload: oldPayload },
+        { ownerUserId: 'student-1', generation: cloud.cloudGeneration });
+    cloud.sm.progressData.units['unit-a'].states.matching.answer = 'newest';
+    cloud.buildUnitWorkSyncPayload();
+    resolveRequest({ unit: { states: { matching: { answer: 'new' } } } });
+    await replaying;
+    assert.equal(applied, 0);
+    const oldGenerationSave = cloud.saveProgressToCloud();
+    cloud.stopCoinSync();
+    assert.equal(cloud.syncQueue.latestUnitSnapshots.size, 0);
+    resolveRequest({ unit: {} });
+    await oldGenerationSave;
+    assert.equal(applied, 0, 'Same-owner previous-generation replies stay invalid after tracking resets');
+    const previousGenerationReplay = cloud.syncQueuedRecord({ ownerUserId: 'student-1', type: 'student-unit-work',
+        payload: cloud.buildUnitWorkSyncPayload() }, { ownerUserId: 'student-1', generation: cloud.cloudGeneration });
+    cloud.stopCoinSync();
+    resolveRequest({ unit: {} });
+    await previousGenerationReplay;
+    assert.equal(applied, 0, 'Queued replies also reject previous-generation same-owner work');
+});
+
+test('Spark queue insertion failure shows persistent attention instead of saved locally', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const { StudentActivityHomeSpark } = await import('../js/student/studentActivityHomeSpark.js');
+    const { sparkResponsesRepository } = await import('../js/services/sparkResponsesRepository.js');
+    t.mock.method(sparkResponsesRepository, 'submit', async () => { throw new TypeError('Failed to fetch'); });
+    t.mock.method(imageDB, 'enqueueSyncAction', async () => { throw Object.assign(new Error('full'), { code: 'SYNC_QUEUE_FULL' }); });
+    t.mock.method(console, 'warn', () => {});
+    const statuses = [];
+    const warnings = [];
+    const cloud = unitSaveCloud();
+    cloud.sm.setAuthStatus = status => statuses.push(status);
+    cloud.sm.showToast = text => warnings.push(text);
+    cloud.sm.progress = { syncQueue: cloud.syncQueue };
+    const home = new StudentActivityHomeSpark({ sm: cloud.sm });
+    home.sparkResponseSyncSequence.set('spark', 1);
+    home.getSparkLibraryStorageKey = () => 'spark-cache';
+    await home.syncSparkLibraryState({ sparkId: 'spark', answers: { q: 'answer' } }, 1);
+    assert.equal(statuses.at(-1), 'Local sync storage is full');
+    assert.equal(cloud.syncQueue.getAuthStatus(), 'Local sync storage is full');
+    assert.equal(warnings.length, 1);
+    assert.ok(statuses.every(status => !status.includes('saved locally')));
+});
+
+test('a newer direct success retires previously failed work so restart cannot replay it', async (t) => {
+    const fake = await import('fake-indexeddb');
+    const originalGlobals = new Map();
+    for (const [key, value] of Object.entries(fake)) {
+        if (key === 'indexedDB' || key.startsWith('IDB')) {
+            originalGlobals.set(key, Object.getOwnPropertyDescriptor(globalThis, key));
+            Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
+        }
+    }
+    const { ImageDB } = await import('../js/db.js');
+    const { deleteDB } = await import('idb');
+    const db = new ImageDB();
+    db.dbName = `unit-success-restart-${Date.now()}`;
+    const owner = getActiveStudentStorageOwner();
+    t.after(async () => {
+        setActiveStudentStorageOwner(owner); await db.close(); await deleteDB(db.dbName);
+        for (const [key, descriptor] of originalGlobals) {
+            if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key];
+        }
+    });
+    setActiveStudentStorageOwner('student-1');
+    for (const method of ['enqueueSyncAction', 'retireUnitSyncActions', 'getPendingSyncActions', 'getFailedSyncActions']) {
+        t.mock.method(imageDB, method, db[method].bind(db));
+    }
+    t.mock.method(console, 'error', () => {});
+    const cloud = unitSaveCloud();
+    t.mock.method(cloud.syncQueue, 'scheduleRetry', () => {});
+    t.mock.method(cloud, 'applyUnitProgressResult', () => {});
+    const serverAnswers = [];
+    let fail = true;
+    t.mock.method(supabaseService, 'syncStudentUnitWork', async payload => {
+        if (fail) throw new TypeError('Failed to fetch');
+        serverAnswers.push(payload.workPatch.states.matching.answer);
+        return { unit: {} };
+    });
+    await cloud.saveProgressToCloud();
+    assert.equal((await db.getPendingSyncActions({ ownerUserId: 'student-1' })).length, 1);
+    const staleRecord = (await db.getPendingSyncActions({ ownerUserId: 'student-1' }))[0];
+    fail = false;
+    cloud.sm.progressData.units['unit-a'].states.matching.answer = 'new-success';
+    await cloud.saveProgressToCloud();
+    assert.deepEqual(await db.getPendingSyncActions({ ownerUserId: 'student-1' }), []);
+    await cloud.syncQueuedRecord(staleRecord, { ownerUserId: 'student-1', generation: cloud.cloudGeneration });
+    assert.deepEqual(serverAnswers, ['new-success'], 'Obsolete in-memory replay is skipped before its RPC');
+    await db.close();
+    const restarted = unitSaveCloud();
+    await restarted.flushLocalSyncQueue({ silent: true });
+    assert.deepEqual(serverAnswers, ['new-success'], 'A new queue instance cannot redispatch retired work');
+    assert.equal(cloud.syncQueue.unitWriteLanes.size, 0);
+});
+
+test('queued and direct unit writes share an ordered lane across account generations', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    t.mock.method(cloud, 'applyUnitProgressResult', () => {});
+    const requests = [];
+    const committed = [];
+    t.mock.method(supabaseService, 'syncStudentUnitWork', payload => new Promise(resolve => {
+        requests.push({ payload, finish() { committed.push(payload.workPatch.states.matching.answer); resolve({ unit: {} }); } });
+    }));
+    const queued = cloud.syncQueuedRecord({ ownerUserId: 'student-1', type: 'student-unit-work',
+        payload: cloud.buildUnitWorkSyncPayload() }, { ownerUserId: 'student-1', generation: cloud.cloudGeneration });
+    cloud.stopCoinSync();
+    cloud.sm.progressData.units['unit-a'].states.matching.answer = 'new-session';
+    const direct = cloud.saveProgressToCloud();
+    assert.equal(requests.length, 1);
+    requests[0].finish();
+    await queued;
+    await Promise.resolve();
+    assert.equal(requests.length, 2);
+    requests[1].finish();
+    await direct;
+    assert.deepEqual(committed, ['original', 'new-session']);
+    assert.equal(cloud.syncQueue.unitWriteLanes.size, 0);
+});
+
+test('late previous-session enqueue cannot cancel the active account retry timer', async (t) => {
+    const owner = getActiveStudentStorageOwner();
+    t.after(() => setActiveStudentStorageOwner(owner));
+    setActiveStudentStorageOwner('student-1');
+    const cloud = unitSaveCloud();
+    let finishEnqueue;
+    t.mock.method(imageDB, 'enqueueSyncAction', () => new Promise(resolve => { finishEnqueue = resolve; }));
+    let canceled = 0;
+    cloud.syncQueue.scheduler = { now: () => 0, setTimeout: () => 1, clearTimeout: () => { canceled++; } };
+    const oldEnqueue = cloud.enqueueProgressSync({ ownerUserId: 'student-1' });
+    cloud.stopCoinSync();
+    cloud.sm.currentUser = { uid: 'student-2' };
+    setActiveStudentStorageOwner('student-2');
+    cloud.syncQueue.scheduleRetry({ ownerUserId: 'student-2' });
+    finishEnqueue({ id: 'old-work' });
+    await oldEnqueue;
+    assert.equal(canceled, 0);
+    assert.equal(cloud.syncQueue.retryTimer, 1);
+    cloud.syncQueue.cancelRetry();
 });

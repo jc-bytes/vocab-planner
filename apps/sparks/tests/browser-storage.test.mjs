@@ -6,6 +6,9 @@ import { deleteDB, openDB } from 'idb';
 import { ImageDB } from '../js/db.js';
 import {
     getStudentProgressStorageKey,
+    setStudentActivityAssignment,
+    readStudentActivityValue,
+    writeStudentActivityValue,
     readStudentJson,
     setActiveStudentStorageOwner,
     writeStudentJson
@@ -36,6 +39,7 @@ test('browser storage commits drawings and ordered offline work reliably', async
     assert.equal(failed.lastError, 'offline');
     assert.equal(failed.status, 'pending');
     assert.ok(Date.parse(failed.nextAttemptAt) > Date.now());
+    assert.ok((await db.getPendingSyncActions({ includeDeferred: true })).some(record => record.id === first.id));
 
     await db.completeSyncAction(first.id);
     assert.deepEqual((await db.getPendingSyncActions()).map(record => record.id), [second.id]);
@@ -191,4 +195,138 @@ test('database upgrade quarantines legacy sync work without an attributable owne
     await db.close();
     await deleteDB(db.dbName);
     setActiveStudentStorageOwner('local-dev');
+});
+
+
+test('assigned games cannot restore a same-name legacy game from another class', () => {
+    const entries = new Map();
+    const storage = { getItem: key => entries.get(key) ?? null,
+        setItem: (key, value) => entries.set(key, value), removeItem: key => entries.delete(key) };
+    setActiveStudentStorageOwner('student-shared');
+    writeStudentActivityValue('flashcards:Cells:10', 'old-class-state', { storage });
+    assert.equal(readStudentActivityValue('flashcards:Cells:10', { storage }), 'old-class-state');
+    for (const assignment of ['class-a-assignment', 'class-b-assignment']) {
+        setStudentActivityAssignment(assignment);
+        assert.equal(readStudentActivityValue('flashcards:Cells:10', { storage }), null);
+        writeStudentActivityValue('flashcards:Cells:10', 'assignment-state', { storage });
+        assert.equal(entries.size, 1, 'assigned games use normalized assignment state, never duplicate legacy caches');
+    }
+    setActiveStudentStorageOwner('different-student');
+    assert.equal(readStudentActivityValue('flashcards:Cells:10', { storage }), null);
+    setActiveStudentStorageOwner('local-dev');
+});
+
+test('parallel queue replacements serialize and stale acknowledgements preserve newer work', async () => {
+    const db = new ImageDB();
+    db.dbName = `queue-revisions-${Date.now()}`;
+    const options = { ownerUserId: 'student-race' };
+    try {
+        const [first, second] = await Promise.all([
+            db.enqueueSyncAction('student-spark-response', { sparkId: 'spark', answers: { q: 'first' } }, options),
+            db.enqueueSyncAction('student-spark-response', { sparkId: 'spark', answers: { q: 'second' } }, options)
+        ]);
+        assert.equal(first.id, second.id);
+        assert.equal(second.revision, first.revision + 1);
+        assert.equal((await db.getPendingSyncActions(options)).length, 1);
+        assert.equal(await db.completeSyncAction(first.id, { ...options, expectedRevision: first.revision }), false);
+        assert.equal((await db.getPendingSyncActions(options))[0].payload.answers.q, 'second');
+        const staleFailure = await db.markSyncActionFailed(first, new Error('network'), options);
+        assert.equal(staleFailure.skipped, true);
+        assert.equal((await db.getPendingSyncActions(options))[0].payload.answers.q, 'second');
+        assert.equal(await db.completeSyncAction(second.id, { ...options, expectedRevision: second.revision }), true);
+        assert.equal((await db.markSyncActionFailed(second, new Error('late network failure'), options)).skipped, true);
+        assert.deepEqual(await db.getPendingSyncActions(options), []);
+    } finally {
+        await db.close();
+        await deleteDB(db.dbName);
+    }
+});
+
+test('legacy queue snapshots without revisions can still be acknowledged safely', async () => {
+    const db = new ImageDB();
+    db.dbName = `queue-legacy-revision-${Date.now()}`;
+    const options = { ownerUserId: 'student-legacy' };
+    try {
+        const connection = await db.open();
+        await connection.put(db.syncStoreName, { id: 'legacy', ownerUserId: options.ownerUserId,
+            type: 'student-unit-work', status: 'pending', payload: {} });
+        assert.equal(await db.completeSyncAction('legacy', { ...options, expectedRevision: 0 }), true);
+    } finally {
+        await db.close();
+        await deleteDB(db.dbName);
+    }
+});
+
+test('cumulative unit snapshots coalesce before event IDs without disturbing other owners or units', async () => {
+    const db = new ImageDB();
+    db.dbName = `unit-coalescing-${Date.now()}`;
+    const options = { ownerUserId: 'student-a' };
+    try {
+        const otherOwner = await db.enqueueSyncAction('student-unit-work', { eventId: 'other-account', unitKey: 'unit' }, { ownerUserId: 'student-b' });
+        const otherUnit = await db.enqueueSyncAction('student-unit-work', { eventId: 'other-unit', unitKey: 'other' }, options);
+        const first = await db.enqueueSyncAction('student-unit-work', { eventId: 'event-0', unitKey: 'unit', workPatch: { states: { old: {} } } }, options);
+        let latest;
+        for (let i = 1; i <= 260; i++) {
+            latest = await db.enqueueSyncAction('student-unit-work', { eventId: `event-${i}`, unitKey: 'unit',
+                workPatch: { states: { matching: { version: i } }, wordHunt: { answer: `${i}` } } }, options);
+        }
+        const pending = await db.getPendingSyncActions(options);
+        assert.equal(pending.length, 2);
+        assert.equal(latest.id, first.id);
+        assert.equal(latest.payload.eventId, 'event-260');
+        assert.deepEqual(latest.payload.workPatch.states, { matching: { version: 260 } });
+        assert.equal(await db.completeSyncAction(first.id, { ...options, expectedRevision: first.revision }), false);
+        assert.ok(pending.some(record => record.id === otherUnit.id));
+        assert.equal((await db.getPendingSyncActions({ ownerUserId: 'student-b' }))[0].id, otherOwner.id);
+        for (let i = 0; i < 248; i++) await db.enqueueSyncAction('student-unit-work', { eventId: `distinct-${i}`, unitKey: `distinct-${i}` }, options);
+        await assert.rejects(db.enqueueSyncAction('student-unit-work', { eventId: 'overflow', unitKey: 'overflow' }, options), error => error.code === 'SYNC_QUEUE_FULL');
+        assert.equal((await db.getPendingSyncActions(options)).length, 250);
+    } finally {
+        await db.close();
+        await deleteDB(db.dbName);
+    }
+});
+
+test('unit coalescing compares capture order instead of failure arrival order', async () => {
+    const db = new ImageDB();
+    db.dbName = `unit-order-${Date.now()}`;
+    const options = { ownerUserId: 'student-order' };
+    try {
+        const newer = await db.enqueueSyncAction('student-unit-work', { eventId: 'new-event', unitKey: 'unit',
+            snapshotOrder: 200, workPatch: { states: { matching: { answer: 'new' } } } }, options);
+        const old = await db.enqueueSyncAction('student-unit-work', { eventId: 'old-event', unitKey: 'unit',
+            snapshotOrder: 100, workPatch: { states: { matching: { answer: 'old' } } } }, options);
+        assert.equal(old.skipped, true);
+        const retained = (await db.getPendingSyncActions(options))[0];
+        assert.equal(retained.revision, newer.revision);
+        assert.equal(retained.payload.eventId, 'new-event');
+        assert.equal(retained.payload.workPatch.states.matching.answer, 'new');
+    } finally {
+        await db.close();
+        await deleteDB(db.dbName);
+    }
+});
+
+test('successful unit save retires only confirmed or older snapshots atomically', async () => {
+    const db = new ImageDB();
+    db.dbName = `unit-retirement-${Date.now()}`;
+    const options = { ownerUserId: 'student-retirement' };
+    try {
+        const connection = await db.open();
+        for (const [id, order, eventId, ownerUserId, unitKey] of [
+            ['old', 100, 'old', options.ownerUserId, 'unit'],
+            ['same-event', 200, 'confirmed', options.ownerUserId, 'unit'],
+            ['peer', 200, 'equal-peer', options.ownerUserId, 'unit'],
+            ['newer', 300, 'newer', options.ownerUserId, 'unit'],
+            ['other-unit', 100, 'other', options.ownerUserId, 'other'],
+            ['other-owner', 100, 'other-owner', 'student-other', 'unit']
+        ]) await connection.put(db.syncStoreName, { id, ownerUserId, type: 'student-unit-work', status: 'pending',
+            payload: { unitKey, snapshotOrder: order, eventId } });
+        await db.retireUnitSyncActions({ unitKey: 'unit', snapshotOrder: 200, eventId: 'confirmed' }, options);
+        assert.deepEqual((await connection.getAll(db.syncStoreName)).map(record => record.id).sort(),
+            ['newer', 'other-owner', 'other-unit', 'peer']);
+    } finally {
+        await db.close();
+        await deleteDB(db.dbName);
+    }
 });

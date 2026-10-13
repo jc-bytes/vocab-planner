@@ -80,7 +80,7 @@ export function resolveActivityFlow(vocabulary = {}) {
         ? settings.requiredActivities
         : getDefaultRequiredActivities(vocabulary);
     let required = unique([
-        'flashcards',
+        ...(settings.weeklyPoolVersion === 1 && settings.reviewOnly ? [] : ['flashcards']),
         ...requestedRequired.filter(id => ACTIVITY_IDS.includes(id) && id !== 'flashcards')
     ]);
     if (!hasRequired) required = replaceUnsuitableRequiredActivities(required, vocabulary);
@@ -136,7 +136,7 @@ export function validateVocabulary(vocabulary = {}, source = vocabulary.id || 'u
     if (!vocabulary.id) errors.push(`${prefix} missing id`);
     if (!MONTHS.includes(vocabulary.month)) errors.push(`${prefix} month must be explicit and canonical`);
     if (!Number.isInteger(vocabulary.week) || vocabulary.week < 1) errors.push(`${prefix} week must be a positive integer`);
-    if (!Array.isArray(required) || required.length === 0) errors.push(`${prefix} requiredActivities must be a non-empty array`);
+    if (!Array.isArray(required) || (required.length === 0 && !(settings.weeklyPoolVersion === 1 && settings.reviewOnly))) errors.push(`${prefix} requiredActivities must be a non-empty array`);
     if (!Array.isArray(additional)) errors.push(`${prefix} additionalActivities must be an array`);
 
     for (const [label, values] of [['requiredActivities', required], ['additionalActivities', additional]]) {
@@ -147,7 +147,7 @@ export function validateVocabulary(vocabulary = {}, source = vocabulary.id || 'u
         }
     }
     if (Array.isArray(required)) {
-        if (required[0] !== 'flashcards') errors.push(`${prefix} requiredActivities must begin with flashcards`);
+        if (required[0] !== 'flashcards' && !(settings.weeklyPoolVersion === 1 && settings.reviewOnly)) errors.push(`${prefix} requiredActivities must begin with flashcards`);
         for (const activityType of required) {
             if (ACTIVITY_IDS.includes(activityType) && !isRequiredActivitySuitable(activityType, vocabulary)) {
                 errors.push(`${prefix} required activity ${activityType} is unsuitable for its words`);

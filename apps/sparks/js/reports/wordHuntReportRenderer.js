@@ -243,6 +243,7 @@ export const wordHuntReportMethods = {
         try {
             const words = this.getWordHuntWords(vocabOrName);
             const rows = await this.buildWordHuntPdfRows(vocabName, words, options);
+            options.assertCurrent?.();
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: PDF_PAGE_FORMAT });
 
             const pageHeight = pdf.internal.pageSize.getHeight();
@@ -293,8 +294,10 @@ export const wordHuntReportMethods = {
                 });
             }
 
+            options.assertCurrent?.();
             pdf.save(this.buildWordHuntFileName(studentProfile, vocabOrName, options));
         } catch (err) {
+            if (err?.name === 'AbortError') throw err;
             console.error('Word Hunt report generation failed:', err);
             alert('Failed to generate Word Hunt download.');
         }
@@ -306,6 +309,7 @@ export const wordHuntReportMethods = {
                 const blob = await options.loadImage(entry.imagePath);
                 if (blob) return blob;
             } catch (error) {
+                if (error?.name === 'AbortError') throw error;
                 console.warn('Could not load report image from Storage:', error);
             }
         }
@@ -329,4 +333,3 @@ export const wordHuntReportMethods = {
         return words;
     },
 };
-

@@ -1,21 +1,15 @@
-import { createElement } from '../../main.js';
+import { createElement, refreshIcons } from '../../main.js';
 
 export const wordSearchViewMethods = {
 render() {
         this.detachPointerListeners();
         this.container.innerHTML = '';
 
-        const header = this.renderHeader();
-        this.container.appendChild(header);
-
         const wrapper = createElement('div', 'word-search-wrapper');
-        wrapper.style.maxWidth = '1040px';
-        wrapper.style.margin = '0 auto';
-        wrapper.style.display = 'flex';
-        wrapper.style.gap = '1.5rem';
 
         // Left side: Word list
         const wordList = this.renderWordList();
+        wordList.prepend(this.renderHeader());
         wrapper.appendChild(wordList);
 
         // Right side: Grid
@@ -23,43 +17,20 @@ render() {
         wrapper.appendChild(gridContainer);
 
         this.container.appendChild(wrapper);
-        window.lucide?.createIcons({ root: this.container });
+        refreshIcons(this.container);
 
         // Restore highlights for found words after rendering
         this.restoreHighlights();
     },
 
-renderHeader() {
+    renderHeader() {
         const header = createElement('div', 'word-search-header');
-        header.style.maxWidth = '1040px';
-        header.style.margin = '0 auto 1rem';
-        header.style.display = 'flex';
-        header.style.alignItems = 'flex-end';
-        header.style.justifyContent = 'space-between';
-        header.style.gap = '1rem';
-        header.style.flexWrap = 'wrap';
 
-        const copy = createElement('div');
-        const title = createElement('h2');
-        title.textContent = 'Word Search';
-        title.style.margin = '0 0 0.35rem';
-        title.style.color = '#f8fafc';
-        title.style.fontSize = '1.75rem';
-        title.style.lineHeight = '1.1';
-        copy.appendChild(title);
-
-        const subtitle = createElement('p');
+        const subtitle = createElement('p', 'word-search-instructions');
         subtitle.textContent = `Find ${this.words.length} hidden words. Words can go across, down, diagonal, or backward.`;
-        subtitle.style.margin = '0';
-        subtitle.style.color = '#cbd5e1';
-        subtitle.style.fontSize = '0.95rem';
-        copy.appendChild(subtitle);
-        header.appendChild(copy);
+        header.appendChild(subtitle);
 
-        const actions = createElement('div');
-        actions.style.display = 'flex';
-        actions.style.gap = '0.5rem';
-        actions.style.flexWrap = 'wrap';
+        const actions = createElement('div', 'word-search-actions');
 
         const newPuzzleButton = createElement('button', 'btn primary-btn');
         newPuzzleButton.type = 'button';
@@ -82,12 +53,9 @@ restoreHighlights() {
 
 renderWordList() {
         const listContainer = createElement('div', 'word-list-container');
-        listContainer.style.flex = '0 0 260px';
-        listContainer.style.padding = '1rem';
         listContainer.style.background = 'rgba(15, 23, 42, 0.88)';
         listContainer.style.border = '1px solid rgba(148, 163, 184, 0.22)';
         listContainer.style.borderRadius = '0.75rem';
-        listContainer.style.height = 'fit-content';
         listContainer.style.boxShadow = '0 18px 45px rgba(0, 0, 0, 0.24)';
 
         const heading = createElement('h3');
@@ -114,7 +82,7 @@ renderWordList() {
         progress.style.fontSize = '0.875rem';
         listContainer.appendChild(progress);
 
-        const progressTrack = createElement('div');
+        const progressTrack = createElement('div', 'word-search-progress-track');
         progressTrack.style.width = '100%';
         progressTrack.style.height = '0.45rem';
         progressTrack.style.background = 'rgba(148, 163, 184, 0.22)';
@@ -222,16 +190,15 @@ renderWordListItem(wordObj, isFound = false) {
         return item;
     },
 
-renderGrid() {
+    renderGrid() {
         const gridContainer = createElement('div', 'word-search-grid-container');
-        gridContainer.style.flex = '1';
 
         const grid = createElement('div', 'word-search-grid');
         grid.style.display = 'grid';
         grid.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
-        grid.style.gap = '2px';
+        grid.style.gap = '1px';
         grid.style.background = '#e5e7eb';
-        grid.style.padding = '2px';
+        grid.style.padding = '1px';
         grid.style.borderRadius = '0.5rem';
         grid.style.userSelect = 'none';
         grid.style.touchAction = 'none';
@@ -288,7 +255,7 @@ updateWordList() {
         if (wordListContainer) {
             const newWordList = this.renderWordList();
             wordListContainer.parentNode.replaceChild(newWordList, wordListContainer);
-            window.lucide?.createIcons({ root: newWordList });
+            refreshIcons(newWordList);
         }
     },
 
@@ -296,42 +263,31 @@ showCompletionOverlay() {
         const overlay = document.createElement('div');
         this.completionOverlay = overlay;
         overlay.className = 'completion-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        `;
         overlay.innerHTML = `
-            <div class="completion-screen" style="background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 1rem; text-align: center;">
+            <div class="completion-screen">
                 <h2 class="activity-result-heading">
                     <i data-lucide="badge-check" aria-hidden="true"></i>
                     <span>All Words Found!</span>
                 </h2>
                 <p>You found all ${this.words.length} words!</p>
-                <button id="new-wordsearch" class="btn primary-btn" style="margin-top: 1rem;">New Puzzle</button>
-                <button id="close-wordsearch" class="btn secondary-btn" style="margin-top: 0.5rem; margin-left: 0.5rem;">Close</button>
+                <div class="completion-actions">
+                    <button id="new-wordsearch" class="btn primary-btn">New Puzzle</button>
+                    <button id="close-wordsearch" class="btn secondary-btn">Close</button>
+                </div>
             </div>
         `;
-        
+
         document.body.appendChild(overlay);
-        window.lucide?.createIcons({ root: overlay });
+        refreshIcons(overlay);
 
         overlay.querySelector('#new-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
             this.startNewPuzzle();
         });
-        
+
         overlay.querySelector('#close-wordsearch').addEventListener('click', () => {
             document.body.removeChild(overlay);
             this.completionOverlay = null;
         });
     }
 };
-

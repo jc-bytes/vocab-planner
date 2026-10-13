@@ -1,0 +1,45 @@
+{
+  "id": "t3_review_prototype_model",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Prototype and model",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "trimester": "3",
+  "month": "October",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "prototype",
+      "definition": "An early version of a product used to test an idea.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/prototype"
+    },
+    {
+      "word": "model",
+      "definition": "A simple version that shows what an object looks like.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/model"
+    }
+  ]
+}

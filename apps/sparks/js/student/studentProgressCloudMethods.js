@@ -1,13 +1,13 @@
 import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { studentProgressRepository } from '../services/studentProgressRepository.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { imageDB } from '../db.js';
 import { classifySyncError } from '../services/syncQueuePolicy.js';
 import { StudentProgressSyncQueue } from './studentProgressSyncQueue.js';
 import {
     COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
-    COIN_REFRESH_THROTTLE_MS,
-    COIN_SYNC_INTERVAL_MS
+    COIN_REFRESH_THROTTLE_MS
 } from './studentProgressConstants.js';
 import {
     getActiveStudentStorageOwner,
@@ -15,19 +15,18 @@ import {
     isActiveStudentStorageOwner
 } from './persistence/studentStorage.js';
 
+const STUDENT_PROGRESS_SUMMARY_QUERY_KEY = ['student', 'progress-summary'];
+
 export class StudentProgressCloud {
     constructor(progress) {
         this.progress = progress;
         this.sm = progress.sm;
+        this.queryService = progress.queryService || this.sm.serverStateQuery || serverStateQuery;
         this.coinRealtimeUnsubscribe = null;
-        this.coinSyncInterval = null;
-        this.coinRefreshTimeout = null;
-        this.coinRefreshInFlight = false;
-        this.coinRefreshPendingOptions = null;
-        this.lastCoinRefreshAt = 0;
+        this.coinSummaryObservation = null;
+        this.lastAppliedSummary = null;
+        this.lastAppliedSummaryUpdatedAt = 0;
         this.storageSyncHandler = null;
-        this.focusSyncHandler = null;
-        this.visibilitySyncHandler = null;
         this.onlineSyncHandler = null;
         this.cloudGeneration = 0;
         this.syncQueue = new StudentProgressSyncQueue(this);
@@ -58,75 +57,73 @@ export class StudentProgressCloud {
         };
         window.addEventListener('storage', this.storageSyncHandler);
 
-        this.visibilitySyncHandler = () => {
-            if (document.visibilityState === 'visible') {
-                if (this.sm.shouldDebugStudentDom?.()) console.log('VISIBILITY', document.visibilityState);
-                this.scheduleCoinRefresh({ silent: true, reason: 'visibilitychange', ownerUserId: userId, generation });
-            }
-        };
-        document.addEventListener('visibilitychange', this.visibilitySyncHandler);
-
-        this.focusSyncHandler = () => {
-            if (this.sm.shouldDebugStudentDom?.()) console.log('FOCUS');
-            this.scheduleCoinRefresh({ silent: true, reason: 'focus', ownerUserId: userId, generation });
-        };
         this.onlineSyncHandler = () => {
             this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
-            this.scheduleCoinRefresh({ silent: true, reason: 'online', force: true, ownerUserId: userId, generation });
         };
-        window.addEventListener('focus', this.focusSyncHandler);
         window.addEventListener('online', this.onlineSyncHandler);
+
+        this.coinSummaryObservation = this.queryService.observe({
+            accountId: userId,
+            key: STUDENT_PROGRESS_SUMMARY_QUERY_KEY,
+            scope: 'account',
+            queryFn: ({ signal }) => studentProgressRepository.getSummary(userId, { signal }),
+            staleTime: COIN_REFRESH_THROTTLE_MS,
+            refetchInterval: COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS,
+            refetchIntervalInBackground: false,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: 'always'
+        }, result => this.applyObservedCoinSummary(result, { ownerUserId: userId, generation }));
 
         this.coinRealtimeUnsubscribe = studentProgressRepository.subscribe(userId, progress => {
             if (!this.isCurrentOwner(userId) || generation !== this.cloudGeneration) return;
             this.sm.logStudentDomUpdate?.('student-progress-realtime', { source: 'studentProgressRepository.subscribe' });
-            this.applyRemoteCoinProgress(progress);
+            this.queryService.setData({
+                accountId: userId,
+                key: STUDENT_PROGRESS_SUMMARY_QUERY_KEY,
+                scope: 'account',
+                updater: progress
+            });
         });
-
-        const syncInterval = this.coinRealtimeUnsubscribe
-            ? COIN_REALTIME_SAFETY_SYNC_INTERVAL_MS
-            : COIN_SYNC_INTERVAL_MS;
-        this.coinSyncInterval = window.setInterval(() => {
-            if (document.visibilityState === 'hidden') return;
-            void this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
-            this.scheduleCoinRefresh({ silent: true, reason: 'interval', ownerUserId: userId, generation });
-        }, syncInterval);
 
         this.flushLocalSyncQueue({ silent: true, ownerUserId: userId, generation });
     }
 
     stopCoinSync() {
+        this.syncQueue.cancelRetry();
         this.cloudGeneration += 1;
+        this.syncQueue.resetUnitSnapshots();
         if (this.coinRealtimeUnsubscribe) {
             this.coinRealtimeUnsubscribe();
             this.coinRealtimeUnsubscribe = null;
         }
-        if (this.coinSyncInterval) {
-            window.clearInterval(this.coinSyncInterval);
-            this.coinSyncInterval = null;
+        if (this.coinSummaryObservation) {
+            this.coinSummaryObservation.unsubscribe();
+            this.coinSummaryObservation = null;
         }
-        if (this.coinRefreshTimeout) {
-            window.clearTimeout(this.coinRefreshTimeout);
-            this.coinRefreshTimeout = null;
-        }
-        this.coinRefreshInFlight = false;
-        this.coinRefreshPendingOptions = null;
+        this.lastAppliedSummary = null;
+        this.lastAppliedSummaryUpdatedAt = 0;
         if (this.storageSyncHandler) {
             window.removeEventListener('storage', this.storageSyncHandler);
             this.storageSyncHandler = null;
-        }
-        if (this.visibilitySyncHandler) {
-            document.removeEventListener('visibilitychange', this.visibilitySyncHandler);
-            this.visibilitySyncHandler = null;
-        }
-        if (this.focusSyncHandler) {
-            window.removeEventListener('focus', this.focusSyncHandler);
-            this.focusSyncHandler = null;
         }
         if (this.onlineSyncHandler) {
             window.removeEventListener('online', this.onlineSyncHandler);
             this.onlineSyncHandler = null;
         }
+    }
+
+    applyObservedCoinSummary(result, options = {}) {
+        if (!result?.isSuccess || !result.data) return;
+        const ownerUserId = options.ownerUserId || this.sm.currentUser?.uid;
+        if (!this.isCurrentOwner(ownerUserId)
+            || options.generation !== this.cloudGeneration
+            || (result.data === this.lastAppliedSummary
+                && result.dataUpdatedAt === this.lastAppliedSummaryUpdatedAt)) return;
+
+        this.lastAppliedSummary = result.data;
+        this.lastAppliedSummaryUpdatedAt = result.dataUpdatedAt;
+        this.sm.logStudentDomUpdate?.('student-progress', { source: 'studentProgressSummaryQuery' });
+        this.applyRemoteCoinProgress(result.data);
     }
 
     scheduleCoinRefresh(options = {}) {
@@ -135,29 +132,7 @@ export class StudentProgressCloud {
         if (!this.isCurrentOwner(ownerUserId)
             || (options.generation !== undefined && options.generation !== this.cloudGeneration)) return;
 
-        if (this.coinRefreshInFlight) {
-            this.coinRefreshPendingOptions = {
-                ...this.coinRefreshPendingOptions,
-                ...options,
-                reason: options.reason || this.coinRefreshPendingOptions?.reason
-            };
-            return;
-        }
-
-        const now = Date.now();
-        const throttleDelay = options.force
-            ? 0
-            : Math.max(0, COIN_REFRESH_THROTTLE_MS - (now - this.lastCoinRefreshAt));
-
-        if (this.coinRefreshTimeout) {
-            window.clearTimeout(this.coinRefreshTimeout);
-            this.coinRefreshTimeout = null;
-        }
-
-        this.coinRefreshTimeout = window.setTimeout(() => {
-            this.coinRefreshTimeout = null;
-            this.refreshCoinsFromCloud(options);
-        }, throttleDelay);
+        return this.refreshCoinsFromCloud(options);
     }
 
     applyRemoteCoinProgress(progress) {
@@ -171,8 +146,7 @@ export class StudentProgressCloud {
             : this.sm.coinHistory;
         this.progress.applyCoinSnapshot(cloudCoinData.coinData, coinHistory, { saveLocal: true });
         this.progress.updateLevelDisplay();
-        this.lastCoinRefreshAt = Date.now();
-        this.sm.setAuthStatus('Synced');
+        this.sm.setAuthStatus(this.syncQueue.getAuthStatus());
     }
 
     applyUnitProgressResult(progress, fallbackPayload = {}) {
@@ -210,41 +184,31 @@ export class StudentProgressCloud {
         const ownerUserId = options.ownerUserId || this.sm.currentUser.uid;
         const generation = options.generation ?? this.cloudGeneration;
         if (!this.isCurrentOwner(ownerUserId, options) || generation !== this.cloudGeneration) return;
-        if (this.coinRefreshInFlight) {
-            this.coinRefreshPendingOptions = {
-                ...this.coinRefreshPendingOptions,
-                ...options,
-                reason: options.reason || this.coinRefreshPendingOptions?.reason
-            };
-            return;
-        }
-
-        this.coinRefreshInFlight = true;
         try {
             this.sm.logStudentDomUpdate?.('student-progress', {
                 source: 'refreshCoinsFromCloud:start',
                 reason: options.reason || ''
             });
-            this.lastCoinRefreshAt = Date.now();
-            const progress = await studentProgressRepository.getSummary(ownerUserId, options);
+            const progress = await this.queryService.refresh({
+                accountId: ownerUserId,
+                key: STUDENT_PROGRESS_SUMMARY_QUERY_KEY,
+                scope: 'account',
+                queryFn: ({ signal }) => studentProgressRepository.getSummary(ownerUserId, { ...options, signal }),
+                staleTime: COIN_REFRESH_THROTTLE_MS
+            });
             if (!this.isCurrentOwner(ownerUserId, options) || generation !== this.cloudGeneration) return;
             if (!progress) return;
-            this.sm.logStudentDomUpdate?.('student-progress', {
-                source: 'refreshCoinsFromCloud:snapshot',
-                reason: options.reason || ''
-            });
-            this.applyRemoteCoinProgress(progress);
+            if (!this.coinSummaryObservation) {
+                this.sm.logStudentDomUpdate?.('student-progress', {
+                    source: 'refreshCoinsFromCloud:snapshot',
+                    reason: options.reason || ''
+                });
+                this.applyRemoteCoinProgress(progress);
+            }
+            return progress;
         } catch (error) {
             if (!options.silent) {
                 console.warn('Could not refresh coins from cloud:', error);
-            }
-        } finally {
-            if (generation !== this.cloudGeneration) return;
-            this.coinRefreshInFlight = false;
-            const pendingOptions = this.coinRefreshPendingOptions;
-            this.coinRefreshPendingOptions = null;
-            if (pendingOptions) {
-                this.scheduleCoinRefresh(pendingOptions);
             }
         }
     }
@@ -315,7 +279,7 @@ export class StudentProgressCloud {
                 this.progress.saveLocalProgress(true);
             }
 
-            this.sm.setAuthStatus('Synced');
+            this.sm.setAuthStatus(this.syncQueue.getAuthStatus());
         } catch (error) {
             if (!this.isCurrentOwner(ownerUserId, options)) return;
             console.error('Failed to load cloud progress:', error);
@@ -337,31 +301,48 @@ export class StudentProgressCloud {
         if (this.sm.authDisabled) return;
         if (!this.sm.currentUser) return;
         const ownerUserId = this.sm.currentUser.uid;
+        const generation = this.cloudGeneration;
+        const unitPayload = this.buildUnitWorkSyncPayload();
         try {
             let progress = null;
-            const unitPayload = this.buildUnitWorkSyncPayload();
             if (unitPayload && typeof supabaseService.syncStudentUnitWork === 'function') {
-                progress = await supabaseService.syncStudentUnitWork(unitPayload, { ownerUserId });
+                const result = await this.syncQueue.executeUnitWork(unitPayload, { ownerUserId, generation });
+                if (result.skipped) return;
+                progress = result.progress;
             } else if (typeof supabaseService.ensureOwnStudentProgress === 'function') {
                 // Unit sync already ensures the row exists. Avoid a duplicate round trip
                 // whenever the current save contains unit work.
                 progress = await supabaseService.ensureOwnStudentProgress(this.sm.studentProfile);
             }
 
-            if (!this.isCurrentOwner(ownerUserId)) return;
+            if (!this.isCurrentOwner(ownerUserId) || generation !== this.cloudGeneration) return;
 
-            if (progress) {
+            if (progress && this.syncQueue.isLatestUnitSnapshot(unitPayload || {})) {
                 this.applyUnitProgressResult(progress, unitPayload || {});
             }
 
-            this.sm.setAuthStatus('Synced');
+            this.sm.setAuthStatus(this.syncQueue.getAuthStatus());
         } catch (error) {
-            if (!this.isCurrentOwner(ownerUserId)) return;
+            if (!this.isCurrentOwner(ownerUserId) || generation !== this.cloudGeneration) return;
             console.error('Failed to save progress to cloud:', error);
             const failure = classifySyncError(error, { online: navigator.onLine });
             if (failure.retryable) {
-                await this.enqueueProgressSync({ ownerUserId });
-                this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+                try {
+                    const queued = await this.enqueueProgressSync({ ownerUserId, generation, payload: unitPayload });
+                    if (!this.isCurrentOwner(ownerUserId) || generation !== this.cloudGeneration) return;
+                    if (queued?.skipped) return;
+                    if (!queued) {
+                        this.sm.setAuthStatus('Cloud save failed');
+                        return;
+                    }
+                    this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
+                } catch (queueError) {
+                    if (!this.isCurrentOwner(ownerUserId) || generation !== this.cloudGeneration) return;
+                    console.warn('Could not queue progress for later sync:', queueError);
+                    this.syncQueue.setQueueStatus(queueError?.code === 'SYNC_QUEUE_FULL'
+                        ? 'Local sync storage is full' : 'Could not save changes for sync', ownerUserId, this.cloudGeneration);
+                    notifications.warning('Your latest changes could not be queued. Reconnect and save again.');
+                }
             } else {
                 this.sm.setAuthStatus('Cloud rejected this change');
                 notifications.warning('This change could not be accepted. Refresh and try again, or ask your teacher for help.');

@@ -9,6 +9,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
+      validation_only:
+        description: "Validate the release without publishing it"
+        required: false
+        default: false
+        type: boolean
       pilot_publish:
         description: "Publish a formative pilot while the unrelated cross-browser smoke test is being repaired"
         required: false
@@ -19,6 +24,7 @@ on:
 # granted only to the small job that publishes the already-tested artifact.
 permissions:
   contents: read
+  actions: read
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -29,6 +35,21 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_TELEMETRY_DISABLED: "1"
+      UI_SMOKE_PORT: "8560"
+      UI_TEACHER_QUIZ_PORT: "8561"
+      UI_TEACHER_SPARKS_PORT: "8562"
+      UI_TEACHER_PAGES_PORT: "8563"
+      UI_TEACHER_DATA_PORT: "8564"
+      UI_TEACHER_GROUPS_PORT: "8565"
+      UI_TEACHER_WORD_HUNT_PORT: "8566"
+      UI_ACTIVITY_REGISTRY_PORT: "8567"
+      STUDENT_SHELL_TEST_PORT: "8568"
+      UI_CROSS_BROWSER_PORT: "8571"
+      UI_AUTH_SMOKE_PORT: "8572"
+      UI_AUDIT_PORT: "8573"
+      PRIVATE_CLASSROOM_UI_PORT: "8574"
     defaults:
       run:
         working-directory: apps/sparks
@@ -57,10 +78,19 @@ jobs:
         run: supabase start
       - name: Smoke test app shells
         run: npm run test:ui:smoke
+      - name: Configure local worker lifecycle builds
+        run: |
+          sparks_test_config=$(supabase status --output json)
+          printf 'VITE_SUPABASE_URL=%s\n' "$(printf '%s' "$sparks_test_config" | jq -r '.API_URL')" >> "$GITHUB_ENV"
+          printf 'VITE_SUPABASE_PUBLISHABLE_KEY=%s\n' "$(printf '%s' "$sparks_test_config" | jq -r '.PUBLISHABLE_KEY // .ANON_KEY')" >> "$GITHUB_ENV"
       - name: Unit and composition tests
         run: npm test
+      - name: Verify school authorization and database regressions
+        run: npm run test:school-platform:rest
+      - name: Verify student insight and feedback database regressions
+        run: npm run test:student-insight:database
       - name: Supabase authorization acceptance tests
-        run: npm run test:acceptance:supabase
+        run: npm run test:acceptance:supabase && npm run test:private-classrooms
       - name: Diagnose local Supabase failure
         if: failure()
         run: |
@@ -98,12 +128,28 @@ jobs:
         run: |
           mkdir -p dist-desktop/g9-summative2-safety-check-site
           cp -R ../../public/g9-summative2-safety-check-site/. dist-desktop/g9-summative2-safety-check-site/
+      - name: Retain previous immutable assets for open student tabs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous_run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -n "$previous_run" ]; then
+            previous_dir=$(mktemp -d)
+            gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"
+            mkdir -p "$previous_dir/site"
+            tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
+            if [ -d "$previous_dir/site/assets" ]; then
+              cp -Rn "$previous_dir/site/assets/." dist-desktop/assets/
+            fi
+            node scripts/check-dist-size.mjs
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: apps/sparks/dist-desktop
 
   deploy:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validation_only }}
     needs: validate
     permissions:
       pages: write

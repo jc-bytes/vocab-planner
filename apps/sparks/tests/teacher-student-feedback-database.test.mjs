@@ -1,0 +1,58 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {execFileSync,spawn} from 'node:child_process';
+import {randomUUID} from 'node:crypto';
+const db=process.env.SPARKS_SCHOOL_TEST_DATABASE,container=process.env.SPARKS_SCHOOL_TEST_CONTAINER;
+const enabled=Boolean(db && container && /rehearsal|test|validation/.test(db));
+const sql=q=>execFileSync('docker',['exec','-i',container,'psql','-U','postgres','-X','-qAt','-v','ON_ERROR_STOP=1','-d',db],{input:q,encoding:'utf8',stdio:['pipe','pipe','pipe']}).trim();
+const as=(actor,q)=>sql(`begin; set local role authenticated; set local request.jwt.claim.sub='${actor}'; ${q}; commit;`);
+test('persistent feedback protects school authority, revisions, history and the reviewed submission',{skip:!enabled},async()=>{
+ const [teacher,coTeacher,other,student,unrelated,school,otherSchool,subject,classId,version,assignment]=Array.from({length:11},randomUUID);
+ for(const id of [teacher,coTeacher,other,student,unrelated]) {
+  const token=randomUUID(),email=`${id}@feedback-test.invalid`;
+  sql(`select public.issue_auth_user_provisioning_ticket('${email}','${token}'); insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data) values('${id}','${email}',now(),'{"provisioning_token":"${token}"}');`);
+ }
+ sql(`insert into public.schools(id,name) values('${school}','Feedback school'),('${otherSchool}','Other feedback school');
+ insert into public.school_memberships(school_id,user_id) values('${school}','${teacher}'),('${school}','${coTeacher}'),('${otherSchool}','${other}'),('${school}','${student}');
+ insert into public.school_member_roles(school_id,user_id,role) values('${school}','${teacher}','teacher'),('${school}','${coTeacher}','teacher'),('${otherSchool}','${other}','teacher'),('${school}','${student}','student');
+ insert into public.school_academic_years(school_id,year,label) values('${school}',2026,'2026');
+ insert into public.teacher_subjects(id,school_id,owner_id,name) values('${subject}','${school}','${teacher}','Technology');
+ insert into public.teaching_classes(id,school_id,owner_id,subject_id,name,school_year) values('${classId}','${school}','${teacher}','${subject}','Feedback class',2026);
+ insert into public.class_teachers(class_id,school_id,teacher_id) values('${classId}','${school}','${coTeacher}');
+ insert into public.class_memberships(class_id,student_id,active) values('${classId}','${student}',true);`);
+ sql(`update public.profiles set first_name='Teacher',last_name='A' where user_id='${teacher}'; update public.profiles set first_name='Teacher',last_name='B' where user_id='${coTeacher}';`);
+ const spark=`feedback-${randomUUID()}`;
+ sql(`insert into public.subjects(slug,name) values('technology','Technology') on conflict do nothing;
+ insert into public.weekly_sparks(id,title,spark_text,owner_id,school_id,teacher_subject_id) values('${spark}','Read carefully','Sample reading','${teacher}','${school}','${subject}');
+ insert into private.class_material_versions(id,owner_id,school_id,spark_id,student_content) values('${version}','${teacher}','${school}','${spark}','{"checkMode":"required","questions":[{"id":"q1","prompt":"Why?","type":"short_text"}]}');
+ insert into public.class_assignments(id,school_id,owner_id,class_id,version_id,title,kind,release_at,publication_key) values('${assignment}','${school}','${teacher}','${classId}','${version}','Reading review','spark',now()-interval '1 day',gen_random_uuid());
+ insert into public.class_assignment_responses(assignment_id,student_id,response,answers,evaluation,revision) values('${assignment}','${student}','A student explanation','{"q1":"A student explanation"}','{"needsTeacherReview":true,"isComplete":true}',1);`);
+ const save=(actor,expected,status='reviewed',responseRevision=1,note='Check the sender',target=student,schoolId=school,activity='')=>JSON.parse(as(actor,`select public.save_student_assignment_feedback_v1('${schoolId}','${assignment}','${target}','${activity}','${note}','${status}',${responseRevision},${expected})`));
+ const first=save(teacher,0);assert.equal(first.revision,1);assert.equal(first.updated_by,teacher);assert.equal(first.authorName,'Teacher A');
+ assert.throws(()=>save(coTeacher,0),/review changed/);
+ const second=save(coTeacher,1,'needs_revision');assert.equal(second.revision,2);assert.equal(second.updated_by,coTeacher);
+ const history=JSON.parse(as(teacher,`select public.student_feedback_history_v1('${school}','${assignment}','${student}','')`));assert.deepEqual(history.map(f=>f.revision),[2,1]);assert.equal(history[0].authorName,'Teacher B');assert.equal(history[1].authorName,'Teacher A');
+ assert.equal(JSON.parse(as(teacher,`select public.teacher_student_insight_v1('${school}','${student}',2026)`)).assignments[0].feedback[0].review_status,'needs_revision');
+ assert.equal(JSON.parse(as(coTeacher,`select public.assignment_student_feedback_v1('${school}','${assignment}')`))[0].revision,2);
+ for(const actor of [other,student,unrelated]) assert.throws(()=>save(actor,2),/not available/);
+ assert.throws(()=>save(teacher,2,'reviewed',1,'x',unrelated),/not available/);
+ assert.throws(()=>save(teacher,2,'reviewed',1,'x',student,otherSchool),/not available/);
+ assert.throws(()=>save(teacher,0,'reviewed',1,'x',student,school,'quiz'),/Activity is not part/);
+ assert.throws(()=>save(teacher,2,'reviewed',1,'x'.repeat(4001)),/Invalid teacher feedback/);
+ assert.throws(()=>as(student,'select * from private.student_assignment_feedback'),/permission denied/);
+ assert.throws(()=>sql(`begin; set local role anon; select public.assignment_student_feedback_v1('${school}','${assignment}'); rollback;`),/permission denied/);
+ sql(`update public.class_assignment_responses set revision=2 where assignment_id='${assignment}' and student_id='${student}';`);
+ assert.throws(()=>save(teacher,2,'reviewed',1),/submission changed/);assert.equal(save(teacher,2,'reviewed',2).response_revision,2);
+ const race=actor=>new Promise(resolve=>{
+  const process=spawn('docker',['exec','-i',container,'psql','-U','postgres','-X','-qAt','-v','ON_ERROR_STOP=1','-d',db]);let error='';
+  process.stderr.on('data',chunk=>{error+=chunk;});process.stdout.on('data',()=>{});process.on('close',code=>resolve({code,error}));
+  process.stdin.end(`begin; set local role authenticated; set local request.jwt.claim.sub='${actor}'; select public.save_student_assignment_feedback_v1('${school}','${assignment}','${student}','','Concurrent note','reviewed',2,3); commit;`);
+ });
+ const raceResults=await Promise.all([race(teacher),race(coTeacher)]);
+ assert.equal(raceResults.filter(r=>r.code===0).length,1);assert.match(raceResults.find(r=>r.code!==0).error,/review changed/);
+ assert.equal(JSON.parse(as(teacher,`select public.student_feedback_history_v1('${school}','${assignment}','${student}','')`)).length,4);
+ sql(`update public.class_teachers set active=false,removed_at=now() where class_id='${classId}' and teacher_id='${coTeacher}';`);
+ assert.throws(()=>save(coTeacher,3,'reviewed',2),/not available/);
+ sql(`update public.class_memberships set active=false,removed_at=now() where class_id='${classId}' and student_id='${student}';`);
+ assert.equal(JSON.parse(as(teacher,`select public.teacher_student_insight_v1('${school}','${student}',2026)`)).assignments[0].enrolled,false);
+});

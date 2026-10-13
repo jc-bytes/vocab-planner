@@ -1,4 +1,4 @@
-import { $, createElement } from '../main.js';
+import { $, createElement, refreshIcons } from '../main.js';
 
 export class StudentActivityBrowserNavigation {
     constructor(browser) {
@@ -138,7 +138,7 @@ export class StudentActivityBrowserNavigation {
                 this.setStudentVocabularyViewMode(button.dataset.vocabViewMode);
             });
         });
-        window.lucide?.createIcons({ root: container });
+        refreshIcons(container);
     }
 
     renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups) {
@@ -201,7 +201,7 @@ export class StudentActivityBrowserNavigation {
             toolbar.appendChild(monthStrip);
         }
         container.appendChild(toolbar);
-        window.lucide?.createIcons({ root: toolbar });
+        refreshIcons(toolbar);
     }
 
 }
