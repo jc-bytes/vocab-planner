@@ -24,6 +24,7 @@ on:
 # granted only to the small job that publishes the already-tested artifact.
 permissions:
   contents: read
+  actions: read
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -107,6 +108,21 @@ jobs:
         run: |
           mkdir -p dist-desktop/g9-summative2-safety-check-site
           cp -R ../../public/g9-summative2-safety-check-site/. dist-desktop/g9-summative2-safety-check-site/
+      - name: Retain previous immutable assets for open student tabs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous_run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -n "$previous_run" ]; then
+            previous_dir=$(mktemp -d)
+            gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"
+            mkdir -p "$previous_dir/site"
+            tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
+            if [ -d "$previous_dir/site/assets" ]; then
+              cp -Rn "$previous_dir/site/assets/." dist-desktop/assets/
+            fi
+            node scripts/check-dist-size.mjs
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
