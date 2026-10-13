@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import test from 'node:test';
+import test, { afterEach } from 'node:test';
 
 globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
 globalThis.document = {
@@ -35,6 +35,7 @@ const {
     teacherStudentCsvImportMethods
 } = await import('../js/teacherStudentProgress/teacherStudentCsvImportMethods.js');
 const { teacherStudentProvisioningMethods } = await import('../js/teacherStudentProgress/teacherStudentProvisioningMethods.js');
+const { serverStateQuery } = await import('../js/services/serverStateQuery.js');
 const { supabaseService } = await import('../js/supabaseService.js');
 const progressDataSource = await readFile(
     new URL('../js/teacherStudentProgress/teacherProgressDataMethods.js', import.meta.url),
@@ -43,8 +44,19 @@ const progressDataSource = await readFile(
 const teacherListenersSource = await readFile(new URL('../js/teacherListeners.js', import.meta.url), 'utf8');
 const teacherGlobalListenersSource = await readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8');
 
-class TestTeacherManager {}
+class TestTeacherManager {
+    constructor() {
+        this.currentUser = { uid: 'teacher-test' };
+        this.serverStateQuery = serverStateQuery;
+        this.loadStudentRosterProgress = async () => {};
+    }
+}
 installTeacherStudentProgressDataMethods(TestTeacherManager);
+
+afterEach(async () => {
+    await serverStateQuery.clearAccount('teacher-test');
+    await serverStateQuery.clearAccount('teacher-other');
+});
 
 function createDomElement({ classes = [], innerHTML = '', textContent = '', value = '' } = {}) {
     const classNames = new Set(classes);
@@ -82,6 +94,14 @@ async function flushAsync() {
     await Promise.resolve();
 }
 
+async function waitFor(condition, message) {
+    for (let attempt = 0; attempt < 50; attempt += 1) {
+        if (condition()) return;
+        await new Promise(resolve => setImmediate(resolve));
+    }
+    throw new Error(message);
+}
+
 test('teacher progress installer exposes progress, provisioning, and CSV workflows', () => {
     const methodNames = [
         'getStudentRosterData',
@@ -116,7 +136,7 @@ test('teacher progress responsibilities have one complete owner each', () => {
     ];
     const methodNames = groups.flatMap(group => Object.keys(group));
 
-    assert.equal(methodNames.length, 33);
+    assert.equal(methodNames.length, 34);
     assert.equal(new Set(methodNames).size, methodNames.length);
     methodNames.forEach(name => assert.equal(typeof TestTeacherManager.prototype[name], 'function'));
     assert.deepEqual(
@@ -254,6 +274,27 @@ test('identity roster requests are shared and cached across teacher tools', asyn
     }
 });
 
+test('teacher progress queries do not cross teacher accounts', async () => {
+    const manager = new TestTeacherManager();
+    manager.authDisabled = false;
+    manager.allStudentData = [];
+    manager.filteredStudentData = [];
+    let requests = 0;
+    const originalListStudentIdentityRoster = supabaseService.listStudentIdentityRoster;
+    supabaseService.listStudentIdentityRoster = async () => [{ id: `student-${++requests}` }];
+
+    try {
+        assert.deepEqual(await manager.getStudentRosterData(), [{ id: 'student-1' }]);
+        manager.currentUser = { uid: 'teacher-other' };
+        assert.deepEqual(await manager.getStudentRosterData(), [{ id: 'student-2' }]);
+        manager.currentUser = { uid: 'teacher-test' };
+        assert.deepEqual(await manager.getStudentRosterData(), [{ id: 'student-1' }]);
+        assert.equal(requests, 2);
+    } finally {
+        supabaseService.listStudentIdentityRoster = originalListStudentIdentityRoster;
+    }
+});
+
 test('account changes clear roster selection and suppress late student data', async () => {
     const manager = new TestTeacherManager();
     manager.authDisabled = false;
@@ -273,7 +314,7 @@ test('account changes clear roster selection and suppress late student data', as
         assert.deepEqual(manager.allStudentData, []);
         assert.deepEqual(manager.filteredStudentData, []);
         assert.equal(manager.selectedStudents.size, 0);
-        assert.equal(manager.studentIdentityRosterCache, null);
+        assert.equal('studentIdentityRosterCache' in manager, false);
     } finally {
         supabaseService.listStudentIdentityRoster = originalListStudentIdentityRoster;
     }
@@ -321,7 +362,6 @@ test('account changes clear paginated progress, filters, timers, and selection s
     manager.studentProgressSessionGeneration = 2;
     manager.studentProgressPageGeneration = 4;
     manager.studentRosterFiltersGeneration = 6;
-    manager.studentProgressPageCache = new Map([['old-query', { items: [{ id: 'old' }] }]]);
     manager.studentProgressLastPage = { items: [{ id: 'old' }], total: 1, limit: 50, offset: 0 };
     manager.studentProgressPage = { page: 2, pageSize: 50, total: 80 };
     manager.studentProgressLoadState = 'stale';
@@ -330,7 +370,6 @@ test('account changes clear paginated progress, filters, timers, and selection s
     manager.allStudentData = [{ id: 'old' }];
     manager.filteredStudentData = [{ id: 'old' }];
     manager.selectedStudents = new Set(['old']);
-    manager.studentProgressDetailPromises = new Map([['old', Promise.resolve()] ]);
     manager.activeStudentId = 'old';
 
     manager.clearStudentProgressSessionState();
@@ -338,7 +377,7 @@ test('account changes clear paginated progress, filters, timers, and selection s
     assert.equal(manager.studentProgressSessionGeneration, 3);
     assert.equal(manager.studentProgressPageGeneration, 5);
     assert.equal(manager.studentRosterFiltersGeneration, 7);
-    assert.equal(manager.studentProgressPageCache, null);
+    assert.equal('studentProgressPageCache' in manager, false);
     assert.equal(manager.studentProgressLastPage, null);
     assert.equal(manager.studentProgressPage, null);
     assert.equal(manager.studentProgressLoadState, 'idle');
@@ -347,7 +386,7 @@ test('account changes clear paginated progress, filters, timers, and selection s
     assert.deepEqual(manager.allStudentData, []);
     assert.deepEqual(manager.filteredStudentData, []);
     assert.equal(manager.selectedStudents.size, 0);
-    assert.equal(manager.studentProgressDetailPromises.size, 0);
+    assert.equal('studentProgressDetailPromises' in manager, false);
     assert.equal(manager.activeStudentId, null);
 });
 
@@ -365,11 +404,12 @@ test('a late paginated response cannot repopulate progress after an account chan
 
     try {
         const oldRequest = manager.fetchStudentProgressPage({ forceRefresh: true });
+        await waitFor(() => typeof resolvePage === 'function', 'The old progress-page request did not start.');
         manager.clearStudentProgressSessionState();
         resolvePage({ items: [{ id: 'old' }], total: 1, limit: 50, offset: 0 });
 
         assert.deepEqual(await oldRequest, []);
-        assert.equal(manager.studentProgressPageCache, null);
+        assert.equal('studentProgressPageCache' in manager, false);
         assert.equal(manager.studentProgressLastPage, null);
         assert.deepEqual(manager.allStudentData, []);
     } finally {
@@ -377,29 +417,31 @@ test('a late paginated response cannot repopulate progress after an account chan
     }
 });
 
-test('the next account cannot reuse a matching cached progress page', async () => {
+test('the next progress session cannot reuse a matching cached progress page', async () => {
     const manager = new TestTeacherManager();
     manager.authDisabled = false;
     manager.selectedStudents = new Set();
     manager.allStudentData = [];
     manager.filteredStudentData = [];
-    manager.studentProgressPageCache = new Map([[
-        JSON.stringify({ page: 1, pageSize: 50, grade: '', section: '', search: '', offset: 0 }),
-        { items: [{ id: 'old' }], total: 1, limit: 50, offset: 0 }
-    ]]);
     manager.renderProgressTable = () => {};
     manager.renderStudentProgressPagination = () => {};
     let requests = 0;
     const originalList = supabaseService.listStudentProgressSummaries;
     supabaseService.listStudentProgressSummaries = async () => {
         requests += 1;
-        return { items: [{ id: 'new' }], total: 1, limit: 50, offset: 0 };
+        return {
+            items: [{ id: requests === 1 ? 'old' : 'new' }],
+            total: 1,
+            limit: 50,
+            offset: 0
+        };
     };
 
     try {
+        assert.deepEqual(await manager.fetchStudentProgressPage(), [{ id: 'old' }]);
         manager.clearStudentProgressSessionState();
         assert.deepEqual(await manager.fetchStudentProgressPage(), [{ id: 'new' }]);
-        assert.equal(requests, 1);
+        assert.equal(requests, 2);
         assert.deepEqual(manager.allStudentData.map(student => student.id), ['new']);
     } finally {
         supabaseService.listStudentProgressSummaries = originalList;
@@ -499,13 +541,14 @@ test('account cleanup scrubs rendered roster, filters, selection controls, and s
         '#student-progress-list', '#student-progress-cards', '#student-progress-pagination',
         '#student-progress-status', '#student-roster-import-status', '#progress-loading',
         '#filter-grade', '#filter-group', '#filter-search', '#detail-student-name',
-        '#detail-student-grade', '#detail-student-group', '#detail-student-coins',
+        '#detail-student-coins',
         '#detail-last-active', '#detail-avg-score', '#detail-total-activities',
         '#detail-password-flag', '#detail-activity-list', '#coin-adjust-status',
         '#reset-password-status', '#temporary-password-output', '#coin-adjust-input',
         '#reset-student-password-btn', '#select-all-students',
         '#select-visible-students-mobile', '#bulk-action-toolbar', '#bulk-selected-count',
-        '#bulk-coin-input', '#student-detail-modal', '#add-student-form',
+        '#bulk-coin-input', '#student-profile-content', '#student-profile-loading',
+        '#student-profile-error', '#add-student-form',
         '#add-student-status', '#create-student-account-btn', '#add-student-modal',
         '#student-csv-input', '#import-student-csv-btn', '#add-student-password',
         '#add-student-confirm-password'
@@ -518,6 +561,7 @@ test('account cleanup scrubs rendered roster, filters, selection controls, and s
     elements.set('.password-toggle[aria-controls="add-student-password"]', passwordToggle);
     elements.set('.password-toggle[aria-controls="add-student-confirm-password"]', confirmToggle);
     elements.get('#temporary-password-output').style.display = 'block';
+    elements.get('#student-profile-loading').classList.add('hidden');
     elements.get('#reset-student-password-btn').disabled = true;
     elements.get('#create-student-account-btn').disabled = true;
     elements.get('#import-student-csv-btn').disabled = true;
@@ -541,7 +585,9 @@ test('account cleanup scrubs rendered roster, filters, selection controls, and s
         assert.equal(elements.get('#detail-student-name').textContent, 'Student Name');
         assert.equal(elements.get('#temporary-password-output').innerHTML, '');
         assert.equal(elements.get('#temporary-password-output').style.display, 'none');
-        assert.equal(elements.get('#student-detail-modal').classList.contains('hidden'), true);
+        assert.equal(elements.get('#student-profile-content').classList.contains('hidden'), true);
+        assert.equal(elements.get('#student-profile-loading').classList.contains('hidden'), false);
+        assert.equal(elements.get('#student-profile-error').classList.contains('hidden'), true);
         assert.equal(elements.get('#add-student-modal').classList.contains('hidden'), true);
         assert.equal(elements.get('#add-student-form').resetCalls, 1);
         assert.equal(elements.get('#add-student-password').type, 'password');
@@ -670,8 +716,11 @@ test('a stale paginated failure cannot restore the prior account page', async ()
 
     try {
         const oldRequest = manager.fetchStudentProgressPage({ forceRefresh: true });
+        await waitFor(() => typeof rejectPage === 'function', 'The old failing progress-page request did not start.');
         manager.clearStudentProgressSessionState();
-        rejectPage(new Error('old account failed'));
+        const oldAccountError = new Error('old account failed');
+        oldAccountError.status = 400;
+        rejectPage(oldAccountError);
         assert.deepEqual(await oldRequest, []);
         assert.equal(applyCalls, 0);
         assert.equal(manager.studentProgressLastPage, null);
@@ -817,57 +866,90 @@ test('an older password reset cannot enable the button while a newer reset is pe
     }
 });
 
-test('an old detail request cannot overwrite the same student ID in a new account session', async () => {
+test('an old routed profile request cannot overwrite the same student ID in a new account session', async () => {
     class DetailManager extends TestTeacherManager {}
     installTeacherStudentProgressRenderMethods(DetailManager);
     const manager = new DetailManager();
     manager.studentProgressSessionGeneration = 0;
+    manager.studentProgressDetailGeneration = 0;
     manager.selectedStudents = new Set();
     manager.allStudentData = [];
     manager.filteredStudentData = [];
+    manager.ensureAuthenticated = () => true;
+    manager.switchView = () => {};
     const rendered = [];
     let resolveOldDetail;
-    manager.renderStudentDetails = (student, options) => rendered.push({ student, options });
-    manager.ensureStudentProgressDetail = () => new Promise(resolve => { resolveOldDetail = resolve; });
+    let requestCount = 0;
+    manager.renderStudentProfile = student => rendered.push(student);
+    manager.ensureStudentProgressDetail = () => {
+        requestCount += 1;
+        if (requestCount === 1) return new Promise(resolve => { resolveOldDetail = resolve; });
+        return Promise.resolve({ id: 'shared-student', progressDetailLoaded: true, marker: 'NEW_B' });
+    };
+    const originalGetProfile = supabaseService.getProfile;
+    const originalQuerySelector = document.querySelector;
+    supabaseService.getProfile = async () => ({
+        id: 'shared-student', firstName: 'New', lastName: 'Student', mustChangePassword: false
+    });
+    document.querySelector = () => null;
 
-    const oldStudent = { id: 'shared-student', progressDetailLoaded: false };
-    const oldRequest = manager.showStudentDetails(oldStudent);
-    manager.clearStudentProgressSessionState();
-    const newStudent = { id: 'shared-student', progressDetailLoaded: true };
-    await manager.showStudentDetails(newStudent);
-    resolveOldDetail({ id: 'shared-student', progressDetailLoaded: true, marker: 'OLD_A' });
-    await oldRequest;
+    try {
+        const oldRequest = manager.showStudentProfileById('shared-student');
+        manager.studentProgressSessionGeneration += 1;
+        manager.studentProgressDetailGeneration += 1;
+        await manager.showStudentProfileById('shared-student');
+        resolveOldDetail({ id: 'shared-student', progressDetailLoaded: true, marker: 'OLD_A' });
+        await oldRequest;
 
-    assert.equal(manager.activeStudentId, 'shared-student');
-    assert.equal(rendered.length, 2);
-    assert.equal(rendered[0].student, oldStudent);
-    assert.equal(rendered[1].student, newStudent);
-    assert.equal(rendered.some(entry => entry.student?.marker === 'OLD_A'), false);
+        assert.equal(rendered.length, 1);
+        assert.equal(rendered[0].marker, 'NEW_B');
+    } finally {
+        supabaseService.getProfile = originalGetProfile;
+        document.querySelector = originalQuerySelector;
+    }
 });
 
-test('an old detail failure cannot replace the same student ID in a new account session', async () => {
+test('an old routed profile failure cannot replace the current profile with an error', async () => {
     class DetailManager extends TestTeacherManager {}
     installTeacherStudentProgressRenderMethods(DetailManager);
     const manager = new DetailManager();
     manager.studentProgressSessionGeneration = 0;
+    manager.studentProgressDetailGeneration = 0;
     manager.selectedStudents = new Set();
     manager.allStudentData = [];
     manager.filteredStudentData = [];
-    const rendered = [];
+    manager.ensureAuthenticated = () => true;
+    manager.switchView = () => {};
     let rejectOldDetail;
-    manager.renderStudentDetails = (student, options) => rendered.push({ student, options });
-    manager.ensureStudentProgressDetail = () => new Promise((resolve, reject) => { rejectOldDetail = reject; });
+    let requestCount = 0;
+    const rendered = [];
+    manager.renderStudentProfile = student => rendered.push(student);
+    manager.ensureStudentProgressDetail = () => {
+        requestCount += 1;
+        if (requestCount === 1) return new Promise((resolve, reject) => { rejectOldDetail = reject; });
+        return Promise.resolve({ id: 'shared-student', marker: 'NEW_B' });
+    };
+    const originalGetProfile = supabaseService.getProfile;
+    const originalQuerySelector = document.querySelector;
+    const errorElement = createDomElement();
+    supabaseService.getProfile = async () => ({ id: 'shared-student', mustChangePassword: false });
+    document.querySelector = selector => selector === '#student-profile-error' ? errorElement : null;
 
-    const oldStudent = { id: 'shared-student', progressDetailLoaded: false };
-    const oldRequest = manager.showStudentDetails(oldStudent);
-    manager.clearStudentProgressSessionState();
-    const newStudent = { id: 'shared-student', progressDetailLoaded: true };
-    await manager.showStudentDetails(newStudent);
-    rejectOldDetail(new Error('old account failed'));
-    await oldRequest;
+    try {
+        const oldRequest = manager.showStudentProfileById('shared-student');
+        manager.studentProgressSessionGeneration += 1;
+        manager.studentProgressDetailGeneration += 1;
+        await manager.showStudentProfileById('shared-student');
+        rejectOldDetail(new Error('old account failed'));
+        await oldRequest;
 
-    assert.equal(rendered.length, 2);
-    assert.equal(rendered[1].student, newStudent);
+        assert.equal(rendered.length, 1);
+        assert.equal(rendered[0].marker, 'NEW_B');
+        assert.equal(errorElement.textContent, '');
+    } finally {
+        supabaseService.getProfile = originalGetProfile;
+        document.querySelector = originalQuerySelector;
+    }
 });
 
 test('same-student password resets only publish and finish the newest request', async () => {
@@ -1058,5 +1140,45 @@ test('CSV handler stops after an in-flight account when its session is cleared',
         supabaseService.createStudentAccount = originalCreate;
         globalThis.confirm = originalConfirm;
         document.querySelector = originalQuerySelector;
+    }
+});
+
+
+test('a rejected roster refresh preserves successful rows and learning progress and offers retry', async () => {
+    const manager = new TestTeacherManager();
+    const previous = { items: [{ id: 'student-1', name: 'Saved student' }], total: 1, limit: 50, offset: 0 };
+    const progress = new Map([['student-1', { state: 'ready', progress: { required: 2, completed: 1 } }]]);
+    const failure = new Error('Roster unavailable');
+    manager.serverStateQuery = { refresh: async () => { throw failure; } };
+    manager.studentProgressLastPage = previous;
+    manager.studentRosterProgressById = progress;
+    manager.allStudentData = previous.items;
+    manager.selectedStudents = new Set();
+    manager.renderProgressTable = () => {};
+    manager.renderStudentProgressPagination = () => {};
+    const originalApply = manager.applyStudentProgressPage;
+    let restoreOptions;
+    manager.applyStudentProgressPage = function(page, options) {
+        restoreOptions = options;
+        return originalApply.call(this, page, options);
+    };
+    const status = createDomElement();
+    const originalQuerySelector = document.querySelector;
+    const originalError = console.error;
+    document.querySelector = selector => selector === '#student-progress-status' ? status : null;
+    console.error = () => {};
+    try {
+        await assert.rejects(manager.fetchStudentProgressPage({ forceRefresh: true, showError: false }), error => error === failure);
+        assert.deepEqual(restoreOptions, { preserveProgress: true });
+        assert.deepEqual(manager.allStudentData, previous.items);
+        assert.equal(manager.studentProgressLastPage, previous);
+        assert.equal(manager.studentRosterProgressById, progress);
+        assert.equal(manager.studentProgressLoadState, 'stale');
+        assert.match(status.innerHTML, /last successfully loaded page/);
+        assert.match(status.innerHTML, /data-progress-retry/);
+        assert.equal(status.classList.contains('hidden'), false);
+    } finally {
+        document.querySelector = originalQuerySelector;
+        console.error = originalError;
     }
 });

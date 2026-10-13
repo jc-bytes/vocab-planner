@@ -127,7 +127,7 @@ test('Student Progress roster delegates static presentation to its owned stylesh
 
     for (const declaration of [
         /\.student-progress-filter-control\s*\{[^}]*width:\s*100%;[^}]*padding:\s*0\.5rem;/s,
-        /\.student-progress-table\s*\{[^}]*width:\s*100%;[^}]*min-width:\s*760px;[^}]*border-collapse:\s*collapse;[^}]*text-align:\s*left;/s,
+        /\.student-progress-table\s*\{[^}]*width:\s*100%;[^}]*min-width:\s*1050px;[^}]*border-collapse:\s*collapse;[^}]*text-align:\s*left;/s,
         /\.student-progress-table-head\s*\{[^}]*position:\s*sticky;[^}]*top:\s*0;[^}]*z-index:\s*10;[^}]*background:\s*var\(--card-bg,/s,
         /\.student-progress-table-heading-row\s*\{[^}]*border-bottom:\s*2px solid var\(--color-border\);/s,
         /\.student-progress-table :is\(\.data-table__header-cell, \.data-table__cell\)\s*\{[^}]*padding:\s*1rem;/s,
@@ -140,7 +140,7 @@ test('Student Progress roster delegates static presentation to its owned stylesh
     }
 
     const rosterCssStart = teacherCss.indexOf('.student-filter-card');
-    const rosterCssEnd = teacherCss.indexOf('#student-detail-modal .modal-content', rosterCssStart);
+    const rosterCssEnd = teacherCss.indexOf('.student-progress-cards', rosterCssStart);
     assert.ok(rosterCssStart >= 0 && rosterCssEnd > rosterCssStart);
     assert.doesNotMatch(teacherCss.slice(rosterCssStart, rosterCssEnd), /!important/);
     assert.doesNotMatch(teacherCss, /#teacher-progress-view \.card>div\[style\*="overflow-x"\]/,
@@ -149,7 +149,7 @@ test('Student Progress roster delegates static presentation to its owned stylesh
 
 test('Add Student modal delegates static presentation to its feature classes', () => {
     const start = teacherHtml.indexOf('<!-- Modal: Add Student -->');
-    const end = teacherHtml.indexOf('<!-- Modal: Student Details -->', start);
+    const end = teacherHtml.indexOf('<!-- View: Student Profile -->', start);
     assert.ok(start >= 0 && end > start, 'Missing bounded Add Student modal');
     const addStudentTemplate = teacherHtml.slice(start, end);
 
@@ -180,40 +180,33 @@ test('Add Student modal delegates static presentation to its feature classes', (
     assert.doesNotMatch(teacherCss.slice(addStudentCssStart, addStudentCssEnd), /!important/);
 });
 
-test('Student Detail delegates static presentation without disturbing runtime state styles', () => {
-    const start = teacherHtml.indexOf('<!-- Modal: Student Details -->');
+test('Student Profile delegates static presentation while retaining calculated progress state', () => {
+    const start = teacherHtml.indexOf('<!-- View: Student Profile -->');
     const end = teacherHtml.indexOf('<!-- View: Editor -->', start);
-    assert.ok(start >= 0 && end > start, 'Missing bounded Student Detail modal');
+    assert.ok(start >= 0 && end > start, 'Missing bounded Student Profile view');
     const detailTemplate = teacherHtml.slice(start, end);
-    const showStart = studentProgressRenderer.indexOf('    async showStudentDetails(');
+    const showStart = studentProgressRenderer.indexOf('    async showStudentProfileById(');
     const renderEnd = studentProgressRenderer.indexOf('    formatActivityDuration(', showStart);
-    assert.ok(showStart >= 0 && renderEnd > showStart, 'Missing bounded Student Detail renderer');
+    assert.ok(showStart >= 0 && renderEnd > showStart, 'Missing bounded Student Profile renderer');
     const detailRenderer = studentProgressRenderer.slice(showStart, renderEnd);
 
     assert.doesNotMatch(detailTemplate, /\sstyle=/,
-        'Student Detail markup must not recreate static styles inline');
-    assert.doesNotMatch(detailRenderer, /style=/,
-        'Student Detail generated markup must use feature-owned classes');
-    assert.match(detailRenderer, /tempOutput\.style\.display\s*=\s*'none'/,
-        'Temporary-password visibility remains runtime state for Task 14');
+        'Student Profile markup must not recreate static styles inline');
+    assert.match(detailRenderer, /style="width: \$\{unit\.percent\}%"/,
+        'Only the calculated progress width remains runtime presentation state');
 
     for (const declaration of [
-        /\.student-detail-section \.modal-section-title,[\s\S]*?\.student-detail-unit-title\s*\{[^}]*margin-bottom:\s*0\.5rem;/s,
-        /\.student-detail-control-row\s*\{[^}]*align-items:\s*center;[^}]*gap:\s*0\.75rem;/s,
-        /\.student-detail-control-row--coins,[\s\S]*?\.student-detail-quick-actions\s*\{[^}]*gap:\s*0\.5rem;/s,
-        /\.student-detail-coin-input\s*\{[^}]*width:\s*90px;/s,
-        /\.student-detail-action-button\s*\{[^}]*padding:\s*0\.5rem 1rem;/s,
-        /\.student-detail-temp-password\s*\{[^}]*display:\s*none;[^}]*margin-top:\s*0\.75rem;[^}]*padding:\s*0\.75rem 0;[^}]*border-top:\s*1px solid rgba\(255, 255, 255, 0\.1\);[^}]*color:\s*var\(--color-text\);/s,
-        /\.student-detail-activity-list\s*\{[^}]*display:\s*grid;[^}]*gap:\s*0;[^}]*margin-top:\s*1rem;/s,
-        /\.student-detail-unit-results\s*\{[^}]*min-width:\s*0;[^}]*padding-top:\s*0\.5rem;[^}]*border-top:\s*1px solid var\(--color-border\);/s,
-        /\.student-detail-score\s*\{[^}]*color:\s*var\(--color-brand\);/s,
-        /#student-detail-modal \.modal-content\s*\{[^}]*width:\s*min\(92vw, 800px\) !important;[^}]*max-width:\s*800px;[^}]*max-height:\s*88vh !important;/s
+        /\.student-profile-overview-grid\s*\{[^}]*display:\s*grid;/s,
+        /\.student-profile-unit\s*\{[^}]*grid-template-columns:/s,
+        /\.student-profile-activity-table\s*\{[^}]*min-width:\s*1120px;/s,
+        /\.student-profile-account-grid\s*\{[^}]*grid-template-columns:/s,
+        /@container\s*\(max-width:\s*900px\)/s
     ]) {
         assert.match(teacherCss, declaration);
     }
 
-    assert.doesNotMatch(teacherCss, /#detail-activity-list[^\{]*\[style\*="display: flex"\]/,
-        'Student Detail layout must not depend on inline-style substring selectors');
+    assert.doesNotMatch(teacherCss, /#student-detail-modal/,
+        'The routed Student Profile must not retain modal-only layout rules');
 });
 
 test('Teacher loading and login views delegate static presentation to auth classes', () => {

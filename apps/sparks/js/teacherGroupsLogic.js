@@ -1,3 +1,5 @@
+import { shuffled } from './randomUtils.js';
+
 export function getStudentDisplayName(student) {
     const profile = student?.studentProfile || {};
     return [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim()
@@ -14,18 +16,14 @@ export function getStudentClassKey(student) {
 }
 
 export function randomizeStudents(students, groupSize = 2, random = Math.random) {
-    const shuffled = [...students];
-    for (let index = shuffled.length - 1; index > 0; index -= 1) {
-        const swapIndex = Math.floor(random() * (index + 1));
-        [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-    }
+    const shuffledStudents = shuffled(students, random);
 
     const size = Math.max(2, Number.parseInt(groupSize, 10) || 2);
-    if (shuffled.length === 0) return [];
-    if (shuffled.length <= size) return [shuffled];
+    if (shuffledStudents.length === 0) return [];
+    if (shuffledStudents.length <= size) return [shuffledStudents];
 
-    const fullGroupCount = Math.floor(shuffled.length / size);
-    const remainder = shuffled.length % size;
+    const fullGroupCount = Math.floor(shuffledStudents.length / size);
+    const remainder = shuffledStudents.length % size;
     let groupSizes;
 
     if (remainder === 0) {
@@ -38,7 +36,7 @@ export function randomizeStudents(students, groupSize = 2, random = Math.random)
 
     let cursor = 0;
     return groupSizes.map(currentSize => {
-        const group = shuffled.slice(cursor, cursor + currentSize);
+        const group = shuffledStudents.slice(cursor, cursor + currentSize);
         cursor += currentSize;
         return group;
     });

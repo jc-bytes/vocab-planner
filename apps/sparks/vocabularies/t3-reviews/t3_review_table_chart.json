@@ -1,0 +1,43 @@
+{
+  "id": "t3_review_table_chart",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Table and chart",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "7"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "table",
+      "definition": "Information arranged in rows and columns.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/table"
+    },
+    {
+      "word": "chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/chart"
+    }
+  ]
+}

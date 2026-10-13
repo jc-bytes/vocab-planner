@@ -22,12 +22,14 @@ export class StudentGames {
         this.gameTimerInterval = null;
         this.isHandlingGameMinute = false;
         this.isAddingGameTime = false;
+        this.isStartingGame = false;
         this.gamesList = STUDENT_GAME_REGISTRY;
         this.currentGameIndex = 0;
         this.currentGameScore = 0;
         this.currentGameMetadata = null;
         this.lastSavedScore = 0;
         this.isGamePaused = false;
+        this.destroyed = false;
         this.settings = new StudentGameSettings(this);
         this.access = new StudentGameAccess(this);
         this.leaderboard = new StudentGameLeaderboard(this);
@@ -140,5 +142,12 @@ export class StudentGames {
 
     updateGameTimer() {
         return this.lifecycle.updateGameTimer();
+    }
+
+    destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
+        this.lifecycle.destroy();
+        this.leaderboard.destroy();
     }
 }

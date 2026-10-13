@@ -1,7 +1,7 @@
 {
   "id": "grade8_t3_2026_w02_part1",
-  "name": "G8 T3 W02 Part 1 - Test your lunch map",
-  "description": "Test your lunch map. 2 words. Required: Flashcards and Matching. Read the Spark with the same name. Use this part in its Technology class.",
+  "name": "G8 T3 W02 Part 1 - Test your lunch app",
+  "description": "Test your lunch app. 2 words. Required: Flashcards and Matching. Use the assigned class link; review the same words in 04 Sparks Review if unavailable.",
   "grades": [
     "8"
   ],
@@ -50,6 +50,10 @@
     ],
     "flashcards": 2,
     "matching": 2,
-    "fillInBlank": 2
+    "fillInBlank": 2,
+    "retiredWeeklySet": true,
+    "replacementIds": [
+      "grade8_t3_2026_w02_weekly_v1"
+    ]
   }
 }

@@ -1,0 +1,326 @@
+[
+  {
+    "word": "row",
+    "url": "https://techterms.com/definition/row",
+    "ok": true,
+    "description": "Learn what a table row is and how it differs from a column in a database or spreadsheet."
+  },
+  {
+    "word": "column",
+    "url": "https://techterms.com/definition/column",
+    "ok": true,
+    "description": "Learn what a database or spreadsheet column is and how it differs from a table row."
+  },
+  {
+    "word": "cell",
+    "url": "https://techterms.com/definition/cell",
+    "ok": true,
+    "description": "Learn how a cell refers to a specific location within a spreadsheet at the intersection of a row and a column."
+  },
+  {
+    "word": "table",
+    "url": "https://www.merriam-webster.com/dictionary/table",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "chart",
+    "url": "https://www.merriam-webster.com/dictionary/chart",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "data",
+    "url": "https://techterms.com/definition/data",
+    "ok": true,
+    "description": "Learn what makes up digital data, how it&#039;s stored, and how it&#039;s measured."
+  },
+  {
+    "word": "label",
+    "url": "https://www.merriam-webster.com/dictionary/label",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "value",
+    "url": "https://www.merriam-webster.com/dictionary/value",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "comparison",
+    "url": "https://www.merriam-webster.com/dictionary/comparison",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "dimension",
+    "url": "https://www.merriam-webster.com/dictionary/dimension",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "length",
+    "url": "https://www.merriam-webster.com/dictionary/length",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "width",
+    "url": "https://www.merriam-webster.com/dictionary/width",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "height",
+    "url": "https://www.merriam-webster.com/dictionary/height",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "model",
+    "url": "https://www.merriam-webster.com/dictionary/model",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "input",
+    "url": "https://techterms.com/definition/input",
+    "ok": true,
+    "description": "Read about several different types of computer input, from simple text entry to complex data transfers."
+  },
+  {
+    "word": "output",
+    "url": "https://techterms.com/definition/output",
+    "ok": true,
+    "description": "Learn several different ways a computer can present the results of its work, known as output."
+  },
+  {
+    "word": "variable",
+    "url": "https://techterms.com/definition/variable",
+    "ok": true,
+    "description": "The definition of Variable defined and explained in simple language."
+  },
+  {
+    "word": "button",
+    "url": "https://www.merriam-webster.com/dictionary/button",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "counter",
+    "url": "https://www.merriam-webster.com/dictionary/counter",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "test",
+    "url": "https://www.merriam-webster.com/dictionary/test",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "feedback",
+    "url": "https://www.merriam-webster.com/dictionary/feedback",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "formula",
+    "url": "https://techterms.com/definition/formula",
+    "ok": true,
+    "description": "Learn how computer programs and spreadsheets use formulas to perform calculations on data."
+  },
+  {
+    "word": "function",
+    "url": "https://techterms.com/definition/function",
+    "ok": true,
+    "description": "Learn how computer programs use functions to take input parameters, perform a calculation, then return output."
+  },
+  {
+    "word": "total",
+    "url": "https://www.merriam-webster.com/dictionary/total",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "average",
+    "url": "https://www.merriam-webster.com/dictionary/average",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "loop",
+    "url": "https://techterms.com/definition/loop",
+    "ok": true,
+    "description": "The definition of Loop defined and explained in simple language."
+  },
+  {
+    "word": "position",
+    "url": "https://www.merriam-webster.com/dictionary/position",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "reset",
+    "url": "https://www.merriam-webster.com/dictionary/reset",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "sensor",
+    "url": "https://www.merriam-webster.com/dictionary/sensor",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "threshold",
+    "url": "https://www.merriam-webster.com/dictionary/threshold",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "condition",
+    "url": "https://www.merriam-webster.com/dictionary/condition",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "radio",
+    "url": "https://www.merriam-webster.com/dictionary/radio",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "message",
+    "url": "https://www.merriam-webster.com/dictionary/message",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "bug",
+    "url": "https://techterms.com/definition/bug",
+    "ok": true,
+    "description": "Learn what a computer bug is and some of their many possible causes."
+  },
+  {
+    "word": "event",
+    "url": "https://techterms.com/definition/event",
+    "ok": false,
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "word": "result",
+    "url": "https://www.merriam-webster.com/dictionary/result",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "bit",
+    "url": "https://techterms.com/definition/bit",
+    "ok": true,
+    "description": "Learn about the bit, the smallest unit of digital storage, and how all digital data consists of bits."
+  },
+  {
+    "word": "binary",
+    "url": "https://techterms.com/definition/binary",
+    "ok": true,
+    "description": "Read an easy-to-understand definition of Binary and learn what all those 0s and 1s mean."
+  },
+  {
+    "word": "decimal",
+    "url": "https://www.merriam-webster.com/dictionary/decimal",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "digit",
+    "url": "https://www.merriam-webster.com/dictionary/digit",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "place value",
+    "url": "https://www.merriam-webster.com/dictionary/place%20value",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "integer",
+    "url": "https://techterms.com/definition/integer",
+    "ok": true,
+    "description": "Learn what an integer is and how integers are used in computer programming."
+  },
+  {
+    "word": "sprite",
+    "url": "https://techterms.com/definition/sprite",
+    "ok": true,
+    "description": "The definition of Sprite defined and explained in simple language."
+  },
+  {
+    "word": "phishing",
+    "url": "https://techterms.com/definition/phishing",
+    "ok": true,
+    "description": "Learn about phishing and how hackers use it to steal usernames and passwords to popular websites."
+  },
+  {
+    "word": "malware",
+    "url": "https://techterms.com/definition/malware",
+    "ok": true,
+    "description": "Learn about the different types of malware and how to defend against it."
+  },
+  {
+    "word": "ransomware",
+    "url": "https://techterms.com/definition/ransomware",
+    "ok": true,
+    "description": "The definition of Ransomware defined and explained in simple language."
+  },
+  {
+    "word": "password",
+    "url": "https://techterms.com/definition/password",
+    "ok": true,
+    "description": "Learn how computer systems use passwords as part of an authentication process."
+  },
+  {
+    "word": "protection",
+    "url": "https://www.merriam-webster.com/dictionary/protection",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "risk",
+    "url": "https://www.merriam-webster.com/dictionary/risk",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "probability",
+    "url": "https://www.merriam-webster.com/dictionary/probability",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "impact",
+    "url": "https://www.merriam-webster.com/dictionary/impact",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "evidence",
+    "url": "https://www.merriam-webster.com/dictionary/evidence",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "word": "backup",
+    "url": "https://techterms.com/definition/backup",
+    "ok": true,
+    "description": "Learn how important it is to regularly back up your data in multiple ways."
+  },
+  {
+    "word": "priority",
+    "url": "https://www.merriam-webster.com/dictionary/priority",
+    "ok": false,
+    "error": "HTTP Error 403: Forbidden"
+  }
+]

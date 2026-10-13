@@ -1,3 +1,4 @@
+import { activityHasPlayableRound } from './weeklyVocabularyPolicy.js';
 import { $, createElement } from '../main.js';
 
 export class StudentActivityGateDisplay {
@@ -100,7 +101,7 @@ export class StudentActivityGateDisplay {
         grid.querySelectorAll(':scope > .unit-loading-state').forEach(state => state.remove());
 
         const completion = this.getRequiredCompletion(flow);
-        const hasPlayableWords = activityType => this.activities.getActivityPlayableCount(activityType) > 0;
+        const hasPlayableWords = activityType => activityHasPlayableRound(activityType, this.sm.currentVocab, this.activities.getActivityPlayableCount(activityType));
         const visibleAdditionalCount = flow.additional.filter(hasPlayableWords).length;
         const visibleHiddenCount = flow.hidden.filter(hasPlayableWords).length;
         const allCards = Array.from(cards);
@@ -136,6 +137,7 @@ export class StudentActivityGateDisplay {
             'required-activity-section',
             'Complete these activities to unlock the full practice library.'
         );
+        requiredGrid.parentElement.style.display = flow.required.length ? '' : 'none';
         requiredGrid.classList.add('required-activity-path');
         requiredGrid.style.setProperty('--required-count', Math.max(flow.required.length, 1));
         const pathTrack = createElement('div', 'required-path-track');

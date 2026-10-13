@@ -1,3 +1,4 @@
+import { weeklyVocabularyVisible, weeklySettings, studentSection } from './weeklyVocabularyPolicy.js';
 import {
     calculateClassReleaseDate,
     calculateVocabularyPlacement,
@@ -11,7 +12,7 @@ export class StudentActivitySchedule {
     }
 
     getVocabSchedule(vocab, date = new Date()) {
-        let assignedDate = vocab.assignedDate || '';
+        let assignedDate = weeklySettings(vocab)?.releaseDates?.[studentSection(this.activities.sm?.studentProfile)] || vocab.assignedDate || '';
         let month = String(vocab.month || '').trim().toLowerCase();
         let week = Number.parseInt(vocab.week, 10);
 
@@ -40,7 +41,7 @@ export class StudentActivitySchedule {
 
         let dueDate = null;
         if (assignedDate) {
-            const releaseDate = calculateClassReleaseDate(
+            const releaseDate = weeklySettings(vocab) ? assignedDate : calculateClassReleaseDate(
                 assignedDate,
                 this.activities.schoolCalendar,
                 this.activities.sm?.studentProfile
@@ -286,6 +287,7 @@ export class StudentActivitySchedule {
     }
 
     isStudentVocabularyAvailable(vocab, date = new Date()) {
+        if (!weeklyVocabularyVisible(vocab, this.activities.sm?.studentProfile, date)) return false;
         const currentWindow = this.getCurrentScheduleWindow(date);
         const currentMonthStart = new Date(
             currentWindow.date.getFullYear(),

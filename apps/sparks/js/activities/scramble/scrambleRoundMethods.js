@@ -1,4 +1,5 @@
 import { MAX_SCRAMBLE_HINTS } from './scrambleConstants.js';
+import { createUniqueId, shuffled as shuffleCopy } from '../../randomUtils.js';
 
 export const scrambleRoundMethods = {
 startRound() {
@@ -28,7 +29,7 @@ createScrambledLetters(answer) {
         let shuffled = [...letters];
 
         for (let attempt = 0; attempt < 30; attempt++) {
-            shuffled = this.shuffleArray([...letters]);
+            shuffled = shuffleCopy(letters);
             const samePositionCount = shuffled.filter((letter, index) => letter === letters[index]).length;
             const isDifferent = shuffled.join('') !== answer;
             const hasGoodMix = letters.length < 4 || samePositionCount <= Math.ceil(letters.length * 0.55);
@@ -37,16 +38,8 @@ createScrambledLetters(answer) {
 
         return shuffled.map((char, index) => ({
             char,
-            id: `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 8)}`
+            id: createUniqueId(`letter-${index}-`)
         }));
-    },
-
-shuffleArray(items) {
-        for (let index = items.length - 1; index > 0; index--) {
-            const swapIndex = Math.floor(Math.random() * (index + 1));
-            [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
-        }
-        return items;
     },
 
 handlePoolClick(letterObj) {
@@ -172,4 +165,3 @@ getEditDistance(a, b) {
         return rows[a.length][b.length];
     }
 };
-

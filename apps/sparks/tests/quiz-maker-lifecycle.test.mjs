@@ -46,7 +46,7 @@ function createHarness() {
     maker.rubricOverlays = new Set();
     maker.downloadUrls = new Set();
     maker.downloadRevokeTimers = new Map();
-    maker.dragSrcEl = { id: 'dragged' };
+    maker.questionSortables = [];
     maker.onStateChange = () => {};
     maker.onClose = () => {};
     return maker;
@@ -71,6 +71,12 @@ test('Quiz Maker destroy is idempotent and releases timers, handlers, overlays, 
     maker.rubricOverlays.add(overlay);
     maker.downloadUrls.add('blob:pending');
     maker.downloadRevokeTimers.set('blob:pending', window.setTimeout(() => {}, 1000));
+    const sortable = { destroys: 0, destroy() { this.destroys += 1; } };
+    maker.questionSortables.push(sortable);
+    maker.destroyQuestionSortables = function destroyQuestionSortables() {
+        this.questionSortables.forEach(instance => instance.destroy());
+        this.questionSortables = [];
+    };
     let generated = 0;
     maker.generateQuizFromSections = () => { generated += 1; };
     maker.scheduleAutoGenerate();
@@ -86,7 +92,8 @@ test('Quiz Maker destroy is idempotent and releases timers, handlers, overlays, 
     assert.equal(overlay.removed, 1);
     assert.deepEqual(revokedUrls, ['blob:pending']);
     assert.deepEqual(replaced, ['sections', 'preview']);
-    assert.equal(maker.dragSrcEl, null);
+    assert.equal(sortable.destroys, 1);
+    assert.deepEqual(maker.questionSortables, []);
     assert.equal(maker.onStateChange, null);
     assert.equal(maker.onClose, null);
     const inputIds = new Set([

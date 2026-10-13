@@ -1,6 +1,15 @@
-import { $ } from './main.js';
+import { schoolContext } from './services/schoolContext.js';
+const bindTeacherSchoolSession = async manager => {
+    const { bindTeacherSchoolSession: bind } = await import('./teacherSchoolSession.js');
+    if (manager.isAuthenticated) bind(manager);
+};
+import { $, refreshIcons } from './main.js';
 import { SessionInitializationCoordinator } from './services/sessionInitialization.js';
 import { teacherAuthApi } from './services/teacherAuthApi.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
+import { requestWithTimeout } from './services/requestReliability.js';
+
+export const TEACHER_AUTH_REQUEST_TIMEOUT_MS = 8000;
 
 export const DEV_AUTH_DISABLED = false;
 export const DEV_TEACHER_USER = {
@@ -10,6 +19,12 @@ export const DEV_TEACHER_USER = {
 };
 
 class TeacherAuthMethods {
+    clearCurrentTeacherServerState() {
+        const accountId = this.currentUser?.uid || this.currentUser?.id;
+        if (accountId) void serverStateQuery.clearAccount(accountId);
+        this.overviewAnalytics = null;
+    }
+
     getAuthCoordinator() {
         this.authCoordinator ||= new SessionInitializationCoordinator();
         return this.authCoordinator;
@@ -30,6 +45,7 @@ class TeacherAuthMethods {
     async initAuth() {
         try {
             await this.teacherAuthApi.init();
+            void import('./schoolAccountAccess.js').then(({ mountSchoolAccountAccess }) => mountSchoolAccountAccess(document.getElementById('teacher-login-view'))).catch(error => console.warn('Account access unavailable:', error));
             const restoredUser = this.teacherAuthApi.getCurrentUser();
             let restoredUserHandled = false;
 
@@ -44,6 +60,7 @@ class TeacherAuthMethods {
             this.authUnsubscribe = this.teacherAuthApi.onAuthStateChanged((user, event) => {
                 if (user) {
                     if (this.currentUser?.uid && this.currentUser.uid !== user.uid) {
+                        this.clearCurrentTeacherServerState();
                         this.disposeLoadedTeacherFeatures?.();
                         this.clearStudentProgressSessionState?.();
                         this.clearTeacherSettingsSessionState?.();
@@ -57,10 +74,13 @@ class TeacherAuthMethods {
                 } else {
                     restoredUserHandled = false;
                     this.getAuthCoordinator().invalidate();
+                    this.clearCurrentTeacherServerState();
                     this.disposeLoadedTeacherFeatures?.();
                     this.clearStudentProgressSessionState?.();
                     this.clearTeacherSettingsSessionState?.();
                     this.clearTeacherVocabularySessionState?.();
+                    this.schoolContextUnsubscribe?.();
+                    this.schoolAccess.clear();
                     this.isAuthenticated = false;
                     this.currentUser = null;
                     this.updateAuthUI(null);
@@ -73,7 +93,7 @@ class TeacherAuthMethods {
             this.showLoginView();
         }
     }
-    
+
     handleAuthWithRole(user, options = {}) {
         return this.getAuthCoordinator().run(
             user?.uid,
@@ -84,80 +104,77 @@ class TeacherAuthMethods {
 
     async initializeAuthWithRole(user, context) {
         try {
-            const role = await this.fetchUserRole(user);
-            if (!context.isCurrent()) return false;
-            this.currentRole = role;
-            if (role !== 'teacher') {
-                this.disposeLoadedTeacherFeatures?.();
-                this.clearStudentProgressSessionState?.();
-                this.clearTeacherSettingsSessionState?.();
-                this.clearTeacherVocabularySessionState?.();
-                this.isAuthenticated = false;
-                this.currentUser = null;
-                this.updateAuthUI(null);
-                try {
-                    await this.teacherAuthApi.signOut();
-                } catch (signOutError) {
-                    console.warn('Could not clear the rejected teacher session:', signOutError);
-                }
-                this.showAuthError(role === 'unknown'
-                    ? 'No teacher profile was found for this account. Check the teacher allowlist and database sync.'
-                    : 'Access restricted to allowlisted teacher emails.');
-                this.showLoginView();
-                return false;
-            }
+            const access = await this.teacherRequestWithTimeout(() => this.schoolAccess.load(user.uid || user.id), {
+                signal: context.signal, timeoutMs: TEACHER_AUTH_REQUEST_TIMEOUT_MS, label: 'School access'
+            });
+            if (!context.isCurrent() || !access) return false;
+            this.currentRole = this.schoolAccess.hasRole('teacher') ? 'teacher' : 'school_member';
             this.isAuthenticated = true;
             this.currentUser = user;
             localStorage.setItem('was_logged_in', 'true');
             this.updateAuthUI(user);
-            await Promise.all([
-                this.loadSubjectSettings({ isCurrent: context.isCurrent }),
-                this.loadSchoolCalendarSettings({ isCurrent: context.isCurrent })
+            await this.bindSchoolSession(this);
+            if (!context.isCurrent()) return false;
+            if (!this.schoolAccess.hasRole('teacher') && !this.schoolAccess.hasRole('school_admin')) {
+                this.setRoute({ view: 'administration' }, { replace: true });
+                await this.showSchoolAdministration();
+                return context.isCurrent();
+            }
+            const settingsResults = await Promise.allSettled([
+                this.teacherRequestWithTimeout(
+                    signal => this.loadSubjectSettings({
+                        isCurrent: context.isCurrent,
+                        signal,
+                        surfaceErrors: true
+                    }),
+                    {
+                        signal: context.signal,
+                        timeoutMs: TEACHER_AUTH_REQUEST_TIMEOUT_MS,
+                        label: 'Teacher subjects'
+                    }
+                ),
+                this.teacherRequestWithTimeout(
+                    signal => this.loadSchoolCalendarSettings({
+                        isCurrent: context.isCurrent,
+                        signal,
+                        surfaceErrors: true
+                    }),
+                    {
+                        signal: context.signal,
+                        timeoutMs: TEACHER_AUTH_REQUEST_TIMEOUT_MS,
+                        label: 'School calendar'
+                    }
+                )
             ]);
             if (!context.isCurrent()) return false;
+            const settingsFailures = settingsResults.filter(result => result.status === 'rejected');
+            if (settingsFailures.length) {
+                console.warn('Teacher settings loaded with defaults:', settingsFailures.map(result => result.reason));
+                this.showAuthError('Some teacher settings could not load. Using defaults.');
+            }
             await this.restoreRouteOrDefault();
             return context.isCurrent();
         } catch (err) {
             if (!context.isCurrent()) return false;
             console.error('Role check failed:', err);
             this.getAuthCoordinator().invalidate();
+            this.clearCurrentTeacherServerState();
             this.disposeLoadedTeacherFeatures?.();
             this.clearStudentProgressSessionState?.();
             this.clearTeacherSettingsSessionState?.();
             this.clearTeacherVocabularySessionState?.();
             this.isAuthenticated = false;
             this.currentUser = null;
+            this.schoolContextUnsubscribe?.();
+            this.schoolAccess.clear();
             this.currentRole = 'unknown';
             this.updateAuthUI(null);
-            this.showAuthError('Could not verify teacher role.');
+            this.showAuthError('Could not verify school access.');
             this.showLoginView();
             return false;
         }
     }
 
-    async fetchUserRole(user) {
-        try {
-            const profile = await this.teacherAuthApi.getProfile(user.uid);
-            if (!profile || profile.role !== 'teacher') {
-                if (typeof this.teacherAuthApi.ensureAllowlistedTeacherProfile === 'function') {
-                    try {
-                        const repairedProfile = await this.teacherAuthApi.ensureAllowlistedTeacherProfile();
-                        return repairedProfile?.role || 'unknown';
-                    } catch (repairError) {
-                        console.warn('Could not repair allowlisted teacher profile:', repairError);
-                    }
-                }
-            }
-
-            if (!profile) {
-                return 'unknown';
-            }
-            return profile.role || 'unknown';
-        } catch (err) {
-            console.error('Failed to fetch role', err);
-            throw err;
-        }
-    }
     updateAuthUI(user) {
         const headerLoginBtn = $('#teacher-login-btn');
         const signOutBtn = $('#teacher-sign-out-btn');
@@ -178,7 +195,7 @@ class TeacherAuthMethods {
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
                 loginViewBtn.innerHTML = '<i data-lucide="scan-face" aria-hidden="true"></i><span>Sign in</span>';
-                window.lucide?.createIcons({ root: loginViewBtn });
+                refreshIcons(loginViewBtn);
             }
             this.showAuthError('');
             this.setCloudStatus('Ready', 'info');
@@ -188,7 +205,7 @@ class TeacherAuthMethods {
             if (loginViewBtn) {
                 loginViewBtn.disabled = false;
                 loginViewBtn.innerHTML = '<i data-lucide="scan-face" aria-hidden="true"></i><span>Sign in</span>';
-                window.lucide?.createIcons({ root: loginViewBtn });
+                refreshIcons(loginViewBtn);
             }
             this.setCloudStatus('Offline', 'muted');
         }
@@ -229,11 +246,23 @@ class TeacherAuthMethods {
 
 }
 
-export function installTeacherAuthMethods(TeacherManager, { authApi = teacherAuthApi } = {}) {
+export function installTeacherAuthMethods(TeacherManager, {
+    authApi = teacherAuthApi,
+    schoolAccess = schoolContext,
+    bindSchoolSession = bindTeacherSchoolSession,
+    requestTimeout = requestWithTimeout
+} = {}) {
+    Object.defineProperty(TeacherManager.prototype, 'schoolAccess', { configurable: true, value: schoolAccess });
+    Object.defineProperty(TeacherManager.prototype, 'bindSchoolSession', { configurable: true, value: bindSchoolSession });
     Object.defineProperty(TeacherManager.prototype, 'teacherAuthApi', {
         configurable: true,
         writable: true,
         value: authApi
+    });
+    Object.defineProperty(TeacherManager.prototype, 'teacherRequestWithTimeout', {
+        configurable: true,
+        writable: true,
+        value: requestTimeout
     });
     for (const name of Object.getOwnPropertyNames(TeacherAuthMethods.prototype)) {
         if (name === 'constructor') continue;

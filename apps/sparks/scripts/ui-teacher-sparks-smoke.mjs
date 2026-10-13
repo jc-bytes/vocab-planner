@@ -31,7 +31,7 @@ try {
             <section id="teacher-sparks-view"><button id="add-spark-btn">Add Spark</button><div id="spark-library-list"></div></section>
             <div data-teacher-feature-mount="sparks-modal"></div>
             <template id="teacher-sparks-modal-template">
-                <div id="spark-modal" class="modal hidden">
+                <section id="teacher-spark-editor-view" hidden><div id="spark-modal">
                     <div class="modal-content">
                         <div class="modal-header"><h2 id="spark-modal-title">Add Spark</h2><button class="close-modal" type="button">Close</button></div>
                         <form id="spark-form">
@@ -48,9 +48,20 @@ try {
                             <button id="schedule-spark-btn" type="button">Schedule</button>
                         </form>
                     </div>
-                </div>
+                </div></section>
             </template>
         `;
+        const { supabaseService } = await import('/js/supabaseService.js');
+        const { schoolContext } = await import('/js/services/schoolContext.js');
+        window.sparkSchoolRoles = [];
+        supabaseService.init = async () => {};
+        supabaseService.getClient = () => ({ rpc(name) {
+            if (name !== 'my_school_access_v1') throw new Error(`Unexpected fixture RPC: ${name}`);
+            const result = { data: { platformAdmin: false, schools: [{ id: 'school-smoke', active: true, roles: window.sparkSchoolRoles }] }, error: null };
+            const query = { then(resolve) { return Promise.resolve(result).then(resolve); }, abortSignal() { return query; } };
+            return query;
+        } });
+        await schoolContext.load('teacher-smoke');
         const { sparksRepository } = await import('/js/services/sparksRepository.js');
         const rows = [];
         let listCalls = 0;
@@ -77,12 +88,18 @@ try {
             }
 
             ensureAuthenticated() { return true; }
-            switchView(viewId) { this.currentView = viewId; }
+            switchView(viewId) {
+                this.currentView = viewId;
+                document.querySelector('#teacher-spark-editor-view').hidden = viewId !== 'teacher-spark-editor-view';
+            }
+            setRoute() {}
+            openAssignmentPublisher(context) { window.sparkPublishedContext = context; }
             refreshIcons() {}
         }
 
         installTeacherLazyFeatureMethods(Manager);
         const manager = new Manager();
+        manager.openAssignmentPublisher = context => { window.sparkPublishedContext = context; };
         const modalBefore = document.querySelector('#spark-modal');
         await manager.showSparksView();
         window.teacherSparksSmoke = {
@@ -101,7 +118,7 @@ try {
         };
     });
 
-    if (initial.modalBefore || !initial.modalAfter || initial.modalReady !== 'true') {
+    if (initial.modalBefore || !initial.modalAfter) {
         throw new Error(`Spark modal lazy mounting changed: ${JSON.stringify(initial)}`);
     }
     if (initial.currentView !== 'teacher-sparks-view' || initial.listCalls !== 1) {
@@ -118,7 +135,20 @@ try {
     await page.locator('#spark-target-grade-6-input').check();
     await page.locator('#save-spark-draft-btn').click();
     await page.waitForFunction(() => window.teacherSparksSmoke.counts().saveCalls === 1);
-    await page.locator('#spark-modal').waitFor({ state: 'hidden' });
+    await page.locator('#teacher-spark-editor-view').waitFor({ state: 'hidden' });
+    if (await page.locator('[data-spark-action=assign]').count() !== 0) throw new Error('A school member without teacher authority could assign a Spark.');
+    await page.evaluate(async () => {
+        const { schoolContext } = await import('/js/services/schoolContext.js');
+        window.sparkSchoolRoles = ['teacher'];
+        await schoolContext.load('teacher-smoke');
+        await window.teacherSparksSmoke.manager.showSparksView();
+    });
+    await page.locator('[data-spark-action=assign]').first().click();
+    await page.waitForFunction(() => window.sparkPublishedContext?.kind === 'spark' && window.sparkPublishedContext?.materialId);
+    await page.evaluate(() => window.teacherSparksSmoke.manager.showSparkEditor({ materialId: window.sparkPublishedContext.materialId }));
+    await page.locator('#spark-title-input').filter({ hasNotText: 'missing' }).waitFor();
+    if (await page.locator('#spark-title-input').inputValue() !== 'Architecture smoke Spark') throw new Error('Saved editor route lost material');
+    await page.evaluate(() => window.teacherSparksSmoke.manager.showSparksView());
 
     const disposal = await page.evaluate(async () => {
         const { manager, counts } = window.teacherSparksSmoke;

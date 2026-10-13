@@ -6,6 +6,14 @@ import {
     getWordHuntReviewUnitLabel as getUnitLabel
 } from './wordHuntReviewModel.js';
 
+const WORD_HUNT_REVIEW_QUERY_KEY = ['teacher', 'word-hunt-review'];
+
+function getReviewAccountId(owner) {
+    if (owner.isAuthenticationDisabled?.()) return 'local-development';
+    const user = owner.getCurrentUser?.();
+    return user?.uid || user?.id || '';
+}
+
 export const teacherWordHuntReviewDataMethods = {
 async showWordHuntReviewView(options = {}) {
         if (!this.ensureAuthenticated(false)) return;
@@ -48,21 +56,17 @@ async loadWordHuntReview(options = {}) {
         const content = this.query('#word-hunt-review-content');
         if (content) content.innerHTML = '<div class="loading-spinner">Loading Word Hunt work...</div>';
 
-        let request;
         try {
             const forceRefresh = options.forceRefresh === true;
-            if (forceRefresh) {
-                this.wordHuntReviewDataCache = null;
-                this.wordHuntReviewDataPromise = null;
-            }
-            let students = this.wordHuntReviewDataCache;
-            if (!students) {
-                this.wordHuntReviewDataPromise ||= Promise.resolve(this.repository.loadReviewData());
-                request = this.wordHuntReviewDataPromise;
-                students = await request;
-            }
+            const query = {
+                accountId: getReviewAccountId(this),
+                key: WORD_HUNT_REVIEW_QUERY_KEY,
+                queryFn: () => this.repository.loadReviewData()
+            };
+            const students = await (forceRefresh
+                ? this.queryService.refresh(query)
+                : this.queryService.ensure(query));
             if (generation !== this.wordHuntReviewLoadGeneration) return;
-            this.wordHuntReviewDataCache = students;
             this.wordHuntReviewRows = this.buildWordHuntReviewRows(students);
             this.renderWordHuntReviewBrowser({ preserveSelection: true });
         } catch (error) {
@@ -70,10 +74,6 @@ async loadWordHuntReview(options = {}) {
             console.error('Failed to load Word Hunt review:', error);
             if (content) content.innerHTML = '<p class="teacher-empty-state">Could not load Word Hunt responses.</p>';
             this.feedback.error('Could not load Word Hunt review.');
-        } finally {
-            if (this.wordHuntReviewDataPromise === request) {
-                this.wordHuntReviewDataPromise = null;
-            }
         }
     },
 

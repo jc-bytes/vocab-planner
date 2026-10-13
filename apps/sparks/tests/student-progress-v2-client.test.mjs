@@ -112,3 +112,35 @@ test('offline replay verifies the live authenticated user before invoking its ow
     );
     assert.deepEqual(calls, []);
 });
+
+test('unit RPC timeout aborts transport and keeps its immutable receipt payload', async (t) => {
+    const { service } = createService();
+    let fireTimeout;
+    let requestedSignal;
+    let args;
+    t.mock.method(globalThis, 'setTimeout', (callback, delay) => {
+        assert.equal(delay, 30000); fireTimeout = callback; return 123;
+    });
+    const cleared = [];
+    t.mock.method(globalThis, 'clearTimeout', timer => cleared.push(timer));
+    service.client.rpc = (_name, parameters) => {
+        args = parameters;
+        return {
+            abortSignal(signal) {
+                requestedSignal = signal;
+                return new Promise((_resolve, reject) => signal.addEventListener('abort',
+                    () => reject(new DOMException('Aborted', 'AbortError')), { once: true }));
+            }
+        };
+    };
+    const payload = { eventId: 'stable-receipt', snapshotOrder: 456, unitKey: 'unit', workPatch: { states: {} } };
+    const saving = service.syncStudentUnitWork(payload, { ownerUserId: 'student-1' });
+    await Promise.resolve();
+    await Promise.resolve();
+    fireTimeout();
+    await assert.rejects(saving, error => error.code === 'REQUEST_TIMEOUT');
+    assert.equal(requestedSignal.aborted, true);
+    assert.equal(args.p_event_id, 'stable-receipt');
+    assert.equal('snapshotOrder' in args, false, 'Ordering metadata stays outside the RPC receipt hash');
+    assert.deepEqual(cleared, [123]);
+});

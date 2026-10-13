@@ -1,0 +1,92 @@
+{
+  "id": "grade9_t3_2026_w02_weekly_v1",
+  "name": "G9 T3 W02 - Online dangers",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "9"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "assignedDate": "2026-09-21",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Phishing",
+      "definition": "A trick that uses a fake message or website to steal private information.",
+      "example": "The phishing message asks for the school-account password.",
+      "source": "https://techterms.com/definition/phishing",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Malware",
+      "definition": "Software made to harm a device, disrupt it or steal information.",
+      "example": "The unsafe download installs malware on the computer.",
+      "source": "https://techterms.com/definition/malware",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Ransomware",
+      "definition": "Malware that blocks access to files or a device and demands payment.",
+      "example": "The ransomware locks the project files and demands money.",
+      "source": "https://techterms.com/definition/ransomware",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Password",
+      "definition": "A secret set of characters used to help prove that someone may access an account.",
+      "example": "Keep your password private when a message asks you to share it.",
+      "source": "https://techterms.com/definition/password",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Protection",
+      "definition": "An action or safeguard that reduces the chance or harm of a problem.",
+      "example": "A separate backup provides protection against losing the only project copy.",
+      "source": "https://www.merriam-webster.com/dictionary/protection",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-09-21",
+      "B": "2026-09-21"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

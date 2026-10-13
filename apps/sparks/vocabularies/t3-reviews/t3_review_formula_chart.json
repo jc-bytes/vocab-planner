@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_formula_chart",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Formula and chart",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "3",
+  "month": "October",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "formula",
+      "definition": "A calculation written in a spreadsheet.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/formula"
+    },
+    {
+      "word": "chart",
+      "definition": "A picture that shows data so it is easier to compare.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/chart"
+    }
+  ]
+}

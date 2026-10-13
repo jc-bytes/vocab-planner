@@ -3,7 +3,7 @@ import { $ } from './main.js';
 const teacherDataDashboardViewMethods = {
     async showDataManagementView(options = {}) {
         if (this.destroyed || !this.ensureAuthenticated(false)) return false;
-        const settingsTabs = ['subjects', 'gamification', 'calendar'];
+        const settingsTabs = ['subjects', 'gamification', 'calendar', 'export', 'view', 'reset'];
         const dataTabs = ['dashboard', 'export', 'view', 'reset'];
         const requestedTab = String(options.tab || '');
         const inferredArea = dataTabs.includes(requestedTab) ? 'data' : 'settings';
@@ -28,6 +28,7 @@ const teacherDataDashboardViewMethods = {
         this.switchDataTab(activeTab, { updateRoute: false });
 
         if (area === 'data') return true;
+        if (['export', 'view', 'reset'].includes(activeTab)) return true;
 
         const lifecycleGeneration = this.lifecycleGeneration;
         const isCurrent = () => !this.destroyed && lifecycleGeneration === this.lifecycleGeneration;

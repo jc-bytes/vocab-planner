@@ -10,7 +10,7 @@
     justify-content: center;
     z-index: 100;
     padding: var(--spacing-md);
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-overlay);
 }
 
 .modal.hidden {
@@ -23,10 +23,10 @@
     max-height: min(88vh, 900px);
     overflow-y: auto;
     padding: var(--spacing-lg);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid color-mix(in srgb, var(--color-text) 15%, transparent);
     border-radius: var(--radius-lg);
-    background: rgba(15, 23, 42, 0.8);
-    box-shadow: 0 25px 50px -20px rgba(0, 0, 0, 0.8);
+    background: color-mix(in srgb, var(--color-background) 80%, transparent);
+    box-shadow: var(--shadow-dialog);
 }
 
 .modal-header {

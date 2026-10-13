@@ -221,9 +221,7 @@ test('returning students keep the navigation rail visible while a direct route r
     assert.match(studentHtmlSource, /src="js\/studentEarlyShell\.js" type="module"/);
     assert.match(studentEarlyShellSource, /studentShell\.classList\.remove\('hidden'\)/);
     assert.match(studentEarlyShellSource, /studentShell\.dataset\.sessionReserved = 'true'/);
-    assert.match(studentEarlyShellSource, /routePath === 'units' \|\| routePath\.startsWith\('unit\/'\)/);
-    assert.match(studentEarlyShellSource, /routePath === 'sparks'/);
-    assert.match(studentEarlyShellSource, /routePath === 'arcade'/);
+    assert.match(studentEarlyShellSource, /getStudentSectionForRoutePath\(routePath\)/);
     assert.match(studentEarlyShellSource, /tab\.dataset\.section === initialSection/);
     assert.doesNotMatch(
         studentCssSource,

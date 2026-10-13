@@ -1,3 +1,4 @@
+import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 
@@ -5,7 +6,7 @@ export function mapVocabularyRow(row) {
     if (!row) return null;
     return {
         id: row.id, name: row.name || '', description: row.description || '', grades: row.grades || [],
-        subjectSlug: row.subject_slug || 'technology', assignedDate: row.assigned_date || '',
+        subjectSlug: row.teacher_subject_id || row.subject_slug || 'technology', assignedDate: row.assigned_date || '',
         trimester: row.trimester || '', month: row.month || '', week: row.week || '',
         activitySettings: row.activity_settings || {}, words: row.words || [], ownerId: row.owner_id || null,
         createdAt: toClientTimestamp(row.created_at), updatedAt: toClientTimestamp(row.updated_at)
@@ -39,7 +40,8 @@ export function vocabularyPayload(vocabulary = {}, id = null) {
         name: vocabulary.name,
         description: vocabulary.description,
         grades: Array.isArray(vocabulary.grades) ? vocabulary.grades.map(String) : vocabulary.grade ? [String(vocabulary.grade)] : undefined,
-        subject_slug: vocabulary.subjectSlug || vocabulary.subject_slug || vocabulary.subject || 'technology',
+        subject_slug: 'technology',
+        teacher_subject_id: /^[0-9a-f-]{36}$/.test(vocabulary.subjectSlug || '') ? vocabulary.subjectSlug : undefined,
         assigned_date: (vocabulary.assignedDate ?? vocabulary.assigned_date) === '' ? null : vocabulary.assignedDate ?? vocabulary.assigned_date,
         trimester: vocabulary.trimester,
         month: vocabulary.month,
@@ -52,21 +54,28 @@ export function vocabularyPayload(vocabulary = {}, id = null) {
 }
 
 export const vocabularyRepository = {
-    async listMetadata() {
+    async listMetadata(options = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().rpc('list_vocabulary_metadata_v1');
+        let query = supabaseService.getClient().rpc('list_vocabulary_metadata_school_v1', { p_school_id: schoolId });
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return (Array.isArray(data) ? data : []).map(mapVocabularyMetadata);
     },
     async list() {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        const { data, error } = await supabaseService.getClient().from('vocabularies').select('*');
+        const { data, error } = await supabaseService.getClient().from('vocabularies').select('*').eq('school_id', schoolId);
         if (error) throw error;
         return (data || []).map(mapVocabularyRow);
     },
     async get(id, options = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        let query = supabaseService.getClient().from('vocabularies').select('*').eq('id', id).maybeSingle();
+        let query = supabaseService.getClient().from('vocabularies').select('*').eq('school_id', schoolId).eq('id', id).maybeSingle();
         if (options.signal && typeof query.abortSignal === 'function') {
             query = query.abortSignal(options.signal);
         }
@@ -75,23 +84,26 @@ export const vocabularyRepository = {
         return mapVocabularyRow(data);
     },
     async save(id, vocabulary = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
         const payload = vocabularyPayload({ ...vocabulary, updatedAt: vocabulary.updatedAt || new Date().toISOString() }, id);
         const { error } = await supabaseService.getClient()
-            .from('vocabularies').upsert(payload, { onConflict: 'id' });
+            .from('vocabularies').upsert({ ...payload, school_id: schoolId }, { onConflict: 'id' });
         if (error) throw error;
         return { id, ...vocabulary };
     },
     async update(id, patch = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
         const { id: _id, ...payload } = vocabularyPayload({ ...patch, updatedAt: patch.updatedAt || new Date().toISOString() }, id);
         const { data, error } = await supabaseService.getClient()
-            .from('vocabularies').update(payload).eq('id', id).select('*').maybeSingle();
+            .from('vocabularies').update(payload).eq('school_id', schoolId).eq('id', id).select('*').maybeSingle();
         if (error) throw error;
         if (data) return mapVocabularyRow(data);
-        return this.save(id, patch);
+        throw new Error('This material is unavailable in the selected school.');
     },
     async updateVocabularyPlacements(updates = []) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
         const payload = updates.map(update => ({
             id: update.id,
@@ -104,7 +116,8 @@ export const vocabularyRepository = {
             updated_at: timestampToIso(update.updatedAt)
         }));
         if (payload.length === 0) return { requested: 0, updated: 0 };
-        const { data, error } = await supabaseService.getClient().rpc('update_vocabulary_placements_v1', {
+        const { data, error } = await supabaseService.getClient().rpc('update_vocabulary_placements_school_v1', {
+            p_school_id: schoolId,
             p_updates: payload
         });
         if (error) throw error;
@@ -115,8 +128,9 @@ export const vocabularyRepository = {
         };
     },
     async remove(id) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        const { error } = await supabaseService.getClient().from('vocabularies').delete().eq('id', id);
+        const { error } = await supabaseService.getClient().from('vocabularies').delete().eq('school_id', schoolId).eq('id', id);
         if (error) throw error;
     }
 };

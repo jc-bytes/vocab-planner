@@ -1,3 +1,4 @@
+import { schoolContext } from '../services/schoolContext.js';
 export function bindTeacherSparksListeners(context) {
     const disposers = [];
     const listen = (element, type, handler) => {
@@ -7,11 +8,10 @@ export function bindTeacherSparksListeners(context) {
     };
 
     context.queryAll('#spark-modal .close-modal').forEach(button => {
-        listen(button, 'click', () => context.closeDialog('#spark-modal'));
+        listen(button, 'click', () => context.showSparksView());
     });
     listen(context.query('#add-spark-btn'), 'click', () => context.openSparkModal());
-    listen(context.query('#save-spark-draft-btn'), 'click', () => context.saveSparkFromForm('draft'));
-    listen(context.query('#schedule-spark-btn'), 'click', () => context.saveSparkFromForm('scheduled'));
+    listen(context.query('#save-spark-draft-btn'), 'click', () => context.saveSparkFromForm());
     listen(context.query('#add-spark-question-btn'), 'click', () => context.addSparkQuestion());
     listen(context.query('#spark-check-mode-input'), 'change', () => context.updateSparkCheckModeUi());
     listen(context.query('#spark-question-builder'), 'click', (event) => {
@@ -59,6 +59,10 @@ export function bindTeacherSparksListeners(context) {
 
         if (action === 'edit') {
             context.openSparkModal(spark);
+        } else if (action === 'assign' && schoolContext.hasRole('teacher') && context.publishMaterial && !context.isAuthenticationDisabled()) {
+            Promise.resolve(context.publishMaterial({ kind: 'spark', materialId: spark.id })).catch(error => {
+                context.feedback.error(error?.message || 'Could not open assignment publishing.');
+            });
         } else if (action === 'duplicate') {
             context.openSparkModal(spark, { duplicate: true });
         } else if (action === 'archive') {

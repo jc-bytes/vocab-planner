@@ -1,4 +1,5 @@
 import { getDefaultSchoolCalendar } from './services/vocabularyApi.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
 import { installTeacherOverviewMethods } from './teacherOverview.js';
 import { installTeacherLazyFeatureMethods } from './teacherLazyFeatures.js';
@@ -36,8 +37,8 @@ class TeacherManager {
             this.teacherVocabularyViewModes = {};
         }
         this.subjects = [];
-        this.teacherLibraryCache = null;
-        this.teacherLibraryPromise = null;
+        this.teacherVocabularyQueryService = serverStateQuery;
+        this.teacherVocabularyLibraryLoadGeneration = 0;
         this.teacherVocabularySessionGeneration = 0;
         this.teacherVocabularyDocumentGeneration = 0;
         this.teacherVocabularySaveSequence = 0;
@@ -52,7 +53,6 @@ class TeacherManager {
         this.studentProgressDetailGeneration = 0;
         this.teacherSettingsSessionGeneration = 0;
         this.gamificationStatusTimer = null;
-        this.overviewStudentLoadScheduled = false;
         this.isApplyingRoute = false;
         this.pendingTeacherRoute = null;
         this.pendingTeacherNavigation = null;

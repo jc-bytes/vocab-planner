@@ -1,11 +1,13 @@
+import { schoolContext } from './schoolContext.js';
+import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseValues.js';
 
 export function mapSubjectRow(row) {
     if (!row) return null;
     return {
-        id: row.slug, slug: row.slug, name: row.name || '', color: row.color || '#2563eb',
-        sortOrder: Number(row.sort_order) || 0, active: row.active !== false,
+        id: row.id, slug: row.id, name: row.name || '', color: row.color || '#2563eb',
+        sortOrder: Number(row.sort_order) || 0, active: !row.archived,
         createdAt: toClientTimestamp(row.created_at), updatedAt: toClientTimestamp(row.updated_at)
     };
 }
@@ -23,8 +25,9 @@ export function subjectPayload(subject = {}) {
 
 export const subjectsRepository = {
     async list(options = {}) {
+        const schoolId = requireSchoolId();
         await supabaseService.init();
-        let query = supabaseService.getClient().from('subjects').select('*');
+        let query = supabaseService.getClient().from('teacher_subjects').select('*').eq('school_id', schoolId);
         if (options.signal && typeof query.abortSignal === 'function') {
             query = query.abortSignal(options.signal);
         }
@@ -32,13 +35,17 @@ export const subjectsRepository = {
         if (error) throw error;
         return (data || []).map(mapSubjectRow);
     },
-    async saveAll(subjects = []) {
-        await supabaseService.init();
-        const payloads = subjects.map(subjectPayload);
-        if (payloads.length === 0) return [];
-        const { error } = await supabaseService.getClient()
-            .from('subjects').upsert(payloads, { onConflict: 'slug' });
-        if (error) throw error;
-        return subjects.map((subject, index) => ({ ...subject, slug: payloads[index].slug }));
+    async saveAll(subjects = [], options = {}) {
+        const schoolId = requireSchoolId();
+        const generation = schoolContext.getGeneration();
+        const isCurrent = () => generation === schoolContext.getGeneration() && (!options.isCurrent || options.isCurrent());
+        const assertCurrent = () => {
+            options.signal?.throwIfAborted();
+            if (!isCurrent()) throw new DOMException('Subject save session changed', 'AbortError');
+        };
+        assertCurrent();
+        const { saveTeacherSubjects } = await import('./teacherSubjectWrites.js');
+        assertCurrent();
+        return saveTeacherSubjects(supabaseService, subjects, schoolId, { ...options, isCurrent });
     }
 };

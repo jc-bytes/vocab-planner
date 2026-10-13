@@ -1,10 +1,12 @@
-import { $, $$, createElement } from '../main.js';
+import { captureStudentReport } from './studentReportSession.js';
+import { $, $$, createElement, refreshIcons } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import { STUDENT_ACTIVITY_REGISTRY, getStudentActivity } from './studentActivityRegistry.js';
 import { setStudentPageLoading } from './studentLoadingSkeletons.js';
 
 export class StudentActivityMenu {
-    constructor(activities) {
+    constructor(activities, { loadReportGenerator = () => import('../reportGenerator.js') } = {}) {
+        this.loadReportGenerator = loadReportGenerator;
         this.activities = activities;
         this.sm = activities.sm;
     }
@@ -44,28 +46,30 @@ export class StudentActivityMenu {
             throw new Error('Complete this activity before exporting its PDF.');
         }
 
-        const { ReportGenerator } = await import('../reportGenerator.js');
-        const unitProgress = this.activities.getCurrentUnitProgress();
-        const bestAttempt = scoreData.bestAttempt && typeof scoreData.bestAttempt === 'object'
-            ? scoreData.bestAttempt
+        const report = captureStudentReport(this.sm, { scoreData, unitProgress: this.activities.getCurrentUnitProgress(), states: this.sm.unitStates });
+        const { ReportGenerator } = await this.loadReportGenerator();
+        report.assertCurrent();
+        const { scoreData: savedScore, unitProgress } = report;
+        const bestAttempt = savedScore.bestAttempt && typeof savedScore.bestAttempt === 'object'
+            ? savedScore.bestAttempt
             : null;
         const reportScoreData = bestAttempt
             ? {
-                ...scoreData,
+                ...savedScore,
                 ...bestAttempt,
-                isComplete: Boolean(bestAttempt.mastered) || Boolean(scoreData.isComplete),
-                evidence: bestAttempt.details?.evidence || scoreData.evidence
+                isComplete: Boolean(bestAttempt.mastered) || Boolean(savedScore.isComplete),
+                evidence: bestAttempt.details?.evidence || savedScore.evidence
             }
-            : scoreData;
+            : savedScore;
         ReportGenerator.generateActivityReport(
-            this.sm.studentProfile,
-            this.sm.currentVocab,
+            report.profile,
+            report.vocabulary,
             activityType,
             reportScoreData,
             {
                 trimester: unitProgress?.trimester || '',
                 state: bestAttempt?.state
-                    || this.sm.unitStates?.[activityType]
+                    || report.states?.[activityType]
                     || unitProgress?.states?.[activityType]
                     || null
             }
@@ -114,6 +118,14 @@ export class StudentActivityMenu {
             descriptionEl.textContent = this.activities.formatVocabularyCardDescription?.(this.sm.currentVocab, unitTitle)
                 || this.sm.currentVocab.description
                 || '';
+        }
+
+        document.getElementById('weekly-retirement-notice')?.remove();
+        if (this.sm.currentVocab.activitySettings?.retiredWeeklySet && descriptionEl) {
+            const notice = document.createElement('p');
+            notice.id = 'weekly-retirement-notice';
+            notice.textContent = 'This earlier class set is archived. Your saved results and exports remain available. Open Units to find this week’s vocabulary. Project weeks have no vocabulary tasks.';
+            descriptionEl.after(notice);
         }
 
         // Get word coverage stats
@@ -206,6 +218,6 @@ export class StudentActivityMenu {
         if (!options.skipActivityPreload) {
             this.activities.scheduleActivityPreload(activityFlow);
         }
-        if (window.lucide) window.lucide.createIcons({ root: $('#activity-menu-view') });
+        refreshIcons($('#activity-menu-view'));
     }
 }

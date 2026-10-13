@@ -1,36 +1,10 @@
 import { $ } from '../main.js';
 import { GAME_HOST_EVENT, parseGameHostMessage } from './studentGameProtocol.js';
 import { getStudentGame } from './studentGameRegistry.js';
-import { readStudentJson, writeStudentJson } from './persistence/studentStorage.js';
+import { persistSandboxGameStorage, readSandboxGameStorage } from './studentGameStorage.js';
+import { createUniqueId } from '../randomUtils.js';
 
 const GAME_STORAGE_PREFIX = 'vocab-game-storage:';
-const MAX_GAME_STORAGE_ENTRIES = 250;
-const MAX_GAME_STORAGE_SIZE = 1_000_000;
-
-function readGameStorage(gameId, ownerUserId) {
-    try {
-        const entries = readStudentJson(`game-storage:${gameId}`, [], {
-            owner: ownerUserId,
-            legacyKeys: [`${GAME_STORAGE_PREFIX}${gameId}`]
-        });
-        return Array.isArray(entries) ? entries : [];
-    } catch (_error) {
-        return [];
-    }
-}
-
-function isSafeStorageEntries(entries) {
-    if (!Array.isArray(entries) || entries.length > MAX_GAME_STORAGE_ENTRIES) return false;
-    let size = 0;
-    for (const entry of entries) {
-        if (!Array.isArray(entry) || entry.length !== 2) return false;
-        const key = String(entry[0]);
-        const value = String(entry[1]);
-        size += key.length + value.length;
-        if (size > MAX_GAME_STORAGE_SIZE) return false;
-    }
-    return true;
-}
 
 export class StudentGameHtmlLoader {
     constructor(games) {
@@ -41,7 +15,7 @@ export class StudentGameHtmlLoader {
     async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
         // Hide canvas and create iframe for the HTML game
         canvas.style.display = 'none';
-        
+
         // Remove any previous frame for this game.
         const existingFrameShell = gameStage.querySelector(`#${gameId}-frame-shell`);
         if (existingFrameShell) {
@@ -51,24 +25,23 @@ export class StudentGameHtmlLoader {
         if (existingIframe) {
             existingIframe.remove();
         }
-        
+
         // All games now have standalone HTML files, no build checks needed
         if (gameStage) {
             ['display', 'flex-direction', 'align-items', 'justify-content', 'width', 'min-width'].forEach((property) => {
                 gameStage.style.removeProperty(property);
             });
         }
-        
+
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
         const ownerUserId = this.games.sessionOwnerId;
-        const storageChannel = globalThis.crypto?.randomUUID?.()
-            || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+        const storageChannel = createUniqueId();
         iframe.name = `${GAME_STORAGE_PREFIX}${JSON.stringify({
             gameId,
             channel: storageChannel,
-            entries: readGameStorage(gameId, ownerUserId)
+            entries: readSandboxGameStorage(gameId, ownerUserId)
         })}`;
         iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals allow-downloads allow-pointer-lock');
         iframe.setAttribute('allow', 'fullscreen');
@@ -79,7 +52,7 @@ export class StudentGameHtmlLoader {
         const frameWidth = frame.width || 800;
         const frameHeight = frame.height || 600;
         const scaleFixedFrame = frame.responsive !== true;
-        
+
         // The stage owns each game's maximum width. Fill it so the iframe stays
         // aligned with the timer bar instead of collapsing to its 80% minimum.
         iframe.style.width = '100%';
@@ -104,7 +77,7 @@ export class StudentGameHtmlLoader {
         if (gameStage) {
             gameStage.style.setProperty('--game-frame-width', `${frameWidth}px`);
         }
-        
+
         iframe.style.border = 'none';
         iframe.style.borderRadius = '8px';
         iframe.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
@@ -155,12 +128,12 @@ export class StudentGameHtmlLoader {
             iframe.style.alignSelf = 'start';
             canvas.parentNode.insertBefore(iframe, canvas.nextSibling);
         }
-        
+
         // Focus iframe when clicked
         iframe.addEventListener('mouseenter', () => {
             iframe.focus();
         });
-        
+
         iframe.addEventListener('click', () => {
             iframe.focus();
             try {
@@ -169,13 +142,13 @@ export class StudentGameHtmlLoader {
                 }
             } catch (e) {}
         });
-        
+
         // Set up iframe onload handler for optimizations and score reporting
         const originalOnload = iframe.onload;
         iframe.onload = () => {
             // Focus the iframe so keyboard events work
             iframe.focus();
-            
+
             // Also try to focus the iframe's content window
             try {
                 if (iframe.contentWindow) {
@@ -190,7 +163,7 @@ export class StudentGameHtmlLoader {
                 originalOnload();
             }
         };
-        
+
         // Set up message listener for score reporting (if scoreMessageType is provided)
         let messageHandler = null;
         const storageMessageHandler = (event) => {
@@ -198,13 +171,12 @@ export class StudentGameHtmlLoader {
             if (event.source !== iframe.contentWindow
                 || data?.type !== 'vocab-game-storage'
                 || data.gameId !== gameId
-                || data.channel !== storageChannel
-                || !isSafeStorageEntries(data.entries)) return;
-            try {
-                writeStudentJson(`game-storage:${gameId}`, data.entries, { owner: ownerUserId });
-            } catch (error) {
-                console.warn(`Could not persist sandboxed storage for ${gameId}:`, error);
-            }
+                || data.channel !== storageChannel) return;
+            persistSandboxGameStorage(data, {
+                gameId,
+                channel: storageChannel,
+                ownerUserId
+            });
         };
         window.addEventListener('message', storageMessageHandler);
         if (scoreMessageType) {
@@ -215,7 +187,7 @@ export class StudentGameHtmlLoader {
                     if (!message) return;
                     const { score, metadata } = message;
                     const isGameOver = message.event === GAME_HOST_EVENT.GAME_OVER;
-                    
+
                     // Update score display dynamically
                     const scoreDisplay = $('#game-score');
                     if (scoreDisplay) {
@@ -227,12 +199,12 @@ export class StudentGameHtmlLoader {
                             scoreDisplay.textContent = `Score: ${score.toLocaleString()}`;
                         }
                     }
-                    
+
                     // Store current score for final reporting (ensure it's a number)
                     const currentScore = Number(this.games.currentGameScore) || 0;
                     this.games.currentGameScore = Math.max(currentScore, score);
                     this.games.currentGameMetadata = metadata; // Store metadata
-                    
+
                     // Save score periodically (not just on game over) to ensure it's saved
                     // Compare as numbers to avoid string comparison issues
                     const lastSaved = Number(this.games.lastSavedScore) || 0;
@@ -243,7 +215,7 @@ export class StudentGameHtmlLoader {
                             console.error('Error saving score:', err);
                         });
                     }
-                    
+
                     if (isGameOver) {
                         // Game completed - call the callback with final score
                         gameOverCallback(score);
@@ -252,15 +224,15 @@ export class StudentGameHtmlLoader {
                     }
                 }
             };
-            
+
             window.addEventListener('message', messageHandler);
         }
-        
+
         // Initialize score tracking
         this.games.currentGameScore = 0;
         this.games.lastSavedScore = 0;
         this.games.currentGameMetadata = null;
-        
+
         // Store reference for cleanup
         this.games.currentGame = {
             gameType: gameId,

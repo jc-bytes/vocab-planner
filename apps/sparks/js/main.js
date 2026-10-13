@@ -3,6 +3,7 @@
  */
 
 import { notifications } from './notifications.js';
+import { createFocusTrap } from 'focus-trap';
 
 // Helper to select elements
 export const $ = (selector) => document.querySelector(selector);
@@ -10,6 +11,11 @@ export const $$ = (selector) => document.querySelectorAll(selector);
 
 // Export notifications for convenience
 export { notifications };
+
+export function refreshIcons(root = document) {
+    const iconRoot = root?.querySelectorAll ? root : document;
+    window.lucide?.createIcons?.({ root: iconRoot });
+}
 
 // Helper to create elements
 export const createElement = (tag, className, text) => {
@@ -27,32 +33,13 @@ export const escapeHtml = (value = '') => String(value)
     .replace(/'/g, '&#39;');
 
 const modalState = new WeakMap();
-const focusableSelector = [
-    'a[href]',
-    'area[href]',
-    'button:not([disabled])',
-    'input:not([disabled])',
-    'select:not([disabled])',
-    'textarea:not([disabled])',
-    'iframe',
-    'object',
-    'embed',
-    '[contenteditable="true"]',
-    '[tabindex]:not([tabindex="-1"])'
-].join(',');
+const managedModals = new Set();
+const modalTrapStack = [];
 
 function resolveElement(elementOrSelector) {
     return typeof elementOrSelector === 'string'
         ? document.querySelector(elementOrSelector)
         : elementOrSelector;
-}
-
-function getFocusableElements(modal) {
-    return Array.from(modal.querySelectorAll(focusableSelector))
-        .filter((element) => element instanceof HTMLElement
-            && !element.hidden
-            && element.getAttribute('aria-hidden') !== 'true'
-            && element.getClientRects().length > 0);
 }
 
 function getModalState(modal) {
@@ -61,10 +48,47 @@ function getModalState(modal) {
             dismissible: true,
             onClose: null,
             previouslyFocused: null,
-            managedTabIndex: false
+            initialFocus: null,
+            managedTabIndex: false,
+            trap: null,
+            visibilityObserver: null
         });
     }
     return modalState.get(modal);
+}
+
+function pruneDisconnectedModalTraps() {
+    for (const modal of managedModals) {
+        if (modal.isConnected) continue;
+
+        const state = modalState.get(modal);
+        state?.trap?.deactivate({ returnFocus: false });
+        state?.visibilityObserver?.disconnect();
+        if (state) state.visibilityObserver = null;
+        managedModals.delete(modal);
+    }
+}
+
+function createModalTrap(modal, content, state) {
+    return createFocusTrap(modal, {
+        trapStack: modalTrapStack,
+        isolateSubtrees: 'inert',
+        escapeDeactivates: false,
+        clickOutsideDeactivates: false,
+        returnFocusOnDeactivate: true,
+        delayInitialFocus: false,
+        delayReturnFocus: false,
+        initialFocus: () => resolveElement(state.initialFocus) || undefined,
+        fallbackFocus: () => content,
+        setReturnFocus: () => state.previouslyFocused?.isConnected
+            ? state.previouslyFocused
+            : false
+    });
+}
+
+if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+    const modalRemovalObserver = new MutationObserver(pruneDisconnectedModalTraps);
+    modalRemovalObserver.observe(document.documentElement, { childList: true, subtree: true });
 }
 
 function ensureModalLabel(modal) {
@@ -102,6 +126,19 @@ export function setupModal(elementOrSelector, options = {}) {
         state.managedTabIndex = true;
     }
 
+    if (!state.trap) {
+        state.trap = createModalTrap(modal, content, state);
+    }
+    if (!state.visibilityObserver && typeof MutationObserver !== 'undefined') {
+        state.visibilityObserver = new MutationObserver(() => {
+            if (modal.classList.contains('hidden') && state.trap?.active) {
+                state.trap.deactivate({ returnFocus: false });
+            }
+        });
+        state.visibilityObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    }
+    managedModals.add(modal);
+
     if (modal.dataset.modalReady === 'true') return modal;
     modal.dataset.modalReady = 'true';
 
@@ -117,30 +154,12 @@ export function setupModal(elementOrSelector, options = {}) {
 
         const currentState = getModalState(modal);
         if (event.key === 'Escape') {
-            if (currentState.dismissible) {
+            const isTopTrap = modalTrapStack.at(-1) === currentState.trap;
+            if (isTopTrap && currentState.dismissible) {
                 event.preventDefault();
+                event.stopPropagation();
                 closeModal(modal);
             }
-            return;
-        }
-
-        if (event.key !== 'Tab') return;
-
-        const focusableElements = getFocusableElements(modal);
-        if (focusableElements.length === 0) {
-            event.preventDefault();
-            content.focus({ preventScroll: true });
-            return;
-        }
-
-        const first = focusableElements[0];
-        const last = focusableElements[focusableElements.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-            event.preventDefault();
-            last.focus({ preventScroll: true });
-        } else if (!event.shiftKey && document.activeElement === last) {
-            event.preventDefault();
-            first.focus({ preventScroll: true });
         }
     });
 
@@ -148,6 +167,7 @@ export function setupModal(elementOrSelector, options = {}) {
 }
 
 export function openModal(elementOrSelector, options = {}) {
+    pruneDisconnectedModalTraps();
     const modal = setupModal(elementOrSelector, options);
     if (!modal) return null;
 
@@ -155,18 +175,10 @@ export function openModal(elementOrSelector, options = {}) {
     state.dismissible = options.dismissible ?? state.dismissible;
     state.onClose = typeof options.onClose === 'function' ? options.onClose : state.onClose;
     state.previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    state.initialFocus = options.initialFocus || null;
 
     modal.classList.remove('hidden');
-
-    const content = modal.querySelector('.modal-content') || modal;
-    const preferredFocus = options.initialFocus ? resolveElement(options.initialFocus) : null;
-    const focusTarget = preferredFocus || getFocusableElements(modal)[0] || content;
-    focusTarget?.focus?.({ preventScroll: true });
-    window.requestAnimationFrame(() => {
-        if (!modal.contains(document.activeElement)) {
-            focusTarget?.focus?.({ preventScroll: true });
-        }
-    });
+    state.trap.activate();
 
     return modal;
 }
@@ -179,19 +191,12 @@ export function closeModal(elementOrSelector, options = {}) {
     const wasOpen = !modal.classList.contains('hidden');
     modal.classList.add('hidden');
 
-    if (wasOpen && options.restoreFocus !== false && state.previouslyFocused?.isConnected) {
-        state.previouslyFocused.focus({ preventScroll: true });
+    if (wasOpen) {
+        state.trap?.deactivate({ returnFocus: options.restoreFocus !== false });
     }
 
     if (wasOpen && typeof state.onClose === 'function') {
         state.onClose();
-    }
-}
-
-function refreshLucideIcons(root = document) {
-    if (window.lucide?.createIcons) {
-        const iconRoot = root?.querySelectorAll ? root : document;
-        window.lucide.createIcons({ root: iconRoot });
     }
 }
 
@@ -211,12 +216,12 @@ function initPasswordToggles() {
             button.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
             button.title = shouldShow ? 'Hide password' : 'Show password';
             button.innerHTML = `<i data-lucide="${shouldShow ? 'eye-off' : 'eye'}"></i>`;
-            refreshLucideIcons(button);
+            refreshIcons(button);
             input.focus({ preventScroll: true });
         });
     });
 
-    refreshLucideIcons();
+    refreshIcons();
 }
 
 if (document.readyState === 'loading') {
@@ -225,4 +230,4 @@ if (document.readyState === 'loading') {
     initPasswordToggles();
 }
 
-window.addEventListener('load', refreshLucideIcons);
+window.addEventListener('load', refreshIcons);

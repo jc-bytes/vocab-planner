@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = path => readFile(new URL(path, root), 'utf8');
 
-const [containersCss, landingCss, studentCss, teacherCss, indexHtml, studentHtml, teacherHtml, studentBrowser, teacherBrowser, quizBrowser, wordHuntView] = await Promise.all([
+const [containersCss, landingCss, studentCss, teacherCss, indexHtml, studentHtml, teacherHtml, studentBrowser, teacherBrowser, quizBrowser, vocabularyHierarchy, wordHuntView] = await Promise.all([
     read('css/containers.css'),
     read('css/landing.css'),
     read('css/student.css'),
@@ -16,6 +16,7 @@ const [containersCss, landingCss, studentCss, teacherCss, indexHtml, studentHtml
     read('js/student/studentActivityBrowserMethods.js'),
     read('js/teacherVocabularyLibrary/teacherVocabularyBrowserViewMethods.js'),
     read('js/teacherQuizBrowserMethods.js'),
+    read('js/teacherVocabularyLibrary/teacherVocabularyHierarchy.js'),
     read('js/teacherWordHuntReview/teacherWordHuntReviewViewMethods.js')
 ]);
 
@@ -89,8 +90,9 @@ test('page shells and content-browser producers keep the shared class contract',
     assert.match(studentBrowser, /teacher-library-browser/);
     assert.match(studentBrowser, /teacher-library-choice-grid/);
     assert.match(teacherBrowser, /teacher-library-browser/);
-    assert.match(teacherBrowser, /teacher-library-choice-grid/);
+    assert.match(teacherBrowser, /renderTeacherVocabularyHierarchy/);
     assert.match(quizBrowser, /teacher-library-browser/);
-    assert.match(quizBrowser, /teacher-library-choice-grid/);
+    assert.match(quizBrowser, /vocabularyBrowser\.renderHierarchy/);
+    assert.match(vocabularyHierarchy, /teacher-library-choice-grid/);
     assert.match(wordHuntView, /teacher-library-choice-grid/);
 });

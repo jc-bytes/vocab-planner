@@ -1,4 +1,5 @@
 import { $ } from '../main.js';
+import { shuffled } from '../randomUtils.js';
 import { STUDENT_ACTIVITY_REGISTRY } from './studentActivityRegistry.js';
 
 export class StudentActivityCoverage {
@@ -10,18 +11,18 @@ export class StudentActivityCoverage {
 
     initWordCoverage() {
         if (!this.sm.currentVocab) return;
-        
+
         const vocabName = this.activities.progressFlow.getUnitProgressKey(this.sm.currentVocab);
-        
+
         // Load from progress data or initialize
         if (!this.sm.progressData.wordCoverage) {
             this.sm.progressData.wordCoverage = {};
         }
-        
+
         if (!this.sm.progressData.wordCoverage[vocabName]) {
             this.sm.progressData.wordCoverage[vocabName] = {};
         }
-        
+
         this.wordCoverage = this.sm.progressData.wordCoverage[vocabName];
     }
 
@@ -29,7 +30,7 @@ export class StudentActivityCoverage {
         if (!this.wordCoverage[activityType]) {
             this.wordCoverage[activityType] = {};
         }
-        
+
         words.forEach(w => {
             const word = typeof w === 'string' ? w : w.word;
             this.wordCoverage[activityType][word] = {
@@ -37,7 +38,7 @@ export class StudentActivityCoverage {
                 count: (this.wordCoverage[activityType][word]?.count || 0) + 1
             };
         });
-        
+
         // Save coverage data
         if (this.sm.currentVocab) {
             const vocabName = this.activities.progressFlow.getUnitProgressKey(this.sm.currentVocab);
@@ -51,14 +52,14 @@ export class StudentActivityCoverage {
 
     getWordCoverageStats() {
         if (!this.sm.currentVocab) return null;
-        
+
         const totalWords = this.sm.currentVocab.words.length;
         const activities = STUDENT_ACTIVITY_REGISTRY
             .filter(activity => activity.tracksCoverage)
             .map(activity => activity.id);
-        
+
         const stats = {};
-        
+
         activities.forEach(activity => {
             const practiced = this.wordCoverage[activity] ? Object.keys(this.wordCoverage[activity]).length : 0;
             stats[activity] = {
@@ -67,7 +68,7 @@ export class StudentActivityCoverage {
                 percentage: Math.round((practiced / totalWords) * 100)
             };
         });
-        
+
         // Overall coverage (words practiced in at least one activity)
         const allPracticed = new Set();
         activities.forEach(activity => {
@@ -75,30 +76,29 @@ export class StudentActivityCoverage {
                 Object.keys(this.wordCoverage[activity]).forEach(word => allPracticed.add(word));
             }
         });
-        
+
         stats.overall = {
             practiced: allPracticed.size,
             total: totalWords,
             percentage: Math.round((allPracticed.size / totalWords) * 100)
         };
-        
+
         return stats;
     }
 
     getPrioritizedWords(activityType, limit = 10, sourceWords = null) {
         if (!this.sm.currentVocab) return [];
-        
-        const allWords = [...(sourceWords || this.sm.currentVocab.words)];
+
+        const allWords = shuffled(sourceWords || this.sm.currentVocab.words);
         const practiced = this.wordCoverage[activityType] || {};
-        
-        // Sort by practice count (ascending) then shuffle within same count
+
+        // A stable sort keeps the unbiased shuffled order within equal counts.
         allWords.sort((a, b) => {
             const countA = practiced[a.word]?.count || 0;
             const countB = practiced[b.word]?.count || 0;
-            if (countA !== countB) return countA - countB;
-            return Math.random() - 0.5; // Random within same count
+            return countA - countB;
         });
-        
+
         return allWords.slice(0, limit);
     }
 

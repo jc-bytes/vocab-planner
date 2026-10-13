@@ -51,7 +51,7 @@ export class StudentActivityWorkTimer {
     }
 
     canRun() {
-        return Boolean(this.attemptId && this.timeLimitSeconds)
+        return Boolean(this.attemptId)
             && document?.visibilityState !== 'hidden'
             && this.windowFocused;
     }
@@ -185,4 +185,3 @@ export class StudentActivityWorkTimer {
         this.render();
     }
 }
-

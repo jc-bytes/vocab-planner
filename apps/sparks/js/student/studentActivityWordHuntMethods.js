@@ -1,6 +1,6 @@
+import { captureStudentReport } from './studentReportSession.js';
 import { imageDB } from '../db.js';
-import { compressImageToWebp, dataUrlToBlob } from '../imageUtils.js';
-import { $, notifications } from '../main.js';
+import { $, notifications, refreshIcons } from '../main.js';
 import { studentApi } from '../services/studentApi.js';
 import {
     getActiveStudentStorageOwner,
@@ -20,6 +20,7 @@ export class StudentActivityWordHunt {
         const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
         const path = studentApi.buildWordHuntImagePath({
             userId: this.sm.currentUser.uid,
+            assignmentId: this.sm.currentVocab?.assignmentId,
             schoolYear: unitProgress.schoolYear,
             trimesterKey: unitProgress.trimester,
             grade: unitProgress.grade,
@@ -108,7 +109,7 @@ export class StudentActivityWordHunt {
         button.innerHTML = isExporting
             ? '<i data-lucide="loader-circle"></i><span>Generating PDF...</span>'
             : '<i data-lucide="file-down"></i><span>Word Hunt PDF</span>';
-        if (window.lucide?.createIcons) window.lucide.createIcons({ root: button });
+        refreshIcons(button);
     }
 
     async downloadWordHuntSubmission() {
@@ -124,14 +125,17 @@ export class StudentActivityWordHunt {
                 this.sm.progress.saveLocalProgress();
             }
 
-            const wordHunt = this.getReportWordHuntEntries();
-            const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
+            const report = captureStudentReport(this.sm, {
+                wordHunt: this.getReportWordHuntEntries(),
+                trimester: this.activities.progressFlow.getCurrentUnitProgress()?.trimester || ''
+            });
             const { ReportGenerator } = await import('../reportGenerator.js');
-            await ReportGenerator.generateWordHuntReport(this.sm.studentProfile, this.sm.currentVocab, {
-                wordHunt,
-                trimester: unitProgress?.trimester || '',
-                ownerUserId: this.sm.currentUser?.uid || getActiveStudentStorageOwner(),
-                loadImage: path => this.loadWordHuntImage(path)
+            report.assertCurrent();
+            await ReportGenerator.generateWordHuntReport(report.profile, report.vocabulary, {
+                wordHunt: report.wordHunt, trimester: report.trimester,
+                ownerUserId: report.ownerUserId || getActiveStudentStorageOwner(),
+                assertCurrent: report.assertCurrent,
+                loadImage: path => { report.assertCurrent(); return this.loadWordHuntImage(path); }
             });
         } catch (error) {
             console.error('Failed to export Word Hunt PDF:', error);
@@ -145,7 +149,7 @@ export class StudentActivityWordHunt {
     async migrateLegacyWordHuntImages() {
         if (this.sm.authDisabled || !this.sm.currentUser || !this.sm.currentVocab) return;
 
-        const unitName = this.sm.currentVocab.name;
+        const unitName = this.activities.getUnitProgressKey(this.sm.currentVocab);
         const unitProgress = this.activities.progressFlow.getCurrentUnitProgress();
         const images = unitProgress.images || {};
         const wordHunt = unitProgress.wordHunt || {};
@@ -162,6 +166,7 @@ export class StudentActivityWordHunt {
             }
 
             try {
+                const { compressImageToWebp, dataUrlToBlob } = await import('../imageUtils.js');
                 const sourceBlob = await dataUrlToBlob(dataUrl);
                 const imageData = await compressImageToWebp(sourceBlob);
                 await imageDB.saveDrawing(unitName, word, imageData.blob, {
@@ -191,9 +196,9 @@ export class StudentActivityWordHunt {
     }
 
     handleIllustrationSave(vocabName, word, payload) {
-        const unitName = vocabName || (this.sm.currentVocab ? this.sm.currentVocab.name : null);
+        const unitName = vocabName || (this.sm.currentVocab ? this.activities.getUnitProgressKey(this.sm.currentVocab) : null);
         if (!unitName) return;
-        const unitProgress = this.sm.currentVocab && this.sm.currentVocab.name === unitName
+        const unitProgress = this.sm.currentVocab && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitName
             ? this.activities.progressFlow.getCurrentUnitProgress()
             : (this.sm.progressData.units?.[unitName] || null);
         if (!unitProgress) return;
@@ -213,7 +218,7 @@ export class StudentActivityWordHunt {
             }
         }
 
-        if (this.sm.currentVocab && this.sm.currentVocab.name === unitName) {
+        if (this.sm.currentVocab && this.activities.getUnitProgressKey(this.sm.currentVocab) === unitName) {
             this.sm.unitImages = unitProgress.images;
             this.sm.unitWordHunt = unitProgress.wordHunt;
         }

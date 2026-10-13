@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'vocabulary-student-shell-';
-const CACHE_NAME = `${CACHE_PREFIX}v2`;
+const CACHE_NAME = `${CACHE_PREFIX}v3`;
 const SHELL_URL = new URL('./student.html', self.registration.scope).toString();
 
 async function putSuccessfulResponse(cache, request, response) {
@@ -50,9 +50,9 @@ self.addEventListener('fetch', event => {
     }
 
     const isBuiltAsset = url.pathname.includes('/assets/');
-    const isVocabulary = url.pathname.includes('/vocabularies/') && url.pathname.endsWith('.json');
+    if (url.pathname.includes('/vocabularies/')) return;
     const isStaticAsset = ['style', 'script', 'font', 'image'].includes(request.destination);
-    if (!isBuiltAsset && !isVocabulary && !isStaticAsset) return;
+    if (!isBuiltAsset && !isStaticAsset) return;
 
     event.respondWith((async () => {
         const cache = await caches.open(CACHE_NAME);

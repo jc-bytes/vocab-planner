@@ -70,6 +70,30 @@ test('report PDF artifact renderers preserve appendices and reject incomplete ex
     ), /Only completed activities/);
 });
 
+test('report tables delegate wrapping and repeated-page layout to AutoTable', () => {
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+    const rows = Array.from({ length: 30 }, (_, index) => ({
+        label: `Activity ${index + 1}`,
+        score: index % 2 === 0 ? 100 : 65,
+        details: `Saved activity evidence ${index + 1} with enough text to exercise wrapped table cells.`,
+        status: index % 2 === 0 ? 'Completed' : 'In progress',
+        started: true,
+        completed: index % 2 === 0
+    }));
+
+    ReportGenerator.drawFinalReportActivityTable(pdf, rows, 120, {
+        vocabName: 'Programming',
+        subjectName: 'Computer Science',
+        fullName: 'Ada Lovelace',
+        grade: 7,
+        group: 'B'
+    });
+
+    assert.ok(pdf.getNumberOfPages() > 1);
+    assert.ok(pdf.lastAutoTable?.finalY > 0);
+    assert.ok(pdf.output('arraybuffer').byteLength > 1000);
+});
+
 test('Word Hunt row construction keeps saved text when no image is available', async () => {
     const originalLoader = ReportGenerator.loadWordHuntImageBlob;
     ReportGenerator.loadWordHuntImageBlob = async () => null;

@@ -1,7 +1,9 @@
-import { createElement, $ } from '../main.js';
+import { createElement, $, refreshIcons } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
 import { hasConsistentMultipleChoiceState } from './multipleChoiceState.js';
-import { readStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { readStudentActivityJson, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { quizActivityStateSchema, validateActivityState } from './activityStateValidation.js';
+import { shuffled } from '../randomUtils.js';
 
 const MASTERY_ACCURACY = 80;
 
@@ -33,7 +35,7 @@ export class QuizActivity {
     generateQuestions() {
         const questions = this.words.map(word => {
             const distractors = this.getDefinitionDistractors(word, 3);
-            const options = this.shuffleOptions([word.definition, ...distractors]);
+            const options = shuffled([word.definition, ...distractors]);
 
             return {
                 word: word.word,
@@ -42,7 +44,7 @@ export class QuizActivity {
             };
         });
 
-        return this.shuffleItems(questions);
+        return shuffled(questions);
     }
 
     normalizeText(value) {
@@ -106,23 +108,10 @@ export class QuizActivity {
             });
         });
 
-        return candidates
-            .sort((first, second) => second.score - first.score || Math.random() - 0.5)
+        return shuffled(candidates)
+            .sort((first, second) => second.score - first.score)
             .slice(0, count)
             .map(candidate => candidate.definition);
-    }
-
-    shuffleOptions(options) {
-        return this.shuffleItems(options);
-    }
-
-    shuffleItems(items) {
-        const shuffled = [...items];
-        for (let index = shuffled.length - 1; index > 0; index -= 1) {
-            const swapIndex = Math.floor(Math.random() * (index + 1));
-            [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-        }
-        return shuffled;
     }
 
     prepareReplayQuestions(previousQuestions = []) {
@@ -157,16 +146,13 @@ export class QuizActivity {
     }
 
     restoreState() {
-        if (this.applySavedState(this.initialState)) return;
+        if (this.applySavedState(validateActivityState(quizActivityStateSchema, this.initialState))) return;
 
-        const saved = readStudentActivityValue(this.getStorageKey());
+        const saved = readStudentActivityJson(this.getStorageKey(), null, {
+            validate: value => validateActivityState(quizActivityStateSchema, value)
+        });
         if (!saved) return;
-
-        try {
-            this.applySavedState(JSON.parse(saved));
-        } catch (error) {
-            console.error('Error restoring quiz state:', error);
-        }
+        this.applySavedState(saved);
     }
 
     applySavedState(state) {
@@ -376,11 +362,11 @@ export class QuizActivity {
         `;
 
         this.container.appendChild(summary);
-        window.lucide?.createIcons({ root: summary });
+        refreshIcons(summary);
 
         $('#restart-quiz').addEventListener('click', () => this.restart());
     }
-    
+
     restart() {
         // Reset game state
         this.currentIndex = 0;
@@ -388,16 +374,16 @@ export class QuizActivity {
         this.answeredCount = 0;
         this.selectedAnswers = [];
         this.isFinished = false;
-        
+
         // Regenerate questions with new shuffle
         this.questions = this.generateQuestions();
         this.saveState();
-        
+
         // Notify progress system of new session
         if (this.onProgress) {
             this.onProgress({ score: 0, details: `Answered: 0/${this.totalQuestions}. Correct: 0/0 (0% accuracy)`, accuracy: 0, isComplete: false, isReplay: true });
         }
-        
+
         this.render();
     }
 

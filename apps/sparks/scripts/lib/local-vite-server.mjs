@@ -30,6 +30,7 @@ export async function ensureViteServer({
     host,
     port,
     external = false,
+    cwd = process.cwd(),
     args = ['vite', '--host', host, '--port', String(port), '--strictPort']
 }) {
     const probeUrl = `${baseUrl}${probePath}`;
@@ -37,7 +38,7 @@ export async function ensureViteServer({
     if (external) throw new Error(`Configured UI server is not reachable: ${baseUrl}`);
 
     const server = spawn('npx', args, {
-        cwd: process.cwd(),
+        cwd,
         stdio: 'ignore'
     });
     if (await waitForServer(probeUrl)) return server;

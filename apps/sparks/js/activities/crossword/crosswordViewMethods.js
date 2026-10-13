@@ -1,4 +1,4 @@
-import { createElement } from '../../main.js';
+import { createElement, refreshIcons } from '../../main.js';
 
 export const crosswordViewMethods = {
 render() {
@@ -56,7 +56,7 @@ render() {
         gameArea.appendChild(cluesPanel);
         wrapper.appendChild(gameArea);
         this.container.appendChild(wrapper);
-        window.lucide?.createIcons({ root: this.container });
+        refreshIcons(this.container);
         this.syncSolvedState();
         this.updateHighlights();
         this.updateProgressUI();
@@ -185,45 +185,34 @@ showCompletionOverlay() {
         const overlay = document.createElement('div');
         this.completionOverlay = overlay;
         overlay.className = 'completion-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        `;
         overlay.innerHTML = `
-            <div class="completion-screen" style="background: var(--card-bg, #1e293b); padding: 2rem; border-radius: 1rem; text-align: center;">
+            <div class="completion-screen">
                 <h2 class="activity-result-heading">
                     <i data-lucide="badge-check" aria-hidden="true"></i>
                     <span>Crossword Complete!</span>
                 </h2>
                 <p>You solved all ${this.placedWords.length} words!</p>
-                <button id="replay-crossword" class="btn primary-btn" style="margin-top: 1rem;">
-                    <i data-lucide="rotate-ccw" aria-hidden="true"></i>
-                    <span>Play Again</span>
-                </button>
-                <button id="close-crossword" class="btn secondary-btn" style="margin-top: 0.5rem; margin-left: 0.5rem;">Close</button>
+                <div class="completion-actions">
+                    <button id="replay-crossword" class="btn primary-btn">
+                        <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                        <span>Play Again</span>
+                    </button>
+                    <button id="close-crossword" class="btn secondary-btn">Close</button>
+                </div>
             </div>
         `;
-        
+
         document.body.appendChild(overlay);
-        window.lucide?.createIcons({ root: overlay });
-        
+        refreshIcons(overlay);
+
         overlay.querySelector('#replay-crossword').addEventListener('click', () => {
             document.body.removeChild(overlay);
             this.restart();
         });
-        
+
         overlay.querySelector('#close-crossword').addEventListener('click', () => {
             document.body.removeChild(overlay);
             this.completionOverlay = null;
         });
     },
 };
-

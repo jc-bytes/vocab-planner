@@ -4,6 +4,7 @@ import { ensureViteServer } from './lib/local-vite-server.mjs';
 
 const widths = [320, 360, 390, 430, 768, 1024, 1280];
 const viewportHeight = 900;
+const auditUnitId = process.env.UI_AUDIT_ASSIGNMENT_ID ? `assignment.${process.env.UI_AUDIT_ASSIGNMENT_ID}` : 'grade6_t2_august_week1_knowledge_cards';
 const requiredEnv = ['UI_AUDIT_TEACHER_EMAIL', 'UI_AUDIT_STUDENT_EMAIL', 'UI_AUDIT_PASSWORD'];
 const supabaseOverride = process.env.UI_AUDIT_SUPABASE_URL && process.env.UI_AUDIT_SUPABASE_KEY
     ? {
@@ -52,8 +53,17 @@ async function waitForApp(page) {
     await page.waitForTimeout(350);
 }
 
-async function applySupabaseOverride(context) {
+async function applySupabaseOverride(context, baseUrl) {
     if (!supabaseOverride) return;
+    const target = new URL(supabaseOverride.url);
+    if (target.hostname === '127.0.0.1' && target.port !== '54321') {
+        await context.grantPermissions(['local-network-access'], { origin: baseUrl });
+        await context.route('**/*.html', async route => {
+            const response = await route.fetch();
+            const body = (await response.text()).replaceAll(':54321', ':' + target.port);
+            await route.fulfill({ response, body });
+        });
+    }
     await context.addInitScript(config => {
         window.SUPABASE_CONFIG = {
             url: config.url,
@@ -112,7 +122,9 @@ async function loginStudent(page, baseUrl) {
 async function auditRoute(page, url, label, options = {}) {
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.goto(url, { waitUntil: 'load' });
+        const shell = url.includes('/teacher.html') ? '#teacher-tab-shell:not(.hidden)' : '#student-tab-shell:not(.hidden)';
+        await page.locator(shell).waitFor({ state: 'visible' });
         await waitForApp(page);
         await options.beforeAudit?.(page, width);
 
@@ -216,29 +228,26 @@ async function findFirstAssignmentId(page, url, selector) {
     return cards.first().getAttribute('data-assignment-id').catch(() => null);
 }
 
-async function auditTeacherStudentModal(page, baseUrl) {
+async function auditTeacherStudentProfile(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
     await page.goto(`${baseUrl}/teacher.html#/teacher/students`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
 
     const buttons = page.locator('#student-progress-cards .view-details-btn');
-    const count = await buttons.count();
-    if (count === 0) return;
+    await buttons.first().waitFor({ timeout: 10000 });
 
     await buttons.first().click();
-    await page.waitForSelector('#student-detail-modal:not(.hidden)', { timeout: 5000 });
+    await page.waitForSelector('#teacher-student-profile-view:not(.hidden)', { timeout: 5000 });
     const ok = await page.evaluate(() => {
-        const modal = document.querySelector('#student-detail-modal');
-        if (!modal) return false;
-        const before = document.activeElement;
-        return modal.getAttribute('role') === 'dialog'
-            && modal.getAttribute('aria-modal') === 'true'
-            && modal.contains(before);
+        const profile = document.querySelector('#teacher-student-profile-view');
+        return Boolean(profile
+            && document.querySelector('#student-profile-back-btn')
+            && document.querySelector('.student-profile-tabs[role="tablist"]'));
     });
-    if (!ok) throw new Error('Student detail modal did not expose dialog semantics or focus inside the modal.');
+    if (!ok) throw new Error('Student profile did not expose routed profile navigation and tabs.');
 
-    await page.keyboard.press('Escape');
-    await page.waitForFunction(() => document.querySelector('#student-detail-modal')?.classList.contains('hidden'), null, { timeout: 5000 });
+    await page.locator('#student-profile-back-btn').click();
+    await page.waitForSelector('#teacher-progress-view:not(.hidden)', { timeout: 5000 });
 }
 
 async function assertTeacherMobileMenu(page, baseUrl) {
@@ -336,7 +345,7 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         };
     });
 
-    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar'
+    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar,export,view,reset'
         || settingsState.selectedTab !== 'subjects'
         || settingsState.tabListHeight > 72
         || settingsState.visiblePanels.length !== 1
@@ -347,25 +356,14 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
     await page.goto(`${baseUrl}/teacher.html#/teacher/data`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
 
-    const dataState = await page.evaluate(() => {
-        const dataView = document.querySelector('#teacher-data-management-view');
-        const visiblePanels = Array.from(document.querySelectorAll('.data-tab-content'))
-            .filter(panel => window.getComputedStyle(panel).display !== 'none')
-            .map(panel => panel.id);
-        return {
-            visibleTabs: Array.from(dataView?.querySelectorAll('.data-tab-btn') || [])
-                .filter(button => window.getComputedStyle(button).display !== 'none')
-                .map(button => button.dataset.tab),
-            selectedTab: dataView?.querySelector('.data-tab-btn[data-tab][aria-selected="true"]')?.dataset.tab,
-            visiblePanels
-        };
-    });
+    const dataState = await page.evaluate(() => ({
+        hash: window.location.hash,
+        activeView: document.querySelector('.view.active')?.id,
+        activeSection: document.querySelector('.teacher-tab.active')?.dataset.section
+    }));
 
-    if (dataState.visibleTabs.join(',') !== 'dashboard,export,view,reset'
-        || dataState.selectedTab !== 'dashboard'
-        || dataState.visiblePanels.length !== 1
-        || dataState.visiblePanels[0] !== 'data-dashboard-section') {
-        throw new Error(`Data did not isolate its tools: ${JSON.stringify(dataState)}`);
+    if (dataState.activeView !== 'teacher-overview-view' || dataState.activeSection !== 'overview') {
+        throw new Error(`Legacy Data route did not redirect Home: ${JSON.stringify(dataState)}`);
     }
 }
 
@@ -383,8 +381,8 @@ async function assertTeacherSparksRoute(page, baseUrl) {
         currentSparkText: document.querySelector('#spark-library-list')?.textContent || ''
     }));
 
-    if (state.activeLabel !== 'Sparks'
-        || state.mobileLabel !== 'Sparks'
+    if (state.activeLabel !== 'Content'
+        || state.mobileLabel !== 'Content'
         || !state.addButtonVisible
         || !state.currentSparkText.includes('Audit Spark')) {
         throw new Error(`Teacher Sparks route did not render expected controls: ${JSON.stringify(state)}`);
@@ -393,25 +391,12 @@ async function assertTeacherSparksRoute(page, baseUrl) {
 
 async function assertStudentSparkCard(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
-    await page.goto(`${baseUrl}/student.html#/menu`, { waitUntil: 'domcontentloaded' });
-    await waitForApp(page);
-    await page.waitForSelector('.student-spark-card', { timeout: 10000 });
-
-    const state = await page.evaluate(() => {
-        const card = document.querySelector('.student-spark-card');
-        return {
-            text: card?.textContent || '',
-            activeTab: document.querySelector('.student-home-tab.active')?.dataset.panel,
-            visiblePanel: document.querySelector('.student-home-panel.active')?.dataset.panel
-        };
-    });
-
-    if (!state.text.includes('Audit Spark')
-        || state.text.includes('Future Audit Spark')
-        || state.activeTab !== 'spark'
-        || state.visiblePanel !== 'spark') {
-        throw new Error(`Student Today Spark card is wrong: ${JSON.stringify(state)}`);
-    }
+    await page.goto(`${baseUrl}/student.html#/classes`, { waitUntil: 'domcontentloaded' });
+    await page.locator('#student-classes-view').getByRole('button', { name: 'Current Audit Spark', exact: true }).waitFor();
+    const text = await page.locator('#student-classes-view').innerText();
+    if (text.includes('Future Audit Spark')) throw new Error('Future class assignments appeared early.');
+    await page.locator('#student-classes-view').getByRole('button', { name: 'Current Audit Spark', exact: true }).click();
+    await page.getByLabel('Your written response').waitFor();
 }
 
 async function assertStudentMobileMenu(page, baseUrl) {
@@ -527,13 +512,13 @@ async function assertStudentMobileMenu(page, baseUrl) {
 
     if (dashboardState.headingVisible
         || !dashboardState.tabsVisible
-        || dashboardState.activeTab !== 'spark'
+        || dashboardState.activeTab !== 'week'
         || dashboardState.visiblePanels.length !== 1
-        || dashboardState.visiblePanels[0] !== 'spark') {
+        || dashboardState.visiblePanels[0] !== 'week') {
         throw new Error(`Student mobile dashboard is not compacted into one active panel: ${JSON.stringify(dashboardState)}`);
     }
-    if (!dashboardState.subject) {
-        throw new Error(`Student mobile class picker is missing: ${JSON.stringify(dashboardState)}`);
+    if (dashboardState.subject?.height) {
+        throw new Error('The legacy subject picker must be hidden for enrolled students.');
     }
 
     await page.locator('#student-mobile-menu-toggle').click();
@@ -561,7 +546,7 @@ async function assertStudentMobileMenu(page, baseUrl) {
 
 async function assertStudentActivityCardsAreButtons(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
-    await page.goto(`${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${baseUrl}/student.html#/unit/${auditUnitId}`, { waitUntil: 'domcontentloaded' });
     await waitForApp(page);
 
     const result = await page.evaluate(() => {
@@ -580,8 +565,8 @@ async function main() {
         browser = await chromium.launch({ headless: true });
         const teacherContext = await browser.newContext({ timezoneId: 'America/Panama' });
         const studentContext = await browser.newContext({ timezoneId: 'America/Panama' });
-        await applySupabaseOverride(teacherContext);
-        await applySupabaseOverride(studentContext);
+        await applySupabaseOverride(teacherContext, baseUrl);
+        await applySupabaseOverride(studentContext, baseUrl);
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
 
@@ -596,17 +581,19 @@ async function main() {
             ['Teacher Overview', `${baseUrl}/teacher.html#/teacher/overview`],
             ['Teacher Students', `${baseUrl}/teacher.html#/teacher/students`],
             ['Teacher Vocabulary', `${baseUrl}/teacher.html#/teacher/vocabulary`],
+            ['Teacher Classes', `${baseUrl}/teacher.html#/teacher/classes`],
             ['Teacher Sparks', `${baseUrl}/teacher.html#/teacher/sparks`],
             ['Teacher Quizzes', `${baseUrl}/teacher.html#/teacher/quizzes`],
-            ['Teacher Data', `${baseUrl}/teacher.html#/teacher/data`],
+            ['Teacher Data Redirect', `${baseUrl}/teacher.html#/teacher/data`],
             ['Teacher Settings', `${baseUrl}/teacher.html#/teacher/settings`]
         ];
 
         const studentRoutes = [
             ['Student Dashboard', `${baseUrl}/student.html#/menu`],
             ['Student Units', `${baseUrl}/student.html#/units?all=1`],
-            ['Student Unit Menu', `${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards`],
-            ['Student Flashcards', `${baseUrl}/student.html#/unit/grade6_t2_august_week1_knowledge_cards/activity/flashcards`],
+            ['Student Classes', `${baseUrl}/student.html#/classes`],
+            ['Student Unit Menu', `${baseUrl}/student.html#/unit/${auditUnitId}`],
+            ['Student Flashcards', `${baseUrl}/student.html#/unit/${auditUnitId}/activity/flashcards`],
             ['Student Arcade', `${baseUrl}/student.html#/arcade`]
         ];
 
@@ -617,7 +604,7 @@ async function main() {
             await auditRoute(studentPage, url, label, options);
         }
 
-        await auditTeacherStudentModal(teacherPage, baseUrl);
+        await auditTeacherStudentProfile(teacherPage, baseUrl);
         await assertTeacherMobileMenu(teacherPage, baseUrl);
         await assertDataAndSettingsTabs(teacherPage, baseUrl);
         await assertTeacherSparksRoute(teacherPage, baseUrl);

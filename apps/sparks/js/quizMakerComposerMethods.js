@@ -1,4 +1,4 @@
-import { $, createElement } from './main.js';
+import { $, createElement, refreshIcons } from './main.js';
 
 class QuizMakerComposerMethods {
     renderSectionComposer() {
@@ -63,7 +63,7 @@ class QuizMakerComposerMethods {
             `;
         }).join('');
 
-        window.lucide?.createIcons({ root: list });
+        refreshIcons(list);
 
         list.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', () => {

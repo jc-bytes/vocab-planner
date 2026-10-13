@@ -47,9 +47,13 @@ export function defineTeacherPages(definitions) {
 }
 
 export const teacherPageRegistry = defineTeacherPages([
+    { id: 'administration', viewId: 'teacher-administration-view' },
+    { id: 'classes', viewId: 'teacher-classes-view' },
     { id: 'overview', viewId: 'teacher-overview-view' },
     { id: 'vocabulary', viewId: 'teacher-dashboard-view' },
     { id: 'sparks', viewId: 'teacher-sparks-view' },
+    { id: 'assignments', viewId: 'teacher-assignments-view' },
+    { id: 'review', viewId: 'teacher-review-view' },
     { id: 'students', viewId: 'teacher-progress-view' },
     { id: 'groups', viewId: 'teacher-groups-view' },
     { id: 'data', viewId: 'teacher-data-management-view' },

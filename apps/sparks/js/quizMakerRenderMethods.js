@@ -1,9 +1,11 @@
 import { $, createElement, escapeHtml } from './main.js';
 import { renderQuizQuestionCard } from './quizMakerQuestionCardRenderer.js';
+import Sortable from 'sortablejs';
 
 class QuizMakerRenderMethods {
     renderEditor() {
         const container = $('#quiz-questions-list');
+        this.destroyQuestionSortables();
         container.innerHTML = '';
 
         // Auto-scale preview
@@ -153,22 +155,27 @@ class QuizMakerRenderMethods {
             // Add questions in this section
             section.questions.forEach((q, sectionIndex) => {
                 const globalIndex = this.questions.indexOf(q);
-                const qCard = this.renderQuestionCard(q, sectionIndex + 1); // Use 1-based section numbering
+                const qCard = this.renderQuestionCard(q, sectionIndex + 1, {
+                    questionNumber: globalIndex + 1,
+                    canMoveUp: globalIndex > 0,
+                    canMoveDown: globalIndex < this.questions.length - 1
+                }); // Use 1-based section numbering
                 qCard.classList.add('doc-q-card');
-                qCard.dataset.globalIndex = globalIndex; // Store global index for drag/drop
+                qCard.dataset.globalIndex = globalIndex;
                 qCard.dataset.index = globalIndex;
-                // Re-attach drag events
-                qCard.draggable = true;
-                qCard.addEventListener('dragstart', (e) => this.handleDragStart(e, globalIndex));
-                qCard.addEventListener('dragover', this.handleDragOver.bind(this));
-                qCard.addEventListener('drop', (e) => this.handleDrop(e, globalIndex));
-                qCard.addEventListener('dragend', this.handleDragEnd.bind(this));
+                qCard.querySelector('.quiz-question-move-up')?.addEventListener('click', () => {
+                    this.moveQuestion(globalIndex, -1, 'up');
+                });
+                qCard.querySelector('.quiz-question-move-down')?.addEventListener('click', () => {
+                    this.moveQuestion(globalIndex, 1, 'down');
+                });
                 qCard.style.pageBreakInside = 'avoid';
                 qCard.style.breakInside = 'avoid';
                 appendToPage(qCard);
             });
         });
 
+        this.setupQuestionSortables(container);
         this.updateTotalPoints();
         this.renderSectionComposer();
         this.notifyStateChange();
@@ -252,50 +259,56 @@ class QuizMakerRenderMethods {
         // Redundant in doc view
     }
 
-    renderQuestionCard(q, index) {
-        return renderQuizQuestionCard(q, index);
+    renderQuestionCard(q, index, reorder) {
+        return renderQuizQuestionCard(q, index, reorder);
     }
 
-    handleDragStart(e) {
-        this.dragSrcEl = e.target.closest('.doc-q-card');
-        if (!this.dragSrcEl) return;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', this.dragSrcEl.innerHTML);
-        this.dragSrcEl.classList.add('dragging');
+    destroyQuestionSortables() {
+        this.questionSortables?.forEach(sortable => sortable.destroy());
+        this.questionSortables = [];
     }
 
-    handleDragOver(e) {
-        if (e.preventDefault) e.preventDefault();
-        return false;
+    setupQuestionSortables(container) {
+        if (this.disposed) return;
+        const pages = Array.from(container.querySelectorAll('.document-page'));
+        this.questionSortables = pages.map(page => Sortable.create(page, {
+            group: 'quiz-maker-questions',
+            animation: 150,
+            forceFallback: true,
+            fallbackTolerance: 3,
+            draggable: '.doc-q-card',
+            handle: '.quiz-question-drag-handle',
+            ghostClass: 'quiz-question-ghost',
+            chosenClass: 'quiz-question-chosen',
+            dragClass: 'quiz-question-dragging',
+            onEnd: () => this.commitQuestionOrderFromPreview(container)
+        }));
     }
 
-    handleDrop(e) {
-        if (e.stopPropagation) e.stopPropagation();
-        const target = e.target.closest('.doc-q-card');
-        if (this.dragSrcEl !== target) {
-            const srcIdx = parseInt(this.dragSrcEl.dataset.index);
-            const tgtIdx = parseInt(target?.dataset.index);
-            if (Number.isNaN(srcIdx) || Number.isNaN(tgtIdx)) return false;
-
-            // Swap in array
-            const item = this.questions.splice(srcIdx, 1)[0];
-            this.questions.splice(tgtIdx, 0, item);
-
-            this.renderEditor();
-            this.updateTotalPoints();
+    commitQuestionOrderFromPreview(container) {
+        const indexes = Array.from(container.querySelectorAll('.doc-q-card'), card => (
+            Number.parseInt(card.dataset.index, 10)
+        ));
+        const hasCompleteOrder = indexes.length === this.questions.length
+            && indexes.every(index => Number.isInteger(index) && index >= 0 && index < this.questions.length)
+            && new Set(indexes).size === this.questions.length;
+        if (hasCompleteOrder) {
+            this.questions = indexes.map(index => this.questions[index]);
         }
-        return false;
+        this.renderEditor();
     }
 
-    handleDragEnd(e) {
-        this.questions.forEach((q, i) => {
-            const card = document.querySelector(`.doc-q-card[data-index="${i}"]`);
-            if (card) card.classList.remove('dragging');
-        });
-        // Also remove from the source element if we can find it
-        if (this.dragSrcEl) {
-            this.dragSrcEl.classList.remove('dragging');
-        }
+    moveQuestion(index, delta, preferredControl) {
+        const targetIndex = index + delta;
+        if (index < 0 || index >= this.questions.length || targetIndex < 0 || targetIndex >= this.questions.length) return;
+        const [question] = this.questions.splice(index, 1);
+        this.questions.splice(targetIndex, 0, question);
+        this.renderEditor();
+
+        const movedCard = document.querySelector(`#quiz-questions-list .doc-q-card[data-index="${targetIndex}"]`);
+        const preferredButton = movedCard?.querySelector(`.quiz-question-move-${preferredControl}:not(:disabled)`);
+        const fallbackButton = movedCard?.querySelector('.quiz-question-move-up:not(:disabled), .quiz-question-move-down:not(:disabled)');
+        (preferredButton || fallbackButton || movedCard?.querySelector('.quiz-question-drag-handle'))?.focus();
     }
 }
 

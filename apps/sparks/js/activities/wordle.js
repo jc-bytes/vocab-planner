@@ -1,5 +1,7 @@
 import { createElement } from '../main.js';
-import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { readStudentActivityJson, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { validateActivityState, wordleStateSchema } from './activityStateValidation.js';
+import { shuffleInPlace } from '../randomUtils.js';
 
 const MAX_GUESSES = 6;
 
@@ -31,7 +33,7 @@ export class WordleActivity {
         }
 
         if (!this.restoreState()) {
-            this.words.sort(() => Math.random() - 0.5);
+            shuffleInPlace(this.words);
         }
 
         this.render();
@@ -47,7 +49,7 @@ export class WordleActivity {
     }
 
     restoreState() {
-        const state = this.initialState || this.getLocalState();
+        const state = validateActivityState(wordleStateSchema, this.initialState) || this.getLocalState();
         if (!state) return false;
 
         try {
@@ -78,8 +80,9 @@ export class WordleActivity {
     }
 
     getLocalState() {
-        const saved = readStudentActivityValue(`wordle_state_${this.words.length}`);
-        return saved ? JSON.parse(saved) : null;
+        return readStudentActivityJson(`wordle_state_${this.words.length}`, null, {
+            validate: value => validateActivityState(wordleStateSchema, value)
+        });
     }
 
     saveState() {
@@ -192,7 +195,7 @@ export class WordleActivity {
 
     restart() {
         removeStudentActivityValue(`wordle_state_${this.words.length}`);
-        this.words.sort(() => Math.random() - 0.5);
+        shuffleInPlace(this.words);
         this.currentIndex = 0;
         this.currentGuess = '';
         this.guesses = [];

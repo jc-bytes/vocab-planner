@@ -1,3 +1,4 @@
+import { activityHasPlayableRound, weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $ } from '../main.js';
 import { notifications } from '../notifications.js';
 import { getSubjectBySlug, getVocabSubjectSlug } from '../services/vocabularyApi.js';
@@ -28,7 +29,7 @@ export class StudentActivityLauncher {
             activitySettings: settings,
             allowTextPaste: settings.wordHuntAllowTextPaste !== false,
             isRequired: this.activities.getActivityFlowConfig(vocab).required.includes('illustration'),
-            vocabName: vocab.name,
+            vocabName: this.activities.getUnitProgressKey?.(vocab) || vocab.name,
             initialData: this.sm.unitWordHunt,
             ownerUserId: this.sm.currentUser?.uid || 'local-dev',
             initialIndex: options.initialWordIndex || 0,
@@ -56,6 +57,7 @@ export class StudentActivityLauncher {
 
     createRegisteredActivity(descriptor, ActivityClass, context) {
         const prepared = descriptor.prepare({
+            vocab: context.vocab,
             savedState: context.savedState,
             wordLimit: context.wordLimit,
             playableWords: context.playableWords,
@@ -196,7 +198,7 @@ export class StudentActivityLauncher {
             console.error('Activity container was not found.');
             return;
         }
-        if (this.activities.getActivityPlayableCount(type, vocab) <= 0) {
+        if (!weeklyVocabularyVisible(vocab, this.sm.studentProfile || {}, new Date()) || !activityHasPlayableRound(type, vocab, this.activities.getActivityPlayableCount(type, vocab))) {
             setStudentPageLoading(activityView, false);
             this.renderActivityUnavailable(container, unitId);
             return;
@@ -268,6 +270,7 @@ export class StudentActivityLauncher {
                 : null;
             activityInstance = this.startActivityWithStateRecovery(type, initialState, savedState => {
                 return this.createRegisteredActivity(activityDescriptor, ActivityClass, {
+                    vocab,
                     container,
                     savedState,
                     wordLimit: getActivityWordLimit(activityDescriptor.settingKey),
@@ -278,7 +281,7 @@ export class StudentActivityLauncher {
                     ),
                     onProgress,
                     onSaveState,
-                    persistenceId: vocab.id || vocab.name,
+                    persistenceId: this.activities.getUnitProgressKey?.(vocab) || vocab.id || vocab.name,
                     onNewRound: () => {
                         if (!isCurrentLaunch()) return;
                         this.activities.resetActivityState(type);
@@ -309,8 +312,8 @@ export class StudentActivityLauncher {
         }
         this.sm.activityInstance = activityInstance;
         session.startActivityTimer();
-        const restoredCompletion = this.getRestoredCompletion(type, initialState, activityInstance, playableWords);
-        if (restoredCompletion) onProgress(restoredCompletion);
+        const restored = this.getRestoredCompletion(type, initialState, activityInstance, playableWords);
+        if (restored && isCurrentLaunch()) this.activities.handleAutoSave(restored);
         setStudentPageLoading(activityView, false);
     }
 

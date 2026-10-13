@@ -1,4 +1,5 @@
 import { collectStaticImportKeys } from './deliverySizeBudgets.mjs';
+import { collectStudentPrecacheFiles } from '../student-precache.mjs';
 
 export const REQUIRED_LAZY_EDGES = Object.freeze([
   Object.freeze({ parent: 'student', children: Object.freeze(['studentGames', 'reportGenerator']) }),
@@ -79,6 +80,9 @@ export function validateLazyBuildContracts(manifest, { precacheFiles = null } = 
     }
 
     if (entryName === 'student') {
+      if (staticKeys.has('js/services/classroomRepository.js')) {
+        throw new Error('student loads the optional classroom repository eagerly.');
+      }
       for (const deferredKey of REQUIRED_DEFERRED_KEYS) {
         if (!manifest[deferredKey]?.file) {
           throw new Error(`Production manifest is missing deferred asset ${deferredKey}.`);
@@ -91,19 +95,11 @@ export function validateLazyBuildContracts(manifest, { precacheFiles = null } = 
   }
 
   if (precacheFiles) {
-    const forbiddenPrecacheFiles = new Set();
-    for (const [key, entry] of Object.entries(manifest)) {
-      const isOptionalFeature = OPTIONAL_FEATURE_NAMES.includes(entry?.name);
-      const isOwnedLazyModule = key.startsWith('js/games/') || key.startsWith('js/activities/');
-      if (!isOptionalFeature && !isOwnedLazyModule && !REQUIRED_DEFERRED_KEYS.includes(key)) continue;
-      if (entry.file) forbiddenPrecacheFiles.add(entry.file);
-      for (const file of entry.css || []) forbiddenPrecacheFiles.add(file);
-      for (const file of entry.assets || []) forbiddenPrecacheFiles.add(file);
-    }
-    const eagerPrecacheFile = [...precacheFiles].find(file => forbiddenPrecacheFiles.has(file));
-    if (eagerPrecacheFile) {
-      throw new Error(`Student precache includes lazy delivery file ${eagerPrecacheFile}.`);
-    }
+    const expected = collectStudentPrecacheFiles(manifest, byName.get('student').key);
+    const missing = [...expected].find(file => !precacheFiles.has(file));
+    if (missing) throw new Error(`Student precache is missing code graph file ${missing}.`);
+    const extra = [...precacheFiles].find(file => !expected.has(file));
+    if (extra) throw new Error(`Student precache includes a file outside its code graph: ${extra}.`);
   }
 
   return Object.freeze({

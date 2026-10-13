@@ -104,14 +104,21 @@ test('pairing restrictions have a private device fallback when cloud storage is 
 });
 
 test('Groups owns one explicit lazy feature boundary instead of manager state and handlers', async () => {
-    const [managerSource, groupsSource, lazySource, globalListeners] = await Promise.all([
+    const [managerSource, groupsSource, lazySource, globalListeners, teacherCss, groupsCss] = await Promise.all([
         readFile(new URL('../js/teacher.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/teacherGroups.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8')
+        readFile(new URL('../js/teacherGlobalListeners.js', import.meta.url), 'utf8'),
+        readFile(new URL('../css/teacher.css', import.meta.url), 'utf8'),
+        readFile(new URL('../css/teacherGroups.css', import.meta.url), 'utf8')
     ]);
 
     assert.match(groupsSource, /export function createTeacherGroupsFeature/);
+    assert.match(groupsSource, /import ['"]\.\.\/css\/teacherGroups\.css['"]/);
+    assert.doesNotMatch(teacherCss, /\.group-generator-layout/);
+    assert.match(groupsCss, /\.group-generator-layout/);
+    assert.match(groupsCss, /\.group-restriction-settings/);
+    assert.match(groupsCss, /\.random-group-card/);
     assert.doesNotMatch(groupsSource, /installTeacherGroupsMethods/);
     assert.match(groupsSource, /Object\.freeze\(\{[\s\S]*show:[\s\S]*destroy:/);
     assert.match(lazySource, /import\(['"]\.\/teacherGroups\.js['"]\)/);

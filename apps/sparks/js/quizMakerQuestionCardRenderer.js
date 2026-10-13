@@ -1,9 +1,17 @@
 import { createElement, escapeHtml } from './main.js';
 
-export function renderQuizQuestionCard(q, index) {
+export function renderQuizQuestionCard(q, index, reorder = {}) {
     const card = createElement('div', 'doc-q-card');
     const text = (value = '') => escapeHtml(value);
     const pts = q.points !== undefined ? `(${text(q.points)} pts)` : '';
+    const questionNumber = Number(reorder.questionNumber) || index;
+    const reorderControls = `
+        <div class="quiz-question-reorder" aria-label="Reorder question ${questionNumber}">
+            <button type="button" class="quiz-question-drag-handle" aria-label="Drag question ${questionNumber} to reorder" title="Drag to reorder">↕</button>
+            <button type="button" class="quiz-question-move-up" aria-label="Move question ${questionNumber} up" title="Move question up" ${reorder.canMoveUp === false ? 'disabled' : ''}>↑</button>
+            <button type="button" class="quiz-question-move-down" aria-label="Move question ${questionNumber} down" title="Move question down" ${reorder.canMoveDown === false ? 'disabled' : ''}>↓</button>
+        </div>
+    `;
 
     const renderMC = () => `
         <div class="q-prompt"><strong>${index}.</strong> ${text(q.prompt)} ${pts}</div>
@@ -134,7 +142,7 @@ export function renderQuizQuestionCard(q, index) {
         <div class="q-prompt"><strong>${index}.</strong> ${text(q.prompt || '')} ${pts}</div>
     `);
 
-    card.innerHTML = renderer();
+    card.innerHTML = `${reorderControls}${renderer()}`;
     if (q.type === 'wordsearch' || q.type === 'crossword') {
         card.style.pageBreakInside = 'avoid';
     }

@@ -88,7 +88,8 @@ async function main() {
         await runCommand('npm', ['run', 'test:ui:smoke'], {
             env: {
                 ...process.env,
-                UI_SMOKE_BASE_URL: baseUrl
+                UI_SMOKE_BASE_URL: baseUrl,
+                UI_SMOKE_SOURCE_FIXTURES: '0'
             }
         });
     } finally {

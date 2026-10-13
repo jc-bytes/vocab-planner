@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { after, test } from 'node:test';
 
 const originalGlobals = {
@@ -15,14 +16,25 @@ const clearedTimers = [];
 function createElement(tagName) {
     const attributes = new Map();
     const listeners = new Map();
-    return {
+    const classes = new Set();
+    const element = {
         tagName: tagName.toUpperCase(),
         id: '',
-        className: '',
         textContent: '',
         style: {},
         children: [],
         parentNode: null,
+        get className() {
+            return [...classes].join(' ');
+        },
+        set className(value) {
+            classes.clear();
+            String(value).split(/\s+/).filter(Boolean).forEach(token => classes.add(token));
+        },
+        classList: {
+            add: (...tokens) => tokens.forEach(token => classes.add(token)),
+            contains: token => classes.has(token)
+        },
         setAttribute(name, value) {
             attributes.set(name, String(value));
         },
@@ -51,6 +63,7 @@ function createElement(tagName) {
             if (!event.propagationStopped && this.parentNode) this.parentNode.dispatchEvent(event);
         }
     };
+    return element;
 }
 
 function findById(root, id) {
@@ -102,6 +115,8 @@ after(() => {
 });
 
 const { notifications } = await import('../js/notifications.js');
+const notificationSource = await readFile(new URL('../js/notifications.js', import.meta.url), 'utf8');
+const feedbackCssSource = await readFile(new URL('../css/feedback.css', import.meta.url), 'utf8');
 
 test('notifications expose appropriate live-region semantics and normalize unknown types', () => {
     const errorToast = notifications.show('Could not save', 'error', 0);
@@ -129,7 +144,7 @@ test('clicking a close-button glyph schedules exactly one removal and cancels au
     closeButton.dispatchEvent(clickEvent());
 
     assert.deepEqual(clearedTimers, [autoTimerId]);
-    assert.equal(toast.style.animation, 'slideOutRight 0.3s ease-out');
+    assert.equal(toast.classList.contains('toast-closing'), true);
     assert.equal(timers.size, 1, 'only the removal animation timer should remain');
 
     const [{ callback, delay }] = [...timers.values()];
@@ -144,6 +159,17 @@ test('clicking the toast surface remains a supported dismissal path', () => {
 
     toast.dispatchEvent(clickEvent());
 
-    assert.equal(toast.style.animation, 'slideOutRight 0.3s ease-out');
+    assert.equal(toast.classList.contains('toast-closing'), true);
     assert.equal(timers.size, 1);
+});
+
+test('toast presentation lives in shared feedback CSS and uses semantic status colors', () => {
+    assert.doesNotMatch(notificationSource, /style\.cssText|toast-styles|createElement\('style'\)/);
+    assert.match(feedbackCssSource, /\.toast-container\s*\{[^}]*position:\s*fixed/s);
+    assert.match(feedbackCssSource, /\.toast\s*\{[^}]*animation:\s*toast-slide-in/s);
+    assert.match(feedbackCssSource, /\.toast-info\s*\{[^}]*--toast-status-color:\s*var\(--color-info\)/s);
+    assert.match(feedbackCssSource, /\.toast-success\s*\{[^}]*--toast-status-color:\s*var\(--color-success\)/s);
+    assert.match(feedbackCssSource, /\.toast-warning\s*\{[^}]*--toast-status-color:\s*var\(--color-warning\)/s);
+    assert.match(feedbackCssSource, /\.toast-error\s*\{[^}]*--toast-status-color:\s*var\(--color-danger\)/s);
+    assert.match(feedbackCssSource, /\.toast\.toast-closing\s*\{[^}]*animation:\s*toast-slide-out/s);
 });

@@ -1,13 +1,26 @@
 import { $, notifications } from '../main.js';
 import { supabaseService } from '../supabaseService.js';
+import {
+    getTeacherProgressAccountId,
+    getTeacherProgressQueryKey,
+    getTeacherProgressQueryService
+} from './teacherProgressDataMethods.js';
+
+function runTeacherProgressPageQuery(owner, options, forceRefresh) {
+    const service = getTeacherProgressQueryService(owner);
+    return forceRefresh ? service.refresh(options) : service.ensure(options);
+}
 
 export const teacherProgressPageMethods = {
     async loadStudentRosterFilters({ forceRefresh = false } = {}) {
         if (this.authDisabled) return { grades: [], classes: [] };
-        if (!forceRefresh && this.studentRosterFilters) return this.studentRosterFilters;
         const generation = this.studentRosterFiltersGeneration || 0;
         try {
-            const filters = await supabaseService.getStudentRosterFilters();
+            const filters = await runTeacherProgressPageQuery(this, {
+                accountId: getTeacherProgressAccountId(this),
+                key: getTeacherProgressQueryKey(this, 'roster-filters'),
+                queryFn: ({ signal }) => supabaseService.getStudentRosterFilters({ signal })
+            }, forceRefresh);
             if (generation !== (this.studentRosterFiltersGeneration || 0)) {
                 return this.studentRosterFilters || { grades: [], classes: [] };
             }
@@ -41,42 +54,46 @@ export const teacherProgressPageMethods = {
 
         const query = this.getStudentProgressQuery({ page: resetPage ? 1 : null });
         const offset = (query.page - 1) * query.pageSize;
-        const cacheKey = JSON.stringify({ ...query, offset });
         const generation = (this.studentProgressPageGeneration || 0) + 1;
         this.studentProgressPageGeneration = generation;
-        this.studentProgressPageCache ||= new Map();
-        const cached = this.studentProgressPageCache.get(cacheKey);
-        if (!forceRefresh && cached) {
-            this.applyStudentProgressPage(cached);
-            this.setStudentProgressLoadState('ready');
-            return cached.items;
-        }
 
         this.setStudentProgressLoadState('loading');
         try {
-            const result = await supabaseService.listStudentProgressSummaries({
-                limit: query.pageSize,
-                offset,
-                grade: query.grade,
-                section: query.section,
-                search: query.search
-            });
+            const result = await runTeacherProgressPageQuery(this, {
+                accountId: getTeacherProgressAccountId(this),
+                key: getTeacherProgressQueryKey(this, 'summaries', {
+                    pageSize: query.pageSize,
+                    offset,
+                    grade: query.grade,
+                    section: query.section,
+                    search: query.search
+                }),
+                queryFn: ({ signal }) => supabaseService.listStudentProgressSummaries({
+                    limit: query.pageSize,
+                    offset,
+                    grade: query.grade,
+                    section: query.section,
+                    search: query.search,
+                    signal
+                })
+            }, forceRefresh);
             if (generation !== this.studentProgressPageGeneration) return this.allStudentData;
-            this.studentProgressPageCache.set(cacheKey, result);
             this.applyStudentProgressPage(result);
             this.setStudentProgressLoadState('ready');
+            await this.loadStudentRosterProgress({ generation, forceRefresh });
             return result.items;
         } catch (error) {
             if (generation !== this.studentProgressPageGeneration) return this.allStudentData;
             console.error('Error fetching student progress page:', error);
-            if (this.studentProgressLastPage) this.applyStudentProgressPage(this.studentProgressLastPage);
+            if (this.studentProgressLastPage) this.applyStudentProgressPage(this.studentProgressLastPage, { preserveProgress: true });
             this.setStudentProgressLoadState(this.studentProgressLastPage ? 'stale' : 'error');
             if (showError) notifications.error('Student data could not be refreshed.');
             throw error;
         }
     },
 
-    applyStudentProgressPage(page) {
+    applyStudentProgressPage(page, { preserveProgress = false } = {}) {
+        if (!preserveProgress) this.studentRosterProgressById = new Map();
         this.studentProgressLastPage = page;
         this.applyStudentProgressData(page?.items || []);
         const limit = Number(page?.limit) || 50;

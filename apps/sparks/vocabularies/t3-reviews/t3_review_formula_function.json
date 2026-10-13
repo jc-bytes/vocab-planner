@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_formula_function",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Formula and function",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "7"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "formula",
+      "definition": "A calculation written in a spreadsheet.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/formula"
+    },
+    {
+      "word": "function",
+      "definition": "A named group of instructions that performs a task.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/function"
+    }
+  ]
+}

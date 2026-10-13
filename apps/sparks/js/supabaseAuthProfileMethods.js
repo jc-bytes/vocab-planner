@@ -1,9 +1,9 @@
+import { requireSchoolId } from './services/schoolScope.js';
 import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
 import {
     mapProfileRow,
     normalizeProfile,
     normalizeUser,
-    profilePayload,
     toClientTimestamp
 } from './services/supabaseValues.js';
 import { DEFAULT_COIN_DATA } from './studentProgressDefaults.js';
@@ -27,6 +27,16 @@ function normalizeTeacherProgressRecord(record, { detailed = false } = {}) {
         createdAt: toClientTimestamp(record.createdAt),
         updatedAt: toClientTimestamp(record.updatedAt),
         progressDetailLoaded: detailed
+    };
+}
+
+function profileWriteGuard(service, userId) {
+    const user = service.currentUser;
+    const generation = service.authIdentityGeneration || 0;
+    return () => {
+        if (!user || user.uid !== userId || service.currentUser !== user || generation !== (service.authIdentityGeneration || 0)) {
+            throw new DOMException('The account changed. Save your profile again.', 'AbortError');
+        }
     };
 }
 
@@ -77,18 +87,19 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         await this.init();
         const { data, error } = await this.client.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        this.authIdentityGeneration = (this.authIdentityGeneration || 0) + 1;
         this.currentSession = data.session || null;
         this.currentUser = normalizeUser(data.user);
         return { ...data, user: this.currentUser };
     },
 
     async upsertStudentProfile(userId, profile) {
+        const assertCurrent = profileWriteGuard(this, userId);
+        assertCurrent();
         await this.init();
+        assertCurrent();
         const normalized = normalizeProfile(profile);
-        const payload = profilePayload({
-            ...normalized,
-            role: 'student'
-        }, userId);
+        const payload = { first_name: normalized.firstName, last_name: normalized.lastName };
 
         const { data, error } = await this.client
             .from('profiles')
@@ -101,12 +112,12 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async updateStudentProfile(profile) {
+        const user = this.currentUser;
+        if (!user) throw new Error('You must be signed in to update your profile.');
+        const assertCurrent = profileWriteGuard(this, user.uid);
         await this.init();
-        if (!this.currentUser) throw new Error('You must be signed in to update your profile.');
-        await this.upsertStudentProfile(this.currentUser.uid, {
-            ...profile,
-            email: this.currentUser.email || profile.email
-        });
+        assertCurrent();
+        await this.upsertStudentProfile(user.uid, { ...profile, email: user.email || profile.email });
     },
 
     async ensureStudentProgress(userId, profile = {}) {
@@ -138,11 +149,15 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return mapProfileRow(data);
     },
 
-    async ensureAllowlistedTeacherProfile() {
+    async ensureAllowlistedTeacherProfile(options = {}) {
         await this.init();
         if (!this.currentUser) throw new Error('You must be signed in to verify teacher access.');
 
-        const { data, error } = await this.client.rpc('ensure_allowlisted_teacher_profile');
+        let query = this.client.rpc('ensure_allowlisted_teacher_profile');
+        if (options.signal && typeof query.abortSignal === 'function') {
+            query = query.abortSignal(options.signal);
+        }
+        const { data, error } = await query;
         if (error) throw error;
         return mapProfileRow(Array.isArray(data) ? data[0] : data);
     },
@@ -154,10 +169,11 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         section = null,
         search = null
     } = {}) {
+        const schoolId = requireSchoolId();
         await this.init();
         const pageLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 100, 1), 200);
         const pageOffset = Math.max(Number.parseInt(offset, 10) || 0, 0);
-        const { data, error } = await this.client.rpc('list_student_progress_summaries_v1', {
+        const { data, error } = await this.client.rpc('list_student_progress_summaries_school_v1', { p_school_id: schoolId,
             p_limit: pageLimit,
             p_offset: pageOffset,
             p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10),
@@ -175,24 +191,27 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async getWordHuntReviewData() {
+        const schoolId = requireSchoolId();
         await this.init();
-        const { data, error } = await this.client.rpc('list_word_hunt_reviews_v1');
+        const { data, error } = await this.client.rpc('list_word_hunt_reviews_school_v1', { p_school_id: schoolId });
         if (error) throw error;
         const rows = Array.isArray(data) ? data : [];
         return rows.map(row => normalizeTeacherProgressRecord(row, { detailed: true }));
     },
 
     async listStudentIdentityRoster() {
+        const schoolId = requireSchoolId();
         await this.init();
-        const { data, error } = await this.client.rpc('list_student_identity_roster_v1');
+        const { data, error } = await this.client.rpc('list_student_identity_roster_school_v1', { p_school_id: schoolId });
         if (error) throw error;
         const rows = Array.isArray(data) ? data : [];
         return rows.map(row => normalizeTeacherProgressRecord(row));
     },
 
     async getStudentRosterFilters() {
+        const schoolId = requireSchoolId();
         await this.init();
-        const { data, error } = await this.client.rpc('list_student_roster_filters_v1');
+        const { data, error } = await this.client.rpc('list_student_roster_filters_school_v1', { p_school_id: schoolId });
         if (error) throw error;
         const filters = Array.isArray(data) ? data[0] : data;
         return {
@@ -205,8 +224,9 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async getTeacherDashboardAnalytics({ grade = null } = {}) {
+        const schoolId = requireSchoolId();
         await this.init();
-        const { data, error } = await this.client.rpc('get_teacher_dashboard_analytics_v1', {
+        const { data, error } = await this.client.rpc('get_teacher_dashboard_analytics_school_v1', { p_school_id: schoolId,
             p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10)
         });
         if (error) throw error;
@@ -224,8 +244,9 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async getStudentProgressForTeacher(userId, options = {}) {
+        const schoolId = requireSchoolId();
         await this.init();
-        let query = this.client.rpc('get_student_progress_v3', { p_user_id: userId });
+        let query = this.client.rpc('get_student_progress_school_v3', { p_school_id: schoolId, p_user_id: userId });
         if (options.signal && typeof query.abortSignal === 'function') {
             query = query.abortSignal(options.signal);
         }
@@ -235,6 +256,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async setStudentActivityLateOverride(attemptId, { excused, reason = '' } = {}) {
+        const schoolId = requireSchoolId();
         await this.init();
         const { data, error } = await this.client.rpc('set_student_activity_late_override_v1', {
             p_attempt_id: attemptId,
@@ -245,14 +267,18 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         return Array.isArray(data) ? data[0] : data;
     },
 
-    async getStudentsProgressForTeacher(userIds = []) {
+    async getStudentsProgressForTeacher(userIds = [], { schoolId = requireSchoolId(), signal } = {}) {
         await this.init();
+        signal?.throwIfAborted();
         const ids = Array.from(new Set(userIds.filter(Boolean)));
         if (ids.length === 0) return [];
         if (ids.length > 200) throw new Error('A maximum of 200 students can be loaded at once.');
-        const { data, error } = await this.client.rpc('get_students_progress_by_ids_v1', {
+        let request = this.client.rpc('get_students_progress_by_ids_school_v1', { p_school_id: schoolId,
             p_user_ids: ids
         });
+        if (signal && typeof request.abortSignal === 'function') request = request.abortSignal(signal);
+        const { data, error } = await request;
+        signal?.throwIfAborted();
         if (error) throw error;
         const rows = Array.isArray(data) ? data : [];
         return rows.map(row => normalizeTeacherProgressRecord(row, { detailed: true }));
@@ -301,6 +327,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
     },
 
     async signOut() {
+        this.authIdentityGeneration = (this.authIdentityGeneration || 0) + 1;
         await this.init();
         await this.client.auth.signOut({ scope: 'local' });
         this.currentSession = null;
@@ -315,6 +342,7 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         const { data } = this.client.auth.onAuthStateChange((event, session) => {
             const eventSession = session || null;
             const eventUser = normalizeUser(session?.user || null);
+            this.authIdentityGeneration = (this.authIdentityGeneration || 0) + 1;
             this.currentSession = eventSession;
             this.currentUser = eventUser;
             setTimeout(() => {

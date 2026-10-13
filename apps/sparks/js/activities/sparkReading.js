@@ -1,4 +1,4 @@
-import { closeModal, createElement, escapeHtml, openModal } from '../main.js';
+import { closeModal, createElement, escapeHtml, openModal, refreshIcons } from '../main.js';
 import { sparksRepository } from '../services/sparksRepository.js';
 import {
     evaluateSparkAnswers,
@@ -350,6 +350,6 @@ export class SparkReadingActivity {
         });
 
         this.container.appendChild(activity);
-        if (window.lucide) window.lucide.createIcons({ root: activity });
+        refreshIcons(activity);
     }
 }

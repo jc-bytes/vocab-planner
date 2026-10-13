@@ -1,0 +1,43 @@
+{
+  "id": "t3_review_sensor_threshold",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Sensor and threshold",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "7"
+  ],
+  "trimester": "3",
+  "month": "November",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "sensor",
+      "definition": "A part that detects a change, such as light or distance.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/sensor"
+    },
+    {
+      "word": "threshold",
+      "definition": "The value where a program changes its response.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/threshold"
+    }
+  ]
+}

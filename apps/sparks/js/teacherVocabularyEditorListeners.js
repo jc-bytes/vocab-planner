@@ -1,6 +1,7 @@
 import { $, $$, closeModal as closeDialog } from './main.js';
 import { getVocabSubjectSlug } from './services/vocabularyApi.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
+import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
@@ -178,17 +179,12 @@ function bindVocabularyWorkflowTabs(manager) {
             manager.setVocabularyWorkflowTab(tab.dataset.vocabularyTab || 'assign');
         });
         tab.addEventListener('keydown', (event) => {
-            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
             const tabs = Array.from($$('.activity-workflow-tab[data-vocabulary-tab]'));
-            const currentIndex = tabs.indexOf(tab);
-            let nextIndex = currentIndex;
-            if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
-            if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-            if (event.key === 'Home') nextIndex = 0;
-            if (event.key === 'End') nextIndex = tabs.length - 1;
+            const nextTab = getKeyboardNavigatedTab(tabs, tab, event.key);
+            if (!nextTab) return;
             event.preventDefault();
-            tabs[nextIndex]?.focus();
-            manager.setVocabularyWorkflowTab(tabs[nextIndex]?.dataset.vocabularyTab || 'assign');
+            nextTab.focus();
+            manager.setVocabularyWorkflowTab(nextTab.dataset.vocabularyTab || 'assign');
         });
     });
 }

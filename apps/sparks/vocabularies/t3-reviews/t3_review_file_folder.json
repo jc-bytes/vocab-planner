@@ -1,0 +1,43 @@
+{
+  "id": "t3_review_file_folder",
+  "subjectSlug": "technology",
+  "name": "T3 Review: File and folder",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "7",
+    "8"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "file",
+      "definition": "A saved piece of work on a computer.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/file"
+    },
+    {
+      "word": "folder",
+      "definition": "A place on a computer for keeping files together.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/folder"
+    }
+  ]
+}

@@ -1,17 +1,14 @@
-import { $, createElement, escapeHtml } from '../main.js';
+import { $, createElement, escapeHtml, refreshIcons } from '../main.js';
 import { getSubjectBySlug, getVocabSubjectSlug, preloadVocabularyFile } from '../services/vocabularyApi.js';
 import { MONTH_INDEX } from './studentActivityConstants.js';
 import { StudentActivityHomeSpark } from './studentActivityHomeSpark.js';
+import { getKeyboardNavigatedTab } from '../ui/tabNavigation.js';
 
 export class StudentActivityHome {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
         this.spark = new StudentActivityHomeSpark(this);
-    }
-
-    get currentSparkSessionCache() {
-        return this.spark.currentSparkSessionCache;
     }
 
     getUnitProgressSummary(vocab) {
@@ -155,9 +152,7 @@ export class StudentActivityHome {
         this.loadAndRenderCurrentSpark(container.querySelector('.student-spark-host'));
         this.activities.browser.cards.scheduleFirstVocabularyPreload(container);
 
-        if (window.lucide) {
-            window.lucide.createIcons({ root: container });
-        }
+        refreshIcons(container);
     }
 
     getHomeRecommendation({ decoratedVocabs = [], weekItems = [], requiredWork = {}, today = new Date() } = {}) {
@@ -430,17 +425,13 @@ export class StudentActivityHome {
             });
         };
 
-        tabs.forEach((tab, index) => {
+        tabs.forEach(tab => {
             tab.addEventListener('click', () => activate(tab.dataset.panel));
             tab.addEventListener('keydown', event => {
-                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                let nextIndex = index;
-                if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
-                if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
-                if (event.key === 'Home') nextIndex = 0;
-                if (event.key === 'End') nextIndex = tabs.length - 1;
+                const nextTab = getKeyboardNavigatedTab(tabs, tab, event.key);
+                if (!nextTab) return;
                 event.preventDefault();
-                activate(tabs[nextIndex].dataset.panel, true);
+                activate(nextTab.dataset.panel, true);
             });
         });
     }

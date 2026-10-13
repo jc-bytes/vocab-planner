@@ -28,7 +28,7 @@ test('every vocabulary unit has explicit valid placement and activity flow', asy
 
 test('T3 class parts have small sourced word sets and distinct required practice', async () => {
     const records = await loadVocabularyCatalog(workspaceRoot);
-    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)) && !v.activitySettings.onlineLessonException);
+    const t3 = records.map(r => r.vocabulary).filter(v => ['3', 'IIIT'].includes(String(v.trimester)) && !v.activitySettings.weeklyPoolVersion && !v.activitySettings.onlineLessonException);
     assert.equal(t3.length, 91);
     for (const v of t3) {
         assert.match(v.id, /^grade[6-9]_t3_2026_w\d{2}_part[12]$/);
@@ -80,6 +80,20 @@ test('catalog SQL updates existing rows and verifies database parity transaction
     assert.match(sql, /Vocabulary catalog verification failed after upsert/);
     assert.match(sql, /grade9_iit_june_week3_loops_strings/);
     assert.match(sql, /"requiredActivities":\["flashcards","word-search"\]/);
+    assert.match(sql, /^begin;[\s\S]*commit;\s*$/i);
+});
+
+test('catalog SQL can limit a production repair to exact vocabulary IDs', () => {
+    const sql = execFileSync(process.execPath, [
+        'scripts/generate-vocabulary-catalog-upsert.mjs',
+        '--grade', '6',
+        '--id', 'grade6_t3_2026_w01_part1',
+        '--id', 'grade6_t3_2026_w01_part2'
+    ], { cwd: workspaceRoot, encoding: 'utf8' });
+
+    assert.match(sql, /grade6_t3_2026_w01_part1/);
+    assert.match(sql, /grade6_t3_2026_w01_part2/);
+    assert.doesNotMatch(sql, /grade6_t1_summative_technology_vocabulary/);
     assert.match(sql, /^begin;[\s\S]*commit;\s*$/i);
 });
 

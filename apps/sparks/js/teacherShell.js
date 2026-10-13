@@ -1,4 +1,5 @@
-import { $, $$ } from './main.js';
+import { canOpenSchoolSection } from './services/schoolScope.js';
+import { $, $$, refreshIcons } from './main.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const TEACHER_SIDEBAR_STORAGE_KEY = 'teacher_sidebar_collapsed';
@@ -9,7 +10,14 @@ const STUDENTS_PAGE = teacherPageRegistry.get('students');
 const GROUPS_PAGE = teacherPageRegistry.get('groups');
 const DATA_PAGE = teacherPageRegistry.get('data');
 const SETTINGS_PAGE = teacherPageRegistry.get('settings');
-const TEACHER_SHELL_VIEW_IDS = ['teacher-loading-view', 'teacher-login-view', 'teacher-editor-view', 'quiz-maker-view'];
+const TEACHER_SHELL_VIEW_IDS = [
+    'teacher-loading-view',
+    'teacher-login-view',
+    'teacher-editor-view',
+    'teacher-spark-editor-view',
+    'teacher-student-profile-view',
+    'quiz-maker-view'
+];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
     ...TEACHER_SHELL_VIEW_IDS,
     ...teacherPageRegistry.pages.map(page => page.viewId)
@@ -49,6 +57,7 @@ class TeacherShellMethods {
     }
 
     switchView(viewId, options = {}) {
+        this.deactivateTeacherWorkspace?.();
         const targetView = document.getElementById(viewId);
         TEACHER_VIEW_IDS.forEach(id => {
             const el = document.getElementById(id);
@@ -73,7 +82,7 @@ class TeacherShellMethods {
         if (!this.ensureAuthenticated(false)) return;
         this.showTeacherSection(OVERVIEW_PAGE.id);
     }
-    
+
 
     showEditor() {
         if (!this.ensureAuthenticated(false)) return;
@@ -108,24 +117,22 @@ class TeacherShellMethods {
     }
 
     refreshIcons(root = document) {
-        if (window.lucide?.createIcons) {
-            window.lucide.createIcons({ root });
-        }
+        refreshIcons(root);
     }
 
     getSectionForView(viewId) {
-        if ([VOCABULARY_PAGE.viewId, 'teacher-editor-view', 'quiz-maker-view'].includes(viewId)) {
+        if ([VOCABULARY_PAGE.viewId, SPARKS_PAGE.viewId, 'teacher-spark-editor-view', 'teacher-editor-view', 'quiz-maker-view'].includes(viewId)) {
             return VOCABULARY_PAGE.id;
         }
+        if (['teacher-student-profile-view', STUDENTS_PAGE.viewId, GROUPS_PAGE.viewId].includes(viewId)) return 'classes';
         if (viewId === DATA_PAGE.viewId) {
-            const route = this.parseRoute?.();
-            return route?.view === DATA_PAGE.id ? DATA_PAGE.id : SETTINGS_PAGE.id;
+            return SETTINGS_PAGE.id;
         }
         return teacherPageRegistry.pages.find(page => page.viewId === viewId)?.id || '';
     }
 
     setActiveTeacherTab(sectionId) {
-        let activeLabel = 'Overview';
+        let activeLabel = 'Home';
         $$('.teacher-tab').forEach(tab => {
             const active = tab.dataset.section === sectionId;
             tab.classList.toggle('active', active);
@@ -170,6 +177,7 @@ class TeacherShellMethods {
 
     showTeacherSection(sectionId, options = {}) {
         if (!this.ensureAuthenticated(false)) return;
+        if (!this.authDisabled && !canOpenSchoolSection(sectionId)) sectionId = 'administration';
         this.closeTeacherMobileMenu();
         this.beginTeacherNavigation();
         const primaryPage = teacherPageRegistry.get(sectionId);
@@ -186,12 +194,22 @@ class TeacherShellMethods {
                         ? 'subjects'
                         : undefined;
                 this.setRoute(
-                    { view: primaryPage.id, tab: options.tab || defaultTab },
+                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, tab: options.tab || defaultTab },
                     { replace: options.replaceRoute === true }
                 );
             }
         }
         switch (sectionId) {
+            case 'administration':
+                this.showSchoolAdministration();
+                break;
+            case 'classes':
+                this.showClassesView(options);
+                break;
+            case 'assignments':
+            case 'review':
+                this.showAssignmentsView({ ...options, mode: sectionId });
+                break;
             case OVERVIEW_PAGE.id:
                 this.switchView(OVERVIEW_PAGE.viewId);
                 this.loadTeacherOverview();
@@ -210,7 +228,7 @@ class TeacherShellMethods {
                 this.showProgressView();
                 break;
             case GROUPS_PAGE.id:
-                this.showGroupsView();
+                this.showGroupsView(options);
                 break;
             case 'word-hunt-review':
                 this.showWordHuntReviewView();
@@ -219,16 +237,17 @@ class TeacherShellMethods {
                 this.showQuizzesView({ resumeEditor: true });
                 break;
             case DATA_PAGE.id:
-                this.showDataManagementView({ ...options, area: DATA_PAGE.id, updateRoute: false });
+                if (['export', 'view', 'reset'].includes(options.tab)) {
+                    this.showTeacherSection(SETTINGS_PAGE.id, options);
+                } else {
+                    this.showTeacherSection(OVERVIEW_PAGE.id);
+                }
                 break;
             case SETTINGS_PAGE.id:
                 this.showDataManagementView({ ...options, area: SETTINGS_PAGE.id, updateRoute: false });
                 break;
             case 'data-settings':
-                this.showTeacherSection(
-                    ['dashboard', 'export', 'view', 'reset'].includes(options.tab) ? DATA_PAGE.id : SETTINGS_PAGE.id,
-                    options
-                );
+                this.showTeacherSection(options.tab === 'dashboard' ? OVERVIEW_PAGE.id : SETTINGS_PAGE.id, options);
                 break;
             default:
                 this.showTeacherSection(OVERVIEW_PAGE.id);

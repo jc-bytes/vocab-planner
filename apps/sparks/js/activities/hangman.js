@@ -1,6 +1,8 @@
-import { createElement, $, notifications } from '../main.js';
+import { createElement, $, notifications, refreshIcons } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
-import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { readStudentActivityJson, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { hangmanStateSchema, validateActivityState } from './activityStateValidation.js';
+import { shuffleInPlace } from '../randomUtils.js';
 
 export class HangmanActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -25,7 +27,7 @@ export class HangmanActivity {
     init() {
         if (!this.restoreState()) {
             // Shuffle words if new game
-            this.words.sort(() => Math.random() - 0.5);
+            shuffleInPlace(this.words);
             this.startRound();
         } else if (this.currentWordIndex >= this.words.length) {
             this.startRound();
@@ -75,21 +77,16 @@ export class HangmanActivity {
 
     restoreState() {
         // Try initial state passed from StudentManager
-        if (this.initialState) {
-            return this.applyRestoredState(this.initialState);
+        const initialState = validateActivityState(hangmanStateSchema, this.initialState);
+        if (initialState) {
+            return this.applyRestoredState(initialState);
         }
 
         const key = `hangman_state_${this.words.length}`;
-        const saved = readStudentActivityValue(key);
-        if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                return this.applyRestoredState(state);
-            } catch (e) {
-                console.error('Failed to restore hangman state', e);
-            }
-        }
-        return false;
+        const saved = readStudentActivityJson(key, null, {
+            validate: value => validateActivityState(hangmanStateSchema, value)
+        });
+        return saved ? this.applyRestoredState(saved) : false;
     }
 
     saveState() {
@@ -125,8 +122,8 @@ export class HangmanActivity {
                     </button>
                 </div>
             `;
-            window.lucide?.createIcons({ root: this.container });
-            
+            refreshIcons(this.container);
+
             // Add replay button listener
             const replayBtn = this.container.querySelector('#replay-hangman');
             if (replayBtn) {
@@ -271,22 +268,22 @@ export class HangmanActivity {
         // Clear saved state
         const key = `hangman_state_${this.words.length}`;
         removeStudentActivityValue(key);
-        
+
         // Reset game state
         this.currentWordIndex = 0;
         this.score = 0;
         this.mistakes = 0;
         this.guessedLetters = new Set();
         this.wordStatus = [];
-        
+
         // Reshuffle words for variety
-        this.words.sort(() => Math.random() - 0.5);
-        
+        shuffleInPlace(this.words);
+
         // Notify progress system of new session
         if (this.onProgress) {
             this.onProgress({ score: 0, details: '0/0 words completed', isComplete: false, isReplay: true });
         }
-        
+
         this.startRound();
         this.saveState();
     }

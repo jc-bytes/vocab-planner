@@ -7,6 +7,7 @@ import {
 export function installSupabaseStorageMethods(supabaseService) {
     Object.assign(supabaseService, {
     buildWordHuntImagePath({
+        assignmentId,
         userId = this.currentUser?.uid,
         schoolYear = getCurrentSchoolYear(),
         trimesterKey = 'other',
@@ -19,15 +20,9 @@ export function installSupabaseStorageMethods(supabaseService) {
             throw new Error('A signed-in student is required to save Word Hunt images.');
         }
 
-        return [
-            userId,
-            slugifyStoragePart(schoolYear, 'year'),
-            slugifyStoragePart(trimesterKey, 'trimester'),
-            `subject-${slugifyStoragePart(subjectSlug, 'technology')}`,
-            `grade-${slugifyStoragePart(grade, 'unknown')}`,
-            slugifyStoragePart(unitId, 'unit'),
-            `${slugifyStoragePart(word, 'word')}.webp`
-        ].join('/');
+        if (!/^[0-9a-f-]{36}$/.test(assignmentId || '')) throw new Error('Open Word Hunt from a class assignment.');
+        return `${assignmentId}/${userId}/${slugifyStoragePart(word, 'word')}.webp`;
+
     },
 
     async uploadWordHuntImage({ path, blob }) {

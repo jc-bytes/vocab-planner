@@ -1,0 +1,92 @@
+{
+  "id": "grade8_t3_2026_w02_weekly_v1",
+  "name": "G8 T3 W02 - Test and finish LunchApp",
+  "description": "Study these five words across this week. Complete Flashcards, Matching and Fill in Blank once. Then choose additional practice. Reuse this pool throughout the week. Follow your separate class instructions.",
+  "grades": [
+    "8"
+  ],
+  "subjectSlug": "technology",
+  "trimester": "3",
+  "month": "September",
+  "week": 2,
+  "assignedDate": "2026-09-21",
+  "purpose": "practice",
+  "words": [
+    {
+      "word": "Input",
+      "definition": "Information or a signal given to a computer or program.",
+      "example": "Pressing button A provides an input to the program.",
+      "source": "https://techterms.com/definition/input",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Output",
+      "definition": "Information or a signal produced by a computer or program.",
+      "example": "The displayed number is an output from the counter.",
+      "source": "https://techterms.com/definition/output",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Variable",
+      "definition": "A named place in a program that stores a value which can change.",
+      "example": "The variable count stores the number of button presses.",
+      "source": "https://techterms.com/definition/variable",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Test",
+      "definition": "A check used to find out whether something works as expected.",
+      "example": "We test the program by pressing the button three times.",
+      "source": "https://www.merriam-webster.com/dictionary/test",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    },
+    {
+      "word": "Bug",
+      "definition": "An error that makes a program behave incorrectly.",
+      "example": "The bug makes the app show the wrong lunch choice.",
+      "source": "https://techterms.com/definition/bug",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": []
+    }
+  ],
+  "activitySettings": {
+    "weeklyPoolVersion": 1,
+    "sections": [
+      "A",
+      "B"
+    ],
+    "releaseDates": {
+      "A": "2026-09-23",
+      "B": "2026-09-21"
+    },
+    "reviewOnly": false,
+    "requiredActivities": [
+      "flashcards",
+      "matching",
+      "fill-in-blank"
+    ],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
+    "flashcards": 5,
+    "matching": 5,
+    "fillInBlank": 5
+  }
+}

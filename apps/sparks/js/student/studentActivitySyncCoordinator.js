@@ -179,6 +179,7 @@ export class StudentActivitySyncCoordinator {
     }
 
     async submitActivityProgressPayload(payload, options = {}) {
+        const queueGeneration = this.sm.progress?.syncQueue?.cloud.cloudGeneration;
         const ownerUserId = options.ownerUserId || getActiveStudentStorageOwner();
         try {
             const previousTotalXp = Number(this.sm.progressData?.totalXp) || 0;
@@ -207,11 +208,7 @@ export class StudentActivitySyncCoordinator {
                     ...payload, retryNotBefore: Date.now() + delayMs
                 }, { ownerUserId });
                 this.sm.setAuthStatus('Saved locally - checking in background');
-                setTimeout(() => {
-                    if (!isActiveStudentStorageOwner(ownerUserId)
-                        || this.sm.currentUser?.uid !== ownerUserId) return;
-                    void this.sm.progress.flushLocalSyncQueue({ silent: true, ownerUserId });
-                }, delayMs);
+                this.sm.progress.syncQueue?.scheduleRetry({ ownerUserId, generation: queueGeneration }, delayMs);
                 return null;
             }
             if (!isActiveStudentStorageOwner(ownerUserId)
@@ -235,10 +232,13 @@ export class StudentActivitySyncCoordinator {
             if (failure.retryable) {
                 try {
                     await imageDB.enqueueSyncAction('student-activity-progress', payload, { ownerUserId });
+                    this.sm.progress.syncQueue?.scheduleRetry({ ownerUserId, generation: queueGeneration });
                     this.sm.setAuthStatus(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
                 } catch (queueError) {
                     console.warn('Could not queue activity progress event:', queueError);
-                    this.sm.setAuthStatus('Local sync storage is full');
+                    const queue = this.sm.progress.syncQueue;
+                    if (queue) queue.setQueueStatus('Local sync storage is full', ownerUserId, queue.cloud.cloudGeneration);
+                    else this.sm.setAuthStatus('Local sync storage is full');
                     this.sm.showToast?.('Reconnect before completing more work so your progress can sync.');
                 }
             } else {

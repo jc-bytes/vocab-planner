@@ -36,7 +36,8 @@ class TeacherStudentProgressCoinMethods {
 
     async adjustStudentCoins(studentId, amount, message = '') {
         const generation = this.studentProgressSessionGeneration || 0;
-        const student = this.allStudentData.find(s => s.id === studentId);
+        const student = this.allStudentData.find(s => s.id === studentId)
+            || (this.activeStudentProfile?.id === studentId ? this.activeStudentProfile : null);
         if (!student) throw new Error('Student not found');
 
         const progress = await supabaseService.giftStudentCoins({
@@ -50,6 +51,11 @@ class TeacherStudentProgressCoinMethods {
         // Update local student data (for display)
         student.coins = progress.coinData?.balance ?? progress.coins ?? student.coins ?? 0;
         student.coinData = progress.coinData || student.coinData;
+        await this.invalidateStudentProgressQueries();
+        const refreshed = await this.ensureStudentProgressDetail(student, { forceRefresh: true });
+        if (generation !== (this.studentProgressSessionGeneration || 0)
+            || this.activeStudentId !== studentId) return null;
+        if (refreshed && refreshed !== student) Object.assign(student, refreshed);
         const filteredItem = this.filteredStudentData.find(s => s.id === studentId);
         if (filteredItem) {
             filteredItem.coins = student.coins;
@@ -58,6 +64,9 @@ class TeacherStudentProgressCoinMethods {
 
         $('#detail-student-coins').textContent = student.coins;
         this.renderProgressTable();
+        if (this.activeStudentId === studentId && this.activeStudentProfile) {
+            this.renderStudentProfile(student, { tab: 'account' });
+        }
     }
 
     handleSelectAll(checked) {
@@ -154,6 +163,9 @@ class TeacherStudentProgressCoinMethods {
                     filteredItem.coinData = student.coinData;
                 }
             }
+
+            await this.invalidateStudentProgressQueries();
+            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
 
             alert(`Successfully gifted ${amount} coins to ${selectedStudentIds.length} student${selectedStudentIds.length > 1 ? 's' : ''}! They will receive a notification when they log in.`);
 

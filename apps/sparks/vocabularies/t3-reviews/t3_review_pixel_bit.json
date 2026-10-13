@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_pixel_bit",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Pixel and bit",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "9"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "pixel",
+      "definition": "A tiny square of colour that helps make a digital picture.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/pixel"
+    },
+    {
+      "word": "bit",
+      "definition": "A single 0 or 1 used to store information.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/bit"
+    }
+  ]
+}

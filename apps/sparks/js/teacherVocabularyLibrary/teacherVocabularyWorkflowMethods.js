@@ -1,5 +1,7 @@
 import { $ } from '../main.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { teacherPageRegistry } from '../teacherPageRegistry.js';
+import { TEACHER_VOCABULARY_CLOUD_QUERY_KEY } from './teacherVocabularyDataMethods.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
@@ -130,7 +132,12 @@ ensureAuthenticated(showAlert = true) {
     },
 
 invalidateTeacherLibraryCache() {
-        this.teacherLibraryCache = null;
-        this.teacherLibraryPromise = null;
+        const accountId = this.currentUser?.uid || this.currentUser?.id;
+        if (!accountId) return Promise.resolve();
+        return (this.teacherVocabularyQueryService || serverStateQuery).invalidate({
+            accountId,
+            key: TEACHER_VOCABULARY_CLOUD_QUERY_KEY,
+            exact: true
+        });
     }
 };

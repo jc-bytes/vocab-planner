@@ -1,6 +1,9 @@
-import { $, $$, closeModal as closeDialog, notifications, setupModal } from './main.js';
+import { captureStudentReport } from './student/studentReportSession.js';
+import { $, $$, closeModal as closeDialog, notifications, refreshIcons, setupModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 import { STUDENT_WIDE_SHELL_MEDIA_QUERY } from './studentShellMethods.js';
+import { getKeyboardNavigatedTab } from './ui/tabNavigation.js';
+import { STUDENT_SECTIONS } from './student/studentSectionRegistry.js';
 
 const STUDENT_RESIZE_DEBOUNCE_MS = 120;
 
@@ -50,7 +53,7 @@ export class StudentListeners {
             }
         }
 
-        if (window.lucide?.createIcons) window.lucide.createIcons({ root: button });
+        refreshIcons(button);
     }
 
     async exitActivity() {
@@ -184,39 +187,24 @@ export class StudentListeners {
             this.sm.navigateTo({ view: 'units' });
         });
 
-        this.addListener('#student-tab-today', 'click', () => {
-            this.sm.navigateTo({ view: 'menu' });
-        });
-
-        this.addListener('#student-tab-vocabulary', 'click', () => {
-            this.sm.navigateTo({ view: 'units' });
-        });
-
-        this.addListener('#student-tab-sparks', 'click', () => {
-            this.sm.navigateTo({ view: 'sparks' });
+        STUDENT_SECTIONS.forEach(section => {
+            this.addListener(`#${section.tabId}`, 'click', () => {
+                this.sm.navigateTo({ view: section.rootRoute });
+            });
         });
 
         this.addListener('#mobile-edit-profile-btn', 'click', () => {
             this.sm.auth.checkProfile(true);
         });
 
-        this.addListener('#student-tab-arcade', 'click', () => {
-            this.sm.navigateTo({ view: 'arcade' });
-        });
-
         $$('.student-tab').forEach(tab => {
             this.listen(tab, 'keydown', (event) => {
-                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
                 const tabs = Array.from($$('.student-tab'));
-                const currentIndex = tabs.indexOf(tab);
-                let nextIndex = currentIndex;
-                if (event.key === 'ArrowRight') nextIndex = (currentIndex + 1) % tabs.length;
-                if (event.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
-                if (event.key === 'Home') nextIndex = 0;
-                if (event.key === 'End') nextIndex = tabs.length - 1;
+                const nextTab = getKeyboardNavigatedTab(tabs, tab, event.key);
+                if (!nextTab) return;
                 event.preventDefault();
-                tabs[nextIndex].focus();
-                tabs[nextIndex].click();
+                nextTab.focus();
+                nextTab.click();
             });
         });
 
@@ -323,12 +311,16 @@ export class StudentListeners {
                     this.sm.progress.saveLocalProgress();
                 }
 
+                const report = captureStudentReport(this.sm, {
+                    scores: this.sm.unitScores, wordHunt: this.sm.activities.getReportWordHuntEntries(),
+                    trimester: this.sm.activities.getCurrentUnitProgress()?.trimester || ''
+                });
                 const { ReportGenerator } = await import('./reportGenerator.js');
-                const unitProgress = this.sm.activities.getCurrentUnitProgress();
-                await ReportGenerator.generateReport(this.sm.studentProfile, this.sm.currentVocab, this.sm.unitScores, {
-                    wordHunt: this.sm.activities.getReportWordHuntEntries(),
-                    trimester: unitProgress?.trimester || '',
-                    loadImage: path => supabaseService.downloadWordHuntImage(path)
+                report.assertCurrent();
+                await ReportGenerator.generateReport(report.profile, report.vocabulary, report.scores, {
+                    wordHunt: report.wordHunt, trimester: report.trimester, ownerUserId: report.ownerUserId,
+                    assertCurrent: report.assertCurrent,
+                    loadImage: path => { report.assertCurrent(); return supabaseService.downloadWordHuntImage(path); }
                 });
             } catch (error) {
                 console.error('Failed to generate final report:', error);
@@ -349,46 +341,32 @@ export class StudentListeners {
 
             const firstName = $('#student-firstname').value.trim();
             const lastName = $('#student-lastname').value.trim();
-            let grade = $('#student-grade').value.trim();
-            let group = $('#student-group').value.trim();
-
-            if (!firstName) {
-                notifications.warning('Please enter your first name.');
+            if (!firstName || !lastName) {
+                notifications.warning('Please enter your first and last name.');
                 return;
             }
-
-            // Validate grade: only numbers
-            if (grade && !/^\d+$/.test(grade)) {
-                notifications.warning('Grade must contain only numbers (e.g., 6, 7, 8).');
-                return;
-            }
-
-            // Validate and normalize group: single letter, convert to uppercase
-            if (group) {
-                if (!/^[a-zA-Z]$/.test(group)) {
-                    notifications.warning('Group must be a single letter (e.g., A, B, C).');
+            const accountId = this.sm.currentUser?.uid;
+            const identity = { firstName, lastName, name: `${firstName} ${lastName}`.trim() };
+            let demoPlacement = {};
+            if (this.sm.authDisabled) {
+                const grade = $('#student-grade').value.trim();
+                const group = $('#student-group').value.trim().toUpperCase();
+                if ((grade && !/^\d+$/.test(grade)) || (group && !/^[A-Z]$/.test(group))) {
+                    notifications.warning('Use a numeric grade and one section letter for this local profile.');
                     return;
                 }
-                group = group.toUpperCase();
+                demoPlacement = { grade, group, sectionLetter: group };
             }
-
-            this.sm.studentProfile = this.sm.normalizeStudentProfile({
-                firstName,
-                lastName,
-                name: `${firstName} ${lastName}`.trim(), // For backward compatibility
-                grade,
-                group,
-                sectionLetter: group,
-                email: this.sm.currentUser?.email || this.sm.studentProfile.email || ''
-            });
-
             try {
-                if (this.sm.currentUser && !this.sm.authDisabled) {
-                    await supabaseService.updateStudentProfile(this.sm.studentProfile);
-                }
-                this.sm.progress.saveLocalProgress(); // Save to local storage
+                if (accountId && !this.sm.authDisabled) await supabaseService.updateStudentProfile(identity);
+                if (accountId !== this.sm.currentUser?.uid) return;
+                this.sm.studentProfile = this.sm.normalizeStudentProfile({ ...this.sm.studentProfile, ...identity, ...demoPlacement });
+                const { applyStudentSchoolPlacement } = await import('./student/studentSchoolSession.js');
+                if (accountId !== this.sm.currentUser?.uid) return;
+                applyStudentSchoolPlacement(this.sm);
+                this.sm.progress.saveLocalProgress();
             } catch (error) {
-                console.error('Failed to update Supabase profile:', error);
+                console.error('Failed to update profile:', error);
                 notifications.error('Could not save your profile. Please try again.');
                 return;
             }

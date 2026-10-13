@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import test from 'node:test';
+import test, { afterEach } from 'node:test';
 
 const storage = new Map();
 globalThis.localStorage = {
@@ -34,6 +34,9 @@ globalThis.window = { addEventListener() {}, removeEventListener() {} };
 globalThis.CSS = { escape(value) { return String(value); } };
 
 const { createTeacherWordHuntReviewFeature } = await import('../js/teacherWordHuntReview.js');
+const { createServerStateQuery, serverStateQuery } = await import('../js/services/serverStateQuery.js');
+
+afterEach(() => serverStateQuery.clear());
 const { teacherWordHuntReviewDataMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewDataMethods.js');
 const { teacherWordHuntReviewImageMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewImageMethods.js');
 const { teacherWordHuntReviewInteractionMethods } = await import('../js/teacherWordHuntReview/teacherWordHuntReviewInteractionMethods.js');
@@ -61,8 +64,9 @@ function createManager() {
     manager.wordHuntReviewDrilldown = { subject: '', grade: '', group: '', unitId: '' };
     manager.wordHuntReviewFilters = { status: '', search: '' };
     manager.wordHuntReviewViewModes = {};
-    manager.wordHuntReviewDataCache = null;
-    manager.wordHuntReviewDataPromise = null;
+    manager.queryService = createServerStateQuery({ gcTime: Infinity });
+    manager.getCurrentUser = () => ({ uid: 'teacher-test' });
+    manager.isAuthenticationDisabled = () => false;
     manager.wordHuntReviewLoadGeneration = 0;
     manager.wordHuntReviewImageGeneration = 0;
     manager.storage = globalThis.localStorage;
@@ -128,7 +132,7 @@ test('Teacher Word Hunt review responsibilities have one complete owner each', (
 
 test('Word Hunt rows normalize student, subject, quality, dates, and local review notes', () => {
     storage.clear();
-    localStorage.setItem('teacher_word_hunt_review_notes', JSON.stringify({
+    localStorage.setItem('teacher_word_hunt_review_notes:teacher-test', JSON.stringify({
         'student-1::science:unit_one': { reviewed: true, feedback: 'Strong evidence.' }
     }));
     const manager = createManager();
@@ -199,7 +203,7 @@ test('Word Hunt review notes update local state without mutating unrelated rows'
 
     assert.equal(manager.wordHuntReviewRows[0].note.reviewed, true);
     assert.equal(manager.wordHuntReviewRows[1], untouched);
-    assert.equal(JSON.parse(localStorage.getItem('teacher_word_hunt_review_notes')).one.reviewed, true);
+    assert.equal(JSON.parse(localStorage.getItem('teacher_word_hunt_review_notes:teacher-test')).one.reviewed, true);
 });
 
 test('Word Hunt filters retain matching review status and student search results', () => {
@@ -348,7 +352,6 @@ test('Word Hunt forced refresh is latest-wins and suppresses stale failures', as
     first.reject(new Error('stale request'));
     await olderLoad;
 
-    assert.deepEqual(manager.wordHuntReviewDataCache, ['newer']);
     assert.deepEqual(rendered, [['newer']]);
     assert.equal(errors, 0);
 });

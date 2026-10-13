@@ -1,3 +1,5 @@
+import { getStudentSectionForRoutePath } from './student/studentSectionRegistry.js';
+
 try {
     if (localStorage.getItem('student_sidebar_collapsed') === 'true') {
         document.querySelector('.app-container')?.classList.add('student-sidebar-collapsed');
@@ -8,13 +10,7 @@ try {
         const routePath = String(window.location.hash || '#/menu')
             .replace(/^#\/?/, '')
             .split('?')[0];
-        const initialSection = routePath === 'sparks'
-            ? 'sparks'
-            : routePath === 'arcade'
-                ? 'arcade'
-                : routePath === 'units' || routePath.startsWith('unit/')
-                    ? 'vocabulary'
-                    : 'today';
+        const initialSection = getStudentSectionForRoutePath(routePath);
         appContainer?.classList.add('student-session-loading');
         if (studentShell) {
             studentShell.classList.remove('hidden');

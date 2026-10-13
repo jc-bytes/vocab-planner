@@ -1,3 +1,8 @@
+import {
+    addUtcDateOnlyDays,
+    formatUtcDateOnly,
+    parseUtcDateOnly
+} from '../services/dateOnly.js';
 import { timestampMillis } from '../services/dateUtils.js';
 import { normalizeSparkDate } from '../sparkModel.js';
 
@@ -13,33 +18,16 @@ export function compareSparkScheduleAscending(a, b) {
     return timestampMillis(b.updatedAt) - timestampMillis(a.updatedAt);
 }
 
-function parseDateValue(value) {
-    const normalized = normalizeSparkDate(value);
-    if (!normalized) return null;
-    const [year, month, day] = normalized.split('-').map(Number);
-    return new Date(Date.UTC(year, month - 1, day));
-}
-
-function toDateValue(date) {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-
-function addDays(value, days) {
-    const date = parseDateValue(value);
-    if (!date) return '';
-    date.setUTCDate(date.getUTCDate() + days);
-    return toDateValue(date);
-}
-
 export function getWeekBounds(value) {
-    const date = parseDateValue(value);
+    const date = parseUtcDateOnly(value);
     if (!date) return { start: '', end: '' };
     const day = date.getUTCDay() || 7;
-    const start = toDateValue(new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - day + 1)));
-    return { start, end: addDays(start, 6) };
+    const start = formatUtcDateOnly(new Date(Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate() - day + 1
+    )));
+    return { start, end: addUtcDateOnlyDays(start, 6) };
 }
 
 export function getMonthValue(value) {
@@ -47,7 +35,7 @@ export function getMonthValue(value) {
 }
 
 export function formatShortDate(value) {
-    const date = parseDateValue(value);
+    const date = parseUtcDateOnly(value);
     if (!date) return 'No date';
     return new Intl.DateTimeFormat('en-US', {
         timeZone: 'UTC',

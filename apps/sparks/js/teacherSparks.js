@@ -4,6 +4,7 @@ import { teacherSparkLibraryModelMethods } from './teacherSparks/teacherSparkLib
 import { teacherSparkLibraryViewMethods } from './teacherSparks/teacherSparkLibraryViewMethods.js';
 import { teacherSparkPersistenceMethods } from './teacherSparks/teacherSparkPersistenceMethods.js';
 import { bindTeacherSparksListeners } from './teacherSparks/teacherSparkListeners.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
 import { sparksRepository } from './services/sparksRepository.js';
 
 const teacherSparkMethodGroups = [
@@ -28,14 +29,14 @@ function installInternalMethods(target) {
 export function createTeacherSparksFeature({
     ensureAuthenticated,
     showView,
+    showEditorView,
+    publishMaterial,
     isAuthenticationDisabled,
     getCurrentUser,
     refreshIcons,
+    queryService = serverStateQuery,
     repository = sparksRepository,
     feedback,
-    setupDialog,
-    openDialog,
-    closeDialog,
     documentTarget = globalThis.document,
     query = selector => documentTarget?.querySelector(selector) || null,
     queryAll = selector => Array.from(documentTarget?.querySelectorAll(selector) || [])
@@ -43,50 +44,42 @@ export function createTeacherSparksFeature({
     const context = {
         ensureAuthenticated,
         showView,
+        showEditorView,
+        publishMaterial,
         isAuthenticationDisabled,
         getCurrentUser,
         refreshIcons,
+        queryService,
         repository,
         feedback,
-        setupDialog,
-        openDialog,
-        closeDialog,
-        documentTarget,
+                    documentTarget,
         query,
         queryAll,
         weeklySparkItems: [],
-        weeklySparkCache: null,
-        weeklySparkPromise: null,
-        weeklySparkActiveView: 'week',
+        weeklySparkActiveView: 'types',
         weeklySparkTypeFilter: 'all',
         weeklySparkMonth: null,
         weeklySparkLoadGeneration: 0,
+        weeklySparkEditorGeneration: 0,
         weeklySparkLifecycleGeneration: 0,
         editingSparkId: null,
         sparkModalMode: 'create',
     };
     installInternalMethods(context);
 
-    setupDialog('#spark-modal', {
-        dismissible: true,
-        onClose: () => {
-            context.editingSparkId = null;
-            context.sparkModalMode = 'create';
-            context.setSparkModalStatus('');
-        }
-    });
     const removeListeners = bindTeacherSparksListeners(context);
 
     function destroy() {
         context.weeklySparkLoadGeneration += 1;
         context.weeklySparkLifecycleGeneration += 1;
-        context.weeklySparkCache = null;
-        context.weeklySparkPromise = null;
+        void context.invalidateWeeklySparks().catch(error => {
+            console.warn('Could not invalidate the Teacher Sparks query during cleanup:', error);
+        });
         context.weeklySparkItems = [];
         context.editingSparkId = null;
         context.sparkModalMode = 'create';
         removeListeners();
-        closeDialog('#spark-modal');
+        query('#spark-form')?.reset?.();
         const list = query('#spark-library-list');
         if (list) {
             list.innerHTML = '';
@@ -96,6 +89,7 @@ export function createTeacherSparksFeature({
 
     return Object.freeze({
         show: context.showSparksView.bind(context),
+        edit: context.showSparkEditor.bind(context),
         destroy
     });
 }

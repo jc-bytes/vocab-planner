@@ -155,13 +155,15 @@ test('HTML games are sandboxed away from account storage', async () => {
     }
 });
 
-test('password reset reports recoverable partial success after the password changes', async () => {
-    const source = await read('supabase/functions/reset-student-password/index.ts');
-    const partialSuccess = source.slice(source.indexOf('if (profileUpdateError)'));
-    assert.match(partialSuccess, /temporaryPassword/);
-    assert.match(partialSuccess, /passwordChanged: true/);
-    assert.match(partialSuccess, /profileFlagUpdated: false/);
-    assert.doesNotMatch(partialSuccess.split('return jsonResponse')[1]?.split(');')[0] || '', /, 500/);
+test('retired administrator account endpoints direct users to school invitations and account recovery', async () => {
+    for (const endpoint of ['create-student-account', 'reset-student-password']) {
+        const source = await read(`supabase/functions/${endpoint}/index.ts`);
+        assert.match(source, /status: 410/);
+        assert.match(source, /SCHOOL_ACCOUNT_RECOVERY_REQUIRED/);
+        assert.doesNotMatch(source, /createClient|auth\.admin|updateUserById|createUser|temporaryPassword|passwordChanged|Deno\.env|fetch\s*\(/);
+    }
+    const reset = await read('supabase/functions/reset-student-password/index.ts');
+    assert.match(reset, /school administrators cannot reset a shared account password/);
 });
 
 test('offline cache cleanup is scoped to this application', async () => {

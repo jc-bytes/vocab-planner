@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_dimension_model",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Dimension and model",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "month": "November",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "dimension",
+      "definition": "A measurement such as length, width, or height.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/dimension"
+    },
+    {
+      "word": "model",
+      "definition": "A simple version that shows what an object looks like.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/model"
+    }
+  ]
+}

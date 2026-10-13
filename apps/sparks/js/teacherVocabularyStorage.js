@@ -1,3 +1,5 @@
+import { schoolContext } from './services/schoolContext.js';
+import { schoolSessionKey } from './services/schoolScope.js';
 import { createElement, escapeHtml, notifications } from './main.js';
 import { vocabularyRepository } from './services/vocabularyRepository.js';
 import {
@@ -5,6 +7,7 @@ import {
     loadVocabularyFile
 } from './services/vocabularyApi.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
+import { validateVocabularyCollection } from './services/vocabularyValidation.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
 
@@ -16,7 +19,7 @@ class TeacherVocabularyStorageMethods {
         if (!this.ensureAuthenticated(false)) return [];
 
         try {
-            const vocabularies = await vocabularyRepository.listMetadata();
+            const vocabularies = await vocabularyRepository.listMetadata({ signal: options.signal });
             if (!isCurrent()) return [];
             this.setCloudStatus('Ready', 'info');
             return vocabularies.map(vocabulary => ({ ...vocabulary, source: 'cloud' }));
@@ -29,11 +32,22 @@ class TeacherVocabularyStorageMethods {
     }
 
     getLocalVocabs() {
-        const stored = localStorage.getItem('teacher_vocab_library');
-        return stored ? JSON.parse(stored).map(vocab => ({
-            ...vocab,
-            subjectSlug: getVocabSubjectSlug(vocab)
-        })) : [];
+        const stored = localStorage.getItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`);
+        if (!stored) return [];
+        try {
+            const vocabularies = validateVocabularyCollection(JSON.parse(stored));
+            if (!vocabularies) {
+                console.warn('Local vocabulary drafts do not match the expected format.');
+                return [];
+            }
+            return vocabularies.map(vocab => ({
+                ...vocab,
+                subjectSlug: getVocabSubjectSlug(vocab)
+            }));
+        } catch (error) {
+            console.warn('Could not read local vocabulary drafts:', error);
+            return [];
+        }
     }
 
     removeLocalVocab(id) {
@@ -42,8 +56,7 @@ class TeacherVocabularyStorageMethods {
         const after = before.filter(vocab => vocab.id !== id);
         if (after.length === before.length) return false;
 
-        localStorage.setItem('teacher_vocab_library', JSON.stringify(after));
-        this.invalidateTeacherLibraryCache();
+        localStorage.setItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`, JSON.stringify(after));
         return true;
     }
 
@@ -64,8 +77,7 @@ class TeacherVocabularyStorageMethods {
             vocabs.push(cleanVocab);
         }
 
-        localStorage.setItem('teacher_vocab_library', JSON.stringify(vocabs));
-        this.invalidateTeacherLibraryCache();
+        localStorage.setItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`, JSON.stringify(vocabs));
     }
 
     createLibraryCard(container, vocab, type) {
@@ -95,16 +107,17 @@ class TeacherVocabularyStorageMethods {
             <h3 class="card-title">${escapeHtml(vocab.name || 'Untitled')}</h3>
             <small class="card-caption teacher-vocab-id">${escapeHtml(vocab.id)}</small>
             ${this.formatVocabPlacementLabel(vocab) ? `<small class="card-caption teacher-vocab-placement">${escapeHtml(this.formatVocabPlacementLabel(vocab))}</small>` : ''}
+            ${type === 'cloud' && schoolContext.hasRole('teacher') ? '<button type="button" class="btn secondary-btn assign-vocab-btn">Assign</button>' : ''}
             ${deleteBtnHtml}
         `;
 
         card.addEventListener('click', (e) => {
             // Prevent click if deleting
-            if (e.target.closest('.delete-vocab-btn')) return;
+            if (e.target.closest('button')) return;
             this.openTeacherVocabularyItem(vocab, type);
         });
         card.addEventListener('keydown', (event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return;
+            if (event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return;
             event.preventDefault();
             card.click();
         });
@@ -127,6 +140,10 @@ class TeacherVocabularyStorageMethods {
                 });
             }
         }
+        card.querySelector('.assign-vocab-btn')?.addEventListener('click', event => {
+            event.stopPropagation();
+            if (schoolContext.hasRole('teacher')) this.openAssignmentPublisher({ materialId: vocab.id, kind: 'vocabulary' });
+        });
         container.appendChild(card);
     }
 

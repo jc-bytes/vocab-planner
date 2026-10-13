@@ -1,4 +1,5 @@
 import process from 'node:process';
+import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
 import { ensureViteServer } from './lib/local-vite-server.mjs';
@@ -20,6 +21,58 @@ const server = await ensureViteServer({
 let browser = null;
 try {
     browser = await chromium.launch();
+    const startPage = await browser.newPage();
+    await startPage.goto(`${baseUrl}/`, { waitUntil: 'domcontentloaded' });
+    const starts = await startPage.evaluate(async () => {
+        const { StudentGames } = await import('/js/student/studentGames.js');
+        document.body.innerHTML = '<main><div id="current-game-card"></div><div id="game-selection"></div><div id="game-stage"><canvas id="game-canvas"></canvas></div><div id="game-timer"></div><button id="add-time-btn"></button></main>';
+        let gate, releasePurchase, purchases = 0; const launches = [];
+        const manager = { currentUser: { uid: 'arcade-start-smoke' }, coins: 100,
+            activities: { refreshCurrentSparkGate: () => new Promise(resolve => { gate = resolve; }), getPendingRequiredWork: () => ({ isBlocked: false }) },
+            addListener: (selector, event, listener) => document.querySelector(selector).addEventListener(event, listener) };
+        const games = new StudentGames(manager); games.gameTimeRemaining = 0;
+        games.settings.loadGlobalSettings = async () => { games.settings.globalSettings = { exchangeRate: 10 }; };
+        games.loadArcadeTime = async () => {}; games.getAvailableArcadeSeconds = () => 300;
+        games.startArcadeMinute = async () => { purchases++; return { minuteSeconds: 60 }; };
+        games.updateArcadeUI = async () => {};
+        games.lifecycle.launchGame = (type, options) => { launches.push({ type, options }); return true; };
+        await games.updateGameSelectionUI(); document.querySelector('#play-current-game-btn').click();
+        const disabledOnClick = document.querySelector('#play-current-game-btn').disabled;
+        const duplicateRejected = await games.startGame('snake') === false;
+        await games.updateGameSelectionUI(); const disabledAfterRerender = document.querySelector('#play-current-game-btn').disabled;
+        gate(); while (games.isStartingGame) await new Promise(resolve => setTimeout(resolve, 0));
+        const onePurchase = purchases === 1 && launches.length === 1 && games.gameTimeRemaining === 60;
+        const unlocked = !document.querySelector('#play-current-game-btn').disabled;
+        games.gameTimeRemaining = 0; manager.activities.refreshCurrentSparkGate = async () => {};
+        games.startArcadeMinute = () => { purchases++; return new Promise(resolve => { releasePurchase = resolve; }); };
+        const pending = games.startGame('snake'); while (!releasePurchase) await new Promise(resolve => setTimeout(resolve, 0));
+        games.stopCurrentGame(); const stoppedDuplicateRejected = await games.startGame('pong') === false;
+        releasePurchase({ minuteSeconds: 60 }); const stopped = await pending === false && launches.length === 1 && games.gameTimeRemaining === 60;
+        const paidResumeLabel = document.querySelector('#play-current-game-btn').textContent.includes('Resume (1m 0s)');
+        const resumed = await games.startGame('pong') === true && purchases === 2 && launches.at(-1).options.resetTimer === false;
+        let releaseExtension;
+        games.currentGame = { gameType: 'snake', pause() { throw new Error('Obsolete game paused'); }, stop() {} };
+        games.gameTimeRemaining = 0;
+        games.startArcadeMinute = () => new Promise(resolve => { releaseExtension = resolve; });
+        const extension = games.pauseGame();
+        const extensionPlayLocked = document.querySelector('#play-current-game-btn').disabled && await games.startGame('pong') === false;
+        const manualExtensionLocked = await games.requestAdditionalTime() === false;
+        await games.updateGameSelectionUI();
+        const extensionRerenderLocked = document.querySelector('#play-current-game-btn').disabled;
+        games.stopCurrentGame(); const replacement = { gameType: 'pong', pause() { throw new Error('Replacement paused'); }, stop() {} };
+        games.currentGame = replacement; releaseExtension(null); await extension;
+        const replacementSurvives = games.currentGame === replacement && !games.isHandlingGameMinute;
+        games.currentGame = { gameType: 'snake', stop() {} };
+        const paidExtension = games.pauseGame(); games.stopCurrentGame();
+        releaseExtension({ minuteSeconds: 60 }); await paidExtension;
+        const extensionPaidResume = games.gameTimeRemaining === 60 && games.currentGame === null
+            && document.querySelector('#play-current-game-btn').textContent.includes('Resume (1m 0s)');
+        games.destroy();
+        return { disabledOnClick, duplicateRejected, disabledAfterRerender, onePurchase, unlocked, stoppedDuplicateRejected, stopped, paidResumeLabel, resumed, extensionPlayLocked, manualExtensionLocked, extensionRerenderLocked, replacementSurvives, extensionPaidResume };
+    });
+    assert.deepEqual(starts, { disabledOnClick: true, duplicateRejected: true, disabledAfterRerender: true,
+        onePurchase: true, unlocked: true, stoppedDuplicateRejected: true, stopped: true, paidResumeLabel: true, resumed: true, extensionPlayLocked: true, manualExtensionLocked: true, extensionRerenderLocked: true, replacementSurvives: true, extensionPaidResume: true });
+    await startPage.close();
     for (const game of htmlGames) {
         const page = await browser.newPage();
         const errors = [];

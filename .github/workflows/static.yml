@@ -9,6 +9,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
+      validation_only:
+        description: "Validate the release without publishing it"
+        required: false
+        default: false
+        type: boolean
       pilot_publish:
         description: "Publish a formative pilot while the unrelated cross-browser smoke test is being repaired"
         required: false
@@ -59,8 +64,12 @@ jobs:
         run: npm run test:ui:smoke
       - name: Unit and composition tests
         run: npm test
+      - name: Verify school authorization and database regressions
+        run: npm run test:school-platform:rest
+      - name: Verify student insight and feedback database regressions
+        run: npm run test:student-insight:database
       - name: Supabase authorization acceptance tests
-        run: npm run test:acceptance:supabase
+        run: npm run test:acceptance:supabase && npm run test:private-classrooms
       - name: Diagnose local Supabase failure
         if: failure()
         run: |
@@ -104,6 +113,7 @@ jobs:
           path: apps/sparks/dist-desktop
 
   deploy:
+    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.validation_only }}
     needs: validate
     permissions:
       pages: write

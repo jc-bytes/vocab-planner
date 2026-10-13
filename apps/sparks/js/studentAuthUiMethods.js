@@ -49,9 +49,7 @@ export class StudentAuthUi {
         const normalized = this.normalizeStudentProfile(profile);
         return Boolean(
             normalized.firstName &&
-            normalized.lastName &&
-            normalized.grade &&
-            normalized.group
+            normalized.lastName
         );
     }
 

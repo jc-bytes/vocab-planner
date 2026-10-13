@@ -1,5 +1,7 @@
-import { readStudentActivityValue, writeStudentActivityValue } from '../../student/persistence/studentStorage.js';
+import { readStudentActivityJson, writeStudentActivityValue } from '../../student/persistence/studentStorage.js';
 import { MAX_SCRAMBLE_HINTS } from './scrambleConstants.js';
+import { scrambleStateSchema, validateActivityState } from '../activityStateValidation.js';
+import { shuffled } from '../../randomUtils.js';
 
 export const scramblePersistenceMethods = {
 init() {
@@ -18,22 +20,19 @@ getStorageKey() {
     },
 
 shuffleWords() {
-        this.words = [...this.words].sort(() => Math.random() - 0.5);
+        this.words = shuffled(this.words);
     },
 
-restoreState() {
-        if (this.applySavedState(this.initialState)) return true;
+    restoreState() {
+        if (this.applySavedState(validateActivityState(scrambleStateSchema, this.initialState))) return true;
 
-        const saved = readStudentActivityValue(this.getStorageKey())
-            || readStudentActivityValue(`scramble_state_${this.words.length}`);
+        const readOptions = {
+            validate: value => validateActivityState(scrambleStateSchema, value)
+        };
+        const saved = readStudentActivityJson(this.getStorageKey(), null, readOptions)
+            || readStudentActivityJson(`scramble_state_${this.words.length}`, null, readOptions);
         if (!saved) return false;
-
-        try {
-            return this.applySavedState(JSON.parse(saved));
-        } catch (error) {
-            console.error('Failed to restore scramble state', error);
-            return false;
-        }
+        return this.applySavedState(saved);
     },
 
 applySavedState(state) {
@@ -122,4 +121,3 @@ hasSameWordSet(wordKeys) {
             currentWords.every((word, index) => word === savedWords[index]);
     }
 };
-

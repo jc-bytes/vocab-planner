@@ -1,6 +1,15 @@
-import { execFile, spawn } from 'node:child_process';
+import { execFile, execFileSync, spawn } from 'node:child_process';
 import process from 'node:process';
 import { createClient } from '@supabase/supabase-js';
+import { createClassroomRepository } from '../../js/services/classroomRepository.js';
+
+// Trusted local fixture operator; never a hosted database connection.
+export function runLocalAuditSql(query) {
+    if(process.env.SPARKS_TEST_SUPABASE_WORKDIR && !process.env.SPARKS_TEST_DB_CONTAINER)throw new Error('A rehearsal workdir requires SPARKS_TEST_DB_CONTAINER; refusing the default database');
+    const container=process.env.SPARKS_TEST_DB_CONTAINER || 'supabase_db_ifofhiypzffruzhiukst';
+    if(!/^supabase_db_[a-zA-Z0-9_-]+$/.test(container))throw new Error('Expected a local Supabase database container');
+    return execFileSync('docker',['exec','-i',container,'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1'],{input:query,encoding:'utf8',stdio:['pipe','pipe','pipe']});
+}
 
 export const AUDIT_PASSWORD = 'AuditPass123!';
 export const AUDIT_TEACHER_EMAIL = 'audit.teacher@aid.edu.pa';
@@ -9,7 +18,7 @@ export const AUDIT_SPARK_IDS = [
     'audit-current-spark',
     'audit-future-spark'
 ];
-export const AUDIT_VOCABULARY_ID = 'grade6_t2_august_week1_knowledge_cards';
+export const AUDIT_VOCABULARY_ID = 'audit-private-vocabulary';
 
 function execFileText(command, args, options = {}) {
     return new Promise((resolve, reject) => {
@@ -74,15 +83,18 @@ export function getBrowserSupabaseConfig(status) {
 }
 
 export async function readLocalSupabaseStatus({ startIfStopped = true } = {}) {
+    if (process.env.SPARKS_TEST_SUPABASE_WORKDIR && !process.env.SPARKS_TEST_DB_CONTAINER) {
+        throw new Error('A rehearsal workdir requires SPARKS_TEST_DB_CONTAINER before creating any fixtures.');
+    }
     let output = '';
     try {
-        output = await execFileText('supabase', ['status', '--output', 'json']);
+        output = await execFileText('supabase', ['status', '--output', 'json', ...(process.env.SPARKS_TEST_SUPABASE_WORKDIR ? ['--workdir', process.env.SPARKS_TEST_SUPABASE_WORKDIR] : [])]);
     } catch (error) {
         if (!startIfStopped) {
             throw new Error(`Local Supabase is not reachable. Start it with "supabase start". ${error.stderr || error.message}`);
         }
-        await runCommand('supabase', ['start'], { stdio: process.env.CI ? 'inherit' : 'ignore' });
-        output = await execFileText('supabase', ['status', '--output', 'json']);
+        await runCommand('supabase', ['start', ...(process.env.SPARKS_TEST_SUPABASE_WORKDIR ? ['--workdir', process.env.SPARKS_TEST_SUPABASE_WORKDIR] : [])], { stdio: process.env.CI ? 'inherit' : 'ignore' });
+        output = await execFileText('supabase', ['status', '--output', 'json', ...(process.env.SPARKS_TEST_SUPABASE_WORKDIR ? ['--workdir', process.env.SPARKS_TEST_SUPABASE_WORKDIR] : [])]);
     }
 
     const status = parseStatusJson(output);
@@ -241,12 +253,22 @@ function buildAuditSparks({ teacherId }) {
 
 export async function seedLocalAuditData() {
     const status = await readLocalSupabaseStatus();
-    await runCommand('supabase', ['migration', 'up', '--local'], { stdio: 'ignore' });
     const admin = createLocalAdminClient(status);
     const users = await seedAuditUsers(admin);
 
+    const schoolId = '6b47ab0a-2026-4000-8000-000000000010';
+    runLocalAuditSql(`insert into public.schools(id,name,timezone,active) values('${schoolId}','Local audit school','America/Panama',true) on conflict(id) do update set active=true,onboarding_pending=false;
+      insert into public.school_memberships(school_id,user_id,active,grade,section) values('${schoolId}','${users.teacher.id}',true,null,null),('${schoolId}','${users.student.id}',true,'6','A') on conflict(school_id,user_id) do update set active=true,removed_at=null,grade=excluded.grade,section=excluded.section;
+      insert into public.school_member_roles(school_id,user_id,role) values('${schoolId}','${users.teacher.id}','school_admin'),('${schoolId}','${users.teacher.id}','teacher'),('${schoolId}','${users.student.id}','student') on conflict do nothing;`);
+    const client = createClient(status.API_URL, getBrowserSupabaseConfig(status).publishableKey,
+        { auth: { persistSession: false, autoRefreshToken: false } });
+    await client.auth.signInWithPassword({ email: AUDIT_TEACHER_EMAIL, password: AUDIT_PASSWORD }).then(({ error }) => { if (error) throw error; });
+    const repo = createClassroomRepository(() => client, () => schoolId);
+    await client.rpc('set_school_year_v1',{p_school_id:schoolId,p_year:2026,p_label:'2026',p_archived:false}).throwOnError();
+    let subject = (await repo.listSubjects()).find(row => row.name === 'Audit Technology');
+    subject ||= await repo.createSubject('Audit Technology');
     await admin.from('vocabularies').upsert({
-        id: AUDIT_VOCABULARY_ID,
+        id: AUDIT_VOCABULARY_ID, school_id:schoolId, teacher_subject_id:subject.id,
         name: 'Cross-browser Audit Vocabulary',
         description: 'Stable local vocabulary used by authenticated browser smoke tests.',
         grades: ['6'],
@@ -272,20 +294,22 @@ export async function seedLocalAuditData() {
     const auditSparks = buildAuditSparks({ teacherId: users.teacher.id });
     await admin
         .from('weekly_sparks')
-        .delete()
-        .eq('subject_slug', 'technology')
-        .in('id', AUDIT_SPARK_IDS)
+        .upsert(auditSparks.map(spark=>({...spark,school_id:schoolId,teacher_subject_id:subject.id})), { onConflict: 'id' })
         .throwOnError();
 
-    await admin
-        .from('weekly_sparks')
-        .upsert(auditSparks, { onConflict: 'id' })
-        .throwOnError();
-
-    return {
-        status,
-        admin,
-        users,
-        browserConfig: getBrowserSupabaseConfig(status)
-    };
+    let classroom = (await repo.listClasses()).find(row => row.name === 'Audit 6A' && row.subject_id === subject.id);
+    classroom ||= await repo.createClass({ name: 'Audit 6A', subjectId: subject.id, schoolYear: 2026 });
+    if (classroom.archived) await repo.setClassArchived(classroom.id, false);
+    await admin.from('class_memberships').upsert({ class_id: classroom.id, student_id: users.student.id,
+        active: true, removed_at: null }, { onConflict: 'class_id,student_id' }).throwOnError();
+    const assignments = [];
+    for (const [index, [kind, materialId]] of [['vocabulary', AUDIT_VOCABULARY_ID], ['spark', AUDIT_SPARK_IDS[0]], ['spark', AUDIT_SPARK_IDS[1]]].entries()) {
+        const published = await repo.publishMaterial({ classIds: [classroom.id], kind, materialId,
+            releaseAt: index === 2 ? '2099-01-01T00:00:00Z' : '2026-01-01T00:00:00Z',
+            publicationKey: `6b47ab0a-2026-4000-8000-00000000000${index + 1}` });
+        assignments.push(...published);
+    }
+    await client.auth.signOut();
+    return { status, admin, users, schoolId, subject, classroom, assignments, vocabularyAssignmentId: assignments[0].id,
+        browserConfig: getBrowserSupabaseConfig(status) };
 }

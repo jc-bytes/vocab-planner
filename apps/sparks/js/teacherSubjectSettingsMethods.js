@@ -31,7 +31,10 @@ export const teacherSubjectSettingsMethods = {
                     ? stored.map((subject, index) => normalizeSubject(subject, index))
                     : await loadSubjects();
             } else {
-                subjects = await loadSubjects(supabaseService);
+                subjects = await loadSubjects(supabaseService, {
+                    signal: options.signal,
+                    surfaceErrors: options.surfaceErrors
+                });
             }
             if (!isCurrent()) return false;
             this.subjects = subjects;
@@ -150,7 +153,11 @@ export const teacherSubjectSettingsMethods = {
     },
 
     async saveSubjectSettings(options = {}) {
-        const isCurrent = createTeacherSettingsOperationGuard(this, options);
+        const settingsCurrent = createTeacherSettingsOperationGuard(this, options);
+        const owner = this.currentUser?.uid || this.currentUser?.id;
+        const local = this.authDisabled;
+        const isCurrent = () => settingsCurrent() && local === this.authDisabled
+            && owner === (this.currentUser?.uid || this.currentUser?.id);
         if (!isCurrent()) return false;
         const statusEl = $('#subjects-save-status');
         const saveBtn = $('#save-subjects-btn');
@@ -172,11 +179,12 @@ export const teacherSubjectSettingsMethods = {
             if (this.authDisabled) {
                 localStorage.setItem(SUBJECTS_LOCAL_KEY, JSON.stringify(subjects));
             } else {
-                await subjectsRepository.saveAll(subjects.map(subject => ({
+                const savedSubjects = await subjectsRepository.saveAll(subjects.map(subject => ({
                     ...subject,
                     updatedAt: new Date().toISOString()
-                })));
+                })), { isCurrent, signal: options.signal });
                 if (!isCurrent()) return false;
+                this.subjects = savedSubjects;
             }
 
             if (!isCurrent()) return false;

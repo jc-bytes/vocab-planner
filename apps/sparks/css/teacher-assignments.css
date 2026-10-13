@@ -1,0 +1,21 @@
+.teacher-assignment-dialog {
+    margin: auto;
+    box-sizing: border-box;
+    width: min(92vw, 42rem);
+    max-height: 88dvh;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border, #888);
+    border-radius: var(--radius-lg);
+    color: var(--color-text);
+    background: var(--color-background);
+    overflow-y: auto;
+}
+.teacher-assignment-dialog:not([open]) { display: none; }
+.teacher-assignment-dialog::backdrop { background: var(--color-overlay); }
+.teacher-assignment-dialog form, .teacher-assignment-dialog > div { display: grid; gap: 1rem; }
+.teacher-assignment-dialog .modal-footer { display: flex; flex-wrap: wrap; }
+.teacher-assignment-table { display: block; overflow-x: auto; max-width: 100%; }
+.teacher-assignment-table th, .teacher-assignment-table td { padding: .5rem; text-align: left; }
+.teacher-assignment-response { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.teacher-assignment-dialog [hidden] { display: none; }

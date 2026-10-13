@@ -29,6 +29,12 @@ The migration preserved the existing camelCase application record shapes while m
 
 `studentApi.js` and `teacherAuthApi.js` expose separate frozen capability allowlists for student operations and teacher authentication. They do not re-export data primitives or the broad internal Supabase service.
 
+## Browser caching policy
+
+Disposable Supabase read results use the shared `serverStateQuery` service, backed by TanStack Query Core. Query keys always include the authenticated account ID. Ordinary reads share in-flight work and may reuse fresh data for 60 seconds; explicit refreshes and successful mutations invalidate the matching domain key. Sign-out and account replacement remove that account's queries.
+
+This cache is not a persistence or authorization layer. Workbox/Tauri assets, owner-partitioned IndexedDB progress and sync queues, local preferences/drafts, and server-authoritative wallet or recovery state keep their existing owners. Bundled vocabulary JSON relies on the delivery cache only; it is no longer copied into a second long-lived `localStorage` cache.
+
 ## Mapping and timestamps
 
 Repositories map snake_case database fields to the pre-existing camelCase application shapes. Shared scalar/profile/progress mappings that are also required by Auth, RPC results, or Realtime live in `services/supabaseValues.js`. It contains no table registry, generic query builder, document reference, or snapshot abstraction.
@@ -96,7 +102,7 @@ Do not wrap repository objects in another layer. A new or extracted interface is
 | Settings | document read/upsert of `app_settings` | Medium; flattened setting values and local fallbacks preserved. |
 | Subjects | collection read and independent upserts | Medium; normalization, defaults, and independent writes preserved. |
 | Vocabulary | list/get/upsert/update/delete | High; source merging, cloud overrides, placement recalculation, and record shape preserved. |
-| Sparks | list, scheduled filtered query, save/archive | High; ordering, grade targeting, duplicate constraint errors, and cache behavior preserved. |
+| Sparks | list, scheduled filtered query, save/archive | High; ordering, grade targeting, duplicate constraint errors, and account-scoped query behavior preserved. |
 | Progress | document reads plus Realtime | Critical; RPC writes, offline queue, local storage, retry, and subscription teardown preserved. |
 | Leaderboards | score read and filtered/ordered list | High; deterministic IDs, lower-is-better SpacePi ordering, limits, and RPC writes preserved. |
 | Teacher exports | progress/profile reads, score lists, export-log insert | Medium; per-student error isolation and export shapes preserved. |

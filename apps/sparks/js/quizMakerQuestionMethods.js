@@ -1,3 +1,5 @@
+import { createUniqueId, shuffled } from './randomUtils.js';
+
 class QuizMakerQuestionMethods {
     addQuestions(type, count, basePoints = 1, options = {}) {
         const newQuestions = this.generateQuestions(type, count, basePoints, options);
@@ -14,13 +16,13 @@ class QuizMakerQuestionMethods {
         const generated = [];
         for (let i = 0; i < count; i++) {
             const w = words[Math.floor(Math.random() * words.length)];
-            const id = Date.now() + Math.random().toString(36).substr(2, 9);
+            const id = createUniqueId('quiz-question-');
 
             let q = { id, type, points: basePoints };
 
             if (type === 'mc') {
                 const distractors = this.getDistractors(w, words, 3);
-                const options = this.shuffle([w.word, ...distractors]);
+                const options = shuffled([w.word, ...distractors]);
                 q.prompt = w.definition;
                 q.options = options;
                 q.answer = w.word;
@@ -28,21 +30,21 @@ class QuizMakerQuestionMethods {
             } else if (type === 'sata') {
                 const choiceCount = Math.max(3, parseInt(options.choices) || 5);
                 const correctCount = Math.min(choiceCount - 1, Math.max(2, parseInt(options.correct) || 2));
-                const correctWords = this.shuffle(words).slice(0, correctCount);
-                const wrongWords = this.shuffle(words.filter(item => !correctWords.includes(item))).slice(0, choiceCount - correctCount);
+                const correctWords = shuffled(words).slice(0, correctCount);
+                const wrongWords = shuffled(words.filter(item => !correctWords.includes(item))).slice(0, choiceCount - correctCount);
                 const correctOptions = correctWords.map(item => ({
                     text: `${item.word} means "${item.definition}".`,
                     correct: true
                 }));
                 const wrongOptions = wrongWords.map(item => {
-                    const wrongDefinition = this.shuffle(words.filter(other => other.word !== item.word))[0]?.definition || item.definition;
+                    const wrongDefinition = shuffled(words.filter(other => other.word !== item.word))[0]?.definition || item.definition;
                     return {
                         text: `${item.word} means "${wrongDefinition}".`,
                         correct: false
                     };
                 });
                 q.prompt = 'Select all correct term-definition matches.';
-                q.options = this.shuffle([...correctOptions, ...wrongOptions]);
+                q.options = shuffled([...correctOptions, ...wrongOptions]);
                 q.answer = q.options.filter(option => option.correct).map(option => option.text);
                 q.points = basePoints;
             } else if (type === 'tf') {
@@ -62,12 +64,12 @@ class QuizMakerQuestionMethods {
             } else if (type === 'matching') {
                 // Matching Section logic
                 // We create ONE question object that contains multiple pairs
-                // But the loop above creates 'count' questions. 
+                // But the loop above creates 'count' questions.
                 // We should break the loop if type is matching and just create one section with 'count' pairs.
 
                 const pairs = [];
                 // Get 'count' random words
-                const selectedWords = this.shuffle(words).slice(0, count);
+                const selectedWords = shuffled(words).slice(0, count);
                 selectedWords.forEach(w => {
                     pairs.push({ term: w.word, def: w.definition });
                 });
@@ -90,7 +92,7 @@ class QuizMakerQuestionMethods {
                 // Synonym/Antonym MC question
                 const isSynonym = Math.random() > 0.5;
                 const distractors = this.getDistractors(w, words, 3);
-                const options = this.shuffle([w.word, ...distractors]);
+                const options = shuffled([w.word, ...distractors]);
                 q.prompt = isSynonym ?
                     `Which word is a SYNONYM (similar meaning) of "${w.definition}"?` :
                     `Which word is an ANTONYM (opposite meaning) of "${w.definition}"?`;
@@ -100,7 +102,7 @@ class QuizMakerQuestionMethods {
                 q.points = basePoints;
             } else if (type === 'wordsearch') {
                 // Word Search - create one puzzle with multiple words
-                const selectedWords = this.shuffle(words).slice(0, Math.min(count || 15, 15, words.length));
+                const selectedWords = shuffled(words).slice(0, Math.min(count || 15, 15, words.length));
                 const wordList = selectedWords.map(w => w.word);
                 const puzzleData = this.generateWordSearchGrid(wordList, 15);
 
@@ -116,7 +118,7 @@ class QuizMakerQuestionMethods {
                 break; // Only create one word search
             } else if (type === 'crossword') {
                 // Crossword - create one puzzle with multiple words
-                const selectedWords = this.shuffle(words).slice(0, Math.min(count || 10, 10, words.length));
+                const selectedWords = shuffled(words).slice(0, Math.min(count || 10, 10, words.length));
                 const wordData = selectedWords.map(w => ({ word: w.word, clue: w.definition }));
                 const puzzleData = this.generateCrosswordLayout(wordData, 15);
 
@@ -299,12 +301,7 @@ class QuizMakerQuestionMethods {
 
     getDistractors(targetWord, allWords, count) {
         const others = allWords.filter(w => w.word !== targetWord.word);
-        const shuffled = this.shuffle(others);
-        return shuffled.slice(0, count).map(w => w.word);
-    }
-
-    shuffle(array) {
-        return array.sort(() => Math.random() - 0.5);
+        return shuffled(others).slice(0, count).map(w => w.word);
     }
 }
 

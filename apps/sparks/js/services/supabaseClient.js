@@ -25,6 +25,9 @@ export function createSupabaseClient() {
     if (!isSupabaseConfigured()) {
         throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY, or provide window.SUPABASE_CONFIG.');
     }
+    if (/(?:^#|&)type=recovery(?:&|$)/.test(globalThis.window?.location?.hash || '')) {
+        globalThis.window.__sparksPasswordRecoveryPending = true;
+    }
     return createClient(config.url, config.publishableKey, {
         auth: {
             autoRefreshToken: true,

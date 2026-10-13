@@ -1,0 +1,58 @@
+{
+  "id": "grade6_t3_word_hunt_rehearsal",
+  "subjectSlug": "technology",
+  "name": "Grade 6 T3 Practice: Word Hunt Rehearsal",
+  "description": "Two unscored table words for practicing the complete Word Hunt and PDF submission workflow before Summative 1.",
+  "grades": [
+    "6"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards",
+      "illustration"
+    ],
+    "additionalActivities": [
+      "matching",
+      "quiz",
+      "synonym-antonym",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match",
+      "fill-in-blank"
+    ],
+    "flashcards": 2,
+    "illustration": 2,
+    "wordHuntAllowTextPaste": false
+  },
+  "words": [
+    {
+      "word": "cell",
+      "definition": "One box where spreadsheet data is entered.",
+      "example": "The student typed a club name in one spreadsheet cell.",
+      "difficulty": 1,
+      "synonyms": [
+        "spreadsheet box"
+      ],
+      "antonyms": [],
+      "wordHunt": true
+    },
+    {
+      "word": "record",
+      "definition": "One complete row of related data.",
+      "example": "Each student record contained an ID, club, and number of minutes.",
+      "difficulty": 1,
+      "synonyms": [
+        "data row"
+      ],
+      "antonyms": [],
+      "wordHunt": true
+    }
+  ]
+}

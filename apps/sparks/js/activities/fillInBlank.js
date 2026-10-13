@@ -1,7 +1,9 @@
 
-import { createElement, $, notifications, openModal, closeModal } from '../main.js';
+import { createElement, $, notifications, openModal, closeModal, refreshIcons } from '../main.js';
 import { ActivityTimeoutController } from './activityTimeoutController.js';
-import { readStudentActivityValue, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { readStudentActivityJson, removeStudentActivityValue, writeStudentActivityValue } from '../student/persistence/studentStorage.js';
+import { fillInBlankStateSchema, validateActivityState } from './activityStateValidation.js';
+import { shuffleInPlace } from '../randomUtils.js';
 
 export class FillInBlankActivity {
     constructor(container, words, onProgress, onSaveState, initialState) {
@@ -23,7 +25,7 @@ export class FillInBlankActivity {
 
     init() {
         if (!this.restoreState()) {
-            this.words.sort(() => Math.random() - 0.5);
+            shuffleInPlace(this.words);
             this.startRound();
         } else if (this.currentIndex >= this.words.length) {
             this.startRound();
@@ -33,8 +35,9 @@ export class FillInBlankActivity {
     }
 
     restoreState() {
-        if (this.initialState) {
-            const state = this.initialState;
+        const initialState = validateActivityState(fillInBlankStateSchema, this.initialState);
+        if (initialState) {
+            const state = initialState;
             this.currentIndex = state.currentIndex;
             this.score = state.score;
             this.attempts = state.attempts;
@@ -48,23 +51,20 @@ export class FillInBlankActivity {
         }
 
         const key = `fib_state_${this.words.length} `;
-        const saved = readStudentActivityValue(key);
+        const saved = readStudentActivityJson(key, null, {
+            validate: value => validateActivityState(fillInBlankStateSchema, value)
+        });
         if (saved) {
-            try {
-                const state = JSON.parse(saved);
-                this.currentIndex = state.currentIndex;
-                this.score = state.score;
-                this.attempts = state.attempts;
+            this.currentIndex = saved.currentIndex;
+            this.score = saved.score;
+            this.attempts = saved.attempts;
 
-                if (state.shuffledWords) {
-                    this.words = state.shuffledWords;
-                }
-
-                this.currentWord = this.words[this.currentIndex];
-                return true;
-            } catch (e) {
-                console.error('Failed to restore fib state', e);
+            if (saved.shuffledWords) {
+                this.words = saved.shuffledWords;
             }
+
+            this.currentWord = this.words[this.currentIndex];
+            return true;
         }
         return false;
     }
@@ -100,8 +100,8 @@ export class FillInBlankActivity {
                     </button>
                 </div>
             `;
-            window.lucide?.createIcons({ root: this.container });
-            
+            refreshIcons(this.container);
+
             // Add replay button listener
             const replayBtn = this.container.querySelector('#replay-fib');
             if (replayBtn) {
@@ -216,21 +216,21 @@ export class FillInBlankActivity {
         const key = `fib_state_${this.words.length}`;
         removeStudentActivityValue(key);
         removeStudentActivityValue(key.trim());
-        
+
         // Reset game state
         this.currentIndex = 0;
         this.score = 0;
         this.currentWord = null;
         this.attempts = 0;
-        
+
         // Reshuffle words for variety
-        this.words.sort(() => Math.random() - 0.5);
-        
+        shuffleInPlace(this.words);
+
         // Notify progress system of new session
         if (this.onProgress) {
             this.onProgress({ score: 0, details: '0/0 words completed', isComplete: false, isReplay: true });
         }
-        
+
         this.startRound();
         this.saveState();
     }
@@ -344,7 +344,7 @@ export class FillInBlankActivity {
         gotItButton.addEventListener('click', () => closeModal(hintModal));
 
         this.container.appendChild(wrapper);
-        window.lucide?.createIcons({ root: wrapper });
+        refreshIcons(wrapper);
 
         // Focus input
         this.timeouts.schedule(() => {

@@ -1,5 +1,6 @@
 import { studentApi } from '../services/studentApi.js';
 import { createRequestError, requestWithTimeout } from '../services/requestReliability.js';
+import { createUniqueId } from '../randomUtils.js';
 
 export class StudentActivityAttemptService {
     constructor(persistence) {
@@ -22,7 +23,7 @@ export class StudentActivityAttemptService {
         const attempt = await requestWithTimeout(signal => (
             studentApi.startStudentActivityAttempt({
                 unitKey: this.activities.getUnitProgressKey(vocab),
-                vocabularyId: this.sm.getVocabRouteId?.(vocab) || vocab?.id || '',
+                vocabularyId: vocab?.id || '',
                 activityType,
                 signal
             })
@@ -46,8 +47,7 @@ export class StudentActivityAttemptService {
             this.sm.unitStates?.[activityType] ?? unitProgress.states?.[activityType] ?? null
         );
         return {
-            eventId: `activity-progress:${globalThis.crypto?.randomUUID?.()
-                || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}`,
+            eventId: createUniqueId('activity-progress:'),
             unitKey: this.activities.getUnitProgressKey(this.sm.currentVocab),
             unitContext: {
                 unitId: unitProgress.unitId || this.sm.getVocabRouteId?.(this.sm.currentVocab) || this.sm.currentVocab.id || '',
@@ -102,8 +102,7 @@ export class StudentActivityAttemptService {
 
     async reportActiveTime(snapshot = this.activities.session.getActivityTimeSnapshot?.() || {}) {
         const attemptId = String(snapshot.attemptId || this.activities.session.activityAttempt?.attemptId || '');
-        const timeLimitSeconds = Number(snapshot.timeLimitSeconds);
-        if (!attemptId || !(timeLimitSeconds > 0) || this.sm.authDisabled || !this.sm.currentUser) return null;
+        if (!attemptId || this.sm.authDisabled || !this.sm.currentUser) return null;
 
         const result = await studentApi.reportStudentActivityTime({
             attemptId,

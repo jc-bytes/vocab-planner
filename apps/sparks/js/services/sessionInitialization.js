@@ -18,7 +18,7 @@ export class SessionInitializationCoordinator {
             return Promise.resolve(this.completedResult);
         }
 
-        this.activeController?.abort(new Error('A newer student session replaced this initialization.'));
+        this.activeController?.abort(new Error('A newer session replaced this initialization.'));
         const controller = new AbortController();
         const generation = ++this.generation;
         this.activeKey = normalizedKey;
@@ -51,7 +51,7 @@ export class SessionInitializationCoordinator {
     }
 
     invalidate() {
-        this.activeController?.abort(new Error('The student session ended.'));
+        this.activeController?.abort(new Error('The session ended.'));
         this.activeController = null;
         this.generation += 1;
         this.activeKey = '';

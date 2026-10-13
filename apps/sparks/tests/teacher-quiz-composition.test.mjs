@@ -69,6 +69,17 @@ function createHarness() {
     manager.getVocabGrades = vocab => vocab.grades || [];
     manager.getTeacherTrimesterKey = vocab => vocab.trimester || '';
     manager.getTeacherMonthKey = vocab => vocab.month || '';
+    manager.vocabularyBrowser = {
+        filterItems(items, drilldown = {}) {
+            return items.filter(({ vocab }) => (
+                (!drilldown.subject || vocab.subjectSlug === drilldown.subject)
+                && (!drilldown.grade || manager.getVocabGrades(vocab).includes(drilldown.grade))
+                && (!drilldown.trimester || manager.getTeacherTrimesterKey(vocab) === drilldown.trimester)
+                && (!drilldown.month || manager.getTeacherMonthKey(vocab) === drilldown.month)
+            ));
+        },
+        getWordCount: vocab => vocab.words?.length || 0
+    };
     return manager;
 }
 
@@ -414,12 +425,13 @@ test('Quiz implementation no longer depends on mutable Vocabulary browser state'
 });
 
 test('TeacherManager and shell do not own Quiz implementation state', async () => {
-    const [teacherSource, shellSource, lazySource, featureSource, browserSource] = await Promise.all([
+    const [teacherSource, shellSource, lazySource, featureSource, browserSource, adapterSource] = await Promise.all([
         readFile(new URL('../js/teacher.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/teacherShell.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/teacherLazyFeatures.js', import.meta.url), 'utf8'),
         readFile(new URL('../js/teacherQuizFeature.js', import.meta.url), 'utf8'),
-        readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8')
+        readFile(new URL('../js/teacherQuizBrowserMethods.js', import.meta.url), 'utf8'),
+        readFile(new URL('../js/teacherQuizVocabularyBrowserAdapter.js', import.meta.url), 'utf8')
     ]);
 
     const privateQuizFields = /this\.quiz(?:LibraryItems|Drilldown|Maker|MakerVocabKey|EditorOpen|ReturnView)/;
@@ -429,10 +441,14 @@ test('TeacherManager and shell do not own Quiz implementation state', async () =
     assert.match(lazySource, /publicMethods:\s*\{\s*showQuizzesView: 'show',\s*openQuizMaker: 'open'\s*\}/);
     assert.match(lazySource, /createTeacherQuizFeature\(\{/);
     assert.match(lazySource, /createQuizVocabularyBrowserAdapter\(manager\)/);
+    assert.doesNotMatch(lazySource, /^import \{ createQuizVocabularyBrowserAdapter \}/m);
+    assert.match(lazySource, /await import\(['"]\.\/teacherQuizVocabularyBrowserAdapter\.js['"]\)/);
     assert.match(featureSource, /context\.quizMaker = null/);
-    assert.match(browserSource, /getTeacherVocabularyRowColumns\(this\.quizDrilldown\)/);
-    assert.match(browserSource, /getTeacherVocabularyRowDepthClass\(this\.quizDrilldown\)/);
-    assert.match(browserSource, /compareTeacherVocabularyRowOrder\(itemA, itemB, this\.quizDrilldown\)/);
+    assert.equal(QUIZ_VOCABULARY_BROWSER_CAPABILITIES.length, 10);
+    assert.match(browserSource, /this\.vocabularyBrowser\.getRowLayout\(this\.quizDrilldown\)/);
+    assert.match(browserSource, /this\.vocabularyBrowser\.compareRows\(itemA, itemB, this\.quizDrilldown\)/);
+    assert.match(adapterSource, /manager\.getTeacherVocabularyRowColumns\(drilldown\)/);
+    assert.match(adapterSource, /manager\.compareTeacherVocabularyRowOrder\(itemA, itemB, drilldown\)/);
     assert.doesNotMatch(browserSource, /hydrateTeacherVocabularyRowWordCounts/);
 });
 

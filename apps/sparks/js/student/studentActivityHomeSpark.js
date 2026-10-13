@@ -1,4 +1,4 @@
-import { $, createElement, escapeHtml } from '../main.js';
+import { $, createElement, escapeHtml, refreshIcons } from '../main.js';
 import { imageDB } from '../db.js';
 import {
     getActiveStudentStorageOwner,
@@ -8,6 +8,7 @@ import { classifySyncError } from '../services/syncQueuePolicy.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
 import { sparkResponsesRepository } from '../services/sparkResponsesRepository.js';
 import { sparksRepository } from '../services/sparksRepository.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { normalizeSchoolCalendar } from '../services/vocabularyApi.js';
 import {
     evaluateSparkAnswers,
@@ -41,7 +42,7 @@ export class StudentActivityHomeSpark {
         this.home = home;
         this.activities = home.activities;
         this.sm = home.sm;
-        this.currentSparkSessionCache = new Map();
+        this.queryService = home.queryService || serverStateQuery;
         this.currentSpark = null;
         this.sparkResponseSyncSequence = new Map();
     }
@@ -72,26 +73,26 @@ export class StudentActivityHomeSpark {
         const dateValue = getPanamaDateValue();
         const dateRange = this.getCurrentSparkDateRange(dateValue);
         const grade = this.getStudentGradeLevel();
-        const cacheKey = `${subjectSlug}:${grade || 'all'}:${dateRange.trimester}:${dateRange.onOrAfter}:${dateRange.onOrBefore}`;
-        if (this.currentSparkSessionCache.has(cacheKey)) {
-            this.currentSpark = this.currentSparkSessionCache.get(cacheKey);
-            return this.currentSpark;
-        }
-        const sparks = (await sparksRepository.listScheduledForStudent({
-            subjectSlug,
-            onOrAfter: dateRange.onOrAfter,
-            onOrBefore: dateRange.onOrBefore,
-            targetGrade: grade,
-            limit: 1
-        })).map(spark => this.normalizeSpark(spark));
-        let currentSpark = null;
-        if (grade) {
-            const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
-            if (gradeMatch) currentSpark = gradeMatch;
-        }
-        currentSpark = currentSpark || sparks.find(isAllGradeSpark) || null;
+        const accountId = this.sm.currentUser.uid || this.sm.currentUser.id;
+        const currentSpark = await this.queryService.ensure({
+            accountId,
+            key: ['student', 'scheduled-sparks', 'current', subjectSlug, grade || 'all', dateRange],
+            queryFn: async () => {
+                const sparks = (await sparksRepository.listScheduledForStudent({
+                    subjectSlug,
+                    onOrAfter: dateRange.onOrAfter,
+                    onOrBefore: dateRange.onOrBefore,
+                    targetGrade: grade,
+                    limit: 1
+                })).map(spark => this.normalizeSpark(spark));
+                if (grade) {
+                    const gradeMatch = sparks.find(spark => spark.targetGrades.includes(grade));
+                    if (gradeMatch) return gradeMatch;
+                }
+                return sparks.find(isAllGradeSpark) || null;
+            }
+        });
         this.currentSpark = currentSpark;
-        this.currentSparkSessionCache.set(cacheKey, currentSpark);
         return currentSpark;
     }
 
@@ -101,22 +102,23 @@ export class StudentActivityHomeSpark {
         const dateValue = getPanamaDateValue();
         const dateRange = this.getCurrentSparkDateRange(dateValue);
         const grade = this.getStudentGradeLevel();
-        const cacheKey = `library:${subjectSlug}:${grade || 'all'}:${dateRange.trimester}:${dateRange.onOrAfter}:${dateRange.onOrBefore}`;
-        if (this.currentSparkSessionCache.has(cacheKey)) {
-            return this.currentSparkSessionCache.get(cacheKey);
-        }
-        const sparks = (await sparksRepository.listScheduledForStudent({
-            subjectSlug,
-            onOrAfter: dateRange.onOrAfter,
-            onOrBefore: dateRange.onOrBefore,
-            targetGrade: grade,
-            limit: 20
-        })).map(spark => this.normalizeSpark(spark));
-        const available = grade
-            ? sparks.filter(spark => spark.targetGrades.includes(grade) || isAllGradeSpark(spark))
-            : sparks.filter(isAllGradeSpark);
-        this.currentSparkSessionCache.set(cacheKey, available);
-        return available;
+        const accountId = this.sm.currentUser.uid || this.sm.currentUser.id;
+        return this.queryService.ensure({
+            accountId,
+            key: ['student', 'scheduled-sparks', 'library', subjectSlug, grade || 'all', dateRange],
+            queryFn: async () => {
+                const sparks = (await sparksRepository.listScheduledForStudent({
+                    subjectSlug,
+                    onOrAfter: dateRange.onOrAfter,
+                    onOrBefore: dateRange.onOrBefore,
+                    targetGrade: grade,
+                    limit: 20
+                })).map(spark => this.normalizeSpark(spark));
+                return grade
+                    ? sparks.filter(spark => spark.targetGrades.includes(grade) || isAllGradeSpark(spark))
+                    : sparks.filter(isAllGradeSpark);
+            }
+        });
     }
 
     getSparkLibraryStorageKey() {
@@ -198,6 +200,7 @@ export class StudentActivityHomeSpark {
     }
 
     async syncSparkLibraryState(state, sequence) {
+        const queueGeneration = this.sm.progress?.syncQueue?.cloud.cloudGeneration;
         const ownerUserId = this.sm.currentUser?.uid || getActiveStudentStorageOwner();
         try {
             const saved = await sparkResponsesRepository.submit(state, { ownerUserId });
@@ -219,8 +222,17 @@ export class StudentActivityHomeSpark {
                         answers: state.answers || {},
                         storageKey: this.getSparkLibraryStorageKey()
                     }, { ownerUserId });
+                    this.sm.progress?.syncQueue?.scheduleRetry({ ownerUserId, generation: queueGeneration });
                 } catch (queueError) {
+                    if (!isActiveStudentStorageOwner(ownerUserId) || this.sm.currentUser?.uid !== ownerUserId) return;
                     console.warn('Could not queue the Spark response for later sync:', queueError);
+                    const message = queueError?.code === 'SYNC_QUEUE_FULL'
+                        ? 'Local sync storage is full' : 'Could not save changes for sync';
+                    const queue = this.sm.progress?.syncQueue;
+                    if (queue) queue.setQueueStatus(message, ownerUserId, queue.cloud.cloudGeneration);
+                    else this.sm.setAuthStatus?.(message);
+                    this.sm.showToast?.('Your latest Spark answers could not be queued. Reconnect and save again.');
+                    return;
                 }
                 this.sm.setAuthStatus?.(navigator.onLine ? 'Sync failed - saved locally' : 'Saved locally - offline');
             } else {
@@ -310,7 +322,7 @@ export class StudentActivityHomeSpark {
             this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:replaceChildren' });
             host.replaceChildren(this.createStudentSparkCard(spark));
             this.activities.updateArcadeGateDisplay();
-            if (window.lucide) window.lucide.createIcons({ root: host });
+            refreshIcons(host);
         } catch {
             this.removeSparkHomePanel(host);
         }

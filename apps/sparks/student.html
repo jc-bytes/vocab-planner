@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/cards.css?v=shared-cards-20260824a" data-shared-cards>
     <link rel="stylesheet" href="css/dialogs.css?v=shared-dialogs-20260824a" data-shared-dialogs>
     <link rel="stylesheet" href="css/navigation.css?v=shared-navigation-20260824a" data-shared-navigation>
-    <link rel="stylesheet" href="css/feedback.css?v=shared-feedback-20260824a" data-shared-feedback>
+    <link rel="stylesheet" href="css/feedback.css?v=shared-feedback-20260830a" data-shared-feedback>
     <link rel="stylesheet" href="css/containers.css?v=shared-containers-20260824a" data-shared-containers>
     <link rel="stylesheet" href="css/student.css?v=flashcard-layout-20260816b">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
@@ -39,6 +39,10 @@
                     <span id="student-mobile-section-label">Today</span>
                 </button>
                 <div id="student-tabs" class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
+                    <button class="teacher-tab student-tab" id="student-tab-classes" type="button" role="tab"
+                        aria-selected="false" aria-controls="student-classes-view" aria-label="My classes" title="My classes" data-tooltip="My classes" data-section="classes">
+                        <i data-lucide="graduation-cap"></i><span>My classes</span>
+                    </button>
                     <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
                         aria-selected="true" aria-label="Today" title="Today" data-tooltip="Today" data-section="today">
                         <i data-lucide="layout-dashboard"></i>
@@ -69,7 +73,7 @@
                         <span class="student-coin-label">Coins</span>
                         <span data-coin-balance-value>0</span>
                     </div>
-                    <span id="auth-status" class="status-dot" title="Syncing" aria-label="Syncing"></span>
+                    <span id="auth-status" class="status-dot" role="status" title="Syncing" aria-label="Syncing"></span>
                     <button id="mobile-edit-profile-btn" class="btn text-btn icon-btn student-mobile-profile-btn" title="Student profile" aria-label="Student profile">
                         <i data-lucide="user"></i>
                     </button>
@@ -85,8 +89,8 @@
             </div>
         </header>
 
-        <div class="student-top-bar" aria-label="Student identity and progress">
-            <div class="student-sidebar-context" aria-label="Student class context">
+        <aside class="student-top-bar" aria-label="Student identity and progress">
+            <div class="student-sidebar-context" role="group" aria-label="Student class context">
                 <div id="student-subject-picker" class="student-subject-picker"></div>
             </div>
             <div class="header-left">
@@ -113,7 +117,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
 
         <main>
             <!-- Loading View -->
@@ -133,7 +137,7 @@
                         <i data-lucide="graduation-cap"></i>
                     </div>
                     <p class="auth-kicker">Vocabulary Master</p>
-                    <h2>Student Access</h2>
+                    <h1>Student Access</h1>
 
                     <div id="student-login-panel" class="card auth-panel">
                         <form id="student-login-form">
@@ -161,6 +165,7 @@
             </section>
 
             <!-- View: Main Menu -->
+            <section id="student-classes-view" class="view hidden" role="tabpanel" aria-labelledby="student-tab-classes"></section>
             <section id="main-menu-view" class="view hidden student-home-loading" aria-busy="true">
                 <div class="student-dashboard-heading" hidden>
                     <div>
@@ -201,7 +206,7 @@
                 <div class="section-header vocab-selection-header page-header">
                     <button id="back-to-main-menu-btn" class="btn text-btn" type="button" hidden>Today</button>
                     <div class="vocab-page-intro page-header__content">
-                        <h2 class="page-header__title">Vocabulary Units</h2>
+                        <h1 class="page-header__title">Vocabulary Units</h1>
                         <div id="vocab-context-breadcrumb" class="vocab-context-breadcrumb"></div>
                     </div>
                     <div id="vocab-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>

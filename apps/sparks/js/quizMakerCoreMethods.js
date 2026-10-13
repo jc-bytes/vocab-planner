@@ -1,4 +1,5 @@
 import { cleanQuizTitle } from './quizMakerTitle.js';
+import { validateQuizMakerState } from './quizMakerStateValidation.js';
 
 class QuizMakerCoreMethods {
     init(options = {}) {
@@ -12,7 +13,8 @@ class QuizMakerCoreMethods {
     }
 
     restoreState(state) {
-        if (!state || typeof state !== 'object') return false;
+        state = validateQuizMakerState(state);
+        if (!state) return false;
 
         try {
             if (state.meta && typeof state.meta === 'object') {
@@ -119,6 +121,8 @@ class QuizMakerCoreMethods {
         this.disposed = true;
         this.lifecycleGeneration = (this.lifecycleGeneration || 0) + 1;
 
+        this.destroyQuestionSortables?.();
+
         window.clearTimeout(this.autoGenerateTimer);
         this.autoGenerateTimer = null;
 
@@ -154,7 +158,6 @@ class QuizMakerCoreMethods {
 
         document.getElementById('quiz-section-list')?.replaceChildren();
         document.getElementById('quiz-questions-list')?.replaceChildren();
-        this.dragSrcEl = null;
         this.onStateChange = null;
         this.onClose = null;
     }

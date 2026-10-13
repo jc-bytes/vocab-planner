@@ -1,0 +1,8 @@
+.school-admin-content { display: grid; gap: 1.5rem; }
+.school-admin-form { display: grid; gap: .75rem; padding: 1rem; border: 1px solid var(--border-color, #d1d5db); border-radius: .5rem; }
+.school-admin-field { display: flex; flex-direction: column; gap: .35rem; margin-block: .5rem; }
+.school-admin-field input, .school-admin-field select { width: 100%; min-height: 2.75rem; padding: .5rem; }
+.school-admin-form fieldset { display: flex; gap: 1rem; flex-wrap: wrap; }
+.school-admin-form fieldset label { display: inline-flex; align-items: center; gap: .35rem; }
+.school-admin p { overflow-wrap: anywhere; }
+.school-admin button { min-height: 2.75rem; }

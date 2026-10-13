@@ -338,8 +338,7 @@ export class StudentManager {
             return;
         }
 
-        // Load manifest and local data
-        await this.activities.loadManifest();
+        // Authenticated students load material only from their class assignments.
         await this.loadSubjectSettings();
         this.progress.loadLocalProgress();
 

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { ACTIVITY_DEFINITIONS } from '../js/activityMetadata.js';
 import {
     STUDENT_ACTIVITY_REGISTRY,
     defineStudentActivityRegistry,
@@ -615,6 +616,21 @@ test('activity registry is the complete route and module source', () => {
         STUDENT_ACTIVITY_REGISTRY.map(activity => [activity.id, activity.settingKey])
     ));
     assert.deepEqual(VOCAB_ACTIVITY_SETTING_KEYS, PERSISTED_ACTIVITY_SETTING_KEYS);
+});
+
+test('shared activity metadata exactly matches launchable activity IDs', () => {
+    assertUniqueIds(ACTIVITY_DEFINITIONS, 'Activity metadata');
+    const metadataIds = ACTIVITY_DEFINITIONS.map(activity => activity.id).sort();
+    const launchableIds = getStudentActivityIds().sort();
+    assert.deepEqual(metadataIds, launchableIds);
+
+    const persistedAliases = ACTIVITY_DEFINITIONS.flatMap(({ id, metricIds }) => (
+        metricIds.filter(metricId => metricId !== id)
+    ));
+    assert.ok(persistedAliases.length > 0, 'Expected legacy metric aliases to remain covered.');
+    for (const alias of persistedAliases) {
+        assert.equal(getStudentActivity(alias), null, `${alias} must remain metadata-only`);
+    }
 });
 
 test('game registry owns display, launch, frame, and leaderboard configuration', async () => {

@@ -21,12 +21,12 @@ test('vocabulary API remains a complete compatibility barrel with one owner per 
     );
 });
 
-test('subject normalization preserves defaults and stable custom metadata', () => {
+test('subject normalization uses the supplied workspace subjects and stable metadata', () => {
     const subjects = vocabularyApi.normalizeSubjects([
         { slug: 'digital-art', name: 'Digital Art', color: '#112233', sortOrder: 5 }
     ]);
 
-    assert.deepEqual(subjects.map(subject => subject.slug), ['digital-art', 'technology', 'science']);
+    assert.deepEqual(subjects.map(subject => subject.slug), ['digital-art']);
     assert.deepEqual(vocabularyApi.getSubjectBySlug(subjects, 'digital-art'), {
         slug: 'digital-art', id: 'digital-art', name: 'Digital Art',
         color: '#112233', sortOrder: 5, active: true

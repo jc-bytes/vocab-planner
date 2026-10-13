@@ -56,12 +56,11 @@ test('teacher routes keep their public URL contract through the shared parser', 
         vocabularyId: 'week 1'
     });
     assert.deepEqual(teacher.parseRoute('#/teacher/data?tab=export'), {
-        view: 'data',
-        tab: 'export'
+        view: 'review'
     });
-    assert.equal(teacher.buildRoute({ view: 'data', tab: 'export' }), '#/teacher/data?tab=export');
+    assert.equal(teacher.buildRoute({ view: 'data', tab: 'export' }), '#/teacher/settings?tab=export');
     assert.deepEqual(teacher.parseRoute('#/teacher/data-settings?tab=dashboard'), {
-        view: 'data', tab: 'dashboard'
+        view: 'overview'
     });
     assert.deepEqual(teacher.parseRoute('#/teacher/data-settings?tab=calendar'), {
         view: 'settings', tab: 'calendar'
@@ -96,6 +95,21 @@ test('teacher routes keep their public URL contract through the shared parser', 
     assert.deepEqual(teacher.parseRoute('#/teacher/students'), { view: 'students' });
     assert.equal(teacher.buildRoute({ view: 'students' }), '#/teacher/students');
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-progress-view'), { view: 'students' });
+    assert.deepEqual(teacher.parseRoute('#/teacher/students/student%201?tab=activity'), {
+        view: 'student-profile', studentId: 'student 1', tab: 'activity'
+    });
+    assert.deepEqual(teacher.parseRoute('#/teacher/students/student%201?tab=unknown'), {
+        view: 'student-profile', studentId: 'student 1', tab: 'overview'
+    });
+    assert.equal(
+        teacher.buildRoute({ view: 'student-profile', studentId: 'student 1', tab: 'account' }),
+        '#/teacher/students/student%201?tab=account'
+    );
+    teacher.activeStudentId = 'student 1';
+    teacher.activeStudentProfileTab = 'activity';
+    assert.deepEqual(teacher.currentTeacherRouteForView('teacher-student-profile-view'), {
+        view: 'student-profile', studentId: 'student 1', tab: 'activity'
+    });
     assert.deepEqual(teacher.parseRoute('#/teacher/groups'), { view: 'groups' });
     assert.equal(teacher.buildRoute({ view: 'groups' }), '#/teacher/groups');
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-groups-view'), { view: 'groups' });
@@ -117,9 +131,9 @@ test('teacher routes keep their public URL contract through the shared parser', 
         subject: 'science', grade: '9', trimester: '3', month: 'October'
     });
 
-    window.location.hash = '#/teacher/data?tab=view';
+    window.location.hash = '#/teacher/settings?tab=view';
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-data-management-view'), {
-        view: 'data', tab: 'view'
+        view: 'settings', tab: 'subjects'
     });
     window.location.hash = '#/teacher/settings?tab=calendar';
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-data-management-view'), {
@@ -160,6 +174,7 @@ test('teacher route queue applies only the newest navigation generation', async 
     }
     installTeacherRoutingMethods(TeacherManager);
     const teacher = new TeacherManager();
+    teacher.authDisabled = true;
     const firstRoute = teacher.applyRoute({ view: 'groups' });
     await Promise.resolve();
     await teacher.applyRoute({ view: 'sparks' });

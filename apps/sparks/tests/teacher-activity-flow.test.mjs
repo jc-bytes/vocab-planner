@@ -26,6 +26,7 @@ globalThis.window = {
     removeEventListener() {}
 };
 
+const { applyActivityPreset } = await import('../js/teacherActivitySettingsView.js');
 const { installTeacherVocabularyActivityFlowMethods } = await import('../js/teacherVocabularyActivityFlowMethods.js');
 
 class TeacherFlowHarness {}
@@ -112,4 +113,20 @@ test('teacher activity rewards use the shared defaults and activity override pre
     });
     manager.setActivityRewardSetting('matching', 'progressReward', 'invalid');
     assert.equal(manager.vocabSet.activitySettings.activityRewards.matching.progressReward, 1);
+});
+
+
+test('activity presets change only the learning path and keep per-activity settings', () => {
+    const manager = new TeacherFlowHarness();
+    manager.vocabSet = { activitySettings: { requiredActivities: ['flashcards', 'quiz'], additionalActivities: ['matching'], activityTimeLimits: { illustration: 45 } } };
+    let saves = 0;
+    manager.renderActivityFlowSettings = manager.renderWords = manager.updateVocabularyEditorSummary = () => {};
+    manager.triggerAutoSave = () => saves++;
+    applyActivityPreset(manager, 'evidence');
+    assert.deepEqual(manager.vocabSet.activitySettings.requiredActivities, ['flashcards', 'illustration']);
+    assert.deepEqual(manager.vocabSet.activitySettings.additionalActivities, []);
+    assert.deepEqual(manager.vocabSet.activitySettings.activityTimeLimits, { illustration: 45 });
+    assert.equal(saves, 1);
+    applyActivityPreset(manager, 'unknown');
+    assert.equal(saves, 1);
 });

@@ -1,3 +1,4 @@
+import { waitStudentSchoolReady } from './student/studentSchoolSession.js';
 import { notifications } from './notifications.js';
 import { setStudentPageLoading } from './student/studentLoadingSkeletons.js';
 import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
@@ -10,6 +11,8 @@ export class StudentRouting {
         this.pendingRoute = null;
         this.games = null;
         this.gamesPromise = null;
+        this.gamesGeneration = 0;
+        this.loadGamesModule = () => import('./student/studentGames.js');
     }
 
     reset() {
@@ -19,7 +22,10 @@ export class StudentRouting {
     }
 
     resetSession() {
-        this.games?.cleanupCurrentGame?.({ preserveSelection: false });
+        this.classroomView?.destroy();
+        this.classroomView = null;
+        this.gamesGeneration += 1;
+        this.games?.destroy?.();
         this.games = null;
         this.gamesPromise = null;
         this.reset();
@@ -34,6 +40,7 @@ export class StudentRouting {
     }
 
     getVocabRouteId(vocab) {
+        if (vocab?.assignmentId) return `assignment.${vocab.assignmentId}`;
         return String(vocab?.id || this.slugifyRouteId(vocab?.name) || '').trim();
     }
 
@@ -45,14 +52,17 @@ export class StudentRouting {
         if (this.games) return this.games;
 
         if (!this.gamesPromise) {
-            this.gamesPromise = import('./student/studentGames.js')
+            const gamesGeneration = this.gamesGeneration;
+            const gamesPromise = this.loadGamesModule()
                 .then(({ StudentGames }) => {
+                    if (gamesGeneration !== this.gamesGeneration) return null;
                     this.games = new StudentGames(this.sm);
                     return this.games;
                 })
                 .finally(() => {
-                    this.gamesPromise = null;
+                    if (this.gamesPromise === gamesPromise) this.gamesPromise = null;
                 });
+            this.gamesPromise = gamesPromise;
         }
 
         return this.gamesPromise;
@@ -62,6 +72,7 @@ export class StudentRouting {
         const location = parseHashLocation(hash);
         if (!location) return null;
         const { parts, params } = location;
+        if (parts.length === 1 && parts[0] === 'classes') return { view: 'classes' };
 
         if (parts.length === 1 && parts[0] === 'menu') {
             return { view: 'menu' };
@@ -122,6 +133,7 @@ export class StudentRouting {
         if (!route || !route.view) return '#/menu';
 
         if (route.view === 'menu') return '#/menu';
+        if (route.view === 'classes') return '#/classes';
         if (route.view === 'units') {
             const params = new URLSearchParams();
             if (route.all) params.set('all', '1');
@@ -158,7 +170,7 @@ export class StudentRouting {
         await this.applyRoute(route);
     }
 
-    async restoreRouteOrDefault(defaultRoute = { view: 'menu' }) {
+    async restoreRouteOrDefault(defaultRoute = { view: this.sm.authDisabled === false ? 'classes' : 'menu' }) {
         this.routeReady = true;
         const route = this.parseRoute();
 
@@ -190,7 +202,15 @@ export class StudentRouting {
             this.sm.activities.renderDashboard();
         }
 
-        return this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized) || null;
+        const visible = this.sm.activities.availableVocabs.find(vocab => this.getVocabRouteId(vocab) === normalized);
+        if (visible) return visible;
+        // Archived sets remain addressable for their own grade's saved evidence.
+        const grade = String(this.sm.studentProfile?.grade || '');
+        return this.sm.activities.getAllVocabularySources?.().find(vocab => (
+            vocab.activitySettings?.retiredWeeklySet
+            && this.getVocabRouteId(vocab) === normalized
+            && vocab.grades?.map(String).includes(grade)
+        )) || null;
     }
 
     isKnownActivityType(activityType) {
@@ -233,6 +253,11 @@ export class StudentRouting {
     }
 
     async showSparksView() {
+        if (this.sm.authDisabled === false) {
+            this.setRoute({ view: 'classes' }, { replace: true });
+            await this.applyRouteTarget({ view: 'classes' });
+            return;
+        }
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
         this.sm.switchView('student-sparks-view');
@@ -256,6 +281,7 @@ export class StudentRouting {
         setStudentPageLoading(arcadeView, true);
         try {
             const games = await this.getGames();
+            if (!games) return false;
             await Promise.all([
                 games.updateArcadeUI(),
                 games.updateGameSelectionUI()
@@ -314,6 +340,22 @@ export class StudentRouting {
     async applyRouteTarget(targetRoute) {
         try {
             await this.flushActivityProgressBeforeRoute(targetRoute);
+            if (targetRoute.view === 'classes') {
+                const generation = this.gamesGeneration;
+                const { createClassroomView } = await import('./classroomView.js');
+                if (generation !== this.gamesGeneration) return;
+                this.sm.cleanupActivity();
+                this.sm.currentVocab = null;
+                this.sm.switchView('student-classes-view');
+                this.classroomView ||= createClassroomView({
+                    root: document.getElementById('student-classes-view'), role: 'student',
+                    getUserId: () => this.sm.currentUser?.uid || this.sm.currentUser?.id,
+                    onSchoolReady: options => waitStudentSchoolReady(this.sm, options),
+                    openVocabulary: assignmentId => this.navigateTo({ view: 'unit', unitId: `assignment.${assignmentId}` })
+                });
+                await this.classroomView.show();
+                return;
+            }
 
             if (targetRoute.view === 'invalid') {
                 this.setRoute({ view: 'units' }, { replace: true });
@@ -345,7 +387,9 @@ export class StudentRouting {
             }
 
             if (targetRoute.view === 'unit' || targetRoute.view === 'activity') {
-                const vocab = this.findVocabByRouteId(targetRoute.unitId);
+                const vocab = /^assignment\.[0-9a-f-]{36}$/.test(targetRoute.unitId || '')
+                    ? { assignmentId: targetRoute.unitId.slice(11), name: 'Class assignment' }
+                    : this.findVocabByRouteId(targetRoute.unitId);
                 if (!vocab) {
                     this.setRoute({ view: 'units' }, { replace: true });
                     this.showUnitsView();
@@ -355,8 +399,13 @@ export class StudentRouting {
                 await this.sm.activities.loadVocabulary(vocab, {
                     fromRoute: true,
                     skipActivityPreload: targetRoute.view === 'activity',
-                    deferActivityMenu: targetRoute.view === 'activity'
+                    deferActivityMenu: targetRoute.view === 'activity' && !vocab.activitySettings?.retiredWeeklySet
                 });
+
+                if (vocab.activitySettings?.retiredWeeklySet) {
+                    this.setRoute({ view: 'unit', unitId: this.getVocabRouteId(vocab) }, { replace: true });
+                    return;
+                }
 
                 if (targetRoute.view === 'unit') {
                     return;

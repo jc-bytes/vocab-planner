@@ -1,3 +1,4 @@
+import { schoolContext } from '../js/services/schoolContext.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -43,34 +44,24 @@ test('settings rows preserve the previous flattened client shape', () => {
 test('subject repository maps camelCase fields in both directions', () => {
     const payload = subjectPayload({ slug: 'science', name: 'Science', sortOrder: 20, active: true });
     assert.equal(payload.sort_order, 20);
-    const subject = mapSubjectRow({ slug: 'science', name: 'Science', sort_order: 20, active: true });
+    const subject = mapSubjectRow({ id: 'science', name: 'Science', sort_order: 20, active: true });
     assert.deepEqual({ slug: subject.slug, sortOrder: subject.sortOrder, active: subject.active }, {
         slug: 'science', sortOrder: 20, active: true
     });
 });
 
-test('subject repository saves a collection in one upsert request', async () => {
+test('subject creation uses private subjects without accepting an owner from the caller', async () => {
     const calls = [];
-    const client = {
-        from(table) {
-            assert.equal(table, 'subjects');
-            return {
-                upsert(payloads, options) {
-                    calls.push({ payloads, options });
-                    return Promise.resolve({ error: null });
-                }
-            };
-        }
-    };
-
-    const saved = await withFakeClient(client, () => subjectsRepository.saveAll([
-        { slug: 'technology', name: 'Technology', sortOrder: 10, active: true },
-        { slug: 'science', name: 'Science', sortOrder: 20, active: true }
-    ]));
-
-    assert.equal(calls.length, 1);
-    assert.equal(calls[0].payloads.length, 2);
-    assert.deepEqual(saved.map(subject => subject.slug), ['technology', 'science']);
+    const client = { from(table) {
+        assert.equal(table, 'teacher_subjects');
+        return { insert(payload) {
+            assert.ok(!('owner_id' in payload)); calls.push(payload);
+            return { select() { return { single: async () => ({ data: { id: 'owned-subject', ...payload }, error: null }) }; } };
+        } };
+    } };
+    const saved = await withFakeClient(client, () => subjectsRepository.saveAll([{ name: 'Science' }]));
+    assert.equal(calls.length, 1); assert.equal(saved[0].slug, 'owned-subject');
+    assert.equal(calls[0].school_id, 'school-a');
 });
 
 test('vocabulary mapping preserves legacy defaults and nullable placement fields', () => {
@@ -102,7 +93,8 @@ test('vocabulary placement updates use one bounded RPC payload', async () => {
     ]));
 
     assert.equal(calls.length, 1);
-    assert.equal(calls[0].name, 'update_vocabulary_placements_v1');
+    assert.equal(calls[0].name, 'update_vocabulary_placements_school_v1');
+    assert.equal(calls[0].args.p_school_id, 'school-a');
     assert.equal(calls[0].args.p_updates.length, 2);
     assert.deepEqual(result, { requested: 2, updated: 2 });
 });
@@ -176,12 +168,17 @@ test('profile, progress, and score rows preserve existing application shapes', (
     });
 });
 
-function withFakeClient(client, run) {
+async function withFakeClient(client, run) {
     const originalInit = supabaseService.init;
     const originalGetClient = supabaseService.getClient;
     supabaseService.init = async () => supabaseService;
-    supabaseService.getClient = () => client;
-    return Promise.resolve(run()).finally(() => {
+    supabaseService.getClient = () => ({ ...client, rpc(name, args) {
+        if (name === 'my_school_access_v1') return { abortSignal() { return Promise.resolve({ data: { schools: [{ id: 'school-a', name: 'A', roles: ['teacher'] }, { id: 'school-b', name: 'B', roles: ['teacher'] }] }, error: null }); } };
+        return client.rpc(name, args);
+    } });
+    await schoolContext.load('teacher-test');
+    return Promise.resolve().then(run).finally(() => {
+        schoolContext.clear();
         supabaseService.init = originalInit;
         supabaseService.getClient = originalGetClient;
     });
@@ -197,11 +194,29 @@ function createReadBuilder(result, calls) {
         in(field, value) { calls.push(['in', field, value]); return this; },
         order(field, options) { calls.push(['order', field, options]); return this; },
         limit(value) { calls.push(['limit', value]); return this; },
+        abortSignal(value) { calls.push(['abortSignal', value]); return this; },
         maybeSingle() { calls.push(['maybeSingle']); return Promise.resolve(result); },
         then(resolve, reject) { return Promise.resolve(result).then(resolve, reject); }
     };
     return builder;
 }
+
+test('navigable teacher repository reads forward cancellation signals', async () => {
+    const signal = new AbortController().signal;
+    const sparkCalls = [];
+    const sparkBuilder = createReadBuilder({ data: [], error: null }, sparkCalls);
+    await withFakeClient({
+        from(table) { sparkCalls.push(['from', table]); return sparkBuilder; }
+    }, () => sparksRepository.list({ signal }));
+    assert.ok(sparkCalls.some(call => call[0] === 'abortSignal' && call[1] === signal));
+
+    const vocabularyCalls = [];
+    const vocabularyBuilder = createReadBuilder({ data: [], error: null }, vocabularyCalls);
+    await withFakeClient({
+        rpc(name) { vocabularyCalls.push(['rpc', name]); return vocabularyBuilder; }
+    }, () => vocabularyRepository.listMetadata({ signal }));
+    assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] === signal));
+});
 
 test('student Spark response reads are scoped to the requested Spark ids', async () => {
     const calls = [];
@@ -234,7 +249,7 @@ test('scheduled Spark query preserves domain filters, ordering, and limit', asyn
         assert.equal(sparks[0].id, 's1');
     });
     assert.deepEqual(calls, [
-        ['from', 'weekly_sparks'], ['select', '*'],
+        ['from', 'weekly_sparks'], ['select', '*'], ['eq', 'school_id', 'school-a'],
         ['eq', 'subject_slug', 'technology'], ['eq', 'status', 'scheduled'],
         ['lte', 'scheduled_date', '2026-07-13'],
         ['gte', 'scheduled_date', '2026-06-08'],
@@ -290,5 +305,20 @@ test('student progress repository preserves missing-record and realtime teardown
         assert.deepEqual(channel.config, { event: '*' });
         unsubscribe();
         assert.equal(removed, channel);
+    });
+});
+
+
+test('a delayed material save retains its captured school when the user switches', async () => {
+    const writes = [];
+    await withFakeClient({ from: () => ({ upsert: async payload => { writes.push(payload); return { error: null }; } }) }, async () => {
+        const init = supabaseService.init;
+        let release;
+        supabaseService.init = () => new Promise(resolve => { release = resolve; });
+        const saving = vocabularyRepository.save('material-a', { name: 'Original school', words: [] });
+        schoolContext.select('school-b');
+        release();
+        try { await saving; } finally { supabaseService.init = init; }
+        assert.equal(writes[0].school_id, 'school-a');
     });
 });

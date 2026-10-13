@@ -63,6 +63,7 @@ export function clearTeacherSettingsSessionState(owner) {
     owner.subjectSettingsLoaded = false;
     owner.gamificationSettingsLoaded = false;
     owner.schoolCalendarSettingsLoaded = false;
+    owner.overviewAnalytics = null;
     owner.subjects = [];
     owner.schoolCalendar = getDefaultSchoolCalendar();
     globalThis.clearTimeout(owner.gamificationStatusTimer);

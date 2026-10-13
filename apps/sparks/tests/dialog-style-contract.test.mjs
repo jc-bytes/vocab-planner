@@ -67,7 +67,8 @@ test('page and lazy styles retain refinements without recreating the dialog core
     }
 
     assert.match(studentFeatureCss, /\.modal-content\s*\{[^}]*max-width:\s*calc\(100vw - 64px\)\s*!important/s);
-    assert.match(teacherCss, /#student-detail-modal \.modal-content\s*\{/);
+    assert.doesNotMatch(teacherHtml, /id="student-detail-modal"/);
+    assert.match(teacherHtml, /id="teacher-student-profile-view"/);
     assert.doesNotMatch(teacherCss, /\.activity-student-preview-/);
     assert.match(teacherQuizCss, /\.rubric-modal-backdrop\s*\{/);
     assert.match(fillInBlankJs, /modal hidden fib-hint-modal/);
@@ -75,17 +76,22 @@ test('page and lazy styles retain refinements without recreating the dialog core
 });
 
 test('shared dialog behavior still owns accessibility and focus lifecycle', () => {
+    assert.match(mainJs, /import \{ createFocusTrap \} from 'focus-trap'/);
     assert.match(mainJs, /export function setupModal/);
     assert.match(mainJs, /modal\.setAttribute\('aria-modal', 'true'\)/);
     assert.match(mainJs, /event\.key === 'Escape'/);
-    assert.match(mainJs, /event\.key !== 'Tab'/);
+    assert.match(mainJs, /trapStack: modalTrapStack/);
+    assert.match(mainJs, /isolateSubtrees: 'inert'/);
+    assert.match(mainJs, /pruneDisconnectedModalTraps/);
+    assert.doesNotMatch(mainJs, /focusableSelector|getFocusableElements|event\.key !== 'Tab'/);
     assert.match(mainJs, /export function openModal/);
     assert.match(mainJs, /export function closeModal/);
-    assert.match(mainJs, /state\.previouslyFocused\.focus/);
+    assert.match(mainJs, /state\.trap\?\.deactivate/);
 
     const staticDialogs = [...`${studentHtml}\n${teacherHtml}`.matchAll(/<div[^>]*class="[^"]+"[^>]*>/g)]
         .filter(([tag]) => tag.match(/class="([^"]+)"/)?.[1].split(/\s+/).includes('modal'));
-    assert.equal(staticDialogs.length, 7);
+    assert.equal(staticDialogs.length, 5);
+    assert.match(teacherHtml, /id="teacher-spark-editor-view" class="view hidden"/);
     for (const [tag] of staticDialogs) {
         assert.match(tag, /role="dialog"/);
         assert.match(tag, /aria-modal="true"/);

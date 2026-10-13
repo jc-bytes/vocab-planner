@@ -1,0 +1,43 @@
+{
+  "id": "t3_review_row_column",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Row and column",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "7"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "row",
+      "definition": "A line of cells going across a table.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/row"
+    },
+    {
+      "word": "column",
+      "definition": "A line of cells going down a table.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/column"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { schoolContext } from '../services/schoolContext.js';
 import { createElement, escapeHtml } from '../main.js';
 import { normalizeSparkCheckMode, normalizeSparkQuestions, SPARK_CHECK_MODES } from '../sparkCheckModel.js';
 import { normalizeSparkGradeQuestions, normalizeSparkTargetGrades, SPARK_GRADE_LEVELS } from '../sparkModel.js';
@@ -17,7 +18,8 @@ renderSparkLibrary() {
         }
 
         const data = this.getSparkLibraryData();
-        list.appendChild(this.createSparkOverview(data));
+        const help = createElement('p', 'form-helper', 'Save reusable Sparks here. Use Assign to choose classes and availability. Editing a material does not change published copies.');
+        list.appendChild(help);
         list.appendChild(this.createSparkViewTabs(data));
 
         const body = createElement('div', 'spark-library-body');
@@ -38,7 +40,7 @@ createSparkOverview(data) {
         const currentTitle = data.currentSpark?.title || 'No current Spark';
         const currentMeta = data.currentSpark
             ? `${formatShortDate(data.currentSpark.scheduledDate)} · ${this.getSparkTypeLabel(data.currentSpark.sparkType)}`
-            : 'Schedule a Spark to make it student-visible.';
+            : 'Assign a saved Spark to make it available to a class.';
         overview.innerHTML = `
             <div class="spark-command-main">
                 <span class="spark-command-kicker">Current Spark</span>
@@ -250,7 +252,7 @@ createSparkSpotlight(spark, { eyebrow, currentId }) {
                     <span class="spark-type-pill"><i data-lucide="${meta.icon}"></i>${escapeHtml(meta.label)}</span>
                     <span class="spark-status-pill">${escapeHtml(this.formatSparkDateLabel(spark))}</span>
                 </div>
-                <h3>${escapeHtml(spark.title || 'Untitled Spark')}</h3>
+                <h2>${escapeHtml(spark.title || 'Untitled Spark')}</h2>
                 <p>${escapeHtml(spark.sparkText || 'No Spark text yet.')}</p>
                 ${spark.question ? `
                     <div class="spark-question">
@@ -281,7 +283,7 @@ renderSparkSection(container, { title, description, items, emptyText, currentId 
         section.innerHTML = `
             <div class="spark-section-header section-heading">
                 <div>
-                    <h3 class="section-header__title">${escapeHtml(title)}</h3>
+                    <h2 class="section-header__title">${escapeHtml(title)}</h2>
                     <p class="section-header__description">${escapeHtml(description)}</p>
                 </div>
                 <span class="spark-section-count section-header__metric">${items.length}</span>
@@ -308,7 +310,7 @@ createSparkCard(spark, { currentId = '' } = {}) {
         const meta = SPARK_TYPE_META[spark.sparkType] || SPARK_TYPE_META.cool_fact;
         const isCurrent = spark.id && spark.id === currentId;
         const card = createElement('article', `spark-card is-${spark.status}${isCurrent ? ' is-current' : ''}`);
-        const statusLabel = isCurrent ? 'Current' : this.formatSparkStatusLabel(spark.status);
+        const statusLabel = this.formatSparkStatusLabel(spark.status);
         const sourceHtml = spark.sourceUrl
             ? `<a href="${escapeHtml(spark.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(spark.sourceTitle || 'Source')}</a>`
             : '';
@@ -326,7 +328,7 @@ createSparkCard(spark, { currentId = '' } = {}) {
                 <span class="spark-type-pill"><i data-lucide="${meta.icon}"></i>${escapeHtml(meta.label)}</span>
                 <span class="spark-status-pill">${escapeHtml(statusLabel)}</span>
             </div>
-            <h4 class="card-title">${escapeHtml(spark.title || 'Untitled Spark')}</h4>
+            <h3 class="card-title">${escapeHtml(spark.title || 'Untitled Spark')}</h3>
             <p class="card-secondary">${escapeHtml(spark.sparkText || 'No Spark text yet.')}</p>
             ${spark.whyItMatters ? `
                 <div class="spark-detail">
@@ -349,6 +351,10 @@ createSparkCard(spark, { currentId = '' } = {}) {
                     ${sourceHtml}
                 </div>
                 <div class="spark-card-actions">
+                    ${this.publishMaterial && schoolContext.hasRole('teacher') && !this.isAuthenticationDisabled() && spark.id ? `
+                    <button class="btn text-btn spark-card-action" type="button" data-spark-action="assign" data-spark-id="${escapeHtml(spark.id)}">
+                        <i data-lucide="send"></i> Assign
+                    </button>` : ''}
                     <button class="btn text-btn spark-card-action" type="button" data-spark-action="edit" data-spark-id="${escapeHtml(spark.id)}">
                         <i data-lucide="pencil"></i>
                         Edit
@@ -385,7 +391,7 @@ createSparkTargetGradeSummaryHtml(spark) {
             : grades.map(grade => `Grade ${grade}`).join(', ');
         return `
             <div class="spark-detail spark-target-grade-summary">
-                <strong>Target grades</strong>
+                <strong>Suggested grades</strong>
                 <span>${escapeHtml(label)}</span>
             </div>
         `;
@@ -403,7 +409,7 @@ createSparkCheckSummaryHtml(spark) {
         const modeLabels = {
             [SPARK_CHECK_MODES.READING_ONLY]: 'Reading only',
             [SPARK_CHECK_MODES.OPTIONAL]: 'Optional check',
-            [SPARK_CHECK_MODES.REQUIRED]: 'Required · gates Arcade'
+            [SPARK_CHECK_MODES.REQUIRED]: 'Required check'
         };
         const countLabel = questionCount === 1 ? '1 question' : `${questionCount} questions`;
         return `

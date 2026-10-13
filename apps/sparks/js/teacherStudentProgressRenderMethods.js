@@ -1,5 +1,6 @@
-import { $, $$, createElement, escapeHtml, notifications, openModal } from './main.js';
+import { $, $$, createElement, escapeHtml, notifications } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { buildStudentProfileModel } from './teacherStudentProfileModel.js';
 
 class TeacherStudentProgressRenderMethods {
     renderProgressTable() {
@@ -13,7 +14,7 @@ class TeacherStudentProgressRenderMethods {
             if (tbody) {
                 tbody.innerHTML = `
                     <tr>
-                        <td class="data-table__cell data-table__empty" colspan="8">No students match the current filters.</td>
+                        <td class="data-table__cell data-table__empty" colspan="9">No students match the current filters.</td>
                     </tr>
                 `;
             }
@@ -40,14 +41,15 @@ class TeacherStudentProgressRenderMethods {
                 <td class="data-table__cell">
                     <input type="checkbox" class="student-checkbox student-select-control" data-id="${escapeHtml(student.id)}" aria-label="Select ${details.name}" ${this.selectedStudents.has(student.id) ? 'checked' : ''}>
                 </td>
-                <td class="data-table__cell">${details.name}</td>
-                <td class="data-table__cell data-table__secondary student-progress-table-email">${details.email}</td>
-                <td class="data-table__cell">${details.grade}</td>
-                <td class="data-table__cell">${details.group}</td>
+                <td class="data-table__cell">${details.name}<span class="student-roster-secondary">${details.email}</span></td>
+                <td class="data-table__cell">${details.grade}${details.group}</td>
+                <td class="data-table__cell student-roster-learning">${details.completion}</td>
+                <td class="data-table__cell"><span class="student-roster-attention ${details.attentionClass}">${details.attention}</span></td>
+                <td class="data-table__cell data-table__metric">${details.accuracy}</td>
                 <td class="data-table__cell data-table__metric">${details.coins}</td>
                 <td class="data-table__cell data-table__secondary">${details.lastActive}</td>
                 <td class="data-table__cell data-table__action">
-                    <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
+                    <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Profile</button>
                     <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}">Add Coins</button>
                 </td>
             `;
@@ -70,13 +72,15 @@ class TeacherStudentProgressRenderMethods {
                         </div>
                     </div>
                     <div class="student-card-meta">
-                        <span>Grade<strong>${details.grade}</strong></span>
-                        <span>Section<strong>${details.group}</strong></span>
+                        <span>Class<strong>${details.grade}${details.group}</strong></span>
+                        <span>Required vocabulary<strong>${details.completion}</strong></span>
+                        <span>Needs attention<strong class="${details.attentionClass}">${details.attention}</strong></span>
+                        <span>Recent accuracy<strong>${details.accuracy}</strong></span>
                         <span>Coins<strong>${details.coins}</strong></span>
-                        <span>Last Active<strong>${details.lastActive}</strong></span>
+                        <span>Last learning activity<strong>${details.lastActive}</strong></span>
                     </div>
                     <div class="student-card-actions">
-                        <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Details</button>
+                        <button class="btn text-btn view-details-btn" data-id="${escapeHtml(student.id)}">View Profile</button>
                         <button class="btn secondary-btn add-coins-btn" data-id="${escapeHtml(student.id)}">Add Coins</button>
                     </div>
                 `;
@@ -93,7 +97,12 @@ class TeacherStudentProgressRenderMethods {
         const rawName = profile.firstName && profile.lastName
             ? `${profile.firstName} ${profile.lastName}`
             : (profile.name || 'Unknown');
-        const updatedTime = this.getStudentUpdatedTime(student);
+        const result = this.studentRosterProgressById?.get(student.id);
+        const progress = result?.progress;
+        const ready = result?.state === 'ready' && progress;
+        const unavailable = result?.state === 'error';
+        const placeholder = unavailable ? 'Unavailable' : 'Loading…';
+        const updatedTime = ready ? progress.lastActive : null;
         const date = updatedTime ? new Date(updatedTime) : null;
 
         return {
@@ -102,7 +111,13 @@ class TeacherStudentProgressRenderMethods {
             grade: escapeHtml(profile.grade || '-'),
             group: escapeHtml(profile.group || '-'),
             coins: escapeHtml(student.coins || 0),
-            lastActive: date ? escapeHtml(date.toLocaleDateString()) : '-'
+            completion: ready ? (progress.required === null ? 'Unavailable' : progress.required
+                ? `${progress.completed} / ${progress.required} activities` : 'No required work') : placeholder,
+            attention: ready ? (progress.pending === null ? 'Unavailable' : progress.overdue
+                ? `${progress.overdue} overdue · ${progress.pending} unfinished` : progress.pending ? `${progress.pending} unfinished` : 'Up to date') : placeholder,
+            attentionClass: ready && progress.pending > 0 ? 'student-roster-needs-help' : '',
+            accuracy: ready ? (progress.accuracy === null ? 'No results' : `${progress.accuracy}%`) : placeholder,
+            lastActive: ready ? (date ? escapeHtml(date.toLocaleDateString()) : 'No activity') : placeholder
         };
     }
 
@@ -119,8 +134,7 @@ class TeacherStudentProgressRenderMethods {
                 const id = e.currentTarget.dataset.id;
                 const student = this.allStudentData.find(s => s.id === id);
                 if (student) {
-                    this.showStudentDetails(student);
-                    window.requestAnimationFrame(() => $('#coin-adjust-input')?.focus());
+                    this.showStudentDetails(student, { tab: 'account' });
                 }
             });
         });
@@ -155,135 +169,275 @@ class TeacherStudentProgressRenderMethods {
         });
     }
 
-    async showStudentDetails(student) {
-        const generation = this.studentProgressSessionGeneration || 0;
+    showStudentDetails(student, { tab = 'overview' } = {}) {
+        if (!student?.id) return;
         this.activeStudentId = student.id;
-        const needsDetail = !student.progressDetailLoaded;
-        this.renderStudentDetails(student, { loading: needsDetail });
+        this.activeStudentProfile = student;
+        const route = { view: 'student-profile', studentId: student.id, tab };
+        this.setRoute(route);
+        void this.applyRoute(route);
+    }
 
-        if (!needsDetail) return;
+    async showStudentProfileById(studentId, { tab = 'overview' } = {}) {
+        if (!this.ensureAuthenticated(false) || !studentId) return false;
+        const generation = this.studentProgressSessionGeneration || 0;
+        const request = (this.studentProfileRequest || 0) + 1;
+        this.studentProfileRequest = request;
+        this.studentInsightRequest = (this.studentInsightRequest || 0) + 1;
+        this.studentDashboardCharts?.dispose();
+        this.studentDashboardCharts = null;
+        $('#student-profile-assigned-work')?.replaceChildren();
+        const insightSummary = $('#student-insight-summary');
+        if (insightSummary) insightSummary.textContent = 'Loading assigned-work insight...';
+        this.activeStudentId = studentId;
+        this.switchView('teacher-student-profile-view', { updateRoute: false });
+        $('#student-profile-loading')?.classList.remove('hidden');
+        $('#student-profile-content')?.classList.add('hidden');
+        $('#student-profile-error')?.classList.add('hidden');
+
         try {
-            const detailedStudent = await this.ensureStudentProgressDetail(student);
-            if (generation === (this.studentProgressSessionGeneration || 0)
-                && this.activeStudentId === student.id
-                && detailedStudent) {
-                this.renderStudentDetails(detailedStudent);
+            const rosterStudent = this.allStudentData.find(student => student.id === studentId);
+            const seed = rosterStudent || { id: studentId, userId: studentId, studentProfile: {} };
+            const [progressStudent, identity] = await Promise.all([
+                this.ensureStudentProgressDetail(seed),
+                supabaseService.getProfile(studentId)
+            ]);
+            if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return false;
+            if (!identity && !rosterStudent && !progressStudent?.progressDetailLoaded) {
+                throw new Error('Student progress was not found.');
             }
+            const student = {
+                ...(progressStudent || seed),
+                email: identity?.email || progressStudent?.email || '',
+                mustChangePassword: identity?.mustChangePassword,
+                studentProfile: {
+                    ...(progressStudent?.studentProfile || {}),
+                    ...(identity ? {
+                        firstName: identity.firstName,
+                        lastName: identity.lastName,
+                        name: identity.name,
+                        email: identity.email,
+                        grade: identity.grade,
+                        group: identity.group
+                    } : {})
+                },
+                progressDetailLoaded: true
+            };
+            this.activeStudentProfile = student;
+            this.renderStudentProfile(student, { tab });
+            const { loadStudentInsight } = await import('./teacherStudentInsightView.js');
+            if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0) || this.activeStudentId !== studentId) return false;
+            await loadStudentInsight(this, studentId);
+            return true;
         } catch (error) {
-            if (generation !== (this.studentProgressSessionGeneration || 0)) return;
-            console.error('Failed to load student details:', error);
-            if (this.activeStudentId === student.id) {
-                const list = $('#detail-activity-list');
-                if (list) {
-                    list.innerHTML = '<p class="modal-secondary student-detail-message student-detail-message--error">Activity details are unavailable right now. Please try again.</p>';
-                }
+            if (request !== this.studentProfileRequest || generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return false;
+            console.error('Failed to load student profile:', error);
+            $('#student-profile-loading')?.classList.add('hidden');
+            const errorElement = $('#student-profile-error');
+            if (errorElement) {
+                errorElement.textContent = 'This student profile is unavailable. Return to Students and try again.';
+                errorElement.classList.remove('hidden');
             }
+            return false;
         }
     }
 
-    renderStudentDetails(student, { loading = false } = {}) {
-        const modal = $('#student-detail-modal');
-        const profile = student.studentProfile || {};
-        this.activeStudentId = student.id;
+    renderStudentDetails(student, options = {}) {
+        return this.renderStudentProfile(student, options);
+    }
+
+    renderStudentProfile(student, { tab = this.activeStudentProfileTab || 'overview' } = {}) {
+        const model = buildStudentProfileModel(student);
+        this.activeStudentId = model.id;
+        this.activeStudentProfile = student;
+        this.activeStudentProfileModel = model;
         this.updateCoinStatus('');
 
-        $('#detail-student-name').textContent = profile.firstName && profile.lastName
-            ? `${profile.firstName} ${profile.lastName}`
-            : (profile.name || 'Unknown');
-        $('#detail-student-grade').textContent = profile.grade || '-';
-        $('#detail-student-group').textContent = profile.group || '-';
-        $('#detail-student-coins').textContent = student.coins || 0;
-        const lastActiveTime = this.getStudentUpdatedTime(student);
-        const lastActiveDate = lastActiveTime ? new Date(lastActiveTime).toLocaleString() : '-';
-        $('#detail-last-active').textContent = lastActiveDate;
+        $('#detail-student-name').textContent = model.name;
+        $('#student-profile-email').textContent = model.email;
+        $('#student-profile-class').textContent = [
+            model.grade ? `Grade ${model.grade}` : '',
+            model.section ? `Section ${model.section}` : ''
+        ].filter(Boolean).join(' · ') || 'Student profile';
+        $('#detail-student-coins').textContent = model.coins.toLocaleString();
+        $('#detail-last-active').textContent = model.lastActive
+            ? new Date(model.lastActive).toLocaleString()
+            : 'No activity';
+        $('#detail-avg-score').textContent = model.summary.averageBestScore === null
+            ? '-'
+            : `${model.summary.averageBestScore}%`;
+        $('#detail-avg-accuracy').textContent = model.summary.averageAccuracy === null
+            ? '-'
+            : `${model.summary.averageAccuracy}%`;
+        $('#detail-total-activities').textContent = `${model.summary.completed} / ${model.summary.recorded}`;
+        $('#detail-total-xp').textContent = model.totalXp.toLocaleString();
+        $('#detail-password-flag').textContent = model.mustChangePassword === null
+            ? 'Unknown'
+            : model.mustChangePassword ? 'Yes' : 'No';
 
-        const passwordFlag = $('#detail-password-flag');
-        if (passwordFlag) {
-            passwordFlag.textContent = student.mustChangePassword ? 'Required' : 'No';
+        this.renderStudentProfileAttention(model);
+        this.renderStudentProfileUnits(model);
+        this.renderStudentProfileActivities(student, model);
+        this.renderStudentProfileCoinHistory(model);
+        this.updateStudentProfileNavigation(model.id);
+        this.setStudentProfileTab(tab, { updateRoute: false });
+
+        $('#student-profile-loading')?.classList.add('hidden');
+        $('#student-profile-error')?.classList.add('hidden');
+        $('#student-profile-content')?.classList.remove('hidden');
+        this.refreshIcons($('#teacher-student-profile-view'));
+        $('#detail-student-name')?.focus({ preventScroll: true });
+    }
+
+    renderStudentProfileAttention(model) {
+        const container = $('#student-profile-attention');
+        if (!container) return;
+        if (model.attention.length === 0) {
+            container.innerHTML = '<p class="student-profile-clear"><i data-lucide="circle-check"></i>No immediate concerns in the recorded activity.</p>';
+            return;
         }
-        const resetStatus = $('#reset-password-status');
-        const tempOutput = $('#temporary-password-output');
-        if (resetStatus) resetStatus.textContent = '';
-        if (tempOutput) {
-            tempOutput.textContent = '';
-            tempOutput.style.display = 'none';
+        container.innerHTML = `<ul>${model.attention.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    }
+
+    renderStudentProfileUnits(model) {
+        const container = $('#student-profile-units');
+        if (!container) return;
+        if (model.units.length === 0) {
+            container.innerHTML = '<p class="teacher-empty-state">No vocabulary progress has been recorded.</p>';
+            return;
         }
+        container.innerHTML = model.units.map(unit => `
+            <article class="student-profile-unit">
+                <div>
+                    <strong>${escapeHtml(unit.name)}</strong>
+                    <span>${unit.completed} of ${unit.total} completed</span>
+                </div>
+                <div class="student-profile-progress" aria-label="${unit.percent}% complete">
+                    <span style="width: ${unit.percent}%"></span>
+                </div>
+                <b>${unit.percent}%</b>
+            </article>
+        `).join('');
+    }
 
-        const list = $('#detail-activity-list');
-        list.innerHTML = '';
-
-        const units = student.units || {};
-        let totalScores = 0;
-        let scoreCount = 0;
-        let totalActivities = 0;
-        if (loading) {
-            list.innerHTML = '<div class="loading-spinner runtime-status">Loading activity details...</div>';
-        } else if (Object.keys(units).length === 0) {
-            list.innerHTML = '<p class="modal-secondary student-detail-message">No activity data recorded.</p>';
-        } else {
-            for (const [unitName, unitData] of Object.entries(units)) {
-                const card = createElement('div', 'student-detail-activity-row');
-
-                let scoresHtml = '';
-                if (unitData.scores) {
-                    for (const [activity, data] of Object.entries(unitData.scores)) {
-                        totalActivities++;
-                        if (data.score !== undefined) {
-                            totalScores += data.score;
-                            scoreCount++;
-                        }
-                        const attempt = data.latestAttempt || data.bestAttempt || {};
-                        const activeSeconds = Number(attempt.activeSeconds);
-                        const timeLimitSeconds = Number(attempt.timeLimitSeconds);
-                        const hasTiming = Number.isFinite(activeSeconds) && Number.isFinite(timeLimitSeconds)
-                            && timeLimitSeconds > 0;
-                        const timingLabel = hasTiming
-                            ? `${this.formatActivityDuration(activeSeconds)} / ${this.formatActivityDuration(timeLimitSeconds)}`
-                            : '';
-                        const lateStatus = attempt.isLate
-                            ? '<span class="activity-late-badge is-late">Late</span>'
-                            : attempt.wasLate && attempt.lateOverride
-                                ? '<span class="activity-late-badge is-excused">Late excused</span>'
-                                : '';
-                        const overrideAction = attempt.wasLate && attempt.attemptId
+    renderStudentProfileActivities(student, model) {
+        const container = $('#detail-activity-list');
+        if (!container) return;
+        if (model.activities.length === 0) {
+            container.innerHTML = '<p class="teacher-empty-state">No activity data recorded.</p>';
+            return;
+        }
+        container.innerHTML = `
+            <div class="table-scroll-wrapper student-profile-activity-table-wrap">
+                <table class="data-table student-profile-activity-table">
+                    <thead><tr>
+                        <th class="data-table__header-cell">Vocabulary</th>
+                        <th class="data-table__header-cell">Activity</th>
+                        <th class="data-table__header-cell">Status</th>
+                        <th class="data-table__header-cell">Latest</th>
+                        <th class="data-table__header-cell">Best</th>
+                        <th class="data-table__header-cell">Accuracy</th>
+                        <th class="data-table__header-cell">Finished runs</th>
+                        <th class="data-table__header-cell">Time</th>
+                        <th class="data-table__header-cell">Last played</th>
+                        <th class="data-table__header-cell">Late work</th>
+                    </tr></thead>
+                    <tbody>${model.activities.map(activity => {
+                        const timing = Number.isFinite(activity.activeSeconds) && Number.isFinite(activity.timeLimitSeconds)
+                            ? `${this.formatActivityDuration(activity.activeSeconds)} / ${this.formatActivityDuration(activity.timeLimitSeconds)}`
+                            : '-';
+                        const lateLabel = activity.isLate ? 'Late' : activity.excused ? 'Excused' : '-';
+                        const lateAction = activity.wasLate && activity.attemptId
                             ? `<button class="btn text-btn activity-late-override-btn" type="button"
-                                    data-attempt-id="${escapeHtml(attempt.attemptId)}"
-                                    data-excused="${attempt.lateOverride ? 'true' : 'false'}">
-                                    ${attempt.lateOverride ? 'Remove excuse' : 'Excuse late'}
+                                data-attempt-id="${escapeHtml(activity.attemptId)}" data-excused="${activity.excused}">
+                                ${activity.excused ? 'Remove excuse' : 'Excuse late'}
                                </button>`
                             : '';
-                        const reason = attempt.lateOverrideReason
-                            ? `<small class="activity-late-reason">${escapeHtml(attempt.lateOverrideReason)}</small>`
-                            : '';
-                        scoresHtml += `
-                            <div class="modal-activity-meta teacher-activity-result-row">
-                                <span class="modal-activity-name">${escapeHtml(activity)}</span>
-                                <span class="teacher-activity-result-timing">${timingLabel}${lateStatus}${reason}</span>
-                                <span class="modal-inline-metric student-detail-score">${data.score}%</span>
-                                ${overrideAction}
-                            </div>
-                        `;
-                    }
-                }
-
-                card.innerHTML = `
-                    <h4 class="modal-section-title student-detail-unit-title">${unitName}</h4>
-                    <div class="student-detail-unit-results">
-                        ${scoresHtml || '<span class="modal-secondary student-detail-message">No scores yet</span>'}
-                    </div>
-                `;
-                list.appendChild(card);
-            }
-        }
-        const avgScore = loading ? '-' : (scoreCount ? Math.round(totalScores / scoreCount) : '-');
-        $('#detail-avg-score').textContent = avgScore === '-' ? '-' : `${avgScore}%`;
-        $('#detail-total-activities').textContent = loading ? '-' : (totalActivities || '-');
-
+                        return `<tr>
+                            <td class="data-table__cell" data-label="Vocabulary">${escapeHtml(activity.unitName)}</td>
+                            <td class="data-table__cell" data-label="Activity">${escapeHtml(activity.activityName)}</td>
+                            <td class="data-table__cell" data-label="Status"><span class="student-profile-status" data-status="${activity.status.toLowerCase().replace(' ', '-')}">${activity.status}</span></td>
+                            <td class="data-table__cell" data-label="Latest score">${activity.latestScore === null ? '-' : `${Math.round(activity.latestScore)}%`}</td>
+                            <td class="data-table__cell data-table__metric" data-label="Best score">${activity.bestScore === null ? '-' : `${Math.round(activity.bestScore)}%`}</td>
+                            <td class="data-table__cell" data-label="Accuracy">${activity.accuracy === null ? '-' : `${Math.round(activity.accuracy)}%`}</td>
+                            <td class="data-table__cell" data-label="Finished runs">${activity.plays}</td>
+                            <td class="data-table__cell" data-label="Time">${timing}</td>
+                            <td class="data-table__cell" data-label="Last played">${activity.lastPlayed ? new Date(activity.lastPlayed).toLocaleDateString() : '-'}</td>
+                            <td class="data-table__cell student-profile-late-cell" data-label="Late work">
+                                <span>${lateLabel}</span>${activity.lateReason ? `<small>${escapeHtml(activity.lateReason)}</small>` : ''}${lateAction}
+                            </td>
+                        </tr>`;
+                    }).join('')}</tbody>
+                </table>
+            </div>`;
         $$('.activity-late-override-btn').forEach(button => {
             button.addEventListener('click', () => this.handleActivityLateOverride(student, button));
         });
+    }
 
-        openModal(modal, { initialFocus: '#close-detail-modal' });
+    renderStudentProfileCoinHistory(model) {
+        const container = $('#student-profile-coin-history');
+        if (!container) return;
+        if (model.coinHistory.length === 0) {
+            container.innerHTML = '<p class="teacher-empty-state">No coin transactions recorded.</p>';
+            return;
+        }
+        container.innerHTML = `<table class="data-table student-profile-coin-table">
+            <thead><tr><th class="data-table__header-cell">Date</th><th class="data-table__header-cell">Description</th><th class="data-table__header-cell">Source</th><th class="data-table__header-cell">Amount</th></tr></thead>
+            <tbody>${model.coinHistory.map(entry => `<tr>
+                <td class="data-table__cell" data-label="Date">${entry.timestamp ? new Date(entry.timestamp).toLocaleString() : '-'}</td>
+                <td class="data-table__cell" data-label="Description">${escapeHtml(entry.description || entry.type || 'Coin transaction')}</td>
+                <td class="data-table__cell" data-label="Source">${escapeHtml(entry.source || '-')}</td>
+                <td class="data-table__cell data-table__metric" data-label="Amount">${entry.amount > 0 ? '+' : ''}${entry.amount}</td>
+            </tr>`).join('')}</tbody>
+        </table>`;
+    }
+
+    setStudentProfileTab(tab, { updateRoute = true } = {}) {
+        const activeTab = ['overview', 'assigned', 'activity', 'account'].includes(tab) ? tab : 'overview';
+        this.activeStudentProfileTab = activeTab;
+        $$('[data-student-profile-tab]').forEach(button => {
+            const active = button.dataset.studentProfileTab === activeTab;
+            button.classList.toggle('active', active);
+            button.classList.toggle('secondary-tab--active', active);
+            button.setAttribute('aria-selected', active ? 'true' : 'false');
+            button.tabIndex = active ? 0 : -1;
+        });
+        ['overview', 'assigned', 'activity', 'account'].forEach(name => {
+            $(`#student-profile-${name}-panel`)?.classList.toggle('hidden', name !== activeTab);
+        });
+        if (updateRoute && this.activeStudentId) {
+            this.setRoute({ view: 'student-profile', studentId: this.activeStudentId, tab: activeTab });
+        }
+    }
+
+    updateStudentProfileNavigation(studentId) {
+        const roster = this.filteredStudentData.length ? this.filteredStudentData : this.allStudentData;
+        const index = roster.findIndex(student => student.id === studentId);
+        const previous = $('#student-profile-previous-btn');
+        const next = $('#student-profile-next-btn');
+        if (previous) {
+            previous.disabled = index <= 0;
+            previous.dataset.studentId = index > 0 ? roster[index - 1].id : '';
+        }
+        if (next) {
+            next.disabled = index < 0 || index >= roster.length - 1;
+            next.dataset.studentId = index >= 0 && index < roster.length - 1 ? roster[index + 1].id : '';
+        }
+    }
+
+    moveStudentProfile(direction) {
+        const button = direction < 0 ? $('#student-profile-previous-btn') : $('#student-profile-next-btn');
+        if (!button?.dataset.studentId) return;
+        const route = {
+            view: 'student-profile',
+            studentId: button.dataset.studentId,
+            tab: this.activeStudentProfileTab || 'overview'
+        };
+        this.setRoute(route);
+        void this.applyRoute(route);
     }
 
     formatActivityDuration(totalSeconds) {
@@ -319,6 +473,9 @@ class TeacherStudentProgressRenderMethods {
             });
             if (generation !== (this.studentProgressSessionGeneration || 0)
                 || this.activeStudentId !== studentId) return;
+            await this.invalidateStudentProgressQueries();
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId) return;
             for (const unit of Object.values(student.units || {})) {
                 for (const score of Object.values(unit.scores || {})) {
                     if (score.latestAttempt?.attemptId === attemptId) score.latestAttempt = updatedAttempt;
@@ -326,7 +483,11 @@ class TeacherStudentProgressRenderMethods {
                 }
             }
             notifications.success(currentlyExcused ? 'Late excuse removed.' : 'Late activity excused.');
-            this.renderStudentDetails(student);
+            this.renderStudentProfile(student);
+            const { loadStudentInsight } = await import('./teacherStudentInsightView.js');
+            if (generation === (this.studentProgressSessionGeneration || 0) && this.activeStudentId === studentId) {
+                await loadStudentInsight(this, studentId);
+            }
         } catch (error) {
             if (generation !== (this.studentProgressSessionGeneration || 0)
                 || this.activeStudentId !== studentId) return;
@@ -345,7 +506,8 @@ class TeacherStudentProgressRenderMethods {
         if (!this.activeStudentId) return;
         const studentId = this.activeStudentId;
         const generation = this.studentProgressSessionGeneration || 0;
-        const student = this.allStudentData.find(s => s.id === studentId);
+        const student = this.allStudentData.find(s => s.id === studentId)
+            || (this.activeStudentProfile?.id === studentId ? this.activeStudentProfile : null);
         const name = student?.studentProfile?.name || student?.email || 'this student';
         const confirmed = confirm(`Reset the password for ${name}?`);
         if (!confirmed) return;
@@ -365,6 +527,10 @@ class TeacherStudentProgressRenderMethods {
             if (tempOutput) tempOutput.style.display = 'none';
 
             const result = await supabaseService.resetStudentPassword(studentId);
+            if (generation !== (this.studentProgressSessionGeneration || 0)
+                || this.activeStudentId !== studentId
+                || resetGeneration !== this.studentPasswordResetGeneration) return;
+            await this.invalidateStudentProgressQueries();
             if (generation !== (this.studentProgressSessionGeneration || 0)
                 || this.activeStudentId !== studentId
                 || resetGeneration !== this.studentPasswordResetGeneration) return;

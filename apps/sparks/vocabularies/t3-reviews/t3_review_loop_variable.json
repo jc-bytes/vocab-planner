@@ -1,0 +1,42 @@
+{
+  "id": "t3_review_loop_variable",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Loop and variable",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "8"
+  ],
+  "trimester": "3",
+  "month": "November",
+  "week": 4,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "loop",
+      "definition": "Instructions that a program repeats.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/loop"
+    },
+    {
+      "word": "variable",
+      "definition": "A named place in a program that holds a changeable value.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/variable"
+    }
+  ]
+}

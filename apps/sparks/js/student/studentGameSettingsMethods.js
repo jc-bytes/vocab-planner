@@ -1,10 +1,12 @@
-import { $ } from '../main.js';
+import { captureArcadeSession } from './studentGameAccessMethods.js';
+import { $, refreshIcons } from '../main.js';
 import {
     DEV_GAMIFICATION_SETTINGS_KEY,
     GAMIFICATION_SETTINGS_KEY,
     normalizeExchangeRate,
     resolveArcadeEconomySettings
 } from '../gamificationConfig.js';
+import { serverStateQuery } from '../services/serverStateQuery.js';
 import { settingsRepository } from '../services/settingsRepository.js';
 import {
     ARCADE_MINUTE_SECONDS,
@@ -15,6 +17,7 @@ export class StudentGameSettings {
     constructor(games) {
         this.games = games;
         this.sm = games.sm;
+        this.queryService = games.queryService || serverStateQuery;
         this.globalSettings = null;
     }
 
@@ -29,9 +32,8 @@ export class StudentGameSettings {
     }
 
     async loadGlobalSettings() {
-        // Return cached settings if available
-        if (this.globalSettings) return this.globalSettings;
-
+        const isCurrent = captureArcadeSession(this.games);
+        if (!isCurrent()) return null;
         if (this.sm.authDisabled) {
             try {
                 const localSettings = JSON.parse(localStorage.getItem(DEV_GAMIFICATION_SETTINGS_KEY) || '{}');
@@ -43,10 +45,22 @@ export class StudentGameSettings {
             return this.globalSettings;
         }
 
+        const accountId = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        if (!accountId) {
+            this.globalSettings = resolveArcadeEconomySettings();
+            return this.globalSettings;
+        }
+
         try {
-            const settings = await settingsRepository.get(GAMIFICATION_SETTINGS_KEY);
+            const settings = await this.queryService.ensure({
+                accountId,
+                key: ['student', 'game-settings', GAMIFICATION_SETTINGS_KEY],
+                queryFn: ({ signal }) => settingsRepository.get(GAMIFICATION_SETTINGS_KEY, { signal })
+            });
+            if (!isCurrent()) return null;
             this.globalSettings = resolveArcadeEconomySettings(settings);
         } catch (error) {
+            if (!isCurrent()) return null;
             console.error('Error loading global gamification settings:', error);
             // Fallback to defaults
             this.globalSettings = resolveArcadeEconomySettings();
@@ -60,11 +74,14 @@ export class StudentGameSettings {
     }
 
     async updateArcadeUI(options = {}) {
+        const isCurrent = captureArcadeSession(this.games);
+        if (!isCurrent()) return;
         // Load global settings
         await Promise.all([
             this.loadGlobalSettings(),
             this.games.loadArcadeTime({ force: options.force !== false })
         ]);
+        if (!isCurrent()) return;
         const exchangeRate = this.getExchangeRate();
 
         const costEl = $('#galactic-breaker-cost');
@@ -84,15 +101,18 @@ export class StudentGameSettings {
     }
 
     async updateGameSelectionUI() {
+        const isCurrent = captureArcadeSession(this.games);
+        if (!isCurrent()) return;
         const game = this.games.gamesList[this.games.currentGameIndex];
         const container = $('#current-game-card');
         if (!container) return;
 
         // Load global settings
         await Promise.all([this.loadGlobalSettings(), this.games.loadArcadeTime()]);
+        if (!isCurrent()) return;
         const exchangeRate = this.getExchangeRate();
         const resumableTime = this.games.gameTimeRemaining;
-        
+
         // Game counter (e.g., "3/20")
         const currentNum = this.games.currentGameIndex + 1;
         const totalGames = this.games.gamesList.length;
@@ -114,12 +134,12 @@ export class StudentGameSettings {
                 <span>Play rate</span><strong>${exchangeRate} coins / min</strong>
                 <span>Learning check</span><strong>One formative activity every ${FORMATIVE_PASS_MINUTES} min</strong>
             </div>
-            <button id="play-current-game-btn" class="btn primary-btn">
+            <button id="play-current-game-btn" class="btn primary-btn"${this.games.isStartingGame || this.games.lifecycle.extensionOperation ? ' disabled aria-busy="true"' : ''}>
                 <i data-lucide="play" aria-hidden="true"></i>
                 <span>${resumableTime > 0 ? `Resume (${this.formatTime(resumableTime)})` : 'Play game'}</span>
             </button>
         `;
-        window.lucide?.createIcons({ root: container });
+        refreshIcons(container);
 
         // Re-attach the play button listener
         this.sm.addListener('#play-current-game-btn', 'click', () => {

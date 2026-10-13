@@ -1,0 +1,43 @@
+{
+  "id": "t3_review_input_output",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Input and output",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "8"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 1,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "input",
+      "definition": "Information sent into a computer.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/input"
+    },
+    {
+      "word": "output",
+      "definition": "Information produced by a computer.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://techterms.com/definition/output"
+    }
+  ]
+}

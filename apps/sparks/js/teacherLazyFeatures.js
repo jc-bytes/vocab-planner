@@ -1,6 +1,6 @@
-import { closeModal, notifications, openModal, setupModal } from './main.js';
+import { schoolSessionKey } from './services/schoolScope.js';
+import { notifications } from './main.js';
 import { supabaseService } from './supabaseService.js';
-import { createQuizVocabularyBrowserAdapter } from './teacherQuizVocabularyBrowserAdapter.js';
 import { teacherPageRegistry } from './teacherPageRegistry.js';
 
 const VOCABULARY_PAGE = teacherPageRegistry.get('vocabulary');
@@ -44,21 +44,42 @@ function getFeatureContext(manager, featureName, feature) {
 }
 
 const featureDefinitions = {
-    sparks: async () => {
-        const module = await import('./teacherSparks.js');
+    schoolAdministration: async () => {
+        const { createSchoolAdminView } = await import('./schoolAdminView.js');
+        return { publicMethods: { showSchoolAdministration: 'show' }, create(manager) {
+            const view = createSchoolAdminView({ root: document.getElementById('teacher-administration-view') });
+            return { show() { if (!manager.ensureAuthenticated(false)) return;
+                manager.switchView('teacher-administration-view', { updateRoute: false });
+                return view.show(); }, destroy() { view.destroy(); } };
+        } };
+    },
+    classes: async () => {
+        const { createTeacherWorkspaceFeature } = await import('./teacherWorkspaceFeature.js');
         return {
-            publicMethods: { showSparksView: 'show' },
+            publicMethods: { showClassesView: 'showClasses', showAssignmentsView: 'showAssignments', openAssignmentPublisher: 'publish' },
+            create: createTeacherWorkspaceFeature
+        };
+    },
+    sparks: async () => {
+        const [module] = await Promise.all([
+            import('./teacherSparks.js'),
+            import('../css/teacherSparks.css')
+        ]);
+        return {
+            publicMethods: { showSparksView: 'show', showSparkEditor: 'edit' },
             create(manager) {
                 return module.createTeacherSparksFeature({
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
                     showView: () => manager.switchView(SPARKS_PAGE.viewId),
+                    showEditorView: ({ materialId }) => {
+                        manager.switchView('teacher-spark-editor-view', { updateRoute: false });
+                        if (!manager.isApplyingRoute) manager.setRoute({ view: 'spark-editor', materialId });
+                    },
                     isAuthenticationDisabled: () => manager.authDisabled,
                     getCurrentUser: () => manager.currentUser,
+                    publishMaterial: context => manager.openAssignmentPublisher(context),
                     refreshIcons: root => manager.refreshIcons(root),
-                    feedback: notifications,
-                    setupDialog: setupModal,
-                    openDialog: openModal,
-                    closeDialog: closeModal
+                    feedback: notifications
                 });
             }
         };
@@ -71,7 +92,7 @@ const featureDefinitions = {
                 return module.createTeacherGroupsFeature({
                     ensureAuthenticated: (...args) => manager.ensureAuthenticated(...args),
                     showView: () => manager.switchView(GROUPS_PAGE.viewId),
-                    loadRoster: () => manager.getStudentRosterData(),
+                    classesRepository: manager.classroomRepository,
                     getSession: () => ({
                         authDisabled: manager.authDisabled,
                         currentUser: manager.currentUser
@@ -146,6 +167,7 @@ const featureDefinitions = {
                     },
                     isReviewActive: () => manager.vocabularyMode === 'review',
                     isAuthenticationDisabled: () => manager.authDisabled,
+                    getCurrentUser: () => manager.currentUser,
                     getSubjects: () => manager.getSubjects(),
                     refreshIcons: () => manager.refreshIcons(),
                     feedback: notifications
@@ -155,6 +177,7 @@ const featureDefinitions = {
     },
     quizzes: async () => {
         const module = await import('./teacherQuiz.js');
+        const { createQuizVocabularyBrowserAdapter } = await import('./teacherQuizVocabularyBrowserAdapter.js');
         return {
             publicMethods: {
                 showQuizzesView: 'show',
@@ -197,7 +220,7 @@ const featureDefinitions = {
                     storage: localStorage,
                     getOwnedStorageKey(key) {
                         const ownerId = manager.currentUser?.uid || manager.currentUser?.id;
-                        return `${key}:${ownerId || 'development-teacher'}`;
+                        return `${key}:${schoolSessionKey(ownerId || 'development-teacher')}`;
                     },
                     vocabularyBrowser: createQuizVocabularyBrowserAdapter(manager)
                 });
@@ -249,11 +272,12 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
     });
 }
 
-function disposeLoadedTeacherFeatures(manager) {
+function disposeLoadedTeacherFeatures(manager, { preserveAdministration = false } = {}) {
     const managerContexts = featureContexts.get(manager);
     if (!managerContexts) return;
 
     for (const [featureName, context] of managerContexts) {
+        if (preserveAdministration && featureName === 'schoolAdministration') continue;
         if (typeof context.destroy !== 'function') continue;
         try {
             context.destroy();
@@ -266,8 +290,16 @@ function disposeLoadedTeacherFeatures(manager) {
 }
 
 export function installTeacherLazyFeatureMethods(TeacherManager) {
+    TeacherManager.prototype.deactivateTeacherWorkspace = function () {
+        featureContexts.get(this)?.get('classes')?.deactivate();
+    };
     [
+        ['showSchoolAdministration', 'schoolAdministration'],
+        ['showClassesView', 'classes'],
+        ['showAssignmentsView', 'classes'],
+        ['openAssignmentPublisher', 'classes'],
         ['showSparksView', 'sparks'],
+        ['showSparkEditor', 'sparks'],
         ['showGroupsView', 'groups'],
         ['showDataManagementView', 'dataManagement'],
         ['showWordHuntReviewView', 'wordHuntReview'],
@@ -279,9 +311,9 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
     Object.defineProperty(TeacherManager.prototype, 'disposeLoadedTeacherFeatures', {
         configurable: true,
         writable: true,
-        value() {
+        value(options) {
             this.invalidateTeacherNavigation?.();
-            disposeLoadedTeacherFeatures(this);
+            disposeLoadedTeacherFeatures(this, options);
         }
     });
 }

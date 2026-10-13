@@ -1,4 +1,5 @@
 import { getCurrentSchoolYear } from './supabaseValues.js';
+import { addUtcDateOnlyDays, parseUtcDateOnly } from './dateOnly.js';
 
 export { getCurrentSchoolYear };
 
@@ -39,20 +40,6 @@ const DEFAULT_SCHOOL_CALENDARS = Object.freeze({
     })
 });
 
-function parseDateOnly(value) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return null;
-    const [year, month, day] = String(value).split('-').map(Number);
-    const date = new Date(Date.UTC(year, month - 1, day));
-    if (
-        date.getUTCFullYear() !== year ||
-        date.getUTCMonth() !== month - 1 ||
-        date.getUTCDate() !== day
-    ) {
-        return null;
-    }
-    return date;
-}
-
 function toDateOnly(value) {
     if (value instanceof Date && !Number.isNaN(value.getTime())) {
         const year = value.getFullYear();
@@ -61,16 +48,9 @@ function toDateOnly(value) {
         return `${year}-${month}-${day}`;
     }
 
-    const date = parseDateOnly(value);
+    const date = parseUtcDateOnly(value);
     if (!date || Number.isNaN(date.getTime())) return '';
     return date.toISOString().slice(0, 10);
-}
-
-function addDaysDateOnly(date, days) {
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
-    const result = new Date(date.getTime());
-    result.setUTCDate(result.getUTCDate() + Number(days || 0));
-    return result.toISOString().slice(0, 10);
 }
 
 function normalizeWeekCount(value) {
@@ -79,20 +59,20 @@ function normalizeWeekCount(value) {
 }
 
 export function getMonthKeyFromDate(value) {
-    const date = parseDateOnly(value);
+    const date = parseUtcDateOnly(value);
     return date ? MONTH_KEYS[date.getUTCMonth()] : '';
 }
 
 export function calculateCalendarEndDateFromWeekCount(startDate, weekCount) {
-    const start = parseDateOnly(startDate);
+    const start = parseUtcDateOnly(startDate);
     const weeks = normalizeWeekCount(weekCount);
     if (!start || !weeks) return '';
-    return addDaysDateOnly(start, ((weeks - 1) * 7) + 4);
+    return addUtcDateOnlyDays(start, ((weeks - 1) * 7) + 4);
 }
 
 export function calculateCalendarWeekCount(startDate, endDate) {
-    const start = parseDateOnly(startDate);
-    const end = parseDateOnly(endDate);
+    const start = parseUtcDateOnly(startDate);
+    const end = parseUtcDateOnly(endDate);
     if (!start || !end || end < start) return '';
 
     const daysSinceStart = Math.floor((end.getTime() - start.getTime()) / 86400000);
@@ -100,15 +80,15 @@ export function calculateCalendarWeekCount(startDate, endDate) {
 }
 
 export function calculateCalendarWeekRange(startDate, weekNumber) {
-    const start = parseDateOnly(startDate);
+    const start = parseUtcDateOnly(startDate);
     const week = normalizeWeekCount(weekNumber);
     if (!start || !week) return { startDate: '', endDate: '' };
 
-    const weekStartDate = addDaysDateOnly(start, (week - 1) * 7);
-    const weekStart = parseDateOnly(weekStartDate);
+    const weekStartDate = addUtcDateOnlyDays(start, (week - 1) * 7);
+    const weekStart = parseUtcDateOnly(weekStartDate);
     return {
         startDate: weekStartDate,
-        endDate: addDaysDateOnly(weekStart, 4)
+        endDate: addUtcDateOnlyDays(weekStart, 4)
     };
 }
 
@@ -187,7 +167,7 @@ export function getStudentClassSchedule(calendar, profile = {}) {
 }
 
 export function calculateClassReleaseDate(assignedDate, calendar, profile = {}) {
-    const assigned = parseDateOnly(assignedDate);
+    const assigned = parseUtcDateOnly(assignedDate);
     if (!assigned) return '';
 
     const schedule = getStudentClassSchedule(calendar, profile);
@@ -227,7 +207,7 @@ export function normalizeSchoolCalendar(calendar, fallbackDate = new Date()) {
 }
 
 export function calculateVocabularyPlacement(assignedDate, calendar) {
-    const date = parseDateOnly(assignedDate);
+    const date = parseUtcDateOnly(assignedDate);
     if (!date) return null;
 
     const normalizedCalendar = normalizeSchoolCalendar(calendar, date);
@@ -235,8 +215,8 @@ export function calculateVocabularyPlacement(assignedDate, calendar) {
 
     for (const trimester of ['IT', 'IIT', 'IIIT']) {
         const range = normalizedCalendar.trimesters[trimester];
-        const startDate = parseDateOnly(range.startDate);
-        const endDate = parseDateOnly(range.endDate);
+        const startDate = parseUtcDateOnly(range.startDate);
+        const endDate = parseUtcDateOnly(range.endDate);
 
         if (!startDate || !endDate || date < startDate || date > endDate) continue;
 
@@ -262,4 +242,3 @@ export function getCurrentTrimesterFromCalendar(date = new Date(), calendar = nu
     const placement = calculateVocabularyPlacement(dateOnly, calendar);
     return placement?.trimester || '';
 }
-

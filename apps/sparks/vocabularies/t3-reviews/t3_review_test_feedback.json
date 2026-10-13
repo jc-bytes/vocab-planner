@@ -1,0 +1,45 @@
+{
+  "id": "t3_review_test_feedback",
+  "subjectSlug": "technology",
+  "name": "T3 Review: Test and feedback",
+  "description": "Review these two words and their meanings. No written definition task.",
+  "grades": [
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "trimester": "3",
+  "month": "September",
+  "week": 3,
+  "purpose": "practice",
+  "activitySettings": {
+    "requiredActivities": [
+      "flashcards"
+    ],
+    "additionalActivities": [],
+    "flashcards": 2
+  },
+  "words": [
+    {
+      "word": "test",
+      "definition": "A check to find out whether something works.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/test"
+    },
+    {
+      "word": "feedback",
+      "definition": "Information about work that helps someone improve it.",
+      "example": "",
+      "difficulty": 1,
+      "synonyms": [],
+      "antonyms": [],
+      "wordHunt": false,
+      "definitionSource": "https://www.merriam-webster.com/dictionary/feedback"
+    }
+  ]
+}

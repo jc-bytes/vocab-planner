@@ -79,7 +79,7 @@ test('Scramble responsibilities have one complete owner each', () => {
     ];
     const methodNames = groups.flatMap(group => Object.keys(group));
 
-    assert.equal(methodNames.length, 33);
+    assert.equal(methodNames.length, 32);
     assert.equal(new Set(methodNames).size, methodNames.length);
     methodNames.forEach(name => assert.equal(typeof ScrambleActivity.prototype[name], 'function'));
     assert.deepEqual(

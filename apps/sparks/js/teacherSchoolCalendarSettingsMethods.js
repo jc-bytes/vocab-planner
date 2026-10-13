@@ -1,3 +1,4 @@
+import { schoolSessionKey } from './services/schoolScope.js';
 import { $, notifications } from './main.js';
 import { settingsRepository } from './services/settingsRepository.js';
 import { vocabularyRepository } from './services/vocabularyRepository.js';
@@ -51,7 +52,9 @@ export const teacherSchoolCalendarSettingsMethods = {
         }
 
         try {
-            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY);
+            const settings = await settingsRepository.get(SCHOOL_CALENDAR_SETTINGS_KEY, {
+                signal: options.signal
+            });
             if (!isCurrent()) return false;
             this.schoolCalendar = normalizeSchoolCalendar(settings);
             this.schoolCalendarSettingsLoaded = true;
@@ -395,7 +398,7 @@ export const teacherSchoolCalendarSettingsMethods = {
             };
         });
 
-        localStorage.setItem('teacher_vocab_library', JSON.stringify(recalculated));
+        localStorage.setItem(`teacher_vocab_library:${this.authDisabled ? 'demo' : schoolSessionKey(this.currentUser?.uid || this.currentUser?.id)}`, JSON.stringify(recalculated));
         if (this.vocabSet?.assignedDate) {
             this.applyAssignedDatePlacement(this.vocabSet);
         }

@@ -7,80 +7,11 @@ export class StudentActivityBrowser {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
+        this.calendar = activities.calendar;
+        this.schedule = activities.schedule;
+        this.vocabularyData = activities.vocabularyData;
         this.cards = new StudentActivityBrowserCards(this);
         this.navigation = new StudentActivityBrowserNavigation(this);
-    }
-
-    renderSubjectPicker(...args) {
-        return this.activities.renderSubjectPicker(...args);
-    }
-
-    getVisibleVocabularyList(...args) {
-        return this.activities.getVisibleVocabularyList(...args);
-    }
-
-    filterStudentAvailableVocabulary(...args) {
-        return this.activities.filterStudentAvailableVocabulary(...args);
-    }
-
-    buildVocabularyTrimesterGroups(...args) {
-        return this.activities.buildVocabularyTrimesterGroups(...args);
-    }
-
-    buildVocabularyMonthGroups(...args) {
-        return this.activities.buildVocabularyMonthGroups(...args);
-    }
-
-    getCurrentTrimesterKey(...args) {
-        return this.activities.getCurrentTrimesterKey(...args);
-    }
-
-    normalizeMonthKey(...args) {
-        return this.activities.normalizeMonthKey(...args);
-    }
-
-    getMonthLabel(...args) {
-        return this.activities.getMonthLabel(...args);
-    }
-
-    getMonthOrder(...args) {
-        return this.activities.getMonthOrder(...args);
-    }
-
-    getTrimesterLabel(...args) {
-        return this.activities.getTrimesterLabel(...args);
-    }
-
-    getTrimesterOrder(...args) {
-        return this.activities.getTrimesterOrder(...args);
-    }
-
-    formatMonthSummary(...args) {
-        return this.activities.formatMonthSummary(...args);
-    }
-
-    formatUnitCount(...args) {
-        return this.activities.formatUnitCount(...args);
-    }
-
-    compareVocabularySchedule(...args) {
-        return this.activities.compareVocabularySchedule(...args);
-    }
-
-    getVocabTrimesterKey(...args) {
-        return this.activities.getVocabTrimesterKey(...args);
-    }
-
-    getVocabSchedule(...args) {
-        return this.activities.getVocabSchedule(...args);
-    }
-
-    loadVocabulary(...args) {
-        return this.activities.loadVocabulary(...args);
-    }
-
-    scheduleIdleTask(...args) {
-        return this.activities.scheduleIdleTask(...args);
     }
 
     renderDashboard() {
@@ -89,13 +20,13 @@ export class StudentActivityBrowser {
         if (!container) return;
         setStudentPageLoading(view, true);
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
-        this.renderSubjectPicker('#student-subject-picker');
-        this.renderSubjectPicker('#vocab-subject-picker');
+        this.vocabularyData.renderSubjectPicker('#student-subject-picker');
+        this.vocabularyData.renderSubjectPicker('#vocab-subject-picker');
         container.innerHTML = getStudentPageSkeleton('units', 'Loading vocabulary units');
         container.className = 'vocab-groups';
         this.activities.availableVocabs = [];
 
-        const { vocabs, message } = this.getVisibleVocabularyList({ availableOnly: true });
+        const { vocabs, message } = this.vocabularyData.getVisibleVocabularyList({ availableOnly: true });
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p>${message}</p>`;
@@ -117,10 +48,10 @@ export class StudentActivityBrowser {
         container.innerHTML = '';
 
         const visibleVocabs = Array.isArray(vocabs)
-            ? this.filterStudentAvailableVocabulary(vocabs)
-            : this.getVisibleVocabularyList({ availableOnly: true }).vocabs;
+            ? this.schedule.filterStudentAvailableVocabulary(vocabs)
+            : this.vocabularyData.getVisibleVocabularyList({ availableOnly: true }).vocabs;
         const drilldown = this.sm.studentVocabularyDrilldown || { trimester: null, month: null };
-        const trimesterGroups = this.buildVocabularyTrimesterGroups(visibleVocabs);
+        const trimesterGroups = this.schedule.buildVocabularyTrimesterGroups(visibleVocabs);
         const selectedTrimester = drilldown.trimester;
         const selectedMonth = drilldown.month;
 
@@ -136,8 +67,8 @@ export class StudentActivityBrowser {
                     container,
                     automaticLocation.trimester,
                     automaticLocation.month,
-                    this.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester)).get(automaticLocation.month),
-                    this.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester))
+                    this.schedule.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester)).get(automaticLocation.month),
+                    this.schedule.buildVocabularyMonthGroups(trimesterGroups.get(automaticLocation.trimester))
                 );
                 return;
             }
@@ -152,7 +83,7 @@ export class StudentActivityBrowser {
             return;
         }
 
-        const monthGroups = this.buildVocabularyMonthGroups(trimesterGroups.get(selectedTrimester));
+        const monthGroups = this.schedule.buildVocabularyMonthGroups(trimesterGroups.get(selectedTrimester));
 
         if (!selectedMonth || !monthGroups.has(selectedMonth)) {
             this.sm.studentVocabularyDrilldown.month = null;
@@ -202,12 +133,12 @@ export class StudentActivityBrowser {
         if (this.getStudentVocabularyViewMode() === 'rows') {
             const list = this.createStudentVocabRowList(['Trimester', 'Months', 'Units']);
             Array.from(trimesterGroups.entries())
-                .sort(([trimesterA], [trimesterB]) => this.getTrimesterOrder(trimesterA) - this.getTrimesterOrder(trimesterB))
+                .sort(([trimesterA], [trimesterB]) => this.schedule.getTrimesterOrder(trimesterA) - this.schedule.getTrimesterOrder(trimesterB))
                 .forEach(([trimesterKey, trimesterVocabs]) => {
-                    const monthSummary = this.formatMonthSummary(this.buildVocabularyMonthGroups(trimesterVocabs)) || 'No months';
+                    const monthSummary = this.schedule.formatMonthSummary(this.schedule.buildVocabularyMonthGroups(trimesterVocabs)) || 'No months';
                     const row = this.createStudentVocabRow({
-                        primary: this.getTrimesterLabel(trimesterKey),
-                        cells: [monthSummary, this.formatUnitCount(trimesterVocabs.length)],
+                        primary: this.schedule.getTrimesterLabel(trimesterKey),
+                        cells: [monthSummary, this.schedule.formatUnitCount(trimesterVocabs.length)],
                         icon: 'chevron-right'
                     });
                     row.addEventListener('click', () => {
@@ -223,12 +154,12 @@ export class StudentActivityBrowser {
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(trimesterGroups.entries())
-            .sort(([trimesterA], [trimesterB]) => this.getTrimesterOrder(trimesterA) - this.getTrimesterOrder(trimesterB))
+            .sort(([trimesterA], [trimesterB]) => this.schedule.getTrimesterOrder(trimesterA) - this.schedule.getTrimesterOrder(trimesterB))
             .forEach(([trimesterKey, trimesterVocabs]) => {
                 const card = this.createStudentLibraryChoiceCard({
-                    title: this.getTrimesterLabel(trimesterKey),
-                    count: this.formatUnitCount(trimesterVocabs.length),
-                    meta: this.formatMonthSummary(this.buildVocabularyMonthGroups(trimesterVocabs)),
+                    title: this.schedule.getTrimesterLabel(trimesterKey),
+                    count: this.schedule.formatUnitCount(trimesterVocabs.length),
+                    meta: this.schedule.formatMonthSummary(this.schedule.buildVocabularyMonthGroups(trimesterVocabs)),
                     icon: 'chevron-right'
                 });
                 card.addEventListener('click', () => {
@@ -248,11 +179,11 @@ export class StudentActivityBrowser {
         if (this.getStudentVocabularyViewMode() === 'rows') {
             const list = this.createStudentVocabRowList(['Month', 'Units', 'Trimester']);
             Array.from(monthGroups.entries())
-                .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+                .sort(([monthA], [monthB]) => this.schedule.getMonthOrder(monthA) - this.schedule.getMonthOrder(monthB))
                 .forEach(([monthKey, monthVocabs]) => {
                     const row = this.createStudentVocabRow({
-                        primary: this.getMonthLabel(monthKey),
-                        cells: [this.formatUnitCount(monthVocabs.length), this.getTrimesterLabel(selectedTrimester)],
+                        primary: this.schedule.getMonthLabel(monthKey),
+                        cells: [this.schedule.formatUnitCount(monthVocabs.length), this.schedule.getTrimesterLabel(selectedTrimester)],
                         icon: 'chevron-right'
                     });
                     this.appendCurrentMonthBadge(row.querySelector('strong'), monthKey);
@@ -272,12 +203,12 @@ export class StudentActivityBrowser {
 
         const grid = createElement('div', 'teacher-library-choice-grid');
         Array.from(monthGroups.entries())
-            .sort(([monthA], [monthB]) => this.getMonthOrder(monthA) - this.getMonthOrder(monthB))
+            .sort(([monthA], [monthB]) => this.schedule.getMonthOrder(monthA) - this.schedule.getMonthOrder(monthB))
             .forEach(([monthKey, monthVocabs]) => {
                 const card = this.createStudentLibraryChoiceCard({
-                    title: this.getMonthLabel(monthKey),
-                    count: this.formatUnitCount(monthVocabs.length),
-                    meta: this.getTrimesterLabel(selectedTrimester),
+                    title: this.schedule.getMonthLabel(monthKey),
+                    count: this.schedule.formatUnitCount(monthVocabs.length),
+                    meta: this.schedule.getTrimesterLabel(selectedTrimester),
                     icon: 'chevron-right'
                 });
                 this.appendCurrentMonthBadge(card.querySelector('strong'), monthKey);
@@ -306,7 +237,7 @@ export class StudentActivityBrowser {
         if (this.getStudentVocabularyViewMode() === 'rows') {
             const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type', 'Progress']);
             monthVocabs
-                .sort((a, b) => this.compareVocabularySchedule(a, b))
+                .sort((a, b) => this.schedule.compareVocabularySchedule(a, b))
                 .forEach(vocab => list.appendChild(this.createVocabularyRow(vocab)));
 
             container.appendChild(list);
@@ -317,7 +248,7 @@ export class StudentActivityBrowser {
 
         const grid = createElement('div', 'vocab-grid trimester-vocab-grid');
         monthVocabs
-            .sort((a, b) => this.compareVocabularySchedule(a, b))
+            .sort((a, b) => this.schedule.compareVocabularySchedule(a, b))
             .forEach(vocab => grid.appendChild(this.createVocabularyCard(vocab)));
 
         container.appendChild(grid);

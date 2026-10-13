@@ -1,11 +1,14 @@
+import { schoolSessionKey } from './services/schoolScope.js';
+import '../css/teacherGroups.css';
 import { $, createElement, notifications } from './main.js';
+import { classroomRepository } from './services/classroomRepository.js';
 import { setInlineStatus } from './ui/inlineStatus.js';
+import { createUniqueId } from './randomUtils.js';
 import {
     canonicalStudentPair,
     teacherGroupRestrictionsRepository
 } from './services/teacherGroupRestrictionsRepository.js';
 import {
-    getStudentClassKey,
     getStudentDisplayName,
     randomizeStudentsWithRestrictions
 } from './teacherGroupsLogic.js';
@@ -21,19 +24,21 @@ class TeacherGroupsFeature {
     constructor({
         ensureAuthenticated,
         showView,
-        loadRoster,
+        classesRepository = classroomRepository,
         getSession,
         refreshIcons,
         repository = teacherGroupRestrictionsRepository,
         feedback = notifications,
         storage = globalThis.localStorage,
         clipboard = globalThis.navigator?.clipboard,
-        createRestrictionId = () => globalThis.crypto?.randomUUID?.() || `restriction-${Date.now()}`,
+        createRestrictionId = () => createUniqueId(),
         query = $
     }) {
         this.ensureAuthenticated = ensureAuthenticated;
         this.showView = showView;
-        this.loadRoster = loadRoster;
+        this.classesRepository = classesRepository;
+        this.classes = [];
+        this.rosterGeneration = 0;
         this.getSession = getSession;
         this.refreshIcons = refreshIcons;
         this.repository = repository;
@@ -56,25 +61,30 @@ class TeacherGroupsFeature {
         this.destroyed = false;
     }
 
-    async show() {
+    async show({ classId } = {}) {
         if (this.destroyed) return;
         if (!this.ensureAuthenticated(false)) return;
         const lifecycleGeneration = this.lifecycleGeneration;
         const showGeneration = ++this.showGeneration;
+        this.rosterGeneration += 1;
+        const ownerId = this.getSessionOwnerId();
+        this.roster = [];
+        this.randomGroups = [];
+        this.renderGroupStudentList();
+        this.renderRandomGroups();
         this.bindListeners();
         this.showView();
         this.setGroupGeneratorStatus('Loading your class roster…');
 
         try {
-            const [roster] = await Promise.all([
-                this.loadRoster(),
+            const [classes] = await Promise.all([
+                this.classesRepository.listClasses(),
                 this.loadGroupPairRestrictions({ lifecycleGeneration, showGeneration })
             ]);
-            if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return;
-            this.roster = Array.isArray(roster) ? roster : [];
-            this.populateGroupClassSelect();
-            this.renderGroupStudentList();
-            this.setGroupGeneratorStatus('');
+            if (!this.isCurrent({ lifecycleGeneration, showGeneration }) || ownerId !== this.getSessionOwnerId()) return;
+            this.classes = (Array.isArray(classes) ? classes : []).filter(item => !item.archived);
+            this.populateGroupClassSelect(classId);
+            await this.handleGroupClassChange(this.selectedClass);
         } catch (error) {
             if (!this.isCurrent({ lifecycleGeneration, showGeneration })) return;
             console.error('Could not load group generator roster:', error);
@@ -124,6 +134,8 @@ class TeacherGroupsFeature {
         this.listenerDisposers.splice(0).forEach(dispose => dispose());
         this.listenersBound = false;
         this.selectedClass = '';
+        this.classes = [];
+        this.rosterGeneration += 1;
         this.roster = [];
         this.absentStudents.clear();
         this.randomGroups = [];
@@ -178,31 +190,25 @@ class TeacherGroupsFeature {
         this.setGroupGeneratorStatus('');
     }
 
-    populateGroupClassSelect() {
+    populateGroupClassSelect(classId) {
         const select = this.query('#group-class-select');
         if (!select) return;
-
-        const previous = select.value || this.selectedClass || '';
-        const classKeys = [...new Set(this.roster.map(getStudentClassKey).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-
+        const previous = classId ?? this.selectedClass;
         select.innerHTML = '<option value="">Select a class</option>';
-        classKeys.forEach(classKey => {
+        for (const classroom of this.classes) {
             const option = createElement('option');
-            option.value = classKey;
-            option.textContent = classKey;
+            option.value = classroom.id;
+            option.textContent = [classroom.subject?.name, classroom.name, classroom.school_year].filter(Boolean).join(' · ');
             select.appendChild(option);
-        });
-
-        const nextClass = classKeys.includes(previous) ? previous : (classKeys[0] || '');
-        select.value = nextClass;
-        this.selectedClass = nextClass;
-        this.loadTodayGroupAbsences();
+        }
+        // A stale or unavailable explicit class must not silently open another roster.
+        this.selectedClass = this.classes.some(item => item.id === previous)
+            ? previous : (classId ? '' : this.classes[0]?.id || '');
+        select.value = this.selectedClass;
     }
 
     getSelectedGroupStudents() {
-        return this.roster
-            .filter(student => getStudentClassKey(student) === this.selectedClass)
+        return [...this.roster]
             .sort((a, b) => getStudentDisplayName(a).localeCompare(getStudentDisplayName(b)));
     }
 
@@ -227,13 +233,35 @@ class TeacherGroupsFeature {
         }
     }
 
-    handleGroupClassChange(classKey) {
-        this.selectedClass = classKey;
+    async handleGroupClassChange(classId) {
+        const generation = ++this.rosterGeneration;
+        const lifecycleGeneration = this.lifecycleGeneration;
+        const ownerId = this.getSessionOwnerId();
+        this.selectedClass = this.classes.some(item => item.id === classId) ? classId : '';
+        this.roster = [];
         this.loadTodayGroupAbsences();
         this.randomGroups = [];
         this.renderGroupStudentList();
-        this.renderGroupRestrictionSettings();
         this.renderRandomGroups();
+        if (!this.selectedClass) {
+            this.setGroupGeneratorStatus('Choose an active class.');
+            return;
+        }
+        this.setGroupGeneratorStatus('Loading class enrollment…');
+        const current = () => !this.destroyed && generation === this.rosterGeneration
+            && lifecycleGeneration === this.lifecycleGeneration && ownerId === this.getSessionOwnerId();
+        try {
+            const enrolled = await this.classesRepository.getRoster(this.selectedClass);
+            if (!current()) return;
+            this.roster = (Array.isArray(enrolled) ? enrolled : []).map(student => ({
+                id: student.studentId, email: student.email, studentProfile: { name: student.name }
+            }));
+            this.renderGroupStudentList();
+            this.setGroupGeneratorStatus('');
+        } catch (error) {
+            if (!current()) return;
+            this.setGroupGeneratorStatus('The class roster could not be loaded. Please try again.', 'error');
+        }
     }
 
     toggleGroupStudentAbsent(studentId, absent) {
@@ -302,7 +330,7 @@ class TeacherGroupsFeature {
     }
 
     groupRestrictionsStorageKey() {
-        return `teacher_group_pair_restrictions:${this.getSessionOwnerId()}`;
+        return `teacher_group_pair_restrictions:${schoolSessionKey(this.getSessionOwnerId())}`;
     }
 
     getSessionOwnerId() {
@@ -441,6 +469,11 @@ class TeacherGroupsFeature {
             return;
         }
 
+        const enrolled = this.getCurrentClassRestrictionStudents();
+        if (!enrolled.has(studentAId) || !enrolled.has(studentBId)) {
+            this.setGroupRestrictionStatus('Choose students enrolled in this class.', 'error');
+            return;
+        }
         const pair = canonicalStudentPair(studentAId, studentBId);
         const alreadySaved = this.pairRestrictions.some(restriction => (
             restriction.studentAId === pair.studentAId

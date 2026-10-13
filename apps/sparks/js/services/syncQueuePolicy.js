@@ -77,6 +77,11 @@ export function getSyncRetryDelayMs(attempts) {
 }
 
 export function getSyncActionDedupeKey(type, payload = {}) {
+    // Unit saves contain the cumulative snapshot; only the newest one needs replay.
+    if (type === 'student-unit-work') {
+        const unitKey = String(payload?.unitKey || '').trim();
+        if (unitKey) return `${type}:unit:${unitKey}`;
+    }
     const eventId = String(payload?.eventId || '').trim();
     if (eventId) return `${type}:event:${eventId}`;
     if (type === 'student-spark-response') {

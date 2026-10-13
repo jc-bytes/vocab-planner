@@ -1,5 +1,6 @@
 import { notifications } from './main.js';
 import { supabaseService } from './supabaseService.js';
+import { serverStateQuery } from './services/serverStateQuery.js';
 import { teacherWordHuntReviewDataMethods } from './teacherWordHuntReview/teacherWordHuntReviewDataMethods.js';
 import { teacherWordHuntReviewImageMethods } from './teacherWordHuntReview/teacherWordHuntReviewImageMethods.js';
 import { teacherWordHuntReviewInteractionMethods } from './teacherWordHuntReview/teacherWordHuntReviewInteractionMethods.js';
@@ -31,8 +32,10 @@ export function createTeacherWordHuntReviewFeature({
     activateReview,
     isReviewActive,
     isAuthenticationDisabled,
+    getCurrentUser = () => null,
     getSubjects,
     refreshIcons,
+    queryService = serverStateQuery,
     repository = {
         loadReviewData: () => supabaseService.getWordHuntReviewData(),
         downloadImage: path => supabaseService.downloadWordHuntImage(path)
@@ -56,8 +59,10 @@ export function createTeacherWordHuntReviewFeature({
         activateReview,
         isReviewActive,
         isAuthenticationDisabled,
+        getCurrentUser,
         getSubjects,
         refreshIcons,
+        queryService,
         repository,
         feedback,
         storage,
@@ -73,8 +78,6 @@ export function createTeacherWordHuntReviewFeature({
         wordHuntReviewDrilldown: { subject: '', grade: '', group: '', unitId: '' },
         wordHuntReviewFilters: { status: '', search: '' },
         wordHuntReviewViewModes: {},
-        wordHuntReviewDataCache: null,
-        wordHuntReviewDataPromise: null,
         wordHuntReviewLoadGeneration: 0,
         wordHuntReviewImageGeneration: 0,
         addPersistentListener(element, type, handler) {
@@ -87,8 +90,6 @@ export function createTeacherWordHuntReviewFeature({
 
     function destroy() {
         context.wordHuntReviewLoadGeneration += 1;
-        context.wordHuntReviewDataCache = null;
-        context.wordHuntReviewDataPromise = null;
         context.revokeWordHuntReviewImageUrls();
         listenerDisposers.splice(0).forEach(dispose => dispose());
         context.wordHuntReviewRows = [];

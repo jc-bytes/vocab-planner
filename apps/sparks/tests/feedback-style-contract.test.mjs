@@ -58,6 +58,7 @@ test('feedback.css owns completion presentation and cloud status indicators', ()
         '.completion-screen',
         '.completion-screen h2',
         '.completion-screen p',
+        '.completion-actions',
         '.completion-overlay',
         '.completion-overlay .completion-screen',
         '.status-dot',
@@ -96,8 +97,8 @@ test('entry and lazy styles keep refinements without recreating the shared struc
 });
 
 test('status indicators retain accessible labels and their state owners', () => {
-    assert.match(studentHtml, /id="auth-status"[^>]+class="status-dot"[^>]+title="Syncing"[^>]+aria-label="Syncing"/);
-    assert.match(teacherHtml, /id="teacher-cloud-status"[^>]+class="status-dot"[^>]+title="Signed out"[^>]+aria-label="Signed out"[^>]+data-state="offline"/);
+    assert.match(studentHtml, /id="auth-status"[^>]+class="status-dot"[^>]+role="status"[^>]+title="Syncing"[^>]+aria-label="Syncing"/);
+    assert.match(teacherHtml, /id="teacher-cloud-status"[^>]+class="status-dot"[^>]+role="status"[^>]+title="Signed out"[^>]+aria-label="Signed out"[^>]+data-state="offline"/);
     assert.match(studentAuth, /statusEl\.dataset\.state = state/);
     assert.match(studentAuth, /statusEl\.setAttribute\('aria-label', label\)/);
     assert.match(teacherShell, /el\.dataset\.state = dotState/);
@@ -110,4 +111,10 @@ test('activity completion producers remain reachable without a shared behavior a
     assert.match(wordSearchView, /class="completion-screen"/);
     assert.match(crosswordView, /overlay\.className = 'completion-overlay'/);
     assert.match(crosswordView, /class="completion-screen"/);
+    for (const [name, source] of [['Word Search', wordSearchView], ['Crossword', crosswordView]]) {
+        assert.match(source, /class="completion-actions"/, `${name} must use the shared action row`);
+        assert.doesNotMatch(source, /style\.cssText|\sstyle="/, `${name} must not duplicate fixed completion presentation inline`);
+    }
+    assert.match(wordSearchView, /progressFill\.style\.width = `\$\{percentage\}%`/,
+        'calculated puzzle progress remains an explicit runtime-style exception');
 });
