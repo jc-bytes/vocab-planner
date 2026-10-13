@@ -241,13 +241,13 @@ export class StudentActivityGateDisplay {
 
         const unavailableDetails = createElement('details', 'activity-flow-section unavailable-activity-section activity-secondary-disclosure activity-disclosure');
         unavailableDetails.open = false;
-        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Not Required (${visibleHiddenCount})`);
+        const unavailableSummary = createElement('summary', 'activity-disclosure__summary', `Optional (${visibleHiddenCount})`);
         const unavailableGrid = createElement('div', 'activities-grid-inner activity-secondary-grid activity-unavailable-grid');
         unavailableDetails.appendChild(unavailableSummary);
         unavailableDetails.appendChild(createElement(
             'p',
             'activity-disclosure-note',
-            'These activities are visible for reference but are not part of this vocabulary unit.'
+            'These optional activities are listed for reference and are unavailable in this vocabulary unit.'
         ));
         unavailableDetails.appendChild(unavailableGrid);
 
@@ -290,7 +290,7 @@ export class StudentActivityGateDisplay {
             card.title = !hasPlayableContent
                 ? 'This unit does not have enough suitable words for this activity.'
                 : isHidden
-                    ? 'Not required for this vocabulary unit.'
+                    ? 'This optional activity is unavailable for this vocabulary unit.'
                 : isLockedRequired
                     ? `Complete ${prerequisiteTitle} first.`
                     : isLockedAdditional
@@ -301,7 +301,7 @@ export class StudentActivityGateDisplay {
                 card.prepend(createElement(
                     'span',
                     'activity-unavailable-label',
-                    hasPlayableContent ? 'Not required' : 'Not enough words'
+                    hasPlayableContent ? 'Optional' : 'Not enough words'
                 ));
             }
             if (isLocked && !card.querySelector('.activity-lock-label')) {

@@ -141,7 +141,7 @@ export class StudentActivityLauncher {
                 ? prerequisiteType.replaceAll('-', ' ').replace(/\b\w/g, letter => letter.toUpperCase())
                 : '';
             const warning = flow.hidden?.includes(type)
-                ? 'This activity is not required for this vocabulary unit.'
+                ? 'This optional activity is unavailable for this vocabulary unit.'
                 : prerequisiteType
                     ? `Complete ${prerequisiteTitle} first.`
                     : 'Finish the required activities first to unlock additional practice.';
