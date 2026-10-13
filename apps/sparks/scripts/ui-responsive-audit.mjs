@@ -345,7 +345,7 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         };
     });
 
-    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar,export,view,reset'
+    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar'
         || settingsState.selectedTab !== 'subjects'
         || settingsState.tabListHeight > 72
         || settingsState.visiblePanels.length !== 1
@@ -381,8 +381,8 @@ async function assertTeacherSparksRoute(page, baseUrl) {
         currentSparkText: document.querySelector('#spark-library-list')?.textContent || ''
     }));
 
-    if (state.activeLabel !== 'Content'
-        || state.mobileLabel !== 'Content'
+    if (state.activeLabel !== 'Library'
+        || state.mobileLabel !== 'Library'
         || !state.addButtonVisible
         || !state.currentSparkText.includes('Audit Spark')) {
         throw new Error(`Teacher Sparks route did not render expected controls: ${JSON.stringify(state)}`);
