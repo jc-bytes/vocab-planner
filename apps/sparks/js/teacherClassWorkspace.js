@@ -98,8 +98,9 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         block.append(element('p', `${roster.length} student${roster.length === 1 ? '' : 's'}`));
         if (!roster.length) block.append(element('p', 'No students have joined yet.'));
         for (const student of roster) {
-            const row = element('article', undefined, 'card');
-            row.append(element('h4', student.name), element('p', student.email));
+            const row = element('article', undefined, 'teacher-workspace-row');
+            const summary = element('div', undefined, 'teacher-workspace-summary');
+            summary.append(element('h4', student.name), element('p', student.email)); row.append(summary);
             if (!active.archived) {
                 const remove = button('Remove from class', () => dialog('Remove student', [], () => repository.removeStudent(active.id, student.studentId),
                     `Remove ${student.name} from ${active.name}? They will lose access to this class. Saved work remains in its history.`));
@@ -127,9 +128,10 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
         if (!active.archived && active.canTeach === true && onPublish) block.append(button('Assign material', () => onPublish({ classId: active.id }), true));
         if (!assignments.length) block.append(element('p', 'No work has been assigned to this class.'));
         for (const assignment of assignments) {
-            const row = element('article', undefined, 'card');
-            row.append(element('h4', assignment.title), element('p', assignment.withdrawn ? 'Withdrawn' : `Available ${new Date(assignment.release_at).toLocaleString()}`));
-            if (assignment.due_at) row.append(element('p', `Due ${new Date(assignment.due_at).toLocaleString()}`));
+            const row = element('article', undefined, 'teacher-workspace-row');
+            const summary = element('div', undefined, 'teacher-workspace-summary'); row.append(summary);
+            summary.append(element('h4', assignment.title), element('p', assignment.withdrawn ? 'Withdrawn' : `Available ${new Date(assignment.release_at).toLocaleString()}`));
+            if (assignment.due_at) summary.append(element('p', `Due ${new Date(assignment.due_at).toLocaleString()}`));
             if (onReview) row.append(button('Review work', () => onReview({ classId: active.id, assignmentId: assignment.id })));
             block.append(row);
         }
@@ -153,12 +155,15 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
                 if (!current(id, owner)) return;
                 root.append(setupActions(subjects, years));
                 if (!classes.length) root.append(element('p', 'Create a subject and class to begin.'));
+                const list = element('section', undefined, 'teacher-workspace-list teacher-class-grid');
                 for (const c of classes) {
-                    const card = element('article', undefined, 'card');
-                    card.append(element('h3', c.name), element('p', `${c.subject?.name || 'Subject'} · ${c.school_year}${c.archived ? ' · Archived' : ''}`),
-                        button('Open class', () => navigate({ classId: c.id, tab: 'students' })));
-                    root.append(card);
+                    const card = element('article', undefined, 'teacher-workspace-row');
+                    const summary = element('div', undefined, 'teacher-workspace-summary');
+                    summary.append(element('h3', c.name), element('p', `${c.subject?.name || 'Subject'} · ${c.school_year}${c.archived ? ' · Archived' : ''}`));
+                    card.append(summary, button('Open class', () => navigate({ classId: c.id, tab: 'students' })));
+                    list.append(card);
                 }
+                root.append(list);
             } else {
                 root.append(button('All classes', () => navigate({ classId: null, tab: 'students' })));
                 const active = classes.find(c => c.id === classId);

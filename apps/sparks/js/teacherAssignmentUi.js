@@ -10,11 +10,11 @@ export function action(label, run, primary = false) {
     result.type = 'button'; result.addEventListener('click', run); return result;
 }
 export function inputField(form, label, name, type = 'text') {
-    const wrapper = node('label', label); const input = node('input');
+    const wrapper = node('label', label, 'teacher-workspace-field'); const input = node('input');
     input.name = name; input.type = type; wrapper.append(input); form.append(wrapper); return input;
 }
 export function selectField(form, label, name, options) {
-    const wrapper = node('label', label); const select = node('select'); select.name = name;
+    const wrapper = node('label', label, 'teacher-workspace-field'); const select = node('select'); select.name = name;
     for (const [value, text] of options) { const option = node('option', text); option.value = value; select.append(option); }
     wrapper.append(select); form.append(wrapper); return select;
 }

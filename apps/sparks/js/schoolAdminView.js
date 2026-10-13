@@ -11,7 +11,7 @@ function element(tag, text, className) {
 
 export function createSchoolAdminView({ root, context = schoolContext, repository = schoolRepository }) {
     let generation = 0, controller, destroyed = false;
-    let memberScope, memberSearch = '', memberOffset = 0;
+    let memberScope, memberSearch = '', memberOffset = 0, activeSection = 'members';
     const memberPageSize = 25;
     const status = element('p', '', 'inline-status');
     status.setAttribute('role', 'status');
@@ -43,7 +43,7 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
         });
         form.append(group); return () => controls.filter(([, input]) => input.checked).map(([role]) => role);
     }
-    function form(title, submitLabel, build) {
+    function form(title, submitLabel, build, { disclosure = false } = {}) {
         const node = element('form', undefined, 'school-admin-form'); node.append(element('h3', title));
         const run = generation, account = context.getAccountId(), school = context.getSchoolId();
         const action = build(node);
@@ -56,7 +56,9 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
             catch (error) { if (current(run, account, school)) status.textContent = error.message || 'Could not save changes.'; }
             finally { submit.disabled = false; }
         });
-        return node;
+        if (!disclosure) return node;
+        const details = element('details', undefined, 'school-admin-editor');
+        details.append(element('summary', title), node); return details;
     }
     async function refreshAfter(action) {
         const account = context.getAccountId(), school = context.getSchoolId(), run = generation;
@@ -70,7 +72,7 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
         const run = ++generation, account = context.getAccountId(), schoolId = context.getSchoolId();
         const access = context.getAccess(), school = context.getSchool();
         const scope = JSON.stringify([account, schoolId]);
-        if (memberScope !== scope) { memberScope = scope; memberSearch = ''; memberOffset = 0; }
+        if (memberScope !== scope) { memberScope = scope; memberSearch = ''; memberOffset = 0; activeSection = school?.onboardingPending ? 'invitations' : 'members'; }
         root.classList.add('school-admin'); root.replaceChildren(element('h2', 'Schools and administration'), status);
         status.textContent = 'Loading…';
         const chooser = element('label', 'School ', 'school-admin-field'), select = element('select');
@@ -80,9 +82,51 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
         }
         select.value = schoolId || ''; select.disabled = access.schools.length === 0;
         select.addEventListener('change', () => { if (current(run, account, schoolId)) { context.select(select.value); void show(); } });
-        chooser.append(select); root.append(chooser);
-        root.append(button('Refresh access', () => refreshAfter(() => Promise.resolve())));
+        chooser.append(select);
+        const toolbar = element('div', undefined, 'school-admin-toolbar');
+        toolbar.append(chooser, button('Refresh access', () => refreshAfter(() => Promise.resolve()))); root.append(toolbar);
         const content = element('div', undefined, 'school-admin-content'); root.append(content);
+        const panels = new Map();
+        function append(section, ...nodes) {
+            if (!panels.has(section)) {
+                const panel = element('section', undefined, 'school-admin-panel');
+                panel.id = `school-admin-${section}`; panels.set(section, panel);
+            }
+            panels.get(section).append(...nodes);
+        }
+        function renderSections() {
+            const labels = { members: 'Members', invitations: 'Invitations', years: 'Academic years', history: 'History', platform: 'Platform administration' };
+            const keys = Object.keys(labels).filter(key => panels.has(key));
+            if (!keys.length) return;
+            if (!keys.includes(activeSection)) activeSection = keys[0];
+            const nav = element('nav', undefined, 'secondary-tabs school-admin-sections');
+            nav.setAttribute('role', 'tablist'); nav.setAttribute('aria-label', 'School administration sections');
+            const tabs = new Map();
+            function selectSection(key, focus = false) {
+                activeSection = key;
+                for (const [name, panel] of panels) {
+                    panel.hidden = name !== key;
+                    const tab = tabs.get(name); tab.classList.toggle('active', name === key);
+                    tab.setAttribute('aria-selected', String(name === key)); tab.tabIndex = name === key ? 0 : -1;
+                }
+                if (focus) tabs.get(key).focus();
+            }
+            for (const key of keys) {
+                const tab = button(labels[key], () => selectSection(key));
+                tab.className = 'secondary-tab'; tab.id = `school-admin-tab-${key}`;
+                tab.setAttribute('role', 'tab'); tab.setAttribute('aria-controls', panels.get(key).id);
+                panels.get(key).setAttribute('role', 'tabpanel'); panels.get(key).setAttribute('aria-labelledby', tab.id);
+                tab.addEventListener('keydown', event => {
+                    const index = keys.indexOf(key);
+                    const next = event.key === 'ArrowRight' ? keys[(index + 1) % keys.length]
+                        : event.key === 'ArrowLeft' ? keys[(index + keys.length - 1) % keys.length]
+                        : event.key === 'Home' ? keys[0] : event.key === 'End' ? keys.at(-1) : null;
+                    if (next && current(run, account, schoolId)) { event.preventDefault(); selectSection(next, true); }
+                });
+                tabs.set(key, tab); nav.append(tab);
+            }
+            content.append(nav, ...keys.map(key => panels.get(key))); selectSection(activeSection);
+        }
         try {
             const opts = { signal: controller.signal };
             const canManage = Boolean(school && (access.platformAdmin || school.roles.includes('school_admin')));
@@ -102,11 +146,11 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                     const row = element('p', `${invitation.school_name}: ${(invitation.roles || []).join(', ')} `);
                     row.append(button('Accept invitation', () => refreshAfter(() => repository.acceptInvitation(invitation.id)))); section.append(row);
                 }
-                content.append(section);
+                append('invitations', section);
             }
-            if (!school) content.append(element('p', 'You have no school memberships. A school administrator can invite your verified email address.'));
+            if (!school) append('members', element('p', 'You have no school memberships. A school administrator can invite your verified email address.'));
             if (access.platformAdmin) {
-                content.append(form('Create school and invite administrator', 'Create school and invite administrator', node => {
+                append('platform', form('Create school and invite administrator', 'Create school and invite administrator', node => {
                     const name = field(node, 'School name'), timezone = field(node, 'Timezone', 'America/Panama');
                     const admin = field(node, 'First administrator email', '', 'email');
                     node.append(element('p', 'The school opens when its administrator verifies this email and accepts the invitation. Share the app link with them; this action does not send an invitation email.'));
@@ -118,10 +162,10 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                     };
                 }));
                 if (school?.onboardingPending) {
-                    content.append(element('p', 'Awaiting the first administrator. Membership and teaching remain unavailable until they accept.'));
-                    content.append(button('Cancel school onboarding', () => refreshAfter(() => repository.setSchoolActive(schoolId, false))));
-                } else if (school) content.append(button(school.active === false ? 'Reactivate school' : 'Suspend school', () => refreshAfter(() => repository.setSchoolActive(schoolId, school.active === false))));
-                content.append(form('Grant platform administration', 'Grant access', node => {
+                    append('platform', element('p', 'Awaiting the first administrator. Membership and teaching remain unavailable until they accept.'));
+                    append('platform', button('Cancel school onboarding', () => refreshAfter(() => repository.setSchoolActive(schoolId, false))));
+                } else if (school) append('platform', button(school.active === false ? 'Reactivate school' : 'Suspend school', () => refreshAfter(() => repository.setSchoolActive(schoolId, school.active === false))));
+                append('platform', form('Grant platform administration', 'Grant access', node => {
                     const user = field(node, 'Account ID'); return () => repository.setPlatformAdmin(user.value.trim(), true);
                 }));
                 const list = element('section'); list.append(element('h3', 'Platform administrators'));
@@ -130,10 +174,10 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                     if (admin.active !== false) row.append(button('Revoke platform access', () => refreshAfter(() => repository.setPlatformAdmin(admin.user_id, false))));
                     list.append(row);
                 }
-                content.append(list);
+                append('platform', list);
             }
             if (canManageYears) {
-                content.append(form('Add academic year', 'Save academic year', node => {
+                append('years', form('Add academic year', 'Save academic year', node => {
                     const year = field(node, 'Year', String(new Date().getFullYear()), 'number'); year.min = '2020'; year.max = '2200';
                     const label = field(node, 'Year label', String(new Date().getFullYear()));
                     return () => repository.setYear(schoolId, Number(year.value), label.value, false);
@@ -145,29 +189,29 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                     row.append(button(year.archived ? 'Reopen academic year' : 'Archive academic year', () => refreshAfter(() => repository.setYear(schoolId, year.year, year.label, !year.archived))));
                     yearList.append(row);
                 }
-                content.append(yearList);
+                append('years', yearList);
             }
             if (canManage) {
                 if (school.onboardingPending) {
-                    content.append(form('Replace first administrator invitation', 'Replace invitation', node => {
+                    append('invitations', form('Replace first administrator invitation', 'Replace invitation', node => {
                         const email = field(node, 'Administrator email', '', 'email');
                         node.append(element('p', 'This revokes the previous invitation. Share the app link with the new administrator; no invitation email is sent.'));
                         return () => repository.replaceInitialAdminInvitation(schoolId, email.value);
                     }));
                 } else {
-                    content.append(form('Invite school member', 'Create invitation', node => {
+                    append('invitations', form('Invite school member', 'Create invitation', node => {
                         const email = field(node, 'Email', '', 'email'), roles = roleFields(node, ['teacher']);
                         node.append(element('p', 'The invitation appears after the recipient signs in with this verified email.'));
                         return () => repository.inviteMember(schoolId, email.value, roles());
                     }));
-                    content.append(form('Add an existing account', 'Save membership', node => {
+                    append('members', form('Add an existing account', 'Save membership', node => {
                         const id = field(node, 'Account ID'), roles = roleFields(node, ['teacher']);
                         return () => repository.setMember(schoolId, id.value.trim(), roles(), true);
-                    }));
+                    }, { disclosure: true }));
                 }
                 const list = element('section'); list.append(element('h3', 'School members'));
                 const members = memberPage.members;
-                const searchForm = element('form');
+                const searchForm = element('form', undefined, 'school-admin-search');
                 const search = field(searchForm, 'Search members by name or email', memberSearch, 'search');
                 search.required = false; search.maxLength = 200;
                 const searchButton = element('button', 'Search members', 'btn secondary-btn'); searchButton.type = 'submit'; searchForm.append(searchButton);
@@ -182,7 +226,8 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                 previous.disabled = memberOffset === 0;
                 const next = button('Next members', () => { memberOffset += memberPageSize; return show(); });
                 next.disabled = memberOffset + members.length >= memberPage.total;
-                list.append(previous, next);
+                const pagination = element('nav', undefined, 'school-admin-toolbar');
+                pagination.setAttribute('aria-label', 'School member pages'); pagination.append(previous, next); list.append(pagination);
                 if (!members.length) list.append(element('p', memberSearch ? 'No members match this search.' : 'No school members.'));
                 for (const member of members) {
                     list.append(form(`${member.display_name || member.email || member.user_id}${member.active ? '' : ' (inactive)'}`, 'Save member', node => {
@@ -193,23 +238,28 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                         const placement = () => ({ grade: grade.value.trim() || null, section: section.value.trim() || null });
                         node.append(button(member.active ? 'Remove from school' : 'Restore membership', () => refreshAfter(() => repository.setMember(schoolId, member.user_id, roles(), !member.active, placement()))));
                         return () => repository.setMember(schoolId, member.user_id, roles(), member.active, placement());
-                    }));
+                    }, { disclosure: true }));
                 }
-                content.append(list);
+                append('members', list);
                 const inviteList = element('section'); inviteList.append(element('h3', 'School invitations'));
                 for (const invite of pending) {
                     const row = element('p', `${invite.email} · ${(invite.roles || []).join(', ')} `);
                     if (!invite.revoked_at && !invite.accepted_at) row.append(button('Revoke invitation', () => refreshAfter(() => repository.revokeInvitation(invite.id))));
                     inviteList.append(row);
                 }
-                content.append(inviteList);
+                append('invitations', inviteList);
             }
             if (canManage || access.platformAdmin) {
                 const events = element('section'); events.append(element('h3', 'Administration history'));
                 if (!audit.length) events.append(element('p', 'No administrative events.'));
-                for (const event of audit) events.append(element('p', `${event.created_at || ''} · ${event.action || ''} · ${event.target_user_id || event.target_id || ''}`));
-                content.append(events);
+                for (const event of audit) {
+                    const row = element('details', undefined, 'school-admin-editor');
+                    row.append(element('summary', `${event.created_at ? new Date(event.created_at).toLocaleString() : 'Date unavailable'} · ${(event.action || 'Administrative change').replaceAll('.', ' ')}`), element('pre', JSON.stringify(event, null, 2)));
+                    events.append(row);
+                }
+                append('history', events);
             }
+            renderSections();
         } catch (error) { if (current(run, account, schoolId)) status.textContent = error.message || 'Could not load school administration.'; }
     }
     return Object.freeze({ show, destroy() { destroyed = true; generation++; controller?.abort(); unsubscribe(); root.replaceChildren(); } });

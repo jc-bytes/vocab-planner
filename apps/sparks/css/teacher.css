@@ -1186,6 +1186,7 @@ body {
 }
 
 .teacher-settings-grid--actions {
+    grid-template-columns: minmax(12rem, 1fr) 4rem auto;
     align-items: end;
 }
 
@@ -5043,7 +5044,7 @@ button.activity-card {
     html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) {
         --teacher-shell-sidebar-width: 240px;
         --teacher-shell-frame-gap: 12px;
-        --teacher-shell-topbar-height: 52px;
+        --teacher-shell-topbar-height: 0px;
         --teacher-shell-chrome-bg: #081225;
         --teacher-sidebar-transition-duration: 280ms;
         --teacher-sidebar-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
@@ -5226,37 +5227,7 @@ button.activity-card {
         padding: 0;
     }
 
-    html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > .teacher-top-bar {
-        position: fixed;
-        inset: 0 0 auto var(--teacher-shell-sidebar-width);
-        z-index: 38;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        box-sizing: border-box;
-        height: var(--teacher-shell-topbar-height);
-        padding: 0 28px;
-        background: var(--teacher-shell-chrome-bg);
-        transition: left var(--teacher-sidebar-transition-duration) var(--teacher-sidebar-transition-easing);
-    }
-
-    .teacher-top-bar-copy {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        color: rgba(173, 198, 255, 0.66);
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }
-
-    .teacher-top-bar-copy strong {
-        color: #e7edff;
-        font-size: 0.8rem;
-        letter-spacing: 0;
-        text-transform: none;
-    }
+    html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > .teacher-top-bar { display: none; }
 
     html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > main.teacher-main {
         box-sizing: border-box;
@@ -5269,14 +5240,9 @@ button.activity-card {
         margin-left: calc(var(--teacher-shell-sidebar-width) + var(--teacher-shell-frame-gap));
         padding: 40px clamp(24px, 3vw, 40px) 56px;
         border: 0;
-        border-radius: 22px;
-        background:
-            radial-gradient(circle at 8% 5%, rgba(93, 83, 255, 0.13), transparent 36%),
-            linear-gradient(145deg, rgba(14, 25, 52, 0.98), rgba(6, 14, 31, 0.99));
-        background-clip: padding-box;
-        box-shadow:
-            inset 0 0 0 1px rgba(173, 198, 255, 0.08),
-            0 24px 70px -50px rgba(0, 0, 0, 0.95);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
         transition: margin-left var(--teacher-sidebar-transition-duration) var(--teacher-sidebar-transition-easing);
     }
 
@@ -5522,3 +5488,38 @@ button.activity-card {
 .student-insight-attempt { border-bottom: 1px solid var(--border-color); padding-block: 0.75rem; }
 
 .student-profile-tabs .secondary-tab:not(.active) { color: var(--text-main); }
+
+/* Teacher content uses the page surface; forms retain their own input boundaries. */
+.teacher-site .data-settings-panel {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 1rem 0;
+}
+.teacher-site .subject-manager-row {
+    border: 0;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    background: transparent;
+}
+.teacher-site .subject-manager-row details { overflow-wrap: anywhere; }
+
+.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > main.teacher-main {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.subject-manager-field { display: grid; gap: .25rem; color: var(--color-text-muted); }
+.subject-manager-row details[open] { grid-column: 1 / -1; }
+
+.teacher-settings-grid--actions input[type="color"] { width: 3rem; }
+@media (max-width: 700px) {
+    .teacher-settings-grid--actions { grid-template-columns: 4rem minmax(0, 1fr); }
+    .teacher-settings-grid--actions > .form-group:first-child { grid-column: 1 / -1; }
+    .subject-manager-row { grid-template-columns: 4rem minmax(0, 1fr); }
+    .subject-manager-row > .subject-color-dot { display: none; }
+    .subject-manager-row > .subject-manager-field:first-of-type { grid-column: 1 / -1; }
+}
+
+body.teacher-site:has(#teacher-tab-shell:not(.hidden)) { background: var(--bg-color); }
