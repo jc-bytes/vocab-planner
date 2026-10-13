@@ -64,7 +64,16 @@
       "matching",
       "fill-in-blank"
     ],
-    "additionalActivities": [],
+    "additionalActivities": [
+      "illustration",
+      "quiz",
+      "word-search",
+      "crossword",
+      "hangman",
+      "scramble",
+      "wordle",
+      "speed-match"
+    ],
     "sections": [
       "A",
       "B"

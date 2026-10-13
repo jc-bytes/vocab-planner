@@ -225,8 +225,8 @@ export class StudentActivityGateDisplay {
             'summary',
             'activity-disclosure__summary',
             completion.isComplete
-                ? `Additional Practice (${visibleAdditionalCount})`
-                : `Additional Practice (${visibleAdditionalCount}) · locked`
+                ? `Optional (${visibleAdditionalCount})`
+                : `Optional (${visibleAdditionalCount}) · locked`
         );
         const additionalGrid = createElement('div', 'activities-grid-inner activity-secondary-grid');
         additionalDetails.appendChild(additionalSummary);

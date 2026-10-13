@@ -59,6 +59,10 @@ test('October 13 online lesson has five sourced words and three required activit
     assert.deepEqual(v.activitySettings.sections, ['A', 'B']);
     assert.deepEqual(v.activitySettings.requiredActivities, ['flashcards', 'matching', 'fill-in-blank']);
     assert.deepEqual(v.words.map(w => w.word), ['Privacy', 'Boundary', 'Pressure', 'Permission', 'Report']);
+    assert.deepEqual(v.activitySettings.additionalActivities, [
+        'illustration', 'quiz', 'word-search', 'crossword',
+        'hangman', 'scramble', 'wordle', 'speed-match'
+    ]);
     for (const word of v.words) {
         assert.ok(word.definition);
         assert.ok(word.example.toLowerCase().includes(word.word.toLowerCase()));
