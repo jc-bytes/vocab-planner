@@ -13,7 +13,7 @@
 .classrooms summary { min-height: 2.75rem; cursor: pointer; }
 
 .teacher-workspace-list { display: grid; }
-.classrooms { container-type: inline-size; }
+.teacher-site .classrooms { container-type: inline-size; }
 .teacher-class-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem 1.5rem; }
 .teacher-class-grid > .teacher-workspace-row { align-items: start; flex-direction: column; gap: .75rem; }
 .teacher-class-grid .teacher-workspace-summary { flex: none; width: 100%; }
