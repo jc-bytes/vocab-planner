@@ -24,7 +24,7 @@ try {
   manager.setRoute=r=>{manager.route=r;};manager.applyRoute=()=>{};
   manager.serverStateQuery={ensure:o=>o.queryFn({signal:new AbortController().signal})};
   manager.classroomRepository={listClasses:async()=>[{id:'c',school_year:new Date().getFullYear()}],listAssignments:async()=>[{id:'a',class_id:'c',kind:'vocabulary',release_at:'2026-01-01',due_at:'2026-01-02'}],getRoster:async()=>[{studentId:'s'},{studentId:'new'}],readAssignment:async()=>({content:{activitySettings:{requiredActivities:['flashcards','matching']}}})};
-  supabaseService.getStudentsProgressForTeacher=async()=>[{id:'s',units:{'assignment:a':{scores:{flashcards:{score:100,verified:true,lastPlayed:'2026-10-01',latestAttempt:{score:100,accuracy:90}},matching:{score:40,lastPlayed:'2026-10-02',latestAttempt:{score:40,accuracy:40}}}}}},{id:'new',units:{}}];
+  supabaseService.getStudentsProgressForTeacher=async()=>[{id:'s',units:{'assignment:a':{scores:{flashcards:{score:100,verified:true,isComplete:true,lastPlayed:'2026-10-01',latestAttempt:{score:100,accuracy:90}},matching:{score:40,lastPlayed:'2026-10-02',latestAttempt:{score:40,accuracy:40}}}}}},{id:'new',units:{}}];
   manager.renderProgressTable();const loading=document.querySelector('#student-progress-list').textContent;
   await manager.loadStudentRosterProgress({generation:1});
   const ready=document.querySelector('#student-progress-list').textContent;

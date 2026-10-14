@@ -12,10 +12,19 @@ export function createAssignmentResultsPdf({ rows, studentIds, kind, className, 
     let y = 20 + titleLines.length * 6;
     doc.setFontSize(10); const scopeLines = doc.splitTextToSize(`${className} | ${new Set(scopedRows.map(r => r.studentId)).size} students selected`, width);
     doc.text(scopeLines, 14, y); y += scopeLines.length * 5 + 3;
-    const columns = kind === 'spark' ? ['Student', 'Status', 'Response', 'Automatic check', 'Written review'] : ['Student', 'Activity', 'Status', 'Score', 'Accuracy'];
+    const completion = kind === 'vocabulary-completion';
+    if (completion) {
+        const summaries = [...new Map(scopedRows.map(row => [row.studentId, row])).values()];
+        autoTable(doc, { head: [['Student', 'Roster', 'Vocabulary status', 'Required complete', 'Remaining required']],
+            body: summaries.map(row => [row.name, row.enrolled ? 'Current' : 'Historical', row.completionStatus,
+                row.totalRequired === null ? 'Unavailable' : `${row.completedRequired}/${row.totalRequired}`, (row.remaining || []).join(', ')]),
+            startY: y, margin: { left: 14, right: 14 }, styles: { fontSize: 9, overflow: 'linebreak', cellPadding: 2 }, headStyles: { fillColor: [45, 62, 80] } });
+        y = doc.lastAutoTable.finalY + 8;
+    }
+    const columns = kind === 'spark' ? ['Student', 'Status', 'Response', 'Automatic check', 'Written review'] : ['Student', 'Activity', ...(completion ? ['Requirement'] : []), 'Status', 'Score', 'Accuracy'];
     const body = scopedRows.map(row => kind === 'spark'
         ? [row.name, row.status, row.response, row.automaticTotal !== '' ? `${row.score} / ${row.automaticTotal}` : '', row.status === 'No work submitted' ? '' : row.needsTeacherReview ? 'Needed' : 'Not needed']
-        : [row.name, row.activity, row.status, row.score, row.accuracy]);
+        : [row.name, row.activity, ...(completion ? [row.activity ? row.required === null ? 'Unavailable' : row.required ? 'Required' : 'Optional' : ''] : []), row.status, row.score ?? '', row.accuracy ?? '']);
     autoTable(doc, { head: [columns], body, startY: y, margin: { left: 14, right: 14 },
         styles: { fontSize: 9, overflow: 'linebreak', cellPadding: 2 },
         headStyles: { fillColor: [45, 62, 80] },

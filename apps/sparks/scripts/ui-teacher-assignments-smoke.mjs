@@ -1,14 +1,18 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
 const host = '127.0.0.1', port = Number(process.env.UI_TEACHER_ASSIGNMENTS_PORT || 8042), baseUrl = `http://${host}:${port}`;
+const screenshots = process.env.UI_TEACHER_COMPLETION_SCREENSHOTS;
 let server, browser;
 try {
     server = await ensureViteServer({ baseUrl, probePath: '/', host, port });
     browser = await chromium.launch(); const page = await browser.newPage({ acceptDownloads: true, timezoneId: 'America/Panama' });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
-    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    const teacherHtml = (await readFile(new URL('../teacher.html', import.meta.url), 'utf8'))
+        .replace(/<script[^>]*src="js\/teacher\.js"[^>]*><\/script>/, '');
+    await page.route('**/__teacher-assignments.html', route => route.fulfill({ contentType: 'text/html', body: teacherHtml }));
+    await page.goto(`${baseUrl}/__teacher-assignments.html`, { waitUntil: 'domcontentloaded' });
     await page.evaluate(async () => {
         document.body.replaceChildren();
         const root = document.createElement('main'); document.body.append(root);
@@ -23,6 +27,20 @@ try {
             listAssignments: async classId => assignments.filter(a => !classId || a.class_id === classId),
             getRoster: async classId => classId === 'class-a' ? [{ studentId: 'a', name: 'Ana' }, { studentId: 'b', name: 'Ben' }] : [{ studentId: 'c', name: 'Cora' }],
             getResults: async () => [{ studentId: 'a', name: 'Ana', activity: 'matching', score: 0, accuracy: 0, complete: false }],
+            assignmentCompletion: async assignmentId => ({
+                assignment: { id: assignmentId, title: 'Vocabulary A', kind: 'vocabulary',
+                    content: state.unknownRequirements ? {} : { activitySettings: { requiredActivities: ['matching', 'quiz', 'flashcards'] } } },
+                students: [
+                    { studentId: 'a', name: state.longName ? 'Ana Example Student With A Long Family Name And Additional Names' : 'Ana', enrolled: true, progress: [
+                        { activity: 'matching', score: 0, accuracy: 0, complete: true, verified: true },
+                        { activity: 'hangman', score: 100, complete: true, verified: true }
+                    ], feedback: state.notes.filter(n => n.student_id === 'a' && n.assignment_id === assignmentId) },
+                    { studentId: 'b', name: 'Ben', enrolled: true, progress: [],
+                        feedback: state.notes.filter(n => n.student_id === 'b' && n.assignment_id === assignmentId) },
+                    { studentId: 'former', name: 'Former pupil', enrolled: false,
+                        progress: [{ activity: 'matching', score: 75, complete: true, verified: true }], feedback: [] }
+                ], total: 3, activeTotal: 2, historicalTotal: 1, offset: 0, limit: 100
+            }),
             listResponses: async () => [{ revision:1, student_id: 'c', response: 'My private written answer', evaluation: { correct: 1, automaticTotal: 2, needsTeacherReview: true, isComplete:false } }],
             withdrawAssignment: async id => { state.withdrawn = id; }
         };
@@ -82,7 +100,16 @@ try {
     assert.equal(await page.evaluate(() => window.assignmentSmoke.navigation.at(-1).mode), 'assignments');
     // Scope comes from assignment/class IDs, even when two classes share a name.
     await page.evaluate(() => window.assignmentSmoke.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' }));
-    assert.equal(await page.getByRole('cell', { name: 'No work submitted', exact: true }).count(), 1);
+    const report = page.getByRole('region', { name: 'Vocabulary completion', exact: true });
+    await page.getByText('0 of 2 current class members complete · 1 in progress · 1 not started', { exact: true }).waitFor();
+    assert.equal(await report.getByText('Not started · 0/3 required activities', { exact: true }).count(), 1);
+    assert.equal(await report.getByText('In progress · 1/3 required activities', { exact: true }).count(), 1);
+    assert.equal(await report.getByText('Former pupil', { exact: true }).count(), 0);
+    await report.locator('article').filter({ has: page.getByRole('heading', { name: 'Ana', exact: true }) }).locator(':scope > details > summary').click();
+    assert.equal(await report.getByText('Remaining: Quiz, Flashcards', { exact: true }).count(), 1);
+    assert.equal(await report.getByRole('heading', { name: 'Hangman · Optional', exact: true }).count(), 1);
+    assert.equal(await report.getByText('Activity score: 0', { exact: true }).count(), 1);
+    assert.equal(await report.getByText('Answer accuracy: 0%', { exact: true }).count(), 1);
     assert.equal(await page.getByText('Cora', { exact: true }).count(), 0);
     await page.getByRole('button', { name: 'Export results' }).click();
     await page.getByRole('dialog').getByLabel('Ben', { exact: true }).uncheck();
@@ -90,13 +117,60 @@ try {
     const downloadPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'Download CSV' }).click();
     const csv = await readFile(await (await downloadPromise).path(), 'utf8');
     assert.ok(csv.includes('"a","Ana"')); assert.ok(!csv.includes('"b","Ben"')); assert.ok(csv.includes('"matching","0","0"'));
+    assert.ok(!csv.includes('Former pupil')); assert.ok(csv.includes('"Current","In progress","1","3","quiz, flashcards"'));
+    assert.ok(csv.includes('"Required","Not started","quiz","",""'));
+    assert.ok(csv.includes('"Optional","Complete","hangman","100",""'));
     await page.getByRole('dialog').getByLabel('Format').selectOption('pdf');
     assert.equal(await page.getByRole('dialog').getByLabel('Include update times').isVisible(), false);
     await page.getByRole('dialog').getByLabel('PDF page layout').selectOption('landscape');
     const pdfDownloadPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'Download PDF' }).click();
     const pdfBytes = await readFile(await (await pdfDownloadPromise).path(), 'latin1');
     assert.ok(pdfBytes.startsWith('%PDF-')); assert.ok(pdfBytes.includes('(Ana)')); assert.ok(!pdfBytes.includes('(Ben)'));
+    assert.ok(!pdfBytes.includes('Former pupil')); assert.ok(pdfBytes.includes('(1/3)')); assert.ok(pdfBytes.includes('(quiz, flashcards)'));
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    // Report filters scope both visible rows and the export dialog without changing class totals.
+    await page.getByRole('combobox', { name: /^Completion/ }).selectOption('Not started');
+    assert.equal(await report.getByRole('heading', { name: 'Ana', exact: true }).count(), 0);
+    assert.equal(await report.getByRole('heading', { name: 'Ben', exact: true }).count(), 1);
+    await page.getByRole('button', { name: 'Export results' }).click();
+    assert.equal(await page.getByRole('dialog').getByLabel('Ben', { exact: true }).count(), 1);
+    assert.equal(await page.getByRole('dialog').getByLabel('Ana', { exact: true }).count(), 0);
+    const missingCsvPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'Download CSV' }).click();
+    const missingCsv = await readFile(await (await missingCsvPromise).path(), 'utf8');
+    assert.ok(missingCsv.includes('"b","Ben","Current","Not started","0","3"'));
+    assert.ok(missingCsv.includes('"Required","Not started","matching","",""'));
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('combobox', { name: /^Completion/ }).selectOption('all');
+    await page.getByRole('combobox', { name: /^Roster/ }).selectOption('historical');
+    assert.equal(await report.getByRole('heading', { name: 'Former pupil', exact: true }).count(), 1);
+    assert.equal(await report.getByText('Historical evidence. Excluded from current class totals.', { exact: true }).count(), 1);
+    assert.equal(await report.getByRole('heading', { name: 'Ana', exact: true }).count(), 0);
+    await page.getByRole('button', { name: 'Export results' }).click();
+    const historicalCsvPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'Download CSV' }).click();
+    const historicalCsv = await readFile(await (await historicalCsvPromise).path(), 'utf8');
+    assert.ok(historicalCsv.includes('"former","Former pupil","Historical","In progress","1","3"'));
+    assert.ok(!historicalCsv.includes('"a","Ana"'));
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await page.getByRole('combobox', { name: /^Roster/ }).selectOption('active');
+    await page.getByLabel('Find student', { exact: true }).fill('anA');
+    assert.equal(await report.getByRole('heading', { name: 'Ana', exact: true }).count(), 1);
+    assert.equal(await report.getByRole('heading', { name: 'Ben', exact: true }).count(), 0);
+    // A missing historical requirement snapshot is unavailable, never zero required work or optional work.
+    await page.evaluate(async () => { const s = window.assignmentSmoke; s.unknownRequirements = true;
+        await s.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' }); });
+    await report.getByText('The published requirements are unavailable. Saved activity evidence is shown without a vocabulary completion total.', { exact: true }).waitFor();
+    assert.equal(await report.getByText('Unavailable', { exact: true }).count(), 2);
+    await report.locator('article').filter({ has: page.getByRole('heading', { name: 'Ana', exact: true }) }).locator(':scope > details > summary').click();
+    assert.equal(await report.getByRole('heading', { name: 'Matching · Requirement unavailable', exact: true }).count(), 1);
+    assert.equal(await report.getByRole('heading', { name: /Optional/ }).count(), 0);
+    await page.getByRole('button', { name: 'Export results' }).click();
+    const unknownCsvPromise = page.waitForEvent('download'); await page.getByRole('button', { name: 'Download CSV' }).click();
+    const unknownCsv = await readFile(await (await unknownCsvPromise).path(), 'utf8');
+    assert.ok(unknownCsv.includes('"a","Ana","Current","Unavailable","",""'));
+    assert.ok(unknownCsv.includes('"Unavailable","Complete","matching","0","0"'));
+    assert.ok(!unknownCsv.includes('"Optional"'));
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+    await page.evaluate(() => { window.assignmentSmoke.unknownRequirements = false; });
     await page.evaluate(() => window.assignmentSmoke.workspace.show({ mode: 'review', classId: 'class-b', assignmentId: 'spark-b' }));
     assert.equal(await page.getByText('My private written answer', { exact: true }).count(), 1);
     assert.equal(await page.getByText('Written answers need teacher review.', { exact: true }).count(), 1);
@@ -154,8 +228,8 @@ try {
     const feedbackFilters = await page.evaluate(async () => {
         const s = window.assignmentSmoke;
         await s.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' });
-        const picker = document.querySelector('select[name="student"]');
-        const filter = value => { picker.value = value; picker.dispatchEvent(new Event('change')); };
+        const picker = document.querySelector('input[type="search"]');
+        const filter = value => { picker.value = value === 'a' ? 'Ana' : 'Ben'; picker.dispatchEvent(new Event('input')); };
         const editor = () => document.querySelector('.student-feedback-editor');
         const button = root => [...root.querySelectorAll('button')].find(b => b.textContent === 'Save teacher note');
         const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -184,6 +258,49 @@ try {
     assert.equal(feedbackFilters.otherDraft, 'Ben unsaved draft'); assert.equal(feedbackFilters.preservedOther, true);
     assert.equal(feedbackFilters.newerDraft, 'Ana newer unsaved draft'); assert.equal(feedbackFilters.savedDraft, 'Ana newer unsaved draft');
     assert.ok(feedbackFilters.advancedRevision >= 2); assert.equal(feedbackFilters.detachedSave, true);
+    // The populated report and open evidence editors remain usable at every supported width.
+    await page.evaluate(async teacherHtml => {
+        const s = window.assignmentSmoke; s.longName = true;
+        const template = new DOMParser().parseFromString(teacherHtml, 'text/html');
+        const container = document.createElement('div'); container.className = 'app-container';
+        const header = template.querySelector('.teacher-app-header');
+        header.querySelector('#teacher-tab-shell').classList.remove('hidden');
+        header.querySelector('#teacher-school-name').textContent = 'Academia Internacional David';
+        header.querySelector('#teacher-mobile-section-label').textContent = 'Review';
+        for (const tab of header.querySelectorAll('[data-section]')) {
+            const selected = tab.dataset.section === 'review';
+            tab.classList.toggle('active', selected); tab.setAttribute('aria-selected', String(selected));
+        }
+        container.append(header, s.root); document.body.replaceChildren(container);
+        document.body.className = 'teacher-site'; s.root.className = 'teacher-main classrooms';
+        await s.workspace.show({ mode: 'review', classId: 'class-a', assignmentId: 'vocab-a' });
+        const evidence = s.root.querySelector('.teacher-completion-row > details'); evidence.open = true;
+        evidence.querySelector('details').open = true;
+    }, teacherHtml);
+    if (screenshots) await mkdir(screenshots, { recursive: true });
+    for (const width of [320, 360, 390, 430, 768, 1024, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        const bounds = await page.evaluate(() => ({
+            page: document.documentElement.scrollWidth, viewport: innerWidth,
+            clipped: [...document.querySelectorAll('main input, main select, main textarea, main button, main summary')]
+                .filter(element => element.getClientRects().length && !element.closest('details:not([open])'))
+                .map(element => ({ name: element.getAttribute('name') || element.textContent, box: element.getBoundingClientRect() }))
+                .filter(({ box }) => box.left < -1 || box.right > innerWidth + 1)
+                .map(({ name }) => name),
+            misplacedIdentities: [...document.querySelectorAll('.teacher-completion-row')].filter(row => {
+                const summary = row.querySelector('.teacher-workspace-summary').getBoundingClientRect();
+                const evidence = row.querySelector('details').getBoundingClientRect();
+                return summary.top > evidence.top + 20;
+            }).length
+        }));
+        assert.ok(bounds.page <= bounds.viewport + 1, `Completion report overflows at ${width}px: ${JSON.stringify(bounds)}`);
+        assert.deepEqual(bounds.clipped, [], `Completion controls clip at ${width}px`);
+        assert.equal(bounds.misplacedIdentities, 0, `Student identity loses top alignment at ${width}px`);
+        assert.equal(await report.locator('summary').filter({ hasText: /^Assignment note$/ }).count(), 2);
+        assert.equal(await report.getByRole('button', { name: 'Save teacher note', exact: true }).count(), 1);
+        if (screenshots && [390, 1280].includes(width)) await page.screenshot({ path: `${screenshots}/completion-${width}.png`, fullPage: false });
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
     // A replaced account must not receive a delayed load from the previous account.
     await page.evaluate(() => {
         const s = window.assignmentSmoke; s.owner = 'teacher-a'; s.publisher.destroy(); s.publisher = s.makePublisher();
@@ -197,5 +314,5 @@ try {
     assert.equal(await page.getByRole('dialog').count(), 0);
     await page.evaluate(() => { const s = window.assignmentSmoke; s.publisher.destroy(); s.workspace.destroy(); });
     assert.equal(await page.getByRole('dialog').count(), 0); assert.deepEqual(errors, []);
-    console.log('Teacher assignments smoke passed: retry, modal cancellation, private class review, exact scoped CSV, Spark responses, saved teacher notes, review readback and stale account loads.');
+    console.log('Teacher assignments smoke passed: retry, modal cancellation, required completion checklists, optional/history/unknown evidence, filtered CSV/PDF parity, Spark review, saved drafts and stale account loads.');
 } finally { await browser?.close(); server?.kill(); }

@@ -24,7 +24,8 @@ try {
         ['20260917131020_school_platform_foundation.sql', "select to_regclass('public.schools') is not null"],
         ['20260917131024_school_classroom_ownership.sql', "select exists(select 1 from information_schema.columns where table_schema='public' and table_name='teaching_classes' and column_name='school_id')"],
         ['20261006022529_student_insight_teacher_reads.sql', "select to_regprocedure('public.teacher_student_attempts_v1(uuid,uuid,uuid,text,integer,integer)') is not null"],
-        ['20261006025409_student_feedback_teacher_review.sql', "select to_regclass('private.student_assignment_feedback') is not null"]
+        ['20261006025409_student_feedback_teacher_review.sql', "select to_regclass('private.student_assignment_feedback') is not null"],
+        ['20261014123536_teacher_assignment_completion_reads.sql', "select to_regprocedure('public.teacher_assignment_completion_v1(uuid,uuid,integer,integer)') is not null"]
     ];
     for (const [name, present] of migrations) {
         if (sql(database, present) === 't') continue;
@@ -32,7 +33,7 @@ try {
         console.log(`Applied ${name} in isolated rehearsal.`);
     }
     console.log('Testing disposable schema with original owners/ACL and explicit fixtures.');
-    execFileSync(process.execPath, ['--test', '--test-concurrency=1', 'tests/teacher-student-insight-database.test.mjs', 'tests/teacher-student-feedback-database.test.mjs'], {
+    execFileSync(process.execPath, ['--test', '--test-concurrency=1', 'tests/teacher-student-insight-database.test.mjs', 'tests/teacher-student-feedback-database.test.mjs', 'tests/teacher-assignment-completion-database.test.mjs'], {
         stdio: 'inherit', env: { ...process.env, SPARKS_SCHOOL_TEST_DATABASE: database, SPARKS_SCHOOL_TEST_CONTAINER: source.container }
     });
     if (process.env.SPARKS_VERIFY_APPLIED_SCHEMA === '1') {

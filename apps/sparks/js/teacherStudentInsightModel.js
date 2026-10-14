@@ -1,4 +1,5 @@
 import { readingReviewStatus, assignmentFeedback } from './teacherStudentFeedbackModel.js';
+import { verifiedActivityComplete, vocabularyRequirements } from './verifiedAssignmentProgress.js';
 const date = value => value ? Date.parse(value) : NaN;
 const number = value => value === null || value === undefined || value === '' ? null : Number.isFinite(Number(value)) ? Number(value) : null;
 export function buildStudentInsight({ assignments = [] } = {}, now = Date.now()) {
@@ -8,20 +9,21 @@ export function buildStudentInsight({ assignments = [] } = {}, now = Date.now())
             && date(assignment.releaseAt) <= now && !assignment.content?.activitySettings?.retiredWeeklySet;
         const lifecycle = assignment.content?.activitySettings?.retiredWeeklySet ? 'Retired' : assignment.withdrawn ? 'Withdrawn' : assignment.archived || !assignment.enrolled ? 'Historical'
             : date(assignment.releaseAt) > now ? 'Scheduled' : date(assignment.closeAt) < now ? 'Closed' : 'Available';
-        const configured = assignment.content?.activitySettings?.requiredActivities;
+        const configured = vocabularyRequirements(assignment.content);
         const checkMode = assignment.content?.checkMode ?? assignment.content?.check_mode;
         const readingRequired = assignment.kind === 'spark' && checkMode === 'required';
-        const known = assignment.kind === 'spark' ? readingRequired : Array.isArray(configured);
+        const known = assignment.kind === 'spark' ? ['required', 'optional', 'reading_only'].includes(checkMode) : configured !== null;
         const required = new Set(Array.isArray(configured) ? configured : []);
         const recorded = new Map((assignment.progress || []).map(p => [p.activity_type, p]));
         const activities = assignment.kind === 'spark' ? [] : [...new Set([...required, ...recorded.keys()])].map(type => {
             const progress = recorded.get(type);
-            const complete = progress?.verified === true && (progress.is_complete === true || number(progress.score) >= 100);
+            const complete = verifiedActivityComplete(progress);
             return { type, required: required.has(type), progress,
                 status: complete ? 'Completed' : progress ? 'In progress' : 'Not started' };
         });
         const response = assignment.response;
-        const readingStatus = !response && !readingRequired ? 'No check submitted' : readingReviewStatus(response, assignmentFeedback(assignment));
+        const readingStatus = assignment.kind === 'spark' && !known ? 'Requirements unavailable'
+            : !response && !readingRequired ? 'No required check' : readingReviewStatus(response, assignmentFeedback(assignment));
         const requiredWork = assignment.kind === 'spark' ? readingRequired ? [{ status: readingStatus }] : [] : activities.filter(a => a.required);
         if (current) {
             if (!known) summary.unknown++;

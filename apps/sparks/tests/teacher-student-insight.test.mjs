@@ -11,6 +11,11 @@ test('unverified results and optional results never satisfy required completion'
  const {summary,work}=buildStudentInsight({assignments:[assignment({progress:[{activity_type:'quiz',score:100,verified:false,is_complete:true},{activity_type:'matching',verified:true,is_complete:true},{activity_type:'flashcards',verified:true,is_complete:true}]})]},now);
  assert.equal(summary.required,2);assert.equal(summary.completed,1);assert.equal(summary.inProgress,1);assert.equal(work[0].activities.length,3);
 });
+test('a verified high score without a completion flag remains in progress',()=>{
+ const result=buildStudentInsight({assignments:[assignment({progress:[{activity_type:'quiz',score:100,verified:true},{activity_type:'matching',score:150,verified:true,is_complete:false}]})]},now);
+ assert.equal(result.summary.completed,0);assert.equal(result.summary.inProgress,2);
+ assert.deepEqual(result.work[0].activities.map(activity=>activity.status),['In progress','In progress']);
+});
 test('scheduled, withdrawn, historical and retired work are visible outside current totals',()=>{
  const inputs=[{releaseAt:'2026-10-06'},{withdrawn:true},{archived:true},{enrolled:false},{content:{activitySettings:{retiredWeeklySet:true,requiredActivities:['quiz']}}}].map(assignment);
  const result=buildStudentInsight({assignments:inputs},now);
@@ -19,6 +24,10 @@ test('scheduled, withdrawn, historical and retired work are visible outside curr
 test('unknown requirements are explicit and never become zero-work success',()=>{
  const result=buildStudentInsight({assignments:[assignment({content:{}})]},now);
  assert.equal(result.summary.unknown,1);assert.equal(result.work[0].known,false);
+});
+test('malformed requirement entries remain unavailable even when recorded work is complete',()=>{
+ const result=buildStudentInsight({assignments:[assignment({content:{activitySettings:{requiredActivities:['quiz',null]}},progress:[{activity_type:'quiz',verified:true,is_complete:true}]})]},now);
+ assert.equal(result.work[0].known,false);assert.equal(result.summary.unknown,1);assert.equal(result.summary.completed,0);
 });
 test('reading submission needing review is not called completed even if automatic questions pass',()=>{
  const result=buildStudentInsight({assignments:[assignment({kind:'spark',content:{checkMode:'required'},response:{evaluation:{isComplete:true,needsTeacherReview:true}}})]},now);
@@ -35,7 +44,14 @@ test('zero scores stay zero and old untimed zeros stay unavailable',()=>{
 
 test('reading-only and optional checks do not create invented missing required submissions',()=>{
  const result=buildStudentInsight({assignments:[assignment({kind:'spark',content:{checkMode:'reading_only'}}),assignment({kind:'spark',content:{checkMode:'optional'}})]},now);
+ assert.equal(result.summary.required,0);assert.equal(result.summary.unknown,0);
+ assert.deepEqual(result.work.map(work=>work.known),[true,true]);
+ assert.deepEqual(result.work.map(work=>work.readingStatus),['No required check','No required check']);
+});
+test('missing or unsupported reading requirements stay unavailable',()=>{
+ const result=buildStudentInsight({assignments:[assignment({kind:'spark',content:{}}),assignment({kind:'spark',content:{checkMode:'unsupported'}})]},now);
  assert.equal(result.summary.required,0);assert.equal(result.summary.unknown,2);
+ assert.deepEqual(result.work.map(work=>work.readingStatus),['Requirements unavailable','Requirements unavailable']);
 });
 
 test('attention reasons are evidence-based and long foreground time alone produces no concern',()=>{

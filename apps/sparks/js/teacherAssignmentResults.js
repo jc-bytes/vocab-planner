@@ -36,10 +36,13 @@ export function csvCell(value) {
 }
 export function assignmentResultsCsv({ rows, studentIds, kind, includeDates = true, className, assignmentTitle }) {
     const selected = new Set(studentIds);
-    const columns = ['Class', 'Assignment', 'Student ID', 'Student', 'Status', ...(kind === 'spark'
+    const completion = kind === 'vocabulary-completion';
+    const columns = ['Class', 'Assignment', 'Student ID', 'Student', ...(completion ? ['Roster', 'Vocabulary status', 'Required completed', 'Required total', 'Remaining required', 'Teacher review', 'Requirement'] : []), 'Status', ...(kind === 'spark'
         ? ['Response', 'Automatic correct', 'Automatic total', 'Written review needed']
         : ['Activity', 'Score', 'Accuracy']), ...(includeDates ? ['Updated at'] : [])];
-    const data = rows.filter(row => selected.has(row.studentId)).map(row => [className, assignmentTitle, row.studentId, row.name, row.status,
+    const data = rows.filter(row => selected.has(row.studentId)).map(row => [className, assignmentTitle, row.studentId, row.name,
+        ...(completion ? [row.enrolled ? 'Current' : 'Historical', row.completionStatus, row.completedRequired, row.totalRequired,
+            (row.remaining || []).join(', '), row.reviewStatus, row.activity ? row.required === null ? 'Unavailable' : row.required ? 'Required' : 'Optional' : ''] : []), row.status,
         ...(kind === 'spark' ? [row.response, row.score, row.automaticTotal, row.status === 'No work submitted' ? '' : row.needsTeacherReview ? 'Yes' : 'No'] : [row.activity, row.score, row.accuracy]),
         ...(includeDates ? [row.updatedAt] : [])]);
     return '\uFEFF' + [columns, ...data].map(row => row.map(csvCell).join(',')).join('\r\n');

@@ -35,6 +35,16 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 if (!ownClass) { status.textContent = 'This class is unavailable.'; return; }
                 const returnMode = context.returnMode === 'assignments' ? 'assignments' : 'review';
                 root.append(action(returnMode === 'review' ? 'Back to review list' : 'Back to assignments', () => navigate({ mode: returnMode, classId })), node('h3', assignment.title), node('p', classLabel(ownClass)));
+                if (assignment.kind === 'vocabulary') {
+                    const { showVocabularyCompletion } = await import('./teacherVocabularyCompletionView.js');
+                    if (!current(id, owner)) return;
+                    await showVocabularyCompletion({ root, assignment, repository, signal: controller.signal,
+                        isCurrent: () => current(id, owner), className: classLabel(ownClass),
+                        onWordHuntReview,
+                        onDialog: next => { if (next) closeDialog(); dialog = next; } });
+                    if (current(id, owner)) status.textContent = '';
+                    return;
+                }
                 const [roster, records, feedback] = await Promise.all([
                     repository.getRoster(ownClass.id, { signal: controller.signal }),
                     assignment.kind === 'spark' ? repository.listResponses(assignment.id, { signal: controller.signal }) : repository.getResults(assignment.id, { signal: controller.signal }),
@@ -139,7 +149,9 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 states.addEventListener('change', renderAssignments); renderAssignments();
             }
             if (current(id, owner)) status.textContent = '';
-        } catch (error) { if (current(id, owner)) status.textContent = error.message || 'Could not load assignments. Please try again.'; }
+        } catch (error) { if (current(id, owner)) { status.textContent = error.message || 'Could not load assignments. Please try again.';
+            root.append(action('Retry loading', () => { if (current(id, owner)) show(context); }));
+        } }
     }
     return { show, hide() { generation++; controller?.abort(); closeDialog(); }, destroy() { destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; statusFilter = 'all'; root.replaceChildren(); } };
 }

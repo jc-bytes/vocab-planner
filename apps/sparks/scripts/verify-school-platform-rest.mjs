@@ -10,6 +10,11 @@ import assert from 'node:assert/strict';
 // pristine replay of every historical migration and never connects to hosted DBs.
 const source = process.env.SPARKS_LOCAL_DB_CONTAINER || 'supabase_db_ifofhiypzffruzhiukst';
 if (!/^supabase_db_[a-z0-9_-]+$/.test(source)) throw Error('Expected a local Supabase Docker database');
+// Explicit DB-only rehearsals may use an already cached, versioned vendor image.
+// Default CI continues to reuse the running local Supabase REST image/network.
+const localRestImage=process.env.SPARKS_LOCAL_REST_IMAGE;
+if(localRestImage && !/^public\.ecr\.aws\/supabase\/postgrest:v[0-9]+\.[0-9]+(?:\.[0-9]+)?$/.test(localRestImage))
+ throw Error('Expected a versioned Supabase PostgREST vendor image');
 const sourceDatabase=process.env.SPARKS_LOCAL_SOURCE_DATABASE || 'postgres';
 if (!/^(postgres|sparks_school_test_[a-f0-9]+)$/.test(sourceDatabase)) throw Error('Expected normal or disposable local source database');
 const suffix=randomBytes(5).toString('hex');
@@ -41,13 +46,26 @@ try {
   if ((file.includes('platform_foundation') && foundationPresent) || (file.includes('classroom_ownership') && classroomPresent)) continue;
   sql(readFileSync(join('supabase/migrations',file),'utf8'),database,migrationOwner);
  }
+ for(const [file,present] of [
+  ['20261006022529_student_insight_teacher_reads.sql',"select to_regprocedure('public.teacher_student_attempts_v1(uuid,uuid,uuid,text,integer,integer)') is not null"],
+  ['20261006025409_student_feedback_teacher_review.sql',"select to_regclass('private.student_assignment_feedback') is not null"],
+  ['20261014123536_teacher_assignment_completion_reads.sql',"select to_regprocedure('public.teacher_assignment_completion_v1(uuid,uuid,integer,integer)') is not null"]
+ ]) {
+  if(sql(present)==='t') continue;
+  sql(readFileSync(join('supabase/migrations',file),'utf8'),database,migrationOwner);
+  console.log(`Applied ${file} in disposable REST rehearsal.`);
+ }
  console.log(foundationPresent && classroomPresent ? 'Testing existing school schema cloned with original ACL (CI migrations already applied).' : 'Testing local pre-school schema with additive school migrations applied to disposable clone.');
  sql(`create role ${role} login noinherit password '${password}'; grant anon, authenticated to ${role};`,'postgres');
- const restInspect=JSON.parse(docker(['inspect',source.replace('supabase_db_','supabase_rest_')]))[0];
+ const restInspect=JSON.parse(docker(['inspect',localRestImage ? source : source.replace('supabase_db_','supabase_rest_')]))[0];
  const network=Object.keys(restInspect.NetworkSettings.Networks)[0];
+ if(!network) throw Error('Local rehearsal source has no Docker network');
+ const restImage=localRestImage || restInspect.Config.Image;
+ if(localRestImage) docker(['image','inspect',localRestImage]); // never pull an image implicitly
+
  const env=join(temp,'gateway.env');
  writeFileSync(env,`PGRST_DB_URI=postgres://${role}:${password}@${source}:5432/${database}\nPGRST_DB_SCHEMAS=public\nPGRST_DB_ANON_ROLE=anon\nPGRST_JWT_SECRET=${secret}\nPGRST_DB_EXTRA_SEARCH_PATH=public,extensions\n`,{mode:0o600});
- docker(['run','--rm','-d','--name',gateway,'--network',network,'-p','127.0.0.1::3000','--env-file',env,restInspect.Config.Image]);
+ docker(['run','--rm','-d','--name',gateway,'--network',network,'-p','127.0.0.1::3000','--env-file',env,restImage]);
  const port=docker(['port',gateway,'3000/tcp']).trim().split(':').at(-1);
  const base=`http://127.0.0.1:${port}`;
  for(let i=0;i<40;i++) { try { if((await fetch(base)).ok) break; } catch {} await new Promise(r=>setTimeout(r,250)); }
@@ -131,6 +149,24 @@ try {
  const invitation=success(await rpc(teacher,'invite_class_student_v1',{p_class_id:classroom.id,p_email:`${student}@test.invalid`}));
  const invites=success(await rpc(student,'my_class_invitations_v1'));
  success(await rpc(student,'accept_class_invitation_v1',{p_invitation_id:invites[0].id}));
+ const completionArgs={p_school_id:schoolA.id,p_assignment_id:published[0].id,p_offset:0,p_limit:1};
+ const completion=success(await rpc(teacher,'teacher_assignment_completion_v1',completionArgs));
+ assert.equal(completion.assignment.id,published[0].id);
+ assert.equal(completion.assignment.content.words[0].word,'cell');
+ assert.equal(completion.total,1);assert.equal(completion.activeTotal,1);assert.equal(completion.historicalTotal,0);
+ assert.equal(completion.students[0].studentId,student);assert.equal(completion.students[0].enrolled,true);
+ assert.deepEqual(completion.students[0].progress,[]);
+ assert.equal(success(await rpc(coTeacher,'teacher_assignment_completion_v1',completionArgs)).total,1);
+ for(const deniedActor of [student,adminB,platform]) deny(await rpc(deniedActor,'teacher_assignment_completion_v1',completionArgs));
+ deny(await rpc(teacher,'teacher_assignment_completion_v1',{...completionArgs,p_school_id:schoolB.id}));
+ const completionTail=success(await rpc(teacher,'teacher_assignment_completion_v1',{...completionArgs,p_offset:1}));
+ assert.equal(completionTail.total,1);assert.deepEqual(completionTail.students,[]);
+ success(await rpc(adminA,'set_class_teacher_v1',{p_class_id:classroom.id,p_teacher_id:coTeacher,p_active:false}));
+ deny(await rpc(coTeacher,'teacher_assignment_completion_v1',completionArgs));
+ success(await rpc(adminA,'set_class_teacher_v1',{p_class_id:classroom.id,p_teacher_id:coTeacher,p_active:true}));
+ assert.equal(success(await rpc(coTeacher,'teacher_assignment_completion_v1',completionArgs)).total,1);
+ console.log('PASS REST: completion facts include untouched enrollment, snapshot and paging; student, school mismatch and revoked co-teacher denied.');
+
  // Global profile.role is student for these invited teachers; school roles govern.
  assert.equal(sql(`select role from public.profiles where user_id='${teacher}'`),'student');
  success(await rpc(adminA,'set_school_member_v1',{p_school_id:schoolA.id,p_user_id:coTeacher,p_roles:['teacher','student']}));

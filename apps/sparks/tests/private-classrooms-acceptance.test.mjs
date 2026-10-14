@@ -131,6 +131,25 @@ test('private classes enforce ownership and verified enrollment through real aut
             assert.equal((await both.repo.readAssignment(assignment.id)).content.words[0].word, 'Cell');
             await admin.from('vocabularies').update({ words: [{ word: 'Changed', definition: 'Later library edit.' }] }).eq('id', materialId).throwOnError();
             assert.equal((await both.repo.readAssignment(assignment.id)).content.words[0].word, 'Cell');
+            const completionArgs = { p_school_id: schoolA, p_assignment_id: assignment.id, p_offset: 0, p_limit: 1 };
+            const completion = await a.client.rpc('teacher_assignment_completion_v1', completionArgs);
+            assert.ifError(completion.error);
+            assert.equal(completion.data.assignment.id, assignment.id);
+            assert.equal(completion.data.assignment.content.words[0].word, 'Cell', 'report uses the published snapshot');
+            assert.equal(completion.data.total, 1);
+            assert.equal(completion.data.activeTotal, 1);
+            assert.equal(completion.data.historicalTotal, 0);
+            assert.equal(completion.data.students[0].studentId, both.id);
+            assert.equal(completion.data.students[0].enrolled, true);
+            assert.deepEqual(completion.data.students[0].progress, [], 'untouched enrolled students appear');
+            for (const actor of [b, both, neither]) {
+                assert.ok((await actor.client.rpc('teacher_assignment_completion_v1', completionArgs)).error);
+            }
+            assert.ok((await a.client.rpc('teacher_assignment_completion_v1', { ...completionArgs, p_school_id: schoolB })).error);
+            const completionTail = await a.client.rpc('teacher_assignment_completion_v1', { ...completionArgs, p_offset: 1 });
+            assert.ifError(completionTail.error);
+            assert.equal(completionTail.data.total, 1);
+            assert.deepEqual(completionTail.data.students, []);
             const future = (await a.repo.publishMaterial({ ...request, classIds: [ca.id],
                 releaseAt: new Date(Date.now() + 86400000).toISOString(), publicationKey: crypto.randomUUID() }))[0];
             await assert.rejects(both.repo.readAssignment(future.id));
@@ -212,6 +231,13 @@ test('private classes enforce ownership and verified enrollment through real aut
             assert.ifError(completed.error);
             const results = await a.repo.getResults(assignment.id);
             assert.equal(results[0].score, 100); assert.equal(results[0].studentId, both.id);
+            const completion = await a.client.rpc('teacher_assignment_completion_v1', { p_school_id: schoolA, p_assignment_id: assignment.id });
+            assert.ifError(completion.error);
+            const activity = completion.data.students.find(student => student.studentId === both.id).progress.find(row => row.activity === 'flashcards');
+            assert.equal(activity.score, 100);
+            assert.equal(activity.complete, true);
+            assert.equal(activity.verified, true);
+
             await assert.rejects(b.repo.getResults(assignment.id));
             await assert.rejects(neither.repo.getResults(assignment.id));
 

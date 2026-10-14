@@ -1,6 +1,6 @@
 # Sparks teacher workflow implementation plan
 
-Status: implementation authorized, layout foundation locally verified. Updated 13 October 2026, America/Panama.
+Status: implementation authorized, layout foundation locally verified. Updated 14 October 2026, America/Panama.
 
 Make a teacher able to open a class, choose a vocabulary assignment, see who has finished it, and inspect one student's remaining work and answers. Build the remaining reports, review tools, accommodations, and Arcade policy around the same assignment-specific evidence.
 
@@ -20,9 +20,21 @@ Implemented on `codex/sparks-teacher-layout` from deployed main `781faa870bb8c94
 - Split school administration into Members, Invitations, Academic years, History, and Platform administration. Members open in individual disclosure editors. Existing permission and mutation handlers remain in place.
 - Local verification passed 878 unit tests, the full scripted checks, and the production build. A populated four-screen fixture covers seven widths, long titles, hidden controls, member disclosures, and keyboard navigation. After the three-column adjustment, its focused layout check passed again.
 - The teacher preferred the flatter direction and requested more use of width. The revised three-column layout has a local screenshot; final teacher acceptance, hosted verification, and physical-device acceptance remain pending.
-- No database migration or production data change is included. Linux CI and publication remain pending.
+- No database migration or production data change is included in the layout PR. Linux validation passed for layout commit `1e393e40bd30ad1b358ea7553285ce07b6328c6e`, Actions run `38485320591`. Publication and the integrated teacher walkthrough remain pending.
 
-The remaining functional items are planned. Next is the shared completion contract and the single-vocabulary report, with server aggregation to avoid one published-content request per assignment. Layout patterns continue through every later screen; this first change does not mark all of item 15 complete.
+The teacher authorized continuing through all remaining items on 14 October, with subagents for independent work. The next bounded change implements the shared completion contract and the single-vocabulary report. Item 14 then replaces the roster snapshot fanout with a server summary. Layout patterns continue through every later screen; this first change does not mark all of item 15 complete.
+
+### Single-vocabulary report and completion rules, 14 October 2026
+
+- Added an authorized school/assignment-scoped read RPC. It returns immutable published requirements, all current students including untouched work, and separately marked former-member evidence. Pages preserve total counts and deterministic ordering.
+- Added vocabulary-level student status, complete/required counts, remaining activity names, search and completion/roster filters, activity evidence and existing teacher note editors. CSV/PDF use the same checklist and vocabulary totals as the screen. Missing remains unavailable and zero remains zero.
+- Reused a small verified-completion helper across assignment reports, student insight, and roster counts. A score alone no longer satisfies required work. Known optional reading checks remain distinct from unavailable requirements.
+- Local verification passed 897 unit tests, the full scripted browser regression checks, a realistic report at seven widths, and production delivery budgets. The database rehearsal passed both fresh-migration and applied-schema scenarios. Actual JWT/HTTP acceptance passed the new read RPC and the existing school authorization suite. These harnesses created and removed only disposable databases, roles, and a gateway on an owned local stack; hosted data was untouched. Linux validation, publication, and teacher acceptance remain separate and pending for this change.
+- Item 14's broader roster aggregation, navigation, class board, and later review/reward work remain separate tasks.
+
+### Arcade decisions received, 14 October 2026
+
+The teacher chose refill allowance rather than accumulated credit. After time runs out, fresh formative completion is required to refill it. No daily earning ceiling is wanted. The policy preview will use the proposed two-minute word rate and fifteen-minute vocabulary cap. Workload factors, allowed overrides, capped-refill retry behavior, and shared-wallet adjustment visibility still need concrete implementation and verification before activation.
 
 ## Completion contract shared by every screen
 
@@ -256,7 +268,7 @@ The plan can proceed through reporting and navigation without these decisions. R
 
 1. Confirm the two-minute rate and fifteen-minute vocabulary cap, including allowed teacher overrides.
 2. Confirm the workload factors and how adjusted requirements affect reward calculation.
-3. Choose banked credit or refill allowance, available-wallet ceiling, daily ceiling if any, and capped-entitlement behavior.
+3. Refill allowance and no daily earning ceiling are confirmed. Define the maximum spendable allowance per formative completion and capped-entitlement behavior in the policy preview.
 4. Confirm teacher and administrator visibility/adjustment permissions for the shared wallet.
 
 Public signup, SMTP, invitation emails, and email-based account recovery remain deferred under the existing decision. Existing-account class invitations and school access remain supported. This plan does not widen school membership or account administration permissions.
