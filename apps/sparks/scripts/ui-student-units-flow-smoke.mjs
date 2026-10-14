@@ -73,7 +73,7 @@ try {
     await joinPage.waitForFunction(id => studentApp.currentVocab?.assignmentId === id, joined.ids.assignment);
     assert.equal(await joinPage.evaluate(() => studentApp.currentVocab.assignmentId), joined.ids.assignment);
     await joinPage.locator('[data-activity="matching"]').first().click();
-    await joinPage.waitForFunction(() => window.studentApp?.activityInstance?.constructor.name === 'MatchingActivity');
+    await joinPage.waitForFunction(() => window.studentApp?.currentActivityType === 'matching' && window.studentApp.activityInstance?.container?.querySelector('.matching-shell'));
     assert.deepEqual(joined.errors, []); await joinPage.close();
     console.log('Actual student Units → published vocabulary → activity menu → Matching controller passed; no activity completed.');
 } finally { await browser?.close(); server?.kill(); }
