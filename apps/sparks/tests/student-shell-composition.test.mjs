@@ -5,7 +5,8 @@ import test from 'node:test';
 const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.url), 'utf8');
 const studentCssSource = readFileSync(new URL('../css/student.css', import.meta.url), 'utf8');
 const feedbackCssSource = readFileSync(new URL('../css/feedback.css', import.meta.url), 'utf8');
-const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
+const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8')
+    + readFileSync(new URL('../js/student/studentHomeRenderer.js', import.meta.url), 'utf8');
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
 const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
 const studentLauncherSource = readFileSync(new URL('../js/student/studentActivityLauncherMethods.js', import.meta.url), 'utf8');
