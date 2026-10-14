@@ -117,5 +117,46 @@ try{
  assert.equal(result.second.profile.grade,'9');assert.equal(result.second.profile.group,'C');assert.equal(result.second.year,'2027');
  assert.equal(result.classesFallback,true);assert.equal(result.materialFallback,true);assert.equal(result.lateCalendarYear,'2026');assert.equal(result.waitCancelled,true);assert.deepEqual(result.direct,{school:'a',grade:'6',year:'2026'});assert.deepEqual(result.delayedAssignment,{school:'b',assignment:'b'});assert.equal(result.complete,true);
  assert.deepEqual(result.payload,{first_name:'Edited',last_name:'Identity'});assert.equal(result.offline,'2026');assert.deepEqual(result.other,{grade:'',calendar:null});
+ const vocabularyEntry=await page.evaluate(async()=>{
+  const {StudentRouting}=await import('/js/studentRoutingMethods.js');
+  const {StudentActivityVocabularyData}=await import('/js/student/studentActivityVocabularyDataMethods.js');
+  const {supabaseService}=await import('/js/supabaseService.js');
+  const {schoolContext}=await import('/js/services/schoolContext.js');
+  const assignmentId='11111111-1111-4111-8111-111111111111',calls=[];
+  const respond=data=>{const promise=Promise.resolve({data,error:null});const query={then:(...args)=>promise.then(...args),abortSignal:()=>query};return query;};
+  const client={rpc(name){calls.push(name);
+   if(name==='my_school_access_v1')return respond({schools:[{id:'a',name:'School A',active:true,roles:['student']}]});
+   if(name==='my_teaching_classes_v1')return respond([{id:'class',schoolId:'a',subjectName:'Technology',name:'6A',schoolYear:2026}]);
+   if(name==='read_class_assignment_v1')return respond({id:assignmentId,kind:'vocabulary',title:'Assigned vocabulary',content:{kind:'vocabulary',words:[{word:'Snapshot word',definition:'Published definition'}]}});
+   if(name==='my_school_invitations_v1'||name==='my_class_invitations_v1')return respond([]);
+   throw new Error(`Unexpected vocabulary-entry RPC ${name}`);
+  },from(table){assertTable(table);const promise=Promise.resolve({data:[{id:assignmentId,title:'Assigned vocabulary'}],error:null,count:1});
+   const query={select:()=>query,eq:()=>query,order:()=>query,range:()=>query,abortSignal:()=>query,then:(...args)=>promise.then(...args)};return query;}};
+  function assertTable(table){if(table!=='class_assignments')throw new Error(`Unexpected vocabulary-entry table ${table}`);calls.push(table);}
+  supabaseService.init=async()=>{};supabaseService.getClient=()=>client;schoolContext.clear();
+  document.body.innerHTML='<main id="student-classes-view"></main><main id="vocab-selection-view"></main>';
+  let dashboardReads=0,openedAssignment=null;
+  const sm={currentUser:{uid:'entry-student'},authDisabled:false,studentSchoolReady:Promise.resolve(),studentProfile:{grade:'6'},
+   cleanupActivity(){},resetStudentVocabularyDrilldown(){},switchView(view){this.visibleView=view;},activities:{activityRouteTypes:[],availableVocabs:[],
+    renderDashboard(){dashboardReads++;},loadVocabulary:async vocab=>{openedAssignment=vocab.assignmentId;}}};
+  const data=new StudentActivityVocabularyData({sm,manifest:{vocabularies:[{id:'public-legacy',name:'Public legacy vocabulary'}]}});
+  const authSources=data.getAllVocabularySources();
+  const routing=new StudentRouting(sm);history.replaceState(null,'','/student.html#/units');
+  await routing.applyRoute(routing.parseRoute());
+  const assignedEntry=location.hash==='#/classes'&&sm.visibleView==='student-classes-view'&&document.body.textContent.includes('Assigned vocabulary');
+  const click=label=>[...document.querySelectorAll('button')].find(button=>button.textContent===label).click();
+  const flush=()=>new Promise(resolve=>setTimeout(resolve,0));
+  click('Assigned vocabulary');await flush();
+  const snapshot=document.body.textContent.includes('Snapshot word')&&document.body.textContent.includes('Published definition');
+  click('Open activities');await flush();const opened=openedAssignment===assignmentId;
+  const authenticatedDashboardReads=dashboardReads;routing.resetSession();
+  sm.authDisabled=true;sm.activities.renderDashboard=()=>{dashboardReads++;document.querySelector('#vocab-selection-view').textContent=data.getAllVocabularySources().map(vocab=>vocab.name).join(', ');};
+  await routing.showUnitsView({all:true});
+  return {assignedEntry,snapshot,opened,authenticatedDashboardReads,authSources:authSources.length,
+   demoEntry:sm.visibleView==='vocab-selection-view'&&document.body.textContent.includes('Public legacy vocabulary'),calls};
+ });
+ assert.equal(vocabularyEntry.assignedEntry,true);assert.equal(vocabularyEntry.snapshot,true);assert.equal(vocabularyEntry.opened,true);
+ assert.equal(vocabularyEntry.authenticatedDashboardReads,0);assert.equal(vocabularyEntry.authSources,0);assert.equal(vocabularyEntry.demoEntry,true);
+ assert.ok(vocabularyEntry.calls.includes('my_teaching_classes_v1'));assert.ok(vocabularyEntry.calls.includes('class_assignments'));
  console.log('Student school placement/calendar switching, delayed response discard, assignment context, scoped offline cache and identity-only profile save passed.');
 }finally{await browser?.close();server?.kill();}
