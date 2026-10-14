@@ -1,8 +1,21 @@
-.school-admin-content { display: grid; gap: 1.5rem; }
-.school-admin-form { display: grid; gap: .75rem; padding: 1rem; border: 1px solid var(--border-color, #d1d5db); border-radius: .5rem; }
-.school-admin-field { display: flex; flex-direction: column; gap: .35rem; margin-block: .5rem; }
+.school-admin { display: grid; gap: 1.25rem; }
+.school-admin-content, .school-admin-panel { display: grid; gap: 1rem; }
+.school-admin-panel[hidden] { display: none; }
+.school-admin > [role="status"]:empty { display: none; }
+.school-admin-toolbar, .school-admin-sections { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; }
+.school-admin-toolbar > label { flex: 0 1 28rem; min-width: 0; }
+.school-admin-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1rem; max-width: 48rem; padding: 1rem 0; }
+.school-admin-form > :is(h3, p, fieldset) { grid-column: 1 / -1; }
+.school-admin-form > button { justify-self: start; }
+.school-admin-field { display: flex; flex-direction: column; gap: .35rem; margin-block: .25rem; min-width: 0; }
 .school-admin-field input, .school-admin-field select { width: 100%; min-height: 2.75rem; padding: .5rem; }
-.school-admin-form fieldset { display: flex; gap: 1rem; flex-wrap: wrap; }
+.school-admin-form fieldset { display: flex; gap: .75rem; flex-wrap: wrap; border: 0; }
 .school-admin-form fieldset label { display: inline-flex; align-items: center; gap: .35rem; }
-.school-admin p { overflow-wrap: anywhere; }
+.school-admin-editor { border-bottom: 1px solid var(--color-border); }
+.school-admin-editor summary { min-height: 2.75rem; padding-block: .65rem; cursor: pointer; }
+.school-admin-editor pre, .school-admin p { overflow-wrap: anywhere; white-space: pre-wrap; }
 .school-admin button { min-height: 2.75rem; }
+@media (max-width: 600px) { .school-admin-form { grid-template-columns: minmax(0, 1fr); } }
+
+.school-admin-search { display: flex; align-items: end; flex-wrap: wrap; gap: .75rem; }
+.school-admin-search > label { flex: 0 1 28rem; }

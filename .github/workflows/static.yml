@@ -37,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_TELEMETRY_DISABLED: "1"
+      UI_TEACHER_LAYOUT_PORT: "8575"
       UI_SMOKE_PORT: "8560"
       UI_TEACHER_QUIZ_PORT: "8561"
       UI_TEACHER_SPARKS_PORT: "8562"

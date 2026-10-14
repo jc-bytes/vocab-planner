@@ -20,6 +20,7 @@ try{
  assert.equal(await page.locator('#teacher-tabs [data-section="settings"]').isVisible(),false);
  await page.getByLabel('School',{exact:true}).selectOption('b');
  await page.waitForFunction(()=>document.getElementById('teacher-school-name')?.textContent==='School b');
+ await page.getByRole('tab',{name:'Platform administration',exact:true}).click();
  await page.getByRole('heading',{name:'Create school and invite administrator',exact:true}).waitFor();
  assert.equal(await page.locator('[data-publish-material]').isVisible(),false);
  assert.equal(await page.evaluate(()=>window.teacherApp.isAuthenticated),true);

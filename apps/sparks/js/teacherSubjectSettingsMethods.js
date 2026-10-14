@@ -95,14 +95,14 @@ export const teacherSubjectSettingsMethods = {
             const row = createElement('div', 'subject-manager-row');
             row.innerHTML = `
                 <span class="subject-color-dot" style="background:${escapeHtml(subject.color)};"></span>
-                <input type="text" class="subject-name-input" value="${escapeHtml(subject.name)}" aria-label="Subject name">
-                <input type="color" class="subject-color-input" value="${escapeHtml(subject.color)}" aria-label="Subject color">
-                <input type="number" class="subject-order-input" value="${escapeHtml(subject.sortOrder)}" aria-label="Subject order">
+                <label class="subject-manager-field">Name<input type="text" class="subject-name-input" value="${escapeHtml(subject.name)}" aria-label="Subject name"></label>
+                <label class="subject-manager-field">Color<input type="color" class="subject-color-input" value="${escapeHtml(subject.color)}" aria-label="Subject color"></label>
+                <label class="subject-manager-field">Order<input type="number" class="subject-order-input" value="${escapeHtml(subject.sortOrder)}" aria-label="Subject order"></label>
                 <label class="subject-active-toggle">
                     <input type="checkbox" class="subject-active-input"${subject.active ? ' checked' : ''}>
                     Active
                 </label>
-                <code>${escapeHtml(subject.slug)}</code>
+                <details><summary>Details</summary><code>${escapeHtml(subject.slug)}</code></details>
             `;
 
             row.querySelector('.subject-name-input')?.addEventListener('input', event => {

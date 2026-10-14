@@ -3,6 +3,7 @@ import { node, action, selectField, createAssignmentDialog } from './teacherAssi
 import { assignmentResultRows, assignmentStatus } from './teacherAssignmentResults.js';
 import { createStudentFeedbackEditor } from './teacherStudentFeedbackEditor.js';
 import { openAssignmentExport } from './teacherAssignmentExport.js';
+import '../css/classrooms.css';
 import '../css/teacher-assignments.css';
 import '../css/teacher-student-feedback.css';
 
@@ -41,7 +42,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 ]);
                 if (!current(id, owner)) return;
                 let rows = assignmentResultRows(assignment.kind, records, roster, feedback);
-                const toolbar = node('div');
+                const toolbar = node('div', undefined, 'teacher-workspace-toolbar');
                 const people = [...new Map(rows.map(r => [r.studentId, r.name]))];
                 const student = selectField(toolbar, 'Student', 'student', [['', 'All students'], ...people]);
                 if (people.some(([studentId]) => studentId === studentFilter)) student.value = studentFilter; else studentFilter = '';
@@ -99,25 +100,28 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 if (assignment.kind === 'vocabulary' && onWordHuntReview) toolbar.append(action('Browse Word Hunt evidence', () => { if (current(id, owner)) onWordHuntReview(); }), node('p', 'Word Hunt opens evidence across your assignments. Review notes there are saved on this device.'));
                 root.append(toolbar, content); renderRows();
             } else {
-                const toolbar = node('div');
+                const toolbar = node('div', undefined, 'teacher-workspace-toolbar');
                 const filter = selectField(toolbar, 'Class', 'class', [['', 'All classes'], ...classes.map(c => [c.id, classLabel(c)])]); filter.value = classId || '';
                 filter.addEventListener('change', () => navigate({ mode, classId: filter.value || undefined }));
                 const states = selectField(toolbar, 'Status', 'status', [['all', 'All statuses'], ...['Available', 'Scheduled', 'Closed', 'Withdrawn'].map(s => [s, s])]); states.value = statusFilter;
                 if (mode !== 'review' && onPublish && classes.some(c => c.canTeach === true && !c.archived && (!classId || c.id === classId))) toolbar.append(action('Assign material', () => { if (current(id, owner)) onPublish({ classId }); }, true));
                 if (mode === 'review' && onWordHuntReview) toolbar.append(action('Browse Word Hunt evidence', () => { if (current(id, owner)) onWordHuntReview(); }), node('p', 'Browse Word Hunt evidence across your assignments.'));
-                root.append(toolbar); const list = node('section'); root.append(list);
+                root.append(toolbar); const list = node('section', undefined, 'teacher-workspace-list'); root.append(list);
                 function renderAssignments() {
                     statusFilter = states.value; list.replaceChildren();
                     const visible = assignments.filter(a => statusFilter === 'all' || assignmentStatus(a) === statusFilter);
                     if (!visible.length) list.append(node('p', assignments.length ? 'No assignments match this status.' : 'No assignments yet. Assign a saved material to a class to begin.'));
                     for (const assignment of visible) {
                         const ownClass = classes.find(c => c.id === assignment.class_id); if (!ownClass) continue;
-                        const card = node('article', undefined, 'card'); card.append(node('h3', assignment.title), node('p', classLabel(ownClass)), node('p', assignmentStatus(assignment)),
+                        const card = node('article', undefined, 'teacher-workspace-row');
+                        const summary = node('div', undefined, 'teacher-workspace-summary');
+                        const controls = node('div', undefined, 'teacher-workspace-actions');
+                        card.append(summary, controls); summary.append(node('h3', assignment.title), node('p', classLabel(ownClass)), node('span', assignmentStatus(assignment), 'teacher-workspace-status'),
                             node('p', `Available ${new Date(assignment.release_at).toLocaleString()}`));
-                        if (assignment.due_at) card.append(node('p', `Due ${new Date(assignment.due_at).toLocaleString()}`));
-                        if (assignment.close_at) card.append(node('p', `Responses close ${new Date(assignment.close_at).toLocaleString()}`));
-                        card.append(action('Review work', () => navigate({ mode: 'review', classId: classId || undefined, assignmentId: assignment.id, returnMode: mode })));
-                        if (mode !== 'review' && !assignment.withdrawn && ownClass.canTeach === true) card.append(action('Withdraw assignment', () => {
+                        if (assignment.due_at) summary.append(node('p', `Due ${new Date(assignment.due_at).toLocaleString()}`));
+                        if (assignment.close_at) summary.append(node('p', `Responses close ${new Date(assignment.close_at).toLocaleString()}`));
+                        controls.append(action('Review work', () => navigate({ mode: 'review', classId: classId || undefined, assignmentId: assignment.id, returnMode: mode })));
+                        if (mode !== 'review' && !assignment.withdrawn && ownClass.canTeach === true) controls.append(action('Withdraw assignment', () => {
                             if (!current(id, owner)) return; closeDialog();
                             const confirm = createAssignmentDialog('Withdraw assignment', () => { dialog = null; }); dialog = confirm;
                             confirm.body.append(node('p', `Withdraw “${assignment.title}” from ${ownClass.name}? Students will no longer be able to open it. Saved results remain available to you.`));
