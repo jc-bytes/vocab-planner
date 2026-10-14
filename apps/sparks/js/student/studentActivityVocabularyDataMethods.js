@@ -1,4 +1,4 @@
-import { selectStudentAssignmentSchool, studentSchoolScope } from './studentSchoolSession.js';
+import { selectStudentAssignmentSchool } from './studentSchoolSession.js';
 import { weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
@@ -31,7 +31,7 @@ export class StudentActivityVocabularyData {
     getAllVocabularySources() {
         if (!this.sm.authDisabled) {
             const cache = this.activities.assignedVocabulary;
-            return cache?.key && cache.key === studentSchoolScope(this.sm).key ? cache.vocabs : [];
+            return cache?.isCurrent?.() ? cache.vocabs : [];
         }
         let vocabs = [];
 

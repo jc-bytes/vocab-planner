@@ -60,5 +60,20 @@ try {
     assert.ok(todayPage.url().includes('#/menu')); assert.equal(await todayPage.getByText('No vocabularies found.', { exact: true }).count(), 0);
     await todayPage.waitForTimeout(100); assert.deepEqual(today.errors, []);
     await todayPage.close();
+    const joinPage = await browser.newPage(); const joined = await installStudentAssignedFlowFixture(joinPage, { startEnrolled: false });
+    await joinPage.goto(`${baseUrl}/student.html`);
+    await joinPage.waitForFunction(() => window.studentApp?.authInitialized && studentApp.activities.assignedVocabulary?.vocabs.length === 0);
+    await joinPage.evaluate(() => studentApp.navigateTo({ view: 'classes' }));
+    await joinPage.getByRole('button', { name: 'Join class', exact: true }).click();
+    await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().waitFor();
+    await joinPage.evaluate(() => studentApp.navigateTo({ view: 'units', trimester: 'other', month: 'october' }));
+    await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().waitFor({ timeout: 5000 });
+    await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().click();
+    await joinPage.locator('#activity-menu-view:not(.hidden)').waitFor();
+    await joinPage.waitForFunction(id => studentApp.currentVocab?.assignmentId === id, joined.ids.assignment);
+    assert.equal(await joinPage.evaluate(() => studentApp.currentVocab.assignmentId), joined.ids.assignment);
+    await joinPage.locator('[data-activity="matching"]').first().click();
+    await joinPage.waitForFunction(() => window.studentApp?.activityInstance?.constructor.name === 'MatchingActivity');
+    assert.deepEqual(joined.errors, []); await joinPage.close();
     console.log('Actual student Units → published vocabulary → activity menu → Matching controller passed; no activity completed.');
 } finally { await browser?.close(); server?.kill(); }

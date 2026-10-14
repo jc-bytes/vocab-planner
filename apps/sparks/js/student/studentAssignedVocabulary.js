@@ -13,12 +13,15 @@ export async function loadAssignedVocabulary(activities, { force = false } = {})
     await waitStudentSchoolReady(sm);
     if (!sameOwner()) throw new DOMException('Vocabulary account changed', 'AbortError');
     const key = studentSchoolScope(sm).key;
+    const generation = schoolContext.getGeneration();
     if (!key) throw new Error('Choose a school in My classes to see your vocabulary.');
-    if (!force && activities.assignedVocabulary?.key === key && Date.now() - activities.assignedVocabulary.loadedAt < 60000) return activities.assignedVocabulary.vocabs;
-    if (!force && activities.assignedVocabularyLoad?.key === key) return activities.assignedVocabularyLoad.promise;
+    if (!force && activities.assignedVocabulary?.key === key && activities.assignedVocabulary.isCurrent?.()
+        && Date.now() - activities.assignedVocabulary.loadedAt < 60000) return activities.assignedVocabulary.vocabs;
+    if (!force && activities.assignedVocabularyLoad?.key === key && activities.assignedVocabularyLoad.generation === generation) return activities.assignedVocabularyLoad.promise;
     activities.assignedVocabularyLoad?.controller.abort();
     const controller = new AbortController(), signal = controller.signal;
-    const current = () => !signal.aborted && owner === (sm.currentUser?.uid || sm.currentUser?.id) && key === studentSchoolScope(sm).key;
+    const current = () => !signal.aborted && owner === (sm.currentUser?.uid || sm.currentUser?.id)
+        && key === studentSchoolScope(sm).key && generation === schoolContext.getGeneration();
     const check = () => { if (!current()) throw new DOMException('Vocabulary scope changed', 'AbortError'); };
     const promise = (async () => {
         const classes = (await classroomRepository.listMyClasses({ signal })).filter(item => item.schoolId === schoolContext.getSchoolId() && !item.archived);
@@ -37,9 +40,9 @@ export async function loadAssignedVocabulary(activities, { force = false } = {})
             }));
             check(); vocabs.push(...batch);
         }
-        check(); activities.assignedVocabulary = { key, vocabs, loadedAt: Date.now() }; return vocabs;
+        check(); activities.assignedVocabulary = { key, vocabs, loadedAt: Date.now(), isCurrent: current }; return vocabs;
     })();
-    activities.assignedVocabularyLoad = { key, promise, controller };
+    activities.assignedVocabularyLoad = { key, promise, controller, generation };
     try { return await promise; }
     catch (error) { check(); throw error; }
     finally { if (activities.assignedVocabularyLoad?.promise === promise) activities.assignedVocabularyLoad = null; }

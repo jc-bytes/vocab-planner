@@ -390,14 +390,14 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentPage.waitForFunction(() => document.querySelector('#student-classes-view [role=status]')?.textContent === ''
                     && ![...document.querySelectorAll('#student-classes-view button')].some(b => b.textContent === 'Join class'));
                 assert.equal((await neither.repo.listMyClasses())[0].id, ca.id);
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
+                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
                 await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
                     && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
                 assert.equal(await studentPage.evaluate(() => studentApp.currentVocab.words[0].word), 'Changed');
                 assert.equal(await studentView.getByLabel('School', { exact: true }).count(), 0, 'One school needs no chooser');
                 await studentPage.locator('#student-tab-classes').click();
-                await studentView.getByRole('button', { name: 'Private reflection', exact: true }).click();
+                await studentView.getByRole('button', { name: 'Private reflection', exact: true }).first().click();
                 await studentView.getByLabel('Your written response').fill('My class response is private.');
                 await studentView.getByRole('button', { name: 'Save response', exact: true }).click();
                 await studentView.getByText('Response saved.', { exact: true }).waitFor();
@@ -418,7 +418,7 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentView.getByRole('button', { name: 'Check answers', exact: true }).click();
                 await studentView.getByText('1 of 1 multiple-choice answers correct.', { exact: false }).waitFor();
 
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
+                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
                 await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
                     && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
@@ -434,6 +434,9 @@ test('private classes enforce ownership and verified enrollment through real aut
                 assert.match(studentPage.url(), /#\/units/);
                 await unitsView.getByRole('button').filter({ hasText: 'Cell practice' }).first().click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.assignmentId
+                    && window.location.hash.startsWith('#/unit/assignment.')
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
                 assert.match(studentPage.url(), /unit\/assignment\./);
                 const attemptResponse = studentPage.waitForResponse(r => r.url().includes('/rpc/start_student_activity_attempt'));
                 await studentPage.locator('#activity-menu-view [data-activity="flashcards"]').click();
