@@ -51,6 +51,23 @@ globalThis.window = {
 
 const { StudentManager } = await import('../js/student.js');
 const { StudentRouting } = await import('../js/studentRoutingMethods.js');
+const { StudentActivityVocabularyData } = await import('../js/student/studentActivityVocabularyDataMethods.js');
+
+test('signed-in Vocabulary entry opens assigned class work instead of the empty legacy library', async () => {
+    const manager = { ...createManager(), authDisabled: false, studentProfile: {} };
+    const data = new StudentActivityVocabularyData({ sm: manager, manifest: { vocabularies: [{ id: 'legacy', name: 'Legacy' }] } });
+    let message = '', destination = null;
+    manager.cleanupActivity = () => {};
+    manager.resetStudentVocabularyDrilldown = () => {};
+    manager.switchView = () => {};
+    manager.activities.renderDashboard = () => { message = data.getVisibleVocabularyList().message; };
+    const routing = new StudentRouting(manager);
+    routing.setRoute = route => { destination = route; };
+    routing.applyRouteTarget = async route => { assert.equal(route.view, 'classes'); };
+    await routing.showUnitsView();
+    assert.notEqual(message, 'No vocabularies found.');
+    assert.deepEqual(destination, { view: 'classes' });
+});
 
 function createManager() {
     return {

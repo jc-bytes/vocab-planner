@@ -234,7 +234,12 @@ export class StudentRouting {
         }
     }
 
-    showUnitsView(route = {}) {
+    async showUnitsView(route = {}) {
+        if (this.sm.authDisabled === false) {
+            this.setRoute({ view: 'classes' }, { replace: true });
+            await this.applyRouteTarget({ view: 'classes' });
+            return;
+        }
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
         this.sm.studentVocabularyAutoSelect = !route.all && !route.trimester;
@@ -359,7 +364,7 @@ export class StudentRouting {
 
             if (targetRoute.view === 'invalid') {
                 this.setRoute({ view: 'units' }, { replace: true });
-                this.showUnitsView();
+                await this.showUnitsView();
                 return;
             }
 
@@ -372,7 +377,7 @@ export class StudentRouting {
             }
 
             if (targetRoute.view === 'units') {
-                this.showUnitsView(targetRoute);
+                await this.showUnitsView(targetRoute);
                 return;
             }
 
@@ -392,7 +397,7 @@ export class StudentRouting {
                     : this.findVocabByRouteId(targetRoute.unitId);
                 if (!vocab) {
                     this.setRoute({ view: 'units' }, { replace: true });
-                    this.showUnitsView();
+                    await this.showUnitsView();
                     return;
                 }
 
