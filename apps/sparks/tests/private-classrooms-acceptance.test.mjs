@@ -392,6 +392,8 @@ test('private classes enforce ownership and verified enrollment through real aut
                 assert.equal((await neither.repo.listMyClasses())[0].id, ca.id);
                 await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
                 assert.equal(await studentPage.evaluate(() => studentApp.currentVocab.words[0].word), 'Changed');
                 assert.equal(await studentView.getByLabel('School', { exact: true }).count(), 0, 'One school needs no chooser');
                 await studentPage.locator('#student-tab-classes').click();
@@ -418,6 +420,8 @@ test('private classes enforce ownership and verified enrollment through real aut
 
                 await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
                 await studentPage.locator('#back-to-vocab').click();
                 const unitsView = studentPage.locator('#vocab-selection-view');
                 await unitsView.waitFor({ state: 'visible' });
