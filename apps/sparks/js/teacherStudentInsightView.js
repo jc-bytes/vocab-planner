@@ -152,7 +152,7 @@ export async function loadStudentInsight(manager, studentId, schoolYear = manage
 function renderReading(assignment) {
     const response = assignment.response;
     const questions = assignment.content?.questions || [];
-    return `<p><strong data-reading-status="${text(assignment.id)}">${text(assignment.readingStatus)}</strong></p>${!assignment.readingRequired ? '<p>This reading has no required check. Reading completion is not measured in the assigned-task totals.</p>' : ''}${response ? `<p>Submitted ${text(formatDate(response.submitted_at))} · Revision ${Number(response.revision) || 0}</p>
+    return `<p><strong data-reading-status="${text(assignment.id)}">${text(assignment.readingStatus)}</strong></p>${assignment.known && !assignment.readingRequired ? '<p>This reading has no required check. Reading completion is not measured in the assigned-task totals.</p>' : ''}${response ? `<p>Submitted ${text(formatDate(response.submitted_at))} · Revision ${Number(response.revision) || 0}</p>
         ${response.evaluation?.automaticTotal > 0 ? `<p>Automatic check: ${Number(response.evaluation.correct) || 0} of ${Number(response.evaluation.automaticTotal)} correct.</p>` : ''}
         ${Array.isArray(questions) ? questions.map(q => `<div class="student-insight-answer"><strong>${text(q.prompt || q.question || q.text || q.id)}</strong><p>${text(readingAnswer(q, response.answers?.[q.id]))}</p></div>`).join('') : ''}
         ${response.response ? `<p class="student-insight-answer">${text(response.response)}</p>` : ''}

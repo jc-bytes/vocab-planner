@@ -17,5 +17,10 @@
 .teacher-assignment-table { display: block; overflow-x: auto; max-width: 100%; }
 .teacher-assignment-table th, .teacher-assignment-table td { padding: .5rem; text-align: left; }
 .teacher-assignment-response { white-space: pre-wrap; overflow-wrap: anywhere; }
+.teacher-workspace-row.teacher-completion-row { align-items: flex-start; }
+.teacher-completion-row > details { flex: 0 1 28rem; min-width: 0; }
+.teacher-completion-activities { display: grid; gap: 1rem; padding-block: .75rem; }
+.teacher-completion-activities > section { border-bottom: 1px solid var(--color-border); padding-bottom: .75rem; }
+@media (max-width: 700px) { .teacher-completion-row > details { flex-basis: 100%; } }
 
 .teacher-assignment-dialog [hidden] { display: none; }

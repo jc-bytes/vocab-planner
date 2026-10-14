@@ -7,7 +7,9 @@ export function openAssignmentExport({ rows, kind, className, assignmentTitle, i
         for (const url of urls) URL.revokeObjectURL(url);
         urls.clear(); onClose?.();
     });
-    view.body.append(node('p', `${className} · ${assignmentTitle}`), node('p', 'Each activity or response gets its own row. Missing work is marked without a score.'));
+    view.body.append(node('p', `${className} · ${assignmentTitle}`), node('p', kind === 'vocabulary-completion'
+        ? 'Each required or recorded activity gets a row with its vocabulary completion total. Untouched work has no score. Current and historical members are labeled separately.'
+        : 'Each activity or response gets its own row. Missing work is marked without a score.'));
     const form = node('form');
     const format = selectField(form, 'Format', 'format', [['csv', 'Spreadsheet (CSV; opens in Excel)'], ['pdf', 'PDF report']]);
     const people = new Map(rows.map(row => [row.studentId, row.name]));

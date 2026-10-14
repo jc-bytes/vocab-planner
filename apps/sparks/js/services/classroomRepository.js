@@ -94,6 +94,33 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
         listClassTeachers: (classId, options) => rpc('get_class_teachers_v1', { p_class_id: classId }, options),
         setClassTeacher: (classId, teacherId, active) => rpc('set_class_teacher_v1', { p_class_id: classId, p_teacher_id: teacherId, p_active: active }),
         getResults: (assignmentId, options) => rpc('assignment_results_v1', { p_assignment_id: assignmentId }, options),
+        async assignmentCompletion(assignmentId, options = {}) {
+            const schoolId = getSchoolId();
+            let report = null;
+            let offset = 0;
+            const studentIds = new Set();
+            do {
+                options.signal?.throwIfAborted();
+                const page = await rpc('teacher_assignment_completion_v1', {
+                    p_school_id: schoolId, p_assignment_id: assignmentId, p_offset: offset, p_limit: 100
+                }, options);
+                options.signal?.throwIfAborted();
+                if (schoolId !== getSchoolId()) throw new Error('The selected school changed. Open the report again.');
+                if (!page || !Array.isArray(page.students) || !Number.isInteger(page.total) || page.total < 0) {
+                    throw new Error('Completion report is unavailable. Please try again.');
+                }
+                if (!report) report = { ...page, students: [] };
+                if (page.total !== report.total) throw new Error('The class roster changed. Refresh the report.');
+                if (!page.students.length && offset < page.total) throw new Error('Completion report is incomplete. Refresh the report.');
+                for (const student of page.students) {
+                    if (!student.studentId || studentIds.has(student.studentId)) throw new Error('The class roster changed. Refresh the report.');
+                    studentIds.add(student.studentId);
+                }
+                report.students.push(...page.students);
+                offset += page.students.length;
+            } while (offset < report.total);
+            return report;
+        },
         listInvitations: (classId, options) => rpc('list_class_invitations_v1', { p_class_id: classId }, options),
         revokeInvitation: invitationId => rpc('revoke_class_invitation_v1', { p_invitation_id: invitationId }),
         inviteStudents: (classId, emails) => rpc('invite_class_students_v1', { p_class_id: classId, p_emails: emails }),

@@ -47,6 +47,7 @@ try {
   return {empty:render([]),unknown:render([{...base,content:{}}]),
    slow:render([{...base,progress:[{activity_type:'quiz',latestAttempt:{activeSeconds:1800}}]}]),
    complete:render([{...base,progress:[{activity_type:'quiz',verified:true,is_complete:true}]}]),
+   highScore:render([{...base,progress:[{activity_type:'quiz',score:100,verified:true,is_complete:false}]}]),
    review:render([{...base,kind:'spark',content:{checkMode:'required'},response:{evaluation:{needsTeacherReview:true}}}])};
  });
  assert.match(states.empty,/No current assignments/);
@@ -54,6 +55,7 @@ try {
  assert.doesNotMatch(states.unknown,/Required work complete/);
  assert.doesNotMatch(states.slow,/Needs a check-in|See attempts/);
  assert.match(states.complete,/Required work complete/);
+ assert.doesNotMatch(states.highScore,/Required work complete/);
  assert.match(states.review,/Ready for your review/);
  assert.match(states.review,/Still to do<\/span><strong>0/);
  assert.match(states.review,/&lt;img src=x&gt;/);

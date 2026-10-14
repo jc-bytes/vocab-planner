@@ -9,9 +9,13 @@ test('unstarted assigned activities count as unfinished and overdue',()=>{
  const p=buildStudentRosterProgress(student({}),context);
  assert.equal(p.required,2);assert.equal(p.completed,0);assert.equal(p.pending,2);assert.equal(p.overdue,2);assert.equal(p.accuracy,null);assert.equal(p.lastActive,0);
 });
-test('only verified required mastery counts; unrelated progress does not fill assigned work',()=>{
- const p=buildStudentRosterProgress(student({'assignment:a':{scores:{flashcards:{score:100,verified:true},matching:{score:100,verified:false}}},other:{scores:{matching:{isComplete:true,verified:true}}}}),context);
+test('only verified required completion counts; unrelated progress does not fill assigned work',()=>{
+ const p=buildStudentRosterProgress(student({'assignment:a':{scores:{flashcards:{score:100,verified:true,isComplete:true},matching:{score:100,verified:false,isComplete:true}}},other:{scores:{matching:{isComplete:true,verified:true}}}}),context);
  assert.equal(p.completed,1);assert.equal(p.pending,1);assert.equal(p.overdue,1);
+});
+test('a verified high score without completion does not fill assigned requirements',()=>{
+ const p=buildStudentRosterProgress(student({'assignment:a':{scores:{flashcards:{score:100,verified:true},matching:{score:150,verified:true,isComplete:false}}}}),context);
+ assert.equal(p.completed,0);assert.equal(p.pending,2);assert.equal(p.overdue,2);
 });
 test('future, withdrawn, archived and other-year assignments do not create missing work',()=>{
  const classes=[{id:'class',school_year:2026},{id:'archive',school_year:2026,archived:true},{id:'old',school_year:2025}];

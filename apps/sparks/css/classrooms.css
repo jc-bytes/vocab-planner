@@ -6,6 +6,7 @@
 .classrooms input, .classrooms select { min-height: 2.75rem; max-width: 100%; }
 .classrooms fieldset label { display: flex; align-items: center; gap: .5rem; }
 .classrooms button { margin: .3rem .5rem .3rem 0; }
+.teacher-site .classrooms > button { justify-self: start; max-width: 100%; }
 .classrooms [data-assignment-preview] { margin-top: 1rem; white-space: pre-wrap; }
 .classrooms dt { font-weight: bold; }
 .classrooms dd { margin: .25rem 0 1rem; }
