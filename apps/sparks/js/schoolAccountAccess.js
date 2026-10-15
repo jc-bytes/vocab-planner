@@ -1,3 +1,4 @@
+import '../css/auth-access.css';
 import { supabaseService } from './supabaseService.js';
 
 function node(tag, text) {
@@ -12,11 +13,18 @@ export async function mountSchoolAccountAccess(root) {
     await supabaseService.init();
     if (!root.isConnected || root.querySelector('[data-school-account-access]')) return;
     const client = supabaseService.getClient();
-    const panel = node('section'); panel.dataset.schoolAccountAccess = '';
-    panel.append(node('h2', 'New or returning account'));
-    const register = node('button', 'Create invited account'); register.type = 'button'; register.className = 'btn secondary-btn';
-    const recover = node('button', 'Forgot password'); recover.type = 'button'; recover.className = 'btn text-btn';
-    panel.append(register, recover); root.append(panel);
+    const panel = node('section'); panel.dataset.schoolAccountAccess = ''; panel.className = 'school-account-access';
+    const register = node('button', 'Create invited account'); register.type = 'button'; register.className = 'auth-account-link';
+    const recover = node('button', 'Forgot password?'); recover.type = 'button'; recover.className = 'auth-account-link';
+    const invitation = node('p', 'Have a school invitation?'); invitation.className = 'school-account-access__invitation';
+    invitation.append(' ', register); panel.append(invitation);
+    const card = root.querySelector('.teacher-login-card, .login-container') || root;
+    card.append(panel);
+    const passwordLabel = card.querySelector('label[for="teacher-password"], label[for="login-password"]');
+    if (passwordLabel) {
+        const row = node('div'); row.className = 'auth-password-label';
+        passwordLabel.replaceWith(row); row.append(passwordLabel, recover);
+    } else { panel.append(recover); }
     let activeDialog = null, activeMode = null;
     function open(mode) {
         if (!root.isConnected) return;

@@ -1,0 +1,139 @@
+/* Shared sign-in hierarchy for teachers and students. */
+#teacher-login-view .teacher-login-card,
+#login-view .login-container {
+    width: min(100%, 460px);
+    padding: clamp(1.5rem, 5vw, 2.25rem);
+}
+#teacher-login-view h1,
+#login-view .login-container h1 {
+    margin: 0.5rem 0 2rem;
+    font-size: clamp(1.6rem, 4vw, 1.875rem);
+    line-height: 1.25;
+}
+.auth-password-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+#teacher-login-view .auth-password-label label,
+#login-view .auth-password-label label { margin: 0; }
+#teacher-login-view .auth-account-link,
+#login-view .auth-account-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    box-shadow: none;
+    color: #a5c9ff;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    text-align: center;
+}
+#teacher-login-view .auth-account-link:hover,
+#login-view .auth-account-link:hover { color: #dbeafe; text-decoration: underline; }
+#teacher-login-view .auth-account-link:focus-visible,
+#login-view .auth-account-link:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 4px;
+}
+#teacher-login-view .school-account-access,
+#login-view .school-account-access {
+    margin: 1.5rem 0 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+}
+.school-account-access__invitation {
+    margin: 0;
+    color: #aebbd0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+.school-account-access__invitation .auth-account-link { margin-inline-start: 0.25rem; }
+#teacher-login-view form > .primary-btn,
+#login-view form > .primary-btn {
+    margin-top: 0.5rem;
+    min-height: 48px;
+    border-radius: 12px;
+}
+#teacher-login-view .auth-password-label + .password-field,
+#login-view .auth-password-label + .password-field { margin-top: 0; }
+@media (max-width: 380px) {
+    .school-account-access__invitation .auth-account-link { display: flex; margin-inline: auto; }
+}
+
+/* Login fields share one surface, with no nested form-group panels. */
+#teacher-login-view .form-group,
+#login-view .form-group {
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+#teacher-login-view .form-group > label,
+#login-view .form-group > label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+#teacher-login-view .auth-password-label label,
+#login-view .auth-password-label label { color: #e2e8f0; font-size: 0.875rem; font-weight: 600; }
+#teacher-login-view .form-group input,
+#login-view .form-group input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    background: rgba(8, 17, 35, 0.45);
+    color: #f8fafc;
+    font-size: 1rem;
+}
+#teacher-login-view .password-field input,
+#login-view .password-field input { padding-right: 3rem; }
+#teacher-login-view .form-group input:focus,
+#login-view .form-group input:focus { outline: 2px solid #93c5fd; outline-offset: 2px; }
+#teacher-login-view form > .primary-btn,
+#login-view form > .primary-btn {
+    width: 100%;
+    background: linear-gradient(120deg, #6366f1, #0ea5e9);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+#login-view #student-login-panel,
+#teacher-login-view #teacher-login-panel {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Centre the visible login view instead of distributing empty grid tracks. */
+body.teacher-site .app-container:has(#teacher-login-view:not(.hidden)) > main.teacher-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - (2 * var(--spacing-lg)));
+    min-height: calc(100dvh - (2 * var(--spacing-lg)));
+}
+#teacher-login-view:not(.hidden) {
+    width: 100%;
+    margin: 0;
+}
