@@ -403,8 +403,8 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await teacherPage.locator('#tab-review').click();
                 const reviewView = teacherPage.locator('#teacher-review-view');
                 await reviewView.locator('select[name=class]').selectOption(ca.id);
-                const activeSpark = reviewView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: 'Private reflection', exact: true }) }).filter({ has: teacherPage.getByText('Available now', { exact: true }) });
-                await activeSpark.getByRole('button', { name: 'View results', exact: true }).click();
+                const activeSpark = reviewView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: 'Private reflection', exact: true }) }).filter({ has: teacherPage.getByText('Available', { exact: true }) });
+                await activeSpark.getByRole('button', { name: 'Review work', exact: true }).click();
                 await reviewView.getByText('My class response is private.', { exact: true }).waitFor();
                 const [checkedSpark] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'spark', materialId: sparkCheckMaterialId,
                     releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() });
