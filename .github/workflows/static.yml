@@ -140,20 +140,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          previous_run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
-          if [ -n "$previous_run" ]; then
+          # Promotions publish Pages too. Keep two promoted artifacts so a
+          # previously skipped release can also be restored during this rollout.
+          previous_runs=$(
+            gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[].databaseId'
+            gh run list --repo "$GITHUB_REPOSITORY" --workflow promote-sparks-release.yml --status success --limit 2 --json databaseId --jq '.[].databaseId'
+          )
+          for previous_run in $previous_runs; do
             previous_dir=$(mktemp -d)
             if gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"; then
               mkdir -p "$previous_dir/site"
               tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
               if [ -d "$previous_dir/site/assets" ]; then
-                cp -Rn "$previous_dir/site/assets/." dist-desktop/assets/
+                rsync -a --ignore-existing "$previous_dir/site/assets/" dist-desktop/assets/
               fi
-            else
-              node scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
             fi
-            node scripts/check-dist-size.mjs
-          fi
+          done
+          node scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
+          node scripts/check-dist-size.mjs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
