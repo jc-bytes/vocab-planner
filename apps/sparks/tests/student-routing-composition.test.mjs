@@ -161,6 +161,9 @@ test('route parsing and building preserve the public URL contract', () => {
 
     assert.deepEqual(routing.parseRoute('#/menu'), { view: 'menu' });
     assert.deepEqual(routing.parseRoute('#/sparks'), { view: 'sparks' });
+    for (const location of [{view:'sparks',all:true},{view:'sparks',trimester:'IIIT',month:'october',sparkId:'with spaces'}]) {
+        assert.deepEqual(routing.parseRoute(routing.buildRoute(location)),location);
+    }
     assert.deepEqual(routing.parseRoute('#/units?trimester=t2&month=july'), {
         view: 'units',
         all: false,
