@@ -6,6 +6,7 @@ export const GATED_TESTS = Object.freeze({
     'private-classrooms-acceptance.test.mjs': 'test:private-classrooms',
     'school-platform-database-acceptance.test.mjs': 'test:school-platform:rest',
     'teacher-student-insight-database.test.mjs': 'test:student-insight:database',
+    'teacher-dashboard-database.test.mjs': 'test:student-insight:database',
     'teacher-student-feedback-database.test.mjs': 'test:student-insight:database'
 });
 

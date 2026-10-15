@@ -537,3 +537,23 @@ test('every auth exit invalidates Vocabulary state before another account can us
     assert.match(authSource, /else \{[\s\S]*clearTeacherVocabularySessionState\?\.\(\)[\s\S]*currentUser = null/);
     assert.match(listenerSource, /clearTeacherVocabularySessionState\?\.\(\);[\s\S]*await manager\.teacherAuthApi\.signOut\(\)/);
 });
+
+
+test('authenticated school library never requests or mixes the retired public vocabulary catalog', async () => {
+    const manager = initializeManager(new (createManagerClass())());
+    manager.fetchCloudVocabs = async () => [{ id: 'private-school-vocabulary' }];
+    const requested = [];
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async url => {
+        requested.push(url);
+        return { ok: true, json: async () => ({ vocabularies: [{ id: 'public-catalog', name: 'Public', path: 'vocabularies/public.json' }] }) };
+    };
+    try {
+        const library = await manager.getTeacherLibrary();
+        assert.deepEqual(requested, [], 'Private school library must not fetch the public manifest');
+        assert.deepEqual(library.remoteVocabs, []);
+        assert.deepEqual(library.items.map(item => item.vocab.id), ['private-school-vocabulary']);
+    } finally {
+        globalThis.fetch = originalFetch;
+    }
+});

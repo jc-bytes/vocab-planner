@@ -1,5 +1,5 @@
 import { $ } from '../main.js';
-import { getVocabSubjectSlug, loadManifest } from '../services/vocabularyApi.js';
+import { getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
 import { showLoadingState } from '../ui/loadingState.js';
 import { filterTeacherVocabularyItems } from './teacherVocabularyModel.js';
@@ -30,12 +30,8 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
         };
 
         let cloudVocabs;
-        let manifestData;
         try {
-            [cloudVocabs, manifestData] = await Promise.all([
-                forceRefresh ? queryService.refresh(cloudQuery) : queryService.ensure(cloudQuery),
-                loadManifest({ fresh: forceRefresh })
-            ]);
+            cloudVocabs = await (forceRefresh ? queryService.refresh(cloudQuery) : queryService.ensure(cloudQuery));
         } catch (error) {
             if (!isCurrent() || !isLatest()) return staleTeacherLibraryResult();
             throw error;
@@ -44,9 +40,9 @@ async getTeacherLibrary({ forceRefresh = false } = {}) {
         if (!isCurrent() || !isLatest()) return staleTeacherLibraryResult();
 
         cloudVocabs = cloudVocabs.map(vocab => ({ ...vocab }));
-        const remoteVocabs = Array.isArray(manifestData?.vocabularies)
-            ? manifestData.vocabularies.map(vocab => ({ ...vocab, subjectSlug: getVocabSubjectSlug(vocab) }))
-            : [];
+        // Published materials come from the current school's private repository.
+        // The retired public catalog is intentionally absent from production assets.
+        const remoteVocabs = [];
         const cloudIds = new Set(cloudVocabs.map(vocab => vocab.id).filter(Boolean));
         const localVocabs = this.getLocalVocabs().filter(vocab => !cloudIds.has(vocab.id));
         const items = this.dedupeTeacherVocabularyItems([
