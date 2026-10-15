@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico?v=sparks-transparent-20261015">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Practice school vocabulary, complete learning activities, play review games, and track progress in Vocabulary Master.">
     <meta http-equiv="Content-Security-Policy"
@@ -16,7 +17,7 @@
     <link rel="stylesheet" href="css/navigation.css?v=shared-navigation-20260824a" data-shared-navigation>
     <link rel="stylesheet" href="css/feedback.css?v=shared-feedback-20260830a" data-shared-feedback>
     <link rel="stylesheet" href="css/containers.css?v=shared-containers-20260824a" data-shared-containers>
-    <link rel="stylesheet" href="css/student.css?v=flashcard-layout-20260816b">
+    <link rel="stylesheet" href="css/student.css?v=sparks-unit-cards-20261015a">
     <link rel="stylesheet" href="css/student-arcade.css?v=student-arcade-20260621a">
     <link rel="stylesheet" href="css/typography.css?v=typography-month-navigation-20260815a">
     <link rel="stylesheet" href="css/student-design-system.css?v=student-design-system-20260815a"
@@ -229,18 +230,31 @@
             <section id="student-sparks-view" class="view hidden student-page-loading" aria-busy="true">
                 <div class="section-header spark-library-header page-header">
                     <div class="page-header__content">
-                        <h2 class="page-header__title">Sparks</h2>
+                        <h1 class="page-header__title">Sparks</h1>
                     </div>
                     <div id="spark-subject-picker" class="student-subject-picker vocab-header-subject-picker"></div>
+                    <div id="spark-view-toggle" class="vocab-view-toggle segmented-control" role="group" aria-label="Sparks view" hidden></div>
                 </div>
                 <div id="student-sparks-library" class="student-sparks-library" aria-live="polite">
-                    <div class="student-page-skeleton student-page-skeleton--sparks" role="status" aria-label="Loading Sparks">
-                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
-                        <div class="student-loading-surface student-loading-reading-card">
-                            <div class="student-loading-reading-copy"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-reading-line"></span><span class="student-loading-line student-loading-reading-line student-loading-reading-line--short"></span></div>
-                            <div class="student-loading-response-panel"><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-response-box"></span><span class="student-loading-line student-loading-card-action"></span></div>
-                        </div>
-                    </div>
+<div class="student-page-skeleton student-page-skeleton--sparks" data-loading-layout="" role="status" aria-label="Loading Sparks">
+    <div class="student-loading-spark-page-heading" aria-hidden="true"><span class="student-loading-line"></span></div>
+    <div class="student-current-class-spark" aria-hidden="true">
+        <div class="student-class-spark-heading">
+            <span class="student-loading-line student-loading-spark-context"></span>
+            <span class="student-loading-line student-loading-spark-title"></span>
+        </div>
+        <div class="student-class-spark-reading">
+            <div class="student-spark-step"><span class="student-loading-line student-loading-spark-number"></span><span class="student-loading-line student-loading-spark-step-label"></span></div>
+            <div class="student-loading-spark-passage"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+            <div class="student-loading-spark-connection"><span class="student-loading-line student-loading-spark-step-label"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+        </div>
+        <div class="student-class-spark-questions">
+            <div class="student-spark-step"><span class="student-loading-line student-loading-spark-number"></span><span class="student-loading-line student-loading-spark-step-label"></span></div>
+            <div class="student-loading-spark-passage"><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+            <div class="student-loading-spark-form"><span class="student-loading-line student-loading-spark-answer-label"></span><span class="student-loading-line student-loading-spark-answer-field"></span><span class="student-loading-line student-loading-spark-save"></span></div>
+        </div>
+    </div>
+</div>
                 </div>
             </section>
 

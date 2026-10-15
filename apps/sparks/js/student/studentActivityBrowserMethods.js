@@ -12,9 +12,13 @@ export class StudentActivityBrowser {
         this.vocabularyData = activities.vocabularyData;
         this.cards = new StudentActivityBrowserCards(this);
         this.navigation = new StudentActivityBrowserNavigation(this);
+        this.renderRequest = 0;
     }
 
-    renderDashboard() {
+    async renderDashboard({ forceRefresh = false } = {}) {
+        const request = ++this.renderRequest, owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        const hash = window.location.hash;
+        const current = () => request === this.renderRequest && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id) && hash === window.location.hash;
         const container = $('#vocab-list');
         const view = $('#vocab-selection-view');
         if (!container) return;
@@ -25,6 +29,25 @@ export class StudentActivityBrowser {
         container.innerHTML = getStudentPageSkeleton('units', 'Loading vocabulary units');
         container.className = 'vocab-groups';
         this.activities.availableVocabs = [];
+
+        if (!this.sm.authDisabled) {
+            try {
+                const { loadAssignedVocabulary } = await import('./studentAssignedVocabulary.js');
+                const vocabs = await loadAssignedVocabulary(this.activities, { force: forceRefresh });
+                if (!current() || !hash.startsWith('#/units')) return;
+                this.vocabularyData.renderSubjectPicker('#student-subject-picker');
+                this.vocabularyData.renderSubjectPicker('#vocab-subject-picker');
+                setStudentPageLoading(view, false);
+                if (!vocabs.length) container.textContent = 'No vocabulary has been assigned in your classes yet.';
+                else this.renderVocabularyBrowser(container, vocabs);
+            } catch (error) {
+                if (!current() || error.name === 'AbortError') return;
+                container.replaceChildren(createElement('p', 'inline-status', error.message || 'Assigned vocabulary could not load.'));
+                const retry = createElement('button', 'btn secondary-btn', 'Try again'); retry.type = 'button';
+                retry.addEventListener('click', () => this.renderDashboard({ forceRefresh: true })); container.append(retry);
+            } finally { if (current()) setStudentPageLoading(view, false); }
+            return;
+        }
 
         const { vocabs, message } = this.vocabularyData.getVisibleVocabularyList({ availableOnly: true });
 

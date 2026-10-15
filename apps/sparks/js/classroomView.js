@@ -59,14 +59,22 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
                 repository.listMyClasses({ signal: controller.signal }), repository.listMyInvitations({ signal: controller.signal }), schoolRepository.listMyInvitations({ signal: controller.signal })
             ]);
             if (!current(id, owner)) return;
-            const chooser = element('label', 'School '), select = document.createElement('select');
-            for (const school of schoolContext.getAccess().schools.filter(s => s.roles.includes('student'))) {
-                const option = element('option', school.name); option.value = school.id; select.append(option);
+            const schools = schoolContext.getAccess().schools.filter(s => s.roles.includes('student'));
+            if (schools.length && !schools.some(s => s.id === schoolContext.getSchoolId())) {
+                schoolContext.select(schools[0].id);
+                await onSchoolReady({ signal: controller.signal });
+                if (!current(id, owner)) return;
             }
-            select.value = schoolContext.getSchoolId() || '';
-            if (!select.value && select.options.length) { select.selectedIndex = 0; schoolContext.select(select.value); }
-            select.addEventListener('change', () => { if (current(id, owner)) { schoolContext.select(select.value); void show(); } });
-            chooser.append(select); root.append(chooser);
+            if (schools.length > 1) {
+                const chooser = element('label', 'School '), select = document.createElement('select');
+                select.setAttribute('aria-label', 'School');
+                for (const school of schools) {
+                    const option = element('option', school.name); option.value = school.id; select.append(option);
+                }
+                select.value = schoolContext.getSchoolId();
+                select.addEventListener('change', () => { if (current(id, owner)) { schoolContext.select(select.value); void show(); } });
+                chooser.append(select); root.append(chooser);
+            }
             const selectedSchool = schoolContext.getSchoolId();
             const classes = allClasses.filter(c => c.schoolId === selectedSchool);
             const invites = allInvites.filter(invite => invite.schoolId === selectedSchool);
@@ -94,6 +102,13 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
                 if (!assignments.length) card.append(element('p', 'No assignments are available yet.'));
                 for (const assignment of assignments) {
                     card.append(button(assignment.title, async () => {
+                        if (!current(id, owner)) return;
+                        if (assignment.kind === 'vocabulary' && openVocabulary) {
+                            cancelPreviews();
+                            await openVocabulary(assignment.id);
+                            return;
+                        }
+                        previews.add(preview);
                         preview.controller?.abort(); preview.controller = new AbortController();
                         const signal = preview.controller.signal, request = ++preview.request;
                         const isPreviewCurrent = () => current(id, owner) && request === preview.request && !signal.aborted;
@@ -117,7 +132,7 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
         const section = element('section'); section.dataset.assignmentPreview = assignment.id;
         section.append(element('h3', assignment.title));
         const content = assignment.content;
-        if (content.kind === 'vocabulary') {
+        if (assignment.kind === 'vocabulary') {
             const list = document.createElement('dl');
             for (const word of content.words || []) list.append(element('dt', word.word), element('dd', word.definition));
             section.append(list);
@@ -160,6 +175,7 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
             }
         }
         card.append(section);
+        if (isPreviewCurrent() && section.isConnected) section.scrollIntoView({ block: 'nearest' });
     }
     return { show, destroy() { destroyed = true; generation++; controller?.abort(); cancelPreviews(); root.replaceChildren(); } };
 }

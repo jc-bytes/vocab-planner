@@ -22,6 +22,8 @@ export class StudentRouting {
     }
 
     resetSession() {
+        this.sparkReadController?.abort();
+        this.sm.activities?.vocabularyData?.classSelection?.reset();
         this.classroomView?.destroy();
         this.classroomView = null;
         this.gamesGeneration += 1;
@@ -88,7 +90,10 @@ export class StudentRouting {
         }
 
         if (parts.length === 1 && parts[0] === 'sparks') {
-            return { view: 'sparks' };
+            return { view: 'sparks', ...(params.get('all') === '1' ? {all:true} : {}),
+                ...(params.get('trimester') ? {trimester:params.get('trimester')} : {}),
+                ...(params.get('month') ? {month:params.get('month')} : {}),
+                ...(params.get('spark') ? {sparkId:params.get('spark')} : {}) };
         }
 
         if (parts.length === 1 && parts[0] === 'arcade') {
@@ -142,7 +147,14 @@ export class StudentRouting {
             const query = params.toString();
             return query ? `#/units?${query}` : '#/units';
         }
-        if (route.view === 'sparks') return '#/sparks';
+        if (route.view === 'sparks') {
+            const params = new URLSearchParams();
+            if (route.all) params.set('all', '1');
+            if (route.trimester) params.set('trimester', route.trimester);
+            if (route.month) params.set('month', route.month);
+            if (route.sparkId) params.set('spark', route.sparkId);
+            return `#/sparks${params.size ? `?${params}` : ''}`;
+        }
         if (route.view === 'arcade') return '#/arcade';
 
         if (route.view === 'unit' && route.unitId) {
@@ -170,7 +182,7 @@ export class StudentRouting {
         await this.applyRoute(route);
     }
 
-    async restoreRouteOrDefault(defaultRoute = { view: this.sm.authDisabled === false ? 'classes' : 'menu' }) {
+    async restoreRouteOrDefault(defaultRoute = { view: 'menu' }) {
         this.routeReady = true;
         const route = this.parseRoute();
 
@@ -235,11 +247,6 @@ export class StudentRouting {
     }
 
     async showUnitsView(route = {}) {
-        if (this.sm.authDisabled === false) {
-            this.setRoute({ view: 'classes' }, { replace: true });
-            await this.applyRouteTarget({ view: 'classes' });
-            return;
-        }
         this.sm.cleanupActivity();
         this.sm.currentVocab = null;
         this.sm.studentVocabularyAutoSelect = !route.all && !route.trimester;
@@ -253,14 +260,15 @@ export class StudentRouting {
         } else {
             this.sm.resetStudentVocabularyDrilldown();
         }
-        this.sm.activities.renderDashboard();
         this.sm.switchView('vocab-selection-view');
+        await this.sm.activities.renderDashboard();
     }
 
-    async showSparksView() {
+    async showSparksView(route = this.parseRoute()) {
+        await import('../css/student-class-spark.css');
         if (this.sm.authDisabled === false) {
-            this.setRoute({ view: 'classes' }, { replace: true });
-            await this.applyRouteTarget({ view: 'classes' });
+            const { showStudentClassSparks } = await import('./student/studentClassSparks.js');
+            await showStudentClassSparks(this, route);
             return;
         }
         this.sm.cleanupActivity();
@@ -382,7 +390,7 @@ export class StudentRouting {
             }
 
             if (targetRoute.view === 'sparks') {
-                await this.showSparksView();
+                await this.showSparksView(targetRoute);
                 return;
             }
 

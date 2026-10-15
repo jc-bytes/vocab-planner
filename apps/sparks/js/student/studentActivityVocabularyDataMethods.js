@@ -29,7 +29,10 @@ export class StudentActivityVocabularyData {
     }
 
     getAllVocabularySources() {
-        if (!this.sm.authDisabled) return [];
+        if (!this.sm.authDisabled) {
+            const cache = this.activities.assignedVocabulary;
+            return cache?.isCurrent?.() ? cache.vocabs : [];
+        }
         let vocabs = [];
 
         if (Array.isArray(this.activities.manifest?.vocabularies)) {
@@ -90,7 +93,12 @@ export class StudentActivityVocabularyData {
 
     getVisibleVocabularyList(options = {}) {
         const { availableOnly = false, currentTrimesterOnly = false } = options;
-        let vocabs = this.getAllVocabularySources().filter(vocab => weeklyVocabularyVisible(vocab, this.sm.studentProfile));
+        if (!this.sm.authDisabled) {
+            const sources = this.getAllVocabularySources();
+            const vocabs = availableOnly ? this.activities.schedule.filterStudentAvailableVocabulary(sources) : sources;
+            return { vocabs, message: vocabs.length ? '' : 'No vocabulary has been assigned in your classes yet.' };
+        }
+        let vocabs = this.getAllVocabularySources().filter(vocab => vocab.assignmentId || weeklyVocabularyVisible(vocab, this.sm.studentProfile));
 
         if (vocabs.length === 0) {
             return { vocabs: [], message: 'No vocabularies found.' };
@@ -161,6 +169,7 @@ export class StudentActivityVocabularyData {
     }
 
     getGradeMatchedVocabularySources() {
+        if (!this.sm.authDisabled) return this.getAllVocabularySources();
         let vocabs = this.getAllVocabularySources().filter(vocab => weeklyVocabularyVisible(vocab, this.sm.studentProfile));
         const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
 

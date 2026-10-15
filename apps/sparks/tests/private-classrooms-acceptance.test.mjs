@@ -390,9 +390,14 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentPage.waitForFunction(() => document.querySelector('#student-classes-view [role=status]')?.textContent === ''
                     && ![...document.querySelectorAll('#student-classes-view button')].some(b => b.textContent === 'Join class'));
                 assert.equal((await neither.repo.listMyClasses())[0].id, ca.id);
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
-                await studentView.locator('dt').filter({ hasText: 'Changed' }).waitFor();
-                await studentView.getByRole('button', { name: 'Private reflection', exact: true }).click();
+                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
+                await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
+                assert.equal(await studentPage.evaluate(() => studentApp.currentVocab.words[0].word), 'Changed');
+                assert.equal(await studentView.getByLabel('School', { exact: true }).count(), 0, 'One school needs no chooser');
+                await studentPage.locator('#student-tab-classes').click();
+                await studentView.getByRole('button', { name: 'Private reflection', exact: true }).first().click();
                 await studentView.getByLabel('Your written response').fill('My class response is private.');
                 await studentView.getByRole('button', { name: 'Save response', exact: true }).click();
                 await studentView.getByText('Response saved.', { exact: true }).waitFor();
@@ -413,14 +418,38 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentView.getByRole('button', { name: 'Check answers', exact: true }).click();
                 await studentView.getByText('1 of 1 multiple-choice answers correct.', { exact: false }).waitFor();
 
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).click();
-                await studentView.getByRole('button', { name: 'Open activities', exact: true }).click();
+                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
+                await studentPage.locator('#back-to-vocab').click();
+                const unitsView = studentPage.locator('#vocab-selection-view');
+                await unitsView.waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.activities.assignedVocabulary?.vocabs.some(v => v.name === 'Cell practice'));
+                await studentPage.evaluate(async () => {
+                    const vocab = studentApp.activities.assignedVocabulary.vocabs.find(v => v.name === 'Cell practice');
+                    await studentApp.navigateTo({ view: 'units', trimester: studentApp.activities.schedule.getVocabTrimesterKey(vocab),
+                        month: studentApp.activities.schedule.getVocabCalendarMonthKey(vocab) });
+                });
+                assert.match(studentPage.url(), /#\/units/);
+                await unitsView.getByRole('button').filter({ hasText: 'Cell practice' }).first().click();
+                await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.currentVocab?.assignmentId
+                    && window.location.hash.startsWith('#/unit/assignment.')
+                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
                 assert.match(studentPage.url(), /unit\/assignment\./);
                 const attemptResponse = studentPage.waitForResponse(r => r.url().includes('/rpc/start_student_activity_attempt'));
                 await studentPage.locator('#activity-menu-view [data-activity="flashcards"]').click();
                 assert.equal((await attemptResponse).status(), 200);
                 await studentPage.locator('#activity-view').waitFor({ state: 'visible' });
+                await studentPage.waitForFunction(() => studentApp.activityInstance?.constructor.name === 'FlashcardsActivity');
+                const activityLink = studentPage.url();
+                await studentPage.reload();
+                await studentPage.waitForFunction(() => studentApp.activityInstance?.constructor.name === 'FlashcardsActivity');
+                assert.equal(studentPage.url(), activityLink, 'Reload retains the selected assignment/activity');
+                const unfinished = await admin.from('student_activity_progress').select('is_complete').eq('user_id', neither.id);
+                assert.ifError(unfinished.error);
+                assert.ok(!(unfinished.data || []).some(row => row.is_complete), 'Opening controllers does not complete student work');
                 await teacherPage.evaluate(() => window.scrollTo(0, 0));
                 await teacherPage.screenshot({ path: '/tmp/sparks-private-teacher-classes.png' });
                 await studentPage.screenshot({ path: '/tmp/sparks-private-student-classes.png' });

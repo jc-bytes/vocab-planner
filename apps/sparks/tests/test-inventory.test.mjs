@@ -39,7 +39,8 @@ test('default validation keeps established script checks, insight, and worker up
     const checks = scripts['test:checks'].split(' && ');
     const expected = [
         'ui-school-admin-smoke', 'ui-school-shell-smoke', 'ui-school-account-access-smoke',
-        'ui-student-school-context-smoke', 'ui-teacher-class-workspace-smoke', 'ui-teacher-assignments-smoke',
+        'ui-student-school-context-smoke', 'ui-student-classroom-entry-smoke', 'ui-student-units-flow-smoke', 'ui-student-spark-library-smoke',
+        'ui-teacher-class-workspace-smoke', 'ui-teacher-assignments-smoke',
         'ui-weekly-vocabulary-smoke', 'ui-teacher-data-management-smoke', 'ui-teacher-student-progress-smoke',
         'ui-teacher-groups-smoke', 'ui-teacher-quiz-smoke', 'ui-teacher-sparks-smoke',
         'ui-teacher-word-hunt-smoke', 'ui-teacher-pages-smoke', 'ui-activity-registry-smoke',

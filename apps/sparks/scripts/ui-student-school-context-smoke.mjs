@@ -143,7 +143,8 @@ try{
   const authSources=data.getAllVocabularySources();
   const routing=new StudentRouting(sm);history.replaceState(null,'','/student.html#/units');
   await routing.applyRoute(routing.parseRoute());
-  const assignedEntry=location.hash==='#/classes'&&sm.visibleView==='student-classes-view'&&document.body.textContent.includes('Assigned vocabulary');
+  const assignedEntry=location.hash==='#/units'&&sm.visibleView==='vocab-selection-view';
+  await routing.navigateTo({view:'classes'});
   const click=label=>[...document.querySelectorAll('button')].find(button=>button.textContent===label).click();
   const flush=()=>new Promise(resolve=>setTimeout(resolve,0));
   click('Assigned vocabulary');await flush();
@@ -156,7 +157,7 @@ try{
    demoEntry:sm.visibleView==='vocab-selection-view'&&document.body.textContent.includes('Public legacy vocabulary'),calls};
  });
  assert.equal(vocabularyEntry.assignedEntry,true);assert.equal(vocabularyEntry.snapshot,true);assert.equal(vocabularyEntry.opened,true);
- assert.equal(vocabularyEntry.authenticatedDashboardReads,0);assert.equal(vocabularyEntry.authSources,0);assert.equal(vocabularyEntry.demoEntry,true);
+ assert.equal(vocabularyEntry.authenticatedDashboardReads,1);assert.equal(vocabularyEntry.authSources,0);assert.equal(vocabularyEntry.demoEntry,true);
  assert.ok(vocabularyEntry.calls.includes('my_teaching_classes_v1'));assert.ok(vocabularyEntry.calls.includes('class_assignments'));
  console.log('Student school placement/calendar switching, delayed response discard, assignment context, scoped offline cache and identity-only profile save passed.');
 }finally{await browser?.close();server?.kill();}
