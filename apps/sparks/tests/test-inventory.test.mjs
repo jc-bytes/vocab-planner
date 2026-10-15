@@ -45,7 +45,7 @@ test('default validation keeps established script checks, insight, and worker up
         'ui-teacher-groups-smoke', 'ui-teacher-quiz-smoke', 'ui-teacher-sparks-smoke',
         'ui-teacher-word-hunt-smoke', 'ui-teacher-pages-smoke', 'ui-activity-registry-smoke',
         'package-refactor-tests', 'galactic-breaker-tests', 'student-shell-regression-tests',
-        'ui-smoke', 'ui-game-sandbox-smoke', 'ui-teacher-student-insight-smoke', 'ui-student-worker-lifecycle-smoke'
+        'ui-smoke', 'ui-game-sandbox-smoke', 'ui-teacher-student-insight-smoke', 'ui-student-worker-lifecycle-smoke', 'ui-auth-layout-smoke'
     ].map(name => `node scripts/${name}.mjs`);
     assert.deepEqual([...checks].sort(), expected.sort());
     const defaults = reachableScripts(scripts, 'test');

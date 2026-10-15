@@ -120,6 +120,8 @@ jobs:
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
       - name: Verify built Sparks library and display modes
         run: STUDENT_SPARK_DIST=1 npm run test:ui:student-sparks
+      - name: Verify built student and teacher sign-in layouts
+        run: AUTH_LAYOUT_DIST=1 npm run test:ui:auth-layout
       - name: Verify built Arcade sprites and gameplay
         run: npm run test:ui:arcade-gameplay
       - name: Add Grade 9 risk practice pilot
