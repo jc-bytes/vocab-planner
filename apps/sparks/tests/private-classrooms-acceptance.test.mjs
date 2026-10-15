@@ -409,7 +409,8 @@ test('private classes enforce ownership and verified enrollment through real aut
                 const [checkedSpark] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'spark', materialId: sparkCheckMaterialId,
                     releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() });
                 await studentPage.evaluate(id => studentApp.navigateTo({ view: 'sparks', sparkId: id }), checkedSpark.id);
-                await sparkView.getByRole('radio', { name: 'Private choice', exact: true }).check();
+                await sparkView.getByLabel('Choose the spreadsheet cell.').selectOption('0');
+                await sparkView.getByLabel('Explain your answer.').fill('This answer is reviewed by my teacher.');
                 await sparkView.getByRole('button', { name: 'Check answers', exact: true }).click();
                 await sparkView.getByText('1 of 1 multiple-choice answers correct.', { exact: false }).waitFor();
                 await studentPage.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), publishedVocabulary.id);
