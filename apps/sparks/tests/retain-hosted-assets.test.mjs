@@ -14,7 +14,7 @@ test('expired-artifact fallback retains published lazy chunks and CSS assets wit
     '/app/student-sw.js': 'precache([{url:"assets/optional-IJKLMNOP.js"}]);',
     '/app/assets/main-ABCDEFGH.js': 'import "./shared-QRSTUVWX.js"; import("./lazy-ZYXWVUTS.js"); const css="assets/theme-ABCDEF12.css";',
     '/app/assets/shared-QRSTUVWX.js': 'old shared code',
-    '/app/assets/lazy-ZYXWVUTS.js': 'const external="https://example.invalid/assets/external-12345678.js";const outside="../../private-12345678.js";',
+    '/app/assets/lazy-ZYXWVUTS.js': 'const external="https://example.invalid/assets/external-12345678.js";const outside="../../private-12345678.js";const game="js/games/flappy-bird-sprites/yellowbird-downflap.png";',
     '/app/assets/optional-IJKLMNOP.js': 'export const optional=true;',
     '/app/assets/theme-ABCDEF12.css': '@font-face{src:url(./font-ABCDEFG1.woff2)}',
     '/app/assets/font-ABCDEFG1.woff2': 'font bytes'

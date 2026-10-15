@@ -45,7 +45,7 @@ export async function retainHostedAssets(siteUrl, outputDirectory = 'dist-deskto
         // Only Vite's immutable assets belong here, never app data, external URLs,
         // or arbitrary paths found in a JavaScript string.
         if (dependency.origin !== base.origin || !dependency.pathname.startsWith(assetPrefix)
-          || !/-[\w-]{8,}\.[a-z0-9]+$/i.test(dependency.pathname)) continue;
+          || !/^[^/]+-[\w-]{8,}\.[a-z0-9]+$/i.test(dependency.pathname.slice(assetPrefix.length))) continue;
         dependency.search = ''; dependency.hash = '';
         if (!seen.has(dependency.href)) pending.push(dependency);
       }
