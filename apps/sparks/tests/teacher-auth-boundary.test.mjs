@@ -66,6 +66,7 @@ function createManager(authApi, options = {}) {
         updateAuthUI: user => calls.push(['auth-ui', user]),
         showAuthError: message => calls.push(['error', message]),
         showLoginView: () => calls.push('login'),
+        showStartupRecovery: async () => calls.push('recovery'),
         loadSubjectSettings: async options => calls.push(['subjects', options]),
         loadSchoolCalendarSettings: async options => calls.push(['calendar', options]),
         restoreRouteOrDefault: async () => calls.push('route'),
@@ -91,7 +92,7 @@ test('teacher auth lifecycle consumers use the injected capability', () => {
     assert.match(teacherGlobalListeners, /manager\.teacherAuthApi\.signOut\(\)/);
 });
 
-test('teacher role verification failure closes and clears an existing teacher session', async () => {
+test('teacher access failure blocks tools but preserves identity and drafts for recovery', async () => {
     storage.set('userRole_teacher-1', 'teacher');
     const { manager, calls } = createManager({
         getProfile: async () => { throw new Error('profile request failed'); }
@@ -99,17 +100,9 @@ test('teacher role verification failure closes and clears an existing teacher se
 
     assert.equal(await manager.initializeAuthWithRole({ uid: 'teacher-1' }, currentContext), false);
     assert.equal(manager.isAuthenticated, false);
-    assert.equal(manager.currentUser, null);
+    assert.equal(manager.currentUser.uid, 'teacher-1');
     assert.equal(manager.currentRole, 'unknown');
-    assert.deepEqual(calls, [
-        'dispose-features',
-        'clear-progress',
-        'clear-settings',
-        'clear-vocabulary',
-        ['auth-ui', null],
-        ['error', 'Could not verify school access.'],
-        'login'
-    ]);
+    assert.deepEqual(calls, ['recovery']);
 });
 
 test('a transient role failure does not cache a rejected same-account session', async () => {
@@ -211,4 +204,25 @@ test('a bounded settings failure uses defaults, reports it, and still restores n
         && call[0] === 'error'
         && call[1] === 'Some teacher settings could not load. Using defaults.'));
     assert.equal(calls.at(-1), 'route');
+});
+
+test('a stale empty teacher auth event cannot clear a recovered session; explicit sign-out still clears it', async () => {
+    let listener;
+    const user = { uid: 'teacher-events' };
+    const api = {
+        init: async () => {}, getCurrentUser: () => user,
+        getProfile: async () => ({ role: 'teacher' }),
+        onAuthStateChanged(callback) { listener = callback; return () => {}; }
+    };
+    const { manager, calls } = createManager(api);
+    await manager.initAuth();
+    calls.length = 0;
+    listener(null, 'INITIAL_SESSION');
+    assert.equal(manager.currentUser, user);
+    assert.equal(manager.isAuthenticated, true);
+    assert.equal(calls.length, 0);
+    listener(null, 'SIGNED_OUT');
+    assert.equal(manager.currentUser, null);
+    assert.equal(manager.isAuthenticated, false);
+    assert.ok(calls.includes('login'));
 });

@@ -11,23 +11,31 @@ export function createSchoolContext({ repository = schoolRepository, storage } =
     const notify = () => { for (const listener of listeners) listener(api); };
     const invalidate = () => { generation++; controller?.abort(); controller = null; };
     const api = Object.freeze({
-        async load(id = accountId) {
+        async load(id = accountId, { signal } = {}) {
+            signal?.throwIfAborted();
             invalidate();
             const run = generation;
             const preferred = id === accountId ? schoolId || read(id) : read(id);
             accountId = id || null; schoolId = null; access = emptyAccess(); notify();
             if (!accountId) return access;
             controller = new AbortController();
+            const requestController = controller;
+            const cancel = () => requestController.abort(signal?.reason);
+            signal?.addEventListener('abort', cancel, { once: true });
             try {
-                const result = await repository.getAccess({ signal: controller.signal });
-                if (run !== generation || id !== accountId) return null;
+                const result = await repository.getAccess({ signal: requestController.signal });
+                if (run !== generation || id !== accountId || requestController.signal.aborted) return null;
                 access = Object.freeze({ platformAdmin: result?.platformAdmin === true,
                     schools: Object.freeze((result?.schools || []).map(s => Object.freeze({ ...s, roles: Object.freeze([...(s.roles || [])]) }))) });
                 schoolId = access.schools.find(s => s.id === preferred)?.id || access.schools[0]?.id || null;
                 save(); notify(); return access;
             } catch (error) {
                 if (run !== generation || id !== accountId) return null;
-                save(); notify(); throw error;
+                // A failed read is not confirmation that membership was revoked.
+                // Keep the routing preference, but never keep old capabilities.
+                notify(); throw error;
+            } finally {
+                signal?.removeEventListener('abort', cancel);
             }
         },
         select(id) {

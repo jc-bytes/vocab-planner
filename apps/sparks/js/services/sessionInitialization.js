@@ -4,7 +4,6 @@ export class SessionInitializationCoordinator {
         this.activeKey = '';
         this.inFlight = null;
         this.completedKey = '';
-        this.completedResult = undefined;
         this.activeController = null;
     }
 
@@ -14,14 +13,15 @@ export class SessionInitializationCoordinator {
         if (!options.force && this.activeKey === normalizedKey && this.inFlight) {
             return this.inFlight;
         }
-        if (!options.force && this.completedKey === normalizedKey && !this.inFlight) {
-            return Promise.resolve(this.completedResult);
+        if (!options.force && this.completedKey === normalizedKey) {
+            return Promise.resolve(true);
         }
 
-        this.activeController?.abort(new Error('A newer session replaced this initialization.'));
+        this.activeController?.abort();
         const controller = new AbortController();
         const generation = ++this.generation;
         this.activeKey = normalizedKey;
+        this.completedKey = '';
         this.activeController = controller;
         const context = {
             key: normalizedKey,
@@ -35,28 +35,23 @@ export class SessionInitializationCoordinator {
         };
         const initialization = Promise.resolve().then(() => initialize(context));
         const promise = initialization.then(result => {
-            if (context.isCurrent()) {
+            if (context.isCurrent() && result === true) {
                 this.completedKey = normalizedKey;
-                this.completedResult = result;
             }
             return result;
         }).finally(() => {
             if (this.inFlight === promise) this.inFlight = null;
-            if (this.activeController === controller && !context.isCurrent()) {
-                this.activeController = null;
-            }
         });
         this.inFlight = promise;
         return promise;
     }
 
     invalidate() {
-        this.activeController?.abort(new Error('The session ended.'));
+        this.activeController?.abort();
         this.activeController = null;
         this.generation += 1;
         this.activeKey = '';
         this.inFlight = null;
         this.completedKey = '';
-        this.completedResult = undefined;
     }
 }
