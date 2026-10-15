@@ -1,15 +1,34 @@
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import { createClient } from '@supabase/supabase-js';
+import { createClassroomRepository } from '../js/services/classroomRepository.js';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
-import { AUDIT_PASSWORD, AUDIT_STUDENT_EMAIL, seedLocalAuditData, getBrowserSupabaseConfig } from './lib/local-supabase-audit.mjs';
+import { AUDIT_PASSWORD, AUDIT_STUDENT_EMAIL, AUDIT_TEACHER_EMAIL, seedLocalAuditData, getBrowserSupabaseConfig } from './lib/local-supabase-audit.mjs';
 import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
 
 const port = 8074, baseUrl = `http://127.0.0.1:${port}`;
 const output = '/tmp/sparks-student-class-selector';
 let server, browser, page;
 try {
-    const config = getBrowserSupabaseConfig((await seedLocalAuditData()).status);
+    const seeded = await seedLocalAuditData();
+    const config = getBrowserSupabaseConfig(seeded.status);
+    // Keep the established August fixture and publish an explicit October unit.
+    // Both are needed to prove the current trimester excludes older work.
+    const materialId = 'audit-current-class-vocabulary';
+    await seeded.admin.from('vocabularies').upsert({ id: materialId, owner_id: seeded.users.teacher.id,
+        school_id: seeded.schoolId, teacher_subject_id: seeded.subject.id, name: 'Current class unit',
+        assigned_date: '2026-10-01', trimester: '3', month: 'October', week: 1,
+        words: [{ word: 'Source', definition: 'Where information comes from.' }],
+        activity_settings: { requiredActivities: ['flashcards'] }
+    }).throwOnError();
+    const teacher = createClient(config.url, config.publishableKey, { auth: { persistSession: false } });
+    await teacher.auth.signInWithPassword({ email: AUDIT_TEACHER_EMAIL, password: AUDIT_PASSWORD }).then(({error}) => { if(error) throw error; });
+    await createClassroomRepository(() => teacher, () => seeded.schoolId).publishMaterial({
+        classIds: [seeded.classroom.id], kind: 'vocabulary', materialId,
+        releaseAt: '2026-10-01T12:00:00Z', publicationKey: '6b47ab0a-2026-4000-8000-000000000004'
+    });
+    await teacher.auth.signOut();
     server = await ensureViteServer({ baseUrl, probePath: '/student.html', host: '127.0.0.1', port });
     browser = await chromium.launch();
     const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
@@ -17,6 +36,7 @@ try {
     await context.routeWebSocket(url => url.host === `127.0.0.1:${port}`, socket => socket.close());
     await context.addInitScript(value => { window.SUPABASE_CONFIG = value; }, config);
     page = await context.newPage();
+    await page.clock.setFixedTime(new Date('2026-10-15T15:00:00Z'));
     const errors = [], writes = [];
     let classReads = 0;
     page.on('console', message => { if (message.type() === 'error') console.error(message.text()); });
