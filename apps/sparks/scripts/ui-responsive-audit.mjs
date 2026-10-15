@@ -53,8 +53,17 @@ async function waitForApp(page) {
     await page.waitForTimeout(350);
 }
 
-async function applySupabaseOverride(context) {
+async function applySupabaseOverride(context, baseUrl) {
     if (!supabaseOverride) return;
+    const target = new URL(supabaseOverride.url);
+    if (target.hostname === '127.0.0.1' && target.port !== '54321') {
+        await context.grantPermissions(['local-network-access'], { origin: baseUrl });
+        await context.route('**/*.html', async route => {
+            const response = await route.fetch();
+            const body = (await response.text()).replaceAll(':54321', ':' + target.port);
+            await route.fulfill({ response, body });
+        });
+    }
     await context.addInitScript(config => {
         window.SUPABASE_CONFIG = {
             url: config.url,
@@ -113,7 +122,9 @@ async function loginStudent(page, baseUrl) {
 async function auditRoute(page, url, label, options = {}) {
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.goto(url, { waitUntil: 'load' });
+        const shell = url.includes('/teacher.html') ? '#teacher-tab-shell:not(.hidden)' : '#student-tab-shell:not(.hidden)';
+        await page.locator(shell).waitFor({ state: 'visible' });
         await waitForApp(page);
         await options.beforeAudit?.(page, width);
 
@@ -334,7 +345,7 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         };
     });
 
-    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar,export,view,reset'
+    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar'
         || settingsState.selectedTab !== 'subjects'
         || settingsState.tabListHeight > 72
         || settingsState.visiblePanels.length !== 1
@@ -370,8 +381,8 @@ async function assertTeacherSparksRoute(page, baseUrl) {
         currentSparkText: document.querySelector('#spark-library-list')?.textContent || ''
     }));
 
-    if (state.activeLabel !== 'Content'
-        || state.mobileLabel !== 'Content'
+    if (state.activeLabel !== 'Library'
+        || state.mobileLabel !== 'Library'
         || !state.addButtonVisible
         || !state.currentSparkText.includes('Audit Spark')) {
         throw new Error(`Teacher Sparks route did not render expected controls: ${JSON.stringify(state)}`);
@@ -380,12 +391,13 @@ async function assertTeacherSparksRoute(page, baseUrl) {
 
 async function assertStudentSparkCard(page, baseUrl) {
     await page.setViewportSize({ width: 390, height: viewportHeight });
-    await page.goto(`${baseUrl}/student.html#/classes`, { waitUntil: 'domcontentloaded' });
-    await page.locator('#student-classes-view').getByRole('button', { name: 'Current Audit Spark', exact: true }).waitFor();
-    const text = await page.locator('#student-classes-view').innerText();
+    if (!process.env.UI_AUDIT_SPARK_ASSIGNMENT_ID) throw new Error('Responsive Spark audit needs an assigned fixture.');
+    await page.goto(`${baseUrl}/student.html#/sparks?spark=${encodeURIComponent(process.env.UI_AUDIT_SPARK_ASSIGNMENT_ID)}`, { waitUntil: 'domcontentloaded' });
+    const spark = page.locator('#student-sparks-view');
+    await spark.getByRole('heading', { name: 'Current Audit Spark', exact: true }).waitFor();
+    const text = await spark.innerText();
     if (text.includes('Future Audit Spark')) throw new Error('Future class assignments appeared early.');
-    await page.locator('#student-classes-view').getByRole('button', { name: 'Current Audit Spark', exact: true }).click();
-    await page.getByLabel('Your written response').waitFor();
+    await spark.getByLabel('Your answer', { exact: true }).waitFor();
 }
 
 async function assertStudentMobileMenu(page, baseUrl) {
@@ -554,8 +566,8 @@ async function main() {
         browser = await chromium.launch({ headless: true });
         const teacherContext = await browser.newContext({ timezoneId: 'America/Panama' });
         const studentContext = await browser.newContext({ timezoneId: 'America/Panama' });
-        await applySupabaseOverride(teacherContext);
-        await applySupabaseOverride(studentContext);
+        await applySupabaseOverride(teacherContext, baseUrl);
+        await applySupabaseOverride(studentContext, baseUrl);
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
 

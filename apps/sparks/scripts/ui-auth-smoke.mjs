@@ -130,12 +130,13 @@ try {
     await teacherPage.locator('#teacher-sparks-view:not(.hidden)').waitFor({ timeout: 15000 });
     await assertNoAccessibilityViolations(teacherPage, 'Authenticated teacher Sparks page');
 
+    await studentPage.clock.setFixedTime(new Date('2026-08-24T15:00:00Z'));
     await loginStudent(studentPage);
     await studentPage.locator('#student-classes-view:not(.hidden), #main-menu-view:not(.hidden), #vocab-selection-view:not(.hidden)').first().waitFor({ timeout: 15000 });
     await studentPage.goto(`${baseUrl}/student.html#/classes`, { waitUntil: 'domcontentloaded' });
-    await studentPage.locator('#student-classes-view:not(.hidden)').waitFor({ timeout: 15000 });
-    await studentPage.getByRole('button', { name: 'Cross-browser Audit Vocabulary', exact: true }).waitFor();
-    await assertNoAccessibilityViolations(studentPage, 'Authenticated student Classes page');
+    await studentPage.locator('#vocab-selection-view:not(.hidden)').waitFor({ timeout: 15000 });
+    await studentPage.getByRole('button').filter({ hasText: 'Cross-browser Audit Vocabulary' }).first().waitFor();
+    await assertNoAccessibilityViolations(studentPage, 'Authenticated student Units page');
 
     if (problems.length) {
         throw new Error(`Browser errors during auth smoke:\n${problems.join('\n')}`);

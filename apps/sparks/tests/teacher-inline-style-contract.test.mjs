@@ -28,6 +28,7 @@ const [
     read('js/teacherDataExport.js'),
     read('js/teacherDataExportPreviewRenderer.js')
 ]);
+const teacherProfileCss = await read('css/teacher-student-dashboard.css');
 
 function quizTemplate() {
     const match = teacherHtml.match(/<template id="teacher-quizzes-view-template">([\s\S]*?)<\/template>/);
@@ -202,7 +203,7 @@ test('Student Profile delegates static presentation while retaining calculated p
         /\.student-profile-account-grid\s*\{[^}]*grid-template-columns:/s,
         /@container\s*\(max-width:\s*900px\)/s
     ]) {
-        assert.match(teacherCss, declaration);
+        assert.match(teacherProfileCss, declaration);
     }
 
     assert.doesNotMatch(teacherCss, /#student-detail-modal/,

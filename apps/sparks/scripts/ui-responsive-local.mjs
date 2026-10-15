@@ -36,6 +36,7 @@ await runNodeScript('scripts/ui-responsive-audit.mjs', {
     UI_AUDIT_STUDENT_EMAIL: AUDIT_STUDENT_EMAIL,
     UI_AUDIT_PASSWORD: AUDIT_PASSWORD,
     UI_AUDIT_ASSIGNMENT_ID: seeded.vocabularyAssignmentId,
+    UI_AUDIT_SPARK_ASSIGNMENT_ID: seeded.assignments[1].id,
     UI_AUDIT_SUPABASE_URL: seeded.browserConfig.url,
     UI_AUDIT_SUPABASE_KEY: seeded.browserConfig.publishableKey
 });
