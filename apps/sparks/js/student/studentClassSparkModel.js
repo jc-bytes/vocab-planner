@@ -35,10 +35,11 @@ export function formatClassSparkHeading(value) {
     const match = original.match(/^G(\d{1,2})\s+T([123])\s+W(\d{1,2})\s*[-–—]\s*(.+)$/i);
     if (!match) return { title: original || 'Your Spark', context: '' };
     const [, grade, trimester, week, text] = match;
-    const series = text.match(/\s+[-–—]\s+(Words in use(?:\s+\d+)?)$/i);
+    const series = text.match(/\s+[-–—]\s+(Words in use(?:\s+(\d+))?)$/i);
     const title = series ? text.slice(0, series.index).trim() : text;
     if (!title) return { title: original, context: '' };
     const context = [`Grade ${Number(grade)}`, `Trimester ${trimester}`, `Week ${Number(week)}`];
     if (series) context.push(series[1]);
-    return { title, context: context.join(' · ') };
+    const visibleTitle = series ? `${title} · Part ${Number(series[2] || 1)}` : title;
+    return { title: visibleTitle, context: context.join(' · ') };
 }
