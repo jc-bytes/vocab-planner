@@ -137,11 +137,14 @@ jobs:
           previous_run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow static.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')
           if [ -n "$previous_run" ]; then
             previous_dir=$(mktemp -d)
-            gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"
-            mkdir -p "$previous_dir/site"
-            tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
-            if [ -d "$previous_dir/site/assets" ]; then
-              cp -Rn "$previous_dir/site/assets/." dist-desktop/assets/
+            if gh run download "$previous_run" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$previous_dir"; then
+              mkdir -p "$previous_dir/site"
+              tar -xf "$previous_dir/artifact.tar" -C "$previous_dir/site"
+              if [ -d "$previous_dir/site/assets" ]; then
+                cp -Rn "$previous_dir/site/assets/." dist-desktop/assets/
+              fi
+            else
+              node scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
             fi
             node scripts/check-dist-size.mjs
           fi
