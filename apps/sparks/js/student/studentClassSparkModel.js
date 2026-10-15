@@ -42,4 +42,3 @@ export function formatClassSparkHeading(value) {
     if (series) context.push(series[1]);
     return { title, context: context.join(' · ') };
 }
-

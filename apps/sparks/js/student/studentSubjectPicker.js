@@ -108,4 +108,3 @@ export function renderStudentSubjectPicker(container, subjects, selectedSubject,
         }));
         container.appendChild(picker);
     }
-
