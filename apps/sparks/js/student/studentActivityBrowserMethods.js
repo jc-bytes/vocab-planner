@@ -12,52 +12,48 @@ export class StudentActivityBrowser {
         this.vocabularyData = activities.vocabularyData;
         this.cards = new StudentActivityBrowserCards(this);
         this.navigation = new StudentActivityBrowserNavigation(this);
-        this.renderRequest = 0;
     }
 
-    async renderDashboard({ forceRefresh = false } = {}) {
-        const request = ++this.renderRequest, owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
-        const hash = window.location.hash;
-        const current = () => request === this.renderRequest && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id) && hash === window.location.hash;
+    async renderDashboard() {
+        const route = globalThis.location?.hash;
+        const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
         const container = $('#vocab-list');
         const view = $('#vocab-selection-view');
         if (!container) return;
-        setStudentPageLoading(view, true);
+        if (!this.vocabularyData.classSelection?.loadedAt && !this.sm.authDisabled) {
+            setStudentPageLoading(view, true);
+            container.classList.remove('vocab-grid', 'vocab-groups');
+            container.classList.add('teacher-library-browser');
+            container.innerHTML = getStudentPageSkeleton(this.getStudentVocabularyViewMode() === 'rows' ? (this.sm.studentVocabularyDrilldown?.month ? 'rows' : 'month-rows') : this.sm.studentVocabularyDrilldown?.month ? 'units' : 'months', 'Loading vocabulary units');
+        }
+        if (!this.sm.authDisabled) {
+            try { if (await this.vocabularyData.loadClassSelection() === false) return; }
+            catch (error) {
+                container.textContent = error.message || 'Could not load class units. Please try again.';
+                setStudentPageLoading(view, false);
+                return;
+            }
+        }
+        if (route !== globalThis.location?.hash || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) {
+            setStudentPageLoading(view, false);
+            return;
+        }
         this.sm.logStudentDomUpdate?.('vocab-list', { source: 'renderDashboard:clear' });
         this.vocabularyData.renderSubjectPicker('#student-subject-picker');
         this.vocabularyData.renderSubjectPicker('#vocab-subject-picker');
-        container.innerHTML = getStudentPageSkeleton('units', 'Loading vocabulary units');
-        container.className = 'vocab-groups';
         this.activities.availableVocabs = [];
 
-        if (!this.sm.authDisabled) {
-            try {
-                const { loadAssignedVocabulary } = await import('./studentAssignedVocabulary.js');
-                const vocabs = await loadAssignedVocabulary(this.activities, { force: forceRefresh });
-                if (!current() || !hash.startsWith('#/units')) return;
-                this.vocabularyData.renderSubjectPicker('#student-subject-picker');
-                this.vocabularyData.renderSubjectPicker('#vocab-subject-picker');
-                setStudentPageLoading(view, false);
-                if (!vocabs.length) container.textContent = 'No vocabulary has been assigned in your classes yet.';
-                else this.renderVocabularyBrowser(container, vocabs);
-            } catch (error) {
-                if (!current() || error.name === 'AbortError') return;
-                container.replaceChildren(createElement('p', 'inline-status', error.message || 'Assigned vocabulary could not load.'));
-                const retry = createElement('button', 'btn secondary-btn', 'Try again'); retry.type = 'button';
-                retry.addEventListener('click', () => this.renderDashboard({ forceRefresh: true })); container.append(retry);
-            } finally { if (current()) setStudentPageLoading(view, false); }
-            return;
-        }
-
-        const { vocabs, message } = this.vocabularyData.getVisibleVocabularyList({ availableOnly: true });
+        const { vocabs, message } = this.vocabularyData.getVisibleVocabularyList({ availableOnly: true, currentTrimesterOnly: true });
 
         if (vocabs.length === 0) {
             container.innerHTML = `<p>${message}</p>`;
+            this.vocabularyData.classSelection?.renderInvitations(container);
             setStudentPageLoading(view, false);
             return;
         }
 
         this.renderVocabularyBrowser(container, vocabs);
+        this.vocabularyData.classSelection?.renderInvitations(container);
         this.scheduleFirstVocabularyPreload(container);
         setStudentPageLoading(view, false);
     }
@@ -72,15 +68,19 @@ export class StudentActivityBrowser {
 
         const visibleVocabs = Array.isArray(vocabs)
             ? this.schedule.filterStudentAvailableVocabulary(vocabs)
-            : this.vocabularyData.getVisibleVocabularyList({ availableOnly: true }).vocabs;
+            : this.vocabularyData.getVisibleVocabularyList({ availableOnly: true, currentTrimesterOnly: true }).vocabs;
         const drilldown = this.sm.studentVocabularyDrilldown || { trimester: null, month: null };
         const trimesterGroups = this.schedule.buildVocabularyTrimesterGroups(visibleVocabs);
-        const selectedTrimester = drilldown.trimester;
-        const selectedMonth = drilldown.month;
+        const selectedTrimester = this.calendar.getCurrentTrimesterKey();
+        const selectedMonth = drilldown.trimester === selectedTrimester ? drilldown.month : null;
+        if (drilldown.trimester !== selectedTrimester) {
+            this.sm.studentVocabularyDrilldown = { trimester: selectedTrimester, month: null };
+            this.sm.setRoute({ view: 'units', trimester: selectedTrimester }, { replace: true });
+        }
 
         this.renderStudentVocabularyViewControls();
 
-        if (!selectedTrimester && this.sm.studentVocabularyAutoSelect) {
+        if (!selectedMonth && this.sm.studentVocabularyAutoSelect) {
             const automaticLocation = this.getAutomaticStudentVocabularyLocation(trimesterGroups);
             if (automaticLocation) {
                 this.sm.studentVocabularyDrilldown = automaticLocation;
@@ -256,6 +256,7 @@ export class StudentActivityBrowser {
     renderStudentAssignmentPicker(container, selectedTrimester, selectedMonth, monthVocabs, monthGroups) {
         this.renderStudentLibraryBreadcrumb(container, selectedTrimester, selectedMonth);
         this.renderStudentMonthNavigation(container, selectedTrimester, selectedMonth, monthGroups);
+        container.appendChild(createElement('h2', 'student-unit-list-heading', this.schedule.getMonthLabel(selectedMonth) + ' units'));
 
         if (this.getStudentVocabularyViewMode() === 'rows') {
             const list = this.createStudentVocabRowList(['Name', 'Month', 'Week', 'Type', 'Progress']);

@@ -11,7 +11,6 @@ const {
 
 test('student section registry matches every real tab and owned view', () => {
     assert.deepEqual(STUDENT_SECTIONS.map(section => section.id), [
-        'classes',
         'today',
         'vocabulary',
         'sparks',

@@ -21,11 +21,15 @@ The system owns authentication, navigation, Today, Vocabulary, Sparks, Activity 
 | Page title | 24px | 700 | 1.2 | One title per primary view |
 | Section title | 20px | 700 | 1.2 | Major groups inside a view |
 | Card title | 18px | 600 | 1.25 | Cards and list-item titles |
-| Body/control | 16px | 400/600 | 1.5/1.2 | Reading text and primary controls |
+| Learning text | 18–20px fluid | 400 | 1.65 | Spark passages, questions, and written answers |
+| Learning title | 24–28px fluid | 600 | 1.2 | Title of the current Spark |
+| Body/control | 16px | 400/600 | 1.5/1.2 | Interface text and primary controls |
 | Secondary | 14px | 400 | 1.45 | Supporting descriptions |
 | Caption | 12px | 600 | 1.35 | Short metadata and labels |
 
 Text must not be smaller than 12px. Uppercase and wide tracking are reserved for short eyebrow labels. Buttons use 16px by default and may use 14px in compact mobile or secondary contexts.
+
+Primary-view card titles use the 18px card-title role, descriptions use the 14px secondary role, and short schedule/type metadata uses the 12px caption role at every viewport width. Desktop density must not shrink these roles. Sparks remains directly in the main panel and uses the learning role rather than inheriting compact Units card typography. Activity internals keep their existing feature-owned typography.
 
 ## Spacing
 

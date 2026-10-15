@@ -19,6 +19,8 @@
     --student-type-section-title-size: 1.25rem;
     --student-type-page-title-size: 1.5rem;
     --student-type-display-size: clamp(2rem, 5vw, 3rem);
+    --student-type-learning-size: clamp(1.125rem, 1.35vw, 1.25rem);
+    --student-type-learning-title-size: clamp(1.5rem, 2vw, 1.75rem);
 
     --student-weight-regular: 400;
     --student-weight-medium: 500;
@@ -31,12 +33,14 @@
     --student-leading-caption: 1.35;
     --student-leading-secondary: 1.45;
     --student-leading-body: 1.5;
+    --student-leading-learning: 1.65;
 
     --student-tracking-normal: 0;
     --student-tracking-label: 0.02em;
     --student-tracking-eyebrow: 0.08em;
 
     /* Four-pixel spacing scale */
+    --student-space-0: 0;
     --student-space-1: 0.25rem;
     --student-space-2: 0.5rem;
     --student-space-3: 0.75rem;
@@ -182,6 +186,44 @@
     font-weight: var(--student-weight-regular);
     line-height: var(--student-leading-secondary);
 }
+
+/* Primary views use the same roles even when older component rules are narrower. */
+.student-site :is(#main-menu-view, #vocab-selection-view, #activity-menu-view, #arcade-view)
+    :is(.student-vocab-card h3, .student-vocab-row > strong, .student-spark-card h3, .activity-card h3, .game-card-copy h3) {
+    font-size: var(--student-type-card-title-size);
+    font-weight: var(--student-weight-semibold);
+    line-height: var(--student-leading-card);
+}
+
+.student-site :is(#main-menu-view, #vocab-selection-view, #activity-menu-view, #arcade-view)
+    :is(.student-vocab-card p, .student-vocab-row > span, .student-spark-card p, .activity-card p, .game-card-copy p, .activity-menu-unit-description) {
+    font-size: var(--student-type-secondary-size);
+    line-height: var(--student-leading-secondary);
+}
+
+.student-site #vocab-selection-view :is(.student-vocab-card, .student-vocab-row)
+    :is(.student-vocab-schedule, .student-vocab-purpose, .student-vocab-row-progress small) {
+    font-size: var(--student-type-caption-size);
+    line-height: var(--student-leading-caption);
+}
+
+.student-site .student-top-bar :is(.student-class-picker-label, .student-arcade-balance-label, .student-level-badge, .student-level-title, .student-xp-label),
+.student-site #student-home-dashboard :is(.student-hero-purpose, .student-continue-progress-top, .student-continue-progress-top strong) {
+    font-size: var(--student-type-caption-size);
+    line-height: var(--student-leading-caption);
+}
+
+.student-site #student-home-dashboard .student-continue-copy p {
+    font-size: var(--student-type-body-size);
+    line-height: var(--student-leading-body);
+}
+
+.student-site #student-home-dashboard .student-arcade-gate-copy :is(strong, span),
+.student-site #student-home-dashboard .student-arcade-gate-notice .btn {
+    font-size: var(--student-type-secondary-size);
+    line-height: var(--student-leading-secondary);
+}
+
 
 .student-site :where(
     .teacher-eyebrow,
@@ -346,6 +388,27 @@
     .student-site {
         --student-card-padding: var(--student-space-4);
         --student-section-gap: var(--student-space-6);
+    }
+
+    .student-site #student-home-dashboard .student-continue-copy {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .student-site #student-home-dashboard .student-continue-progress {
+        min-width: 0;
+        padding-right: var(--student-space-0);
+    }
+
+    .student-site #student-home-dashboard .student-continue-progress-top {
+        flex-wrap: wrap;
+    }
+
+    .student-site #student-home-dashboard .student-continue-action {
+        position: static;
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: var(--student-space-4);
     }
 
     .student-site .student-continue-hero {

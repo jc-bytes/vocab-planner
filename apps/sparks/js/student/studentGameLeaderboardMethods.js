@@ -249,7 +249,7 @@ export class StudentGameLeaderboard {
             return;
         }
 
-        container.innerHTML = getStudentPageSkeleton('list', 'Loading scores');
+        container.innerHTML = getStudentPageSkeleton('scores', 'Loading scores');
 
         try {
             // Query: Same grade, same game, order by score (desc for higher=better, asc for lower=better)

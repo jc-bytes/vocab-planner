@@ -1,4 +1,4 @@
-import { selectStudentAssignmentSchool } from './studentSchoolSession.js';
+import { selectStudentAssignmentSchool, waitStudentSchoolReady } from './studentSchoolSession.js';
 import { weeklyVocabularyVisible } from './weeklyVocabularyPolicy.js';
 import { $, createElement, escapeHtml } from '../main.js';
 import { notifications } from '../notifications.js';
@@ -15,6 +15,18 @@ export class StudentActivityVocabularyData {
     constructor(activities) {
         this.activities = activities;
         this.sm = activities.sm;
+
+    }
+
+    async loadClassSelection() {
+        if (this.sm.authDisabled) return;
+        const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        const { StudentClassSelection } = await import('./studentClassSelection.js');
+        if (!owner || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) return false;
+        this.classSelection ||= new StudentClassSelection(this.sm);
+        await this.classSelection.load();
+        await waitStudentSchoolReady(this.sm);
+        return owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
     }
 
     async loadManifest() {
@@ -29,10 +41,7 @@ export class StudentActivityVocabularyData {
     }
 
     getAllVocabularySources() {
-        if (!this.sm.authDisabled) {
-            const cache = this.activities.assignedVocabulary;
-            return cache?.isCurrent?.() ? cache.vocabs : [];
-        }
+        if (!this.sm.authDisabled) return this.classSelection?.owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id) ? this.classSelection?.vocabs || [] : [];
         let vocabs = [];
 
         if (Array.isArray(this.activities.manifest?.vocabularies)) {
@@ -93,18 +102,13 @@ export class StudentActivityVocabularyData {
 
     getVisibleVocabularyList(options = {}) {
         const { availableOnly = false, currentTrimesterOnly = false } = options;
-        if (!this.sm.authDisabled) {
-            const sources = this.getAllVocabularySources();
-            const vocabs = availableOnly ? this.activities.schedule.filterStudentAvailableVocabulary(sources) : sources;
-            return { vocabs, message: vocabs.length ? '' : 'No vocabulary has been assigned in your classes yet.' };
-        }
-        let vocabs = this.getAllVocabularySources().filter(vocab => vocab.assignmentId || weeklyVocabularyVisible(vocab, this.sm.studentProfile));
+        let vocabs = this.getAllVocabularySources().filter(vocab => weeklyVocabularyVisible(vocab, this.sm.studentProfile));
 
         if (vocabs.length === 0) {
             return { vocabs: [], message: 'No vocabularies found.' };
         }
 
-        const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
+        const studentGrade = this.sm.authDisabled && this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
 
         if (studentGrade) {
             vocabs = vocabs.filter(v => {
@@ -125,9 +129,9 @@ export class StudentActivityVocabularyData {
             };
         }
 
-        this.sm.ensureSelectedSubject(vocabs);
+        if (this.sm.authDisabled) this.sm.ensureSelectedSubject(vocabs);
         const selectedSubject = this.sm.getSelectedSubject();
-        vocabs = vocabs.filter(vocab => getVocabSubjectSlug(vocab) === this.sm.selectedSubjectSlug);
+        if (this.sm.authDisabled) vocabs = vocabs.filter(vocab => getVocabSubjectSlug(vocab) === this.sm.selectedSubjectSlug);
 
         if (vocabs.length === 0) {
             const gradeContext = studentGrade ? ` for Grade ${studentGrade}` : '';
@@ -169,9 +173,8 @@ export class StudentActivityVocabularyData {
     }
 
     getGradeMatchedVocabularySources() {
-        if (!this.sm.authDisabled) return this.getAllVocabularySources();
         let vocabs = this.getAllVocabularySources().filter(vocab => weeklyVocabularyVisible(vocab, this.sm.studentProfile));
-        const studentGrade = this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
+        const studentGrade = this.sm.authDisabled && this.sm.studentProfile.grade ? String(this.sm.studentProfile.grade).trim() : '';
 
         if (studentGrade) {
             vocabs = vocabs.filter(v => {
@@ -188,108 +191,15 @@ export class StudentActivityVocabularyData {
         return vocabs;
     }
 
-    renderSubjectPicker(targetId) {
+    async renderSubjectPicker(targetId) {
         const container = $(targetId);
         if (!container) return;
-
-        const gradeVocabs = this.getGradeMatchedVocabularySources();
-        this.sm.ensureSelectedSubject(gradeVocabs);
-        const counts = gradeVocabs.reduce((map, vocab) => {
-            const subjectSlug = getVocabSubjectSlug(vocab);
-            map.set(subjectSlug, (map.get(subjectSlug) || 0) + 1);
-            return map;
-        }, new Map());
-
-        const subjects = this.sm.getActiveSubjects().filter(subject => counts.has(subject.slug));
-        if (subjects.length === 0) {
-            container.innerHTML = '';
+        if (!this.sm.authDisabled) {
+            this.classSelection?.render(container);
             return;
         }
-
-        const selectedSubject = subjects.find(subject => subject.slug === this.sm.selectedSubjectSlug) || subjects[0];
-        const pickerId = targetId.replace(/[^a-z0-9_-]/gi, '');
-        const triggerId = `${pickerId}-class-select`;
-        const labelId = `${pickerId}-class-label`;
-        const valueId = `${pickerId}-class-value`;
-        const listboxId = `${pickerId}-class-options`;
-
-        container.innerHTML = '';
-        container.style.setProperty('--subject-color', selectedSubject.color);
-
-        const picker = createElement('div', 'student-class-picker');
-        picker.innerHTML = `
-            <span id="${escapeHtml(labelId)}" class="student-class-picker-label">Class</span>
-            <span class="subject-color-dot" style="background:${escapeHtml(selectedSubject.color)};"></span>
-            <button id="${escapeHtml(triggerId)}" class="student-subject-select student-subject-trigger" type="button"
-                aria-labelledby="${escapeHtml(labelId)} ${escapeHtml(valueId)}" aria-haspopup="listbox"
-                aria-expanded="false" aria-controls="${escapeHtml(listboxId)}">
-                <span id="${escapeHtml(valueId)}" class="student-subject-value">${escapeHtml(selectedSubject.name)}</span>
-                <span class="student-subject-chevron" aria-hidden="true"></span>
-            </button>
-            <div id="${escapeHtml(listboxId)}" class="student-subject-options" role="listbox"
-                aria-labelledby="${escapeHtml(labelId)}" hidden>
-                ${subjects.map(subject => {
-                    const isSelected = subject.slug === selectedSubject.slug;
-                    return `
-                        <button class="student-subject-option" type="button" role="option"
-                            data-subject-slug="${escapeHtml(subject.slug)}" aria-selected="${isSelected}">
-                            <span class="subject-color-dot" style="background:${escapeHtml(subject.color)};"></span>
-                            <span>${escapeHtml(subject.name)}</span>
-                            <span class="student-subject-option-check" aria-hidden="true">✓</span>
-                        </button>
-                    `;
-                }).join('')}
-            </div>
-        `;
-
-        const trigger = picker.querySelector('.student-subject-trigger');
-        const listbox = picker.querySelector('.student-subject-options');
-        const options = [...picker.querySelectorAll('.student-subject-option')];
-        const selectedOption = options.find(option => option.getAttribute('aria-selected') === 'true') || options[0];
-        const closeOnOutsidePointer = event => {
-            if (!picker.contains(event.target)) setOpen(false);
-        };
-        const setOpen = open => {
-            trigger?.setAttribute('aria-expanded', String(open));
-            if (listbox) listbox.hidden = !open;
-            picker.classList.toggle('is-open', open);
-            document.removeEventListener('pointerdown', closeOnOutsidePointer);
-            if (open) document.addEventListener('pointerdown', closeOnOutsidePointer);
-        };
-        const focusOption = index => options[(index + options.length) % options.length]?.focus();
-
-        trigger?.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
-        trigger?.addEventListener('keydown', event => {
-            if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-            event.preventDefault();
-            setOpen(true);
-            const selectedIndex = Math.max(0, options.indexOf(selectedOption));
-            focusOption(event.key === 'ArrowUp' || event.key === 'End' ? options.length - 1 : selectedIndex);
-        });
-        listbox?.addEventListener('keydown', event => {
-            const currentIndex = options.indexOf(document.activeElement);
-            if (event.key === 'Escape') {
-                event.preventDefault();
-                setOpen(false);
-                trigger?.focus();
-            } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                event.preventDefault();
-                focusOption(currentIndex + (event.key === 'ArrowDown' ? 1 : -1));
-            } else if (event.key === 'Home' || event.key === 'End') {
-                event.preventDefault();
-                focusOption(event.key === 'Home' ? 0 : options.length - 1);
-            }
-        });
-        options.forEach(option => option.addEventListener('click', () => {
-            const subjectSlug = option.dataset.subjectSlug;
-            setOpen(false);
-            if (subjectSlug === this.sm.selectedSubjectSlug) {
-                trigger?.focus();
-                return;
-            }
-            this.sm.selectSubject(subjectSlug);
-        }));
-        container.appendChild(picker);
+        const { renderDemoSubjectPicker } = await import('./studentSubjectPicker.js');
+        if (this.sm.authDisabled) renderDemoSubjectPicker.call(this, targetId);
     }
 
     async loadVocabularyOverride(vocabMeta, options = {}) {
@@ -436,7 +346,7 @@ export class StudentActivityVocabularyData {
             const activityContainer = $('#activity-container');
             setStudentPageLoading(activityView, true);
             if (activityContainer) {
-                activityContainer.innerHTML = getStudentPageSkeleton('activity', 'Loading activity');
+                activityContainer.innerHTML = getStudentPageSkeleton('activity', 'Loading activity', options);
             }
             this.sm.switchView('activity-view');
             return;

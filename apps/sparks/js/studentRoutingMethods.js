@@ -1,6 +1,5 @@
-import { waitStudentSchoolReady } from './student/studentSchoolSession.js';
 import { notifications } from './notifications.js';
-import { setStudentPageLoading } from './student/studentLoadingSkeletons.js';
+import { getStudentPageSkeleton, setStudentPageLoading } from './student/studentLoadingSkeletons.js';
 import { parseHashLocation, writeHashLocation } from './services/hashRouting.js';
 
 export class StudentRouting {
@@ -260,12 +259,11 @@ export class StudentRouting {
         } else {
             this.sm.resetStudentVocabularyDrilldown();
         }
-        this.sm.switchView('vocab-selection-view');
+        if (!document.getElementById('vocab-selection-view')?.classList.contains('active')) this.sm.switchView('vocab-selection-view');
         await this.sm.activities.renderDashboard();
     }
 
     async showSparksView(route = this.parseRoute()) {
-        await import('../css/student-class-spark.css');
         if (this.sm.authDisabled === false) {
             const { showStudentClassSparks } = await import('./student/studentClassSparks.js');
             await showStudentClassSparks(this, route);
@@ -292,6 +290,8 @@ export class StudentRouting {
         this.sm.switchView('arcade-view');
         const arcadeView = document.getElementById('arcade-view');
         setStudentPageLoading(arcadeView, true);
+        const placeholder = arcadeView?.querySelector('.student-page-skeleton--arcade');
+        if (placeholder) placeholder.outerHTML = getStudentPageSkeleton('arcade', 'Loading Arcade');
         try {
             const games = await this.getGames();
             if (!games) return false;
@@ -354,25 +354,14 @@ export class StudentRouting {
         try {
             await this.flushActivityProgressBeforeRoute(targetRoute);
             if (targetRoute.view === 'classes') {
-                const generation = this.gamesGeneration;
-                const { createClassroomView } = await import('./classroomView.js');
-                if (generation !== this.gamesGeneration) return;
-                this.sm.cleanupActivity();
-                this.sm.currentVocab = null;
-                this.sm.switchView('student-classes-view');
-                this.classroomView ||= createClassroomView({
-                    root: document.getElementById('student-classes-view'), role: 'student',
-                    getUserId: () => this.sm.currentUser?.uid || this.sm.currentUser?.id,
-                    onSchoolReady: options => waitStudentSchoolReady(this.sm, options),
-                    openVocabulary: assignmentId => this.navigateTo({ view: 'unit', unitId: `assignment.${assignmentId}` })
-                });
-                await this.classroomView.show();
+                this.setRoute({ view: 'units' }, { replace: true });
+                this.showUnitsView();
                 return;
             }
 
             if (targetRoute.view === 'invalid') {
                 this.setRoute({ view: 'units' }, { replace: true });
-                await this.showUnitsView();
+                this.showUnitsView();
                 return;
             }
 
@@ -405,12 +394,13 @@ export class StudentRouting {
                     : this.findVocabByRouteId(targetRoute.unitId);
                 if (!vocab) {
                     this.setRoute({ view: 'units' }, { replace: true });
-                    await this.showUnitsView();
+                    this.showUnitsView();
                     return;
                 }
 
                 await this.sm.activities.loadVocabulary(vocab, {
                     fromRoute: true,
+                    activityType: targetRoute.activityType,
                     skipActivityPreload: targetRoute.view === 'activity',
                     deferActivityMenu: targetRoute.view === 'activity' && !vocab.activitySettings?.retiredWeeklySet
                 });

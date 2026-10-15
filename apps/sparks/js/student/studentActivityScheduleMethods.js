@@ -12,11 +12,6 @@ export class StudentActivitySchedule {
     }
 
     getVocabSchedule(vocab, date = new Date()) {
-        if (vocab.assignmentId) {
-            const dueDate = vocab.dueAt && Number.isFinite(Date.parse(vocab.dueAt)) ? new Date(vocab.dueAt) : null;
-            return { month: String(vocab.month || '').toLowerCase(), week: Number.parseInt(vocab.week, 10) || 0, dueDate,
-                label: dueDate ? `Due ${dueDate.toLocaleDateString()}` : vocab.closeAt && Date.parse(vocab.closeAt) <= date.getTime() ? 'Closed' : 'Assigned vocabulary' };
-        }
         let assignedDate = weeklySettings(vocab)?.releaseDates?.[studentSection(this.activities.sm?.studentProfile)] || vocab.assignedDate || '';
         let month = String(vocab.month || '').trim().toLowerCase();
         let week = Number.parseInt(vocab.week, 10);
@@ -109,7 +104,6 @@ export class StudentActivitySchedule {
     }
 
     getVocabTrimesterKey(vocab) {
-        if (vocab?.assignmentId) return this.getTrimesterKey(vocab.trimester);
         if (vocab?.assignedDate) {
             const placement = calculateVocabularyPlacement(vocab.assignedDate, this.activities.schoolCalendar);
             if (placement?.trimester) return placement.trimester;
@@ -123,7 +117,7 @@ export class StudentActivitySchedule {
         if (key === 'IT') return 'IT';
         if (key === 'IIT') return 'IIT';
         if (key === 'IIIT') return 'IIIT';
-        return this.activities.sm?.authDisabled === false ? 'Assigned units' : 'Other Units';
+        return 'Other Units';
     }
 
     getTrimesterOrder(trimester) {
@@ -293,7 +287,7 @@ export class StudentActivitySchedule {
     }
 
     isStudentVocabularyAvailable(vocab, date = new Date()) {
-        if (vocab.assignmentId) return !vocab.releaseAt || Date.parse(vocab.releaseAt) <= date.getTime();
+        if (vocab.assignmentId) return true;
         if (!weeklyVocabularyVisible(vocab, this.activities.sm?.studentProfile, date)) return false;
         const currentWindow = this.getCurrentScheduleWindow(date);
         const currentMonthStart = new Date(

@@ -394,7 +394,7 @@ export class StudentActivityHomeSpark {
                 </div>
             </div>
             <div class="student-spark-host">
-                <p class="teacher-empty-state">Loading Spark...</p>
+                ${getStudentPageSkeleton('list', 'Loading Spark')}
             </div>
         `;
         const openButton = createElement('button', 'student-home-spark-open');

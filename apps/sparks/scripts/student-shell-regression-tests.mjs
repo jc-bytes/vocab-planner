@@ -643,14 +643,14 @@ async function assertCollapsedSidebar(page) {
         iconPresent: true,
         toggleWidth: 44,
         toggleHeight: 44,
-        navLabels: ['My classes', 'Today', 'Vocabulary'],
+        navLabels: ['Today', 'Units', 'Sparks'],
         coinTop: 0,
         logoutTop: 0,
         toggleIconCenter: [0, 0],
         activeNavIconCenter: [0, 0],
         overflow: 0
     });
-    assert.match(collapsed.navLabels[4], /^Arcade/);
+    assert.match(collapsed.navLabels.at(-1), /^Arcade/);
     assert.ok(collapsed.coinTop > 700, `collapsed coins are not in the lower rail: ${collapsed.coinTop}`);
     assert.ok(collapsed.logoutTop > collapsed.coinTop, `collapsed logout is not below coins: ${JSON.stringify(collapsed)}`);
     assert.ok(
@@ -700,7 +700,17 @@ async function assertStudentDesignSystem(page, width, view) {
             'Activity menu': '#activity-menu-view .activity-menu-title-block > h2'
         }[currentView];
         const title = titleSelector ? document.querySelector(titleSelector) : null;
+        const textRoles = [
+            ['.student-vocab-card h3, .student-vocab-row > strong, .student-spark-card h3, .activity-card h3', 18],
+            ['.student-vocab-card p, .student-spark-card p, .activity-card p, .activity-menu-unit-description', 14],
+            ['.student-vocab-schedule, .student-vocab-purpose', 12]
+        ];
+        const undersizedText = textRoles.flatMap(([selector, minimum]) =>
+            [...document.querySelectorAll(selector)].filter(element => element.closest('.view:not(.hidden)') && element.getBoundingClientRect().width > 0)
+                .map(element => ({ text: element.textContent.trim().slice(0, 60), size: parseFloat(getComputedStyle(element).fontSize), minimum }))
+                .filter(item => item.size < item.minimum));
         return {
+            undersizedText,
             bodyFont: window.getComputedStyle(document.body).fontFamily,
             designSheetLoaded: [...document.styleSheets].some(sheet => sheet.href?.includes('student-design-system.css')),
             titleSize: title ? Number.parseFloat(window.getComputedStyle(title).fontSize) : null,
@@ -715,6 +725,7 @@ async function assertStudentDesignSystem(page, width, view) {
 
     assert.equal(state.designSheetLoaded, true, 'student design-system stylesheet is not loaded');
     assert.match(state.bodyFont, /^Inter,/, `student UI is not using Inter: ${state.bodyFont}`);
+    assert.deepEqual(state.undersizedText, [], `Text below its role size at ${width}px in ${view}: ${JSON.stringify(state.undersizedText)}`);
     assert.deepEqual(state.undersizedControls, [], `controls below 44px at ${width}px in ${view}: ${JSON.stringify(state.undersizedControls)}`);
 
     if (view === 'Today' && width > 700) {
@@ -835,7 +846,7 @@ try {
     });
     const page = await context.newPage();
     page.on('console', message => {
-        if (message.type() === 'error') browserProblems.push(`console.error: ${message.text()} ${JSON.stringify(message.location())}`);
+        if (message.type() === 'error') browserProblems.push(`console.error: ${message.text()}`);
     });
     page.on('pageerror', error => browserProblems.push(`pageerror: ${error.message}`));
     await installFixture(page);

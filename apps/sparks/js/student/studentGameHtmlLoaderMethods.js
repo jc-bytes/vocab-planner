@@ -1,3 +1,4 @@
+import { getStudentPageSkeleton } from './studentLoadingSkeletons.js';
 import { $ } from '../main.js';
 import { GAME_HOST_EVENT, parseGameHostMessage } from './studentGameProtocol.js';
 import { getStudentGame } from './studentGameRegistry.js';
@@ -15,6 +16,7 @@ export class StudentGameHtmlLoader {
     async loadHTMLGame(gameId, htmlFile, scoreMessageType, gameOverCallback, canvas, gameStage) {
         // Hide canvas and create iframe for the HTML game
         canvas.style.display = 'none';
+        gameStage.querySelectorAll('.student-game-loading').forEach(node => node.remove());
 
         // Remove any previous frame for this game.
         const existingFrameShell = gameStage.querySelector(`#${gameId}-frame-shell`);
@@ -36,6 +38,15 @@ export class StudentGameHtmlLoader {
         // Create iframe for the HTML game
         const iframe = document.createElement('iframe');
         iframe.id = `${gameId}-iframe`;
+        const loading = document.createElement('div');
+        loading.className = 'student-game-loading';
+        loading.innerHTML = getStudentPageSkeleton('game', 'Loading game');
+        gameStage.appendChild(loading);
+        iframe.style.visibility = 'hidden';
+        const loadTimer = setTimeout(() => {
+            if (iframe.isConnected && loading.isConnected) loading.textContent = 'This game could not load. Close it and try again.';
+        }, 20000);
+        iframe.addEventListener('error', () => { clearTimeout(loadTimer); if (loading.isConnected) loading.textContent = 'This game could not load. Close it and try again.'; }, { once: true });
         const ownerUserId = this.games.sessionOwnerId;
         const storageChannel = createUniqueId();
         iframe.name = `${GAME_STORAGE_PREFIX}${JSON.stringify({
@@ -146,6 +157,9 @@ export class StudentGameHtmlLoader {
         // Set up iframe onload handler for optimizations and score reporting
         const originalOnload = iframe.onload;
         iframe.onload = () => {
+            clearTimeout(loadTimer);
+            loading.remove();
+            iframe.style.visibility = '';
             // Focus the iframe so keyboard events work
             iframe.focus();
 
@@ -240,6 +254,8 @@ export class StudentGameHtmlLoader {
             messageHandler: messageHandler,
             storageMessageHandler,
             stop: () => {
+                clearTimeout(loadTimer);
+                loading.remove();
                 if (frameResizeObserver) {
                     frameResizeObserver.disconnect();
                 }

@@ -1,0 +1,105 @@
+
+/* Arcade loading mirrors the game carousel using the shared dashboard motion. */
+
+.student-page-skeleton--arcade { align-content: start; }
+.student-loading-arcade-intro { display: grid; gap: 12px; flex: 1; }
+.student-loading-arcade-carousel { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 16px; align-items: center; }
+.student-loading-arcade-nav { width: 56px; height: 56px; border-radius: 14px; }
+.student-loading-arcade-card {
+    display: grid; grid-template-columns: 180px minmax(0, 1fr) auto;
+    grid-template-areas: "counter counter access" "art copy copy" "art play play";
+    gap: 16px 28px; min-height: 330px; padding: 30px 34px;
+}
+.student-loading-arcade-counter { grid-area: counter; }
+.student-loading-arcade-access { grid-area: access; width: 112px; height: 42px; }
+.student-loading-arcade-art { grid-area: art; width: 180px; height: 190px; border-radius: 18px; }
+.student-loading-arcade-copy { grid-area: copy; display: grid; gap: 12px; align-self: end; }
+.student-loading-arcade-copy .student-loading-reading-title { width: 75%; }
+.student-loading-arcade-card .student-loading-card-action { grid-area: play; width: 190px; height: 52px; margin: 0; }
+.student-loading-arcade-leaderboard { width: 180px; height: 42px; justify-self: center; }
+@media (max-width: 760px) {
+    .student-loading-arcade-carousel { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; }
+    .student-loading-arcade-nav { width: 44px; height: 44px; }
+    .student-loading-arcade-card { grid-template-columns: 1fr auto; grid-template-areas: "counter access" "art art" "copy copy" "play play"; padding: 20px; gap: 16px; min-height: 0; }
+    .student-loading-arcade-art { width: 100%; height: 150px; }
+    .student-loading-arcade-access { width: 64px; }
+    .student-loading-arcade-counter { width: 50px; }
+    .student-loading-arcade-card .student-loading-card-action { width: 100%; }
+}
+
+/* Page geometry uses the dashboard's shared pulse and surface shimmer. */
+.student-loading-breadcrumb { width: min(55%, 380px); height: 14px; }
+.student-loading-month-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.student-loading-month-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
+.student-loading-month-card { display: flex; justify-content: space-between; align-items: center; padding: 24px; min-height: 130px; gap: 18px; }
+.student-loading-month-card > div { display: grid; gap: 12px; flex: 1; }
+.student-loading-month-arrow { width: 12px; height: 20px; flex: 0 0 auto; }
+.student-page-skeleton--units .student-loading-card-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.student-page-skeleton--units .student-loading-unit-card { min-height: 260px; }
+.student-loading-unit-meta { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.student-loading-unit-progress { width: 100%; height: 8px; margin-top: 18px; }
+.student-loading-table { display: grid; gap: 8px; }
+.student-loading-table-row { display: grid; grid-template-columns: minmax(0, 1fr) 82px 82px 112px 132px; gap: 16px; padding: 16px; border-radius: 11px; background: rgba(22,24,58,.82); }
+.student-loading-table-row .student-loading-line { height: 14px; }
+.student-loading-row-name { width: 70%; }
+.student-loading-required-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding-block: 24px; }
+.student-loading-path-step { display: grid; justify-items: center; gap: 14px; }
+.student-loading-path-icon { width: 72px; height: 72px; border-radius: 50%; }
+.student-page-skeleton--unit .student-loading-activity-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.student-page-skeleton--unit .student-loading-activity-card { min-height: 100px; padding: 16px; }
+.student-loading-game-viewport { padding: 16px; }
+.student-loading-game-canvas { width: 100%; height: min(60svh, 520px); border-radius: 12px; }
+@media (min-width: 1121px) {
+    .student-page-skeleton--units .student-loading-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+    .student-page-skeleton--unit .student-loading-activity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .student-loading-table-row { grid-template-columns: minmax(0, 1fr) repeat(4, minmax(0, 70px)); gap: 10px; }
+}
+@media (max-width: 640px) {
+    .student-loading-required-path { grid-template-columns: 1fr; }
+    .student-loading-path-step { grid-template-columns: 72px 1fr; justify-items: start; align-items: center; }
+    .student-loading-path-icon { grid-row: span 2; }
+    .student-loading-table-row { grid-template-columns: 1fr 1fr; }
+    .student-loading-row-name { grid-column: 1 / -1; }
+    .student-page-skeleton--sparks .student-loading-reading-card { padding: 12px 0; gap: 20px; }
+    .student-page-skeleton--sparks .student-loading-card-action { width: 100%; }
+}
+
+.student-loading-score-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) 56px; gap: 16px; align-items: center; padding: 16px 12px; }
+.student-loading-score-row .student-loading-line { height: 16px; }
+
+.student-page-skeleton--month-rows .student-loading-table-row { grid-template-columns: minmax(0, 1fr) 82px 112px; }
+
+/* Sparks reserves the same heading, columns, and controls as the finished page. */
+.student-page-skeleton--sparks { display: block; }
+.student-loading-spark-page-heading {
+    font-size: var(--student-type-page-title-size);
+    height: 1.2em;
+    margin-top: .67em;
+    margin-bottom: var(--student-space-4);
+}
+.student-loading-spark-page-heading > span { width: 110px; height: 100%; border-radius: 6px; }
+.student-page-skeleton--sparks .student-current-class-spark {
+    font-size: var(--student-type-learning-size);
+    line-height: var(--student-leading-learning);
+}
+.student-loading-spark-context { width: min(100%, 400px); height: 20px; }
+.student-loading-spark-title { width: min(80%, 560px); height: 1.2em; font-size: var(--student-type-learning-title-size); border-radius: 6px; }
+.student-loading-spark-number { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; }
+.student-loading-spark-step-label { width: 64px; height: 18px; }
+.student-page-skeleton--sparks .student-spark-step { margin-bottom: var(--student-space-4); }
+.student-loading-spark-passage { display: grid; gap: .85em; padding-block: .425em; margin-bottom: var(--student-space-4); }
+.student-loading-spark-passage > span { height: .8em; width: 100%; }
+.student-loading-spark-passage > span:last-child { width: 76%; }
+.student-loading-spark-connection { display: grid; gap: 10px; margin-top: var(--student-space-6); padding-left: var(--student-space-4); border-left: 3px solid rgba(94,234,212,.3); }
+.student-loading-spark-connection > span { height: 14px; }
+.student-loading-spark-connection > span:last-child { width: 70%; }
+.student-loading-spark-form { display: grid; gap: var(--student-space-4); }
+.student-loading-spark-answer-label { width: 125px; height: 1.5em; }
+.student-loading-spark-answer-field { width: 100%; height: clamp(140px, calc(100svh - 540px), 220px); border: 2px solid rgba(173,198,255,.4); border-radius: var(--radius-md); box-sizing: border-box; }
+.student-loading-spark-save { width: 132px; height: var(--student-touch-target); border-radius: var(--radius-md); }
+@media (max-width: 640px) {
+    .student-loading-spark-answer-field { height: 180px; }
+    .student-loading-spark-save { width: 100%; }
+}

@@ -7,7 +7,7 @@ export async function installStudentAssignedFlowFixture(page, { startEnrolled = 
     const user = { id: ids.user, aud: 'authenticated', role: 'authenticated', email: 'student@fixture.invalid', app_metadata: {}, user_metadata: {} };
     const words = ['Source', 'Hoax', 'Evidence', 'Verify', 'Claim', 'Author', 'Fact', 'Opinion', 'Reliable', 'Bias'].map(word => ({ word, definition: `Meaning of ${word.toLowerCase()}`, emoji: '📘' }));
     const detail = { id: ids.assignment, kind: 'vocabulary', school_id: ids.school, materialId: ids.vocabulary,
-        title: 'G9 T3 W05 - Hoaxes and Fakes', className: 'Technology 9A',
+        release_at: '2026-10-01T12:00:00Z', vocabularyPlacement: { trimester: 'IIIT', month: 'october', assignedDate: '2026-10-01' }, title: 'G9 T3 W05 - Hoaxes and Fakes', className: 'Technology 9A',
         content: { words, activitySettings: { requiredActivities: ['flashcards', 'matching', 'fill-in-blank'] } } };
     const assignment = { id: ids.assignment, class_id: ids.class, kind: 'vocabulary', title: detail.title, release_at: '2026-10-01T12:00:00Z', due_at: null, close_at: null };
     const progress = { user_id: ids.user, coins: 0, coinData: { balance: 0, giftCoins: 0, totalEarned: 0, totalSpent: 0, totalGifted: 0 }, coinHistory: [],

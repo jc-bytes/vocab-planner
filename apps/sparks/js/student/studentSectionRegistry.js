@@ -8,10 +8,6 @@ function defineSection(section) {
 
 export const STUDENT_SECTIONS = Object.freeze([
     defineSection({
-        id: 'classes', tabId: 'student-tab-classes', rootRoute: 'classes',
-        viewIds: ['student-classes-view'], routePrefixes: ['classes']
-    }),
-    defineSection({
         id: 'today',
         tabId: 'student-tab-today',
         rootRoute: 'menu',

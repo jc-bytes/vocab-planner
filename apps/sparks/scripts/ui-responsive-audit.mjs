@@ -53,17 +53,8 @@ async function waitForApp(page) {
     await page.waitForTimeout(350);
 }
 
-async function applySupabaseOverride(context, baseUrl) {
+async function applySupabaseOverride(context) {
     if (!supabaseOverride) return;
-    const target = new URL(supabaseOverride.url);
-    if (target.hostname === '127.0.0.1' && target.port !== '54321') {
-        await context.grantPermissions(['local-network-access'], { origin: baseUrl });
-        await context.route('**/*.html', async route => {
-            const response = await route.fetch();
-            const body = (await response.text()).replaceAll(':54321', ':' + target.port);
-            await route.fulfill({ response, body });
-        });
-    }
     await context.addInitScript(config => {
         window.SUPABASE_CONFIG = {
             url: config.url,
@@ -122,9 +113,7 @@ async function loginStudent(page, baseUrl) {
 async function auditRoute(page, url, label, options = {}) {
     for (const width of widths) {
         await page.setViewportSize({ width, height: viewportHeight });
-        await page.goto(url, { waitUntil: 'load' });
-        const shell = url.includes('/teacher.html') ? '#teacher-tab-shell:not(.hidden)' : '#student-tab-shell:not(.hidden)';
-        await page.locator(shell).waitFor({ state: 'visible' });
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
         await waitForApp(page);
         await options.beforeAudit?.(page, width);
 
@@ -345,7 +334,7 @@ async function assertDataAndSettingsTabs(page, baseUrl) {
         };
     });
 
-    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar'
+    if (settingsState.visibleTabs.join(',') !== 'subjects,gamification,calendar,export,view,reset'
         || settingsState.selectedTab !== 'subjects'
         || settingsState.tabListHeight > 72
         || settingsState.visiblePanels.length !== 1
@@ -381,8 +370,8 @@ async function assertTeacherSparksRoute(page, baseUrl) {
         currentSparkText: document.querySelector('#spark-library-list')?.textContent || ''
     }));
 
-    if (state.activeLabel !== 'Library'
-        || state.mobileLabel !== 'Library'
+    if (state.activeLabel !== 'Content'
+        || state.mobileLabel !== 'Content'
         || !state.addButtonVisible
         || !state.currentSparkText.includes('Audit Spark')) {
         throw new Error(`Teacher Sparks route did not render expected controls: ${JSON.stringify(state)}`);
@@ -565,8 +554,8 @@ async function main() {
         browser = await chromium.launch({ headless: true });
         const teacherContext = await browser.newContext({ timezoneId: 'America/Panama' });
         const studentContext = await browser.newContext({ timezoneId: 'America/Panama' });
-        await applySupabaseOverride(teacherContext, baseUrl);
-        await applySupabaseOverride(studentContext, baseUrl);
+        await applySupabaseOverride(teacherContext);
+        await applySupabaseOverride(studentContext);
         const teacherPage = await teacherContext.newPage();
         const studentPage = await studentContext.newPage();
 

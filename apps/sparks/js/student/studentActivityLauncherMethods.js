@@ -206,7 +206,7 @@ export class StudentActivityLauncher {
         container.innerHTML = ''; // Clear previous
         container.classList.remove('flashcards-activity-container');
         $('#activity-view')?.classList.remove('flashcards-active');
-        container.innerHTML = getStudentPageSkeleton('activity', 'Loading activity');
+        container.innerHTML = getStudentPageSkeleton('activity', 'Loading activity', { activityType: type });
 
         let ActivityClass;
         try {

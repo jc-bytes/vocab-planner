@@ -1,7 +1,6 @@
 import '../../css/student-class-spark.css';
 import { getReleasedClassSparks, formatClassSparkHeading, getAutomaticClassSparkLocation } from './studentClassSparkModel.js';
 import { renderClassSparkLibrary, sparkBreadcrumb, renderSparkViewToggle } from './studentClassSparkLibrary.js';
-import { StudentClassSelection } from './studentClassSelection.js';
 import { classroomRepository } from '../services/classroomRepository.js';
 import { createSparkCheckForm } from '../classroomSparkCheckView.js';
 import { getStudentPageSkeleton, setStudentPageLoading } from './studentLoadingSkeletons.js';
@@ -55,20 +54,12 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
     setStudentPageLoading(view, true);
     root.innerHTML = getStudentPageSkeleton(route.sparkId ? 'sparks' : route.month ? 'units' : 'months', 'Loading Sparks');
     try {
-        const vocabularyData = sm.activities.vocabularyData;
-        if (vocabularyData.loadClassSelection) await vocabularyData.loadClassSelection();
-        else {
-            vocabularyData.classSelection ||= new StudentClassSelection(sm);
-            await vocabularyData.classSelection.load();
-        }
+        await sm.activities.vocabularyData.loadClassSelection();
         if (!current()) return;
         const selection = sm.activities.vocabularyData.classSelection;
         classId = selection.selectedId;
-        for (const target of ['#spark-subject-picker', '#student-subject-picker']) {
-            const container = document.querySelector(target);
-            if (selection.render && container) selection.render(container);
-            else vocabularyData.renderSubjectPicker(target);
-        }
+        sm.activities.vocabularyData.renderSubjectPicker('#spark-subject-picker');
+        sm.activities.vocabularyData.renderSubjectPicker('#student-subject-picker');
         const selected = selection.classes.find(item => item.id === classId);
         if (!selected || selected.archived) { showMessage('No current Spark is available for this class.'); return; }
         const assignments = await repository.listAssignments(classId, { signal });
