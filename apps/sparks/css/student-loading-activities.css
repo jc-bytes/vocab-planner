@@ -1,0 +1,48 @@
+.student-loading-answer-grid { display: none; }
+.student-page-skeleton[data-loading-layout]:not([data-loading-layout=""]) .student-loading-activity-stage { min-height: 300px; }
+.student-page-skeleton:is([data-loading-layout="matching"], [data-loading-layout="speed-match"], [data-loading-layout="quiz"], [data-loading-layout="synonym-antonym"], [data-loading-layout="fill-in-blank"]) .student-loading-answer-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%;
+}
+.student-loading-answer { height: 44px; border-radius: 12px; }
+.student-page-skeleton:is([data-loading-layout="matching"], [data-loading-layout="speed-match"], [data-loading-layout="quiz"], [data-loading-layout="synonym-antonym"], [data-loading-layout="fill-in-blank"]) .student-loading-activity-focus { display: none; }
+.student-page-skeleton:is([data-loading-layout="word-search"], [data-loading-layout="crossword"], [data-loading-layout="wordle"]) .student-loading-activity-focus {
+    width: min(100%, 360px); height: 260px;
+    background-image: repeating-linear-gradient(0deg, transparent 0 35px, rgba(18,31,68,.8) 35px 39px), repeating-linear-gradient(90deg, transparent 0 35px, rgba(18,31,68,.8) 35px 39px);
+}
+.student-page-skeleton[data-loading-layout="illustration"] .student-loading-activity-focus { width: 100%; height: 180px; }
+.student-page-skeleton:is([data-loading-layout="hangman"], [data-loading-layout="scramble"]) .student-loading-activity-focus { height: 100px; }
+.student-game-loading { position: absolute; inset: 70px 0 0; z-index: 2; padding: 16px; }
+.student-page-skeleton--game .student-loading-activity-stage { min-height: 320px; }
+.student-page-skeleton--game .student-loading-activity-focus { width: 100%; height: 220px; }
+
+/* Match answer controls to each activity rather than showing the same question grid. */
+.student-page-skeleton:is([data-loading-layout="quiz"], [data-loading-layout="synonym-antonym"]) .student-loading-answer:nth-child(n+5),
+.student-page-skeleton[data-loading-layout="speed-match"] .student-loading-answer:nth-child(n+3) { display: none; }
+.student-page-skeleton[data-loading-layout="fill-in-blank"] .student-loading-answer-grid { grid-template-columns: 1fr; max-width: 360px; }
+.student-page-skeleton[data-loading-layout="fill-in-blank"] .student-loading-answer:not(:first-child) { display: none; }
+.student-page-skeleton[data-loading-layout="scramble"] .student-loading-activity-focus { display: none; }
+.student-page-skeleton[data-loading-layout="scramble"] .student-loading-answer-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 44px)); gap: 8px; width: min(100%, 304px); }
+.student-page-skeleton[data-loading-layout="hangman"] .student-loading-answer-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; width: min(100%, 420px); }
+.student-page-skeleton[data-loading-layout="flashcards"] .student-loading-activity-focus { width: min(100%, 560px); height: 280px; }
+.student-page-skeleton[data-loading-layout="wordle"] .student-loading-activity-focus { width: 195px; height: 234px; }
+
+.student-loading-activity-side { display: none; }
+.student-loading-answer:nth-child(n+7) { display: none; }
+.student-page-skeleton[data-loading-layout="matching"] .student-loading-answer { display: block; }
+.student-page-skeleton:is([data-loading-layout="flashcards"], [data-loading-layout="word-search"]) .student-loading-activity-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.student-page-skeleton:is([data-loading-layout="flashcards"], [data-loading-layout="word-search"]) .student-loading-activity-prompt,
+.student-page-skeleton:is([data-loading-layout="flashcards"], [data-loading-layout="word-search"]) .student-loading-activity-actions { grid-column: 1 / -1; }
+.student-page-skeleton:is([data-loading-layout="flashcards"], [data-loading-layout="word-search"]) .student-loading-activity-side { display: grid; gap: 14px; width: 100%; }
+.student-loading-side-item { height: 52px; border-radius: 12px; }
+.student-page-skeleton[data-loading-layout="word-search"] .student-loading-activity-side { grid-column: 1; grid-row: 2; }
+.student-page-skeleton[data-loading-layout="word-search"] .student-loading-activity-focus { grid-column: 2; grid-row: 2; }
+.student-page-skeleton[data-loading-layout="speed-match"] .student-loading-answer-grid { display: none; }
+.student-page-skeleton[data-loading-layout="speed-match"] .student-loading-activity-focus { display: block; width: 70%; height: 80px; }
+.student-page-skeleton[data-loading-layout="speed-match"] .student-loading-activity-actions > :nth-child(2) { display: none; }
+@media (max-width: 640px) {
+    .student-page-skeleton:is([data-loading-layout="flashcards"], [data-loading-layout="word-search"]) .student-loading-activity-stage { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+    .student-page-skeleton[data-loading-layout="word-search"] .student-loading-activity-side,
+    .student-page-skeleton[data-loading-layout="word-search"] .student-loading-activity-focus { grid-column: auto; grid-row: auto; }
+    .student-loading-activity-actions { width: 100%; }
+    .student-loading-activity-actions .student-loading-card-action { width: min(45%, 152px); }
+}

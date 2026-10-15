@@ -51,23 +51,6 @@ globalThis.window = {
 
 const { StudentManager } = await import('../js/student.js');
 const { StudentRouting } = await import('../js/studentRoutingMethods.js');
-const { StudentActivityVocabularyData } = await import('../js/student/studentActivityVocabularyDataMethods.js');
-
-test('signed-in Units entry stays in its familiar vocabulary screen', async () => {
-    const manager = { ...createManager(), authDisabled: false, currentUser: { uid: 'student' }, studentProfile: {} };
-    let rendered = 0, destination = null, visible = null;
-    manager.cleanupActivity = () => {};
-    manager.resetStudentVocabularyDrilldown = () => {};
-    manager.switchView = view => { visible = view; };
-    manager.activities.renderDashboard = async () => { rendered++; };
-    const routing = new StudentRouting(manager);
-    routing.setRoute = route => { destination = route; };
-    routing.applyRouteTarget = async route => { destination = route; };
-    await routing.showUnitsView();
-    assert.equal(visible, 'vocab-selection-view');
-    assert.equal(rendered, 1);
-    assert.equal(destination, null);
-});
 
 function createManager() {
     return {
@@ -161,9 +144,9 @@ test('route parsing and building preserve the public URL contract', () => {
 
     assert.deepEqual(routing.parseRoute('#/menu'), { view: 'menu' });
     assert.deepEqual(routing.parseRoute('#/sparks'), { view: 'sparks' });
-    for (const location of [{view:'sparks',all:true},{view:'sparks',trimester:'IIIT',month:'october',sparkId:'with spaces'}]) {
-        assert.deepEqual(routing.parseRoute(routing.buildRoute(location)),location);
-    }
+    assert.deepEqual(routing.parseRoute(routing.buildRoute({view:'sparks',all:true})), {view:'sparks',all:true});
+    const sparkLocation = {view:'sparks',trimester:'IIIT',month:'october',sparkId:'assignment with spaces'};
+    assert.deepEqual(routing.parseRoute(routing.buildRoute(sparkLocation)),sparkLocation);
     assert.deepEqual(routing.parseRoute('#/units?trimester=t2&month=july'), {
         view: 'units',
         all: false,
@@ -260,7 +243,8 @@ test('direct activity restoration keeps the unit menu deferred until the activit
         ['loadVocabulary', vocab, {
             fromRoute: true,
             skipActivityPreload: true,
-            deferActivityMenu: true
+            deferActivityMenu: true,
+            activityType: 'flashcards'
         }],
         ['startActivity', 'flashcards', {
             fromRoute: true,

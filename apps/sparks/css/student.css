@@ -4803,6 +4803,7 @@ section.student-continue-hero {
         z-index: 38 !important;
         display: flex !important;
         align-items: center !important;
+        justify-content: flex-end !important;
         box-sizing: border-box !important;
         height: var(--student-shell-topbar-height) !important;
         padding: 0 28px !important;
@@ -4816,13 +4817,14 @@ section.student-continue-hero {
     html body .app-container:has(#student-tab-shell:not(.hidden)) > .student-top-bar > .student-sidebar-context {
         display: flex !important;
         align-items: center !important;
+        order: 0 !important;
         flex: 0 0 auto !important;
         width: auto !important;
         min-width: 0 !important;
-        margin: 0 0 0 20px !important;
-        padding: 0 0 0 20px !important;
+        margin: 0 20px 0 0 !important;
+        padding: 0 !important;
         border: 0 !important;
-        border-left: 1px solid rgba(173, 198, 255, 0.12) !important;
+
         border-radius: 0 !important;
         background: transparent !important;
     }
@@ -4897,12 +4899,11 @@ section.student-continue-hero {
         line-height: 1.1 !important;
     }
 
-    html body .app-container.student-session-loading:has(#student-tab-shell:not(.hidden)) > .student-top-bar {
-        visibility: hidden !important;
-    }
+
 
     html body .app-container:has(#student-tab-shell:not(.hidden)) > .student-top-bar .header-left {
-        width: 100% !important;
+        width: auto !important;
+        flex: 0 1 28rem !important;
         min-width: 0 !important;
     }
 
@@ -5372,21 +5373,24 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     overflow: hidden !important;
 }
 
+/* Give the Today dashboard breathing room inside the desktop frame. */
+@media (min-width: 1121px) {
+    html body .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#main-menu-view:not(.hidden)) {
+        padding-top: clamp(16px, calc(5svh - 16px), 32px) !important;
+        padding-bottom: clamp(16px, calc(5svh - 16px), 32px) !important;
+    }
+}
+
 /* Keep the complete Today dashboard visible on laptop-height desktop viewports. */
 @media (min-width: 1121px) and (max-height: 920px) {
-    html body .app-container:has(#student-tab-shell:not(.hidden)) > main:has(#main-menu-view:not(.hidden)) {
-        padding-top: 16px !important;
-        padding-bottom: 16px !important;
-    }
-
     #main-menu-view:not(.hidden) {
         display: grid !important;
-        align-content: center !important;
+        align-content: safe center !important;
         min-height: 0 !important;
     }
 
     #main-menu-view > .student-dashboard-heading {
-        margin-bottom: 12px !important;
+        margin-bottom: 20px !important;
     }
 
     .student-dashboard-heading .teacher-eyebrow,
@@ -5395,7 +5399,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     }
 
     .student-dashboard-heading h2 {
-        font-size: clamp(2rem, 3vw, 2.65rem) !important;
+        font-size: clamp(1.75rem, 4svh, 2.65rem) !important;
     }
 
     #student-home-dashboard.student-home-dashboard {
@@ -5404,7 +5408,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
             "hero hero"
             "week spark" !important;
         grid-template-rows: auto min-content !important;
-        gap: 12px !important;
+        gap: 20px !important;
     }
 
     #student-home-dashboard.student-home-dashboard:not(:has(#student-home-panel-spark)) {
@@ -5415,9 +5419,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #student-home-dashboard .student-continue-hero {
         box-sizing: border-box !important;
-        height: 400px !important;
-        min-height: 400px !important;
-        padding: 28px 30px !important;
+        height: auto !important;
+        min-height: 0 !important;
+        grid-template-columns: minmax(0, 0.7fr) minmax(0, 0.3fr) !important;
+        grid-template-rows: auto auto !important;
+        row-gap: 12px !important;
+        padding: clamp(16px, 2.5svh, 24px) 30px !important;
     }
 
     #student-home-dashboard .student-hero-purpose {
@@ -5426,7 +5433,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #student-home-dashboard .student-continue-copy h3 {
         margin-bottom: 7px !important;
-        font-size: clamp(1.9rem, 2.7vw, 2.45rem) !important;
+        font-size: clamp(1.5rem, 3.5svh, 1.9rem) !important;
     }
 
     #student-home-dashboard .student-continue-copy p {
@@ -5444,15 +5451,15 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
     #student-home-dashboard .student-continue-action {
         min-height: 46px !important;
-        margin-top: 14px !important;
+        margin-top: 0 !important;
     }
 
     #student-home-panel-week {
         box-sizing: border-box !important;
         display: grid !important;
         grid-template-rows: auto minmax(0, 1fr) !important;
-        height: 244px !important;
-        min-height: 244px !important;
+        height: clamp(200px, calc(100svh - 440px), 244px) !important;
+        min-height: clamp(200px, calc(100svh - 440px), 244px) !important;
         padding: 14px 16px 86px !important;
         align-self: stretch !important;
     }
@@ -5466,8 +5473,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
         box-sizing: border-box !important;
         display: grid !important;
         grid-template-rows: auto minmax(0, 1fr) !important;
-        height: 244px !important;
-        min-height: 244px !important;
+        height: clamp(200px, calc(100svh - 440px), 244px) !important;
+        min-height: clamp(200px, calc(100svh - 440px), 244px) !important;
         padding: 14px 16px !important;
         align-self: stretch !important;
     }
@@ -5545,7 +5552,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     width: 100%;
 }
 
-.student-dashboard-skeleton-surface {
+.student-dashboard-skeleton-surface,
+.student-loading-surface {
     position: relative;
     box-sizing: border-box;
     overflow: hidden;
@@ -5556,13 +5564,15 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
         rgba(24, 28, 67, 0.72);
 }
 
-.student-dashboard-skeleton-surface::after {
+.student-dashboard-skeleton-surface::after,
+.student-loading-surface::after {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(105deg, transparent 30%, rgba(173, 198, 255, 0.11) 48%, transparent 66%);
     transform: translateX(-120%);
     animation: studentDashboardShimmer 1.45s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .student-dashboard-skeleton-line {
@@ -5717,69 +5727,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 /* Shared student loading system: every placeholder mirrors the page that will replace it. */
-.student-session-loader {
-    display: grid;
-    place-items: center;
-    align-content: center;
-    gap: 20px;
-    width: 100%;
-    min-height: min(520px, 66svh);
-}
-
-.student-session-loader-orbit {
-    position: relative;
-    width: 76px;
-    height: 76px;
-    border: 1px solid rgba(173, 198, 255, 0.18);
-    border-radius: 50%;
-    animation: studentSessionOrbit 1.8s linear infinite;
-}
-
-.student-session-loader-orbit::before,
-.student-session-loader-orbit::after,
-.student-session-loader-orbit span {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-}
-
-.student-session-loader-orbit::before {
-    inset: 16px;
-    border: 2px solid rgba(69, 213, 255, 0.7);
-    box-shadow: 0 0 22px rgba(69, 213, 255, 0.34);
-}
-
-.student-session-loader-orbit::after {
-    top: -4px;
-    left: 32px;
-    width: 10px;
-    height: 10px;
-    background: var(--color-xp, #dfff2a);
-    box-shadow: 0 0 16px rgba(223, 255, 42, 0.7);
-}
-
-.student-session-loader-orbit span:first-child {
-    inset: 28px;
-    background: linear-gradient(135deg, #4ddcff, #ad73ff);
-}
-
-.student-session-loader-orbit span:last-child {
-    inset: 5px;
-    border: 1px dashed rgba(173, 198, 255, 0.2);
-}
-
-.student-session-loader-wordmark {
-    width: 164px;
-    height: 12px;
-    border-radius: 999px;
-    background: rgba(173, 198, 255, 0.16);
-    animation: studentDashboardPulse 1.45s ease-in-out infinite;
-}
-
-@keyframes studentSessionOrbit {
-    to { transform: rotate(360deg); }
-}
-
 .student-page-loading > .section-header,
 .student-page-loading > .activity-header,
 #activity-menu-view.student-page-loading > .section-header,
@@ -5814,27 +5761,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-radius: 999px;
     background: rgba(173, 198, 255, 0.18);
     animation: studentDashboardPulse 1.45s ease-in-out infinite;
-}
-
-.student-loading-surface {
-    position: relative;
-    box-sizing: border-box;
-    overflow: hidden;
-    border: 1px solid rgba(173, 198, 255, 0.16);
-    border-radius: 18px;
-    background:
-        linear-gradient(135deg, rgba(35, 34, 91, 0.78), rgba(18, 31, 68, 0.68)),
-        rgba(24, 28, 67, 0.72);
-}
-
-.student-loading-surface::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(105deg, transparent 30%, rgba(173, 198, 255, 0.11) 48%, transparent 66%);
-    transform: translateX(-120%);
-    animation: studentDashboardShimmer 1.45s ease-in-out infinite;
-    pointer-events: none;
 }
 
 .student-loading-page-title {
@@ -5888,7 +5814,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 
 .student-loading-reading-card {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+    grid-template-columns: 1fr;
     gap: 28px;
     min-height: 460px;
     padding: 30px;
@@ -5992,32 +5918,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin-top: 0;
 }
 
-.student-page-skeleton--arcade {
-    align-content: start;
-}
-
-.student-loading-arcade-card {
-    display: grid;
-    justify-items: center;
-    align-content: center;
-    gap: 16px;
-    min-height: min(520px, 64svh);
-    padding: 34px;
-}
-
-.student-loading-arcade-art {
-    width: 132px;
-    height: 132px;
-    border-radius: 28px;
-}
-
-.student-loading-arcade-card .student-loading-reading-title {
-    width: min(46%, 360px);
-}
-
-.student-loading-arcade-card .student-loading-card-copy {
-    width: min(60%, 480px);
-}
 
 .student-loading-list {
     display: grid;
@@ -6073,8 +5973,6 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .student-session-loader-orbit,
-    .student-session-loader-wordmark,
     .student-loading-line,
     .student-loading-surface::after {
         animation: none;
@@ -6132,7 +6030,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin-top: 10px;
 }
 
-#vocab-selection-view .vocab-context-breadcrumb .teacher-library-breadcrumb {
+:is(#vocab-selection-view, #student-sparks-view) :is(.vocab-context-breadcrumb .teacher-library-breadcrumb, .student-spark-breadcrumb) {
     --breadcrumb-family: var(--font-family-mono);
     --breadcrumb-size: var(--type-caption-size);
     --breadcrumb-letter-spacing: 0.05em;
@@ -6140,7 +6038,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     color: var(--color-primary);
 }
 
-#vocab-selection-view .student-current-month-badge {
+:is(#vocab-selection-view, #student-sparks-view) .student-current-month-badge {
     display: inline-flex;
     align-items: center;
     margin-left: 8px;
@@ -6151,12 +6049,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     color: var(--color-primary);
 }
 
-#vocab-selection-view .teacher-library-breadcrumb > .student-current-month-badge {
+:is(#vocab-selection-view, #student-sparks-view) .teacher-library-breadcrumb > .student-current-month-badge {
     display: inline-flex;
     margin-left: 2px;
 }
 
-#vocab-selection-view .student-vocab-month-navigation {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-navigation {
     --month-navigation-action-size: var(--type-breadcrumb-size);
     display: flex;
     align-items: center;
@@ -6166,7 +6064,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     margin: 0;
 }
 
-#vocab-selection-view .student-vocab-month-nav-strip {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-strip {
     display: grid;
     grid-template-columns: minmax(125px, auto) minmax(72px, 1fr) minmax(125px, auto);
     align-items: center;
@@ -6176,7 +6074,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     background: rgba(173, 198, 255, 0.035);
 }
 
-#vocab-selection-view .student-vocab-month-nav-btn {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -6191,19 +6089,19 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     cursor: pointer;
 }
 
-#vocab-selection-view .student-vocab-month-nav-btn svg {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-btn svg {
     display: block;
     width: 18px;
     height: 18px;
     flex: 0 0 18px;
 }
 
-#vocab-selection-view .student-vocab-month-nav-btn:hover:not(:disabled) {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-btn:hover:not(:disabled) {
     background: rgba(173, 198, 255, 0.09);
     color: var(--color-primary);
 }
 
-#vocab-selection-view .student-vocab-month-nav-btn:disabled {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-btn:disabled {
     border-color: transparent;
     background: transparent;
     color: rgba(194, 198, 214, 0.42);
@@ -6211,7 +6109,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     cursor: not-allowed;
 }
 
-#vocab-selection-view .student-vocab-month-back {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-back {
     justify-content: flex-start;
     min-height: 44px;
     margin: 0;
@@ -6219,7 +6117,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     color: rgba(173, 198, 255, 0.78);
 }
 
-#vocab-selection-view .student-vocab-month-nav-current {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-current {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6231,23 +6129,23 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
 }
 
 @media (max-width: 720px) {
-    #vocab-selection-view .student-vocab-month-navigation {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-navigation {
         --month-navigation-action-size: var(--type-caption-size);
         align-items: stretch;
         flex-direction: column;
         gap: 4px;
     }
 
-    #vocab-selection-view .student-vocab-month-nav-strip {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-strip {
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         width: 100%;
     }
 
-    #vocab-selection-view .student-vocab-month-back {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-back {
         align-self: flex-start;
     }
 
-    #vocab-selection-view .student-vocab-month-nav-btn {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-month-nav-btn {
         padding-inline: 6px;
     }
 }
@@ -6256,7 +6154,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     grid-area: subject;
 }
 
-#vocab-selection-view .vocab-view-toggle {
+:is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle {
     grid-area: view;
     min-height: 52px;
     padding: 3px;
@@ -6267,8 +6165,8 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     backdrop-filter: blur(16px);
 }
 
-#vocab-selection-view .vocab-view-toggle-btn,
-#vocab-selection-view .vocab-view-toggle .vocab-view-toggle-btn {
+:is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle-btn,
+:is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle .vocab-view-toggle-btn {
     min-height: 44px;
     height: 44px;
     padding-inline: 12px;
@@ -6276,13 +6174,13 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     color: rgba(194, 198, 214, 0.82);
 }
 
-#vocab-selection-view .vocab-view-toggle-btn.is-active {
+:is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle-btn.is-active {
     background: rgba(173, 198, 255, 0.2);
     color: var(--color-primary);
     box-shadow: inset 0 0 0 1px rgba(173, 198, 255, 0.4);
 }
 
-#vocab-selection-view .student-vocab-row-list {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row-list {
     gap: 8px;
     margin-top: 4px;
 }
@@ -6291,7 +6189,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     grid-template-columns: minmax(0, 1fr) 82px 82px 112px 132px 1.1rem;
 }
 
-#vocab-selection-view .student-vocab-row {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row {
     box-sizing: border-box;
     min-height: 54px;
     padding: 9px 14px;
@@ -6305,7 +6203,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
-#vocab-selection-view .student-vocab-row-header {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row-header {
     min-height: 28px;
     padding: 4px 14px;
     border: 0;
@@ -6316,7 +6214,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     backdrop-filter: none;
 }
 
-#vocab-selection-view .student-vocab-row:not(.student-vocab-row-header):hover {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row:not(.student-vocab-row-header):hover {
     transform: translateY(-1px);
     border-color: rgba(173, 198, 255, 0.38);
     background:
@@ -6325,13 +6223,13 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     box-shadow: 0 18px 42px -32px rgba(173, 198, 255, 0.5);
 }
 
-#vocab-selection-view .student-vocab-row strong {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row strong {
     color: #eef3ff;
     font-size: 0.95rem;
     font-weight: var(--font-weight-bold);
 }
 
-#vocab-selection-view .student-vocab-row span {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row span {
     color: rgba(218, 226, 253, 0.78);
     font-size: 0.8rem;
 }
@@ -6400,7 +6298,7 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     border-left-color: rgba(98, 230, 167, 0.62);
 }
 
-#vocab-selection-view .student-vocab-row svg {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-row svg {
     color: var(--color-primary);
 }
 
@@ -6420,12 +6318,12 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
     }
 
     #vocab-selection-view .vocab-header-subject-picker,
-    #vocab-selection-view .vocab-view-toggle {
+    :is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle {
         width: auto;
         justify-self: start;
     }
 
-    #vocab-selection-view .student-vocab-row {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-row {
         min-height: 58px;
         padding: 10px 12px;
     }
@@ -6450,11 +6348,11 @@ html body header.app-header.student-app-header .student-mobile-profile-btn {
         max-width: 32rem;
     }
 
-    #vocab-selection-view .vocab-view-toggle {
+    :is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle {
         width: 100%;
     }
 
-    #vocab-selection-view .vocab-view-toggle-btn {
+    :is(#vocab-selection-view, #student-sparks-view) .vocab-view-toggle-btn {
         flex: 1;
     }
 
@@ -6490,8 +6388,8 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
 }
 
 /* Vocabulary card view: substantial tiles inspired by the unit dashboard concept. */
-#vocab-selection-view .trimester-vocab-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+:is(#vocab-selection-view, #student-sparks-view) .trimester-vocab-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
     justify-content: stretch;
     justify-items: stretch;
     width: 100%;
@@ -6499,24 +6397,24 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     margin-top: 0;
 }
 
-#vocab-selection-view .trimester-vocab-grid > .student-vocab-card {
+:is(#vocab-selection-view, #student-sparks-view) .trimester-vocab-grid > .student-vocab-card {
     width: 100%;
     max-width: none;
 }
 
 @media (min-width: 1121px) {
-    #vocab-selection-view .trimester-vocab-grid {
+    :is(#vocab-selection-view, #student-sparks-view) .trimester-vocab-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 720px) and (max-width: 900px) {
-    #vocab-selection-view .trimester-vocab-grid {
+    :is(#vocab-selection-view, #student-sparks-view) .trimester-vocab-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-#vocab-selection-view .student-vocab-card {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -6538,15 +6436,15 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     transform: none;
 }
 
-#vocab-selection-view .student-vocab-card.is-summative {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-summative {
     border-top-color: rgba(255, 183, 134, 0.48);
 }
 
-#vocab-selection-view .student-vocab-card.is-practice {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-practice {
     border-top-color: rgba(221, 183, 255, 0.46);
 }
 
-#vocab-selection-view .student-vocab-card:hover {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card:hover {
     transform: translateY(-2px);
     border-color: rgba(173, 198, 255, 0.4);
     background:
@@ -6557,7 +6455,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
         0 26px 58px -40px rgba(173, 198, 255, 0.38);
 }
 
-#vocab-selection-view .student-vocab-card-head {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -6565,13 +6463,13 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     margin-bottom: 14px;
 }
 
-#vocab-selection-view .student-vocab-card-meta {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card-meta {
     display: grid;
     justify-items: end;
     gap: 5px;
 }
 
-#vocab-selection-view .student-vocab-card .student-vocab-icon {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-icon {
     display: inline-flex;
     flex: 0 0 32px;
     width: 32px;
@@ -6582,24 +6480,24 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     color: var(--color-primary);
 }
 
-#vocab-selection-view .student-vocab-card.is-summative .student-vocab-icon {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-summative .student-vocab-icon {
     border-color: transparent;
     background: transparent;
     color: var(--color-tertiary);
 }
 
-#vocab-selection-view .student-vocab-card.is-practice .student-vocab-icon {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-practice .student-vocab-icon {
     border-color: transparent;
     background: transparent;
     color: var(--color-secondary);
 }
 
-#vocab-selection-view .student-vocab-card .student-vocab-icon svg {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-icon svg {
     width: 23px;
     height: 23px;
 }
 
-#vocab-selection-view .student-vocab-card .student-vocab-schedule {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-schedule {
     max-width: 190px;
     min-height: 0;
     padding: 5px 0 0;
@@ -6617,7 +6515,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     text-transform: uppercase;
 }
 
-#vocab-selection-view .student-vocab-progress-percent {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-progress-percent {
     color: var(--color-xp);
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
     font-size: 1rem;
@@ -6625,7 +6523,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     line-height: 1;
 }
 
-#vocab-selection-view .student-vocab-card .student-vocab-copy {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-copy {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -6633,7 +6531,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     min-width: 0;
 }
 
-#vocab-selection-view .student-vocab-card h3 {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card h3 {
     margin: 0;
     color: #eef3ff;
     font-size: 1.15rem;
@@ -6641,28 +6539,28 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     line-height: 1.2;
 }
 
-#vocab-selection-view .student-vocab-card .student-vocab-purpose {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-purpose {
     min-height: 24px;
     margin-top: 8px;
     padding: 3px 9px;
     font-size: var(--type-caption-size);
 }
 
-#vocab-selection-view .student-vocab-card p {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card p {
     margin: 12px 0 16px;
     color: rgba(218, 226, 253, 0.78);
     font-size: 0.88rem;
     line-height: 1.5;
 }
 
-#vocab-selection-view .student-vocab-required-progress {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress {
     display: grid;
     gap: 7px;
     width: 100%;
     margin: auto 0 14px;
 }
 
-#vocab-selection-view .student-vocab-required-progress-copy {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-copy {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -6672,12 +6570,12 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     font-weight: 700;
 }
 
-#vocab-selection-view .student-vocab-required-progress-copy strong {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-copy strong {
     color: #eef3ff;
     font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 }
 
-#vocab-selection-view .student-vocab-required-progress-track {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-track {
     display: block;
     width: 100%;
     height: 7px;
@@ -6686,7 +6584,7 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     background: rgba(173, 198, 255, 0.14);
 }
 
-#vocab-selection-view .student-vocab-required-progress-track > span {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-track > span {
     display: block;
     height: 100%;
     border-radius: inherit;
@@ -6695,46 +6593,48 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
     transition: width 220ms ease;
 }
 
-#vocab-selection-view .student-vocab-card.is-required-complete .student-vocab-progress-percent,
-#vocab-selection-view .student-vocab-card.is-required-complete .student-vocab-required-progress-copy strong {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-required-complete .student-vocab-progress-percent,
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-required-complete .student-vocab-required-progress-copy strong {
     color: var(--color-success, #62e6a7);
 }
 
-#vocab-selection-view .student-vocab-card.is-required-complete .student-vocab-required-progress-track > span {
+:is(#vocab-selection-view, #student-sparks-view) .student-vocab-card.is-required-complete .student-vocab-required-progress-track > span {
     background: var(--color-success, #62e6a7);
 }
 
 /* Four-column desktop cards: compact, near-square tiles with the same information. */
 @media (min-width: 1121px) {
-    #vocab-selection-view .student-vocab-card {
-        min-height: 0;
-        aspect-ratio: 1 / 1;
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card {
         padding: 14px;
         border-radius: 14px;
     }
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card {
+        min-height: 0;
+        aspect-ratio: 1 / 1;
+    }
 
-    #vocab-selection-view .student-vocab-card-head {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card-head {
         gap: 9px;
         margin-bottom: 10px;
     }
 
-    #vocab-selection-view .student-vocab-card .student-vocab-icon {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-icon {
         flex-basis: 30px;
         width: 30px;
         height: 30px;
         border-radius: 0;
     }
 
-    #vocab-selection-view .student-vocab-card .student-vocab-icon svg {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-icon svg {
         width: 22px;
         height: 22px;
     }
 
-    #vocab-selection-view .student-vocab-card-meta {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card-meta {
         gap: 4px;
     }
 
-    #vocab-selection-view .student-vocab-card .student-vocab-schedule {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-schedule {
         max-width: 132px;
         min-height: 0;
         padding: 3px 0 0;
@@ -6742,56 +6642,59 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
         line-height: 1.2;
     }
 
-    #vocab-selection-view .student-vocab-progress-percent {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-progress-percent {
         font-size: 0.86rem;
     }
 
-    #vocab-selection-view .student-vocab-card h3 {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card h3 {
         font-size: 1rem;
         line-height: 1.15;
     }
 
-    #vocab-selection-view .student-vocab-card .student-vocab-purpose {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card .student-vocab-purpose {
         min-height: 21px;
         margin-top: 6px;
         padding: 2px 7px;
         font-size: 0.64rem;
     }
 
-    #vocab-selection-view .student-vocab-card p {
-        display: -webkit-box;
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card p {
         margin: 8px 0 10px;
-        overflow: hidden;
         color: rgba(218, 226, 253, 0.72);
         font-size: 0.76rem;
         line-height: 1.35;
+    }
+
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card p {
+        display: -webkit-box;
+        overflow: hidden;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
     }
 
-    #vocab-selection-view .student-vocab-required-progress {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress {
         gap: 5px;
         margin: auto 0 10px;
     }
 
-    #vocab-selection-view .student-vocab-required-progress-copy {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-copy {
         gap: 8px;
         font-size: 0.66rem;
     }
 
-    #vocab-selection-view .student-vocab-required-progress-track {
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-required-progress-track {
         height: 5px;
     }
 
 }
 
 @media (max-width: 640px) {
-    #vocab-selection-view .trimester-vocab-grid {
+    :is(#vocab-selection-view, #student-sparks-view) .trimester-vocab-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    #vocab-selection-view .student-vocab-card {
-        min-height: 260px;
+    :is(#vocab-selection-view, #student-sparks-view) .student-vocab-card {
+        min-height: 210px;
     }
 }
 
@@ -8027,3 +7930,41 @@ html body #activity-menu-view .activity-menu-hero > .activity-menu-close {
         max-width: 28rem !important;
     }
 }
+
+#vocab-selection-view .student-unit-list-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+#vocab-selection-view .student-vocab-card {
+    min-height: 210px;
+}
+
+/* Loading chrome keeps the final header geometry and dashboard motion. */
+.student-topbar-skeleton { display: none; }
+.student-loading-class-value { width: 112px; height: 12px; }
+.student-top-bar .header-left { position: relative; }
+.app-container:is(.student-session-loading, .student-header-loading) .student-top-bar .student-identity { visibility: hidden; }
+.app-container:is(.student-session-loading, .student-header-loading) .student-topbar-skeleton {
+    position: absolute; inset: 8px 0; display: grid;
+    grid-template-columns: 64px minmax(80px, 1fr) 88px; gap: 8px 20px;
+}
+.student-topbar-skeleton .student-loading-line { height: 10px; align-self: center; }
+.app-container:is(.student-session-loading, .student-header-loading) #coin-balance [data-coin-balance-value] {
+    color: transparent; border-radius: 8px; min-width: 24px;
+    background: rgba(173, 198, 255, 0.18); animation: studentDashboardPulse 1.45s ease-in-out infinite;
+}
+#loading-view .student-page-skeleton { width: 100%; }
+.student-page-skeleton--months .student-loading-unit-card { min-height: 130px; }
+@media (prefers-reduced-motion: reduce) {
+    .app-container #coin-balance [data-coin-balance-value] { animation: none !important; }
+}
+
+
+#vocab-list > .student-page-skeleton { grid-column: 1 / -1; width: 100%; min-width: 0; }
+
+/* Reserve the sidebar frame immediately during session refresh. */
+html body .app-container.student-session-loading:has(#student-tab-shell:not(.hidden)) > main { transition: none !important; }

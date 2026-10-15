@@ -1,3 +1,4 @@
+import { getStudentRouteLoadingSkeleton } from './student/studentLoadingSkeletons.js';
 import { $, closeModal as closeDialog, notifications, openModal } from './main.js';
 import { studentApi as supabaseService } from './services/studentApi.js';
 
@@ -64,6 +65,8 @@ export class StudentAuthUi {
         }
 
         this.auth.showLoginError('');
+        const view = $('#loading-view');
+        if (view) view.innerHTML = getStudentRouteLoadingSkeleton(window.location.hash);
         this.sm.switchView('loading-view');
 
         try {

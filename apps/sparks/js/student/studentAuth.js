@@ -186,6 +186,7 @@ export class StudentAuth {
         const isCurrent = () => this.isStillSignedIn(userId) && (!context || context.isCurrent());
         if (!isCurrent()) return false;
 
+        document.querySelector('.app-container')?.classList.add('student-header-loading');
         // Paint the cached dashboard immediately on repeat visits. Cloud progress
         // remains authoritative and replaces this snapshot as soon as it arrives.
         this.updateHeader();
@@ -240,6 +241,7 @@ export class StudentAuth {
             ).catch(error => console.warn('Using the default school calendar:', error))
         ]);
         if (!isCurrent()) return false;
+        document.querySelector('.app-container')?.classList.remove('student-header-loading');
         this.sm.renderDashboard();
         await this.sm.restoreRouteOrDefault();
         if (!isCurrent()) return false;

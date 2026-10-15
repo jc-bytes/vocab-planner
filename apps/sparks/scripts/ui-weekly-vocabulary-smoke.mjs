@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import { ensureViteServer } from './lib/local-vite-server.mjs';
-const baseUrl='http://127.0.0.1:8141';let server,browser;
+const port=Number(process.env.UI_WEEKLY_VOCABULARY_PORT || 8141);
+const baseUrl=`http://127.0.0.1:${port}`;let server,browser;
 try {
- server=await ensureViteServer({baseUrl,probePath:'/student.html',host:'127.0.0.1',port:8141,external:false});
+ server=await ensureViteServer({baseUrl,probePath:'/student.html',host:'127.0.0.1',port,external:false});
  browser=await chromium.launch();const page=await browser.newPage({viewport:{width:1280,height:960}});
  await page.clock.setFixedTime(new Date('2026-11-20T17:00:00Z'));
  await page.goto(baseUrl+'/student.html');await page.waitForFunction(()=>window.studentApp?.activities);

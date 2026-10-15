@@ -111,7 +111,7 @@ test('private classes enforce ownership and verified enrollment through real aut
         });
         await t.test('publication is private, atomic, retry-safe and retains a version after library edits', async () => {
             const materialId = `private-vocab-${run}`; materials.push(materialId);
-            await admin.from('vocabularies').insert({ id: materialId, owner_id: a.id, school_id: schoolA, teacher_subject_id:sa.id, name: 'Cell practice',
+            await admin.from('vocabularies').insert({ id: materialId, owner_id: a.id, school_id: schoolA, teacher_subject_id:sa.id, name: 'Cell practice', assigned_date: '2026-10-01', trimester: '3', month: 'October', week: 1,
                 words: [{ word: 'Cell', definition: 'A box in a spreadsheet.' }] }).throwOnError();
             const request = { classIds: [ca.id, club.id], kind: 'vocabulary', materialId,
                 releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() };
@@ -384,55 +384,35 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentPage.locator('#login-email').fill(neither.email);
                 await studentPage.locator('#login-password').fill(neither.password);
                 await studentPage.locator('#student-login-form button[type=submit]').click();
-                await studentPage.locator('#student-tab-classes').click();
-                const studentView = studentPage.locator('#student-classes-view');
+                await studentPage.locator('#student-tab-vocabulary').click();
+                const studentView = studentPage.locator('#vocab-selection-view');
                 await studentView.getByRole('button', { name: 'Join class' }).click();
-                await studentPage.waitForFunction(() => document.querySelector('#student-classes-view [role=status]')?.textContent === ''
-                    && ![...document.querySelectorAll('#student-classes-view button')].some(b => b.textContent === 'Join class'));
+                await studentPage.waitForFunction(() => studentApp.activities.vocabularyData.classSelection?.classes.length > 0);
                 assert.equal((await neither.repo.listMyClasses())[0].id, ca.id);
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
-                await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
-                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
-                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
+                const publishedVocabulary = afterPublication.find(row => row.kind === 'vocabulary' && !baseline.some(old => old.id === row.id));
+                const publishedSpark = afterPublication.find(row => row.kind === 'spark' && !baseline.some(old => old.id === row.id));
+                await studentPage.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), publishedVocabulary.id);
+                await studentPage.locator('#activity-menu-view:not(.hidden)').waitFor();
+                await studentPage.waitForFunction(id => studentApp.currentVocab?.assignmentId === id && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false', publishedVocabulary.id);
                 assert.equal(await studentPage.evaluate(() => studentApp.currentVocab.words[0].word), 'Changed');
-                assert.equal(await studentView.getByLabel('School', { exact: true }).count(), 0, 'One school needs no chooser');
-                await studentPage.locator('#student-tab-classes').click();
-                await studentView.getByRole('button', { name: 'Private reflection', exact: true }).first().click();
-                await studentView.getByLabel('Your written response').fill('My class response is private.');
-                await studentView.getByRole('button', { name: 'Save response', exact: true }).click();
-                await studentView.getByText('Response saved.', { exact: true }).waitFor();
+                await studentPage.evaluate(id => studentApp.navigateTo({ view: 'sparks', sparkId: id }), publishedSpark.id);
+                const sparkView = studentPage.locator('#student-sparks-view');
+                await sparkView.getByLabel('Your answer', { exact: true }).fill('My class response is private.');
+                await sparkView.getByRole('button', { name: 'Save answer', exact: true }).click();
+                await sparkView.getByText('Answer saved. Your teacher will review it.', { exact: true }).waitFor();
                 await teacherPage.locator('#tab-review').click();
                 const reviewView = teacherPage.locator('#teacher-review-view');
                 await reviewView.locator('select[name=class]').selectOption(ca.id);
-                const activeSpark = reviewView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: 'Private reflection', exact: true }) }).filter({ has: teacherPage.getByText('Available', { exact: true }) });
-                await activeSpark.getByRole('button', { name: 'Review work', exact: true }).click();
+                const activeSpark = reviewView.getByRole('article').filter({ has: teacherPage.getByRole('heading', { name: 'Private reflection', exact: true }) }).filter({ has: teacherPage.getByText('Available now', { exact: true }) });
+                await activeSpark.getByRole('button', { name: 'View results', exact: true }).click();
                 await reviewView.getByText('My class response is private.', { exact: true }).waitFor();
-                await reviewView.getByRole('button', { name: 'Export results', exact: true }).click();
-                await teacherPage.getByRole('dialog', { name: 'Export assignment results' }).getByRole('button', { name: 'Cancel', exact: true }).click();
-                await a.repo.publishMaterial({ classIds: [ca.id], kind: 'spark', materialId: sparkCheckMaterialId,
-                    releaseAt: new Date(Date.now()-60000).toISOString(), publicationKey: crypto.randomUUID() });
-                await studentPage.locator('#student-tab-classes').click();
-                await studentView.getByRole('button', { name: 'Private check', exact: true }).click();
-                await studentView.getByLabel('Choose the spreadsheet cell.').selectOption('0');
-                await studentView.getByLabel('Explain your answer.').fill('This answer is reviewed by my teacher.');
-                await studentView.getByRole('button', { name: 'Check answers', exact: true }).click();
-                await studentView.getByText('1 of 1 multiple-choice answers correct.', { exact: false }).waitFor();
-
-                await studentView.getByRole('button', { name: 'Cell practice', exact: true }).first().click();
-                await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
-                await studentPage.waitForFunction(() => studentApp.currentVocab?.words?.[0]?.word === 'Changed'
-                    && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false');
-                await studentPage.locator('#back-to-vocab').click();
-                const unitsView = studentPage.locator('#vocab-selection-view');
-                await unitsView.waitFor({ state: 'visible' });
-                await studentPage.waitForFunction(() => studentApp.activities.assignedVocabulary?.vocabs.some(v => v.name === 'Cell practice'));
-                await studentPage.evaluate(async () => {
-                    const vocab = studentApp.activities.assignedVocabulary.vocabs.find(v => v.name === 'Cell practice');
-                    await studentApp.navigateTo({ view: 'units', trimester: studentApp.activities.schedule.getVocabTrimesterKey(vocab),
-                        month: studentApp.activities.schedule.getVocabCalendarMonthKey(vocab) });
-                });
-                assert.match(studentPage.url(), /#\/units/);
-                await unitsView.getByRole('button').filter({ hasText: 'Cell practice' }).first().click();
+                const [checkedSpark] = await a.repo.publishMaterial({ classIds: [ca.id], kind: 'spark', materialId: sparkCheckMaterialId,
+                    releaseAt: new Date(Date.now() - 60000).toISOString(), publicationKey: crypto.randomUUID() });
+                await studentPage.evaluate(id => studentApp.navigateTo({ view: 'sparks', sparkId: id }), checkedSpark.id);
+                await sparkView.getByRole('radio', { name: 'Private choice', exact: true }).check();
+                await sparkView.getByRole('button', { name: 'Check answers', exact: true }).click();
+                await sparkView.getByText('1 of 1 multiple-choice answers correct.', { exact: false }).waitFor();
+                await studentPage.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), publishedVocabulary.id);
                 await studentPage.locator('#activity-menu-view').waitFor({ state: 'visible' });
                 await studentPage.waitForFunction(() => studentApp.currentVocab?.assignmentId
                     && window.location.hash.startsWith('#/unit/assignment.')

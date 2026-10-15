@@ -13,7 +13,7 @@ function element(tag, text, className) {
 
 // Session-bound student class entry point. Teacher management lives in teacherClassWorkspace.
 // No retained roster or draft data survives destroy/account replacement.
-export function createClassroomView({ root, getUserId, openVocabulary, onSchoolReady = async () => {}, repository = classroomRepository }) {
+export function createClassroomView({ root, getUserId, openVocabulary, onSchoolReady = async () => {}, repository = classroomRepository, getClassId = () => null, materialKind = null, title = 'My classes', loadingMarkup = null }) {
     let generation = 0;
     let controller;
     let destroyed = false;
@@ -47,7 +47,8 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
         cancelPreviews();
         controller?.abort(); controller = new AbortController();
         const id = ++generation, owner = getUserId();
-        root.replaceChildren(element('h1', 'My classes'), status);
+        if (loadingMarkup) { root.innerHTML = loadingMarkup(); root.dataset.classLoading = 'true'; }
+        else root.replaceChildren(element('h1', title), status);
         root.classList.add('classrooms');
         status.textContent = 'Loading classes…';
         if (!owner) { status.textContent = 'Sign in to see your classes.'; return; }
@@ -59,24 +60,17 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
                 repository.listMyClasses({ signal: controller.signal }), repository.listMyInvitations({ signal: controller.signal }), schoolRepository.listMyInvitations({ signal: controller.signal })
             ]);
             if (!current(id, owner)) return;
-            const schools = schoolContext.getAccess().schools.filter(s => s.roles.includes('student'));
-            if (schools.length && !schools.some(s => s.id === schoolContext.getSchoolId())) {
-                schoolContext.select(schools[0].id);
-                await onSchoolReady({ signal: controller.signal });
-                if (!current(id, owner)) return;
+            if (loadingMarkup) root.append(status);
+            const chooser = element('label', 'School '), select = document.createElement('select');
+            for (const school of schoolContext.getAccess().schools.filter(s => s.roles.includes('student'))) {
+                const option = element('option', school.name); option.value = school.id; select.append(option);
             }
-            if (schools.length > 1) {
-                const chooser = element('label', 'School '), select = document.createElement('select');
-                select.setAttribute('aria-label', 'School');
-                for (const school of schools) {
-                    const option = element('option', school.name); option.value = school.id; select.append(option);
-                }
-                select.value = schoolContext.getSchoolId();
-                select.addEventListener('change', () => { if (current(id, owner)) { schoolContext.select(select.value); void show(); } });
-                chooser.append(select); root.append(chooser);
-            }
+            select.value = schoolContext.getSchoolId() || '';
+            if (!select.value && select.options.length) { select.selectedIndex = 0; schoolContext.select(select.value); }
+            select.addEventListener('change', () => { if (current(id, owner)) { schoolContext.select(select.value); void show(); } });
+            chooser.append(select); root.append(chooser);
             const selectedSchool = schoolContext.getSchoolId();
-            const classes = allClasses.filter(c => c.schoolId === selectedSchool);
+            const classes = allClasses.filter(c => c.schoolId === selectedSchool && (!getClassId() || c.id === getClassId()));
             const invites = allInvites.filter(invite => invite.schoolId === selectedSchool);
             for (const invitation of schoolInvites) {
                 const card = element('article', undefined, 'card');
@@ -99,16 +93,10 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
                 root.append(card);
                 const assignments = await repository.listAssignments(c.id, { signal: controller.signal });
                 if (!current(id, owner)) return;
-                if (!assignments.length) card.append(element('p', 'No assignments are available yet.'));
-                for (const assignment of assignments) {
+                const visibleAssignments = assignments.filter(a => !materialKind || a.kind === materialKind);
+                if (!visibleAssignments.length) card.append(element('p', 'No assignments are available yet.'));
+                for (const assignment of visibleAssignments) {
                     card.append(button(assignment.title, async () => {
-                        if (!current(id, owner)) return;
-                        if (assignment.kind === 'vocabulary' && openVocabulary) {
-                            cancelPreviews();
-                            await openVocabulary(assignment.id);
-                            return;
-                        }
-                        previews.add(preview);
                         preview.controller?.abort(); preview.controller = new AbortController();
                         const signal = preview.controller.signal, request = ++preview.request;
                         const isPreviewCurrent = () => current(id, owner) && request === preview.request && !signal.aborted;
@@ -122,9 +110,9 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
                     }, false));
                 }
             }
-            if (current(id, owner)) status.textContent = '';
+            if (current(id, owner)) { root.querySelector('.student-page-skeleton')?.remove(); delete root.dataset.classLoading; status.textContent = ''; }
         } catch (error) {
-            if (current(id, owner)) status.textContent = error.message || 'Could not load classes. Please try again.';
+            if (current(id, owner)) { if (loadingMarkup) { root.replaceChildren(status); delete root.dataset.classLoading; } status.textContent = error.message || 'Could not load classes. Please try again.'; }
         }
     }
     function showMaterial(assignment, card, savedResponse, archived, isPreviewCurrent) {
@@ -132,7 +120,7 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
         const section = element('section'); section.dataset.assignmentPreview = assignment.id;
         section.append(element('h3', assignment.title));
         const content = assignment.content;
-        if (assignment.kind === 'vocabulary') {
+        if (content.kind === 'vocabulary') {
             const list = document.createElement('dl');
             for (const word of content.words || []) list.append(element('dt', word.word), element('dd', word.definition));
             section.append(list);
@@ -175,7 +163,6 @@ export function createClassroomView({ root, getUserId, openVocabulary, onSchoolR
             }
         }
         card.append(section);
-        if (isPreviewCurrent() && section.isConnected) section.scrollIntoView({ block: 'nearest' });
     }
     return { show, destroy() { destroyed = true; generation++; controller?.abort(); cancelPreviews(); root.replaceChildren(); } };
 }

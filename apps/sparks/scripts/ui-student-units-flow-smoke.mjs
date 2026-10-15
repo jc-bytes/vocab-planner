@@ -10,7 +10,7 @@ try {
     if (!process.env.UI_STUDENT_FLOW_BASE_URL) server = await ensureViteServer({ baseUrl, probePath: '/student.html', host: '127.0.0.1', port });
     browser = await chromium.launch(); const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, timezoneId: 'America/Panama' });
     const fixture = await installStudentAssignedFlowFixture(page);
-    await page.goto(`${baseUrl}/student.html#/units?trimester=other&month=october`);
+    await page.goto(`${baseUrl}/student.html#/units?trimester=IIIT&month=october`);
 
     await page.getByRole('button').filter({ hasText: fixture.detail.title }).first().waitFor({ timeout: 30000 });
     assert.ok(page.url().includes('#/units')); assert.equal(await page.getByText('No vocabularies found.', { exact: true }).count(), 0);
@@ -47,11 +47,11 @@ try {
     await racePage.waitForFunction(() => window.studentApp?.currentUser);
     for (let attempt = 0; attempt < 100 && !delayed.hasPendingRead(); attempt++) await racePage.waitForTimeout(20);
     assert.equal(delayed.hasPendingRead(), true);
-    await racePage.evaluate(() => void studentApp.navigateTo({ view: 'classes' }));
+    await racePage.evaluate(() => void studentApp.navigateTo({ view: 'arcade' }));
     delayed.releaseRead();
-    await racePage.locator('#student-classes-view:not(.hidden)').waitFor();
+    await racePage.locator('#arcade-view:not(.hidden)').waitFor();
     await racePage.waitForTimeout(100);
-    assert.ok(racePage.url().includes('#/classes'), 'An old Units load must not replace newer navigation');
+    assert.ok(racePage.url().includes('#/arcade'), 'An old Units load must not replace newer navigation');
     assert.deepEqual(delayed.errors, []);
     await racePage.close();
     const todayPage = await browser.newPage(); const today = await installStudentAssignedFlowFixture(todayPage);
@@ -62,11 +62,11 @@ try {
     await todayPage.close();
     const joinPage = await browser.newPage(); const joined = await installStudentAssignedFlowFixture(joinPage, { startEnrolled: false });
     await joinPage.goto(`${baseUrl}/student.html`);
-    await joinPage.waitForFunction(() => window.studentApp?.authInitialized && studentApp.activities.assignedVocabulary?.vocabs.length === 0);
+    await joinPage.waitForFunction(() => window.studentApp?.authInitialized && studentApp.activities.vocabularyData.classSelection?.classes.length === 0);
     await joinPage.evaluate(() => studentApp.navigateTo({ view: 'classes' }));
     await joinPage.getByRole('button', { name: 'Join class', exact: true }).click();
     await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().waitFor();
-    await joinPage.evaluate(() => studentApp.navigateTo({ view: 'units', trimester: 'other', month: 'october' }));
+    await joinPage.evaluate(() => studentApp.navigateTo({ view: 'units', trimester: 'IIIT', month: 'october' }));
     await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().waitFor({ timeout: 5000 });
     await joinPage.getByRole('button').filter({ hasText: joined.detail.title }).first().click();
     await joinPage.locator('#activity-menu-view:not(.hidden)').waitFor();

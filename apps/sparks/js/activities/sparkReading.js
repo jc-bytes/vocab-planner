@@ -67,6 +67,7 @@ export class SparkReadingActivity {
     }
 
     async init() {
+        if (globalThis.document?.nodeType === 9) await import('../../css/student-class-spark.css');
         try {
             const sparks = await this.loadEligibleSparks();
             this.sparks = sparks.length > 0 ? sparks : [this.createFallbackSpark()];

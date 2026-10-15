@@ -23,7 +23,6 @@ const [teacherQuizCss, studentFeatureCss, ...sharedStyles] = await Promise.all([
 ]);
 
 const teacherCss = await read('css/teacher.css');
-const studentProfileCss = await read('css/teacher-student-profile.css');
 
 test('shared UI foundations do not require important specificity', () => {
     for (const [index, css] of sharedStyles.entries()) {
@@ -71,8 +70,8 @@ test('lazy Flashcards and game-stage foundations do not escalate specificity', (
 });
 
 test('routed teacher student profile does not require modal specificity exceptions', () => {
-    assert.doesNotMatch(teacherCss + studentProfileCss, /#student-detail-modal/);
-    const profileRules = [...studentProfileCss.matchAll(/\.student-profile-[^{]+\{([^}]*)\}/g)];
+    assert.doesNotMatch(teacherCss, /#student-detail-modal/);
+    const profileRules = [...teacherCss.matchAll(/\.student-profile-[^{]+\{([^}]*)\}/g)];
     assert.ok(profileRules.length > 10);
     profileRules.forEach(rule => assert.doesNotMatch(rule[1], /!important/));
 });

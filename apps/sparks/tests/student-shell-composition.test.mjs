@@ -5,8 +5,7 @@ import test from 'node:test';
 const studentHtmlSource = readFileSync(new URL('../student.html', import.meta.url), 'utf8');
 const studentCssSource = readFileSync(new URL('../css/student.css', import.meta.url), 'utf8');
 const feedbackCssSource = readFileSync(new URL('../css/feedback.css', import.meta.url), 'utf8');
-const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8')
-    + readFileSync(new URL('../js/student/studentHomeRenderer.js', import.meta.url), 'utf8');
+const studentHomeSource = readFileSync(new URL('../js/student/studentActivityHomeMethods.js', import.meta.url), 'utf8');
 const studentLoadingSource = readFileSync(new URL('../js/student/studentLoadingSkeletons.js', import.meta.url), 'utf8');
 const studentSparkSource = readFileSync(new URL('../js/student/studentActivityHomeSpark.js', import.meta.url), 'utf8');
 const studentLauncherSource = readFileSync(new URL('../js/student/studentActivityLauncherMethods.js', import.meta.url), 'utf8');
@@ -207,14 +206,15 @@ test('student sections use page-shaped loading states without exposing real head
     assert.match(studentHtmlSource, /id="vocab-selection-view" class="view hidden student-page-loading" aria-busy="true"/);
     assert.match(studentHtmlSource, /id="student-sparks-view" class="view hidden student-page-loading" aria-busy="true"/);
     assert.match(studentHtmlSource, /id="arcade-view" class="view hidden student-page-loading" aria-busy="true"/);
-    assert.match(studentHtmlSource, /student-session-loader/);
+    assert.match(studentHtmlSource, /student-dashboard-loading-template/);
+    assert.doesNotMatch(studentHtmlSource, /student-session-loader-orbit/);
     assert.doesNotMatch(studentHtmlSource, /class="loading-spinner">Loading (?:vocabularies|scores)/);
     for (const kind of ['units', 'sparks', 'unit', 'activity', 'arcade', 'list']) {
-        assert.match(studentLoadingSource, new RegExp(`'${kind}'`));
+        assert.match(studentHtmlSource, new RegExp(`id="student-loading-${kind}-template"`));
     }
     assert.match(studentSparkSource, /getStudentPageSkeleton\('sparks', 'Loading Sparks'\)/);
     assert.match(studentSparkSource, /setStudentPageLoading\(view, false\)/);
-    assert.match(studentLauncherSource, /getStudentPageSkeleton\('activity', 'Loading activity'\)/);
+    assert.match(studentLauncherSource, /getStudentPageSkeleton\('activity', 'Loading activity', \{ activityType: type \}\)/);
     assert.match(studentLauncherSource, /setStudentPageLoading\(activityView, false\)/);
 });
 

@@ -40,19 +40,15 @@
                     <span id="student-mobile-section-label">Today</span>
                 </button>
                 <div id="student-tabs" class="teacher-tabs student-tabs" role="tablist" aria-label="Student tools">
-                    <button class="teacher-tab student-tab" id="student-tab-classes" type="button" role="tab"
-                        aria-selected="false" aria-controls="student-classes-view" aria-label="My classes" title="My classes" data-tooltip="My classes" data-section="classes">
-                        <i data-lucide="graduation-cap"></i><span>My classes</span>
-                    </button>
                     <button class="teacher-tab student-tab active" id="student-tab-today" type="button" role="tab"
                         aria-selected="true" aria-label="Today" title="Today" data-tooltip="Today" data-section="today">
                         <i data-lucide="layout-dashboard"></i>
                         <span>Today</span>
                     </button>
                     <button class="teacher-tab student-tab" id="student-tab-vocabulary" type="button" role="tab"
-                        aria-selected="false" aria-label="Vocabulary" title="Vocabulary" data-tooltip="Vocabulary" data-section="vocabulary">
+                        aria-selected="false" aria-label="Units" title="Units" data-tooltip="Units" data-section="vocabulary">
                         <i data-lucide="book-open"></i>
-                        <span>Vocabulary</span>
+                        <span>Units</span>
                     </button>
                     <button class="teacher-tab student-tab" id="student-tab-sparks" type="button" role="tab"
                         aria-selected="false" aria-label="Sparks" title="Sparks" data-tooltip="Sparks" data-section="sparks">
@@ -92,9 +88,22 @@
 
         <aside class="student-top-bar" aria-label="Student identity and progress">
             <div class="student-sidebar-context" role="group" aria-label="Student class context">
-                <div id="student-subject-picker" class="student-subject-picker"></div>
+                <div id="student-subject-picker" class="student-subject-picker">
+                    <label class="student-class-picker">
+                        <span class="student-class-picker-label">Class</span>
+                        <span class="subject-color-dot" aria-hidden="true"></span>
+                        <button class="student-subject-select student-subject-trigger" type="button" aria-label="Class, loading classes" disabled>
+                            <span class="student-loading-line student-loading-class-value" aria-hidden="true"></span>
+                            <span class="student-subject-chevron" aria-hidden="true"></span>
+                        </button>
+                    </label>
+                </div>
             </div>
             <div class="header-left">
+                <div class="student-topbar-skeleton" aria-hidden="true">
+                    <span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span>
+                    <span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span>
+                </div>
                 <div class="student-identity">
                     <div class="student-arcade-balance" aria-label="Available Arcade time">
                         <span class="student-arcade-balance-label">ARCADE TIME</span>
@@ -120,15 +129,186 @@
             </div>
         </aside>
 
+        <template id="student-dashboard-loading-template">                    <div class="student-dashboard-skeleton" role="status" aria-label="Loading dashboard">
+                        <div class="student-dashboard-skeleton-line student-dashboard-skeleton-title"></div>
+                        <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-hero">
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-badge"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-hero-title"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-meta"></div>
+                            <div class="student-dashboard-skeleton-progress">
+                                <div class="student-dashboard-skeleton-line"></div>
+                                <div class="student-dashboard-skeleton-line"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-button"></div>
+                        </div>
+                        <div class="student-dashboard-skeleton-lower">
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card student-dashboard-skeleton-card--spark">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                        </div>
+                    </div>
+        </template>
+<template id="student-loading-units-template">
+<div class="student-page-skeleton student-page-skeleton--units" data-loading-layout="" role="status" aria-label="Loading">
+<div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div><span class="student-loading-line student-loading-breadcrumb"></span><div class="student-loading-month-nav"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-action"></span></div><div class="student-loading-card-grid"><div class="student-loading-surface student-loading-unit-card"><div class="student-loading-unit-meta"><span class="student-loading-line student-loading-activity-icon"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-unit-progress"></span></div><div class="student-loading-surface student-loading-unit-card"><div class="student-loading-unit-meta"><span class="student-loading-line student-loading-activity-icon"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-unit-progress"></span></div><div class="student-loading-surface student-loading-unit-card"><div class="student-loading-unit-meta"><span class="student-loading-line student-loading-activity-icon"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-unit-progress"></span></div><div class="student-loading-surface student-loading-unit-card"><div class="student-loading-unit-meta"><span class="student-loading-line student-loading-activity-icon"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-unit-progress"></span></div></div>
+</div>
+</template>
+<template id="student-loading-months-template">
+<div class="student-page-skeleton student-page-skeleton--months" data-loading-layout="" role="status" aria-label="Loading">
+<div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div><span class="student-loading-line student-loading-breadcrumb"></span><div class="student-loading-month-grid"><div class="student-loading-surface student-loading-month-card"><div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-month-arrow"></span></div><div class="student-loading-surface student-loading-month-card"><div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-month-arrow"></span></div><div class="student-loading-surface student-loading-month-card"><div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-month-arrow"></span></div><div class="student-loading-surface student-loading-month-card"><div><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-chip"></span></div><span class="student-loading-line student-loading-month-arrow"></span></div></div>
+</div>
+</template>
+<template id="student-loading-rows-template">
+<div class="student-page-skeleton student-page-skeleton--rows" data-loading-layout="" role="status" aria-label="Loading">
+<div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div><span class="student-loading-line student-loading-breadcrumb"></span><div class="student-loading-month-nav"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-card-action"></span></div><div class="student-loading-table"><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div></div>
+</div>
+</template><template id="student-loading-month-rows-template">
+<div class="student-page-skeleton student-page-skeleton--month-rows" data-loading-layout="" role="status" aria-label="Loading">
+<div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div><span class="student-loading-line student-loading-breadcrumb"></span><div class="student-loading-table"><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div><div class="student-loading-table-row"><span class="student-loading-line student-loading-row-name"></span><span class="student-loading-line "></span><span class="student-loading-line "></span></div></div>
+</div>
+</template>
+<template id="student-loading-sparks-template">
+<div class="student-page-skeleton student-page-skeleton--sparks" data-loading-layout="" role="status" aria-label="Loading">
+    <div class="student-loading-spark-page-heading" aria-hidden="true"><span class="student-loading-line"></span></div>
+    <div class="student-current-class-spark" aria-hidden="true">
+        <div class="student-class-spark-heading">
+            <span class="student-loading-line student-loading-spark-context"></span>
+            <span class="student-loading-line student-loading-spark-title"></span>
+        </div>
+        <div class="student-class-spark-reading">
+            <div class="student-spark-step"><span class="student-loading-line student-loading-spark-number"></span><span class="student-loading-line student-loading-spark-step-label"></span></div>
+            <div class="student-loading-spark-passage"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+            <div class="student-loading-spark-connection"><span class="student-loading-line student-loading-spark-step-label"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+        </div>
+        <div class="student-class-spark-questions">
+            <div class="student-spark-step"><span class="student-loading-line student-loading-spark-number"></span><span class="student-loading-line student-loading-spark-step-label"></span></div>
+            <div class="student-loading-spark-passage"><span class="student-loading-line"></span><span class="student-loading-line"></span></div>
+            <div class="student-loading-spark-form"><span class="student-loading-line student-loading-spark-answer-label"></span><span class="student-loading-line student-loading-spark-answer-field"></span><span class="student-loading-line student-loading-spark-save"></span></div>
+        </div>
+    </div>
+</div>
+</template>
+<template id="student-loading-unit-template">
+        <div class="student-page-skeleton student-page-skeleton--unit" data-loading-layout="" role="status" aria-label="Loading">
+
+        <div class="student-loading-page-header">
+            <span class="student-loading-line student-loading-page-title"></span>
+            <span class="student-loading-line student-loading-page-control"></span>
+        </div>
+
+            <span class="student-loading-line student-loading-breadcrumb"></span><span class="student-loading-line student-loading-card-copy"></span><div class="student-loading-required-path"><div class="student-loading-path-step"><span class="student-loading-line student-loading-path-icon"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span></div><div class="student-loading-path-step"><span class="student-loading-line student-loading-path-icon"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span></div><div class="student-loading-path-step"><span class="student-loading-line student-loading-path-icon"></span><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-card-copy"></span></div></div><div class="student-loading-activity-grid"><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div><div class="student-loading-surface student-loading-activity-card">
+            <span class="student-loading-line student-loading-activity-icon"></span>
+            <span class="student-loading-line student-loading-card-title"></span>
+            <span class="student-loading-line student-loading-card-copy"></span>
+        </div></div>
+        </div>
+    </template>
+<template id="student-loading-activity-template">
+        <div class="student-page-skeleton student-page-skeleton--activity" data-loading-layout="" role="status" aria-label="Loading">
+
+        <div class="student-loading-page-header">
+            <span class="student-loading-line student-loading-page-title"></span>
+            <span class="student-loading-line student-loading-page-control"></span>
+        </div>
+
+            <div class="student-loading-surface student-loading-activity-stage">
+            <span class="student-loading-line student-loading-activity-prompt"></span>
+            <span class="student-loading-line student-loading-activity-focus"></span>
+            <div class="student-loading-answer-grid"><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span><span class="student-loading-line student-loading-answer"></span></div>
+            <div class="student-loading-activity-side"><span class="student-loading-line student-loading-card-title"></span><span class="student-loading-line student-loading-side-item"></span><span class="student-loading-line student-loading-side-item"></span><span class="student-loading-line student-loading-side-item"></span><span class="student-loading-line student-loading-side-item"></span></div><div class="student-loading-activity-actions">
+                <span class="student-loading-line student-loading-card-action"></span>
+                <span class="student-loading-line student-loading-card-action"></span>
+            </div>
+        </div>
+        </div>
+    </template>
+<template id="student-loading-game-template">
+<div class="student-page-skeleton student-page-skeleton--game" data-loading-layout="" role="status" aria-label="Loading">
+<div class="student-loading-surface student-loading-game-viewport"><span class="student-loading-line student-loading-game-canvas"></span></div>
+</div>
+</template>
+<template id="student-loading-arcade-template">
+<div class="student-page-skeleton student-page-skeleton--arcade" data-loading-layout="arcade" role="status" aria-label="Loading Arcade">
+    <div class="student-loading-page-header">
+        <div class="student-loading-arcade-intro"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-card-copy"></span></div>
+        <span class="student-loading-line student-loading-chip"></span>
+    </div>
+    <div class="student-loading-arcade-carousel">
+        <span class="student-loading-line student-loading-arcade-nav"></span>
+        <div class="student-loading-surface student-loading-arcade-card">
+            <span class="student-loading-line student-loading-chip student-loading-arcade-counter"></span>
+            <span class="student-loading-line student-loading-arcade-access"></span>
+            <span class="student-loading-line student-loading-arcade-art"></span>
+            <div class="student-loading-arcade-copy"><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-copy"></span></div>
+            <span class="student-loading-line student-loading-card-action"></span>
+        </div>
+        <span class="student-loading-line student-loading-arcade-nav"></span>
+    </div>
+    <span class="student-loading-line student-loading-arcade-leaderboard"></span>
+</div>
+</template>
+<template id="student-loading-scores-template"><div class="student-page-skeleton student-page-skeleton--scores" role="status" aria-label="Loading"><div class="student-loading-score-row"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div><div class="student-loading-score-row"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div><div class="student-loading-score-row"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div><div class="student-loading-score-row"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div><div class="student-loading-score-row"><span class="student-loading-line"></span><span class="student-loading-line"></span><span class="student-loading-line"></span></div></div></template>
+<template id="student-loading-list-template">
+        <div class="student-page-skeleton student-page-skeleton--list" data-loading-layout="" role="status" aria-label="Loading">
+
+            <div class="student-loading-list"><span class="student-loading-line student-loading-list-row"></span><span class="student-loading-line student-loading-list-row"></span><span class="student-loading-line student-loading-list-row"></span><span class="student-loading-line student-loading-list-row"></span></div>
+        </div>
+    </template>
         <main>
             <!-- Loading View -->
             <section id="loading-view" class="view active">
-                <div class="student-session-loader" role="status" aria-label="Loading student session">
-                    <div class="student-session-loader-orbit" aria-hidden="true">
-                        <span></span><span></span><span></span>
+                    <div class="student-dashboard-skeleton" role="status" aria-label="Loading dashboard">
+                        <div class="student-dashboard-skeleton-line student-dashboard-skeleton-title"></div>
+                        <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-hero">
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-badge"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-hero-title"></div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-meta"></div>
+                            <div class="student-dashboard-skeleton-progress">
+                                <div class="student-dashboard-skeleton-line"></div>
+                                <div class="student-dashboard-skeleton-line"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-line student-dashboard-skeleton-button"></div>
+                        </div>
+                        <div class="student-dashboard-skeleton-lower">
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                            <div class="student-dashboard-skeleton-surface student-dashboard-skeleton-card student-dashboard-skeleton-card--spark">
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-card-title"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-row"></div>
+                                <div class="student-dashboard-skeleton-line student-dashboard-skeleton-footer"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="student-session-loader-wordmark" aria-hidden="true"></div>
-                </div>
             </section>
 
             <!-- Login View -->
@@ -166,7 +346,7 @@
             </section>
 
             <!-- View: Main Menu -->
-            <section id="student-classes-view" class="view hidden" role="tabpanel" aria-labelledby="student-tab-classes"></section>
+
             <section id="main-menu-view" class="view hidden student-home-loading" aria-busy="true">
                 <div class="student-dashboard-heading" hidden>
                     <div>
@@ -325,10 +505,24 @@
             <section id="arcade-view" class="view hidden student-page-loading" aria-busy="true">
                 <!-- Game Area -->
                 <div class="arcade-container">
-                    <div class="student-page-skeleton student-page-skeleton--arcade" role="status" aria-label="Loading Arcade">
-                        <div class="student-loading-page-header"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-page-control"></span></div>
-                        <div class="student-loading-surface student-loading-arcade-card"><span class="student-loading-line student-loading-chip"></span><span class="student-loading-line student-loading-arcade-art"></span><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-action"></span></div>
-                    </div>
+                    <div class="student-page-skeleton student-page-skeleton--arcade" data-loading-layout="arcade" role="status" aria-label="Loading Arcade">
+    <div class="student-loading-page-header">
+        <div class="student-loading-arcade-intro"><span class="student-loading-line student-loading-page-title"></span><span class="student-loading-line student-loading-card-copy"></span></div>
+        <span class="student-loading-line student-loading-chip"></span>
+    </div>
+    <div class="student-loading-arcade-carousel">
+        <span class="student-loading-line student-loading-arcade-nav"></span>
+        <div class="student-loading-surface student-loading-arcade-card">
+            <span class="student-loading-line student-loading-chip student-loading-arcade-counter"></span>
+            <span class="student-loading-line student-loading-arcade-access"></span>
+            <span class="student-loading-line student-loading-arcade-art"></span>
+            <div class="student-loading-arcade-copy"><span class="student-loading-line student-loading-reading-title"></span><span class="student-loading-line student-loading-card-copy"></span><span class="student-loading-line student-loading-card-copy"></span></div>
+            <span class="student-loading-line student-loading-card-action"></span>
+        </div>
+        <span class="student-loading-line student-loading-arcade-nav"></span>
+    </div>
+    <span class="student-loading-line student-loading-arcade-leaderboard"></span>
+</div>
                     <div id="game-selection">
                         <header class="arcade-selection-intro">
                             <div>

@@ -543,7 +543,6 @@ test('a too-fast completion is durable before exit returns and retries in the ba
     let callback;
     let queued;
     let flushes = 0;
-    sm.progress.flushLocalSyncQueue = async () => { flushes++; };
     const cloud = new StudentProgressCloud({ sm });
     cloud.flushLocalSyncQueue = async () => { flushes++; };
     sm.progress.syncQueue = cloud.syncQueue;
