@@ -34,7 +34,7 @@ test('library uses Panama release dates and school calendar, retains closed Spar
 
 test('Spark headings separate recognised scheduling context without losing the series or title', () => {
  assert.deepEqual(formatClassSparkHeading('G9 T3 W04 - Explain the message risk - Words in use 2'), {
-  title: 'Explain the message risk', context: 'Grade 9 · Trimester 3 · Week 4 · Words in use 2'
+  title: 'Explain the message risk · Part 2', context: 'Grade 9 · Trimester 3 · Week 4 · Words in use 2'
  });
  assert.deepEqual(formatClassSparkHeading('G6 T1 W02 - Back-up files - Keep a copy'), {
   title: 'Back-up files - Keep a copy', context: 'Grade 6 · Trimester 1 · Week 2'
@@ -43,4 +43,11 @@ test('Spark headings separate recognised scheduling context without losing the s
   assert.deepEqual(formatClassSparkHeading(title), { title, context: '' });
  }
  assert.deepEqual(formatClassSparkHeading(''), {title:'Your Spark',context:''});
+});
+
+test('the two Words in use readings have distinct part labels in their visible titles', () => {
+ const prefix='G9 T3 W04 - Explain the message risk - Words in use';
+ assert.equal(formatClassSparkHeading(prefix+' 1').title,'Explain the message risk · Part 1');
+ assert.equal(formatClassSparkHeading(prefix+' 2').title,'Explain the message risk · Part 2');
+ assert.equal(formatClassSparkHeading(prefix).title,'Explain the message risk · Part 1');
 });
