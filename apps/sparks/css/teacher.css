@@ -4597,6 +4597,7 @@ button.activity-card {
 
     .teacher-app-header .header-actions {
         justify-self: end;
+        align-self: start;
         min-width: 0;
         width: auto;
     }
