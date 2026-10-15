@@ -1,4 +1,5 @@
 import process from 'node:process';
+import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
 import { assertNoAccessibilityViolations } from './lib/accessibility-audit.mjs';
@@ -20,7 +21,10 @@ async function resolveServer() {
         probePath: '/teacher.html',
         host,
         port,
-        external: Boolean(process.env.UI_AUTH_SMOKE_BASE_URL)
+        external: Boolean(process.env.UI_AUTH_SMOKE_BASE_URL),
+        ...(process.env.UI_AUTH_SMOKE_DIST === '1' ? {
+            args: ['vite', 'preview', '--outDir', 'dist-desktop', '--host', host, '--port', String(port), '--strictPort']
+        } : {})
     });
 }
 
@@ -121,7 +125,19 @@ try {
     trackPageProblems(teacherPage, 'teacher', problems);
     trackPageProblems(studentPage, 'student', problems);
 
+    const manifestRequests = [];
+    teacherPage.on('request', request => {
+        if (new URL(request.url()).pathname.endsWith('/vocabularies/manifest.json')) manifestRequests.push(request.url());
+    });
+    const analyticsResponse = teacherPage.waitForResponse(response =>
+        new URL(response.url()).pathname.endsWith('/rpc/get_teacher_dashboard_analytics_school_v1'));
     await loginTeacher(teacherPage);
+    const dashboardResponse = await analyticsResponse;
+    assert.equal(dashboardResponse.status(), 200, 'Dashboard analytics RPC must succeed');
+    const analytics = await dashboardResponse.json();
+    assert.ok(analytics.totalStudents >= 1, 'Fixture must exercise a nonempty roster');
+    await teacherPage.locator('#overview-total-students').filter({ hasText: String(analytics.totalStudents) }).waitFor();
+    await teacherPage.locator('#overview-recent-activity .loading-spinner').waitFor({ state: 'hidden' });
     await teacherPage.locator('#tab-vocabulary').click();
     await teacherPage.locator('#teacher-dashboard-view:not(.hidden)').waitFor({ timeout: 15000 });
     await teacherPage.locator(
@@ -142,7 +158,8 @@ try {
         throw new Error(`Browser errors during auth smoke:\n${problems.join('\n')}`);
     }
 
-    console.log('Authenticated UI smoke passed.');
+    assert.deepEqual(manifestRequests, [], 'Authenticated teacher must not request the retired public catalog');
+    console.log('Authenticated UI smoke passed, including dashboard analytics and private vocabulary loading.');
 } catch (error) {
     if (problems.length) console.error(problems.join('\n'));
     throw error;

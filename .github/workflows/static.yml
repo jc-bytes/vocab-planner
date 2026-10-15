@@ -118,6 +118,8 @@ jobs:
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
+      - name: Verify built dashboard and private vocabulary loading
+        run: UI_AUTH_SMOKE_DIST=1 npm run test:ui:auth-smoke
       - name: Verify built startup recovery
         run: STARTUP_RECOVERY_DIST=1 npm run test:ui:startup-recovery
       - name: Verify built Sparks library and display modes

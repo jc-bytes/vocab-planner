@@ -90,7 +90,7 @@ test('teacher composition omits obsolete vocabulary and progress aliases', () =>
     assert.doesNotMatch(vocabularyDataSource, /teacherLibrary(?:Cache|Promise)/);
     assert.doesNotMatch(vocabularySessionSource, /teacherLibrary(?:Cache|Promise)/);
     assert.match(vocabularyDataSource, /queryFn: \(\{ signal \}\) => this\.fetchCloudVocabs\(\{ isCurrent, signal \}\)/);
-    assert.match(vocabularyDataSource, /loadManifest\(\{ fresh: forceRefresh \}\)/);
+    assert.doesNotMatch(vocabularyDataSource, /loadManifest/);
     assert.match(vocabularyDataSource, /queryService\.(?:refresh|ensure)/);
     assert.doesNotMatch(vocabularyStorageSource, /localStorage\.setItem\('teacher_vocab_library'[\s\S]{0,120}invalidateTeacherLibraryCache/);
 });
