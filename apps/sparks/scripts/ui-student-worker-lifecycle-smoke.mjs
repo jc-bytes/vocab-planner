@@ -74,7 +74,7 @@ try {
     }
     let serving = 'A', installRequested;
     const pendingInstall = new Promise(resolve => { installRequested = resolve; });
-    const heldCode = builds.get('D').manifest['js/classroomView.js'].file;
+    const heldCode = builds.get('D').manifest['js/student/studentClassSparks.js'].file;
     server = http.createServer(async (request, response) => {
         const pathname = new URL(request.url, 'http://localhost').pathname;
         response.setHeader('Cache-Control', 'no-store');
@@ -144,7 +144,7 @@ try {
     assert.equal(await old.evaluate(() => window.auditVersion), 'A');
     const missingLegacy = await old.evaluate(async file => {
         try { await import('/' + file); return false; } catch { return true; }
-    }, builds.get('A').manifest['js/classroomView.js'].file);
+    }, builds.get('A').manifest['js/student/studentClassSparks.js'].file);
     assert.equal(missingLegacy, true, 'First upgrade cannot recover a never-cached, already removed legacy artifact');
 
     const pageB = await context.newPage();
@@ -168,8 +168,8 @@ try {
     await old.close();
     await update(pageB, 'C');
     assert.equal(await pageB.evaluate(() => window.auditVersion), 'B');
-    const oldCode = builds.get('B').manifest['js/classroomView.js'].file;
-    assert.equal(await pageB.evaluate(async file => typeof (await import('/' + file)).createClassroomView, oldCode), 'function');
+    const oldCode = builds.get('B').manifest['js/student/studentClassSparks.js'].file;
+    assert.equal(await pageB.evaluate(async file => typeof (await import('/' + file)).showStudentClassSparks, oldCode), 'function');
     await pageB.evaluate(async ({ file, name }) => {
         const cache = await caches.open(name);
         const key = (await cache.keys()).find(request => new URL(request.url).pathname === '/' + file);
@@ -179,7 +179,7 @@ try {
         await cache.put(key, new Response(await response.arrayBuffer(), { status: response.status, headers }));
     }, { file: oldCode, name: cacheFor('B') });
     await context.setOffline(true);
-    assert.equal(await pageB.evaluate(async file => typeof (await import('/' + file + '?offline-proof')).createClassroomView, oldCode), 'function', 'Retained graph code remains usable beyond runtime cache expiration');
+    assert.equal(await pageB.evaluate(async file => typeof (await import('/' + file + '?offline-proof')).showStudentClassSparks, oldCode), 'function', 'Retained graph code remains usable beyond runtime cache expiration');
     await context.setOffline(false);
     const pageC = await context.newPage();
     await pageC.goto(origin + '/student.html#/sparks');
