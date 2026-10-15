@@ -101,7 +101,7 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
       - name: Authenticated app smoke
-        run: npm run test:ui:auth-smoke
+        run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery
       - name: Firefox and WebKit focused smoke
         if: ${{ !inputs.pilot_publish }}
         run: npm run test:ui:cross-browser
@@ -118,6 +118,8 @@ jobs:
         run: npm run desktop:build:web
       - name: Smoke test built site
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
+      - name: Verify built startup recovery
+        run: STARTUP_RECOVERY_DIST=1 npm run test:ui:startup-recovery
       - name: Verify built Sparks library and display modes
         run: STUDENT_SPARK_DIST=1 npm run test:ui:student-sparks
       - name: Verify built student and teacher sign-in layouts

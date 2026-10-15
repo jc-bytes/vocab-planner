@@ -6,7 +6,6 @@ import { schoolContext } from '../services/schoolContext.js';
  */
 
 import { $, openModal } from '../main.js';
-import { notifications } from '../notifications.js';
 import { studentApi as supabaseService } from '../services/studentApi.js';
 import { requestWithTimeout } from '../services/requestReliability.js';
 import { SessionInitializationCoordinator } from '../services/sessionInitialization.js';
@@ -94,14 +93,32 @@ export class StudentAuth {
     }
 
     handleBackendSignIn(user, options = {}) {
+        if (this.sm.currentUser?.uid !== user?.uid) {
+            this.startupRecovery?.dispose();
+            this.startupRecovery = null;
+        }
         return this.sessionCoordinator.run(
             user?.uid,
-            context => this.initializeBackendSignIn(user, context),
+            async context => {
+                try {
+                    return await this.initializeBackendSignIn(user, context);
+                } catch (error) {
+                    if (context.isCurrent()) await this.showStartupRecovery(user, context, error);
+                    return false;
+                }
+            },
             options
         );
     }
 
+    async showStartupRecovery(user, context, error) {
+        return (await import('../services/startupRecovery.js')).showStudentStartupRecovery(
+            this, user, context, error, () => supabaseService.signOut()
+        );
+    }
+
     async initializeBackendSignIn(user, context) {
+        const sameUser = this.sm.currentUser?.uid === user.uid;
         const ownerChanged = getActiveStudentStorageOwner() !== user.uid;
         if (ownerChanged) {
             const previousOwner = getActiveStudentStorageOwner();
@@ -120,40 +137,17 @@ export class StudentAuth {
         localStorage.setItem('was_logged_in', 'true');
         // Restore the last verified local snapshot before making any network call.
         // This keeps the signed-in shell useful when the device starts offline.
-        this.sm.progress.loadLocalProgress({ ownerUserId: user.uid });
+        if (!sameUser || ownerChanged) this.sm.progress.loadLocalProgress({ ownerUserId: user.uid });
 
         // Update UI immediately (works offline)
         this.setAuthStatus('Signed in');
         this.updateGuestStatus(false);
 
-        // A locally cached student role is enough to paint the non-sensitive
-        // dashboard while the server revalidates the session and profile.
-        // All progress writes still require the verified backend RPCs.
-        if (localStorage.getItem(`userRole_${user.uid}`) === 'student') {
-            this.restoreCachedStudentIdentity(user);
-            this.updateHeader();
-            const initialRoute = this.sm.parseRoute?.();
-            if (!initialRoute || initialRoute.view === 'menu') {
-                this.sm.renderDashboard();
-                this.sm.switchView('main-menu-view');
-            }
-        }
-
-        // Try to fetch role and profile.
-        try {
-            if (navigator.onLine) {
-                const role = await this.fetchAndSetRole(user, context);
-                if (role === null || !context.isCurrent()) return false;
-            } else {
-                this.restoreCachedStudentIdentity(user);
-            }
-        } catch (error) {
-            if (!context.isCurrent()) return false;
-            console.error('Failed to fetch role:', error);
-            const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
-            this.sm.currentRole = cachedRole || 'student';
-            this.setAuthStatus('Signed in');
-        }
+        // Class routes need verified membership. A network error must not be
+        // memoized as a completed startup with an empty school context.
+        if (!navigator.onLine) throw Object.assign(new Error('Offline'), { code: 'OFFLINE' });
+        const role = await this.fetchAndSetRole(user, context);
+        if (role === null || !context.isCurrent()) return false;
 
         if (!context.isCurrent()) return false;
         if (this.sm.currentRole !== 'student') {
@@ -166,6 +160,8 @@ export class StudentAuth {
         }
 
         if (this.sm.mustChangePassword) {
+            this.startupRecovery?.dispose();
+            this.startupRecovery = null;
             this.sm.switchView('loading-view');
             this.showForcedPasswordChange();
             return;
@@ -173,6 +169,8 @@ export class StudentAuth {
 
         const sessionFinished = await this.finishSignedInSession(user.uid, context);
         if (sessionFinished && context.isCurrent()) {
+            this.startupRecovery?.dispose();
+            this.startupRecovery = null;
             this.sm.authInitialized = true;
         }
         return sessionFinished;
@@ -255,6 +253,8 @@ export class StudentAuth {
     }
 
     handleBackendSignOut() {
+        this.startupRecovery?.dispose();
+        this.startupRecovery = null;
         this.sm.studentSchoolUnsubscribe?.();
         this.sm.studentSchoolUnsubscribe = null;
         schoolContext.clear();
@@ -286,68 +286,37 @@ export class StudentAuth {
     }
 
     async fetchAndSetRole(user, context = null) {
-        try {
-            const profile = await requestWithTimeout(
-                signal => supabaseService.getProfile(user.uid, { signal }),
-                { timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Student profile' }
-            );
-            if (context && !context.isCurrent()) return null;
-            if (!profile) {
-                this.sm.currentRole = 'student';
-                this.sm.mustChangePassword = false;
-                this.sm.studentProfile = this.normalizeStudentProfile({
-                    firstName: user.user_metadata?.first_name || '',
-                    lastName: user.user_metadata?.last_name || '',
-                    name: user.displayName || '',
-                    email: user.email || ''
-                });
-                localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
-                return this.sm.currentRole;
-            }
-            const access = await schoolContext.load(user.uid);
-            if (context && !context.isCurrent()) return null;
-            this.sm.currentRole = access?.schools.some(school => school.roles.includes('student'))
-                ? 'student' : profile.role || 'unknown';
-            this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
+        const profile = await requestWithTimeout(
+            signal => supabaseService.getProfile(user.uid, { signal }),
+            { signal: context?.signal, timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'Student profile' }
+        );
+        if (context && !context.isCurrent()) return null;
+        const access = await requestWithTimeout(
+            signal => schoolContext.load(user.uid, { signal }),
+            { signal: context?.signal, timeoutMs: AUTH_REQUEST_TIMEOUT_MS, label: 'School access' }
+        );
+        if (context && !context.isCurrent()) return null;
+        this.sm.currentRole = access?.schools.some(school => school.roles.includes('student'))
+            ? 'student' : profile ? profile.role || 'unknown' : 'student';
+        this.sm.mustChangePassword = Boolean(profile?.mustChangePassword);
 
-            if (profile && this.sm.currentRole === 'student') {
-                this.sm.studentProfile = this.normalizeStudentProfile({
-                    firstName: profile.firstName || '',
-                    lastName: profile.lastName || '',
-                    name: profile.name || `${profile.firstName || ''} ${profile.lastName || ''}`.trim(),
-                    grade: '',
-                    group: '',
-                    email: profile.email || user.email || ''
-                });
-            }
-
-            applyStudentSchoolPlacement(this.sm);
-            localStorage.setItem(`userRole_${user.uid}`, this.sm.currentRole);
-        } catch (error) {
-            if (context && !context.isCurrent()) return null;
-            console.error('Error fetching role:', error);
-            // Try to use cached role if available
-            const cachedRole = localStorage.getItem(`userRole_${user.uid}`);
-            if (cachedRole) {
-                this.sm.currentRole = cachedRole;
-            } else {
-                this.sm.currentRole = 'student';
-            }
-            throw error;
+        if (this.sm.currentRole === 'student') {
+            const identity = profile || {
+                firstName: user.user_metadata?.first_name, lastName: user.user_metadata?.last_name,
+                name: user.displayName
+            };
+            this.sm.studentProfile = this.normalizeStudentProfile({
+                firstName: identity.firstName || '',
+                lastName: identity.lastName || '',
+                name: identity.name || '',
+                grade: '',
+                group: '',
+                email: identity.email || user.email || ''
+            });
         }
-        return this.sm.currentRole;
-    }
 
-    restoreCachedStudentIdentity(user) {
-        this.sm.currentRole = localStorage.getItem(`userRole_${user.uid}`) || 'student';
-        this.sm.mustChangePassword = false;
-        this.sm.studentProfile = this.normalizeStudentProfile({
-            ...(this.sm.studentProfile || {}),
-            firstName: this.sm.studentProfile?.firstName || user.user_metadata?.first_name || '',
-            lastName: this.sm.studentProfile?.lastName || user.user_metadata?.last_name || '',
-            name: this.sm.studentProfile?.name || user.displayName || '',
-            email: this.sm.studentProfile?.email || user.email || ''
-        });
+        applyStudentSchoolPlacement(this.sm);
+        return this.sm.currentRole;
     }
 
     updateHeader() {

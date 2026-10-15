@@ -71,8 +71,10 @@ class TeacherAuthMethods {
                         return;
                     }
                     void this.handleAuthWithRole(user, { force: event === 'USER_UPDATED' });
-                } else {
+                } else if (event === 'SIGNED_OUT' || (event === 'INITIAL_SESSION' && !this.currentUser)) {
                     restoredUserHandled = false;
+                    this.startupRecovery?.dispose();
+                    this.startupRecovery = null;
                     this.getAuthCoordinator().invalidate();
                     this.clearCurrentTeacherServerState();
                     this.disposeLoadedTeacherFeatures?.();
@@ -95,6 +97,10 @@ class TeacherAuthMethods {
     }
 
     handleAuthWithRole(user, options = {}) {
+        if (this.currentUser?.uid !== user?.uid) {
+            this.startupRecovery?.dispose();
+            this.startupRecovery = null;
+        }
         return this.getAuthCoordinator().run(
             user?.uid,
             context => this.initializeAuthWithRole(user, context),
@@ -102,12 +108,18 @@ class TeacherAuthMethods {
         );
     }
 
+    async showStartupRecovery(user, context, error) {
+        return (await import('./services/startupRecovery.js')).showTeacherStartupRecovery(this, user, context, error);
+    }
+
     async initializeAuthWithRole(user, context) {
         try {
-            const access = await this.teacherRequestWithTimeout(() => this.schoolAccess.load(user.uid || user.id), {
+            const access = await this.teacherRequestWithTimeout(signal => this.schoolAccess.load(user.uid || user.id, { signal }), {
                 signal: context.signal, timeoutMs: TEACHER_AUTH_REQUEST_TIMEOUT_MS, label: 'School access'
             });
             if (!context.isCurrent() || !access) return false;
+            this.startupRecovery?.dispose();
+            this.startupRecovery = null;
             this.currentRole = this.schoolAccess.hasRole('teacher') ? 'teacher' : 'school_member';
             this.isAuthenticated = true;
             this.currentUser = user;
@@ -156,21 +168,13 @@ class TeacherAuthMethods {
             return context.isCurrent();
         } catch (err) {
             if (!context.isCurrent()) return false;
-            console.error('Role check failed:', err);
-            this.getAuthCoordinator().invalidate();
-            this.clearCurrentTeacherServerState();
-            this.disposeLoadedTeacherFeatures?.();
-            this.clearStudentProgressSessionState?.();
-            this.clearTeacherSettingsSessionState?.();
-            this.clearTeacherVocabularySessionState?.();
+            // Access failure is not an auth sign-out. Keep identity and drafts,
+            // while blocking teaching tools until membership is verified again.
             this.isAuthenticated = false;
-            this.currentUser = null;
+            this.currentUser = user;
             this.schoolContextUnsubscribe?.();
-            this.schoolAccess.clear();
             this.currentRole = 'unknown';
-            this.updateAuthUI(null);
-            this.showAuthError('Could not verify school access.');
-            this.showLoginView();
+            await this.showStartupRecovery(user, context, err);
             return false;
         }
     }

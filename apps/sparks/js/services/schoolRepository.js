@@ -5,8 +5,11 @@ export function createSchoolRepository(getClient) {
         if (signal?.aborted) throw new DOMException('Request cancelled', 'AbortError');
         let query = client.rpc(name, args);
         if (signal) query = query.abortSignal(signal);
-        const { data, error } = await query;
-        if (error) throw error;
+        const { data, error, status } = await query;
+        if (error) {
+            if (status && !error.status) error.status = status;
+            throw error;
+        }
         return data;
     }
     return Object.freeze({

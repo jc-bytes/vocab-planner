@@ -82,3 +82,32 @@ test('member search and pagination are dispatched to the scoped server RPC', asy
  assert.equal(await repository.listMembersPage('school-a',{search:'Jane',limit:25,offset:25}),page);
  assert.deepEqual(calls,[{name:'list_school_members_page_v1',args:{p_school_id:'school-a',p_search:'Jane',p_limit:25,p_offset:25}}]);
 });
+
+
+test('a failed access read preserves the school preference without retaining capabilities', async () => {
+    const local = storage();
+    let fail = false;
+    const context = createSchoolContext({ storage: local, repository: { getAccess: async () => {
+        if (fail) throw new TypeError('Failed to fetch');
+        return { schools: [school('one'), school('two')] };
+    } } });
+    await context.load('a'); context.select('two'); fail = true;
+    await assert.rejects(context.load('a'), /Failed to fetch/);
+    assert.equal(context.getSchoolId(), null);
+    assert.equal(context.hasRole('teacher'), false);
+    assert.equal(local.getItem('sparks:school:a'), 'two');
+    fail = false; await context.load('a');
+    assert.equal(context.getSchoolId(), 'two');
+});
+
+test('cancelled access reads cannot restore capabilities even when the transport ignores abort', async () => {
+    const request = deferred();
+    const context = createSchoolContext({ repository: { getAccess: () => request.promise } });
+    const controller = new AbortController();
+    const pending = context.load('a', { signal: controller.signal });
+    controller.abort();
+    request.resolve({ schools: [school('one')] });
+    await pending;
+    assert.equal(context.getSchoolId(), null);
+    assert.equal(context.hasRole('teacher'), false);
+});

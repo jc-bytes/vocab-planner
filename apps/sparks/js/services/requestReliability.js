@@ -20,6 +20,10 @@ export async function requestWithTimeout(createRequest, options = {}) {
 
     const controller = new AbortController();
     let timedOut = false;
+    let rejectAborted;
+    const aborted = new Promise((_, reject) => { rejectAborted = reject; });
+    const onAbort = () => rejectAborted(controller.signal.reason);
+    controller.signal.addEventListener('abort', onAbort, { once: true });
     const abortFromExternal = () => controller.abort(externalSignal?.reason);
     externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
 
@@ -29,7 +33,7 @@ export async function requestWithTimeout(createRequest, options = {}) {
     }, timeoutMs);
 
     try {
-        return await createRequest(controller.signal);
+        return await Promise.race([createRequest(controller.signal), aborted]);
     } catch (error) {
         if (timedOut) {
             throw createRequestError(`${label} timed out after ${timeoutMs} ms.`, 'REQUEST_TIMEOUT', error);
@@ -40,6 +44,7 @@ export async function requestWithTimeout(createRequest, options = {}) {
         throw error;
     } finally {
         clearTimeout(timeoutId);
+        controller.signal.removeEventListener('abort', onAbort);
         externalSignal?.removeEventListener('abort', abortFromExternal);
     }
 }
