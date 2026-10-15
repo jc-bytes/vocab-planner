@@ -387,13 +387,13 @@ test('private classes enforce ownership and verified enrollment through real aut
                 await studentPage.locator('#student-tab-vocabulary').click();
                 const studentView = studentPage.locator('#vocab-selection-view');
                 await studentView.getByRole('button', { name: 'Join class' }).click();
-                await studentPage.waitForFunction(() => studentApp.activities.vocabularyData.classSelection?.classes.length > 0);
+                await studentPage.waitForFunction(() => studentApp.activities.vocabularyData.classSelection?.classes.length > 0 && document.querySelector('#vocab-selection-view')?.getAttribute('aria-busy') === 'false');
                 assert.equal((await neither.repo.listMyClasses())[0].id, ca.id);
                 const publishedVocabulary = afterPublication.find(row => row.kind === 'vocabulary' && !baseline.some(old => old.id === row.id));
                 const publishedSpark = afterPublication.find(row => row.kind === 'spark' && !baseline.some(old => old.id === row.id));
                 await studentPage.evaluate(id => studentApp.navigateTo({ view: 'unit', unitId: `assignment.${id}` }), publishedVocabulary.id);
                 await studentPage.locator('#activity-menu-view:not(.hidden)').waitFor();
-                await studentPage.waitForFunction(id => studentApp.currentVocab?.assignmentId === id && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false', publishedVocabulary.id);
+                await studentPage.waitForFunction(id => studentApp.currentVocab?.assignmentId === id && document.querySelector('#activity-menu-view')?.getAttribute('aria-busy') === 'false', publishedVocabulary.id).catch(async error => { console.error('Student route state', await studentPage.evaluate(() => ({hash:location.hash,current:studentApp.currentVocab?.assignmentId,routeReady:studentApp.routing.routeReady}))); console.error(await studentPage.locator('body').innerText()); throw error; });
                 assert.equal(await studentPage.evaluate(() => studentApp.currentVocab.words[0].word), 'Changed');
                 await studentPage.evaluate(id => studentApp.navigateTo({ view: 'sparks', sparkId: id }), publishedSpark.id);
                 const sparkView = studentPage.locator('#student-sparks-view');

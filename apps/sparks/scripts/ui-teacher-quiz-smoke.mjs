@@ -225,7 +225,11 @@ try {
         if (message.type() === 'error') problems.push(`reorder console.error: ${message.text()}`);
     });
     reorderPage.on('pageerror', error => problems.push(`reorder pageerror: ${error.message}`));
-    await reorderPage.goto(`${baseUrl}/teacher.html`, { waitUntil: 'networkidle' });
+    await reorderPage.route('**/__quiz-reorder-smoke.html', route => route.fulfill({
+        contentType: 'text/html',
+        body: '<!doctype html><html><head><link rel="stylesheet" href="/css/theme.css"><link rel="stylesheet" href="/css/teacherQuiz.css"></head><body></body></html>'
+    }));
+    await reorderPage.goto(`${baseUrl}/__quiz-reorder-smoke.html`, { waitUntil: 'load' });
     const reorderSetup = await reorderPage.evaluate(async () => {
         document.body.innerHTML = `
             <main id="quiz-reorder-smoke">
@@ -263,10 +267,11 @@ try {
         return {
             order: maker.questions.map(question => question.id),
             pages: document.querySelectorAll('#quiz-questions-list .document-page').length,
-            sortables: maker.questionSortables.length
+            sortables: maker.questionSortables.length,
+            reorderControls: document.querySelectorAll('.quiz-question-move-up').length
         };
     });
-    if (reorderSetup.pages < 2 || reorderSetup.sortables !== reorderSetup.pages) {
+    if (reorderSetup.pages < 2 || reorderSetup.sortables !== reorderSetup.pages || reorderSetup.reorderControls !== 24) {
         throw new Error(`Quiz reorder did not cover every preview page: ${JSON.stringify(reorderSetup)}`);
     }
 
