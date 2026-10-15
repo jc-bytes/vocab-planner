@@ -16,8 +16,10 @@ try {
   page.setDefaultTimeout(8000);
   // Empty, isolated test sessions exercise the real startup and rendering path.
   // These fixture credentials cannot reach a real Auth project.
-  await page.addInitScript(() => { window.SUPABASE_CONFIG = { url: 'https://auth-layout-fixture.invalid', publishableKey: 'layout-test-public-key' }; });
-  await page.route('https://auth-layout-fixture.invalid/**', route => route.abort());
+  if (!process.env.AUTH_LAYOUT_BASE_URL) {
+    await page.addInitScript(() => { window.SUPABASE_CONFIG = { url: 'https://auth-layout-fixture.invalid', publishableKey: 'layout-test-public-key' }; });
+    await page.route('https://auth-layout-fixture.invalid/**', route => route.abort());
+  }
   await mkdir(output, { recursive: true });
   for (const [role, cardSelector, passwordId] of [
     ['student', '#login-view .login-container', 'login-password'],
