@@ -557,3 +557,14 @@ test('authenticated school library never requests or mixes the retired public vo
         globalThis.fetch = originalFetch;
     }
 });
+
+test('a cloud vocabulary read failure is rejected instead of becoming an empty library', async () => {
+    const manager = initializeManager(new (createManagerClass())());
+    manager.setCloudStatus = () => {};
+    const original = vocabularyRepository.listMetadata;
+    const failure = new Error('Temporary vocabulary outage');
+    vocabularyRepository.listMetadata = async () => { throw failure; };
+    try {
+        await assert.rejects(manager.fetchCloudVocabs(), error => error === failure);
+    } finally { vocabularyRepository.listMetadata = original; }
+});

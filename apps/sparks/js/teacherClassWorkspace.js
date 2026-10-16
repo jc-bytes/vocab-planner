@@ -180,7 +180,13 @@ export function createTeacherClassWorkspace({ root, getUserId, repository = clas
                 else await renderStudents(active, id, owner, signal);
             }
             if (current(id, owner)) status.textContent = '';
-        } catch (error) { if (current(id, owner)) status.textContent = error.message || 'Could not load classes. Please try again.'; }
+        } catch (error) {
+            if (!current(id, owner)) return;
+            status.textContent = '';
+            const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+            showSectionLoadError(root, { label: 'classes', error, current: () => current(id, owner), keepContent: true, hasPreviousContent: false,
+                retry: () => show({ classId, tab }) });
+        }
     }
     function hide() { generation++; controller?.abort(); closeDialog?.(); closeDialog = null; root.replaceChildren(); }
     return { show, hide, destroy() { destroyed = true; hide(); } };

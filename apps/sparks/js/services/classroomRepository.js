@@ -1,3 +1,4 @@
+import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 
@@ -13,8 +14,7 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
         do {
             signal?.throwIfAborted();
             let query = build(client, rows.length ? undefined : { count: 'exact' }).range(rows.length, rows.length + 499);
-            if (signal) query = query.abortSignal(signal);
-            const { data, error, count } = await query;
+            const { data, error, count } = await readSectionQuery(query, { signal });
             signal?.throwIfAborted();
             if (error) throw error;
             if (count != null) total = count;
@@ -29,7 +29,9 @@ export function createClassroomRepository(getClient, getSchoolId = requireSchool
         return data;
     }
     async function rpc(name, args = {}, options = {}) {
-        return result((await getClient()).rpc(name, args), options.signal);
+        const query = (await getClient()).rpc(name, args);
+        const readOnly = /^(list_|my_|get_|read_|class_roster_|assignment_results_|assignment_student_feedback_|teacher_student_)/.test(name);
+        return result(readOnly ? readSectionQuery(query, options) : query, readOnly ? null : options.signal);
     }
     return Object.freeze({
         assignmentFeedback: (assignmentId, options) => rpc('assignment_student_feedback_v1', {

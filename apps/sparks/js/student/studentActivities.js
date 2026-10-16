@@ -296,8 +296,8 @@ export class StudentActivities {
         return this.wordHunt.handleIllustrationSave(vocabName, word, payload);
     }
 
-    renderDashboard() {
-        return this.browser.renderDashboard();
+    renderDashboard(options) {
+        return this.browser.renderDashboard(options);
     }
 
     renderVocabularyBrowser(container, vocabs = null) {
@@ -414,8 +414,8 @@ export class StudentActivities {
         return this.home.getUnitProgressSummary(vocab);
     }
 
-    renderStudentHome() {
-        return this.home.renderStudentHome();
+    renderStudentHome(options) {
+        return this.home.renderStudentHome(options);
     }
 
     renderSparkLibrary() {
@@ -546,3 +546,6 @@ export class StudentActivities {
         return this.progressPersistence.handleStateSave(stateData);
     }
 }
+
+// Keep section recovery available if connectivity drops after startup.
+void import('../ui/sectionRecovery.js').catch(() => {});

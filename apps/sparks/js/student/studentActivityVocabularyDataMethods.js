@@ -18,13 +18,13 @@ export class StudentActivityVocabularyData {
 
     }
 
-    async loadClassSelection() {
+    async loadClassSelection(options) {
         if (this.sm.authDisabled) return;
         const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
         const { StudentClassSelection } = await import('./studentClassSelection.js');
         if (!owner || owner !== (this.sm.currentUser?.uid || this.sm.currentUser?.id)) return false;
         this.classSelection ||= new StudentClassSelection(this.sm);
-        await this.classSelection.load();
+        await this.classSelection.load(options);
         await waitStudentSchoolReady(this.sm);
         return owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
     }

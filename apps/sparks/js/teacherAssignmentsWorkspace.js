@@ -135,7 +135,13 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 states.addEventListener('change', renderAssignments); renderAssignments();
             }
             if (current(id, owner)) status.textContent = '';
-        } catch (error) { if (current(id, owner)) status.textContent = error.message || 'Could not load assignments. Please try again.'; }
+        } catch (error) {
+            if (!current(id, owner)) return;
+            status.textContent = '';
+            const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+            showSectionLoadError(root, { label: 'assignments', error, current: () => current(id, owner), keepContent: true, hasPreviousContent: false,
+                retry: () => show({ ...context }) });
+        }
     }
     return { show, hide() { generation++; controller?.abort(); closeDialog(); }, destroy() { destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; statusFilter = 'all'; root.replaceChildren(); } };
 }

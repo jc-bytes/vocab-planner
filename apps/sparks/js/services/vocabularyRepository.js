@@ -1,3 +1,4 @@
+import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, timestampToIso, toClientTimestamp } from './supabaseValues.js';
@@ -58,10 +59,7 @@ export const vocabularyRepository = {
         const schoolId = requireSchoolId();
         await supabaseService.init();
         let query = supabaseService.getClient().rpc('list_vocabulary_metadata_school_v1', { p_school_id: schoolId });
-        if (options.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(options.signal);
-        }
-        const { data, error } = await query;
+        const { data, error } = await readSectionQuery(query, options);
         if (error) throw error;
         return (Array.isArray(data) ? data : []).map(mapVocabularyMetadata);
     },

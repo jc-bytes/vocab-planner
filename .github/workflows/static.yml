@@ -101,7 +101,7 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high
       - name: Authenticated app smoke
-        run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery
+        run: npm run test:ui:auth-smoke && npm run test:ui:startup-recovery && npm run test:ui:section-recovery
       - name: Firefox and WebKit focused smoke
         if: ${{ !inputs.pilot_publish }}
         run: npm run test:ui:cross-browser
@@ -120,6 +120,8 @@ jobs:
         run: UI_SMOKE_DIST_REUSE=1 npm run test:ui:smoke:dist
       - name: Verify built dashboard and private vocabulary loading
         run: UI_AUTH_SMOKE_DIST=1 npm run test:ui:auth-smoke
+      - name: Verify built section recovery
+        run: SECTION_RECOVERY_DIST=1 npm run test:ui:section-recovery
       - name: Verify built startup recovery
         run: STARTUP_RECOVERY_DIST=1 npm run test:ui:startup-recovery
       - name: Verify built Sparks library and display modes

@@ -312,9 +312,12 @@ export class StudentActivityHomeSpark {
 
     async loadAndRenderCurrentSpark(host) {
         if (!host) return;
+        const owner = this.sm.currentUser, generation = this.home.renderGeneration;
+        const current = () => host.isConnected && owner === this.sm.currentUser && generation === this.home.renderGeneration;
         try {
             this.sm.logStudentDomUpdate?.('student-spark-host', { source: 'loadAndRenderCurrentSpark:fetch' });
             const spark = await this.fetchCurrentSpark();
+            if (!current()) return;
             if (!spark?.id) {
                 this.removeSparkHomePanel(host);
                 return;
@@ -323,8 +326,10 @@ export class StudentActivityHomeSpark {
             host.replaceChildren(this.createStudentSparkCard(spark));
             this.activities.updateArcadeGateDisplay();
             refreshIcons(host);
-        } catch {
-            this.removeSparkHomePanel(host);
+        } catch (error) {
+            const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+            showSectionLoadError(host, { label: 'the current Spark', error, current, keepContent: Boolean(host.children.length),
+                retry: () => this.loadAndRenderCurrentSpark(host) });
         }
     }
 

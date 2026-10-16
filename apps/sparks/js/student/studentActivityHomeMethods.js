@@ -35,13 +35,15 @@ export class StudentActivityHome {
         };
     }
 
-    async renderStudentHome() {
+    async renderStudentHome({ forceRefresh = false } = {}) {
         const container = $('#student-home-dashboard');
         if (!container) return;
         const run = this.renderGeneration = (this.renderGeneration || 0) + 1;
         const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
-        const current = () => run === this.renderGeneration && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
-        if (this.readyOwner !== owner) { this.ready = false; this.readyOwner = owner; }
+        const selection = this.activities.vocabularyData.classSelection;
+        const selectedId = selection?.selectedId;
+        const current = () => (!selectedId || selectedId === selection?.selectedId) && run === this.renderGeneration && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id);
+        if (this.readyOwner !== owner || this.readyClass !== selectedId) { this.ready = false; this.readyOwner = owner; }
         if (!this.ready) {
             container.innerHTML = getStudentPageSkeleton('dashboard');
             $('#main-menu-view')?.classList.add('student-home-loading');
@@ -50,8 +52,14 @@ export class StudentActivityHome {
         this.sm.logStudentDomUpdate?.('student-home-dashboard', { source: 'renderStudentHome:clear' });
 
         if (!this.sm.authDisabled) {
-            try { if (await this.activities.vocabularyData.loadClassSelection() === false) return; }
-            catch { if (current()) { container.textContent = 'Could not load class units. Open Units to try again.'; $('#main-menu-view')?.classList.remove('student-home-loading'); $('#main-menu-view')?.setAttribute('aria-busy','false'); } return; }
+            try { if (await this.activities.vocabularyData.loadClassSelection({ forceRefresh }) === false) return; }
+            catch (error) {
+                const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+                showSectionLoadError(container, { label: 'today’s work', error, current, keepContent: this.ready,
+                    retry: () => this.renderStudentHome({ forceRefresh: true }) });
+                if (current()) { $('#main-menu-view')?.classList.remove('student-home-loading'); $('#main-menu-view')?.setAttribute('aria-busy','false'); }
+                return;
+            }
         }
         this.activities.vocabularyData.renderSubjectPicker('#student-subject-picker');
 
@@ -63,6 +71,7 @@ export class StudentActivityHome {
 
         if (!current()) return;
         this.ready = true;
+        this.readyClass = this.activities.vocabularyData.classSelection?.selectedId;
         const { vocabs, message } = this.activities.vocabularyData.getVisibleVocabularyList({
             availableOnly: true,
             currentTrimesterOnly: true

@@ -88,6 +88,7 @@ function sparkCard(item, data, status, date, onClick) {
 }
 
 export async function renderClassSparkLibrary(root, { items, route, navigate, repository, signal, current, viewMode = 'cards' }) {
+    let incomplete = false;
     const rows = viewMode === 'rows';
     const makeChoice = (...args) => choice(...args, rows);
     const nav = sparkBreadcrumb(route, navigate);
@@ -131,6 +132,7 @@ export async function renderClassSparkLibrary(root, { items, route, navigate, re
             return { detail, saved:responses[0] };
         }));
         if (!current()) return;
+        incomplete = results.find(result => result.status === 'rejected')?.reason || false;
         for (const [index, item] of group.entries()) {
             const result = results[index];
             const data = result.status === 'fulfilled' ? result.value : null;
@@ -144,4 +146,5 @@ export async function renderClassSparkLibrary(root, { items, route, navigate, re
     }
     if (!grid.querySelector('button')) grid.append(node('p', 'No released Sparks are available here yet.', 'teacher-empty-state'));
     refreshIcons(grid);
+    return incomplete;
 }

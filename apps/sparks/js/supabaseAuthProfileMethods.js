@@ -1,3 +1,4 @@
+import { readSectionQuery } from './services/sectionRead.js';
 import { requireSchoolId } from './services/schoolScope.js';
 import { createSupabaseClient, isSupabaseConfigured } from './services/supabaseClient.js';
 import {
@@ -223,12 +224,12 @@ export function installSupabaseAuthProfileMethods(supabaseService) {
         };
     },
 
-    async getTeacherDashboardAnalytics({ grade = null } = {}) {
+    async getTeacherDashboardAnalytics({ grade = null, signal } = {}) {
         const schoolId = requireSchoolId();
         await this.init();
-        const { data, error } = await this.client.rpc('get_teacher_dashboard_analytics_school_v1', { p_school_id: schoolId,
+        const { data, error } = await readSectionQuery(this.client.rpc('get_teacher_dashboard_analytics_school_v1', { p_school_id: schoolId,
             p_grade: grade === null || grade === '' ? null : Number.parseInt(grade, 10)
-        });
+        }), { signal });
         if (error) throw error;
         const analytics = Array.isArray(data) ? data[0] : data;
         return {

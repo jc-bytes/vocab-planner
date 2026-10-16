@@ -1,3 +1,4 @@
+import { schoolSessionKey } from '../services/schoolScope.js';
 import { $ } from '../main.js';
 import { getVocabSubjectSlug } from '../services/vocabularyApi.js';
 import { serverStateQuery } from '../services/serverStateQuery.js';
@@ -150,7 +151,9 @@ dedupeTeacherVocabularyItems(items = []) {
     },
 
 async loadLibrary(options = {}) {
-        const isCurrent = this.createTeacherVocabularyOperationGuard(options);
+        const guard = this.createTeacherVocabularyOperationGuard(options);
+        const run = this.vocabularyReadGeneration = (this.vocabularyReadGeneration || 0) + 1;
+        const isCurrent = () => guard() && run === this.vocabularyReadGeneration;
         const list = $('#library-list');
         if (!list || !isCurrent()) return;
 
@@ -159,7 +162,10 @@ async loadLibrary(options = {}) {
             return;
         }
 
-        showLoadingState(list, 'Loading library...');
+        const scope = schoolSessionKey(this.currentUser?.uid || this.currentUser?.id);
+        const keepContent = this.vocabularyLoadedScope === scope;
+        if (!keepContent) showLoadingState(list, 'Loading library...');
+        list.setAttribute('aria-busy', 'true');
 
         try {
             const { cloudVocabs, remoteVocabs, localVocabs, items, stale } = await this.getTeacherLibrary({
@@ -167,6 +173,7 @@ async loadLibrary(options = {}) {
             });
             if (!isCurrent() || stale) return;
 
+            this.vocabularyLoadedScope = scope;
             list.innerHTML = '';
 
             if (cloudVocabs.length === 0 && remoteVocabs.length === 0 && localVocabs.length === 0) {
@@ -179,8 +186,11 @@ async loadLibrary(options = {}) {
             this.refreshIcons();
         } catch (error) {
             if (!isCurrent()) return;
-            console.error('Failed to load vocabularies:', error);
-            list.innerHTML = '<p>Failed to load vocabulary list.</p>';
+            const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+            showSectionLoadError(list, { label: 'the vocabulary library', error, current: isCurrent, keepContent,
+                retry: () => this.loadLibrary({ forceRefresh: true }) });
+        } finally {
+            if (isCurrent()) list.removeAttribute('aria-busy');
         }
     },
 

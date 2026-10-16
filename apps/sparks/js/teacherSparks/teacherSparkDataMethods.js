@@ -1,3 +1,4 @@
+import { schoolSessionKey } from '../services/schoolScope.js';
 import { getPanamaDateValue } from '../services/dateUtils.js';
 import { DEFAULT_SUBJECT_SLUG } from '../services/vocabularyApi.js';
 import { SPARK_CHECK_MODES } from '../sparkCheckModel.js';
@@ -76,7 +77,10 @@ async showSparksView() {
         if (!list) return;
 
         const generation = ++this.weeklySparkLoadGeneration;
-        if (!this.weeklySparkItems.length) {
+        const scope = schoolSessionKey(getWeeklySparkAccountId(this));
+        const current = () => generation === this.weeklySparkLoadGeneration && scope === schoolSessionKey(getWeeklySparkAccountId(this));
+        const keepContent = this.weeklySparkLoadedScope === scope;
+        if (!keepContent) {
             list.innerHTML = '<div class="loading-spinner">Loading Sparks...</div>';
         } else {
             list.setAttribute('aria-busy', 'true');
@@ -84,16 +88,17 @@ async showSparksView() {
 
         try {
             const sparks = await this.getWeeklySparks({ forceRefresh });
-            if (generation !== this.weeklySparkLoadGeneration) return;
+            if (!current()) return;
+            this.weeklySparkLoadedScope = scope;
             this.weeklySparkItems = sparks;
             this.renderSparkLibrary();
         } catch (error) {
-            if (generation !== this.weeklySparkLoadGeneration) return;
-            console.error('Failed to load Sparks:', error);
-            list.innerHTML = '<p class="teacher-empty-state">Could not load Sparks.</p>';
-            this.feedback.warning('Could not load Sparks.');
+            if (!current()) return;
+            const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+            showSectionLoadError(list, { label: 'the Spark library', error, current, keepContent,
+                retry: () => this.loadWeeklySparks({ forceRefresh: true }) });
         } finally {
-            if (generation === this.weeklySparkLoadGeneration) {
+            if (current()) {
                 list.removeAttribute('aria-busy');
                 this.refreshIcons();
             }

@@ -1,3 +1,4 @@
+import { schoolContext } from './services/schoolContext.js';
 import { DEFAULT_SUBJECT_SLUG } from './services/vocabularyApi.js';
 import { serverStateQuery } from './services/serverStateQuery.js';
 
@@ -19,9 +20,10 @@ function getOwnerId(owner) {
 
 export function createTeacherVocabularyOperationGuard(owner, options = {}) {
     const generation = owner.teacherVocabularySessionGeneration || 0;
+    const schoolGeneration = schoolContext.getGeneration();
     const ownerId = getOwnerId(owner);
     const externalGuard = typeof options.isCurrent === 'function' ? options.isCurrent : () => true;
-    return () => generation === (owner.teacherVocabularySessionGeneration || 0)
+    return () => schoolGeneration === schoolContext.getGeneration() && generation === (owner.teacherVocabularySessionGeneration || 0)
         && ownerId === getOwnerId(owner)
         && externalGuard();
 }

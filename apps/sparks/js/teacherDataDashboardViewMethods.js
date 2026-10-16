@@ -39,20 +39,25 @@ const teacherDataDashboardViewMethods = {
         ]);
         const results = await settingsLoad;
         if (this.destroyed || lifecycleGeneration !== this.lifecycleGeneration) return false;
-        [
+        await Promise.all([
             { label: 'subjects', statusId: '#subjects-save-status' },
             { label: 'coin settings', statusId: '#gamification-save-status' },
             { label: 'school calendar', statusId: '#school-calendar-save-status' }
-        ].forEach((section, index) => {
+        ].map(async (section, index) => {
             const result = results[index];
             if (result.status !== 'rejected') return;
             console.error(`Unable to load ${section.label}:`, result.reason);
             const status = $(section.statusId);
             if (status) {
                 status.style.color = 'var(--danger-color)';
-                status.textContent = `Could not load ${section.label}. Try reopening this view.`;
+                const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+                showSectionLoadError(status, { label: section.label, error: result.reason, current: isCurrent,
+                    retry: async () => {
+                        await this[['loadSubjectSettings', 'loadGamificationSettings', 'loadSchoolCalendarSettings'][index]]({ surfaceErrors: true, isCurrent });
+                        if (isCurrent()) status.replaceChildren();
+                    } });
             }
-        });
+        }));
         return true;
     },
 
