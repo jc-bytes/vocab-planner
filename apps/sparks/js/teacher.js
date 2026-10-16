@@ -1,7 +1,6 @@
 import { getDefaultSchoolCalendar } from './services/vocabularyApi.js';
 import { serverStateQuery } from './services/serverStateQuery.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
-import { installTeacherOverviewMethods } from './teacherOverview.js';
 import { installTeacherLazyFeatureMethods } from './teacherLazyFeatures.js';
 import { installTeacherRoutingMethods } from './teacherRouting.js';
 import { installTeacherSettingsMethods } from './teacherSettings.js';
@@ -82,7 +81,22 @@ class TeacherManager {
 }
 
 installTeacherAuthMethods(TeacherManager);
-installTeacherOverviewMethods(TeacherManager);
+// Home reads have one entry point. Keep their implementation out of the shell
+// while preserving account/navigation guards during the module download.
+TeacherManager.prototype.loadTeacherOverview = async function (options = {}) {
+    const navigation = this.captureTeacherNavigation();
+    const current = () => this.isTeacherNavigationCurrent(navigation);
+    try {
+        const { installTeacherOverviewMethods } = await import('./teacherOverview.js');
+        if (!current()) return;
+        installTeacherOverviewMethods(TeacherManager);
+        return await this.loadTeacherOverview(options);
+    } catch (error) {
+        const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+        showSectionLoadError(document.getElementById('overview-recent-activity'), { label: 'Home', error, current,
+            retry: () => this.loadTeacherOverview(options) });
+    }
+};
 installTeacherLazyFeatureMethods(TeacherManager);
 installTeacherRoutingMethods(TeacherManager);
 installTeacherSettingsMethods(TeacherManager);
