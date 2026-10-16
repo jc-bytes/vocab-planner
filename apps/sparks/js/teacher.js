@@ -1,3 +1,4 @@
+import { requestWithTimeout } from './services/requestReliability.js';
 import { getDefaultSchoolCalendar } from './services/vocabularyApi.js';
 import { serverStateQuery } from './services/serverStateQuery.js';
 import { DEV_AUTH_DISABLED, DEV_TEACHER_USER, installTeacherAuthMethods } from './teacherAuth.js';
@@ -87,7 +88,7 @@ TeacherManager.prototype.loadTeacherOverview = async function (options = {}) {
     const navigation = this.captureTeacherNavigation();
     const current = () => this.isTeacherNavigationCurrent(navigation);
     try {
-        const { installTeacherOverviewMethods } = await import('./teacherOverview.js');
+        const { installTeacherOverviewMethods } = await requestWithTimeout(() => import('./teacherOverview.js'), { label: 'Loading Home' });
         if (!current()) return;
         installTeacherOverviewMethods(TeacherManager);
         return await this.loadTeacherOverview(options);

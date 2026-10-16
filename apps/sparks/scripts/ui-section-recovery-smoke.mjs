@@ -44,6 +44,12 @@ try {
                 await route.fulfill({ status: 503, json: { message: 'Controlled section outage' } });
             } else await route.continue();
         });
+        let holdHomeModule = role === 'teacher';
+        const heldHomeModules = [];
+        await context.route(url => /\/teacherOverview(?:-[\w-]+)?\.js$/.test(url.pathname), async route => {
+            if (holdHomeModule) await new Promise(resolve => heldHomeModules.push(resolve));
+            await route.continue().catch(() => {});
+        });
         const page = await context.newPage();
         page.on('pageerror', error => pageErrors.push(error.message));
         await page.clock.setFixedTime(new Date('2026-08-24T15:00:00Z'));
@@ -102,6 +108,12 @@ try {
             await sparkRecovery.getByRole('button',{name:'Try again',exact:true}).click();
             await sparkRecovery.waitFor({state:'detached'});
         } else {
+            const moduleRecovery = page.locator('#overview-recent-activity [data-section-recovery]');
+            await moduleRecovery.waitFor({timeout:15000});
+            holdHomeModule = false;
+            heldHomeModules.splice(0).forEach(resolve => resolve());
+            await moduleRecovery.getByRole('button',{name:'Try again',exact:true}).click();
+            await moduleRecovery.waitFor({state:'detached'});
             await page.locator('#overview-total-students').filter({hasText:'1'}).waitFor();
             unavailable = true;
             await page.evaluate(() => window.teacherApp.loadTeacherOverview({forceRefresh:true}));
