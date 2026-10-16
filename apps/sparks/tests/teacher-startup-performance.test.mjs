@@ -17,5 +17,5 @@ test('teacher session loads independent settings in parallel', () => {
 test('overview analytics starts without an artificial idle delay', () => {
     assert.doesNotMatch(teacherOverview, /requestIdleCallback/);
     assert.doesNotMatch(teacherOverview, /setTimeout\(load,\s*1200\)/);
-    assert.match(teacherOverview, /void load\(\)/);
+    assert.match(teacherOverview, /return load\(\)/);
 });

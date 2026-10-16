@@ -210,7 +210,13 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
                 for (const event of audit) events.append(element('p', `${event.created_at || ''} · ${event.action || ''} · ${event.target_user_id || event.target_id || ''}`));
                 content.append(events);
             }
-        } catch (error) { if (current(run, account, schoolId)) status.textContent = error.message || 'Could not load school administration.'; }
+        } catch (error) {
+            if (!current(run, account, schoolId)) return;
+            status.textContent = '';
+            const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+            showSectionLoadError(content, { label: 'school administration', error, current: () => current(run, account, schoolId),
+                keepContent: true, retry: () => show() });
+        }
     }
     return Object.freeze({ show, destroy() { destroyed = true; generation++; controller?.abort(); unsubscribe(); root.replaceChildren(); } });
 }

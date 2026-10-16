@@ -19,6 +19,7 @@ export class StudentClassSelection {
         this.generation++;
         this.controller?.abort();
         this.owner = null;
+        this.hasSnapshot = false;
         this.loadedAt = 0;
         this.classes = [];
         this.vocabs = [];
@@ -45,26 +46,44 @@ export class StudentClassSelection {
                 this.repository === classroomRepository ? schoolRepository.listMyInvitations({ signal }) : []
             ]);
             if (!current()) return;
-            this.classes = classes;
-            this.invitations = invitations;
-            this.schoolInvitations = schoolInvitations;
-            this.selectedId = classes.some(c => c.id === this.selectedId) ? this.selectedId : classes[0]?.id || null;
-            const selected = classes.find(c => c.id === this.selectedId);
-            this.vocabs = [];
-            if (!selected) return;
-            if (selected.schoolId && schoolContext.getSchoolId() !== selected.schoolId) schoolContext.select(selected.schoolId);
-            const assignments = await this.repository.listAssignments(selected.id, { signal });
-            const available = assignments.filter(a => a.kind === 'vocabulary' && !a.withdrawn && new Date(a.release_at) <= new Date());
-            const vocabs = await Promise.all(available.map(async a => assignmentVocabulary(await this.repository.readAssignment(a.id, { signal }))));
-            if (current()) { this.vocabs = vocabs; this.loadedAt = Date.now(); }
+            const selectedId = classes.some(c => c.id === this.selectedId) ? this.selectedId : classes[0]?.id || null;
+            const selected = classes.find(c => c.id === selectedId);
+            let vocabs = [];
+            if (selected) {
+                if (selected.schoolId && schoolContext.getSchoolId() !== selected.schoolId) schoolContext.select(selected.schoolId);
+                const assignments = await this.repository.listAssignments(selected.id, { signal });
+                const available = assignments.filter(a => a.kind === 'vocabulary' && !a.withdrawn && new Date(a.release_at) <= new Date());
+                vocabs = await Promise.all(available.map(async a => assignmentVocabulary(await this.repository.readAssignment(a.id, { signal }))));
+            }
+            // Commit a complete snapshot, including a confirmed empty result.
+            if (current()) {
+                this.classes = classes;
+                this.invitations = invitations;
+                this.schoolInvitations = schoolInvitations;
+                this.selectedId = selectedId;
+                this.vocabs = vocabs;
+                this.hasSnapshot = true;
+                this.snapshotClassId = selectedId;
+                this.loadedAt = Date.now();
+            }
         })();
-        try { await this.pending; }
+        try { await this.pending; if (!current()) return false; }
+        catch (error) {
+            if (!current()) return false;
+            if ([401, 403].includes(Number(error?.status)) || error?.code === '42501') {
+                this.classes = []; this.vocabs = []; this.loadedAt = 0; this.hasSnapshot = false;
+            }
+            throw error;
+        }
         finally { if (current()) this.pending = null; }
     }
     select(id) {
         if (!this.classes.some(c => c.id === id)) return;
+        this.generation++;
+        this.controller?.abort();
         this.loadedAt = 0;
         this.selectedId = id;
+        this.hasSnapshot = false;
         this.vocabs = [];
         this.pending = null;
         this.sm.resetStudentVocabularyDrilldown();

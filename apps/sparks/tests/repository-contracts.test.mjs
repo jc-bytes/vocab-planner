@@ -208,14 +208,14 @@ test('navigable teacher repository reads forward cancellation signals', async ()
     await withFakeClient({
         from(table) { sparkCalls.push(['from', table]); return sparkBuilder; }
     }, () => sparksRepository.list({ signal }));
-    assert.ok(sparkCalls.some(call => call[0] === 'abortSignal' && call[1] === signal));
+    assert.ok(sparkCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal));
 
     const vocabularyCalls = [];
     const vocabularyBuilder = createReadBuilder({ data: [], error: null }, vocabularyCalls);
     await withFakeClient({
         rpc(name) { vocabularyCalls.push(['rpc', name]); return vocabularyBuilder; }
     }, () => vocabularyRepository.listMetadata({ signal }));
-    assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] === signal));
+    assert.ok(vocabularyCalls.some(call => call[0] === 'abortSignal' && call[1] instanceof AbortSignal));
 });
 
 test('student Spark response reads are scoped to the requested Spark ids', async () => {

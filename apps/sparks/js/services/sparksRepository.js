@@ -1,3 +1,4 @@
+import { readSectionQuery } from './sectionRead.js';
 import { requireSchoolId } from './schoolScope.js';
 import { supabaseService } from '../supabaseService.js';
 import { cleanUndefined, normalizeTextArray, timestampToIso, toClientTimestamp } from './supabaseValues.js';
@@ -45,10 +46,7 @@ export const sparksRepository = {
         const schoolId = requireSchoolId();
         await supabaseService.init();
         let query = supabaseService.getClient().from('weekly_sparks').select('*').eq('school_id', schoolId);
-        if (options.signal && typeof query.abortSignal === 'function') {
-            query = query.abortSignal(options.signal);
-        }
-        const { data, error } = await query;
+        const { data, error } = await readSectionQuery(query, options);
         if (error) throw error;
         return (data || []).map(mapSparkRow);
     },

@@ -38,7 +38,8 @@ test('assignments beyond 1000 survive a lower server cap, tie ordering and captu
     for (const call of f.calls) {
         assert.deepEqual(call.filters, [['school_id', 'school-a']]);
         assert.deepEqual(call.orders, [['release_at', false], ['id', false]]);
-        assert.equal(call.signal, f.controller.signal);
+        assert.ok(call.signal instanceof AbortSignal);
+        assert.equal(call.signal.aborted, false);
     }
     assert.equal(f.calls.filter(call => call.count === 'exact').length, 1);
 });

@@ -14,23 +14,32 @@ export class StudentActivityBrowser {
         this.navigation = new StudentActivityBrowserNavigation(this);
     }
 
-    async renderDashboard() {
+    async renderDashboard({ forceRefresh = false } = {}) {
         const route = globalThis.location?.hash;
         const owner = this.sm.currentUser?.uid || this.sm.currentUser?.id;
+        const selection = this.vocabularyData.classSelection;
+        const run = this.renderGeneration = (this.renderGeneration || 0) + 1;
+        const selectedId = selection?.selectedId;
+        const current = () => run === this.renderGeneration && route === globalThis.location?.hash
+            && owner === (this.sm.currentUser?.uid || this.sm.currentUser?.id)
+            && (!selectedId || selectedId === selection?.selectedId);
         const container = $('#vocab-list');
         const view = $('#vocab-selection-view');
         if (!container) return;
-        if (!this.vocabularyData.classSelection?.loadedAt && !this.sm.authDisabled) {
+        if (!selection?.hasSnapshot && !this.sm.authDisabled) {
             setStudentPageLoading(view, true);
             container.classList.remove('vocab-grid', 'vocab-groups');
             container.classList.add('teacher-library-browser');
             container.innerHTML = getStudentPageSkeleton(this.getStudentVocabularyViewMode() === 'rows' ? (this.sm.studentVocabularyDrilldown?.month ? 'rows' : 'month-rows') : this.sm.studentVocabularyDrilldown?.month ? 'units' : 'months', 'Loading vocabulary units');
         }
         if (!this.sm.authDisabled) {
-            try { if (await this.vocabularyData.loadClassSelection() === false) return; }
+            try { if (await this.vocabularyData.loadClassSelection({ forceRefresh }) === false) return; }
             catch (error) {
-                container.textContent = error.message || 'Could not load class units. Please try again.';
-                setStudentPageLoading(view, false);
+                const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+                showSectionLoadError(container, { label: 'class units', error, current,
+                    keepContent: Boolean(selection?.hasSnapshot && selection.owner === owner),
+                    retry: () => this.renderDashboard({ forceRefresh: true }) });
+                if (current()) setStudentPageLoading(view, false);
                 return;
             }
         }

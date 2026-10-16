@@ -256,11 +256,13 @@ function installLazyMethod(TeacherManager, methodName, featureName) {
             if (typeof installedMethod !== 'function') {
                 throw new Error(`${featureName} did not install ${methodName}.`);
             }
-            return installedMethod.apply(context, args);
+            return await installedMethod.apply(context, args);
         } catch (error) {
             if (navigation && !this.isTeacherNavigationCurrent(navigation)) return undefined;
             console.error(`Could not load teacher feature ${featureName}:`, error);
-            notifications.error('That teacher tool could not load. Please try again.');
+            const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+            showSectionLoadError(document.querySelector('.view.active'), { label: 'this teacher tool', error, keepContent: true,
+                current: () => !navigation || this.isTeacherNavigationCurrent(navigation), retry: () => lazyFeatureMethod.apply(this, args) });
             return undefined;
         }
     }
@@ -317,3 +319,6 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
         }
     });
 }
+
+// Keep section recovery available if connectivity drops after startup.
+void import('./ui/sectionRecovery.js').catch(() => {});

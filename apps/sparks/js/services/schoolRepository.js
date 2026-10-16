@@ -1,11 +1,13 @@
+import { readSectionQuery } from './sectionRead.js';
 // Every operation is authorized by the server. UI roles are never credentials.
 export function createSchoolRepository(getClient) {
     async function rpc(name, args = {}, { signal } = {}) {
         const client = await getClient();
         if (signal?.aborted) throw new DOMException('Request cancelled', 'AbortError');
         let query = client.rpc(name, args);
-        if (signal) query = query.abortSignal(signal);
-        const { data, error, status } = await query;
+        const readOnly = /^(list_|my_|get_)/.test(name);
+        if (!readOnly && signal) query = query.abortSignal(signal);
+        const { data, error, status } = await (readOnly ? readSectionQuery(query, { signal }) : query);
         if (error) {
             if (status && !error.status) error.status = status;
             throw error;

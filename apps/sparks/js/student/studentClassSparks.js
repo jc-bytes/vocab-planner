@@ -1,3 +1,4 @@
+import { schoolContext } from '../services/schoolContext.js';
 import '../../css/student-class-spark.css';
 import { getReleasedClassSparks, formatClassSparkHeading, getAutomaticClassSparkLocation } from './studentClassSparkModel.js';
 import { renderClassSparkLibrary, sparkBreadcrumb, renderSparkViewToggle } from './studentClassSparkLibrary.js';
@@ -31,6 +32,9 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
     }, Boolean(route.sparkId));
     const owner = sm.currentUser?.uid || sm.currentUser?.id;
     const generation = routing.gamesGeneration;
+    let school = schoolContext.getGeneration();
+    const selectedClass = sm.activities.vocabularyData.classSelection?.selectedId;
+    const scope = JSON.stringify([owner, selectedClass, route, routing.sparkViewMode]);
     const request = routing.sparkReadGeneration = (routing.sparkReadGeneration || 0) + 1;
     routing.sparkReadController?.abort();
     const controller = routing.sparkReadController = new AbortController();
@@ -40,7 +44,7 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
     const repository = routing.sparkRepository || classroomRepository;
     let classId;
     const current = () => !signal.aborted && request === routing.sparkReadGeneration
-        && generation === routing.gamesGeneration && owner === (sm.currentUser?.uid || sm.currentUser?.id)
+        && generation === routing.gamesGeneration && school === schoolContext.getGeneration() && owner === (sm.currentUser?.uid || sm.currentUser?.id)
         && sm.parseRoute()?.view === 'sparks'
         && ['all','trimester','month','sparkId'].every(key => (sm.parseRoute()?.[key] || null) === (route[key] || null))
         && (!classId || classId === sm.activities.vocabularyData.classSelection?.selectedId);
@@ -52,9 +56,12 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
     root.classList.remove('classrooms');
     delete root.dataset.classLoading;
     setStudentPageLoading(view, true);
-    root.innerHTML = getStudentPageSkeleton(route.sparkId ? 'sparks' : route.month ? 'units' : 'months', 'Loading Sparks');
+    const keepContent = !route.sparkId && root.dataset.loadedScope === scope;
+    let showLoadedContent = keepContent;
+    if (!keepContent) root.innerHTML = getStudentPageSkeleton(route.sparkId ? 'sparks' : route.month ? 'units' : 'months', 'Loading Sparks');
     try {
-        await sm.activities.vocabularyData.loadClassSelection();
+        if (await sm.activities.vocabularyData.loadClassSelection() === false) return;
+        school = schoolContext.getGeneration();
         if (!current()) return;
         const selection = sm.activities.vocabularyData.classSelection;
         classId = selection.selectedId;
@@ -74,7 +81,12 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
         }
         const navigate = next => sm.navigateTo(next);
         if (!route.sparkId) {
-            await renderClassSparkLibrary(root, {items, route, navigate, repository, signal, current, viewMode:routing.sparkViewMode});
+            const staged = document.createElement('div');
+            const incomplete = await renderClassSparkLibrary(staged, {items, route, navigate, repository, signal, current, viewMode:routing.sparkViewMode});
+            if (!current()) return;
+            if (!incomplete || !keepContent) root.replaceChildren(...staged.childNodes);
+            if (incomplete) { showLoadedContent = true; throw incomplete; }
+            root.dataset.loadedScope = JSON.stringify([owner, classId, route, routing.sparkViewMode]);
             return;
         }
         const selectedSpark = items.find(item => item.id === route.sparkId);
@@ -137,6 +149,11 @@ export async function showStudentClassSparks(routing, route = routing.sm.parseRo
         }
         const location = {trimester:selectedSpark.trimester,month:selectedSpark.month,sparkId:selectedSpark.id};
         card.append(introduction, reading, response); root.replaceChildren(sparkBreadcrumb(location, navigate), card);
-    } catch (error) { if (current()) showMessage(error.message || 'Could not load Sparks. Please try again.'); }
+    } catch (error) {
+        if (!current()) return;
+        const { showSectionLoadError } = await import('../ui/sectionRecovery.js');
+        showSectionLoadError(root, { label: 'Sparks', error, current, keepContent: showLoadedContent,
+            retry: () => showStudentClassSparks(routing, sm.parseRoute()) });
+    }
     finally { if (current()) setStudentPageLoading(view, false); }
 }

@@ -206,3 +206,8 @@
 .inline-status--accent-success[data-state="success"] {
     color: var(--color-accent);
 }
+
+/* Recovery spans the list when older cards remain visible. */
+.section-load-error {
+    grid-column: 1 / -1;
+}

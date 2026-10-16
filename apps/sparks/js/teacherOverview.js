@@ -15,12 +15,12 @@ function getTeacherAccountId(owner) {
 
 export function installTeacherOverviewMethods(TeacherManager) {
     Object.assign(TeacherManager.prototype, {
-        async loadTeacherOverview() {
+        async loadTeacherOverview(options = {}) {
             if (!this.ensureAuthenticated(false)) return;
             this.renderOverviewLoadingState();
-            this.loadOverviewVocabCount();
+            void this.loadOverviewVocabCount(options);
 
-            this.scheduleOverviewStudentDataLoad();
+            return this.scheduleOverviewStudentDataLoad(options);
         },
 
         renderOverviewLoadingState() {
@@ -34,34 +34,36 @@ export function installTeacherOverviewMethods(TeacherManager) {
             }
         },
 
-        scheduleOverviewStudentDataLoad() {
+        scheduleOverviewStudentDataLoad({ forceRefresh = false } = {}) {
             const accountId = getTeacherAccountId(this);
             const generation = this.teacherSettingsSessionGeneration || 0;
+            const scope = this.getTeacherNavigationOwnerId?.();
+            const run = this.overviewReadGeneration = (this.overviewReadGeneration || 0) + 1;
+            const current = () => run === this.overviewReadGeneration && accountId === getTeacherAccountId(this)
+                && scope === this.getTeacherNavigationOwnerId?.() && generation === (this.teacherSettingsSessionGeneration || 0);
 
             const load = async () => {
                 try {
-                    const analytics = await serverStateQuery.ensure({
+                    const analytics = await serverStateQuery[forceRefresh ? 'refresh' : 'ensure']({
                         accountId,
                         key: OVERVIEW_QUERY_KEY,
                         staleTime: OVERVIEW_STALE_TIME_MS,
                         queryFn: () => supabaseService.getTeacherDashboardAnalytics()
                     });
-                    if (generation !== (this.teacherSettingsSessionGeneration || 0)
-                        || accountId !== getTeacherAccountId(this)) return;
+                    if (!current()) return;
                     this.overviewAnalytics = analytics;
                     if (this.getSectionForView(OVERVIEW_PAGE.viewId) === OVERVIEW_PAGE.id && !$(`#${OVERVIEW_PAGE.viewId}`)?.classList.contains('hidden')) {
                         this.renderOverviewStats();
                         this.renderOverviewRecentActivity();
                     }
-                } catch {
-                    const recentContainer = $('#overview-recent-activity');
-                    if (recentContainer) {
-                        recentContainer.innerHTML = '<p class="teacher-empty-state">Student activity is unavailable right now.</p>';
-                    }
+                } catch (error) {
+                    const { showSectionLoadError } = await import('./ui/sectionRecovery.js');
+                    showSectionLoadError($('#overview-recent-activity'), { label: 'student activity', error, current,
+                        keepContent: Boolean(this.overviewAnalytics), retry: () => this.loadTeacherOverview({ forceRefresh: true }) });
                 }
             };
 
-            void load();
+            return load();
         },
 
         renderOverviewStats() {
@@ -70,18 +72,20 @@ export function installTeacherOverviewMethods(TeacherManager) {
             $('#overview-recent-activity-count').textContent = `${analytics.recentActivities?.length || 0}`;
         },
 
-        async loadOverviewVocabCount() {
+        async loadOverviewVocabCount(options = {}) {
             const countEl = $('#overview-vocab-count');
             if (!countEl) return;
             const isCurrent = this.createTeacherVocabularyOperationGuard();
             try {
-                const { cloudVocabs, remoteVocabs, localVocabs, stale } = await this.getTeacherLibrary();
+                const { cloudVocabs, remoteVocabs, localVocabs, stale } = await this.getTeacherLibrary(options);
                 if (!isCurrent() || stale) return;
+                countEl.parentElement?.querySelector('[data-section-count-status]')?.remove();
                 countEl.textContent = `${cloudVocabs.length + remoteVocabs.length + localVocabs.length}`;
             } catch (error) {
                 if (!isCurrent()) return;
-                console.error('Failed to load overview vocabulary count:', error);
-                countEl.textContent = '--';
+                const { showSectionCountError } = await import('./ui/sectionRecovery.js');
+                showSectionCountError(countEl, { label: 'vocabulary count', error, current: isCurrent, keepContent: true,
+                    retry: () => this.loadOverviewVocabCount({ forceRefresh: true }) });
             }
         },
 
@@ -109,16 +113,6 @@ export function installTeacherOverviewMethods(TeacherManager) {
                     </div>
                 `;
             }).join('');
-        },
-
-        getStudentUpdatedTime(student) {
-            const value = student?.updatedAt;
-            if (!value) return 0;
-            if (typeof value.toMillis === 'function') return value.toMillis();
-            if (value.seconds) return value.seconds * 1000;
-            if (typeof value === 'number') return value;
-            const parsed = Date.parse(value);
-            return Number.isNaN(parsed) ? 0 : parsed;
         }
     });
 }

@@ -53,7 +53,7 @@ test('repository binds target school and caller-selected roles explicitly; propa
 test('repository forwards cancellation and never dispatches an already cancelled operation', async () => {
     const controller = new AbortController(); let signal, calls = 0;
     const repository = createSchoolRepository(async () => ({ rpc() { calls++; return { abortSignal(value) { signal = value; return Promise.resolve({ data: { schools: [] }, error: null }); } }; } }));
-    await repository.getAccess({ signal: controller.signal }); assert.equal(signal, controller.signal);
+    await repository.getAccess({ signal: controller.signal }); assert.ok(signal instanceof AbortSignal); assert.equal(signal.aborted, false);
     controller.abort(); await assert.rejects(repository.getAccess({ signal: controller.signal }), { name: 'AbortError' }); assert.equal(calls, 1);
 });
 

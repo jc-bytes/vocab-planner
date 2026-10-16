@@ -27,7 +27,7 @@ class TeacherVocabularyStorageMethods {
             if (!isCurrent()) return [];
             console.error('Failed to fetch cloud vocabularies:', error);
             this.setCloudStatus('Cloud load failed', 'error');
-            return [];
+            throw error;
         }
     }
 
