@@ -28,7 +28,7 @@ export function createTeacherRouteLoading(route) {
         const layout = createClassWorkspaceLoading({ section: route.assignmentId ? 'results' : route.page });
         root.setAttribute('aria-label', layout.getAttribute('aria-label')); root.append(layout); return root;
     }
-    if (route.page === 'classes') {
+    if (route.page === 'classes' || (route.page === 'students' && !route.profile)) {
         const layout = createClassWorkspaceLoading({ classId: route.classId, tab: route.tab, includeNavigation: Boolean(route.classId) });
         root.setAttribute('aria-label', layout.getAttribute('aria-label'));
         root.append(layout); return root;

@@ -23,7 +23,8 @@ try {
             async setClassTeacher(id, userId, active) { window.calls.push(['teacher', id, userId, active]); },
             async setClassArchived(id, archived) { window.calls.push(['archive', id, archived]); },
             async removeStudent(id, studentId) { window.calls.push(['remove', id, studentId]); },
-            async listAssignments(id) { window.calls.push(['assignments', id]); return window.classWork || [{ id: 'work-one', title: 'Vocabulary One', release_at: '2026-09-01T00:00:00Z' }]; },
+            async readAssignment(id) { window.calls.push(['read-published', id]); if (window.holdPublishedRead) return new Promise(resolve=>window.resolvePublishedRead=resolve); if (window.failPublishedOnce) {window.failPublishedOnce=false;throw new Error('Published copy request failed.');} return {content:{kind:'vocabulary',words:[{word:'Published word',definition:'Saved assignment definition.'}]}}; },
+            async listAssignments(id) { window.calls.push(['assignments', id]); return window.classWork || [{ id: 'work-one', kind: 'vocabulary', title: 'Vocabulary One', release_at: '2026-09-01T00:00:00Z' }]; },
             async inviteStudents(id, emails) { window.calls.push(['invite', id, emails]); },
             async createClass(data) { window.calls.push(['create', data]); },
             async createSubject(name) { window.calls.push(['subject', name]); }
@@ -58,6 +59,10 @@ try {
     await page.getByText('No classes match these filters.').waitFor();
     await page.getByText('Classes 0–0 of 0', { exact: true }).waitFor();
     await page.evaluate(async () => { window.directoryClasses = null; await window.workspace.show(); });
+    await page.getByRole('searchbox',{name:'Search classes'}).fill('');
+    await page.getByLabel('Subjects',{exact:true}).selectOption('');
+    await page.getByLabel('Years',{exact:true}).selectOption('');
+    await page.getByLabel('Statuses',{exact:true}).selectOption('active');
     for (const width of [1440, 768, 390]) {
         await page.setViewportSize({ width, height: 900 });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `Classes overflow at ${width}px`);
@@ -68,7 +73,7 @@ try {
     await page.getByRole('dialog').waitFor({ state: 'detached' });
     assert.equal((await page.evaluate(() => window.calls.find(call => call[0] === 'create')))[1].name, '6B');
     await page.getByRole('button', { name: /^Open class / }).click();
-    await page.getByRole('tab', { name: 'Students', exact: true }).click();
+    await page.evaluate(() => window.workspace.show({classId:'class-a',tab:'students'}));
     await page.getByText('Student One', { exact: true }).waitFor();
     assert.equal(await page.getByText('Vocabulary One', { exact: true }).count(), 0);
     assert.equal(await page.evaluate(() => window.calls.filter(call => call[0] === 'assignments').length), 1);
@@ -80,12 +85,13 @@ try {
     await page.evaluate(async () => {
         const { schoolContext } = await import('/js/services/schoolContext.js');
         const { supabaseService } = await import('/js/supabaseService.js');
+        supabaseService.init=async()=>{};
         window.originalGetClient = supabaseService.getClient;
         supabaseService.getClient = () => ({rpc: () => {const q = {abortSignal(){return q;},then(resolve){return Promise.resolve({data:{schools:[{id:'school-a',roles:['school_admin'],active:true}]},error:null}).then(resolve);}};return q;}});
         await schoolContext.load('teacher-a');
         window.classRoster = Array.from({length: 23}, (_, i) => ({studentId: `student-${i}`, name: `Student ${String(i + 1).padStart(2, '0')}`, email: `student${i + 1}@example.org`}));
         window.classInvitations = [{ id: 'invite', email: 'pending@example.org', expiresAt: '2099-01-01' }];
-        await window.workspace.show({classId: 'class-a'});
+        await window.workspace.show({classId: 'class-a', tab: 'students'});
     });
     const roster = page.getByRole('table', {name: 'Class students', exact: true});
     assert.equal(await roster.locator('tbody tr').count(), 10);
@@ -121,12 +127,19 @@ try {
     await page.setViewportSize({width:1440,height:900});
     await page.getByRole('button', {name: 'Next students page'}).click();
     await page.getByText('Students 11–20 of 23', {exact: true}).waitFor();
+    await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'students'});});
+    await page.getByText('Students 11–20 of 23', {exact: true}).waitFor();
     assert.equal(await roster.getByText('Student 01', {exact: true}).count(), 0);
     await page.getByRole('button', {name: 'Next students page'}).click();
     await page.getByText('Students 21–23 of 23', {exact: true}).waitFor();
     assert.equal(await roster.locator('tbody tr').count(), 3);
     await page.getByRole('searchbox', {name: 'Search students'}).fill('student1@example.org');
     await page.getByText('Students 1–1 of 1', {exact: true}).waitFor();
+    await page.getByRole('button',{name:'View progress for Student 01',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>window.calls.at(-1)),['student',{classId:'class-a',studentId:'student-0',tab:'overview'}]);
+    await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'students'});});
+    assert.equal(await page.getByRole('searchbox',{name:'Search students'}).inputValue(),'student1@example.org');
+    await page.getByText('Students 1–1 of 1',{exact:true}).waitFor();
     for (const [label, tab] of [['View profile','overview'], ['Assigned work','assigned'], ['Activity history','activity'], ['Account and coins','account']]) {
         await page.getByRole('button', {name:'Actions for Student 01', exact:true}).click();
         await page.getByRole('menuitem', {name: label, exact: true}).click();
@@ -145,14 +158,17 @@ try {
     assert.equal(await page.getByText('pending@example.org', {exact:false}).isVisible(), false);
     await page.getByText('Invitations (1)', {exact:true}).click();
     assert.equal(await page.getByText('pending@example.org', {exact:false}).isVisible(), true);
-    await page.getByRole('tab', {name: 'Class settings', exact:true}).click();
-    const settings = page.getByRole('tabpanel', {name:'Class settings', exact:true});
-    await settings.getByText('Teacher Alice', {exact:true}).waitFor();
-    await settings.getByRole('button', {name:'Remove teacher Teacher Alice'}).click();
-    await page.getByRole('tab', {name:'Class settings', exact:true}).waitFor();
+    assert.equal(await page.getByRole('tab', {name: 'Class settings', exact:true}).count(), 0);
+    assert.equal(await page.getByRole('tab').count(), 0);
+    await page.getByRole('button', {name: 'Class actions', exact:true}).click();
+    await page.getByRole('menuitem', {name: 'Manage teachers', exact:true}).click();
+    const teachers = page.getByRole('dialog', {name:'Manage teachers', exact:true});
+    await teachers.getByText('Teacher Alice', {exact:true}).waitFor();
+    await teachers.getByRole('button', {name:'Remove teacher Teacher Alice'}).click();
+    await teachers.waitFor({state:'detached'});
     assert.deepEqual(await page.evaluate(() => window.calls.find(call => call[0] === 'teacher')), ['teacher', 'class-a', 'teacher-a', false]);
-    await page.getByRole('tab', {name: 'Class settings', exact:true}).click();
-    await settings.getByRole('button', {name:'Archive class', exact:true}).click();
+    await page.getByRole('button', {name: 'Class actions', exact:true}).click();
+    await page.getByRole('menuitem', {name: 'Archive class', exact:true}).click();
     await page.getByRole('dialog', {name:'Archive class'}).getByRole('button', {name:'Archive class'}).click();
     await page.getByRole('dialog').waitFor({state:'detached'});
     assert.deepEqual(await page.evaluate(() => window.calls.find(call => call[0] === 'archive')), ['archive', 'class-a', true]);
@@ -165,9 +181,31 @@ try {
         window.classRoster = null; window.classInvitations = null;
         await window.workspace.show({classId:'class-a'});
     });
-    await page.getByRole('tab', { name: 'Classwork', exact: true }).click();
+    assert.equal(await page.getByRole('button', {name:'Class actions',exact:true}).count(), 0);
+    await page.evaluate(() => window.workspace.show({classId:'class-a',tab:'settings'}));
+    assert.equal(await page.getByRole('heading', {name:'Classwork',exact:true}).count(), 1);
+    await page.evaluate(() => window.workspace.show({classId:'class-a',tab:'work'}));
     await page.getByText('Vocabulary One', { exact: true }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'Invite students' }).count(), 0);
+    await page.getByRole('button', {name:'View published material Vocabulary One',exact:true}).click();
+    await page.getByRole('dialog').getByText('Saved assignment definition.', {exact:true}).waitFor();
+    await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>window.calls.find(c=>c[0]==='read-published')),['read-published','work-one']);
+    assert.equal(await page.locator('.class-work-filters').getAttribute('open'),null);
+    await page.evaluate(()=>{window.failPublishedOnce=true;});
+    await page.getByRole('button', {name:'View published material Vocabulary One',exact:true}).click();
+    await page.getByRole('dialog').getByText('Published copy request failed.',{exact:true}).waitFor();
+    await page.getByRole('dialog').getByRole('button',{name:'Try again',exact:true}).click();
+    await page.getByRole('dialog').getByText('Saved assignment definition.',{exact:true}).waitFor();
+    await page.getByRole('dialog').getByRole('button',{name:'Close',exact:true}).click();
+    await page.evaluate(()=>{window.holdPublishedRead=true;});
+    await page.getByRole('button', {name:'View published material Vocabulary One',exact:true}).click();
+    await page.getByRole('dialog').getByText('Loading published material…',{exact:true}).waitFor();
+    await page.evaluate(async()=>{await window.workspace.show({classId:'class-a',tab:'students'});window.resolvePublishedRead({content:{kind:'vocabulary',words:[{word:'Late private word',definition:'Must stay hidden'}]}});window.holdPublishedRead=false;});
+    assert.equal(await page.getByRole('dialog').count(),0);
+    assert.equal(await page.getByText('Late private word',{exact:true}).count(),0);
+    await page.evaluate(()=>window.workspace.show({classId:'class-a',tab:'work'}));
+
     await page.getByRole('button', { name: 'Assign material' }).click();
     await page.getByRole('button', { name: 'Review work Vocabulary One' }).click();
     assert.deepEqual(await page.evaluate(() => window.calls.filter(call => ['publish', 'review'].includes(call[0]))), [
@@ -178,11 +216,24 @@ try {
         await window.workspace.show({classId:'class-a',tab:'work'});
     });
     const workTable = page.getByRole('table', {name:'Class work',exact:true});
+    assert.equal(await page.getByRole('button', {name:'Current',exact:true}).getAttribute('aria-pressed'), 'true');
+    await page.getByText('Work 1–10 of 21', {exact:true}).waitFor();
+    assert.equal(await workTable.getByText('Scheduled', {exact:false}).count(), 0);
+    await page.getByRole('button', {name:'Upcoming',exact:true}).click();
+    await page.getByText('Work 1–1 of 1', {exact:true}).waitFor();
+    await workTable.getByText('Work 01', {exact:true}).waitFor();
+    await page.getByRole('button',{name:'Assignment details Work 01',exact:true}).click();
+    assert.deepEqual(await page.evaluate(()=>window.calls.filter(c=>c[0]==='review').at(-1)),['review',{classId:'class-a',assignmentId:'work-0',tab:'details'}]);
+    assert.equal(await page.getByLabel('Sort', {exact:true}).inputValue(), 'release-asc');
+    await page.locator('.class-work-filters summary').click();
+    await page.getByRole('button', {name:'History',exact:true}).click();
+    await workTable.getByText('Work 02', {exact:true}).waitFor();
+    await page.getByRole('button', {name:'All work',exact:true}).click();
     assert.equal(await workTable.locator('tbody tr').count(),10);
     await workTable.getByText('Scheduled',{exact:false}).waitFor();
-    assert.equal(await workTable.getByText('Withdrawn',{exact:true}).count(),0);
+    assert.equal(await workTable.getByText('Withdrawn · ',{exact:true}).count(),1);
     assert.equal(await workTable.getByRole('columnheader',{name:'When',exact:true}).count(),1);
-    assert.equal(await workTable.locator('tbody tr').filter({hasText:'Work 02'}).locator('td').nth(1).textContent(),'Due Oct 20');
+    assert.equal(await workTable.locator('tbody tr').filter({hasText:'Work 02'}).locator('td').nth(1).textContent(),'Withdrawn · Due Oct 20');
     await page.getByLabel('Trimester',{exact:true}).selectOption('3');
     await page.getByText('Work 1–10 of 22',{exact:true}).waitFor();
     assert.equal(await workTable.getByText('Scheduled',{exact:false}).count(),0);
@@ -202,6 +253,8 @@ try {
 
     await page.getByRole('button',{name:'Next work page'}).click();
     await page.getByText('Work 11–20 of 23',{exact:true}).waitFor();
+    await page.evaluate(async()=>{window.workspace.hide();await window.workspace.show({classId:'class-a',tab:'work'});});
+    await page.getByText('Work 11–20 of 23',{exact:true}).waitFor();
     assert.equal(await workTable.getByText('Work 01',{exact:true}).count(),0);
     await page.getByRole('button',{name:'Next work page'}).click();
     await page.getByText('Work 21–23 of 23',{exact:true}).waitFor();
@@ -212,12 +265,9 @@ try {
     assert.deepEqual(await page.evaluate(()=>window.calls.filter(call=>call[0]==='review').at(-1)),['review',{classId:'class-a',assignmentId:'work-1'}]);
     await page.getByRole('searchbox',{name:'Search work'}).fill('missing');
     await page.getByText('No work matches your search.').waitFor();
-    await page.getByRole('tab',{name:'Classwork',exact:true}).focus();
-    await page.keyboard.press('ArrowRight');
-    assert.equal(await page.getByRole('tab',{name:'Students',exact:true}).evaluate(n=>n===document.activeElement),true);
-    await page.keyboard.press('Enter');
+    await page.evaluate(() => window.workspace.show({classId:'class-a',tab:'students'}));
     await page.getByRole('table',{name:'Class students',exact:true}).waitFor();
-    assert.equal(await page.getByRole('tab',{name:'Students',selected:true}).count(),1);
+    assert.equal(await page.getByRole('tab').count(),0);
     await page.evaluate(()=>{window.classWork=null;});
     await page.evaluate(() => window.workspace.show({ classId: 'missing' }));
     await page.getByText('This class is unavailable. Choose another class.').waitFor();
@@ -232,6 +282,8 @@ try {
     assert.equal(await page.getByRole('dialog').count(), 0);
     assert.equal(await page.locator('main').textContent(), '');
     await page.evaluate(() => window.workspace.show({ classId: 'class-a', tab: 'work' }));
+    assert.equal(await page.getByRole('searchbox',{name:'Search work'}).inputValue(),'missing');
+    await page.getByRole('searchbox',{name:'Search work'}).fill('');
     await page.getByText('Vocabulary One', { exact: true }).waitFor();
     await page.evaluate(async () => {
         window.workspace.destroy();
@@ -267,36 +319,33 @@ try {
     await page.evaluate(()=>window.loadingResolvers.classes.resolve([{id:'loading-class',name:'Loading test',school_year:2026}]));
     await page.getByText('Classes 1–1 of 1',{exact:true}).waitFor();
     assert.equal(await page.locator('main').getAttribute('aria-busy'),'false');
-    await page.evaluate(()=>{window.loadingWorkspace.show({classId:'loading-class'});});
+    await page.evaluate(()=>{window.loadingWorkspace.show({classId:'loading-class',tab:'students'});});
     await page.locator('.class-workspace-loading[data-loading-section="students"] .class-loading-skeleton').waitFor();
     assert.equal(await page.getByText('Loading students…',{exact:true}).count(),0);
-    assert.equal(await page.getByRole('tab',{name:'Students',selected:true}).count(),1);
-    await page.getByRole('tab',{name:'Classwork',exact:true}).click();
+    assert.equal(await page.getByRole('heading',{name:'Students',exact:true}).count(),1);
+    await page.evaluate(() => { window.loadingWorkspace.show({classId:'loading-class',tab:'work'}); });
     await page.locator('.class-workspace-loading[data-loading-section="work"] .class-loading-skeleton').waitFor();
     assert.equal(await page.getByText('Loading work…',{exact:true}).count(),0);
     await page.evaluate(()=>window.loadingResolvers.students.resolve([{studentId:'stale',name:'Stale student',email:'stale@example.org'}]));
     assert.equal(await page.getByText('Stale student',{exact:true}).count(),0);
     await page.evaluate(()=>window.loadingResolvers.work.reject(new Error('Work request failed')));
-    const workRecovery = page.locator('#class-detail-panel [data-section-recovery]');
-    await workRecovery.getByText('Could not load classes. Check your connection and try again.',{exact:true}).waitFor();
-    assert.equal(await workRecovery.getAttribute('role'), 'alert');
-    assert.equal(await page.getByText('Work request failed',{exact:true}).count(),0, 'Raw repository errors are replaced by actionable section feedback');
+    await page.getByRole('alert').getByText('Could not load classes. Check your connection and try again.',{exact:true}).waitFor();
     assert.equal(await page.locator('.class-workspace-loading').count(),0);
     assert.equal(await page.locator('main').getAttribute('aria-busy'),'false');
-    await workRecovery.getByRole('button',{name:'Try again',exact:true}).click();
-    await workRecovery.waitFor({state:'detached'});
+    await page.getByRole('button',{name:'Try again',exact:true}).click();
     await page.locator('.class-workspace-loading[data-loading-section="work"] .class-loading-skeleton').waitFor();
     await page.evaluate(()=>window.loadingResolvers.classes.resolve([{id:'loading-class',name:'Loading test',school_year:2026}]));
     await page.locator('.class-workspace-loading[data-loading-section="work"] .class-loading-skeleton').waitFor();
     await page.evaluate(()=>window.loadingResolvers.work.resolve([]));
     await page.getByText('No work has been assigned to this class.',{exact:true}).waitFor();
-    await page.getByRole('tab',{name:'Class settings',exact:true}).click();
-    await page.locator('.class-workspace-loading[data-loading-section="settings"] .class-loading-skeleton').waitFor();
-    assert.equal(await page.getByText('Loading class settings…',{exact:true}).count(),0);
-    assert.equal(await page.getByRole('tab',{name:'Classwork',exact:true}).isEnabled(),true);
+    await page.getByRole('button',{name:'Class actions',exact:true}).click();
+    await page.getByRole('menuitem',{name:'Manage teachers',exact:true}).click();
+    await page.getByText('Loading teachers…',{exact:true}).waitFor();
+    assert.equal(await page.getByRole('tab',{name:'Class settings',exact:true}).count(),0);
     await page.evaluate(()=>window.loadingWorkspace.hide());
     await page.evaluate(()=>window.loadingResolvers.settings.resolve([{user_id:'private',display_name:'Private teacher',active:true,roles:['teacher']}]));
     assert.equal(await page.locator('main').textContent(),'');
+    assert.equal(await page.getByRole('dialog').count(),0);
     await page.evaluate(async()=>{const {schoolContext}=await import('/js/services/schoolContext.js');schoolContext.clear();const {supabaseService}=await import('/js/supabaseService.js');supabaseService.getClient=window.savedClient;window.loadingWorkspace.destroy();});
     console.log('Teacher class workspace smoke passed: focused tabs, dialogs, callbacks, missing class and account isolation.');
 } finally { await browser?.close(); server?.kill(); }

@@ -1,3 +1,4 @@
+import { schoolContext } from './services/schoolContext.js';
 import { $ } from './main.js';
 
 const teacherDataDashboardViewMethods = {
@@ -71,7 +72,9 @@ const teacherDataDashboardViewMethods = {
         this.dataManagementArea = normalizedArea;
         dataView?.setAttribute('aria-labelledby', normalizedArea === 'data' ? 'tab-data' : 'tab-settings');
         if (title) title.textContent = normalizedArea === 'data' ? 'Data' : 'Settings';
-        if (eyebrow) eyebrow.textContent = normalizedArea === 'data' ? 'Student records' : 'Classroom setup';
+        if (eyebrow) eyebrow.textContent = normalizedArea === 'data' ? 'Student records' : 'School-wide learning settings';
+        const scope = document.getElementById('settings-school-scope');
+        if (scope) scope.textContent = `Learning settings apply to every class in ${schoolContext.getSchool()?.name || 'the selected school'}.`;
         if (tabList) tabList.setAttribute('aria-label', normalizedArea === 'data' ? 'Data sections' : 'Settings sections');
         tabList?.querySelectorAll('.data-tab-btn[data-area]').forEach(button => {
             button.hidden = button.dataset.area !== normalizedArea;

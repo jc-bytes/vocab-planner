@@ -10,7 +10,7 @@ setVocabularyWorkflowTab(mode = 'assign', options = {}) {
         if (nextMode !== 'assign') this.deactivateTeacherVocabularyBrowser?.();
         const scopeLabel = document.querySelector('#teacher-dashboard-view .teacher-library-scope');
         if (scopeLabel) scopeLabel.textContent = nextMode === 'review'
-            ? 'Word Hunt evidence for the selected class.' : 'Reusable material for all your classes.';
+            ? 'Word Hunt evidence for the selected class.' : 'Prepare and reuse material for your classes. Editing here does not change already assigned copies.';
         if (options.updateRoute !== false) {
             this.beginTeacherNavigation();
             if (nextMode === 'quizzes') {

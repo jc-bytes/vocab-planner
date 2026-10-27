@@ -26,10 +26,14 @@ try {
    localStorage.setItem('teacher_sidebar_sections',JSON.stringify(['administration','platform','classes','overview','vocabulary','assignments','review','settings']));
   }
  });
- const routes=[['administration','administration'],['platform','platform'],['classes','classes'],['classes?class=fixture&tab=students','classes'],['classes?class=fixture&tab=work','classes'],['classes?class=fixture&tab=settings','classes'],['overview','overview'],['vocabulary?trimester=IIIT&month=october','vocabulary'],['sparks','vocabulary'],['assignments','assignments'],['review','assignments'],['assignments?assignment=fixture','assignments'],['review?assignment=fixture','assignments'],['settings','settings'],['students/student-fixture','classes'],['vocabulary/editor/unit-fixture','vocabulary'],['sparks/editor/spark-fixture','vocabulary'],['quizzes/editor','vocabulary']];
+ const routes=[['administration','administration'],['platform','platform'],['classes','classes'],['classes?class=fixture&tab=students','students'],['classes?class=fixture&tab=work','classes'],['classes?class=fixture&tab=settings','classes'],['overview','overview'],['vocabulary?trimester=IIIT&month=october','vocabulary'],['sparks','vocabulary'],['assignments','assignments'],['review','assignments'],['assignments?assignment=fixture','assignments'],['review?assignment=fixture','assignments'],['settings','settings'],['students?class=fixture','students'],['students/student-fixture','students'],['vocabulary/editor/unit-fixture','vocabulary'],['sparks/editor/spark-fixture','vocabulary'],['quizzes/editor','vocabulary']];
  for(const [route,section] of routes){
   await page.goto(`${baseUrl}/teacher.html#/teacher/${route}`);await page.reload();
   const skeleton=page.locator('#teacher-loading-view .teacher-route-loading');await skeleton.waitFor();
+  const switcherBounds=await page.locator('#teacher-class-switcher').boundingBox();
+  assert.equal(switcherBounds,null,`Hidden class selector leaked into refresh loading: ${JSON.stringify(switcherBounds)}`);
+  const headerIconSizes=await page.locator('#teacher-class-switcher svg').evaluateAll(icons=>icons.map(icon=>({width:parseFloat(getComputedStyle(icon).width),height:parseFloat(getComputedStyle(icon).height)})));
+  assert.equal(headerIconSizes.every(size=>size.width>0&&size.width<=24&&size.height>0&&size.height<=24),true,`Header icons need bounded sizes before workspace CSS loads: ${JSON.stringify(headerIconSizes)}`);
   assert.equal(await page.locator('#teacher-tab-shell').evaluate(el=>el.inert),true);
   assert.equal(await page.locator('#teacher-cloud-status').getAttribute('data-state'),'pending');
   assert.equal(await skeleton.getAttribute('data-loading-page'),route.split('?')[0].split('/')[0]);
@@ -42,12 +46,12 @@ try {
   }
   if(route.split('?')[0]==='classes') {
    const params=new URLSearchParams(route.split('?')[1]||'');
-   const section=params.has('class')?(params.get('tab')||'students'):'classes';
+   const section=params.has('class')?(params.get('tab')==='students'?'students':'work'):'classes';
    const classLoading=skeleton.locator('.class-workspace-loading');
    assert.equal(await classLoading.getAttribute('data-loading-section'),section);
    assert.equal(await classLoading.locator('.class-loading-row').count(),section==='settings'?3:10);
    assert.equal(await skeleton.locator('.teacher-loading-card').count(),0);
-   if(params.has('class'))assert.equal(await classLoading.locator('.class-loading-navigation .is-selected').textContent(),{students:'Students',work:'Work',settings:'Class settings'}[section]);
+   assert.equal(await classLoading.locator('.class-loading-navigation').count(),0);
    await page.emulateMedia({reducedMotion:'reduce'});
    assert.equal(await classLoading.locator('.class-loading-toolbar').evaluate(el=>getComputedStyle(el).animationName),'none');
    await page.emulateMedia({reducedMotion:'no-preference'});
@@ -56,7 +60,8 @@ try {
   assert.equal(await skeleton.evaluate(el=>el.getBoundingClientRect().left>=document.getElementById('teacher-tab-shell').getBoundingClientRect().right),true,'Desktop skeleton reserves sidebar width');
   for(const width of [1440,768,390,320]){
    await page.setViewportSize({width,height:900});
-   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${route} fits ${width}px`);
+   const excess=await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.width&&r.right>innerWidth+1;}).slice(0,8).map(el=>({tag:el.tagName,id:el.id,class:el.className,width:el.getBoundingClientRect().width,right:el.getBoundingClientRect().right})));
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${route} fits ${width}px: ${JSON.stringify(excess)}`);
    assert.equal(await page.locator('.teacher-app-header').evaluate(el=>{const rect=el.getBoundingClientRect();return rect.height>0 && rect.top>=0;}),true,`${route} keeps navigation onscreen at ${width}px`);
   }
   if(['administration','platform','sparks'].includes(route)) await page.screenshot({path:`/tmp/teacher-refresh-${route}-320.png`,fullPage:true});

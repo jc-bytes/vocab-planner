@@ -11,10 +11,11 @@ export function createTeacherWorkspaceFeature(manager) {
     const navigate = (view, context = {}) => manager.showTeacherSection(view, context);
     const publisher = createTeacherAssignmentPublisher({
         getUserId, repository,
-        onPublished: ({ assignments, classIds }) => navigate('assignments', {
-            classId: classIds.length === 1 ? classIds[0] : undefined,
-            assignmentId: assignments.length === 1 ? assignments[0]?.id || assignments[0] : undefined
-        })
+        onPublished: ({ classIds, releaseAt }) => {
+            const selected = manager.getSelectedTeacherClassId();
+            navigate('classes', { classId: classIds.includes(selected) ? selected : classIds[0],
+                workView: new Date(releaseAt).getTime() > Date.now() ? 'upcoming' : 'current', resetWork: true });
+        }
     });
     const publish = (context = {}) => {
         if (!manager.ensureAuthenticated()) return;
@@ -29,13 +30,13 @@ export function createTeacherWorkspaceFeature(manager) {
         onNavigate: context => navigate('classes', context),
         onClassesLoaded: classes => manager.updateTeacherClassOptions(classes)
     });
-    const classes = createTeacherClassWorkspace({
-        root: document.getElementById('teacher-classes-view'), getUserId, repository,
+    const classOptions = {
+        getUserId, repository,
         getSchoolCalendar,
         onClassesLoaded: classes => manager.updateTeacherClassOptions(classes),
-        onNavigate: context => navigate(context.classId ? 'classes' : 'overview', context),
+        onNavigate: context => navigate(context.classId ? context.tab === 'students' ? 'students' : 'classes' : 'overview', context),
         onPublish: publish,
-        onReview: context => navigate('assignments', context),
+        onReview: context => navigate('assignments', { ...context, returnTo: 'classwork' }),
         onGroups: context => navigate('groups', context),
         onStudent: context => {
             if (!manager.ensureAuthenticated()) return;
@@ -43,13 +44,16 @@ export function createTeacherWorkspaceFeature(manager) {
             manager.setRoute(route);
             return manager.applyRoute(route);
         }
-    });
+    };
+    const classes = createTeacherClassWorkspace({ ...classOptions, root: document.getElementById('teacher-classes-view') });
+    const students = createTeacherClassWorkspace({ ...classOptions, root: document.getElementById('teacher-class-students-view') });
     let assignments;
     function assignmentWorkspace() {
         assignments ||= createTeacherAssignmentsWorkspace({
             root: document.getElementById('teacher-assignments-view'), getUserId, repository, getSchoolCalendar,
             onNavigate: ({ mode, ...context }) => navigate('assignments', context),
-            onPublish: publish,
+            reviewOnly: true,
+            onBackToClasswork: context => navigate('classes', context),
             onWordHuntReview: () => navigate('word-hunt-review')
         });
         return assignments;
@@ -81,6 +85,11 @@ export function createTeacherWorkspaceFeature(manager) {
             }
             return classes.show(context);
         },
+        showStudents(context = {}) {
+            if (!manager.ensureAuthenticated()) return;
+            manager.switchView('teacher-class-students-view', { updateRoute: false });
+            return students.show({ ...context, tab: 'students' });
+        },
         showAssignments({ mode = 'assignments', ...context } = {}) {
             if (!manager.ensureAuthenticated()) return;
             manager.switchView('teacher-assignments-view', { updateRoute: false });
@@ -91,6 +100,7 @@ export function createTeacherWorkspaceFeature(manager) {
         deactivate() {
             publisher.hide();
             classes.hide();
+            students.hide();
             home.hide();
             assignments?.hide();
         },
@@ -98,6 +108,7 @@ export function createTeacherWorkspaceFeature(manager) {
             destroyed = true;
             publisher.destroy();
             classes.destroy();
+            students.destroy();
             home.destroy();
             assignments?.destroy();
         }

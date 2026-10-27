@@ -15,27 +15,31 @@ import { createClassWorkspaceLoading } from './classWorkspaceLoading.js';
 import { compactFilter, sortAssignments, assignmentDate, assignmentWhen, assignmentSortOptions, assignmentTypeOptions } from './compactAssignmentControls.js';
 import '../css/teacher-student-feedback.css';
 
-export function createTeacherAssignmentsWorkspace({ root, getUserId, repository = classroomRepository, onNavigate, onPublish, onWordHuntReview, getSchoolCalendar = async () => null }) {
+export function createTeacherAssignmentsWorkspace({ root, getUserId, repository = classroomRepository, onNavigate, onPublish, onWordHuntReview, reviewOnly = false, onBackToClasswork, getSchoolCalendar = async () => null }) {
     let generation = 0, destroyed = false, controller, dialog;
     let context = { mode: 'assignments' }, studentFilter = '', stateOwner, restoreTabFocus = false;
-    const defaults = () => ({ search: '', trimester: 'all', type: 'all', sort: 'release-desc', offset: 0, listTab: 'current' });
+    const defaults = () => ({ search: '', trimester: 'all', type: 'all', sort: 'release-desc', offset: 0, listTab: reviewOnly ? 'needs-review' : 'current' });
     let listState = defaults();
+    const statesByClass = new Map();
     const current = (id, owner) => !destroyed && id === generation && owner === getUserId();
-    function navigate(next) { if (onNavigate) onNavigate(next); else show(next); }
+    function navigate(next) { const destination = { ...(context.returnTo === 'classwork' ? { returnTo: 'classwork' } : {}), ...next }; if (onNavigate) onNavigate(destination); else show(destination); }
     function closeDialog() { dialog?.close(); dialog = null; }
     async function show(next = {}) {
         if (destroyed) return;
         context = { mode: 'assignments', ...next }; closeDialog(); controller?.abort(); controller = new AbortController();
         const id = ++generation, owner = getUserId(), { mode, classId, assignmentId } = context;
         const focusAfterShow = restoreTabFocus; restoreTabFocus = false;
-        if (stateOwner !== owner) { listState = defaults(); studentFilter = ''; stateOwner = owner; }
-        const validListTabs = ['current', 'needs-review', 'scheduled', 'history'];
+        if (stateOwner !== owner) { statesByClass.clear(); studentFilter = ''; stateOwner = owner; }
+        const stateKey = classId || 'all';
+        listState = statesByClass.get(stateKey) || defaults(); statesByClass.set(stateKey, listState);
+        const validListTabs = reviewOnly ? ['current', 'needs-review', 'history'] : ['current', 'needs-review', 'scheduled', 'history'];
         const listTab = validListTabs.includes(context.listTab) ? context.listTab
             : !assignmentId && validListTabs.includes(context.tab) ? context.tab
             : mode === 'review' && !assignmentId ? 'needs-review' : listState.listTab;
         listState.listTab = listTab;
         root.classList.add('classrooms', 'assignment-workspace', 'teacher-student-library');
-        root.replaceChildren(node('h2', 'Assignments', 'teacher-library-accessible-title'));
+        root.replaceChildren(node('h2', reviewOnly ? 'Review' : 'Assignments', 'teacher-library-accessible-title'));
+        if (reviewOnly && !assignmentId) root.append(node('p', 'Review student work and give feedback. Assign and schedule material in Classwork.', 'teacher-library-scope'));
         function tabs(items, selected, onSelect, label) {
             const bar = node('div', undefined, 'data-tab-list activity-workflow-tabs secondary-tabs');
             bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', label);
@@ -98,7 +102,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                 if (!assignment) { status.textContent = 'This assignment is unavailable.'; return; }
                 const ownClass = classes.find(c => c.id === assignment.class_id);
                 if (!ownClass) { status.textContent = 'This class is unavailable.'; return; }
-                root.append(action('Back to assignments', () => navigate({ mode: 'assignments', classId, tab: listTab })), node('h3', assignment.title), node('p', classLabel(ownClass)));
+                root.append(action(context.returnTo === 'classwork' && onBackToClasswork ? 'Back to Classwork' : reviewOnly ? 'Back to Review' : 'Back to assignments', () => context.returnTo === 'classwork' && onBackToClasswork ? onBackToClasswork({classId}) : navigate({ mode: 'assignments', classId, tab: listTab })), node('h3', assignment.title), node('p', classLabel(ownClass)));
                 const detailTab = context.tab === 'details' ? 'details' : 'student-work';
                 tabs([['student-work', 'Student work'], ['details', 'Details']], detailTab, tab => navigate({ mode: 'assignments', classId, assignmentId, tab, listTab }), 'Assignment sections');
                 const panel = node('section'); panel.id = 'assignment-panel'; panel.setAttribute('role', 'tabpanel'); panel.setAttribute('aria-labelledby', `assignment-tab-${detailTab}`); root.append(panel);
@@ -176,7 +180,7 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
                     panel.append(toolbar, content); renderRows();
                 }
             } else {
-                tabs([['current', 'Current'], ['needs-review', 'Needs review'], ['scheduled', 'Scheduled'], ['history', 'History']], listTab,
+                tabs(reviewOnly ? [['needs-review', 'Needs review'], ['current', 'Current work'], ['history', 'History']] : [['current', 'Current'], ['needs-review', 'Needs review'], ['scheduled', 'Scheduled'], ['history', 'History']], listTab,
                     tab => { listState.offset = 0; navigate({ mode: 'assignments', classId, tab }); }, 'Assignment views');
                 const directory = node('section'); directory.id = 'assignment-panel'; directory.setAttribute('role', 'tabpanel');
                 directory.setAttribute('aria-labelledby', `assignment-tab-${listTab}`);
@@ -279,5 +283,5 @@ export function createTeacherAssignmentsWorkspace({ root, getUserId, repository 
             }
         }
     }
-    return { show, hide() { generation++; controller?.abort(); closeDialog(); root.replaceChildren(); root.removeAttribute('aria-busy'); }, destroy() { destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; listState = defaults(); stateOwner = null; root.replaceChildren(); } };
+    return { show, hide() { generation++; controller?.abort(); closeDialog(); root.replaceChildren(); root.removeAttribute('aria-busy'); }, destroy() { destroyed = true; generation++; controller?.abort(); closeDialog(); context = {}; studentFilter = ''; listState = defaults(); stateOwner = null; statesByClass.clear(); root.replaceChildren(); } };
 }

@@ -129,10 +129,10 @@ const featureDefinitions = {
             });
             const platformView = createSchoolAdminView({ root: document.getElementById('teacher-platform-view'), mode: 'platform', onOpenSchool: () => manager.showTeacherSection('administration'), getCurrentUser: () => manager.currentUser });
             return {
-                show() {
+                show(options = {}) {
                     if (!manager.ensureAuthenticated(false)) return;
                     manager.switchView('teacher-administration-view', { updateRoute: false });
-                    return view.show();
+                    return view.show(options);
                 },
                 async showPlatform() {
                     if (!manager.ensureAuthenticated(false) || !manager.schoolAccess.getAccess().platformAdmin) return;
@@ -148,7 +148,7 @@ const featureDefinitions = {
     classes: async () => {
         const { createTeacherWorkspaceFeature } = await import('./teacherWorkspaceFeature.js');
         return {
-            publicMethods: { showClassHome: 'showHome', refreshTeacherClassSelector: 'refreshClassSelector', showClassesView: 'showClasses', showAssignmentsView: 'showAssignments', openAssignmentPublisher: 'publish' },
+            publicMethods: { showClassHome: 'showHome', refreshTeacherClassSelector: 'refreshClassSelector', showClassesView: 'showClasses', showClassStudentsView: 'showStudents', showAssignmentsView: 'showAssignments', openAssignmentPublisher: 'publish' },
             create: createTeacherWorkspaceFeature
         };
     },
@@ -446,6 +446,7 @@ export function installTeacherLazyFeatureMethods(TeacherManager) {
         ['showClassHome', 'classes'],
         ['refreshTeacherClassSelector', 'classes'],
         ['showClassesView', 'classes'],
+        ['showClassStudentsView', 'classes'],
         ['showAssignmentsView', 'classes'],
         ['openAssignmentPublisher', 'classes'],
         ['showSparksView', 'sparks'],

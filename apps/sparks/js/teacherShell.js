@@ -16,6 +16,7 @@ const TEACHER_SHELL_VIEW_IDS = [
     'teacher-editor-view',
     'teacher-spark-editor-view',
     'teacher-student-profile-view',
+    'teacher-progress-view',
     'quiz-maker-view'
 ];
 const TEACHER_VIEW_IDS = Object.freeze(Array.from(new Set([
@@ -128,7 +129,7 @@ class TeacherShellMethods {
         if ([VOCABULARY_PAGE.viewId, SPARKS_PAGE.viewId, 'teacher-spark-editor-view', 'teacher-editor-view', 'quiz-maker-view'].includes(viewId)) {
             return VOCABULARY_PAGE.id;
         }
-        if (['teacher-student-profile-view', STUDENTS_PAGE.viewId, GROUPS_PAGE.viewId].includes(viewId)) return 'classes';
+        if (['teacher-student-profile-view', 'teacher-progress-view', STUDENTS_PAGE.viewId, GROUPS_PAGE.viewId].includes(viewId)) return 'students';
         if (viewId === DATA_PAGE.viewId) {
             return SETTINGS_PAGE.id;
         }
@@ -205,7 +206,7 @@ class TeacherShellMethods {
                         ? 'subjects'
                         : undefined;
                 this.setRoute(
-                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, listTab: options.listTab, tab: options.tab || defaultTab },
+                    { view: primaryPage.id, classId: options.classId, assignmentId: options.assignmentId, listTab: options.listTab, returnTo: options.returnTo, tab: options.tab || defaultTab },
                     { replace: options.replaceRoute === true }
                 );
             }
@@ -215,7 +216,7 @@ class TeacherShellMethods {
                 this.showPlatformAdministration();
                 break;
             case 'administration':
-                this.showSchoolAdministration();
+                this.showSchoolAdministration(options);
                 break;
             case 'classes':
                 this.showClassesView(options);
@@ -239,7 +240,7 @@ class TeacherShellMethods {
                 this.showSparksView();
                 break;
             case STUDENTS_PAGE.id:
-                this.showProgressView();
+                this.showClassStudentsView(options);
                 break;
             case GROUPS_PAGE.id:
                 this.showGroupsView(options);

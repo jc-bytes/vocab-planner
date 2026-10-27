@@ -52,13 +52,19 @@ export function renderPlatformAdministration({ schoolsPanel, administratorsPanel
                 return () => repository.replaceInitialAdminInvitation(school.id, email.value);
             }, trigger));
             replace.setAttribute('aria-label', `Replace administrator invitation for ${school.name}`);
-            const cancel = button('Cancel onboarding', () => refreshAfter(() => repository.setSchoolActive(school.id, false)));
+            const cancel = button('Cancel onboarding', () => popupForm('Cancel school onboarding', 'Cancel onboarding', node => {
+                node.append(element('p', `Cancel onboarding for ${school.name}? The school will be marked inactive.`));
+                return () => repository.setSchoolActive(school.id, false);
+            }, trigger));
             cancel.setAttribute('aria-label', `Cancel onboarding for ${school.name}`); actions.append(replace, cancel);
         } else {
             if (school.active !== false) {
                 const settings = button('School settings', () => openSchool(school.id)); settings.setAttribute('aria-label', `School settings for ${school.name}`); actions.append(settings);
             }
-            const toggle = button(school.active === false ? 'Reactivate' : 'Suspend', () => refreshAfter(() => repository.setSchoolActive(school.id, school.active === false)));
+            const toggle = button(school.active === false ? 'Reactivate' : 'Suspend', () => popupForm(school.active === false ? 'Reactivate school' : 'Suspend school', school.active === false ? 'Reactivate school' : 'Suspend school', node => {
+                node.append(element('p', `${school.active === false ? 'Reactivate' : 'Suspend'} ${school.name}? This changes the school's active status. Saved records remain in the system.`));
+                return () => repository.setSchoolActive(school.id, school.active === false);
+            }, trigger));
             toggle.setAttribute('aria-label', `${school.active === false ? 'Reactivate' : 'Suspend'} ${school.name}`); actions.append(toggle);
         }
         const trigger = rowMenu(cell, `Actions for ${school.name}`, [...actions.children]);
@@ -78,9 +84,13 @@ export function renderPlatformAdministration({ schoolsPanel, administratorsPanel
         row.append(name, element('td', admin.active === false ? 'Inactive' : 'Active'));
         const cell = element('td');
         if (admin.active !== false) {
-            const revoke = button('Revoke access', () => refreshAfter(() => repository.setPlatformAdmin(admin.user_id, false)));
+            let trigger;
+            const revoke = button('Revoke access', () => popupForm('Revoke platform administration', 'Revoke access', node => {
+                node.append(element('p', `Revoke platform administration from ${admin.display_name || admin.email || admin.user_id}? This removes their platform administrator access.`));
+                return () => repository.setPlatformAdmin(admin.user_id, false);
+            }, trigger));
             revoke.setAttribute('aria-label', `Revoke platform access for ${admin.display_name || admin.email || 'administrator'}`);
-            rowMenu(cell, `Actions for ${admin.display_name || admin.email || 'administrator'}`, [revoke]);
+            trigger = rowMenu(cell, `Actions for ${admin.display_name || admin.email || 'administrator'}`, [revoke]);
         }
         row.append(cell); return row;
     }, 'Add administrator', opener => popupForm('Grant platform administration', 'Grant access', node => {

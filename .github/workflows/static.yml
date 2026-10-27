@@ -124,6 +124,8 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: npm run desktop:build:web
+      - name: Verify first-paint loading styles before feature startup
+        run: LOADING_FIRST_PAINT_DIST=1 npm run test:ui:loading-first-paint
       - name: Verify built private classroom ownership and activity reload
         run: PRIVATE_CLASSROOM_UI_DIST=1 npm run test:private-classrooms
       - name: Verify built student navigation recovery

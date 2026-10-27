@@ -71,7 +71,7 @@ export function createTeacherAssignmentPublisher({ getUserId, repository = class
                     const assignments = await repository.publishMaterial(pending);
                     if (!current(id, owner)) return;
                     view.close();
-                    onPublished({ assignments, classIds: pending.classIds });
+                    onPublished({ assignments, classIds: pending.classIds, releaseAt: pending.releaseAt });
                 } catch (error) {
                     if (current(id, owner)) {
                         status.textContent = `${error.message || 'Could not publish.'}${pending ? ' Retry uses the same saved request to avoid duplicates.' : ''}`;

@@ -104,3 +104,25 @@
     .student-loading-spark-save { width: 100%; }
 }
 .student-page-skeleton--sparks { max-width: none; margin-inline: 0; }
+
+/* Loading must reserve its own geometry before the Spark feature CSS arrives. */
+.student-page-skeleton--sparks .student-current-class-spark {
+    display: grid; grid-template-columns: minmax(0, 1fr); row-gap: var(--student-space-6); box-sizing: border-box;
+}
+.student-page-skeleton--sparks .student-class-spark-heading {
+    grid-column: 1 / -1; display: grid; gap: var(--student-space-2); min-width: 0;
+}
+.student-page-skeleton--sparks :is(.student-class-spark-reading, .student-class-spark-questions) { min-width: 0; }
+.student-page-skeleton--sparks .student-spark-step {
+    margin: 0 0 var(--student-space-4); display: flex; align-items: center; gap: var(--student-space-3);
+    font-size: var(--student-type-caption-size); font-weight: var(--student-weight-semibold); line-height: var(--student-leading-caption);
+}
+.student-page-skeleton--sparks .student-class-spark-questions { padding-top: var(--student-space-6); border-top: 1px solid rgba(173, 198, 255, .18); }
+@media (min-width: 1000px) {
+    .student-page-skeleton--sparks .student-current-class-spark {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); column-gap: var(--student-space-8); align-items: start;
+    }
+    .student-page-skeleton--sparks .student-class-spark-questions {
+        padding-top: 0; padding-left: var(--student-space-8); border-top: 0; border-left: 1px solid rgba(173, 198, 255, .18);
+    }
+}

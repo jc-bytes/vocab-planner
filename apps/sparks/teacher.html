@@ -48,6 +48,10 @@
                         aria-controls="teacher-classes-view" data-section="classes" data-tooltip="Classwork">
                         <i data-lucide="graduation-cap"></i><span>Classwork</span>
                     </button>
+                    <button class="teacher-tab primary-nav__item" id="tab-students" type="button" role="tab" aria-selected="false"
+                        aria-controls="teacher-class-students-view" data-section="students" data-tooltip="Students">
+                        <i data-lucide="users"></i><span>Students</span>
+                    </button>
                     <button class="teacher-tab primary-nav__item" id="tab-vocabulary" type="button" role="tab" aria-selected="false"
                         aria-controls="teacher-dashboard-view" data-section="vocabulary" data-tooltip="Library">
                         <i data-lucide="book-open"></i>
@@ -146,7 +150,7 @@
             <section id="teacher-overview-view" class="view hidden" role="tabpanel" aria-labelledby="tab-overview"></section>
 
             <section id="teacher-dashboard-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <p class="teacher-library-scope">Reusable material for all your classes.</p>
+                <p class="teacher-library-scope">Prepare and reuse material for your classes. Editing here does not change already assigned copies.</p>
                 <div class="data-tab-list activity-workflow-tabs secondary-tabs" role="tablist" aria-label="Library tools">
                     <button id="vocabulary-tab-assign" class="data-tab-btn activity-workflow-tab secondary-tab secondary-tab--active active" type="button"
                         role="tab" aria-selected="true" aria-controls="vocabulary-assign-panel" data-vocabulary-tab="assign">
@@ -222,7 +226,7 @@
 
             <!-- View: Sparks -->
             <section id="teacher-sparks-view" class="view hidden" role="tabpanel" aria-labelledby="tab-vocabulary">
-                <p class="teacher-library-scope">Reusable material for all your classes.</p>
+                <p class="teacher-library-scope">Prepare and reuse material for your classes. Editing here does not change already assigned copies.</p>
                 <div class="data-tab-list activity-workflow-tabs secondary-tabs" role="tablist" aria-label="Library tools">
                     <button class="data-tab-btn activity-workflow-tab secondary-tab" type="button"
                         role="tab" aria-selected="false" aria-controls="vocabulary-assign-panel" data-content-destination="vocabulary">
@@ -258,6 +262,8 @@
                     </div>
                 </div>
             </section>
+
+            <section id="teacher-class-students-view" class="view hidden" role="tabpanel" aria-labelledby="tab-students"></section>
 
             <!-- View: Student Progress -->
             <section id="teacher-progress-view" class="view hidden" role="tabpanel" aria-labelledby="tab-classes">
@@ -544,7 +550,7 @@
             </div>
 
             <!-- View: Student Profile -->
-            <section id="teacher-student-profile-view" class="view hidden student-profile-view" role="tabpanel" aria-labelledby="tab-classes">
+            <section id="teacher-student-profile-view" class="view hidden student-profile-view" role="tabpanel" aria-labelledby="tab-students">
                 <div class="student-profile-loading" id="student-profile-loading">
                     <div class="loading-spinner runtime-status">Loading student profile...</div>
                 </div>
@@ -988,6 +994,8 @@
                     <div>
                         <p id="data-management-eyebrow" class="teacher-eyebrow page-header__eyebrow">Administration</p>
                         <h2 id="data-management-title" class="page-header__title">Settings</h2>
+                        <p id="settings-school-scope">Learning settings apply to every class in the selected school.</p>
+                        <a href="#/teacher/administration?tab=years">Manage academic years and calendar in School settings</a>
                     </div>
                 </div>
 
@@ -1003,7 +1011,7 @@
                         Coins
                     </button>
                     <button class="data-tab-btn secondary-tab" id="data-tab-calendar" type="button" role="tab"
-                        aria-selected="false" aria-controls="data-calendar-section" data-area="settings" data-tab="calendar" tabindex="-1">
+                        aria-selected="false" aria-controls="data-calendar-section" data-area="legacy" hidden data-tab="calendar" tabindex="-1">
                         <i data-lucide="calendar-days"></i>
                         Calendar
                     </button>

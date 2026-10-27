@@ -19,13 +19,14 @@ export function installTeacherRoutingMethods(TeacherManager) {
             const { parts, params } = location;
 
             if (parts[0] !== 'teacher') return null;
-            if (['administration', 'platform'].includes(parts[1])) return { view: parts[1] };
+            if (['administration', 'platform'].includes(parts[1])) return { view: parts[1], ...(parts[1] === 'administration' && params.get('tab') === 'years' ? {tab:'years'} : {}) };
             if (!parts[1] || parts[1] === OVERVIEW_PAGE.id) return { view: OVERVIEW_PAGE.id };
             if (['classes', 'assignments', 'review'].includes(parts[1])) return {
                 view: parts[1] === 'review' ? 'assignments' : parts[1], classId: params.get('class') || null,
                 assignmentId: params.get('assignment') || null,
                 tab: params.get('tab') || (parts[1] === 'review' ? params.has('assignment') ? 'student-work' : 'needs-review' : undefined),
-                ...(params.has('listTab') ? { listTab: params.get('listTab') } : {})
+                ...(params.has('listTab') ? { listTab: params.get('listTab') } : {}),
+                ...(params.get('returnTo') === 'classwork' ? { returnTo: 'classwork' } : {})
             };
             if (parts[1] === STUDENTS_PAGE.id && parts[2]) {
                 const tab = ['overview', 'assigned', 'activity', 'account'].includes(params.get('tab'))
@@ -48,10 +49,12 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 return { view: OVERVIEW_PAGE.id };
             }
             if (parts[1] === SETTINGS_PAGE.id) {
+                if (params.get('tab') === 'calendar') return {view:'administration',tab:'years'};
                 if (params.get('tab') === 'export') return { view: 'assignments', tab: 'needs-review' };
                 return { view: SETTINGS_PAGE.id, tab: ['view', 'reset'].includes(params.get('tab')) ? 'subjects' : params.get('tab') || undefined };
             }
             if (parts[1] === 'data-settings') {
+                if (params.get('tab') === 'calendar') return {view:'administration',tab:'years'};
                 const tab = params.get('tab') || undefined;
                 if (tab === 'dashboard') return { view: OVERVIEW_PAGE.id };
                 if (tab === 'export') return { view: 'assignments', tab: 'needs-review' };
@@ -79,7 +82,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         },
 
         buildRoute(route) {
-            if (['administration', 'platform'].includes(route?.view)) return `#/teacher/${route.view}`;
+            if (['administration', 'platform'].includes(route?.view)) return `#/teacher/${route.view}${route.view === 'administration' && route.tab === 'years' ? '?tab=years' : ''}`;
             if (!route || !route.view) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (route.view === OVERVIEW_PAGE.id) return `#/teacher/${OVERVIEW_PAGE.id}`;
             if (['classes', 'assignments', 'review', GROUPS_PAGE.id].includes(route.view)) {
@@ -88,10 +91,11 @@ export function installTeacherRoutingMethods(TeacherManager) {
                 if (route.assignmentId) params.set('assignment', route.assignmentId);
                 if (route.tab) params.set('tab', route.tab);
                 if (route.listTab) params.set('listTab', route.listTab);
+                if (route.returnTo === 'classwork') params.set('returnTo', 'classwork');
                 if (route.view === 'review' && !route.tab) params.set('tab', route.assignmentId ? 'student-work' : 'needs-review');
                 return `#/teacher/${route.view === 'review' ? 'assignments' : route.view}${params.size ? `?${params}` : ''}`;
             }
-            if (route.view === STUDENTS_PAGE.id) return `#/teacher/${STUDENTS_PAGE.id}`;
+            if (route.view === STUDENTS_PAGE.id) return `#/teacher/${STUDENTS_PAGE.id}${route.classId ? `?class=${encodeURIComponent(route.classId)}` : ''}`;
             if (route.view === 'student-profile' && route.studentId) {
                 const params = new URLSearchParams();
                 if (route.tab && route.tab !== 'overview') params.set('tab', route.tab);
@@ -172,13 +176,14 @@ export function installTeacherRoutingMethods(TeacherManager) {
             if (viewId === 'quiz-maker-view') return { view: 'quiz-editor' };
             if (viewId === DATA_PAGE.viewId) {
                 const currentRoute = this.parseRoute();
-                    if (currentRoute?.view === SETTINGS_PAGE.id) return currentRoute;
+                if (currentRoute?.view === SETTINGS_PAGE.id || (currentRoute?.view === 'administration' && currentRoute.tab === 'years')) return currentRoute;
                 return { view: SETTINGS_PAGE.id, tab: 'subjects' };
             }
+            if (viewId === 'teacher-progress-view') return { view: 'students' };
             const page = teacherPageRegistry.pages.find(candidate => candidate.viewId === viewId);
             const route = this.parseRoute();
-            if (['classes', 'assignments', 'groups'].includes(page?.id) && route?.view === page.id) return route;
-            return { view: page?.id || OVERVIEW_PAGE.id, ...(['classes', 'assignments', 'groups'].includes(page?.id) && this.getSelectedTeacherClassId?.() ? { classId: this.getSelectedTeacherClassId() } : {}) };
+            if (['classes', 'students', 'assignments', 'groups'].includes(page?.id) && route?.view === page.id) return route;
+            return { view: page?.id || OVERVIEW_PAGE.id, ...(['classes', 'students', 'assignments', 'groups'].includes(page?.id) && this.getSelectedTeacherClassId?.() ? { classId: this.getSelectedTeacherClassId() } : {}) };
         },
 
         setRoute(route, options = {}) {
@@ -252,7 +257,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
         async applyRoute(route, navigation = this.beginTeacherNavigation()) {
             if (!route) return;
             const resolved = this.resolveTeacherClassRoute?.(route) || route;
-            if (this.buildRoute(resolved) !== this.buildRoute(route)) this.setRoute(resolved, { replace: true });
+            if (this.buildRoute(resolved) !== this.buildRoute(route) || (resolved.view === 'administration' && resolved.tab === 'years')) this.setRoute(resolved, { replace: true });
             route = resolved;
             if (!this.authDisabled && !canOpenSchoolSection(route.view)) route = { view: 'administration' };
             if (this.isApplyingRoute) {
@@ -277,7 +282,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             await this.showPlatformAdministration();
                             break;
                         case 'administration':
-                            await this.showSchoolAdministration();
+                            await this.showSchoolAdministration(routeToApply);
                             break;
                         case VOCABULARY_PAGE.id:
                             const routeDrilldown = {
@@ -322,7 +327,7 @@ export function installTeacherRoutingMethods(TeacherManager) {
                             }
                             break;
                         case STUDENTS_PAGE.id:
-                            await this.showProgressView();
+                            await this.showClassStudentsView(routeToApply);
                             break;
                         case 'student-profile':
                             await this.showStudentProfileById(routeToApply.studentId, { tab: routeToApply.tab });

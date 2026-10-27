@@ -154,7 +154,7 @@ async showProgressView() {
         const navigation = this.captureTeacherNavigation?.();
         const current = () => generation === (this.studentProgressSessionGeneration || 0)
             && (!navigation || this.isTeacherNavigationCurrent(navigation));
-        this.switchView(STUDENTS_PAGE.viewId);
+        this.switchView('teacher-progress-view');
 
         const loadingEl = $('#progress-loading');
         const listEl = $('#student-progress-list');
