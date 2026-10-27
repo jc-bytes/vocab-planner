@@ -277,10 +277,14 @@ try {
     await page.evaluate(()=>window.loadingResolvers.students.resolve([{studentId:'stale',name:'Stale student',email:'stale@example.org'}]));
     assert.equal(await page.getByText('Stale student',{exact:true}).count(),0);
     await page.evaluate(()=>window.loadingResolvers.work.reject(new Error('Work request failed')));
-    await page.getByText('Work request failed',{exact:true}).waitFor();
+    const workRecovery = page.locator('#class-detail-panel [data-section-recovery]');
+    await workRecovery.getByText('Could not load classes. Check your connection and try again.',{exact:true}).waitFor();
+    assert.equal(await workRecovery.getAttribute('role'), 'alert');
+    assert.equal(await page.getByText('Work request failed',{exact:true}).count(),0, 'Raw repository errors are replaced by actionable section feedback');
     assert.equal(await page.locator('.class-workspace-loading').count(),0);
     assert.equal(await page.locator('main').getAttribute('aria-busy'),'false');
-    await page.getByRole('button',{name:'Try again',exact:true}).click();
+    await workRecovery.getByRole('button',{name:'Try again',exact:true}).click();
+    await workRecovery.waitFor({state:'detached'});
     await page.locator('.class-workspace-loading[data-loading-section="work"] .class-loading-skeleton').waitFor();
     await page.evaluate(()=>window.loadingResolvers.classes.resolve([{id:'loading-class',name:'Loading test',school_year:2026}]));
     await page.locator('.class-workspace-loading[data-loading-section="work"] .class-loading-skeleton').waitFor();

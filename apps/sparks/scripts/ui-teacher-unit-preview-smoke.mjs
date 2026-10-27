@@ -37,6 +37,7 @@ try {
  const frame = page.frameLocator('.teacher-unit-preview-frame');
  await page.addLocatorHandler(frame.getByRole('button', { name: 'Skip guide', exact: true }), async locator => locator.click());
  await frame.locator('#activity-menu-view:not(.hidden)').waitFor();
+ await frame.locator('.activities-grid [data-activity=flashcards]').waitFor();
  assert.equal(await frame.locator('.activities-grid [data-activity=flashcards]').count(), 1);
  await frame.locator('[data-activity=flashcards]').click();
  await frame.locator('#activity-container .flashcard-wrapper').waitFor();

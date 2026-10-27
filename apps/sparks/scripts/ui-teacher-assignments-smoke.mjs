@@ -257,8 +257,13 @@ try {
     await page.getByText('Loading assignments…',{exact:true}).waitFor();
     assert.equal(await page.locator('#teacher-assignments-view').getAttribute('aria-busy'),'true');
     await page.evaluate(()=>window.assignmentSmoke.rejectList(new Error('Assignments unavailable')));
-    await page.getByText('Assignments unavailable',{exact:true}).waitFor();
-    await page.getByRole('button',{name:'Try again',exact:true}).click();
+    const assignmentRecovery = page.locator('#teacher-assignments-view [data-section-recovery]');
+    await assignmentRecovery.getByText('Could not load assignments. Check your connection and try again.',{exact:true}).waitFor();
+    assert.equal(await assignmentRecovery.getAttribute('role'), 'alert');
+    assert.equal(await page.getByText('Assignments unavailable',{exact:true}).count(),0, 'Raw repository errors are replaced by actionable section feedback');
+    assert.equal(await page.locator('#teacher-assignments-view').getAttribute('aria-busy'),'false');
+    await assignmentRecovery.getByRole('button',{name:'Try again',exact:true}).click();
+    await assignmentRecovery.waitFor({state:'detached'});
     await page.getByText('Loading assignments…',{exact:true}).waitFor();
     await page.evaluate(()=>window.assignmentSmoke.resolveList([]));
     await page.getByText('No assignments match this view.').waitFor();
