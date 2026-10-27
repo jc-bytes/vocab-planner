@@ -23,7 +23,8 @@ test('class routes retain context, default to classwork and require a class', ()
     values.clear(); schoolId = 'school-a'; const app = new Manager();
     assert.deepEqual(app.resolveTeacherClassRoute({ view: 'assignments' }), { view: 'overview' });
     assert.deepEqual(app.resolveTeacherClassRoute({ view: 'classes', classId: '6a' }), { view: 'classes', classId: '6a', tab: 'work' });
-    assert.deepEqual(app.resolveTeacherClassRoute({ view: 'students' }), { view: 'classes', classId: '6a', tab: 'students' });
+    assert.deepEqual(app.resolveTeacherClassRoute({ view: 'classes', classId: '6a', tab: 'settings' }), { view: 'classes', classId: '6a', tab: 'work' });
+    assert.deepEqual(app.resolveTeacherClassRoute({ view: 'students' }), { view: 'students', classId: '6a' });
     assert.deepEqual(app.resolveTeacherClassRoute({ view: 'groups' }), { view: 'groups', classId: '6a' });
     assert.deepEqual(app.resolveTeacherClassRoute({ view: 'vocabulary' }), { view: 'vocabulary' });
 });
@@ -37,7 +38,7 @@ test('switching classes discards an assignment or student detail from the old cl
     assert.deepEqual(written, applied);
     app.parseRoute = () => ({ view: 'student-profile', studentId: 'old-student' });
     app.changeTeacherClass('6a');
-    assert.deepEqual(applied, { view: 'classes', classId: '6a', tab: 'students' });
+    assert.deepEqual(applied, { view: 'students', classId: '6a' });
 });
 
 test('switching class in the reusable library keeps the open editor and its draft', () => {
@@ -45,4 +46,16 @@ test('switching class in the reusable library keeps the open editor and its draf
     app.setRoute = () => assert.fail('Library editing should stay open');
     app.applyRoute = () => assert.fail('Library editing should stay open');
     app.changeTeacherClass('7b'); assert.equal(app.getSelectedTeacherClassId(), '7b');
+});
+
+test('sidebar sections keep the selected class and legacy roster links open Students', () => {
+    values.clear(); const app = new Manager();
+    app.selectTeacherClass('6a');
+    assert.deepEqual(app.resolveTeacherClassRoute({view:'students'}), {view:'students',classId:'6a'});
+    assert.deepEqual(app.resolveTeacherClassRoute({view:'classes'}), {view:'classes',classId:'6a',tab:'work'});
+    assert.deepEqual(app.resolveTeacherClassRoute({view:'classes',classId:'7b',tab:'students'}), {view:'students',classId:'7b'});
+    assert.deepEqual(app.resolveTeacherClassRoute({view:'classes'}), {view:'classes',classId:'7b',tab:'work'});
+    let applied; app.setRoute = () => {}; app.applyRoute = route => {applied = route;};
+    app.parseRoute = () => ({view:'students',classId:'7b'});
+    app.changeTeacherClass('6a'); assert.deepEqual(applied, {view:'students',classId:'6a'});
 });

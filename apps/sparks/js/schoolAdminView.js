@@ -107,7 +107,7 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
             }
         } finally { if (refreshTicket === ticket) refreshTicket = null; }
     }
-    async function show() {
+    async function show({ tab } = {}) {
         if (destroyed) return;
         closeDialog?.();
         refreshTicket = null;
@@ -117,11 +117,13 @@ export function createSchoolAdminView({ root, context = schoolContext, repositor
         const access = context.getAccess(), school = context.getSchool();
         const scope = JSON.stringify([account, schoolId]);
         if (memberScope !== scope) { memberScope = scope; memberSearch = ''; memberRole = ''; activeSection = 'members'; }
+        if (!platformMode && tab === 'years') activeSection = 'years';
         root.classList.add('school-admin'); root.classList.toggle('school-admin--school', !platformMode); root.classList.toggle('school-admin--platform', platformMode);
         const heading = element('h2', platformMode ? 'Platform administration' : 'School settings', 'school-admin-control-label');
         const header = element('div', undefined, 'school-admin-header school-admin-header--compact'); header.append(heading);
         root.replaceChildren(header, status);
         if (platformMode && !access.platformAdmin) { status.textContent = 'Platform administration access denied.'; return; }
+        root.append(element('p', platformMode ? 'Manage schools and platform administrator access across the system.' : `School administration for ${school?.name || 'the selected school'}. Class enrollment and student learning records are in Students.`, 'school-admin-scope'));
         status.textContent = '';
         root.setAttribute('aria-busy', 'true');
         const toolbar = element('div', undefined, 'school-admin-toolbar');

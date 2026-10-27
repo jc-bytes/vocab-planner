@@ -65,8 +65,11 @@ test('teacher routes keep their public URL contract through the shared parser', 
         view: 'overview'
     });
     assert.deepEqual(teacher.parseRoute('#/teacher/data-settings?tab=calendar'), {
-        view: 'settings', tab: 'calendar'
+        view: 'administration', tab: 'years'
     });
+    assert.deepEqual(teacher.parseRoute('#/teacher/settings?tab=calendar'), {view:'administration',tab:'years'});
+    assert.equal(teacher.buildRoute({view:'administration',tab:'years'}),'#/teacher/administration?tab=years');
+    assert.equal(teacher.parseRoute('#/teacher/assignments?class=6a&assignment=work&returnTo=classwork').returnTo,'classwork');
     assert.deepEqual(teacher.parseRoute('#/teacher/settings?tab=gamification'), {
         view: 'settings', tab: 'gamification'
     });
@@ -139,7 +142,7 @@ test('teacher routes keep their public URL contract through the shared parser', 
     });
     window.location.hash = '#/teacher/settings?tab=calendar';
     assert.deepEqual(teacher.currentTeacherRouteForView('teacher-data-management-view'), {
-        view: 'settings', tab: 'calendar'
+        view: 'administration', tab: 'years'
     });
     assert.deepEqual(teacher.currentTeacherRouteForView('unknown-view'), { view: 'overview' });
 

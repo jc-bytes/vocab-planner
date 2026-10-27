@@ -87,5 +87,8 @@ try{
  await page.evaluate(()=>window.teacherApp.applyRoute({view:'platform'}));
  assert.equal(await page.locator('#teacher-platform-view').isVisible(),false);
  assert.equal(await page.getByRole('heading',{name:'School settings',exact:true}).isVisible(),true);
+ await page.evaluate(()=>window.teacherApp.applyRoute(window.teacherApp.parseRoute('#/teacher/settings?tab=calendar')));
+ await page.getByRole('tab',{name:'Academic years',selected:true}).waitFor();
+ assert.match(await page.evaluate(()=>location.hash),/administration\?tab=years/);
  console.log('Actual teacher shell school switching and student assignment snapshot loading passed.');
 }finally{await browser?.close();server?.kill();}

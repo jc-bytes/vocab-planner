@@ -60,6 +60,7 @@ if (shell) {
         if (returning && loading?.classList.contains('active') && !loading.classList.contains('hidden')) {
             let sections;
             try { sections = JSON.parse(localStorage.getItem(sectionsKey)); } catch { /* Use the static menu. */ }
+            if (Array.isArray(sections) && sections.includes('classes') && !sections.includes('students')) sections.push('students');
             if (Array.isArray(sections)) shell.querySelectorAll('.teacher-tab').forEach(tab => { tab.hidden = !sections.includes(tab.dataset.section); });
             const route = highlightRoute();
             shell.classList.remove('hidden');

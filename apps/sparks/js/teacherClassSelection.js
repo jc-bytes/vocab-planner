@@ -45,8 +45,8 @@ export function installTeacherClassSelectionMethods(TeacherManager, { sessionKey
             const classId = route.classId || this.getSelectedTeacherClassId();
             if (!classId) return { view: 'overview' };
             this.selectTeacherClass(classId);
-            if (route.view === 'students') return { view: 'classes', classId, tab: 'students' };
-            return { ...route, classId, ...(route.view === 'classes' ? { tab: route.tab || 'work' } : {}) };
+            if (route.view === 'students' || (route.view === 'classes' && route.tab === 'students')) return { view: 'students', classId };
+            return { ...route, classId, ...(route.view === 'classes' ? { tab: route.tab === 'students' ? 'students' : 'work' } : {}) };
         },
         updateTeacherClassOptions(classes) {
             const select = document.getElementById('teacher-class-select');
@@ -70,10 +70,11 @@ export function installTeacherClassSelectionMethods(TeacherManager, { sessionKey
                 return;
             }
             const next = !classId ? { view: 'overview' }
-                : route.view === 'classes' ? { view: 'classes', classId, tab: route.tab || 'work' }
+                : route.view === 'students' || route.view === 'student-profile' || (route.view === 'classes' && route.tab === 'students') ? { view: 'students', classId }
+                : route.view === 'classes' ? { view: 'classes', classId, tab: 'work' }
                 : ['assignments', 'review'].includes(route.view) ? { view: 'assignments', classId, tab: route.listTab || (route.assignmentId ? 'current' : route.tab) }
                 : route.view === 'groups' ? { view: 'groups', classId }
-                : { view: 'classes', classId, tab: route.view === 'student-profile' ? 'students' : 'work' };
+                : { view: 'classes', classId, tab: 'work' };
             this.setRoute(next);
             return this.applyRoute(next);
         }

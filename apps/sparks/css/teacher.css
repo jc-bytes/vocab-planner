@@ -5566,3 +5566,25 @@ button.activity-card {
 .student-insight-attempt { border-bottom: 1px solid var(--border-color); padding-block: 0.75rem; }
 
 .student-profile-tabs .secondary-tab:not(.active) { color: var(--text-main); }
+
+/* Header controls must be styled before lazy workspace modules load. */
+/* Keep the native select for keyboard and platform picker behavior. */
+.teacher-class-switcher { position: relative; display: grid; grid-template-columns: 1.15rem minmax(0, 1fr) .85rem; align-items: center; gap: .65rem; box-sizing: border-box; width: 100%; max-width: 22rem; min-width: 0; min-height: 40px; margin: 0; padding: .3rem .75rem; border: 1px solid var(--color-border); border-radius: .65rem; background: var(--color-control-background, #101a30); color: var(--color-text); cursor: pointer; }
+.teacher-class-switcher[hidden] { display: none; }
+.teacher-class-switcher:hover { border-color: var(--color-interactive, #adc6ff); }
+.teacher-class-switcher:focus-within { outline: 2px solid var(--color-focus, #adc6ff); outline-offset: 2px; }
+.teacher-class-switcher-copy { display: grid; gap: .05rem; min-width: 0; line-height: 1.15; }
+.teacher-class-switcher-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; font-weight: 600; }
+.teacher-class-switcher-copy small { color: var(--color-text-muted, #aab6d0); font-size: .65rem; }
+.teacher-class-switcher-icon { width: 1.15rem; height: 1.15rem; color: var(--color-interactive, #adc6ff); }
+.teacher-class-switcher-chevron { width: .85rem; height: .85rem; color: var(--color-text-muted, #aab6d0); }
+.teacher-class-switcher select { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 0; margin: 0; opacity: 0; cursor: pointer; }
+html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > .teacher-top-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 22rem) minmax(0, 1fr); align-items: center; column-gap: 1rem; }
+.teacher-top-bar-copy { grid-column: 1; }
+.teacher-class-switcher { grid-column: 2; justify-self: center; }
+.teacher-top-bar-school { grid-column: 3; justify-self: end; max-width: 100%; margin-left: 0; font-size: .75rem; color: var(--color-text-muted, #aab6d0); }
+@media (max-width: 600px) {
+    html body.teacher-site .app-container:has(#teacher-tab-shell:not(.hidden)) > .teacher-top-bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: .5rem; }
+    .teacher-top-bar-school { grid-column: 2; }
+    .teacher-class-switcher { grid-column: 1 / -1; grid-row: 2; max-width: none; min-height: 44px; }
+}

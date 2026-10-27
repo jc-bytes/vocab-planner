@@ -35,6 +35,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     env:
       SUPABASE_TELEMETRY_DISABLED: "1"
       UI_SMOKE_PORT: "8560"
@@ -64,7 +67,14 @@ jobs:
           cache-dependency-path: apps/sparks/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Use the Ubuntu HTTPS package mirror
+        run: |
+          for file in /etc/apt/apt-mirrors.txt /etc/apt/apt-*-mirrors.txt /etc/apt/sources.list /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
+            [ -f "$file" ] || continue
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' "$file"
+          done
       - name: Install Playwright browsers
+        timeout-minutes: 10
         run: npx playwright install --with-deps chromium firefox webkit
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@46f7f98c7f948ad727d22c1e67fab04c223a0520 # v3
@@ -72,10 +82,23 @@ jobs:
           version: 2.114.0
       - name: Check Docker
         run: docker info
+      - name: Use the public Supabase image mirror
+        run: printf '%s\n' 'SUPABASE_INTERNAL_IMAGE_REGISTRY=public.ecr.aws' >> "$GITHUB_ENV"
       - name: Start local Supabase
         env:
           SUPABASE_TELEMETRY_DISABLED: 1
-        run: supabase start
+        run: |
+          set -o pipefail
+          for attempt in 1 2 3; do
+            if supabase start 2>&1 | tee /tmp/sparks-supabase-start.log; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ] || ! grep -Eqi 'toomanyrequests|rate exceeded|rate limit' /tmp/sparks-supabase-start.log; then
+              exit 1
+            fi
+            echo "Container registry throttled the download; retrying with cached images in 30 seconds."
+            sleep 30
+          done
       - name: Smoke test app shells
         run: npm run test:ui:smoke
       - name: Configure local worker lifecycle builds
@@ -124,6 +147,8 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: npm run desktop:build:web
+      - name: Verify first-paint loading styles before feature startup
+        run: LOADING_FIRST_PAINT_DIST=1 npm run test:ui:loading-first-paint
       - name: Verify built private classroom ownership and activity reload
         run: PRIVATE_CLASSROOM_UI_DIST=1 npm run test:private-classrooms
       - name: Verify built student navigation recovery

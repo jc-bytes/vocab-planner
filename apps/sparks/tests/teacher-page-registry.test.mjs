@@ -7,6 +7,7 @@ const { defineTeacherPages, teacherPageRegistry } = await import('../js/teacherP
 const EXPECTED_PRIMARY_PAGES = [
     { id: 'overview', viewId: 'teacher-overview-view' },
     { id: 'classes', viewId: 'teacher-classes-view' },
+    { id: 'students', viewId: 'teacher-class-students-view' },
     { id: 'vocabulary', viewId: 'teacher-dashboard-view' },
     { id: 'assignments', viewId: 'teacher-assignments-view' },
     { id: 'settings', viewId: 'teacher-data-management-view' },
