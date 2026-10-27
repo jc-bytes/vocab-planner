@@ -48,9 +48,16 @@ jobs:
           gh run download "$VALIDATED_RUN" --repo "$GITHUB_REPOSITORY" --name github-pages --dir validated-artifact
           mkdir validated-site
           tar -xf validated-artifact/artifact.tar -C validated-site
+      # Validation already pruned candidate assets before Pages packaging.
+      # Packaging omits hidden .vite metadata. Refresh only the actual hosted
+      # graph here, preserving every tested file without manifest-based pruning.
       - name: Retain previously published immutable assets
         run: |
-          node apps/sparks/scripts/retain-hosted-assets.mjs "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" validated-site
+          node --input-type=module <<'JS'
+          import { retainHostedAssets } from './apps/sparks/scripts/retain-hosted-assets.mjs';
+          const repository = process.env.GITHUB_REPOSITORY.split('/')[1];
+          await retainHostedAssets(`https://${process.env.GITHUB_REPOSITORY_OWNER}.github.io/${repository}/`, 'validated-site');
+          JS
           retained_bytes=$(du -sb validated-site | cut -f1)
           test "$retained_bytes" -le $((30 * 1024 * 1024))
       - name: Verify required hosted owned RPCs before publishing
