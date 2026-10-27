@@ -21,6 +21,11 @@ try {
     for (const route of ['units', 'sparks', 'arcade', 'flashcards', 'unit', 'home']) {
         const context = await browser.newContext({ serviceWorkers: 'block' }), page = await context.newPage();
         const fixture = await installStudentAssignedFlowFixture(page, { completeRequiredActivities: true });
+        let releaseClassRead;
+        if (route === 'unit') {
+            const released = new Promise(resolve => { releaseClassRead = resolve; });
+            await page.route('**/rest/v1/rpc/my_teaching_classes_v1', async route => { await released; await route.fallback(); });
+        }
         const requests = [];
         page.on('request', request => { const path = new URL(request.url()).pathname; if (optional.has(path)) requests.push(path); });
         const unit = `assignment.${fixture.ids.assignment}`;
@@ -28,6 +33,19 @@ try {
         await page.goto(`${baseUrl}/student.html${hash}`); await settled(page);
         if (route === 'home') await homeReady(page);
         if (route === 'flashcards') await page.waitForFunction(() => !!studentApp.activityInstance);
+        if (route === 'unit') {
+            await page.locator('#activity-menu-view.active[aria-busy="false"] .activity-card[data-activity="flashcards"]').waitFor();
+            assert.equal(await page.evaluate(() => !!studentApp.activities.vocabularyData.classSelection?.ready), false,
+                'Unit Menu can finish before its background class snapshot');
+            releaseClassRead();
+        }
+        // Authentication/route readiness does not include the asynchronous shared class selector.
+        await page.waitForFunction(() => {
+            const selection = studentApp.activities.vocabularyData.classSelection;
+            const option = document.querySelector('#student-subject-picker .student-subject-option[aria-selected="true"]');
+            return selection?.ready && !selection.pending && selection.owner === studentApp.currentUser?.uid
+                && option?.dataset.subjectSlug === selection.selectedId;
+        });
         assert.equal(requests.includes(renderer), route === 'home', `${route}: cold Home implementation`);
         for (const path of styles) assert.equal(requests.includes(path), route === 'home', `${route}: cold Home styles`);
         if (route !== 'home') {
