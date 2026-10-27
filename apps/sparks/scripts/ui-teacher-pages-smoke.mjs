@@ -69,6 +69,7 @@ try {
             refreshIcons() {}
             loadTeacherOverview() { this.overviewLoads += 1; }
             showSparksView() { this.sparkLoads += 1; this.switchView(sparksPage.viewId); }
+            showClassStudentsView(context) { this.workspaceContext = context; this.progressLoads += 1; this.switchView('teacher-class-students-view', { updateRoute: false }); }
             showClassesView(context) { this.workspaceContext = context; if (context.tab === 'students') this.progressLoads += 1; this.switchView('teacher-classes-view', { updateRoute: false }); }
             showAssignmentsView(context) { this.workspaceContext = context; this.switchView(`teacher-${context.mode}-view`, { updateRoute: false }); }
             showSparkEditor(context) { this.workspaceContext = context; this.switchView('teacher-spark-editor-view', { updateRoute: false }); }
@@ -131,7 +132,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/students?class=class-a');
     const overviewLoadsBeforeBack = await page.evaluate(() => window.teacherPageSmokeManager.overviewLoads);
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
@@ -195,7 +196,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/students?class=class-a');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/vocabulary?subject=technology&grade=7&trimester=2&month=May&mode=review'
@@ -241,7 +242,7 @@ try {
     }
 
     await page.evaluate(() => window.teacherPageSmokeManager.showTeacherSection('students'));
-    await page.waitForFunction(() => window.location.hash === '#/teacher/classes?class=class-a&tab=students');
+    await page.waitForFunction(() => window.location.hash === '#/teacher/students?class=class-a');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/sparks'
@@ -263,11 +264,11 @@ try {
             loadDelta: manager.progressLoads - loadsBefore
         };
     });
-    if (students.hash !== '#/teacher/classes?class=class-a&tab=students'
-        || students.activeView !== 'teacher-classes-view'
-        || students.activeSection !== 'classes'
-        || students.mobileLabel !== 'Classwork'
-        || students.topLabel !== 'Classwork'
+    if (students.hash !== '#/teacher/students?class=class-a'
+        || students.activeView !== 'teacher-class-students-view'
+        || students.activeSection !== 'students'
+        || students.mobileLabel !== 'Students'
+        || students.topLabel !== 'Students'
         || students.loadDelta !== 1) {
         throw new Error(`Students navigation changed: ${JSON.stringify(students)}`);
     }
@@ -283,8 +284,8 @@ try {
             loadDelta: manager.progressLoads - loadsBefore
         };
     });
-    if (studentsDirect.activeView !== 'teacher-classes-view'
-        || studentsDirect.activeSection !== 'classes'
+    if (studentsDirect.activeView !== 'teacher-class-students-view'
+        || studentsDirect.activeSection !== 'students'
         || studentsDirect.loadDelta !== 1) {
         throw new Error(`Students direct route changed: ${JSON.stringify(studentsDirect)}`);
     }
@@ -293,9 +294,9 @@ try {
     await page.waitForFunction(() => window.location.hash === '#/teacher/overview');
     await page.evaluate(() => history.back());
     await page.waitForFunction(() => (
-        window.location.hash === '#/teacher/classes?class=class-a&tab=students'
-        && document.querySelector('.view.active')?.id === 'teacher-classes-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
+        window.location.hash === '#/teacher/students?class=class-a'
+        && document.querySelector('.view.active')?.id === 'teacher-class-students-view'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
     ));
 
     const groups = await page.evaluate(() => {
@@ -313,9 +314,9 @@ try {
     });
     if (groups.hash !== '#/teacher/groups?class=class-a'
         || groups.activeView !== 'teacher-groups-view'
-        || groups.activeSection !== 'classes'
-        || groups.mobileLabel !== 'Classwork'
-        || groups.topLabel !== 'Classwork'
+        || groups.activeSection !== 'students'
+        || groups.mobileLabel !== 'Students'
+        || groups.topLabel !== 'Students'
         || groups.loadDelta !== 1) {
         throw new Error(`Groups navigation changed: ${JSON.stringify(groups)}`);
     }
@@ -332,7 +333,7 @@ try {
         };
     });
     if (groupsDirect.activeView !== 'teacher-groups-view'
-        || groupsDirect.activeSection !== 'classes'
+        || groupsDirect.activeSection !== 'students'
         || groupsDirect.loadDelta !== 1) {
         throw new Error(`Groups direct route changed: ${JSON.stringify(groupsDirect)}`);
     }
@@ -343,7 +344,7 @@ try {
     await page.waitForFunction(() => (
         window.location.hash === '#/teacher/groups?class=class-a'
         && document.querySelector('.view.active')?.id === 'teacher-groups-view'
-        && document.querySelector('.teacher-tab.active')?.dataset.section === 'classes'
+        && document.querySelector('.teacher-tab.active')?.dataset.section === 'students'
     ));
 
     const data = await page.evaluate(() => {

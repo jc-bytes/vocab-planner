@@ -236,8 +236,9 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     await home.getByRole('button', { name: /^Open class / }).first().click();
     const classes = page.locator('#teacher-classes-view');
     if (process.env.UI_AUDIT_CLASS_ID) await page.getByLabel('Current class', { exact: true }).selectOption(process.env.UI_AUDIT_CLASS_ID);
-    await classes.getByRole('tab', { name: 'Students', exact: true }).click();
-    await classes.getByRole('button', { name: /^Actions for / }).first().click();
+    await page.locator('#tab-students').click();
+    const students = page.locator('#teacher-class-students-view');
+    await students.getByRole('button', { name: /^Actions for / }).first().click();
     await page.getByRole('menuitem', { name: 'View profile', exact: true }).click();
     await page.waitForSelector('#teacher-student-profile-view:not(.hidden)', { timeout: 5000 });
     await page.locator('#student-profile-content:not(.hidden)').waitFor();
@@ -250,7 +251,8 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     if (!ok) throw new Error('Student profile did not expose routed profile navigation and tabs.');
 
     await page.locator('#student-profile-back-btn').click();
-    await classes.locator('#class-tab-students[aria-selected="true"]').waitFor();
+    await page.locator('#tab-students[aria-selected="true"]').waitFor();
+    await students.getByRole('button', {name:/^Actions for /}).first().waitFor();
 }
 
 async function assertTeacherMobileMenu(page, baseUrl) {
