@@ -87,7 +87,17 @@ jobs:
       - name: Start local Supabase
         env:
           SUPABASE_TELEMETRY_DISABLED: 1
-        run: supabase start
+        run: |
+          for attempt in 1 2 3; do
+            if supabase start 2>&1 | tee /tmp/sparks-supabase-start.log; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ] || ! grep -Eqi 'toomanyrequests|rate exceeded|rate limit' /tmp/sparks-supabase-start.log; then
+              exit 1
+            fi
+            echo "Container registry throttled the download; retrying with cached images in 30 seconds."
+            sleep 30
+          done
       - name: Smoke test app shells
         run: npm run test:ui:smoke
       - name: Configure local worker lifecycle builds
