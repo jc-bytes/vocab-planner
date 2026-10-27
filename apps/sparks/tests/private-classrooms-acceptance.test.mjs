@@ -382,11 +382,11 @@ test('private classes enforce ownership and verified enrollment through real aut
                     assert.equal(await dialog.locator('input[name=classIds]:checked').count(), 1);
                     await dialog.getByRole('button', { name: 'Assign material', exact: true }).click();
                     await dialog.waitFor({ state: 'detached' });
-                    await teacherPage.locator('#teacher-assignments-view:not(.hidden)').waitFor();
+                    await teacherView.waitFor({ state: 'visible' });
+                    await teacherView.getByRole('rowheader', { name: label.split(' · ').slice(1).join(' · '), exact: true }).waitFor();
                 }
                 await publishSavedMaterial('Vocabulary · Cell practice');
-                const assignmentView = teacherPage.locator('#teacher-assignments-view');
-                await assignmentView.getByRole('heading', { name: 'Cell practice', exact: true }).first().waitFor();
+                await teacherView.getByRole('rowheader', { name: 'Cell practice', exact: true }).waitFor();
                 await publishSavedMaterial('Spark · Private reflection');
                 const afterPublication = await a.repo.listAssignments(ca.id);
                 assert.equal(afterPublication.filter(row => row.title === 'Cell practice').length,

@@ -236,6 +236,7 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     await home.getByRole('button', { name: /^Open class / }).first().click();
     const classes = page.locator('#teacher-classes-view');
     if (process.env.UI_AUDIT_CLASS_ID) await page.getByLabel('Current class', { exact: true }).selectOption(process.env.UI_AUDIT_CLASS_ID);
+    if (!await page.locator('#tab-students').isVisible()) await page.locator('#teacher-mobile-menu-toggle').click();
     await page.locator('#tab-students').click();
     const students = page.locator('#teacher-class-students-view');
     await students.getByRole('button', { name: /^Actions for / }).first().click();
@@ -251,7 +252,7 @@ async function auditTeacherStudentProfile(page, baseUrl) {
     if (!ok) throw new Error('Student profile did not expose routed profile navigation and tabs.');
 
     await page.locator('#student-profile-back-btn').click();
-    await page.locator('#tab-students[aria-selected="true"]').waitFor();
+    await page.locator('#tab-students[aria-selected="true"]').waitFor({ state: 'attached' });
     await students.getByRole('button', {name:/^Actions for /}).first().waitFor();
 }
 
