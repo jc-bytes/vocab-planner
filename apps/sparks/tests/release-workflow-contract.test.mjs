@@ -39,7 +39,7 @@ test('built fault and ownership checks run after the actual CI build and in the 
         ['UI_STUDENT_HOME_PRESENTATION_DIST', 'test:ui:student-home-presentation'],
         ['UI_STUDENT_LIBRARY_STYLES_DIST', 'test:ui:student-library-styles'],
         ['UI_STUDENT_RUNTIME_DIST', 'test:ui:student-active-runtime'],
-        ['UI_STUDENT_WORD_HUNT_EVIDENCE_DIST', 'test:ui:word-hunt-evidence'],
+        ['UI_STUDENT_WORD_HUNT_EVIDENCE_DIST', 'test:ui:word-hunt-evidence:built'],
         ['UI_ARCADE_ELIGIBILITY_DIST', 'test:ui:arcade-eligibility'],
         ['UI_ARCADE_LAYOUT_DIST', 'test:ui:arcade-layout'],
         ['UI_PASSWORD_ISOLATION_DIST', 'test:ui:password-isolation'],
@@ -128,4 +128,18 @@ test('compiled CI checks inherit the same hosted public configuration as the bui
         assert.ok(step.includes(variable + ': $' + '{{ secrets.' + secret + ' }}'));
         assert.ok(step.includes(`printf '${variable}=%s\\n' "$${variable}" >> "$GITHUB_ENV"`));
     }
+});
+
+
+test('compiled Word Hunt acceptance never starts the source-only component server with hosted build configuration', () => {
+    const compiled = [...reachableScripts(scripts, 'test:ui:word-hunt-evidence:built')].map(name => scripts[name]).join('\n');
+    assert.match(compiled, /UI_STUDENT_WORD_HUNT_EVIDENCE_DIST=1 node scripts\/ui-student-word-hunt-evidence-smoke\.mjs/);
+    assert.doesNotMatch(compiled, /node scripts\/ui-word-hunt-evidence-smoke\.mjs/);
+    assert.doesNotMatch(compiled, /ALLOW_PRODUCTION_SUPABASE_IN_DEV/);
+    assert.ok(scripts['test:checks'].split(' && ').includes('node scripts/ui-word-hunt-evidence-smoke.mjs'),
+        'source validation must keep the real canvas/component acceptance');
+    assert.ok(scripts['test:checks'].split(' && ').includes('node scripts/ui-student-word-hunt-evidence-smoke.mjs'),
+        'source validation must keep the real application evidence acceptance');
+    assert.match(scripts['test:ui:word-hunt-evidence'], /node scripts\/ui-word-hunt-evidence-smoke\.mjs && node scripts\/ui-student-word-hunt-evidence-smoke\.mjs/,
+        'the established source command retains both controls');
 });

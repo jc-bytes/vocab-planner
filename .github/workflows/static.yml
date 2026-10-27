@@ -161,7 +161,7 @@ jobs:
       - name: Verify built active student attempt runtime ownership
         run: UI_STUDENT_RUNTIME_DIST=1 npm run test:ui:student-active-runtime
       - name: Verify built Word Hunt evidence ownership and persistence
-        run: UI_STUDENT_WORD_HUNT_EVIDENCE_DIST=1 npm run test:ui:word-hunt-evidence
+        run: UI_STUDENT_WORD_HUNT_EVIDENCE_DIST=1 npm run test:ui:word-hunt-evidence:built
       - name: Verify built Arcade required-work eligibility
         run: UI_ARCADE_ELIGIBILITY_DIST=1 npm run test:ui:arcade-eligibility
       - name: Verify built mobile Arcade card controls
