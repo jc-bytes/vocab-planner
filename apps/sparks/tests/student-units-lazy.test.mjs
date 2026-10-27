@@ -6,7 +6,7 @@ globalThis.location = { hash: '#/units' };
 const view = { classList: { toggle() {} }, setAttribute() {} };
 function element(tag = 'div') {
     let text = '', html = '';
-    const node = { tagName: tag.toUpperCase(), children: [], dataset: {},
+    const node = { tagName: tag.toUpperCase(), children: [], dataset: {}, className: '',
         setAttribute() {}, querySelector() { return null; },
         addEventListener(type, listener) { this.click = listener; },
         append(...children) { this.children.push(...children); },
@@ -17,6 +17,10 @@ function element(tag = 'div') {
         get innerHTML() { return html; },
         set innerHTML(value) { html = value; text = ''; this.children = []; },
         get button() { return this.children.find(child => child.tagName === 'BUTTON') || this.children.map(child => child.button).find(Boolean); }
+    };
+    node.classList = {
+        add(...names) { node.className = [...new Set([...node.className.split(/\s+/), ...names])].filter(Boolean).join(' '); },
+        contains(name) { return node.className.split(/\s+/).includes(name); }
     };
     return node;
 }
@@ -180,6 +184,7 @@ test('same-scope Units refresh keeps its complete display on transient failure b
     await renderStudentUnits(f.activities, { forceRefresh: true });
     assert.match(root.textContent, /Saved owned unit/);
     assert.match(root.textContent, /Previously loaded content is still shown/);
+    assert.ok(root.children.some(node => node.classList.contains('student-library-load-error')), 'Units recovery retains the worker-update safety hook');
     assert.equal(root.button.textContent, 'Try again');
     f.activities.vocabularyData.prepareClassData = async () => { throw Object.assign(new Error('Revoked'), { status: 403 }); };
     await renderStudentUnits(f.activities, { forceRefresh: true });

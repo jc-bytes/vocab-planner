@@ -53,8 +53,10 @@ export async function renderStudentUnits(activities, { load = () => import('./st
         const { showSectionLoadError, isAccessFailure } = await import('../ui/sectionRecovery.js');
         if (!current()) return;
         if (isAccessFailure(error)) activities.browser?.clearPresentation?.();
-        showSectionLoadError(container, { label: 'Units', error, current, keepContent,
+        const recovery = showSectionLoadError(container, { label: 'Units', error, current, keepContent,
             retry: () => renderStudentUnits(activities, { forceRefresh: true }) });
+        // Preserve the worker updater's visible-load-failure guard.
+        recovery?.classList.add('student-library-load-error');
     } finally {
         if (generation === activities.unitsRenderGeneration) activities.unitsPresentationPreparing = false;
         if (current()) setStudentPageLoading(view, false);
